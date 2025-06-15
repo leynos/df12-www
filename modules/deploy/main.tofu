@@ -13,27 +13,39 @@ terraform {
 }
 
 variable "bucket_name" {
-  type = string
+  description = "Name of the S3 bucket hosting the site"
+  type        = string
+  nullable    = false
 }
 
 variable "distribution_id" {
-  type = string
+  description = "ID of the CloudFront distribution"
+  type        = string
+  nullable    = false
 }
 
 variable "github_owner" {
-  type = string
+  description = "GitHub organization or user that owns the repository"
+  type        = string
+  nullable    = false
 }
 
 variable "github_repo" {
-  type = string
+  description = "Name of the repository to deploy"
+  type        = string
+  nullable    = false
 }
 
 variable "github_branch" {
-  type = string
+  description = "Branch containing site content"
+  type        = string
+  nullable    = false
 }
 
 variable "github_token" {
-  type = string
+  description = "Personal access token for GitHub API"
+  type        = string
+  nullable    = false
 }
 
 # Clone repo and sync content to S3 whenever commit changes

@@ -17,6 +17,14 @@ tofu test
 
 These commands ensure consistent style, validate syntax, and execute unit tests. See the unit testing guide for details on setting up and running tests.
 
+### Variable Declarations
+
+All input variables must include at least a `description` and `type` argument. If a variable is required, set `nullable = false`. Document `default` values and mark `sensitive = true` when appropriate so that callers understand the module interface.
+
+### Offline Validation
+
+`tofu validate` should run without network access. Stub out any provider calls or HTTP requests during validation (for example via `mock_provider` blocks) so that the configuration can be validated offline.
+
 ## Development Workflow
 
 Test any changes to `deploy.tofu` or its modules using the OpenTofu native framework as described in `docs/opentofu-module-unit-testing-guide.md`. Follow the standard workflow of `tofu init`, `tofu plan`, and `tofu apply` (or CI equivalents) when updating infrastructure.

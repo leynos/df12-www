@@ -73,6 +73,11 @@ variable "github_token" {
   default   = ""
 }
 
+variable "site_path" {
+  type    = string
+  default = "site"
+}
+
 variable "budget_limit_gbp" {
   description = "Monthly cost limit that triggers email alerts (GBP)"
   type        = number
@@ -120,6 +125,7 @@ module "deploy" {
   github_repo     = var.github_repo
   github_branch   = var.github_branch
   github_token    = var.github_token
+  site_path       = var.site_path
 }
 
 module "monitoring" {

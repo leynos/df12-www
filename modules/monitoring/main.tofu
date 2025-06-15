@@ -32,11 +32,6 @@ resource "aws_budgets_budget" "monthly_limit" {
   limit_amount = var.budget_limit_gbp
   limit_unit   = "GBP"
   time_unit    = "MONTHLY"
-
-  cost_filters = {
-    Service = ["AmazonS3", "Amazon CloudFront"]
-  }
-
   notification {
     comparison_operator        = "GREATER_THAN"
     threshold                  = 50
@@ -129,7 +124,7 @@ locals {
 }
 
 resource "aws_cloudwatch_dashboard" "site" {
-  dashboard_name = "${var.domain_name}-visitors"
+  dashboard_name = "${replace(var.domain_name, ".", "-")}-visitors"
   dashboard_body = local.dashboard_body
 }
 

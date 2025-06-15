@@ -1,11 +1,39 @@
-domain_name      = "www.example.com"
-root_domain      = "example.com"
-aws_region       = "eu-west-2"
-github_owner     = "example"
-github_repo      = "site"
-github_branch    = "main"
-github_token     = "ghp_your_pat_here"
-budget_limit_gbp = 5
-budget_email     = "billing@example.com"
-godaddy_api_key  = "key"
-godaddy_api_secret = "secret"
+# Example configuration values for OpenTofu
+# Copy this file to `terraform.tfvars` and update the values as needed.
+
+# Fully qualified domain for the website
+# domain_name = "www.example.com"
+
+# Apex domain used for DNS records
+# root_domain = "example.com"
+
+# AWS region where resources will be created
+# aws_region = "eu-west-2"
+
+# GitHub organization or user that owns the repository
+# github_owner = "example"
+
+# Name of the repository containing the site
+# github_repo = "site"
+
+# Branch to deploy from
+# github_branch = "main"
+
+# Personal access token for GitHub API operations
+# github_token = "ghp_your_pat_here"
+
+# Local directory with site files relative to this repo
+# site_path = "site"
+
+# Monthly cost limit that triggers alerts (GBP)
+# budget_limit_gbp = 5
+
+# Email address to receive budget alerts
+# budget_email = "billing@example.com"
+
+# GoDaddy API credentials for DNS management
+# godaddy_api_key    = "key"
+# godaddy_api_secret = "secret"
+
+# Number of days to keep CloudFront logs
+# log_retention_days = 14

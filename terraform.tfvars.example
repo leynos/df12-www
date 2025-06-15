@@ -1,0 +1,11 @@
+domain_name      = "www.example.com"
+root_domain      = "example.com"
+aws_region       = "eu-west-2"
+github_owner     = "example"
+github_repo      = "site"
+github_branch    = "main"
+github_token     = "ghp_your_pat_here"
+budget_limit_gbp = 5
+budget_email     = "billing@example.com"
+godaddy_api_key  = "key"
+godaddy_api_secret = "secret"

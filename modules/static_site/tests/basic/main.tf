@@ -34,7 +34,4 @@ provider "aws" {
   region = "us-east-1"
 }
 
-provider "godaddy-dns" {
-  api_key    = "dummy"
-  api_secret = "dummy"
-}
+provider "godaddy-dns" {}

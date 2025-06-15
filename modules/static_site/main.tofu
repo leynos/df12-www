@@ -12,15 +12,31 @@ terraform {
 }
 
 variable "domain_name" {
-  type = string
+  description = "Fully qualified domain name for the site"
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name))
+    error_message = "Domain name must be a valid non-empty hostname"
+  }
 }
 
 variable "root_domain" {
-  type = string
+  description = "Root domain used for DNS validation"
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = length(var.root_domain) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.root_domain))
+    error_message = "Root domain must be a valid non-empty hostname"
+  }
 }
 
 variable "log_retention_days" {
-  type = number
+  description = "Retention period in days for CloudFront logs"
+  type        = number
+  nullable    = false
 }
 
 # Site bucket
@@ -96,7 +112,7 @@ resource "godaddy-dns_record" "acm_validation" {
   domain = var.root_domain
   name   = replace(each.value.name, "${var.root_domain}.", "")
   type   = each.value.type
-  value  = each.value.value
+  data   = each.value.value
   ttl    = 600
 }
 
@@ -113,7 +129,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   enabled = true
   comment = var.domain_name
 
-  origins {
+  origin {
     domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
     origin_id                = "s3-origin-${var.domain_name}"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
@@ -187,7 +203,7 @@ resource "godaddy-dns_record" "cdn_cname" {
   domain = var.root_domain
   name   = replace(var.domain_name, ".${var.root_domain}", "")
   type   = "CNAME"
-  value  = aws_cloudfront_distribution.cdn.domain_name
+  data   = aws_cloudfront_distribution.cdn.domain_name
   ttl    = 600
 }
 

@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
 run "plan" {
   command = plan
   module {
@@ -11,7 +19,7 @@ run "plan" {
     budget_email     = "alerts@example.com"
   }
   assert {
-    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "demo.example.com-visitors"
+    condition     = testing.plan.resource_changes["aws_cloudwatch_dashboard.site"].change.after.dashboard_name == "demo.example.com-visitors"
     error_message = "Dashboard name mismatch"
   }
 }

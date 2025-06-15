@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
 run "plan" {
   command = plan
   module {
@@ -11,7 +19,7 @@ run "plan" {
     budget_email     = "alerts@example.com"
   }
   assert {
-    condition     = aws_budgets_budget.monthly_limit.limit_amount == 20
+    condition     = testing.plan.resource_changes["aws_budgets_budget.monthly_limit"].change.after.limit_amount == 20
     error_message = "Budget limit should be 20"
   }
 }

@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
 mock_provider "aws" {}
 
 run "budget_notifications" {
@@ -17,7 +21,7 @@ run "budget_notifications" {
   }
 
   assert {
-    condition     = contains(flatten([for n in aws_budgets_budget.monthly_limit.notification : n.subscriber_email_addresses]), "ops@example.com")
+    condition     = contains(flatten(aws_budgets_budget.monthly_limit.notification[*].subscriber_email_addresses), "ops@example.com")
     error_message = "Subscriber email not set correctly"
   }
 }
@@ -63,5 +67,22 @@ run "dashboard_metric" {
   assert {
     condition     = strcontains(aws_cloudwatch_dashboard.site.dashboard_body, "XYZ987")
     error_message = "Dashboard body should reference distribution id"
+  }
+}
+
+run "dashboard_multi_domain" {
+  command = plan
+
+  variables {
+    domain_name      = "a.b.example.com"
+    bucket_name      = "dummy"
+    distribution_id  = "XYZ987"
+    budget_limit_gbp = 1
+    budget_email     = "ops@example.com"
+  }
+
+  assert {
+    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "a-b-example-com-visitors"
+    error_message = "Multi-level dashboard name incorrect"
   }
 }

@@ -5,7 +5,8 @@ terraform {
       configuration_aliases = [aws.useast1]
     }
     godaddy-dns = {
-      source = "veksh/godaddy-dns"
+      source  = "registry.terraform.io/veksh/godaddy-dns"
+      version = ">= 0.3.12"
     }
   }
 }

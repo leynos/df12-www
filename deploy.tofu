@@ -10,8 +10,8 @@ terraform {
       version = "~> 5.0"
     }
     godaddy-dns = {
-      source  = "veksh/godaddy-dns"
-      version = "~> 0.3"
+      source  = "registry.terraform.io/veksh/godaddy-dns"
+      version = ">= 0.3.12"
     }
     github = {
       source  = "integrations/github"

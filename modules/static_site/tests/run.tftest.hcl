@@ -1,3 +1,3 @@
 run "plan" {
-  command = plan
+  command = "plan"
 }

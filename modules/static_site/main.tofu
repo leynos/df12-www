@@ -30,6 +30,13 @@ resource "aws_s3_bucket" "site" {
   tags = {
     Name = "${var.domain_name}-site"
   }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket_versioning" "site" {
@@ -52,6 +59,13 @@ resource "aws_s3_bucket_public_access_block" "site" {
 resource "aws_s3_bucket" "logs" {
   bucket        = "${var.domain_name}-logs"
   force_destroy = true
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "logs" {

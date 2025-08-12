@@ -4,8 +4,8 @@ variable "domain_name" {
   nullable    = false
 
   validation {
-    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name))
-    error_message = "Domain name must be a valid non-empty hostname"
+    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name)) && endswith(var.domain_name, var.root_domain)
+    error_message = "Domain name must be a valid non-empty hostname ending with root_domain"
   }
 }
 
@@ -27,11 +27,23 @@ variable "log_retention_days" {
 }
 
 variable "sse_algorithm" {
-  type    = string
-  default = "AES256"
+  description = "Server-side encryption algorithm for S3 bucket (valid values: AES256, aws:kms)"
+  type        = string
+  default     = "AES256"
+
+  validation {
+    condition     = contains(["AES256", "aws:kms"], var.sse_algorithm)
+    error_message = "SSE algorithm must be either 'AES256' or 'aws:kms'"
+  }
 }
 
 variable "sse_kms_key_id" {
-  type    = string
-  default = null
+  description = "KMS key ID for server-side encryption. Required when sse_algorithm is 'aws:kms', otherwise optional."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.sse_algorithm != "aws:kms" || var.sse_kms_key_id != null
+    error_message = "sse_kms_key_id is required when sse_algorithm is 'aws:kms'"
+  }
 }

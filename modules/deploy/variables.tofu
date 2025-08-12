@@ -35,6 +35,7 @@ variable "github_token" {
 }
 
 variable "site_path" {
-  type    = string
-  default = "site"
+  description = "Path to the site directory within the repository"
+  type        = string
+  default     = "site"
 }

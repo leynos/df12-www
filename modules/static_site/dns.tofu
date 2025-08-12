@@ -14,9 +14,13 @@ resource "godaddy-dns_record" "acm_validation" {
   ttl    = 600
 }
 
+locals {
+  subdomain = trimsuffix(var.domain_name, ".${var.root_domain}")
+}
+
 resource "godaddy-dns_record" "cdn_cname" {
   domain = var.root_domain
-  name   = replace(var.domain_name, ".${var.root_domain}", "")
+  name   = local.subdomain
   type   = "CNAME"
   data   = aws_cloudfront_distribution.cdn.domain_name
   ttl    = 600

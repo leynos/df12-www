@@ -1,54 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source                = "hashicorp/aws"
-      configuration_aliases = [aws.useast1]
-    }
-    godaddy-dns = {
-      source  = "registry.terraform.io/veksh/godaddy-dns"
-      version = ">= 0.3.12"
-    }
-  }
-}
-
-variable "domain_name" {
-  description = "Fully qualified domain name for the site"
-  type        = string
-  nullable    = false
-
-  validation {
-    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name))
-    error_message = "Domain name must be a valid non-empty hostname"
-  }
-}
-
-variable "root_domain" {
-  description = "Root domain used for DNS validation"
-  type        = string
-  nullable    = false
-
-  validation {
-    condition     = length(var.root_domain) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.root_domain))
-    error_message = "Root domain must be a valid non-empty hostname"
-  }
-}
-
-variable "log_retention_days" {
-  description = "Retention period in days for CloudFront logs"
-  type        = number
-  nullable    = false
-}
-
-variable "sse_algorithm" {
-  type    = string
-  default = "AES256"
-}
-
-variable "sse_kms_key_id" {
-  type    = string
-  default = null
-}
-
 # Site bucket
 resource "aws_s3_bucket" "site" {
   bucket        = var.domain_name
@@ -231,18 +180,5 @@ resource "godaddy-dns_record" "cdn_cname" {
   type   = "CNAME"
   data   = aws_cloudfront_distribution.cdn.domain_name
   ttl    = 600
-}
-
-
-output "bucket_name" {
-  value = aws_s3_bucket.site.bucket
-}
-
-output "distribution_id" {
-  value = aws_cloudfront_distribution.cdn.id
-}
-
-output "cloudfront_domain" {
-  value = aws_cloudfront_distribution.cdn.domain_name
 }
 

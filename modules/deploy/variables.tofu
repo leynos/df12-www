@@ -2,12 +2,22 @@ variable "bucket_name" {
   description = "Name of the S3 bucket hosting the site"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.bucket_name) != ""
+    error_message = "bucket_name must not be empty or whitespace"
+  }
 }
 
 variable "distribution_id" {
   description = "ID of the CloudFront distribution"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.distribution_id) != ""
+    error_message = "distribution_id must not be empty or whitespace"
+  }
 }
 
 variable "github_owner" {
@@ -32,6 +42,7 @@ variable "github_token" {
   description = "Personal access token for GitHub API"
   type        = string
   nullable    = false
+  sensitive   = true
 }
 
 variable "site_path" {

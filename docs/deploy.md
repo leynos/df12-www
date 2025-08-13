@@ -6,7 +6,7 @@ This guide explains how to use the OpenTofu configuration in this repository to 
 
 - [OpenTofu](https://opentofu.org/) **v1.6** or newer installed on your local machine.
 - [AWS CLI](https://aws.amazon.com/cli/) **v2.0** or newer configured with credentials that can create S3 buckets, CloudFront distributions and other resources.
-- A personal access token for the GitHub repository containing your site files.
+- A personal access token for the GitHub repository containing your site files. The deploy module injects this token as an HTTP Authorization header during `git clone` so credentials aren't exposed in process arguments.
 
 ## Configuration
 
@@ -19,7 +19,7 @@ This guide explains how to use the OpenTofu configuration in this repository to 
    - `domain_name` – fully qualified domain (e.g. `www.example.com`).
    - `root_domain` – apex domain (e.g. `example.com`).
    - `github_owner` and `github_repo` – location of the site source.
-   - `github_token` – GitHub PAT used by the `deploy` module.
+   - `github_token` – GitHub PAT used by the `deploy` module for authenticated cloning.
    - `budget_email` – address for cost alerts.
 3. Optionally adjust defaults such as the AWS region or log retention days.
 

@@ -1,11 +1,15 @@
 locals {
-  git_clone_cmd = "git clone --depth 1 --branch ${var.github_branch} https://github.com/${var.github_owner}/${var.github_repo}.git \"$DIR\" >/dev/null 2>&1"
+  git_clone_cmd = <<-EOC
+    git -c http.extraheader="AUTHORIZATION: bearer ${var.github_token}" \
+        clone --depth 1 --branch ${var.github_branch} https://github.com/${var.github_owner}/${var.github_repo}.git "$DIR" > /dev/null
+  EOC
 }
 
 # Clone repo and sync content to S3 whenever commit changes
 data "external" "git_sync" {
   program = ["bash", "-c", <<EOT
     set -e
+    command -v git >/dev/null 2>&1 || { echo "git not found on PATH" >&2; exit 1; }
     DIR=$(mktemp -d)
     trap 'rm -rf "$DIR"' EXIT
     ${local.git_clone_cmd}
@@ -30,6 +34,8 @@ resource "null_resource" "deploy" {
       DIR=$(mktemp -d)
       trap 'rm -rf "$DIR"' EXIT
       ${local.git_clone_cmd}
+      git -C "$DIR" checkout -q "${data.external.git_sync.result.commit}"
+      test -d "$DIR/${var.site_path}" || { echo "Site path '$DIR/${var.site_path}' not found" >&2; exit 1; }
       aws s3 sync "$DIR/${var.site_path}" s3://${var.bucket_name} --delete
       echo "Invalidating CloudFront cache..."
       aws cloudfront create-invalidation --distribution-id ${var.distribution_id} --paths "/*"

@@ -23,8 +23,14 @@ resource "null_resource" "deploy" {
   provisioner "local-exec" {
     command     = <<EOT
       set -e
+      command -v aws >/dev/null 2>&1 || { echo "aws CLI not found on PATH" >&2; exit 1; }
+      command -v git >/dev/null 2>&1 || { echo "git not found on PATH" >&2; exit 1; }
+      command -v bash >/dev/null 2>&1 || { echo "bash not found on PATH" >&2; exit 1; }
       echo "Syncing site to S3..."
-      aws s3 sync "${path.module}/${var.site_path}" s3://${var.bucket_name} --delete
+      DIR=$(mktemp -d)
+      trap 'rm -rf "$DIR"' EXIT
+      ${local.git_clone_cmd}
+      aws s3 sync "$DIR/${var.site_path}" s3://${var.bucket_name} --delete
       echo "Invalidating CloudFront cache..."
       aws cloudfront create-invalidation --distribution-id ${var.distribution_id} --paths "/*"
     EOT

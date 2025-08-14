@@ -9,8 +9,9 @@ resource "aws_cloudfront_origin_access_control" "oac" {
 resource "aws_cloudfront_distribution" "cdn" {
   depends_on = [aws_acm_certificate_validation.cert_validation]
 
-  enabled = true
-  comment = var.domain_name
+  enabled      = true
+  comment      = var.domain_name
+  http_version = "http2and3"
 
   origin {
     domain_name              = aws_s3_bucket.site.bucket_regional_domain_name

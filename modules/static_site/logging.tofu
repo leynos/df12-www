@@ -13,6 +13,13 @@ resource "aws_s3_bucket" "logs" {
       }
     }
   }
+
+  lifecycle {
+    precondition {
+      condition     = var.sse_algorithm != "aws:kms" || var.sse_kms_key_id != null
+      error_message = "sse_kms_key_id must be provided when sse_algorithm == \"aws:kms\""
+    }
+  }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "logs" {

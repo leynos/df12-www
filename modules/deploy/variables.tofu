@@ -15,8 +15,8 @@ variable "distribution_id" {
   nullable    = false
 
   validation {
-    condition     = trimspace(var.distribution_id) != ""
-    error_message = "distribution_id must not be empty or whitespace"
+    condition     = can(regex("^[A-Z0-9]{14}$", var.distribution_id))
+    error_message = "Distribution ID must be a valid CloudFront distribution identifier (14 uppercase alphanumeric characters)"
   }
 }
 

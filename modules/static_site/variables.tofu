@@ -24,6 +24,11 @@ variable "log_retention_days" {
   description = "Retention period in days for CloudFront logs"
   type        = number
   nullable    = false
+
+  validation {
+    condition     = var.log_retention_days >= 1 && floor(var.log_retention_days) == var.log_retention_days
+    error_message = "log_retention_days must be a positive integer (>= 1)."
+  }
 }
 
 variable "sse_algorithm" {
@@ -38,12 +43,17 @@ variable "sse_algorithm" {
 }
 
 variable "sse_kms_key_id" {
-  description = "KMS key ID for server-side encryption. Required when sse_algorithm is 'aws:kms', otherwise optional."
+  description = "KMS key identifier for SSE-KMS. When sse_algorithm is 'aws:kms', supply one of: Key ID (UUID), Key ARN, Alias ARN or Alias name (alias/...); otherwise leave null."
   type        = string
   default     = null
+  sensitive   = true
 
   validation {
-    condition     = var.sse_kms_key_id == null || can(regex("^[a-f0-9-]+$", var.sse_kms_key_id))
-    error_message = "sse_kms_key_id must be a valid KMS key ID format when provided"
+    condition = var.sse_kms_key_id == null || (
+      can(regex("^arn:(aws|aws-us-gov|aws-cn):kms:[a-z0-9-]+:[0-9]{12}:(key|alias)/[^\\s]+$", var.sse_kms_key_id)) ||
+      can(regex("^[0-9a-fA-F-]{36}$", var.sse_kms_key_id)) ||
+      can(regex("^alias/[A-Za-z0-9/_-]+$", var.sse_kms_key_id))
+    )
+    error_message = "When provided, sse_kms_key_id must be a Key ID (UUID), Key ARN, Alias ARN or Alias name (alias/...)."
   }
 }

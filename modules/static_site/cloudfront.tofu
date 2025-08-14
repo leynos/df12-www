@@ -25,6 +25,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
 
+    compress        = true
     cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
   }
 

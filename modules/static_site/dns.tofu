@@ -12,6 +12,13 @@ resource "godaddy-dns_record" "acm_validation" {
   type   = each.value.type
   data   = each.value.value
   ttl    = 600
+
+  lifecycle {
+    precondition {
+      condition     = endswith(var.domain_name, var.root_domain)
+      error_message = "domain_name must end with root_domain"
+    }
+  }
 }
 
 locals {

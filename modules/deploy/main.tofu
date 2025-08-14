@@ -1,7 +1,7 @@
 locals {
   git_clone_cmd = <<-EOC
     git -c http.extraheader="AUTHORIZATION: bearer ${var.github_token}" \
-        clone --depth 1 --branch ${var.github_branch} https://github.com/${var.github_owner}/${var.github_repo}.git "$DIR" > /dev/null
+        clone --depth 1 --branch ${var.github_branch} https://github.com/${var.github_owner}/${var.github_repo}.git "$DIR"
   EOC
 }
 
@@ -9,6 +9,7 @@ locals {
 data "external" "git_sync" {
   program = ["bash", "-c", <<EOT
     set -e
+    command -v bash >/dev/null 2>&1 || { echo "bash not found on PATH" >&2; exit 1; }
     command -v git >/dev/null 2>&1 || { echo "git not found on PATH" >&2; exit 1; }
     DIR=$(mktemp -d)
     trap 'rm -rf "$DIR"' EXIT

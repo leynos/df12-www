@@ -4,8 +4,8 @@ variable "domain_name" {
   nullable    = false
 
   validation {
-    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name)) && endswith(var.domain_name, var.root_domain)
-    error_message = "Domain name must be a valid non-empty hostname ending with root_domain"
+    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name))
+    error_message = "Domain name must be a valid non-empty hostname"
   }
 }
 
@@ -43,7 +43,7 @@ variable "sse_kms_key_id" {
   default     = null
 
   validation {
-    condition     = var.sse_algorithm != "aws:kms" || var.sse_kms_key_id != null
-    error_message = "sse_kms_key_id is required when sse_algorithm is 'aws:kms'"
+    condition     = var.sse_kms_key_id == null || can(regex("^[a-f0-9-]+$", var.sse_kms_key_id))
+    error_message = "sse_kms_key_id must be a valid KMS key ID format when provided"
   }
 }

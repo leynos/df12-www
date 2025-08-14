@@ -9,6 +9,7 @@ run "budget_notifications" {
     distribution_id  = "EDFD123456789A"
     budget_limit_gbp = 20
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
@@ -31,6 +32,7 @@ run "alarms_use_inputs" {
     distribution_id  = "ABCDEF12345678"
     budget_limit_gbp = 10
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
@@ -53,10 +55,11 @@ run "dashboard_metric" {
     distribution_id  = "IJKL123456MNOP"
     budget_limit_gbp = 1
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
-    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "monitor-example-com-visitors"
+    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "monitor-example-com-prod-visitors"
     error_message = "Dashboard name incorrect"
   }
 
@@ -75,10 +78,11 @@ run "dashboard_multi_domain" {
     distribution_id  = "QRST123456UVWX"
     budget_limit_gbp = 1
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
-    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "a-b-example-com-visitors"
+    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "a-b-example-com-prod-visitors"
     error_message = "Multi-level dashboard name incorrect"
   }
 }

@@ -43,6 +43,10 @@ variable "github_token" {
   type        = string
   nullable    = false
   sensitive   = true
+  validation {
+    condition     = length(var.github_token) > 0
+    error_message = "github_token must be a non-empty string"
+  }
 }
 
 variable "site_path" {

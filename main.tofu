@@ -47,4 +47,5 @@ module "monitoring" {
   distribution_id  = module.site.distribution_id
   budget_limit_gbp = var.budget_limit_gbp
   budget_email     = var.budget_email
+  environment      = var.environment
 }

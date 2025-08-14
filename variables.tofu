@@ -26,6 +26,12 @@ variable "aws_region" {
   default     = "eu-west-2"
 }
 
+variable "environment" {
+  description = "Deployment environment identifier"
+  type        = string
+  default     = "prod"
+}
+
 variable "github_owner" {
   description = "GitHub organization or user that owns the repository"
   type        = string

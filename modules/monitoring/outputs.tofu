@@ -1,1 +1,1 @@
-# This module defines no outputs
+# No outputs defined for this module

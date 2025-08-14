@@ -36,9 +36,12 @@ locals {
       }
     ]
   })
+
+  dashboard_base = replace(var.domain_name, ".", "-")
+  dashboard_name = format("%s-%s-visitors", local.dashboard_base, var.environment)
 }
 
 resource "aws_cloudwatch_dashboard" "site" {
-  dashboard_name = "${replace(var.domain_name, ".", "-")}-visitors"
+  dashboard_name = local.dashboard_name
   dashboard_body = local.dashboard_body
 }

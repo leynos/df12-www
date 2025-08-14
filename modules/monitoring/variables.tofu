@@ -13,6 +13,11 @@ variable "bucket_name" {
   description = "Name of the S3 bucket storing site content"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9.-]*[a-z0-9]$", var.bucket_name)) && length(var.bucket_name) >= 3 && length(var.bucket_name) <= 63
+    error_message = "Bucket name must be a valid S3 bucket name (3-63 characters, lowercase letters, numbers, dots, hyphens)"
+  }
 }
 
 variable "distribution_id" {

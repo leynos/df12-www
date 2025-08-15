@@ -4,8 +4,12 @@ variable "domain_name" {
   nullable    = false
 
   validation {
-    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name))
-    error_message = "Domain name must be a valid non-empty hostname"
+    condition = (
+      length(var.domain_name) > 0 &&
+      can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", var.domain_name)) &&
+      endswith(var.domain_name, var.root_domain)
+    )
+    error_message = "Domain name must be a valid hostname and subdomain of root_domain"
   }
 }
 
@@ -15,8 +19,11 @@ variable "root_domain" {
   nullable    = false
 
   validation {
-    condition     = length(var.root_domain) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.root_domain))
-    error_message = "Root domain must be a valid non-empty hostname"
+    condition = (
+      length(var.root_domain) > 0 &&
+      can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", var.root_domain))
+    )
+    error_message = "Root domain must be a valid hostname"
   }
 }
 

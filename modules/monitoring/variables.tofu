@@ -4,8 +4,12 @@ variable "domain_name" {
   nullable    = false
 
   validation {
-    condition     = length(var.domain_name) > 0 && can(regex("^([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$", var.domain_name)) && length(format("%s-%s-visitors", replace(var.domain_name, ".", "-"), var.environment)) <= 255
-    error_message = "Domain name must be a valid non-empty hostname and result in dashboard name <= 255 characters"
+    condition = (
+      length(var.domain_name) > 0 &&
+      can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", var.domain_name)) &&
+      length(format("%s-%s-visitors", replace(var.domain_name, ".", "-"), var.environment)) <= 255
+    )
+    error_message = "Domain name must be a valid hostname and yield dashboard name <= 255 characters"
   }
 }
 

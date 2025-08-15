@@ -8,7 +8,7 @@ terraform {
     }
     godaddy-dns = {
       source  = "registry.terraform.io/veksh/godaddy-dns"
-      version = ">= 0.3.12"
+      version = "~> 0.3.12"
     }
   }
 }

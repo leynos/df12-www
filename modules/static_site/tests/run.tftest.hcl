@@ -26,4 +26,9 @@ run "plan" {
     root_domain        = "example.com"
     log_retention_days = 1
   }
+
+  assert {
+    condition     = length(tostring(module.static_site.bucket_name)) > 0
+    error_message = "bucket_name output must be non-empty"
+  }
 }

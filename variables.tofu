@@ -37,6 +37,17 @@ variable "environment" {
   }
 }
 
+variable "project_name" {
+  description = "Project name for tagging resources"
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = length(var.project_name) > 0 && can(regex("^[a-zA-Z0-9-]+$", var.project_name))
+    error_message = "Project name must be a non-empty alphanumeric or hyphenated string"
+  }
+}
+
 variable "github_owner" {
   description = "GitHub organization or user that owns the repository"
   type        = string

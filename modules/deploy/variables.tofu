@@ -4,8 +4,15 @@ variable "bucket_name" {
   nullable    = false
 
   validation {
-    condition     = trimspace(var.bucket_name) != ""
-    error_message = "bucket_name must not be empty or whitespace"
+    condition = (
+      length(trimspace(var.bucket_name)) >= 3 &&
+      length(trimspace(var.bucket_name)) <= 63 &&
+      can(regex("^[a-z0-9][a-z0-9.-]*[a-z0-9]$", trimspace(var.bucket_name))) &&
+      !can(regex("\\.\\.", trimspace(var.bucket_name))) &&
+      !can(regex("(?:\\.-|-\\.)", trimspace(var.bucket_name))) &&
+      !can(regex("^\\d+\\.\\d+\\.\\d+\\.\\d+$", trimspace(var.bucket_name)))
+    )
+    error_message = "bucket_name must be a valid S3 bucket name"
   }
 }
 
@@ -15,8 +22,8 @@ variable "distribution_id" {
   nullable    = false
 
   validation {
-    condition     = can(regex("^[A-Z0-9]{14}$", var.distribution_id))
-    error_message = "Distribution ID must be a valid CloudFront distribution identifier (14 uppercase alphanumeric characters)"
+    condition     = can(regex("^E[A-Z0-9]{13}$", var.distribution_id))
+    error_message = "Distribution ID must be a valid CloudFront distribution identifier (starts with 'E' followed by 13 uppercase alphanumeric characters)"
   }
 }
 
@@ -54,7 +61,7 @@ variable "github_branch" {
 }
 
 variable "github_token" {
-  description = "Personal access token for GitHub API"
+  description = "Personal access token used for authenticated git (HTTPS) clones"
   type        = string
   nullable    = false
   sensitive   = true

@@ -41,8 +41,8 @@ variable "distribution_id" {
   nullable    = false
 
   validation {
-    condition     = can(regex("^[A-Z0-9]{14}$", var.distribution_id))
-    error_message = "Distribution ID must be a valid CloudFront distribution identifier (14 uppercase alphanumeric characters)"
+    condition     = can(regex("^E[A-Z0-9]{13}$", var.distribution_id))
+    error_message = "Distribution ID must be a valid CloudFront distribution identifier (starts with 'E' followed by 13 uppercase alphanumeric characters)"
   }
 }
 
@@ -63,7 +63,7 @@ variable "budget_email" {
   nullable    = false
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.budget_email))
+    condition     = trimspace(var.budget_email) != "" && can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", trimspace(var.budget_email)))
     error_message = "Budget email must be a valid email address"
   }
 }

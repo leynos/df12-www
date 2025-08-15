@@ -8,9 +8,9 @@ resource "godaddy-dns_record" "acm_validation" {
   }
 
   domain = var.root_domain
-  name   = replace(each.value.name, "${var.root_domain}.", "")
+  name   = trimsuffix(trimsuffix(each.value.name, ".${var.root_domain}."), ".${var.root_domain}")
   type   = each.value.type
-  data   = each.value.value
+  data   = trimsuffix(each.value.value, ".")
   ttl    = 600
 
   lifecycle {
@@ -22,7 +22,7 @@ resource "godaddy-dns_record" "acm_validation" {
 }
 
 locals {
-  subdomain = trimsuffix(var.domain_name, ".${var.root_domain}")
+  subdomain = trimsuffix(trimsuffix(var.domain_name, ".${var.root_domain}."), ".${var.root_domain}")
 }
 
 resource "godaddy-dns_record" "cdn_cname" {

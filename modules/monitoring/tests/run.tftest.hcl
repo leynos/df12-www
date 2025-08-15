@@ -29,7 +29,7 @@ run "alarms_use_inputs" {
   variables {
     domain_name      = "example.com"
     bucket_name      = "my-bucket"
-    distribution_id  = "ABCDEF12345678"
+    distribution_id  = "EBCDEF12345678"
     budget_limit_gbp = 10
     budget_email     = "ops@example.com"
     environment      = "prod"
@@ -41,7 +41,7 @@ run "alarms_use_inputs" {
   }
 
   assert {
-    condition     = aws_cloudwatch_metric_alarm.cf_requests_spike.dimensions.DistributionId == "ABCDEF12345678"
+    condition     = aws_cloudwatch_metric_alarm.cf_requests_spike.dimensions.DistributionId == "EBCDEF12345678"
     error_message = "CloudFront alarm should use provided distribution id"
   }
 }
@@ -52,7 +52,7 @@ run "dashboard_metric" {
   variables {
     domain_name      = "monitor.example.com"
     bucket_name      = "dummy"
-    distribution_id  = "IJKL123456MNOP"
+    distribution_id  = "EIJKL123456MNO"
     budget_limit_gbp = 1
     budget_email     = "ops@example.com"
     environment      = "prod"
@@ -64,7 +64,7 @@ run "dashboard_metric" {
   }
 
   assert {
-    condition     = strcontains(aws_cloudwatch_dashboard.site.dashboard_body, "IJKL123456MNOP")
+    condition     = strcontains(aws_cloudwatch_dashboard.site.dashboard_body, "EIJKL123456MNO")
     error_message = "Dashboard body should reference distribution id"
   }
 }
@@ -75,7 +75,7 @@ run "dashboard_multi_domain" {
   variables {
     domain_name      = "a.b.example.com"
     bucket_name      = "dummy"
-    distribution_id  = "QRST123456UVWX"
+    distribution_id  = "ERST123456UVWX"
     budget_limit_gbp = 1
     budget_email     = "ops@example.com"
     environment      = "prod"

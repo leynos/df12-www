@@ -1,21 +1,3 @@
-provider "aws" {
-  region = var.aws_region
-}
-
-provider "aws" {
-  alias  = "useast1"
-  region = "us-east-1"
-}
-
-provider "godaddy-dns" {
-  api_key    = var.godaddy_api_key
-  api_secret = var.godaddy_api_secret
-}
-
-provider "github" {
-  token = var.github_token
-}
-
 module "site" {
   source             = "./modules/static_site"
   domain_name        = var.domain_name
@@ -47,4 +29,5 @@ module "monitoring" {
   distribution_id  = module.site.distribution_id
   budget_limit_gbp = var.budget_limit_gbp
   budget_email     = var.budget_email
+  environment      = var.environment
 }

@@ -26,22 +26,48 @@ variable "aws_region" {
   default     = "eu-west-2"
 }
 
+variable "environment" {
+  description = "Deployment environment identifier"
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = length(var.environment) > 0 && can(regex("^[a-z0-9-]+$", var.environment))
+    error_message = "Environment must be a non-empty slug using lowercase letters, digits, and hyphens."
+  }
+}
+
 variable "github_owner" {
   description = "GitHub organization or user that owns the repository"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.github_owner) != ""
+    error_message = "github_owner must not be empty or whitespace"
+  }
 }
 
 variable "github_repo" {
   description = "Repository name containing the site content"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.github_repo) != ""
+    error_message = "github_repo must not be empty or whitespace"
+  }
 }
 
 variable "github_branch" {
   description = "Git branch to deploy from"
   type        = string
   default     = "main"
+
+  validation {
+    condition     = trimspace(var.github_branch) != ""
+    error_message = "github_branch must not be empty or whitespace"
+  }
 }
 
 variable "github_token" {

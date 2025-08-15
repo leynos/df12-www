@@ -11,7 +11,7 @@ root_domain = "example.com"
 aws_region = "eu-west-2"
 
 # Deployment environment
-environment = "prod"
+environment = "dev"
 
 # GitHub organization or user that owns the repository
 github_owner = "example"

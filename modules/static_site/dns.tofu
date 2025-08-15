@@ -26,6 +26,7 @@ locals {
 }
 
 resource "godaddy-dns_record" "cdn_cname" {
+  count  = local.subdomain == "" ? 0 : 1
   domain = var.root_domain
   name   = local.subdomain
   type   = "CNAME"

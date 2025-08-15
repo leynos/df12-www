@@ -56,7 +56,7 @@ variable "sse_algorithm" {
 }
 
 variable "sse_kms_key_id" {
-  description = "KMS key identifier for SSE-KMS. When sse_algorithm is 'aws:kms', supply one of: Key ID (UUID), Key ARN, Alias ARN or Alias name (alias/...); otherwise leave null."
+  description = "KMS key identifier for SSE-KMS. When sse_algorithm is 'aws:kms', supply one of: Key ID (UUID), Key ARN, Alias ARN or Alias name (alias/...); when omitted, a key is created with log-delivery permissions."
   type        = string
   default     = null
   sensitive   = true

@@ -1,5 +1,36 @@
 locals {
   logs_bucket_name = "${replace(lower(replace(trimsuffix(var.domain_name, "."), "*.", "")), "_", "-")}-logs"
+  logs_kms_key_arn = var.sse_kms_key_id != null ? var.sse_kms_key_id : (var.sse_algorithm == "aws:kms" ? aws_kms_key.logs[0].arn : null)
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_kms_key" "logs" {
+  count       = var.sse_algorithm == "aws:kms" && var.sse_kms_key_id == null ? 1 : 0
+  description = "KMS key for S3 log encryption"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowRoot"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowLogDelivery"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = ["kms:Encrypt", "kms:GenerateDataKey*"]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 resource "aws_s3_bucket" "logs" {
@@ -9,15 +40,15 @@ resource "aws_s3_bucket" "logs" {
     rule {
       apply_server_side_encryption_by_default {
         sse_algorithm     = var.sse_algorithm
-        kms_master_key_id = var.sse_algorithm == "aws:kms" ? var.sse_kms_key_id : null
+        kms_master_key_id = var.sse_algorithm == "aws:kms" ? local.logs_kms_key_arn : null
       }
     }
   }
 
   lifecycle {
     precondition {
-      condition     = var.sse_algorithm != "aws:kms" || var.sse_kms_key_id != null
-      error_message = "sse_kms_key_id must be provided when sse_algorithm == \"aws:kms\""
+      condition     = var.sse_algorithm != "aws:kms" || local.logs_kms_key_arn != null
+      error_message = "Provide sse_kms_key_id or allow module to create a key when sse_algorithm == \"aws:kms\""
     }
   }
 }
@@ -64,10 +95,7 @@ resource "aws_s3_bucket_policy" "logs" {
         Sid    = "AllowLogDelivery"
         Effect = "Allow"
         Principal = {
-          Service = [
-            "delivery.logs.amazonaws.com",
-            "cloudfront.amazonaws.com",
-          ]
+          Service = "delivery.logs.amazonaws.com"
         }
         Action   = ["s3:PutObject", "s3:PutObjectAcl"]
         Resource = "${aws_s3_bucket.logs.arn}/*"
@@ -81,4 +109,4 @@ resource "aws_s3_bucket_policy" "logs" {
   })
 }
 
-# If using a customer-managed KMS key, ensure its policy allows the above services to encrypt objects.
+# If supplying an external KMS key via sse_kms_key_id, ensure its policy allows delivery.logs.amazonaws.com to encrypt objects.

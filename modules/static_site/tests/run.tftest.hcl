@@ -11,6 +11,13 @@ override_resource {
   }
 }
 
+override_data {
+  target = data.aws_caller_identity.current
+  values = {
+    account_id = "123456789012"
+  }
+}
+
 run "plan" {
   command = plan
 

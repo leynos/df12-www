@@ -17,7 +17,7 @@ data "external" "git_sync" {
     command -v git >/dev/null 2>&1 || { echo "git not found on PATH" >&2; exit 1; }
     DIR=$(mktemp -d)
     trap 'rm -rf "$DIR"' EXIT
-    ${local.git_clone_cmd}
+    ${local.git_clone_cmd} >/dev/null
     cd "$DIR"
     echo "{\"commit\":\"$(git rev-parse HEAD)\"}"
   EOT

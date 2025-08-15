@@ -24,18 +24,33 @@ variable "github_owner" {
   description = "GitHub organization or user that owns the repository"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.github_owner) != ""
+    error_message = "github_owner must not be empty or whitespace"
+  }
 }
 
 variable "github_repo" {
   description = "Name of the repository to deploy"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.github_repo) != ""
+    error_message = "github_repo must not be empty or whitespace"
+  }
 }
 
 variable "github_branch" {
   description = "Branch containing site content"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.github_branch) != ""
+    error_message = "github_branch must not be empty or whitespace"
+  }
 }
 
 variable "github_token" {

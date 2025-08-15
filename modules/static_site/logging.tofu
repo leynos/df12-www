@@ -22,6 +22,14 @@ resource "aws_s3_bucket" "logs" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "logs" {
   bucket                  = aws_s3_bucket.logs.id
   block_public_acls       = true
@@ -46,3 +54,31 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     }
   }
 }
+
+resource "aws_s3_bucket_policy" "logs" {
+  bucket = aws_s3_bucket.logs.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowLogDelivery"
+        Effect = "Allow"
+        Principal = {
+          Service = [
+            "delivery.logs.amazonaws.com",
+            "cloudfront.amazonaws.com",
+          ]
+        }
+        Action   = ["s3:PutObject", "s3:PutObjectAcl"]
+        Resource = "${aws_s3_bucket.logs.arn}/*"
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# If using a customer-managed KMS key, ensure its policy allows the above services to encrypt objects.

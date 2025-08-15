@@ -12,7 +12,7 @@ locals {
 # Clone repo and sync content to S3 whenever commit changes
 data "external" "git_sync" {
   program = ["bash", "-c", <<EOT
-    set -e
+    set -euo pipefail
     command -v bash >/dev/null 2>&1 || { echo "bash not found on PATH" >&2; exit 1; }
     command -v git >/dev/null 2>&1 || { echo "git not found on PATH" >&2; exit 1; }
     DIR=$(mktemp -d)
@@ -31,7 +31,7 @@ resource "null_resource" "deploy" {
 
   provisioner "local-exec" {
     command     = <<EOT
-      set -e
+      set -euo pipefail
       command -v aws >/dev/null 2>&1 || { echo "aws CLI not found on PATH" >&2; exit 1; }
       command -v git >/dev/null 2>&1 || { echo "git not found on PATH" >&2; exit 1; }
       command -v bash >/dev/null 2>&1 || { echo "bash not found on PATH" >&2; exit 1; }
@@ -41,9 +41,9 @@ resource "null_resource" "deploy" {
       ${local.git_clone_cmd}
       git -C "$DIR" checkout -q "${data.external.git_sync.result.commit}"
       test -d "$DIR/${var.site_path}" || { echo "Site path '$DIR/${var.site_path}' not found" >&2; exit 1; }
-      aws s3 sync "$DIR/${var.site_path}" s3://${var.bucket_name} --delete
+      aws s3 sync "$DIR/${var.site_path}" "s3://${var.bucket_name}" --delete
       echo "Invalidating CloudFront cache..."
-      aws cloudfront create-invalidation --distribution-id ${var.distribution_id} --paths "/*"
+      aws cloudfront create-invalidation --distribution-id "${var.distribution_id}" --paths "/*"
     EOT
     working_dir = path.module
   }

@@ -29,7 +29,6 @@ variable "aws_region" {
 variable "environment" {
   description = "Deployment environment identifier"
   type        = string
-  default     = "prod"
   nullable    = false
 
   validation {
@@ -42,18 +41,33 @@ variable "github_owner" {
   description = "GitHub organization or user that owns the repository"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.github_owner) != ""
+    error_message = "github_owner must not be empty or whitespace"
+  }
 }
 
 variable "github_repo" {
   description = "Repository name containing the site content"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.github_repo) != ""
+    error_message = "github_repo must not be empty or whitespace"
+  }
 }
 
 variable "github_branch" {
   description = "Git branch to deploy from"
   type        = string
   default     = "main"
+
+  validation {
+    condition     = trimspace(var.github_branch) != ""
+    error_message = "github_branch must not be empty or whitespace"
+  }
 }
 
 variable "github_token" {

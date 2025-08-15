@@ -4,9 +4,9 @@ This guide explains how to use the OpenTofu configuration in this repository to 
 
 ## Prerequisites
 
- - [OpenTofu](https://opentofu.org/) **v1.6** or newer installed locally.
+- [OpenTofu](https://opentofu.org/) **v1.6** or newer installed locally.
 - [AWS CLI](https://aws.amazon.com/cli/) **v2.0** or newer configured with credentials that can create S3 buckets, CloudFront distributions and other resources.
- - A personal access token for the GitHub repository containing the site files. The deployment module uses a temporary Git configuration include to inject an HTTP Authorization header during `git clone`, avoiding exposure of credentials in process arguments.
+- A personal access token for the GitHub repository containing the site files. The deployment module uses a temporary Git configuration include to inject an HTTP Authorization header during `git clone`, avoiding exposure of credentials in process arguments.
 
 ## Configuration
 

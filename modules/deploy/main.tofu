@@ -5,7 +5,7 @@ locals {
         extraheader = AUTHORIZATION: bearer ${var.github_token}
     EOF
     git -c include.path="$DIR/git.cfg" \
-        clone --depth 1 --branch ${var.github_branch} https://github.com/${var.github_owner}/${var.github_repo}.git "$DIR"
+        clone --depth 1 --branch "${var.github_branch}" "https://github.com/${var.github_owner}/${var.github_repo}.git" "$DIR" >/dev/null
   EOC
 }
 
@@ -17,7 +17,7 @@ data "external" "git_sync" {
     command -v git >/dev/null 2>&1 || { echo "git not found on PATH" >&2; exit 1; }
     DIR=$(mktemp -d)
     trap 'rm -rf "$DIR"' EXIT
-    ${local.git_clone_cmd} >/dev/null
+    ${local.git_clone_cmd}
     cd "$DIR"
     echo "{\"commit\":\"$(git rev-parse HEAD)\"}"
   EOT

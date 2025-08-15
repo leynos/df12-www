@@ -75,4 +75,8 @@ variable "site_path" {
   description = "Path to the site directory within the repository"
   type        = string
   default     = "site"
+  validation {
+    condition     = trimspace(var.site_path) != ""
+    error_message = "site_path must not be empty or whitespace"
+  }
 }

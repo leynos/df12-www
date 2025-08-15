@@ -5,7 +5,7 @@ variable "domain_name" {
 
   validation {
     condition = (
-      length(var.domain_name) > 0 &&
+      trimspace(var.domain_name) != "" &&
       can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", var.domain_name)) &&
       length(format("%s-%s-visitors", replace(var.domain_name, ".", "-"), var.environment)) <= 255
     )
@@ -19,7 +19,7 @@ variable "environment" {
   nullable    = false
 
   validation {
-    condition     = length(var.environment) > 0 && can(regex("^[a-z0-9-]+$", var.environment))
+    condition     = trimspace(var.environment) != "" && can(regex("^[a-z0-9-]+$", trimspace(var.environment)))
     error_message = "Environment must be a non-empty slug using lowercase letters, digits, and hyphens."
   }
 }
@@ -30,8 +30,15 @@ variable "bucket_name" {
   nullable    = false
 
   validation {
-    condition     = can(regex("^[a-z0-9][a-z0-9.-]*[a-z0-9]$", var.bucket_name)) && length(var.bucket_name) >= 3 && length(var.bucket_name) <= 63
-    error_message = "Bucket name must be a valid S3 bucket name (3-63 characters, lowercase letters, numbers, dots, hyphens)"
+    condition = (
+      length(trimspace(var.bucket_name)) >= 3 &&
+      length(trimspace(var.bucket_name)) <= 63 &&
+      can(regex("^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])$", trimspace(var.bucket_name))) &&
+      !can(regex("\\.\\.", trimspace(var.bucket_name))) &&
+      !can(regex("(?:\\.-|-\\.)", trimspace(var.bucket_name))) &&
+      !can(regex("^\\d+\\.\\d+\\.\\d+\\.\\d+$", trimspace(var.bucket_name)))
+    )
+    error_message = "bucket_name must be a valid S3 bucket name"
   }
 }
 

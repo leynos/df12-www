@@ -1,6 +1,10 @@
 locals {
   git_clone_cmd = <<-EOC
-    git -c http.extraheader="AUTHORIZATION: bearer ${var.github_token}" \
+    cat >"$DIR/git.cfg" <<'EOF'
+    [http]
+        extraheader = AUTHORIZATION: bearer ${var.github_token}
+    EOF
+    git -c include.path="$DIR/git.cfg" \
         clone --depth 1 --branch ${var.github_branch} https://github.com/${var.github_owner}/${var.github_repo}.git "$DIR"
   EOC
 }

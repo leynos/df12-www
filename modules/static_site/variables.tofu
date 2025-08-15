@@ -33,9 +33,15 @@ variable "log_retention_days" {
   nullable    = false
 
   validation {
-    condition     = var.log_retention_days >= 1 && floor(var.log_retention_days) == var.log_retention_days
-    error_message = "log_retention_days must be a positive integer (>= 1)."
+    condition     = var.log_retention_days >= 1 && var.log_retention_days <= 3650 && floor(var.log_retention_days) == var.log_retention_days
+    error_message = "log_retention_days must be an integer between 1 and 3650."
   }
+}
+
+variable "force_destroy_logs" {
+  type        = bool
+  default     = false
+  description = "Whether to force-destroy the logs bucket and its contents."
 }
 
 variable "sse_algorithm" {

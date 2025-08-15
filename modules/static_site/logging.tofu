@@ -1,10 +1,10 @@
 locals {
-  logs_bucket_name = "${replace(lower(var.domain_name), "_", "-")}-logs"
+  logs_bucket_name = "${replace(lower(replace(trimsuffix(var.domain_name, "."), "*.", "")), "_", "-")}-logs"
 }
 
 resource "aws_s3_bucket" "logs" {
   bucket        = local.logs_bucket_name
-  force_destroy = true
+  force_destroy = var.force_destroy_logs
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -22,6 +22,14 @@ resource "aws_s3_bucket" "logs" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "logs" {
+  bucket                  = aws_s3_bucket.logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   bucket = aws_s3_bucket.logs.id
 
@@ -31,6 +39,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
 
     expiration {
       days = var.log_retention_days
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }

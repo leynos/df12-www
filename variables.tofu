@@ -30,6 +30,12 @@ variable "environment" {
   description = "Deployment environment identifier"
   type        = string
   default     = "prod"
+  nullable    = false
+
+  validation {
+    condition     = length(var.environment) > 0 && can(regex("^[a-z0-9-]+$", var.environment))
+    error_message = "Environment must be a non-empty slug using lowercase letters, digits, and hyphens."
+  }
 }
 
 variable "github_owner" {

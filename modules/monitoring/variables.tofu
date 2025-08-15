@@ -19,8 +19,8 @@ variable "environment" {
   nullable    = false
 
   validation {
-    condition     = trimspace(var.environment) != ""
-    error_message = "environment must not be empty"
+    condition     = length(var.environment) > 0 && can(regex("^[a-z0-9-]+$", var.environment))
+    error_message = "Environment must be a non-empty slug using lowercase letters, digits, and hyphens."
   }
 }
 

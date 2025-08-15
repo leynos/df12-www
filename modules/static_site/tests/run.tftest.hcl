@@ -28,7 +28,7 @@ run "plan" {
   }
 
   assert {
-    condition     = length(tostring(module.static_site.bucket_name)) > 0
+    condition     = output.bucket_name != ""
     error_message = "bucket_name output must be non-empty"
   }
 }

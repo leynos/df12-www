@@ -6,7 +6,7 @@ This guide explains how to use the OpenTofu configuration in this repository to 
 
 - [OpenTofu](https://opentofu.org/) **v1.6** or newer installed on a local machine.
 - [AWS CLI](https://aws.amazon.com/cli/) **v2.0** or newer configured with credentials that can create S3 buckets, CloudFront distributions and other resources.
-- A personal access token for the GitHub repository containing the site files.
+- A GitHub Personal Access Token (PAT) for the repository containing the site files.
 
 ## Configuration
 
@@ -25,7 +25,7 @@ This guide explains how to use the OpenTofu configuration in this repository to 
 
 ## Running the Deployment
 
-1. Initialise the working directory:
+1. Initialize the working directory:
 
    ```bash
    tofu init
@@ -59,4 +59,4 @@ To remove all resources created by this configuration, run:
 tofu destroy
 ```
 
-Confirm that the S3 bucket contents and any CloudFront distributions are no longer needed before destroying.
+Confirm that the S3 bucket contents and any CloudFront distributions are no longer needed before running `tofu destroy`.

@@ -1,6 +1,6 @@
 # Deploying the Static Site with OpenTofu
 
-This guide explains how to use the OpenTofu configuration in this repository to publish **your** website. It is tailored to this project and not meant as a one-size-fits-all example. The process uses AWS S3 for storage, CloudFront for CDN, and a GitHub repository as the source of content.
+This guide explains how to use the OpenTofu configuration in this repository to publish a static website. It is tailored to this project and not meant as a one-size-fits-all example. The process uses AWS S3 for storage, CloudFront for CDN, and a GitHub repository as the source of content.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ This guide explains how to use the OpenTofu configuration in this repository to 
 
 ## Running the Deployment
 
-1. Initialize the working directory:
+1. Initialise the working directory:
 
    ```bash
    tofu init
@@ -46,7 +46,7 @@ After the first apply, a forthcoming GitHub Actions workflow will monitor the re
 
 ## Updating Content
 
-Push changes to the configured branch of your GitHub repository. The next run of the deployment will detect the new commit and publish the updated site automatically. You can trigger the sync manually by running `tofu apply` again.
+Push changes to the configured branch of the GitHub repository. The next run of the deployment will detect the new commit and publish the updated site automatically. The sync can be triggered manually by running `tofu apply` again.
 
 ## Testing and Validation
 
@@ -60,4 +60,4 @@ To remove all resources created by this configuration, run:
 tofu destroy
 ```
 
-Ensure you no longer need the S3 bucket contents or any CloudFront distributions before destroying.
+Confirm that the S3 bucket contents and any CloudFront distributions are no longer needed before running `tofu destroy`.

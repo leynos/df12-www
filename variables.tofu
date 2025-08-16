@@ -37,6 +37,18 @@ variable "environment" {
   }
 }
 
+variable "project_name" {
+  description = "Project name for tagging resources"
+  type        = string
+  default     = "df12-www"
+  nullable    = false
+
+  validation {
+    condition     = length(trimspace(var.project_name)) > 0 && can(regex("^[a-z0-9-]+$", var.project_name))
+    error_message = "Project name must be a non-empty lowercase alphanumeric or hyphenated slug"
+  }
+}
+
 variable "github_owner" {
   description = "GitHub organization or user that owns the repository"
   type        = string

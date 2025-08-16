@@ -13,6 +13,9 @@ aws_region = "eu-west-2"
 # Deployment environment
 environment = "dev"
 
+# Project identifier used for tagging resources (defaults to "df12-www")
+project_name = "df12-www"
+
 # GitHub organization or user that owns the repository
 github_owner = "example"
 

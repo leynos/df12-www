@@ -21,6 +21,7 @@ This guide explains how to use the OpenTofu configuration in this repository to 
    - `github_owner` and `github_repo` – location of the site source.
    - `github_token` – GitHub PAT used by the `deploy` module for authenticated cloning.
    - `budget_email` – address for cost alerts.
+   - `project_name` — identifier used in resource tags (defaults to `df12-www`).
 3. Optionally adjust defaults such as the AWS region or log retention days.
 
 ## Running the Deployment

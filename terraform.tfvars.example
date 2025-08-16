@@ -10,6 +10,9 @@ root_domain = "example.com"
 # AWS region where resources will be created
 aws_region = "eu-west-2"
 
+# Deployment environment
+environment = "dev"
+
 # GitHub organization or user that owns the repository
 github_owner = "example"
 

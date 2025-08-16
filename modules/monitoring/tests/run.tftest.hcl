@@ -6,9 +6,10 @@ run "budget_notifications" {
   variables {
     domain_name      = "example.com"
     bucket_name      = "logs"
-    distribution_id  = "DIST123"
+    distribution_id  = "EDFD123456789A"
     budget_limit_gbp = 20
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
@@ -28,9 +29,10 @@ run "alarms_use_inputs" {
   variables {
     domain_name      = "example.com"
     bucket_name      = "my-bucket"
-    distribution_id  = "ABC123"
+    distribution_id  = "EBCDEF12345678"
     budget_limit_gbp = 10
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
@@ -39,7 +41,7 @@ run "alarms_use_inputs" {
   }
 
   assert {
-    condition     = aws_cloudwatch_metric_alarm.cf_requests_spike.dimensions.DistributionId == "ABC123"
+    condition     = aws_cloudwatch_metric_alarm.cf_requests_spike.dimensions.DistributionId == "EBCDEF12345678"
     error_message = "CloudFront alarm should use provided distribution id"
   }
 }
@@ -50,18 +52,19 @@ run "dashboard_metric" {
   variables {
     domain_name      = "monitor.example.com"
     bucket_name      = "dummy"
-    distribution_id  = "XYZ987"
+    distribution_id  = "EIJKL123456MNO"
     budget_limit_gbp = 1
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
-    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "monitor-example-com-visitors"
+    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "monitor-example-com-prod-visitors"
     error_message = "Dashboard name incorrect"
   }
 
   assert {
-    condition     = strcontains(aws_cloudwatch_dashboard.site.dashboard_body, "XYZ987")
+    condition     = strcontains(aws_cloudwatch_dashboard.site.dashboard_body, "EIJKL123456MNO")
     error_message = "Dashboard body should reference distribution id"
   }
 }
@@ -72,13 +75,14 @@ run "dashboard_multi_domain" {
   variables {
     domain_name      = "a.b.example.com"
     bucket_name      = "dummy"
-    distribution_id  = "XYZ987"
+    distribution_id  = "ERST123456UVWX"
     budget_limit_gbp = 1
     budget_email     = "ops@example.com"
+    environment      = "prod"
   }
 
   assert {
-    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "a-b-example-com-visitors"
+    condition     = aws_cloudwatch_dashboard.site.dashboard_name == "a-b-example-com-prod-visitors"
     error_message = "Multi-level dashboard name incorrect"
   }
 }

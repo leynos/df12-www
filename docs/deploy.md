@@ -25,7 +25,7 @@ This guide explains how to use the OpenTofu configuration in this repository to 
 
 ## Running the Deployment
 
-1. Initialize the working directory:
+1. Initialise the working directory:
 
    ```bash
    tofu init

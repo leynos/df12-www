@@ -2,7 +2,7 @@
 
 ## Purpose
 This guide defines house rules for writing OpenTofu HCL in this repository.
-Follow it alongside the HCL syntax reference and module testing guide.
+The guidance complements the HCL syntax reference and module testing guide.
 
 ## Core principles
 - Prefer declarative, idempotent plans; review every `tofu plan` before apply.
@@ -15,6 +15,8 @@ Follow it alongside the HCL syntax reference and module testing guide.
 - Group related resources in dedicated files (e.g. `acm.tofu`, `dns.tofu`).
 - Define module interfaces in `variables.tofu` and `outputs.tofu`.
 - Pin providers in `terraform.tofu`; declare aliases like `aws.useast1`.
+
+Example module structure:
 
 ```plaintext
 modules/

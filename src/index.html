@@ -6,7 +6,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
@@ -15,6 +15,64 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
             background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        :root {
+            --focus-ring-color: #FF00FF;
+        }
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: #111111;
+            color: #f3f4f6;
+            border-radius: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            z-index: 1000;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            opacity: 0;
+        }
+        .skip-link:focus-visible {
+            left: 1rem;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        a:focus-visible,
+        button:focus-visible,
+        [role="button"]:focus-visible {
+            outline: 3px solid var(--focus-ring-color);
+            outline-offset: 4px;
+        }
+        .neon-pulse {
+            animation: neonPulse 3s ease-in-out infinite;
+        }
+        .glyph {
+            transition: transform 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
+            transform: rotate(0deg);
+            transform-origin: 50% 50%;
+        }
+        .group:hover .glyph,
+        .group:focus-visible .glyph {
+            transform: rotate(45deg);
+        }
+        .group:hover .glyph--system rect,
+        .group:focus-visible .glyph--system rect {
+            fill: rgba(8, 145, 178, 0.25);
+        }
+        .group:hover .glyph--creative rect,
+        .group:focus-visible .glyph--creative rect {
+            fill: rgba(255, 0, 255, 0.25);
+        }
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 0 rgba(255, 0, 255, 0.35); }
+            50% { text-shadow: 0 0 12px rgba(255, 0, 255, 0.55); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .neon-pulse {
+                animation: none;
+                text-shadow: none;
+            }
         }
     </style>
     <script>
@@ -39,10 +97,11 @@
     </script>
 </head>
 <body class="bg-gray-100 text-brand-dark">
+    <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <main id="main-content" class="w-full">
+    <main id="main-content" class="w-full" role="main">
 
-        <header id="header" class="fixed top-0 left-0 right-0 z-50 bg-gray-100/80 backdrop-blur-sm">
+        <header id="header" class="fixed top-0 left-0 right-0 z-50 bg-gray-100/80 backdrop-blur-sm" role="banner">
             <div class="container mx-auto px-8 py-4">
                 <div class="flex justify-between items-center">
                     <span class="flex items-center space-x-2 group cursor-pointer" id="logo-link">
@@ -53,177 +112,230 @@
                         </div>
                         <span class="font-mono font-bold text-lg text-brand-dark">df12</span>
                     </span>
-                    <nav id="main-nav" class="hidden md:flex items-center space-x-8 font-mono text-sm">
-                        <span class="text-gray-600 hover:text-brand-cyan transition-colors duration-300 cursor-pointer">Tools</span>
-                        <span class="text-gray-600 hover:text-brand-magenta transition-colors duration-300 cursor-pointer">Creative</span>
-                        <span class="text-gray-600 hover:text-brand-dark transition-colors duration-300 cursor-pointer">Docs</span>
+                    <nav id="main-nav" class="hidden md:flex items-center space-x-8 font-mono text-sm" aria-label="Primary navigation">
+                        <a href="#systems" class="text-gray-600 hover:text-brand-cyan transition-colors duration-300">Tools</a>
+                        <a href="#worlds" class="text-gray-600 hover:text-brand-magenta transition-colors duration-300">Creative</a>
+                        <a href="#footer" class="text-gray-600 hover:text-brand-dark transition-colors duration-300">Docs</a>
                     </nav>
                 </div>
             </div>
         </header>
 
-        <section id="hero-section" class="h-[90vh] min-h-[700px] flex items-center justify-center text-center">
-            <div id="hero-content" class="flex flex-col items-center space-y-12">
+        <section id="hero-section" class="h-[90vh] min-h-[660px] flex items-center justify-center text-center px-6">
+            <div id="hero-content" class="flex flex-col items-center space-y-8 sm:space-y-12">
                 <div id="hero-logo" class="flex flex-col items-center">
                     <div class="bg-brand-dark px-12 py-6">
-                        <h1 class="text-white text-8xl font-mono font-bold" style="font-family: 'IBM Plex Mono', monospace; letter-spacing: -0.05em;">df12</h1>
+                        <h1 class="text-white text-8xl font-mono font-bold" style="font-family: 'IBM Plex Mono', monospace; letter-spacing: -0.02em;">df12</h1>
                     </div>
                     <p class="text-gray-500 font-mono tracking-widest-xl text-lg mt-4">PRODUCTIONS</p>
                 </div>
 
-                <h2 id="hero-tagline" class="text-6xl font-bold max-w-2xl leading-tight">
-					Serious tools,<br />playful <span class="text-brand-magenta">worlds.</span>
+                <h2 id="hero-tagline" class="text-6xl font-bold max-w-2xl leading-[1.05]" style="font-family: 'Inter Display', sans-serif;">
+					Serious tools,<br />playful <span class="text-brand-magenta neon-pulse">worlds.</span>
                 </h2>
 
                 <div id="hero-cta-group" class="flex flex-col items-center space-y-6">
                      <div class="w-48 border-b-2 border-dotted border-brand-cyan"></div>
-                    <span class="bg-brand-cyan text-brand-dark font-mono font-bold text-xl py-4 px-12 rounded-lg shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer" id="hero-cta-button">
-                        Get Started
-                    </span>
+                     <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#systems" class="bg-brand-cyan text-brand-dark font-mono font-bold text-lg py-4 px-10 rounded-lg shadow-lg motion-safe:hover:shadow-cyan-500/50 transition-all duration-300 motion-safe:hover:scale-105" id="hero-cta-tools">
+                            Explore Tools
+                        </a>
+                        <a href="#worlds" class="border border-brand-cyan bg-white text-brand-cyan font-mono font-bold text-lg py-4 px-10 rounded-lg hover:bg-brand-cyan/10 transition-all duration-300" id="hero-cta-worlds">
+                            Browse Worlds
+                        </a>
+                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="tools-section" class="py-24 bg-white">
+        <section id="systems" class="py-24 bg-white">
             <div class="container mx-auto px-8">
                 <div id="tools-header" class="text-center mb-16">
                     <h3 class="font-mono text-4xl font-bold text-brand-dark">Systems We Build</h3>
-                    <p class="mt-4 text-xl text-gray-600 font-mono italic">Fast, elegant, and open by design.</p>
+                    <p class="mt-4 text-2xl text-gray-500 font-mono italic">Fast, elegant, and open by design.</p>
                 </div>
 
                 <div id="tools-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-                    <div id="tool-card-limela" class="border border-gray-200 rounded-lg p-8 flex flex-col hover:shadow-xl hover:border-brand-cyan transition-all duration-300">
-                        <div class="flex items-center mb-4">
-                            <div class="w-6 h-6 flex items-center justify-center transform rotate-45 mr-4">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" stroke="#0891B2" stroke-width="2"/></svg>
+                    <a id="tool-card-limela" href="https://github.com/leynos/limella" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-gray-200 bg-white px-10 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+                        <div class="flex h-full items-start gap-4">
+                            <div class="mt-1 flex-none">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="glyph glyph--system">
+                                    <rect x="4" y="4" width="16" height="16" stroke="#0891B2" stroke-width="2"/>
+                                </svg>
                             </div>
-                            <h4 class="font-mono text-2xl font-bold">Limela</h4>
+                            <div class="flex flex-col flex-1">
+                                <h4 class="font-mono text-2xl font-bold">Limela</h4>
+                                <p class="mt-3 text-gray-600">Cluster email fast. Turn inboxes into a navigable knowledge spine.</p>
+                                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-brand-cyan">
+                                    View on GitHub
+                                    <i class="fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
+                                </span>
+                            </div>
                         </div>
-                        <p class="text-gray-600 mb-6 flex-grow">Cluster email at speed; surface context as a navigable knowledge spine.</p>
-                        <div class="mt-auto">
-                            <a href="https://github.com/leynos/limella" target="_blank" rel="noopener noreferrer" class="inline-block font-mono text-brand-cyan font-semibold group cursor-pointer">
-                                View on GitHub <i class="fa-solid fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
 
-                    <div id="tool-card-netsuke" class="border border-gray-200 rounded-lg p-8 flex flex-col hover:shadow-xl hover:border-brand-cyan transition-all duration-300">
-                        <div class="flex items-center mb-4">
-                            <div class="w-6 h-6 flex items-center justify-center transform rotate-45 mr-4">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" stroke="#0891B2" stroke-width="2"/></svg>
+                    <a id="tool-card-netsuke" href="https://github.com/leynos/netsuke" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-gray-200 bg-white px-10 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+                        <div class="flex h-full items-start gap-4">
+                            <div class="mt-1 flex-none">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="glyph glyph--system">
+                                    <rect x="4" y="4" width="16" height="16" stroke="#0891B2" stroke-width="2"/>
+                                </svg>
                             </div>
-                            <h4 class="font-mono text-2xl font-bold">Netsuke</h4>
+                            <div class="flex flex-col flex-1">
+                                <h4 class="font-mono text-2xl font-bold">Netsuke</h4>
+                                <p class="mt-3 text-gray-600">YAML-first builds (Ninja × Jinja). Fast, reproducible, readable.</p>
+                                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-brand-cyan">
+                                    View on GitHub
+                                    <i class="fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
+                                </span>
+                            </div>
                         </div>
-                        <p class="text-gray-600 mb-6 flex-grow">YAML-powered “Ninja × Jinja” builds that stay readable at scale.</p>
-                        <div class="mt-auto">
-                            <a href="https://github.com/leynos/netsuke" target="_blank" rel="noopener noreferrer" class="inline-block font-mono text-brand-cyan font-semibold group cursor-pointer">
-                                View on GitHub <i class="fa-solid fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
 
-                    <div id="tool-card-mxd" class="border border-gray-200 rounded-lg p-8 flex flex-col hover:shadow-xl hover:border-brand-cyan transition-all duration-300">
-                        <div class="flex items-center mb-4">
-                            <div class="w-6 h-6 flex items-center justify-center transform -rotate-45 mr-4">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" stroke="#0891B2" stroke-width="2"/></svg>
+                    <a id="tool-card-mxd" href="https://github.com/leynos/mxd" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-gray-200 bg-white px-10 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+                        <div class="flex h-full items-start gap-4">
+                            <div class="mt-1 flex-none">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="glyph glyph--system">
+                                    <rect x="4" y="4" width="16" height="16" stroke="#0891B2" stroke-width="2"/>
+                                </svg>
                             </div>
-                            <h4 class="font-mono text-2xl font-bold">mxd</h4>
+                            <div class="flex flex-col flex-1">
+                                <h4 class="font-mono text-2xl font-bold">mxd</h4>
+                                <p class="mt-3 text-gray-600">Hotline-style daemon for joyful file-sharing and retro chat.</p>
+                                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-brand-cyan">
+                                    View on GitHub
+                                    <i class="fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
+                                </span>
+                            </div>
                         </div>
-                        <p class="text-gray-600 mb-6 flex-grow">Hotline-style protocol daemon for joyful file-sharing and retro chat.</p>
-                        <div class="mt-auto">
-                            <a href="https://github.com/leynos/mxd" target="_blank" rel="noopener noreferrer" class="inline-block font-mono text-brand-cyan font-semibold group cursor-pointer">
-                                View on GitHub <i class="fa-solid fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
 
-                    <div id="tool-card-episodic" class="border border-gray-200 rounded-lg p-8 flex flex-col hover:shadow-xl hover:border-brand-cyan transition-all duration-300">
-                         <div class="flex items-center mb-4">
-                            <div class="w-6 h-6 flex items-center justify-center transform -rotate-45 mr-4">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" stroke="#0891B2" stroke-width="2"/></svg>
+                    <a id="tool-card-episodic" href="https://github.com/leynos/episodic" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-gray-200 bg-white px-10 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+                         <div class="flex h-full items-start gap-4">
+                            <div class="mt-1 flex-none">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="glyph glyph--system">
+                                    <rect x="4" y="4" width="16" height="16" stroke="#0891B2" stroke-width="2"/>
+                                </svg>
                             </div>
-                            <h4 class="font-mono text-2xl font-bold">Episodic</h4>
+                            <div class="flex flex-col flex-1">
+                                <h4 class="font-mono text-2xl font-bold">Episodic</h4>
+                                <p class="mt-3 text-gray-600">Agentic podcast studio with human-in-the-loop polish.</p>
+                                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-brand-cyan">
+                                    View on GitHub
+                                    <i class="fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
+                                </span>
+                            </div>
                         </div>
-                        <p class="text-gray-600 mb-6 flex-grow">Agentic podcast studio for consistent, human-reviewable episodes.</p>
-                        <div class="mt-auto">
-                            <a href="https://github.com/leynos/episodic" target="_blank" rel="noopener noreferrer" class="inline-block font-mono text-brand-cyan font-semibold group cursor-pointer">
-                                View on GitHub <i class="fa-solid fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"></i>
-                            </a>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <section id="creative-section" class="py-24 bg-brand-dark text-white">
+        <section id="worlds" class="py-24 bg-brand-dark text-white" data-section="creative">
             <div class="container mx-auto px-8">
                 <div id="creative-header" class="text-center mb-16">
                     <h3 class="font-mono text-4xl font-bold">Worlds We Dream</h3>
-                    <p class="mt-4 text-xl text-gray-400 font-mono italic">Narratives that map the strange and human in the system.</p>
+                    <p class="mt-4 text-2xl text-gray-300 font-mono italic">Narratives that map the strange and human in the system.</p>
                 </div>
 
                 <div id="creative-grid" class="space-y-16">
-                    <div id="creative-card-wildside" class="grid md:grid-cols-2 gap-12 items-center">
-                        <div class="w-full h-80 rounded-lg overflow-hidden">
-                           <img class="w-full h-full object-cover" src="images/wildside-alley.png" alt="A moody, atmospheric image of a neon-lit city street at night, noir style, magenta and cyan highlights reflecting on wet pavement, cinematic photography." />
+                    <a id="creative-card-wildside" href="https://github.com/leynos/wildside" target="_blank" rel="noopener noreferrer" class="group grid md:grid-cols-2 gap-10 items-center rounded-2xl border border-brand-magenta/40 bg-brand-dark/60 px-8 py-11 sm:px-11 sm:py-12 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.2)]">
+                        <div class="w-full h-80 rounded-xl overflow-hidden">
+                           <picture>
+                                <source srcset="images/wildside-alley.avif" type="image/avif" />
+                                <source srcset="images/wildside-alley.webp" type="image/webp" />
+                                <img class="w-full h-full object-cover" src="images/wildside-alley.png" alt="A moody, atmospheric image of a neon-lit city street at night, noir style, magenta and cyan highlights reflecting on wet pavement, cinematic photography." loading="lazy" decoding="async" width="1536" height="1024" sizes="(min-width: 768px) 50vw, 100vw" />
+                           </picture>
                         </div>
                         <div class="flex flex-col justify-center">
                             <div class="flex items-center mb-4">
                                 <div class="w-6 h-6 flex items-center justify-center transform rotate-45 mr-4">
-                                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" stroke="#FF00FF" stroke-width="2"/></svg>
+                                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="glyph glyph--creative"><rect x="4" y="4" width="16" height="16" stroke="#FF00FF" stroke-width="2"/></svg>
                                </div>
                                 <h4 class="font-mono text-3xl font-bold">Wildside</h4>
                             </div>
-                            <p class="text-gray-300 text-lg mb-6">Serendipity engine for urban wanderers, tuned for late-night drift and unexpected connections.</p>
-                            <a href="https://github.com/leynos/wildside" target="_blank" rel="noopener noreferrer" class="inline-block w-fit font-mono text-brand-magenta font-semibold group cursor-pointer">
-                                View on GitHub <i class="fa-solid fa-arrow-right ml-2 transition-transform duration-300 group-hover:translate-x-1"></i>
-                            </a>
+                            <p class="text-gray-300 text-lg">Serendipity for urban wanderers. Late-night drift; unexpected connections.</p>
+                            <span class="mt-6 inline-flex items-center gap-2 font-mono text-sm text-brand-magenta">
+                                Read the pitch
+                                <i class="fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div id="creative-card-pentagon" class="grid md:grid-cols-2 gap-12 items-center">
-                        <div class="w-full h-80 rounded-lg overflow-hidden">
-                            <img class="w-full h-full object-cover" src="images/pentagon-cafe-bytes.png" alt="A dimly lit workspace filled with vintage computer hardware glowing with neon accents." />
+                    </a>
+                    <a id="creative-card-pentagon" href="mailto:hello@df12.studio?subject=Pentagon%20Pitch%20Request" class="group grid md:grid-cols-2 gap-10 items-center rounded-2xl border border-brand-magenta/40 bg-brand-dark/60 px-8 py-11 sm:px-11 sm:py-12 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.2)]">
+                        <div class="w-full h-80 rounded-xl overflow-hidden">
+                            <picture>
+                                <source srcset="images/pentagon-cafe-bytes.avif" type="image/avif" />
+                                <source srcset="images/pentagon-cafe-bytes.webp" type="image/webp" />
+                                <img class="w-full h-full object-cover" src="images/pentagon-cafe-bytes.png" alt="A dimly lit workspace filled with vintage computer hardware glowing with neon accents." loading="lazy" decoding="async" width="1536" height="1024" sizes="(min-width: 768px) 50vw, 100vw" />
+                            </picture>
                         </div>
                         <div class="flex flex-col justify-center md:order-first">
                             <div class="flex items-center mb-4">
                                 <div class="w-6 h-6 flex items-center justify-center transform rotate-45 mr-4">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" stroke="#FF00FF" stroke-width="2"/></svg>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="glyph glyph--creative"><rect x="4" y="4" width="16" height="16" stroke="#FF00FF" stroke-width="2"/></svg>
                                 </div>
                                 <h4 class="font-mono text-3xl font-bold">Pentagon</h4>
                             </div>
-                            <p class="text-gray-300 text-lg mb-6">Retro-cyberpunk Moscow, 2002: hackers, hardware, and the cost of genius.</p>
+                            <p class="text-gray-300 text-lg">Retro-cyberpunk Moscow, 2002: hackers, hardware, the cost of genius.</p>
+                            <span class="mt-6 inline-flex items-center gap-2 font-mono text-sm text-brand-magenta">
+                                Read the pitch
+                                <i class="fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div id="creative-card-messy-secrets" class="grid md:grid-cols-2 gap-12 items-center">
-                        <div class="w-full h-80 rounded-lg overflow-hidden">
-                            <img class="w-full h-full object-cover" src="images/messy-secrets-pager.png" alt="A noir-inspired street scene with vintage neon signs glowing through mist." />
+                    </a>
+                    <a id="creative-card-messy-secrets" href="mailto:hello@df12.studio?subject=Messy%20Secrets%20Pitch%20Request" class="group grid md:grid-cols-2 gap-10 items-center rounded-2xl border border-brand-magenta/40 bg-brand-dark/60 px-8 py-11 sm:px-11 sm:py-12 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.2)]">
+                        <div class="w-full h-80 rounded-xl overflow-hidden">
+                            <picture>
+                                <source srcset="images/messy-secrets-pager.avif" type="image/avif" />
+                                <source srcset="images/messy-secrets-pager.webp" type="image/webp" />
+                                <img class="w-full h-full object-cover" src="images/messy-secrets-pager.png" alt="A noir-inspired street scene with vintage neon signs glowing through mist." loading="lazy" decoding="async" width="1089" height="957" sizes="(min-width: 768px) 50vw, 100vw" />
+                            </picture>
                         </div>
                         <div class="flex flex-col justify-center">
                             <div class="flex items-center mb-4">
                                 <div class="w-6 h-6 flex items-center justify-center transform rotate-45 mr-4">
-                                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" stroke="#FF00FF" stroke-width="2"/></svg>
+                                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="glyph glyph--creative"><rect x="4" y="4" width="16" height="16" stroke="#FF00FF" stroke-width="2"/></svg>
                                </div>
                                 <h4 class="font-mono text-3xl font-bold">Messy Secrets</h4>
                             </div>
-                            <p class="text-gray-300 text-lg mb-6">1980s Hollywood noir where reputation is the most volatile asset.</p>
+                            <p class="text-gray-300 text-lg">1980s Hollywood noir where reputation is the most volatile asset.</p>
+                            <span class="mt-6 inline-flex items-center gap-2 font-mono text-sm text-brand-magenta">
+                                Read the pitch
+                                <i class="fa-solid fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"></i>
+                            </span>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <footer id="footer" class="bg-gray-100">
+        <footer id="footer" class="bg-gray-100" role="contentinfo">
             <div class="container mx-auto px-8 py-12">
-                <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-                    <div class="mb-6 md:mb-0">
-                        <p class="font-mono font-bold text-lg">df12 Productions</p>
-                        <p class="text-gray-500 text-sm max-w-sm mt-2">
-                            We build serious developer tools and playful creative worlds. Our code tools cut build times and reduce surprises; our creative projects explore systems with clarity and bite.
+                <div class="grid gap-8 md:grid-cols-3">
+                    <div>
+                        <p class="font-mono font-bold text-lg text-brand-dark">df12 Productions</p>
+                        <p class="text-gray-600 text-sm max-w-sm mt-3 leading-relaxed">
+                            Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.
                         </p>
                     </div>
-                    <div class="font-mono text-sm text-gray-500">
-                        &copy; 2025 df12 Productions. All rights reserved.
+                    <div>
+                        <p class="font-mono text-sm font-semibold uppercase tracking-wide text-brand-dark">OSS & Licences</p>
+                        <ul class="mt-3 space-y-2 text-sm text-gray-600">
+                            <li><a class="hover:text-brand-cyan transition-colors" href="https://github.com/leynos/limella/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Limela — licence</a></li>
+                            <li><a class="hover:text-brand-cyan transition-colors" href="https://github.com/leynos/netsuke/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Netsuke — licence</a></li>
+                            <li><a class="hover:text-brand-cyan transition-colors" href="https://github.com/leynos/mxd/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">mxd — licence</a></li>
+                            <li><a class="hover:text-brand-cyan transition-colors" href="https://github.com/leynos/episodic/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Episodic — licence</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-mono text-sm font-semibold uppercase tracking-wide text-brand-dark">Stay in touch</p>
+                        <ul class="mt-3 space-y-2 text-sm text-gray-600">
+                            <li><a class="hover:text-brand-magenta transition-colors" href="mailto:hello@df12.studio">hello@df12.studio</a></li>
+                            <li><a class="hover:text-brand-magenta transition-colors inline-flex items-center gap-2" href="https://github.com/leynos" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub</a></li>
+                            <li><a class="hover:text-brand-magenta transition-colors inline-flex items-center gap-2" href="https://bsky.app/profile/df12.studio" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-cloud"></i> Bluesky</a></li>
+                        </ul>
+                        <p class="mt-4 text-xs text-gray-500">Built for curious builders and writers everywhere. © 2025 df12 Productions.</p>
                     </div>
                 </div>
             </div>

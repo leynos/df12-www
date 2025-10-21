@@ -22,10 +22,10 @@
         </span>
         df12
       </a>
-      <nav aria-label="Primary navigation" class="hidden items-center gap-8 font-mono text-sm text-base-content/70 md:flex">
-        <a href="#systems" class="transition-colors duration-200 hover:text-primary">Tools</a>
-        <a href="#worlds" class="transition-colors duration-200 hover:text-accent">Creative</a>
-        <a href="#footer" class="transition-colors duration-200 hover:text-base-content">Docs</a>
+      <nav aria-label="Primary navigation" class="hidden items-center gap-8 md:flex">
+        <a href="#systems" class="nav-link">Tools</a>
+        <a href="#worlds" class="nav-link hover:text-accent">Creative</a>
+        <a href="#footer" class="nav-link hover:text-base-content">Docs</a>
       </nav>
       <div class="md:hidden">
         <details class="dropdown dropdown-end">
@@ -44,12 +44,12 @@
     <section id="hero" class="flex min-h-[90vh] items-center justify-center px-6 text-center">
       <div class="flex max-w-4xl flex-col items-center gap-10">
         <div class="flex flex-col items-center gap-4">
-          <div class="bg-neutral px-12 py-6 shadow-lg shadow-neutral/40">
+          <div class="brand-lockup">
             <span class="font-mono text-7xl font-bold tracking-tight text-neutral-content md:text-8xl">df12</span>
           </div>
-          <p class="font-mono text-sm uppercase tracking-[0.35em] text-base-content/60">Productions</p>
+          <p class="eyebrow">Productions</p>
         </div>
-        <h1 class="text-4xl font-bold leading-[1.05] md:text-6xl">
+        <h1 class="hero-title">
           Serious tools,<br class="hidden sm:block" />
           playful <span class="text-accent neon-pulse">worlds.</span>
         </h1>
@@ -59,10 +59,10 @@
         <div class="flex flex-col items-center gap-6">
           <div class="h-0.5 w-48 border-b-2 border-dashed border-primary"></div>
           <div class="flex flex-col gap-4 sm:flex-row">
-            <a href="#systems" class="group inline-flex items-center justify-center rounded-xl bg-primary px-10 py-4 font-mono text-lg font-bold text-neutral transition-all duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-xl motion-safe:hover:shadow-primary/40">
+            <a href="#systems" class="cta-primary">
               Explore Tools
             </a>
-            <a href="#worlds" class="group inline-flex items-center justify-center rounded-xl border border-primary bg-white px-10 py-4 font-mono text-lg font-bold text-primary transition-all duration-300 hover:bg-primary/10">
+            <a href="#worlds" class="cta-secondary">
               Browse Worlds
             </a>
           </div>
@@ -73,11 +73,11 @@
     <section id="systems" class="bg-white px-4 md:px-8">
       <div class="mx-auto max-w-6xl py-20">
         <div class="text-center">
-          <h2 class="font-mono text-3xl font-bold text-base-content md:text-4xl">Systems We Build</h2>
-          <p class="mt-4 font-mono italic text-base-content/70 md:text-xl">Fast, elegant, and open by design.</p>
+          <h2 class="section-title">Systems We Build</h2>
+          <p class="mt-4 section-kicker">Fast, elegant, and open by design.</p>
         </div>
         <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          <a href="https://github.com/leynos/limella" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+          <a href="https://github.com/leynos/limella" target="_blank" rel="noopener noreferrer" class="group product-card">
             <div class="flex h-full items-start gap-4">
               <div class="mt-1 flex-none text-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="glyph glyph--system" aria-hidden="true">
@@ -85,16 +85,16 @@
                 </svg>
               </div>
               <div class="flex flex-1 flex-col">
-                <h3 class="font-mono text-2xl font-bold text-base-content">Limela</h3>
+                <h3 class="product-card__title">Limela</h3>
                 <p class="mt-3 text-base-content/70">Cluster email fast. Turn inboxes into a navigable knowledge spine.</p>
-                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-primary">
+                <span class="product-card__meta">
                   View on GitHub
                   <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </span>
               </div>
             </div>
           </a>
-          <a href="https://github.com/leynos/netsuke" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+          <a href="https://github.com/leynos/netsuke" target="_blank" rel="noopener noreferrer" class="group product-card">
             <div class="flex h-full items-start gap-4">
               <div class="mt-1 flex-none text-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="glyph glyph--system" aria-hidden="true">
@@ -102,16 +102,16 @@
                 </svg>
               </div>
               <div class="flex flex-1 flex-col">
-                <h3 class="font-mono text-2xl font-bold text-base-content">Netsuke</h3>
+                <h3 class="product-card__title">Netsuke</h3>
                 <p class="mt-3 text-base-content/70">YAML-first builds (Ninja × Jinja). Fast, reproducible, readable.</p>
-                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-primary">
+                <span class="product-card__meta">
                   View on GitHub
                   <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </span>
               </div>
             </div>
           </a>
-          <a href="https://github.com/leynos/mxd" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+          <a href="https://github.com/leynos/mxd" target="_blank" rel="noopener noreferrer" class="group product-card">
             <div class="flex h-full items-start gap-4">
               <div class="mt-1 flex-none text-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="glyph glyph--system" aria-hidden="true">
@@ -119,16 +119,16 @@
                 </svg>
               </div>
               <div class="flex flex-1 flex-col">
-                <h3 class="font-mono text-2xl font-bold text-base-content">mxd</h3>
+                <h3 class="product-card__title">mxd</h3>
                 <p class="mt-3 text-base-content/70">Hotline-style daemon for joyful file-sharing and retro chat.</p>
-                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-primary">
+                <span class="product-card__meta">
                   View on GitHub
                   <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </span>
               </div>
             </div>
           </a>
-          <a href="https://github.com/leynos/episodic" target="_blank" rel="noopener noreferrer" class="group relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl">
+          <a href="https://github.com/leynos/episodic" target="_blank" rel="noopener noreferrer" class="group product-card">
             <div class="flex h-full items-start gap-4">
               <div class="mt-1 flex-none text-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="glyph glyph--system" aria-hidden="true">
@@ -136,9 +136,9 @@
                 </svg>
               </div>
               <div class="flex flex-1 flex-col">
-                <h3 class="font-mono text-2xl font-bold text-base-content">Episodic</h3>
+                <h3 class="product-card__title">Episodic</h3>
                 <p class="mt-3 text-base-content/70">Agentic podcast studio with human-in-the-loop polish.</p>
-                <span class="mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-primary">
+                <span class="product-card__meta">
                   View on GitHub
                   <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </span>
@@ -152,11 +152,11 @@
     <section id="worlds" class="bg-neutral text-neutral-content">
       <div class="mx-auto max-w-6xl px-4 py-24 md:px-8">
         <div class="text-center">
-          <h2 class="font-mono text-3xl font-bold md:text-4xl">Worlds We Dream</h2>
-          <p class="mt-4 font-mono italic text-neutral-content/80 md:text-xl">Narratives that map the strange and human in the system.</p>
+          <h2 class="section-title text-neutral-content">Worlds We Dream</h2>
+          <p class="mt-4 section-kicker text-neutral-content/80">Narratives that map the strange and human in the system.</p>
         </div>
         <div class="mt-12 space-y-16">
-          <a href="https://github.com/leynos/wildside" target="_blank" rel="noopener noreferrer" class="group grid gap-10 rounded-2xl border border-accent/40 bg-neutral/60 px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.2)] md:grid-cols-2">
+          <a href="https://github.com/leynos/wildside" target="_blank" rel="noopener noreferrer" class="group world-card">
             <figure class="h-64 overflow-hidden rounded-xl md:h-80">
               <picture>
                 <source srcset="images/wildside-alley.avif" type="image/avif" />
@@ -180,7 +180,7 @@
               </span>
             </div>
           </a>
-          <a href="mailto:hello@df12.studio?subject=Pentagon%20Pitch%20Request" class="group grid gap-10 rounded-2xl border border-accent/20 bg-neutral/40 px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.15)] md:grid-cols-2">
+          <a href="mailto:hello@df12.studio?subject=Pentagon%20Pitch%20Request" class="group world-card border-accent/20 bg-neutral/40 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.15)]">
             <figure class="order-last h-64 overflow-hidden rounded-xl md:order-first md:h-80">
               <picture>
                 <source srcset="images/pentagon-cafe-bytes.avif" type="image/avif" />
@@ -204,7 +204,7 @@
               </span>
             </div>
           </a>
-          <a href="mailto:hello@df12.studio?subject=Messy%20Secrets%20Pitch%20Request" class="group grid gap-10 rounded-2xl border border-accent/20 bg-neutral/40 px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.15)] md:grid-cols-2">
+          <a href="mailto:hello@df12.studio?subject=Messy%20Secrets%20Pitch%20Request" class="group world-card border-accent/20 bg-neutral/40 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.15)]">
             <figure class="h-64 overflow-hidden rounded-xl md:h-80">
               <picture>
                 <source srcset="images/messy-secrets-pager.avif" type="image/avif" />

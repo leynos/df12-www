@@ -51,6 +51,54 @@
     transform: translateY(0);
     opacity: 1;
   }
+
+  .eyebrow {
+    @apply font-mono text-sm uppercase tracking-[0.35em] text-base-content/60;
+  }
+
+  .brand-lockup {
+    @apply bg-neutral px-12 py-6 shadow-lg shadow-neutral/40;
+  }
+
+  .hero-title {
+    @apply text-4xl font-bold leading-[1.05] md:text-6xl;
+  }
+
+  .cta-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-primary px-10 py-4 font-mono text-lg font-bold text-neutral transition-all duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-xl motion-safe:hover:shadow-primary/40;
+  }
+
+  .cta-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-primary bg-white px-10 py-4 font-mono text-lg font-bold text-primary transition-all duration-300 hover:bg-primary/10;
+  }
+
+  .section-title {
+    @apply font-mono text-3xl font-bold text-base-content md:text-4xl;
+  }
+
+  .section-kicker {
+    @apply font-mono italic text-base-content/70 md:text-xl;
+  }
+
+  .nav-link {
+    @apply font-mono text-sm text-base-content/70 transition-colors duration-200 hover:text-primary;
+  }
+
+  .product-card {
+    @apply relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl;
+  }
+
+  .product-card__title {
+    @apply font-mono text-2xl font-bold text-base-content;
+  }
+
+  .product-card__meta {
+    @apply mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-primary;
+  }
+
+  .world-card {
+    @apply grid gap-10 rounded-2xl border border-accent/40 bg-neutral/60 px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.2)] md:grid-cols-2;
+  }
 }
 
 @layer utilities {

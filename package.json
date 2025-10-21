@@ -1,0 +1,16 @@
+{
+  "name": "df12-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --watch",
+    "build": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
+    "serve": "bun run build && bunx http-server public -p 8080"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.15",
+    "@types/bun": "latest",
+    "daisyui": "^5.3.7",
+    "tailwindcss": "^4.1.15"
+  }
+}

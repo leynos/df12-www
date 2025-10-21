@@ -1,0 +1,138 @@
+/* Tailwind v4 core */
+@import "tailwindcss";
+
+/* daisyUI v5 plugin */
+@plugin "daisyui" {
+  themes: df12 --default, dracula --prefersdark;
+  logs: false;
+}
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  :root {
+    --focus-ring-color: #FF00FF;
+  }
+
+  body {
+    background-color: #f3f4f6;
+    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 3px solid var(--focus-ring-color);
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: #111111;
+    color: #f3f4f6;
+    border-radius: 0.75rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    z-index: 1000;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0;
+  }
+
+  .skip-link:focus-visible {
+    left: 1rem;
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .neon-pulse {
+    animation: neonPulse 3s ease-in-out infinite;
+    text-shadow: 0 0 0 rgba(255, 0, 255, 0.35);
+  }
+
+  .glyph {
+    transition: transform 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
+    transform: rotate(0deg);
+    transform-origin: 50% 50%;
+  }
+
+  .group:hover .glyph,
+  .group:focus-visible .glyph {
+    transform: rotate(45deg);
+  }
+
+  .glyph--system rect,
+  .glyph--creative rect {
+    fill: transparent;
+  }
+
+  .group:hover .glyph--system rect,
+  .group:focus-visible .glyph--system rect {
+    fill: rgba(8, 145, 178, 0.25);
+  }
+
+  .group:hover .glyph--creative rect,
+  .group:focus-visible .glyph--creative rect {
+    fill: rgba(255, 0, 255, 0.25);
+  }
+}
+
+@plugin "daisyui/theme" {
+  name: "df12";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-primary: #0891B2;
+  --color-primary-content: #ECFEFF;
+
+  --color-secondary: #0F172A;
+  --color-secondary-content: #F8FAFC;
+
+  --color-accent: #FF00FF;
+  --color-accent-content: #2E1337;
+
+  --color-neutral: #111111;
+  --color-neutral-content: #F5F5F5;
+
+  --color-base-100: #F3F4F6;
+  --color-base-200: #E5E7EB;
+  --color-base-300: #D1D5DB;
+  --color-base-content: #111111;
+
+  --color-info: #2563EB;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+
+  --radius-box: 1.5rem;
+  --radius-btn: 0.9rem;
+  --radius-badge: 1rem;
+}
+
+@keyframes neonPulse {
+  0%,
+  100% {
+    text-shadow: 0 0 0 rgba(255, 0, 255, 0.35);
+  }
+
+  50% {
+    text-shadow: 0 0 12px rgba(255, 0, 255, 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-pulse {
+    animation: none;
+    text-shadow: none;
+  }
+}

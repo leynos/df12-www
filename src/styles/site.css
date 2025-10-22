@@ -69,7 +69,7 @@
   }
 
   .cta-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-primary px-10 py-4 font-mono text-lg font-bold text-neutral;
+    @apply inline-flex items-center justify-center rounded-xl bg-primary px-10 py-4 font-mono text-lg font-bold text-primary-content;
   }
 
   .cta-secondary {
@@ -81,7 +81,7 @@
   }
 
   .section-kicker {
-    @apply font-mono italic text-base-content/70 md:text-xl;
+    @apply font-mono italic text-base-content/80 md:text-xl;
   }
 
   .nav-link {
@@ -220,13 +220,13 @@
   prefersdark: false;
   color-scheme: light;
 
-  --color-primary: #0891B2;
-  --color-primary-content: #ECFEFF;
+  --color-primary: #005C73;
+  --color-primary-content: #F4FDFF;
 
   --color-secondary: #0F172A;
   --color-secondary-content: #F8FAFC;
 
-  --color-accent: #FF00FF;
+  --color-accent: #FF66FF;
   --color-accent-content: #2E1337;
 
   --color-neutral: #111111;

@@ -52,6 +52,10 @@
     opacity: 1;
   }
 
+  .sr-only-focusable {
+    @apply sr-only focus:not-sr-only;
+  }
+
   .eyebrow {
     @apply font-mono text-sm uppercase tracking-[0.35em] text-base-content/60;
   }
@@ -65,11 +69,11 @@
   }
 
   .cta-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-primary px-10 py-4 font-mono text-lg font-bold text-neutral transition-all duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-xl motion-safe:hover:shadow-primary/40;
+    @apply inline-flex items-center justify-center rounded-xl bg-primary px-10 py-4 font-mono text-lg font-bold text-neutral;
   }
 
   .cta-secondary {
-    @apply inline-flex items-center justify-center rounded-xl border border-primary bg-white px-10 py-4 font-mono text-lg font-bold text-primary transition-all duration-300 hover:bg-primary/10;
+    @apply inline-flex items-center justify-center rounded-xl border border-primary bg-white px-10 py-4 font-mono text-lg font-bold text-primary hover:bg-primary/10;
   }
 
   .section-title {
@@ -81,11 +85,28 @@
   }
 
   .nav-link {
-    @apply font-mono text-sm text-base-content/70 transition-colors duration-200 hover:text-primary;
+    @apply font-mono text-sm text-base-content/70 transition-colors duration-200;
+  }
+
+  [aria-current="page"].nav-link {
+    @apply text-primary underline decoration-dotted underline-offset-4;
+  }
+
+  .nav-link[data-variant="primary"]:hover,
+  .nav-link:not([data-variant]):hover {
+    @apply text-primary;
+  }
+
+  .nav-link[data-variant="accent"]:hover {
+    @apply text-accent;
+  }
+
+  .nav-link[data-variant="neutral"]:hover {
+    @apply text-base-content;
   }
 
   .product-card {
-    @apply relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-xl;
+    @apply relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11;
   }
 
   .product-card__title {
@@ -97,7 +118,25 @@
   }
 
   .world-card {
-    @apply grid gap-10 rounded-2xl border border-accent/40 bg-neutral/60 px-8 py-11 transition duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_45px_rgba(255,0,255,0.2)] md:grid-cols-2;
+    @apply grid gap-10 rounded-2xl border border-accent/40 bg-neutral/60 px-8 py-11;
+    container-type: inline-size;
+    container-name: world-card;
+  }
+
+  .world-card__media {
+    @apply h-64 overflow-hidden rounded-xl;
+  }
+
+  .world-card__body {
+    @apply flex flex-col justify-center;
+  }
+
+  .world-card--media-after .world-card__media {
+    order: 2;
+  }
+
+  .world-card--media-after .world-card__body {
+    order: 1;
   }
 }
 
@@ -132,6 +171,47 @@
   .group:focus-visible .glyph--creative rect {
     fill: rgba(255, 0, 255, 0.25);
   }
+
+  .pressable {
+    @apply transition duration-200 ease-out;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pressable:hover {
+      transform: translateY(-0.125rem);
+    }
+  }
+
+  .pressable:hover {
+    @apply shadow-xl;
+  }
+
+  .pressable:active {
+    transform: translateY(0);
+  }
+
+  .pressable:focus-visible {
+    @apply outline-none ring-4 ring-primary/30;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pressable {
+      transition-duration: 0.001ms;
+    }
+
+    .pressable:hover,
+    .pressable:active {
+      transform: none;
+    }
+  }
+
+  .hit-target {
+    @apply inline-flex min-h-11 min-w-[44px] items-center px-2;
+  }
+
+  .cq {
+    container-type: inline-size;
+  }
 }
 
 @plugin "daisyui/theme" {
@@ -165,6 +245,29 @@
   --radius-box: 1.5rem;
   --radius-btn: 0.9rem;
   --radius-badge: 1rem;
+}
+
+@container world-card (min-width: 48rem) {
+  .world-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .world-card__media {
+    height: 20rem;
+    order: 1;
+  }
+
+  .world-card__body {
+    order: 2;
+  }
+
+  .world-card--media-after .world-card__media {
+    order: 1;
+  }
+
+  .world-card--media-after .world-card__body {
+    order: 2;
+  }
 }
 
 @keyframes neonPulse {

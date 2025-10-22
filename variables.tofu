@@ -107,18 +107,33 @@ variable "budget_email" {
   nullable    = false
 }
 
-variable "godaddy_api_key" {
-  description = "API key for GoDaddy DNS"
+variable "cloudflare_api_token" {
+  description = "API token with DNS edit permissions for the Cloudflare zone"
   type        = string
   sensitive   = true
   nullable    = false
+
+  validation {
+    condition     = trimspace(var.cloudflare_api_token) != ""
+    error_message = "cloudflare_api_token must not be empty or whitespace"
+  }
 }
 
-variable "godaddy_api_secret" {
-  description = "API secret for GoDaddy DNS"
+variable "cloudflare_zone_id" {
+  description = "Identifier of the Cloudflare zone managing the root domain"
   type        = string
-  sensitive   = true
   nullable    = false
+
+  validation {
+    condition     = length(trimspace(var.cloudflare_zone_id)) > 0 && can(regex("^[a-f0-9]{32}$", trimspace(var.cloudflare_zone_id)))
+    error_message = "cloudflare_zone_id must be a 32-character hexadecimal string"
+  }
+}
+
+variable "cloudflare_proxied" {
+  description = "Whether Cloudflare should proxy the CDN CNAME record"
+  type        = bool
+  default     = false
 }
 
 variable "log_retention_days" {

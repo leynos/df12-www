@@ -1,6 +1,6 @@
 # Deployment Guide — df12 Static Site
 
-_Updated: 22 October 2025_
+_Updated: 23 October 2025_
 
 This guide explains how to configure, build, and deploy the df12 static site
 using the OpenTofu infrastructure stack. It also calls out best practices for
@@ -11,10 +11,14 @@ managing secrets and environment-specific overrides.
 - **Tooling**
   - [Bun](https://bun.sh) ≥ 1.1 for building the Tailwind bundle.
   - [OpenTofu CLI](https://opentofu.org) ≥ 1.6.0.
-  - AWS CLI (for manual verification or troubleshooting).
+  - AWS CLI (for manual verification or troubleshooting when targeting AWS).
+  - Optional: Scaleway CLI (`scw`) for ad-hoc diagnostics when targeting Scaleway.
 - **Accounts & credentials**
   - AWS account with permissions to manage S3, CloudFront, ACM, IAM, and
-    Budgets.
+    Budgets (required when `cloud_provider = "aws"`).
+  - Scaleway project with Object Storage and Cockpit access rights (required
+    when `cloud_provider = "scaleway"`). Create API access/secret keys with
+    project-level scope.
   - Cloudflare account with access to the DNS zone that will host the site.
   - GitHub repository containing the site source (this repo) and a personal
     access token for cloning.
@@ -40,9 +44,21 @@ Fill out a copy of `terraform.tfvars` for each environment (e.g.
 | `cloudflare_api_token`                         | API token with DNS edit permissions for the zone.                                         |
 | `cloudflare_zone_id`                           | 32-character Cloudflare zone identifier for `root_domain`.                                |
 | `cloudflare_proxied`                           | Set to `true` to enable Cloudflare proxying for the CDN CNAME.                            |
-| `budget_limit_gbp`                             | Monthly AWS budget threshold in GBP for cost alerts (default `5`).                        |
-| `budget_email`                                 | Email address that receives budget notifications.                                         |
-| `log_retention_days`                           | CloudFront log retention (defaults to 14 days).                                           |
+| `cloud_provider`                               | Either `aws` or `scaleway` (defaults to `aws`).                                           |
+| `budget_limit_gbp`                             | Monthly AWS budget threshold in GBP for cost alerts.                                      |
+| `budget_email`                                 | Email address that receives AWS/Scaleway alert notifications.                             |
+| `log_retention_days`                           | CloudFront log retention (defaults to 14 days, ignored on Scaleway).                      |
+
+If `cloud_provider = "scaleway"`, populate the additional variables:
+
+| Variable                    | Purpose                                                             |
+| --------------------------- | ------------------------------------------------------------------- |
+| `scaleway_access_key`       | API access key with permissions for Object Storage and Cockpit.     |
+| `scaleway_secret_key`       | Secret key paired with the access key.                              |
+| `scaleway_project_id`       | Project UUID that owns the static assets.                           |
+| `scaleway_organization_id`  | Optional organization UUID (leave empty for project-scoped access). |
+| `scaleway_region`           | Object Storage region (e.g. `fr-par`).                              |
+| `scaleway_zone`             | Service zone (e.g. `fr-par-1`).                                     |
 
 ### Secrets Management
 
@@ -76,14 +92,16 @@ latest build artifacts.
 
 All commands below assume the repo root as the working directory.
 
+### AWS flow
+
 1. **Initialize providers**
 
    ```bash
    tofu init
    ```
 
-   This downloads the AWS, Cloudflare, and GitHub providers and creates
-   `.terraform.lock.hcl`.
+   This downloads the AWS, Cloudflare, GitHub, and Scaleway providers and
+   creates `.terraform.lock.hcl`.
 
 2. **Validate configuration**
 
@@ -101,8 +119,8 @@ All commands below assume the repo root as the working directory.
    tofu plan -var-file="terraform.tfvars.prod"
    ```
 
-   Inspect the plan carefully. Key resources include S3 buckets, CloudFront
-   distribution, ACM certificates, and Cloudflare DNS records.
+   Inspect the plan carefully. For AWS, look for S3 buckets, CloudFront
+   distributions, ACM certificates, and Cloudflare DNS records.
 
 4. **Apply infrastructure**
 
@@ -119,12 +137,31 @@ All commands below assume the repo root as the working directory.
      remains valid and that `site_path` contains the built `index.html`,
      `assets/`, and `images/` directories.
 
+### Scaleway flow
+
+The workflow mirrors AWS with a few provider-specific changes:
+
+1. Set `cloud_provider = "scaleway"` and populate the Scaleway variables.
+2. Run `tofu init` to fetch the Scaleway provider alongside the others.
+3. Run `tofu plan -var-file=...` and confirm the plan includes
+   `scaleway_object_bucket` resources, Cloudflare CNAME records, and a
+   `scaleway_cockpit` activation.
+4. Run `tofu apply -var-file=...` to provision the bucket, website
+   configuration, Cloudflare DNS, and Cockpit.
+5. The `modules/deploy_scaleway` module syncs the `site_path` directory using
+   AWS CLI against the Scaleway S3-compatible endpoint and purges the
+   Cloudflare cache so changes propagate immediately.
+
 ## 5. Post-Deployment Verification
 
-- Check CloudFront distribution status and confirm it is “Deployed”.
-- Visit the `domain_name` URL to confirm the site renders and assets load.
-- Verify Cloudflare DNS shows the expected validation and CNAME records.
-- Confirm cost and metric alarms appear in AWS Budgets and CloudWatch.
+- **AWS:** Check the CloudFront distribution status, confirm the bucket has
+  new objects, and ensure AWS Budgets/CloudWatch alarms report healthy.
+- **Scaleway:** Visit the bucket website endpoint (exposed in
+  `delivery_hostname`) and the Cloudflare-protected URL to confirm content.
+  In the Scaleway console, verify Cockpit is active and invoices reflect the
+  new bucket.
+- For either provider, ensure Cloudflare lists the expected CNAME records and
+  that cache purges succeed.
 
 ## 6. Environment Management Tips
 
@@ -149,7 +186,8 @@ All commands below assume the repo root as the working directory.
 
 ## 8. Security Best Practices
 
-- Enforce MFA on AWS, Cloudflare, and GitHub accounts used for deployment.
+- Enforce MFA on AWS, Scaleway, Cloudflare, and GitHub accounts used for
+  deployment.
 - Limit IAM permissions of the AWS credentials running OpenTofu to only the
   services required.
 - Store `.terraform.lock.hcl` under version control to guarantee provider
@@ -159,4 +197,6 @@ All commands below assume the repo root as the working directory.
 
 Following these steps ensures reproducible deployments and safe handling of
 secrets across environments. Update this guide whenever configuration inputs or
-provider usage changes.
+provider usage changes. When using Scaleway, monitor Cockpit’s cost dashboard
+and configure additional alert channels from Grafana if you need granular
+usage notifications or DDoS detection.

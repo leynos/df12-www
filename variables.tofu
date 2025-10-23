@@ -136,6 +136,66 @@ variable "cloudflare_proxied" {
   default     = false
 }
 
+variable "cloud_provider" {
+  description = "Infrastructure provider to deploy the site to (aws or scaleway)"
+  type        = string
+  default     = "aws"
+  validation {
+    condition     = contains(["aws", "scaleway"], lower(trimspace(var.cloud_provider)))
+    error_message = "cloud_provider must be either \"aws\" or \"scaleway\"."
+  }
+}
+
+variable "scaleway_access_key" {
+  description = "Scaleway API access key (required when cloud_provider is scaleway)"
+  type        = string
+  default     = ""
+  sensitive   = true
+  validation {
+    condition     = lower(trimspace(var.cloud_provider)) != "scaleway" || trimspace(var.scaleway_access_key) != ""
+    error_message = "scaleway_access_key must be provided when cloud_provider is scaleway."
+  }
+}
+
+variable "scaleway_secret_key" {
+  description = "Scaleway API secret key (required when cloud_provider is scaleway)"
+  type        = string
+  default     = ""
+  sensitive   = true
+  validation {
+    condition     = lower(trimspace(var.cloud_provider)) != "scaleway" || trimspace(var.scaleway_secret_key) != ""
+    error_message = "scaleway_secret_key must be provided when cloud_provider is scaleway."
+  }
+}
+
+variable "scaleway_project_id" {
+  description = "Scaleway project ID (required when cloud_provider is scaleway)"
+  type        = string
+  default     = ""
+  validation {
+    condition     = lower(trimspace(var.cloud_provider)) != "scaleway" || trimspace(var.scaleway_project_id) != ""
+    error_message = "scaleway_project_id must be provided when cloud_provider is scaleway."
+  }
+}
+
+variable "scaleway_organization_id" {
+  description = "Scaleway organization ID (optional when cloud_provider is scaleway)"
+  type        = string
+  default     = ""
+}
+
+variable "scaleway_region" {
+  description = "Scaleway region for object storage (e.g. fr-par)"
+  type        = string
+  default     = "fr-par"
+}
+
+variable "scaleway_zone" {
+  description = "Scaleway zone for services (e.g. fr-par-1)"
+  type        = string
+  default     = "fr-par-1"
+}
+
 variable "log_retention_days" {
   description = "Retention period in days for CloudFront logs"
   type        = number

@@ -48,5 +48,16 @@ cloudflare_zone_id = "0123456789abcdef0123456789abcdef"
 # Set to true if you want Cloudflare to proxy the CDN CNAME
 cloudflare_proxied = false
 
+# Cloud provider selection (aws or scaleway)
+cloud_provider = "aws"
+
+# Scaleway credentials (required when cloud_provider = "scaleway")
+scaleway_access_key      = "scw_access_key"
+scaleway_secret_key      = "scw_secret_key"
+scaleway_project_id      = "11111111-2222-3333-4444-555555555555"
+scaleway_organization_id = ""
+scaleway_region          = "fr-par"
+scaleway_zone            = "fr-par-1"
+
 # Number of days to keep CloudFront logs
 log_retention_days = 14

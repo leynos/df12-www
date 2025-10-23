@@ -319,7 +319,7 @@ v4's Oxide engine provides:
 
 ## File Organization
 
-```
+```text
 src/
 ├── styles/
 │   ├── main.css          # @import "tailwindcss" + @theme
@@ -378,17 +378,17 @@ src/
 ### Layout
 
 #### Display
-```
+```text
 block, inline-block, inline, flex, inline-flex, table, inline-table, table-caption, table-cell, table-column, table-column-group, table-footer-group, table-header-group, table-row-group, table-row, flow-root, grid, inline-grid, contents, list-item, hidden
 ```
 
 #### Position
-```
+```text
 static, fixed, absolute, relative, sticky
 ```
 
 #### Top/Right/Bottom/Left
-```
+```text
 inset-0, inset-x-0, inset-y-0, start-0, end-0, top-0, right-0, bottom-0, left-0
 inset-px, inset-x-px, inset-y-px, start-px, end-px, top-px, right-px, bottom-px, left-px
 inset-0.5, inset-1, inset-1.5, inset-2, inset-2.5, inset-3, inset-3.5, inset-4, inset-5, inset-6, inset-7, inset-8, inset-9, inset-10, inset-11, inset-12, inset-14, inset-16, inset-20, inset-24, inset-28, inset-32, inset-36, inset-40, inset-44, inset-48, inset-52, inset-56, inset-60, inset-64, inset-72, inset-80, inset-96
@@ -396,13 +396,13 @@ inset-auto, inset-1/2, inset-1/3, inset-2/3, inset-1/4, inset-2/4, inset-3/4, in
 ```
 
 #### Visibility & Z-Index
-```
+```text
 visible, invisible, collapse
 z-0, z-10, z-20, z-30, z-40, z-50, z-auto
 ```
 
 #### Overflow
-```
+```text
 overflow-auto, overflow-hidden, overflow-clip, overflow-visible, overflow-scroll
 overflow-x-auto, overflow-x-hidden, overflow-x-clip, overflow-x-visible, overflow-x-scroll
 overflow-y-auto, overflow-y-hidden, overflow-y-clip, overflow-y-visible, overflow-y-scroll
@@ -411,62 +411,62 @@ overflow-y-auto, overflow-y-hidden, overflow-y-clip, overflow-y-visible, overflo
 ### Flexbox & Grid
 
 #### Flex Direction
-```
+```text
 flex-row, flex-row-reverse, flex-col, flex-col-reverse
 ```
 
 #### Flex Wrap
-```
+```text
 flex-wrap, flex-wrap-reverse, flex-nowrap
 ```
 
 #### Flex
-```
+```text
 flex-1, flex-auto, flex-initial, flex-none
 ```
 
 #### Grow & Shrink
-```
+```text
 grow, grow-0, shrink, shrink-0
 ```
 
 #### Order
-```
+```text
 order-1, order-2, order-3, order-4, order-5, order-6, order-7, order-8, order-9, order-10, order-11, order-12, order-first, order-last, order-none
 ```
 
 #### Grid Template Columns
-```
+```text
 grid-cols-1, grid-cols-2, grid-cols-3, grid-cols-4, grid-cols-5, grid-cols-6, grid-cols-7, grid-cols-8, grid-cols-9, grid-cols-10, grid-cols-11, grid-cols-12, grid-cols-none, grid-cols-subgrid
 ```
 
 #### Grid Column Start/End
-```
+```text
 col-auto, col-span-1, col-span-2, col-span-3, col-span-4, col-span-5, col-span-6, col-span-7, col-span-8, col-span-9, col-span-10, col-span-11, col-span-12, col-span-full
 col-start-1, col-start-2, col-start-3, col-start-4, col-start-5, col-start-6, col-start-7, col-start-8, col-start-9, col-start-10, col-start-11, col-start-12, col-start-13, col-start-auto
 col-end-1, col-end-2, col-end-3, col-end-4, col-end-5, col-end-6, col-end-7, col-end-8, col-end-9, col-end-10, col-end-11, col-end-12, col-end-13, col-end-auto
 ```
 
 #### Grid Template Rows
-```
+```text
 grid-rows-1, grid-rows-2, grid-rows-3, grid-rows-4, grid-rows-5, grid-rows-6, grid-rows-7, grid-rows-8, grid-rows-9, grid-rows-10, grid-rows-11, grid-rows-12, grid-rows-none, grid-rows-subgrid
 ```
 
 #### Grid Row Start/End
-```
+```text
 row-auto, row-span-1, row-span-2, row-span-3, row-span-4, row-span-5, row-span-6, row-span-7, row-span-8, row-span-9, row-span-10, row-span-11, row-span-12, row-span-full
 row-start-1, row-start-2, row-start-3, row-start-4, row-start-5, row-start-6, row-start-7, row-start-8, row-start-9, row-start-10, row-start-11, row-start-12, row-start-13, row-start-auto
 row-end-1, row-end-2, row-end-3, row-end-4, row-end-5, row-end-6, row-end-7, row-end-8, row-end-9, row-end-10, row-end-11, row-end-12, row-end-13, row-end-auto
 ```
 
 #### Gap
-```
+```text
 gap-0, gap-x-0, gap-y-0, gap-px, gap-x-px, gap-y-px
 gap-0.5, gap-1, gap-1.5, gap-2, gap-2.5, gap-3, gap-3.5, gap-4, gap-5, gap-6, gap-7, gap-8, gap-9, gap-10, gap-11, gap-12, gap-14, gap-16, gap-20, gap-24, gap-28, gap-32, gap-36, gap-40, gap-44, gap-48, gap-52, gap-56, gap-60, gap-64, gap-72, gap-80, gap-96
 ```
 
 #### Justify & Align
-```
+```text
 justify-normal, justify-start, justify-end, justify-center, justify-between, justify-around, justify-evenly, justify-stretch
 justify-items-start, justify-items-end, justify-items-center, justify-items-stretch
 justify-self-auto, justify-self-start, justify-self-end, justify-self-center, justify-self-stretch
@@ -481,20 +481,20 @@ place-self-auto, place-self-start, place-self-end, place-self-center, place-self
 ### Spacing
 
 #### Padding
-```
+```text
 p-0, p-px, p-0.5, p-1, p-1.5, p-2, p-2.5, p-3, p-3.5, p-4, p-5, p-6, p-7, p-8, p-9, p-10, p-11, p-12, p-14, p-16, p-20, p-24, p-28, p-32, p-36, p-40, p-44, p-48, p-52, p-56, p-60, p-64, p-72, p-80, p-96
 px-0, py-0, pl-0, pr-0, pt-0, pb-0, ps-0, pe-0
 ```
 
 #### Margin
-```
+```text
 m-0, m-px, m-0.5, m-1, m-1.5, m-2, m-2.5, m-3, m-3.5, m-4, m-5, m-6, m-7, m-8, m-9, m-10, m-11, m-12, m-14, m-16, m-20, m-24, m-28, m-32, m-36, m-40, m-44, m-48, m-52, m-56, m-60, m-64, m-72, m-80, m-96, m-auto
 mx-0, my-0, ml-0, mr-0, mt-0, mb-0, ms-0, me-0
 -m-0, -m-px, -m-0.5, -m-1, -m-1.5, -m-2, -m-2.5, -m-3, -m-3.5, -m-4, -m-5, -m-6, -m-7, -m-8, -m-9, -m-10, -m-11, -m-12, -m-14, -m-16, -m-20, -m-24, -m-28, -m-32, -m-36, -m-40, -m-44, -m-48, -m-52, -m-56, -m-60, -m-64, -m-72, -m-80, -m-96
 ```
 
 #### Space Between
-```
+```text
 space-x-0, space-x-px, space-x-0.5, space-x-1, space-x-1.5, space-x-2, space-x-2.5, space-x-3, space-x-3.5, space-x-4, space-x-5, space-x-6, space-x-7, space-x-8, space-x-9, space-x-10, space-x-11, space-x-12, space-x-14, space-x-16, space-x-20, space-x-24, space-x-28, space-x-32, space-x-36, space-x-40, space-x-44, space-x-48, space-x-52, space-x-56, space-x-60, space-x-64, space-x-72, space-x-80, space-x-96, space-x-reverse
 space-y-0, space-y-px, space-y-0.5, space-y-1, space-y-1.5, space-y-2, space-y-2.5, space-y-3, space-y-3.5, space-y-4, space-y-5, space-y-6, space-y-7, space-y-8, space-y-9, space-y-10, space-y-11, space-y-12, space-y-14, space-y-16, space-y-20, space-y-24, space-y-28, space-y-32, space-y-36, space-y-40, space-y-44, space-y-48, space-y-52, space-y-56, space-y-60, space-y-64, space-y-72, space-y-80, space-y-96, space-y-reverse
 ```
@@ -502,28 +502,28 @@ space-y-0, space-y-px, space-y-0.5, space-y-1, space-y-1.5, space-y-2, space-y-2
 ### Sizing
 
 #### Width
-```
+```text
 w-0, w-px, w-0.5, w-1, w-1.5, w-2, w-2.5, w-3, w-3.5, w-4, w-5, w-6, w-7, w-8, w-9, w-10, w-11, w-12, w-14, w-16, w-20, w-24, w-28, w-32, w-36, w-40, w-44, w-48, w-52, w-56, w-60, w-64, w-72, w-80, w-96, w-auto, w-1/2, w-1/3, w-2/3, w-1/4, w-2/4, w-3/4, w-1/5, w-2/5, w-3/5, w-4/5, w-1/6, w-2/6, w-3/6, w-4/6, w-5/6, w-1/12, w-2/12, w-3/12, w-4/12, w-5/12, w-6/12, w-7/12, w-8/12, w-9/12, w-10/12, w-11/12, w-full, w-screen, w-svw, w-lvw, w-dvw, w-min, w-max, w-fit
 ```
 
 #### Height
-```
+```text
 h-0, h-px, h-0.5, h-1, h-1.5, h-2, h-2.5, h-3, h-3.5, h-4, h-5, h-6, h-7, h-8, h-9, h-10, h-11, h-12, h-14, h-16, h-20, h-24, h-28, h-32, h-36, h-40, h-44, h-48, h-52, h-56, h-60, h-64, h-72, h-80, h-96, h-auto, h-1/2, h-1/3, h-2/3, h-1/4, h-2/4, h-3/4, h-1/5, h-2/5, h-3/5, h-4/5, h-1/6, h-2/6, h-3/6, h-4/6, h-5/6, h-full, h-screen, h-svh, h-lvh, h-dvh, h-min, h-max, h-fit
 ```
 
 #### Size (Width + Height)
-```
+```text
 size-0, size-px, size-0.5, size-1, size-1.5, size-2, size-2.5, size-3, size-3.5, size-4, size-5, size-6, size-7, size-8, size-9, size-10, size-11, size-12, size-14, size-16, size-20, size-24, size-28, size-32, size-36, size-40, size-44, size-48, size-52, size-56, size-60, size-64, size-72, size-80, size-96, size-auto, size-1/2, size-1/3, size-2/3, size-1/4, size-2/4, size-3/4, size-1/5, size-2/5, size-3/5, size-4/5, size-1/6, size-2/6, size-3/6, size-4/6, size-5/6, size-1/12, size-2/12, size-3/12, size-4/12, size-5/12, size-6/12, size-7/12, size-8/12, size-9/12, size-10/12, size-11/12, size-full, size-min, size-max, size-fit
 ```
 
 #### Min/Max Width
-```
+```text
 min-w-0, min-w-full, min-w-min, min-w-max, min-w-fit
 max-w-0, max-w-xs, max-w-sm, max-w-md, max-w-lg, max-w-xl, max-w-2xl, max-w-3xl, max-w-4xl, max-w-5xl, max-w-6xl, max-w-7xl, max-w-full, max-w-min, max-w-max, max-w-fit, max-w-prose, max-w-screen-sm, max-w-screen-md, max-w-screen-lg, max-w-screen-xl, max-w-screen-2xl
 ```
 
 #### Min/Max Height
-```
+```text
 min-h-0, min-h-full, min-h-screen, min-h-svh, min-h-lvh, min-h-dvh, min-h-min, min-h-max, min-h-fit
 max-h-0, max-h-px, max-h-0.5, max-h-1, max-h-1.5, max-h-2, max-h-2.5, max-h-3, max-h-3.5, max-h-4, max-h-5, max-h-6, max-h-7, max-h-8, max-h-9, max-h-10, max-h-11, max-h-12, max-h-14, max-h-16, max-h-20, max-h-24, max-h-28, max-h-32, max-h-36, max-h-40, max-h-44, max-h-48, max-h-52, max-h-56, max-h-60, max-h-64, max-h-72, max-h-80, max-h-96, max-h-full, max-h-screen, max-h-svh, max-h-lvh, max-h-dvh, max-h-min, max-h-max, max-h-fit
 ```
@@ -531,62 +531,62 @@ max-h-0, max-h-px, max-h-0.5, max-h-1, max-h-1.5, max-h-2, max-h-2.5, max-h-3, m
 ### Typography
 
 #### Font Family
-```
+```text
 font-sans, font-serif, font-mono
 ```
 
 #### Font Size
-```
+```text
 text-xs, text-sm, text-base, text-lg, text-xl, text-2xl, text-3xl, text-4xl, text-5xl, text-6xl, text-7xl, text-8xl, text-9xl
 ```
 
 #### Font Weight
-```
+```text
 font-thin, font-extralight, font-light, font-normal, font-medium, font-semibold, font-bold, font-extrabold, font-black
 ```
 
 #### Font Style
-```
+```text
 italic, not-italic
 ```
 
 #### Font Variant Numeric
-```
+```text
 normal-nums, ordinal, slashed-zero, lining-nums, oldstyle-nums, proportional-nums, tabular-nums, diagonal-fractions, stacked-fractions
 ```
 
 #### Font Stretch (NEW in v4)
-```
+```text
 font-stretch-ultra-condensed, font-stretch-extra-condensed, font-stretch-condensed, font-stretch-semi-condensed, font-stretch-normal, font-stretch-semi-expanded, font-stretch-expanded, font-stretch-extra-expanded, font-stretch-ultra-expanded
 ```
 
 #### Letter Spacing
-```
+```text
 tracking-tighter, tracking-tight, tracking-normal, tracking-wide, tracking-wider, tracking-widest
 ```
 
 #### Line Clamp
-```
+```text
 line-clamp-1, line-clamp-2, line-clamp-3, line-clamp-4, line-clamp-5, line-clamp-6, line-clamp-none
 ```
 
 #### Line Height
-```
+```text
 leading-3, leading-4, leading-5, leading-6, leading-7, leading-8, leading-9, leading-10, leading-none, leading-tight, leading-snug, leading-normal, leading-relaxed, leading-loose
 ```
 
 #### List Style
-```
+```text
 list-none, list-disc, list-decimal, list-inside, list-outside
 ```
 
 #### Text Align
-```
+```text
 text-left, text-center, text-right, text-justify, text-start, text-end
 ```
 
 #### Text Color
-```
+```text
 text-inherit, text-current, text-transparent, text-black, text-white
 text-slate-50, text-slate-100, text-slate-200, text-slate-300, text-slate-400, text-slate-500, text-slate-600, text-slate-700, text-slate-800, text-slate-900, text-slate-950
 text-gray-50, text-gray-100, text-gray-200, text-gray-300, text-gray-400, text-gray-500, text-gray-600, text-gray-700, text-gray-800, text-gray-900, text-gray-950
@@ -613,7 +613,7 @@ text-rose-50, text-rose-100, text-rose-200, text-rose-300, text-rose-400, text-r
 ```
 
 #### Text Decoration
-```
+```text
 underline, overline, line-through, no-underline
 decoration-solid, decoration-double, decoration-dotted, decoration-dashed, decoration-wavy
 decoration-auto, decoration-from-font, decoration-0, decoration-1, decoration-2, decoration-4, decoration-8
@@ -621,59 +621,59 @@ underline-offset-auto, underline-offset-0, underline-offset-1, underline-offset-
 ```
 
 #### Text Transform
-```
+```text
 uppercase, lowercase, capitalize, normal-case
 ```
 
 #### Text Overflow
-```
+```text
 truncate, text-ellipsis, text-clip
 ```
 
 #### Text Shadow (NEW in v4)
-```
+```text
 text-shadow-sm, text-shadow, text-shadow-lg, text-shadow-xl, text-shadow-none
 ```
 
 #### Overflow Wrap (NEW in v4)
-```
+```text
 overflow-wrap-normal, overflow-wrap-break-word, overflow-wrap-anywhere
 ```
 
 #### Vertical Align
-```
+```text
 align-baseline, align-top, align-middle, align-bottom, align-text-top, align-text-bottom, align-sub, align-super
 ```
 
 #### Whitespace
-```
+```text
 whitespace-normal, whitespace-nowrap, whitespace-pre, whitespace-pre-line, whitespace-pre-wrap, whitespace-break-spaces
 ```
 
 #### Word Break
-```
+```text
 break-normal, break-words, break-all, break-keep
 ```
 
 #### Hyphens
-```
+```text
 hyphens-none, hyphens-manual, hyphens-auto
 ```
 
 #### Content
-```
+```text
 content-none
 ```
 
 ### Backgrounds
 
 #### Background Attachment
-```
+```text
 bg-fixed, bg-local, bg-scroll
 ```
 
 #### Background Clip
-```
+```text
 bg-clip-border, bg-clip-padding, bg-clip-content, bg-clip-text
 ```
 
@@ -681,40 +681,40 @@ bg-clip-border, bg-clip-padding, bg-clip-content, bg-clip-text
 All color utilities work with `bg-` prefix (same as text colors above)
 
 #### Background Origin
-```
+```text
 bg-origin-border, bg-origin-padding, bg-origin-content
 ```
 
 #### Background Position
-```
+```text
 bg-bottom, bg-center, bg-left, bg-left-bottom, bg-left-top, bg-right, bg-right-bottom, bg-right-top, bg-top
 ```
 
 #### Background Repeat
-```
+```text
 bg-repeat, bg-no-repeat, bg-repeat-x, bg-repeat-y, bg-repeat-round, bg-repeat-space
 ```
 
 #### Background Size
-```
+```text
 bg-auto, bg-cover, bg-contain
 ```
 
 #### Background Image
-```
+```text
 bg-none
 bg-linear-to-t, bg-linear-to-tr, bg-linear-to-r, bg-linear-to-br, bg-linear-to-b, bg-linear-to-bl, bg-linear-to-l, bg-linear-to-tl
 ```
 
 #### Enhanced Gradients (NEW in v4)
-```
+```text
 bg-linear-0, bg-linear-45, bg-linear-90, bg-linear-135, bg-linear-180, bg-linear-225, bg-linear-270, bg-linear-315
 bg-radial, bg-radial-at-t, bg-radial-at-tr, bg-radial-at-r, bg-radial-at-br, bg-radial-at-b, bg-radial-at-bl, bg-radial-at-l, bg-radial-at-tl, bg-radial-at-c
 bg-conic, bg-conic-at-t, bg-conic-at-tr, bg-conic-at-r, bg-conic-at-br, bg-conic-at-b, bg-conic-at-bl, bg-conic-at-l, bg-conic-at-tl, bg-conic-at-c
 ```
 
 #### Gradient Color Stops
-```
+```text
 from-inherit, from-current, from-transparent, from-black, from-white, from-{color}
 via-inherit, via-current, via-transparent, via-black, via-white, via-{color}
 to-inherit, to-current, to-transparent, to-black, to-white, to-{color}
@@ -723,7 +723,7 @@ to-inherit, to-current, to-transparent, to-black, to-white, to-{color}
 ### Borders
 
 #### Border Radius
-```
+```text
 rounded-none, rounded-xs, rounded-sm, rounded, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-3xl, rounded-full
 rounded-s-none, rounded-s-xs, rounded-s-sm, rounded-s, rounded-s-md, rounded-s-lg, rounded-s-xl, rounded-s-2xl, rounded-s-3xl
 rounded-e-none, rounded-e-xs, rounded-e-sm, rounded-e, rounded-e-md, rounded-e-lg, rounded-e-xl, rounded-e-2xl, rounded-e-3xl
@@ -742,7 +742,7 @@ rounded-bl-none, rounded-bl-xs, rounded-bl-sm, rounded-bl, rounded-bl-md, rounde
 ```
 
 #### Border Width
-```
+```text
 border-0, border-2, border-4, border-8, border, border-x, border-y, border-s, border-e, border-t, border-r, border-b, border-l
 ```
 
@@ -750,12 +750,12 @@ border-0, border-2, border-4, border-8, border, border-x, border-y, border-s, bo
 All color utilities work with `border-` prefix (same as text/bg colors)
 
 #### Border Style
-```
+```text
 border-solid, border-dashed, border-dotted, border-double, border-hidden, border-none
 ```
 
 #### Divide Width
-```
+```text
 divide-x-0, divide-x-2, divide-x-4, divide-x-8, divide-x, divide-y-0, divide-y-2, divide-y-4, divide-y-8, divide-y, divide-x-reverse, divide-y-reverse
 ```
 
@@ -763,12 +763,12 @@ divide-x-0, divide-x-2, divide-x-4, divide-x-8, divide-x, divide-y-0, divide-y-2
 All color utilities work with `divide-` prefix
 
 #### Divide Style
-```
+```text
 divide-solid, divide-dashed, divide-dotted, divide-double, divide-none
 ```
 
 #### Outline Width
-```
+```text
 outline-0, outline-1, outline-2, outline-4, outline-8
 ```
 
@@ -776,17 +776,17 @@ outline-0, outline-1, outline-2, outline-4, outline-8
 All color utilities work with `outline-` prefix
 
 #### Outline Style
-```
+```text
 outline-none, outline, outline-dashed, outline-dotted, outline-double
 ```
 
 #### Outline Offset
-```
+```text
 outline-offset-0, outline-offset-1, outline-offset-2, outline-offset-4, outline-offset-8
 ```
 
 #### Ring Width
-```
+```text
 ring-0, ring-1, ring-2, ring, ring-4, ring-8, ring-inset
 ```
 
@@ -794,7 +794,7 @@ ring-0, ring-1, ring-2, ring, ring-4, ring-8, ring-inset
 All color utilities work with `ring-` prefix
 
 #### Ring Offset Width
-```
+```text
 ring-offset-0, ring-offset-1, ring-offset-2, ring-offset-4, ring-offset-8
 ```
 
@@ -804,7 +804,7 @@ All color utilities work with `ring-offset-` prefix
 ### Effects
 
 #### Box Shadow
-```
+```text
 shadow-xs, shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl, shadow-2xl, shadow-inner, shadow-none
 ```
 
@@ -812,254 +812,254 @@ shadow-xs, shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl, shadow-2xl, shado
 All color utilities work with `shadow-` prefix
 
 #### Drop Shadow (NEW colored support in v4)
-```
+```text
 drop-shadow-sm, drop-shadow, drop-shadow-md, drop-shadow-lg, drop-shadow-xl, drop-shadow-2xl, drop-shadow-none
 ```
 
 #### Opacity
-```
+```text
 opacity-0, opacity-5, opacity-10, opacity-15, opacity-20, opacity-25, opacity-30, opacity-35, opacity-40, opacity-45, opacity-50, opacity-55, opacity-60, opacity-65, opacity-70, opacity-75, opacity-80, opacity-85, opacity-90, opacity-95, opacity-100
 ```
 
 #### Mix Blend Mode
-```
+```text
 mix-blend-normal, mix-blend-multiply, mix-blend-screen, mix-blend-overlay, mix-blend-darken, mix-blend-lighten, mix-blend-color-dodge, mix-blend-color-burn, mix-blend-hard-light, mix-blend-soft-light, mix-blend-difference, mix-blend-exclusion, mix-blend-hue, mix-blend-saturation, mix-blend-color, mix-blend-luminosity, mix-blend-plus-darker, mix-blend-plus-lighter
 ```
 
 #### Background Blend Mode
-```
+```text
 bg-blend-normal, bg-blend-multiply, bg-blend-screen, bg-blend-overlay, bg-blend-darken, bg-blend-lighten, bg-blend-color-dodge, bg-blend-color-burn, bg-blend-hard-light, bg-blend-soft-light, bg-blend-difference, bg-blend-exclusion, bg-blend-hue, bg-blend-saturation, bg-blend-color, bg-blend-luminosity
 ```
 
 ### Filters
 
 #### Blur
-```
+```text
 blur-none, blur-xs, blur-sm, blur, blur-md, blur-lg, blur-xl, blur-2xl, blur-3xl
 ```
 
 #### Brightness
-```
+```text
 brightness-0, brightness-50, brightness-75, brightness-90, brightness-95, brightness-100, brightness-105, brightness-110, brightness-125, brightness-150, brightness-200
 ```
 
 #### Contrast
-```
+```text
 contrast-0, contrast-50, contrast-75, contrast-100, contrast-125, contrast-150, contrast-200
 ```
 
 #### Grayscale
-```
+```text
 grayscale-0, grayscale
 ```
 
 #### Hue Rotate
-```
+```text
 hue-rotate-0, hue-rotate-15, hue-rotate-30, hue-rotate-60, hue-rotate-90, hue-rotate-180, -hue-rotate-180, -hue-rotate-90, -hue-rotate-60, -hue-rotate-30, -hue-rotate-15
 ```
 
 #### Invert
-```
+```text
 invert-0, invert
 ```
 
 #### Saturate
-```
+```text
 saturate-0, saturate-50, saturate-100, saturate-150, saturate-200
 ```
 
 #### Sepia
-```
+```text
 sepia-0, sepia
 ```
 
 #### Backdrop Blur
-```
+```text
 backdrop-blur-none, backdrop-blur-xs, backdrop-blur-sm, backdrop-blur, backdrop-blur-md, backdrop-blur-lg, backdrop-blur-xl, backdrop-blur-2xl, backdrop-blur-3xl
 ```
 
 #### Backdrop Brightness
-```
+```text
 backdrop-brightness-0, backdrop-brightness-50, backdrop-brightness-75, backdrop-brightness-90, backdrop-brightness-95, backdrop-brightness-100, backdrop-brightness-105, backdrop-brightness-110, backdrop-brightness-125, backdrop-brightness-150, backdrop-brightness-200
 ```
 
 #### Backdrop Contrast
-```
+```text
 backdrop-contrast-0, backdrop-contrast-50, backdrop-contrast-75, backdrop-contrast-100, backdrop-contrast-125, backdrop-contrast-150, backdrop-contrast-200
 ```
 
 #### Backdrop Grayscale
-```
+```text
 backdrop-grayscale-0, backdrop-grayscale
 ```
 
 #### Backdrop Hue Rotate
-```
+```text
 backdrop-hue-rotate-0, backdrop-hue-rotate-15, backdrop-hue-rotate-30, backdrop-hue-rotate-60, backdrop-hue-rotate-90, backdrop-hue-rotate-180, -backdrop-hue-rotate-180, -backdrop-hue-rotate-90, -backdrop-hue-rotate-60, -backdrop-hue-rotate-30, -backdrop-hue-rotate-15
 ```
 
 #### Backdrop Invert
-```
+```text
 backdrop-invert-0, backdrop-invert
 ```
 
 #### Backdrop Saturate
-```
+```text
 backdrop-saturate-0, backdrop-saturate-50, backdrop-saturate-100, backdrop-saturate-150, backdrop-saturate-200
 ```
 
 #### Backdrop Sepia
-```
+```text
 backdrop-sepia-0, backdrop-sepia
 ```
 
 ### Masks (NEW in v4)
 
 #### Mask Image
-```
+```text
 mask-none
 ```
 
 #### Mask Size
-```
+```text
 mask-auto, mask-cover, mask-contain
 ```
 
 #### Mask Repeat
-```
+```text
 mask-repeat, mask-no-repeat, mask-repeat-x, mask-repeat-y, mask-repeat-round, mask-repeat-space
 ```
 
 #### Mask Position
-```
+```text
 mask-bottom, mask-center, mask-left, mask-left-bottom, mask-left-top, mask-right, mask-right-bottom, mask-right-top, mask-top
 ```
 
 #### Mask Origin
-```
+```text
 mask-origin-border, mask-origin-padding, mask-origin-content
 ```
 
 #### Mask Clip
-```
+```text
 mask-clip-border, mask-clip-padding, mask-clip-content
 ```
 
 #### Mask Composite
-```
+```text
 mask-composite-add, mask-composite-subtract, mask-composite-intersect, mask-composite-exclude
 ```
 
 #### Mask Mode
-```
+```text
 mask-mode-match-source, mask-mode-luminance, mask-mode-alpha
 ```
 
 #### Mask Type
-```
+```text
 mask-type-luminance, mask-type-alpha
 ```
 
 ### Tables
 
 #### Border Collapse
-```
+```text
 border-collapse, border-separate
 ```
 
 #### Border Spacing
-```
+```text
 border-spacing-0, border-spacing-px, border-spacing-0.5, border-spacing-1, border-spacing-1.5, border-spacing-2, border-spacing-2.5, border-spacing-3, border-spacing-3.5, border-spacing-4, border-spacing-5, border-spacing-6, border-spacing-7, border-spacing-8, border-spacing-9, border-spacing-10, border-spacing-11, border-spacing-12, border-spacing-14, border-spacing-16, border-spacing-20, border-spacing-24, border-spacing-28, border-spacing-32, border-spacing-36, border-spacing-40, border-spacing-44, border-spacing-48, border-spacing-52, border-spacing-56, border-spacing-60, border-spacing-64, border-spacing-72, border-spacing-80, border-spacing-96
 border-spacing-x-0, border-spacing-y-0 (and all other spacing values)
 ```
 
 #### Table Layout
-```
+```text
 table-auto, table-fixed
 ```
 
 #### Caption Side
-```
+```text
 caption-top, caption-bottom
 ```
 
 ### Transforms
 
 #### Scale
-```
+```text
 scale-0, scale-50, scale-75, scale-90, scale-95, scale-100, scale-105, scale-110, scale-125, scale-150
 scale-x-0, scale-x-50, scale-x-75, scale-x-90, scale-x-95, scale-x-100, scale-x-105, scale-x-110, scale-x-125, scale-x-150
 scale-y-0, scale-y-50, scale-y-75, scale-y-90, scale-y-95, scale-y-100, scale-y-105, scale-y-110, scale-y-125, scale-y-150
 ```
 
 #### Scale Z (NEW in v4)
-```
+```text
 scale-z-0, scale-z-50, scale-z-75, scale-z-90, scale-z-95, scale-z-100, scale-z-105, scale-z-110, scale-z-125, scale-z-150
 ```
 
 #### Rotate
-```
+```text
 rotate-0, rotate-1, rotate-2, rotate-3, rotate-6, rotate-12, rotate-45, rotate-90, rotate-180, -rotate-180, -rotate-90, -rotate-45, -rotate-12, -rotate-6, -rotate-3, -rotate-2, -rotate-1
 ```
 
 #### Rotate X/Y (NEW in v4)
-```
+```text
 rotate-x-0, rotate-x-1, rotate-x-2, rotate-x-3, rotate-x-6, rotate-x-12, rotate-x-45, rotate-x-90, rotate-x-180, -rotate-x-180, -rotate-x-90, -rotate-x-45, -rotate-x-12, -rotate-x-6, -rotate-x-3, -rotate-x-2, -rotate-x-1
 rotate-y-0, rotate-y-1, rotate-y-2, rotate-y-3, rotate-y-6, rotate-y-12, rotate-y-45, rotate-y-90, rotate-y-180, -rotate-y-180, -rotate-y-90, -rotate-y-45, -rotate-y-12, -rotate-y-6, -rotate-y-3, -rotate-y-2, -rotate-y-1
 ```
 
 #### Translate
-```
+```text
 translate-x-0, translate-x-px, translate-x-0.5, translate-x-1, translate-x-1.5, translate-x-2, translate-x-2.5, translate-x-3, translate-x-3.5, translate-x-4, translate-x-5, translate-x-6, translate-x-7, translate-x-8, translate-x-9, translate-x-10, translate-x-11, translate-x-12, translate-x-14, translate-x-16, translate-x-20, translate-x-24, translate-x-28, translate-x-32, translate-x-36, translate-x-40, translate-x-44, translate-x-48, translate-x-52, translate-x-56, translate-x-60, translate-x-64, translate-x-72, translate-x-80, translate-x-96, translate-x-1/2, translate-x-1/3, translate-x-2/3, translate-x-1/4, translate-x-2/4, translate-x-3/4, translate-x-full
 translate-y-0, translate-y-px, translate-y-0.5, translate-y-1, translate-y-1.5, translate-y-2, translate-y-2.5, translate-y-3, translate-y-3.5, translate-y-4, translate-y-5, translate-y-6, translate-y-7, translate-y-8, translate-y-9, translate-y-10, translate-y-11, translate-y-12, translate-y-14, translate-y-16, translate-y-20, translate-y-24, translate-y-28, translate-y-32, translate-y-36, translate-y-40, translate-y-44, translate-y-48, translate-y-52, translate-y-56, translate-y-60, translate-y-64, translate-y-72, translate-y-80, translate-y-96, translate-y-1/2, translate-y-1/3, translate-y-2/3, translate-y-1/4, translate-y-2/4, translate-y-3/4, translate-y-full
 ```
 
 #### Translate Z (NEW in v4)
-```
+```text
 translate-z-0, translate-z-px, translate-z-0.5, translate-z-1, translate-z-1.5, translate-z-2, translate-z-2.5, translate-z-3, translate-z-3.5, translate-z-4, translate-z-5, translate-z-6, translate-z-7, translate-z-8, translate-z-9, translate-z-10, translate-z-11, translate-z-12, translate-z-14, translate-z-16, translate-z-20, translate-z-24, translate-z-28, translate-z-32, translate-z-36, translate-z-40, translate-z-44, translate-z-48, translate-z-52, translate-z-56, translate-z-60, translate-z-64, translate-z-72, translate-z-80, translate-z-96
 ```
 
 #### Skew
-```
+```text
 skew-x-0, skew-x-1, skew-x-2, skew-x-3, skew-x-6, skew-x-12, -skew-x-12, -skew-x-6, -skew-x-3, -skew-x-2, -skew-x-1
 skew-y-0, skew-y-1, skew-y-2, skew-y-3, skew-y-6, skew-y-12, -skew-y-12, -skew-y-6, -skew-y-3, -skew-y-2, -skew-y-1
 ```
 
 #### Transform Origin
-```
+```text
 origin-center, origin-top, origin-top-right, origin-right, origin-bottom-right, origin-bottom, origin-bottom-left, origin-left, origin-top-left
 ```
 
 #### Transform Style (NEW in v4)
-```
+```text
 transform-style-flat, transform-style-preserve-3d
 ```
 
 #### Perspective (NEW in v4)
-```
+```text
 perspective-none, perspective-250, perspective-500, perspective-750, perspective-1000, perspective-distant
 ```
 
 #### Perspective Origin (NEW in v4)
-```
+```text
 perspective-origin-center, perspective-origin-top, perspective-origin-top-right, perspective-origin-right, perspective-origin-bottom-right, perspective-origin-bottom, perspective-origin-bottom-left, perspective-origin-left, perspective-origin-top-left
 ```
 
 ### Interactivity
 
 #### Accent Color
-```
+```text
 accent-auto, accent-inherit, accent-current, accent-transparent, accent-black, accent-white
 accent-{color} (all color utilities work with accent- prefix)
 ```
 
 #### Appearance
-```
+```text
 appearance-none, appearance-auto
 ```
 
 #### Cursor
-```
+```text
 cursor-auto, cursor-default, cursor-pointer, cursor-wait, cursor-text, cursor-move, cursor-help, cursor-not-allowed, cursor-none, cursor-context-menu, cursor-progress, cursor-cell, cursor-crosshair, cursor-vertical-text, cursor-alias, cursor-copy, cursor-no-drop, cursor-grab, cursor-grabbing, cursor-all-scroll, cursor-col-resize, cursor-row-resize, cursor-n-resize, cursor-e-resize, cursor-s-resize, cursor-w-resize, cursor-ne-resize, cursor-nw-resize, cursor-se-resize, cursor-sw-resize, cursor-ew-resize, cursor-ns-resize, cursor-nesw-resize, cursor-nwse-resize, cursor-zoom-in, cursor-zoom-out
 ```
 
@@ -1067,102 +1067,102 @@ cursor-auto, cursor-default, cursor-pointer, cursor-wait, cursor-text, cursor-mo
 All color utilities work with `caret-` prefix
 
 #### Pointer Events
-```
+```text
 pointer-events-none, pointer-events-auto
 ```
 
 #### Resize
-```
+```text
 resize-none, resize, resize-y, resize-x
 ```
 
 #### Scroll Behavior
-```
+```text
 scroll-auto, scroll-smooth
 ```
 
 #### Scroll Margin
-```
+```text
 scroll-m-0, scroll-m-px, scroll-m-0.5, scroll-m-1, scroll-m-1.5, scroll-m-2, scroll-m-2.5, scroll-m-3, scroll-m-3.5, scroll-m-4, scroll-m-5, scroll-m-6, scroll-m-7, scroll-m-8, scroll-m-9, scroll-m-10, scroll-m-11, scroll-m-12, scroll-m-14, scroll-m-16, scroll-m-20, scroll-m-24, scroll-m-28, scroll-m-32, scroll-m-36, scroll-m-40, scroll-m-44, scroll-m-48, scroll-m-52, scroll-m-56, scroll-m-60, scroll-m-64, scroll-m-72, scroll-m-80, scroll-m-96
 scroll-mx-0, scroll-my-0, scroll-ms-0, scroll-me-0, scroll-mt-0, scroll-mr-0, scroll-mb-0, scroll-ml-0 (and all spacing values)
 ```
 
 #### Scroll Padding
-```
+```text
 scroll-p-0, scroll-p-px, scroll-p-0.5, scroll-p-1, scroll-p-1.5, scroll-p-2, scroll-p-2.5, scroll-p-3, scroll-p-3.5, scroll-p-4, scroll-p-5, scroll-p-6, scroll-p-7, scroll-p-8, scroll-p-9, scroll-p-10, scroll-p-11, scroll-p-12, scroll-p-14, scroll-p-16, scroll-p-20, scroll-p-24, scroll-p-28, scroll-p-32, scroll-p-36, scroll-p-40, scroll-p-44, scroll-p-48, scroll-p-52, scroll-p-56, scroll-p-60, scroll-p-64, scroll-p-72, scroll-p-80, scroll-p-96
 scroll-px-0, scroll-py-0, scroll-ps-0, scroll-pe-0, scroll-pt-0, scroll-pr-0, scroll-pb-0, scroll-pl-0 (and all spacing values)
 ```
 
 #### Scroll Snap Align
-```
+```text
 snap-start, snap-end, snap-center, snap-align-none
 ```
 
 #### Scroll Snap Stop
-```
+```text
 snap-normal, snap-always
 ```
 
 #### Scroll Snap Type
-```
+```text
 snap-none, snap-x, snap-y, snap-both, snap-mandatory, snap-proximity
 ```
 
 #### Touch Action
-```
+```text
 touch-auto, touch-none, touch-pan-x, touch-pan-left, touch-pan-right, touch-pan-y, touch-pan-up, touch-pan-down, touch-pinch-zoom, touch-manipulation
 ```
 
 #### User Select
-```
+```text
 select-none, select-text, select-all, select-auto
 ```
 
 #### Will Change
-```
+```text
 will-change-auto, will-change-scroll, will-change-contents, will-change-transform
 ```
 
 ### SVG
 
 #### Fill
-```
+```text
 fill-none, fill-inherit, fill-current, fill-transparent, fill-black, fill-white
 fill-{color} (all color utilities work with fill- prefix)
 ```
 
 #### Stroke
-```
+```text
 stroke-none, stroke-inherit, stroke-current, stroke-transparent, stroke-black, stroke-white
 stroke-{color} (all color utilities work with stroke- prefix)
 ```
 
 #### Stroke Width
-```
+```text
 stroke-0, stroke-1, stroke-2
 ```
 
 ### Accessibility
 
 #### Screen Readers
-```
+```text
 sr-only, not-sr-only
 ```
 
 #### Forced Color Adjust
-```
+```text
 forced-color-adjust-auto, forced-color-adjust-none
 ```
 
 ### Container Queries (NEW in v4)
 
 #### Container Type
-```
+```text
 @container, @container-normal, @container-size, @container-inline-size
 ```
 
 #### Container Query Variants
-```
+```text
 @xs:, @sm:, @md:, @lg:, @xl:, @2xl:, @3xl:, @4xl:, @5xl:, @6xl:, @7xl:
 @min-w-0:, @min-w-xs:, @min-w-sm:, @min-w-md:, @min-w-lg:, @min-w-xl:, @min-w-2xl:, @min-w-3xl:, @min-w-4xl:, @min-w-5xl:, @min-w-6xl:, @min-w-7xl:
 @max-w-xs:, @max-w-sm:, @max-w-md:, @max-w-lg:, @max-w-xl:, @max-w-2xl:, @max-w-3xl:, @max-w-4xl:, @max-w-5xl:, @max-w-6xl:, @max-w-7xl:
@@ -1173,7 +1173,7 @@ forced-color-adjust-auto, forced-color-adjust-none
 ### Responsive Design
 
 #### Breakpoint Variants
-```
+```text
 sm:, md:, lg:, xl:, 2xl:
 max-sm:, max-md:, max-lg:, max-xl:, max-2xl:
 ```
@@ -1181,71 +1181,71 @@ max-sm:, max-md:, max-lg:, max-xl:, max-2xl:
 ### State Variants
 
 #### Hover, Focus, etc.
-```
+```text
 hover:, focus:, focus-within:, focus-visible:, active:, visited:, target:, disabled:, enabled:, checked:, indeterminate:, default:, required:, valid:, invalid:, in-range:, out-of-range:, placeholder-shown:, autofill:, read-only:
 ```
 
 #### Group States
-```
+```text
 group-hover:, group-focus:, group-focus-within:, group-focus-visible:, group-active:, group-visited:, group-target:, group-disabled:, group-enabled:, group-checked:, group-indeterminate:, group-default:, group-required:, group-valid:, group-invalid:, group-in-range:, group-out-of-range:, group-placeholder-shown:, group-autofill:, group-read-only:
 ```
 
 #### Peer States
-```
+```text
 peer-hover:, peer-focus:, peer-focus-within:, peer-focus-visible:, peer-active:, peer-visited:, peer-target:, peer-disabled:, peer-enabled:, peer-checked:, peer-indeterminate:, peer-default:, peer-required:, peer-valid:, peer-invalid:, peer-in-range:, peer-out-of-range:, peer-placeholder-shown:, peer-autofill:, peer-read-only:
 ```
 
 #### NEW Variants in v4
-```
+```text
 @starting-style:, not-*, nth-*, in-*, inert:, open: (for popovers)
 ```
 
 ### Media Queries
 
 #### Dark Mode
-```
+```text
 dark:
 ```
 
 #### Motion
-```
+```text
 motion-safe:, motion-reduce:
 ```
 
 #### Contrast
-```
+```text
 contrast-more:, contrast-less:
 ```
 
 #### Print
-```
+```text
 print:
 ```
 
 #### Orientation
-```
+```text
 portrait:, landscape:
 ```
 
 ### Content
-```
+```text
 content-none, content-['text']
 ```
 
 ### Arbitrary Values
 You can use arbitrary values with square brackets for any property:
-```
+```text
 w-[123px], h-[456px], text-[#bada55], bg-[url('...')], top-[117px], left-[344px]
 m-[12px], p-[24px], grid-cols-[200px_minmax(900px,_1fr)_100px]
 ```
 
 ### Arbitrary Properties
-```
+```text
 [mask-type:luminance], [tab-size:4], [@supports(backdrop-filter:blur(0))]:bg-white/75
 ```
 
 ### Arbitrary Variants
-```
+```text
 [&:nth-child(3)]:, [&:hover]:, [&_p]:, [@media(min-width:600px)]:
 [@supports(backdrop-filter:blur(0))]:, [data-theme="dark"]:
 ```

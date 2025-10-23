@@ -122,6 +122,45 @@
     @apply h-8 w-8;
   }
 
+  .product-logo--limela {
+    transform-origin: 50% 50%;
+  }
+
+  .group:hover .product-logo--limela,
+  .group:focus-visible .product-logo--limela {
+    animation: limelaOrbit 3.2s ease-in-out infinite;
+  }
+
+  .group:hover .product-logo--netsuke .product-logo__netsuke-bead,
+  .group:focus-visible .product-logo--netsuke .product-logo__netsuke-bead {
+    animation: netsukeSlide 1.6s ease-in-out infinite;
+  }
+
+  .group:hover .product-logo--mxd .product-logo__mxd-center,
+  .group:focus-visible .product-logo--mxd .product-logo__mxd-center {
+    transform-origin: 50% 50%;
+    animation: mxdPulse 1.8s ease-in-out infinite;
+  }
+
+  .product-logo--episodic .product-logo__episodic-track {
+    opacity: 0.7;
+  }
+
+  .group:hover .product-logo--episodic .product-logo__episodic-track,
+  .group:focus-visible .product-logo--episodic .product-logo__episodic-track {
+    animation: episodicShimmer 1.4s ease-in-out infinite;
+  }
+
+  .group:hover .product-logo--episodic .product-logo__episodic-track--2,
+  .group:focus-visible .product-logo--episodic .product-logo__episodic-track--2 {
+    animation-delay: 0.12s;
+  }
+
+  .group:hover .product-logo--episodic .product-logo__episodic-track--3,
+  .group:focus-visible .product-logo--episodic .product-logo__episodic-track--3 {
+    animation-delay: 0.24s;
+  }
+
   .product-card__title {
     @apply font-mono text-2xl font-bold text-base-content;
   }
@@ -341,9 +380,65 @@
   }
 }
 
+@keyframes limelaOrbit {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(15deg);
+  }
+}
+
+@keyframes netsukeSlide {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes mxdPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes episodicShimmer {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .neon-pulse {
     animation: none;
     text-shadow: none;
+  }
+
+  .group:hover .product-logo--limela,
+  .group:focus-visible .product-logo--limela,
+  .group:hover .product-logo--netsuke .product-logo__netsuke-bead,
+  .group:focus-visible .product-logo--netsuke .product-logo__netsuke-bead,
+  .group:hover .product-logo--mxd .product-logo__mxd-center,
+  .group:focus-visible .product-logo--mxd .product-logo__mxd-center,
+  .group:hover .product-logo--episodic .product-logo__episodic-track,
+  .group:focus-visible .product-logo--episodic .product-logo__episodic-track {
+    animation: none;
+    transform: none;
   }
 }

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>df12 PRODUCTIONS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the line printer / CRT theme */
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #0c0c0c;
+            color: #00ff41; /* Base green terminal color */
+            font-size: 1.25rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            /* Animation for the main text glow and flicker */
+            animation: text-glow-flicker 5s linear infinite;
+        }
+
+        /* --- CRT Scanlines and Vignette Overlay --- */
+        /* This pseudo-element sits on top of everything to create the CRT effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: 
+                /* Scanlines */
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.2) 0px,
+                    rgba(0, 0, 0, 0.2) 1px,
+                    transparent 1px,
+                    transparent 3px
+                ),
+                /* Vignette (darker edges) */
+                radial-gradient(ellipse at center, rgba(0,0,0,0) 65%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none; /* Allows clicks to go through to the content below */
+            z-index: 2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative; /* Needed for z-index to work correctly */
+            z-index: 1;
+        }
+
+        .header-art {
+            white-space: pre;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            color: #00c132;
+        }
+        .section-title {
+            border-bottom: 2px solid #00ff41;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+        .category-title {
+            color: #00ff41;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        .repo-link {
+            color: #00ff41;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .repo-link:hover {
+            background-color: #00ff41;
+            color: #0c0c0c;
+        }
+        .repo-item {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 2px solid #008f25;
+        }
+        @media (min-width: 640px) {
+            .repo-item {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+        .repo-name {
+            flex-shrink: 0;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+         @media (min-width: 640px) {
+            .repo-name {
+                 width: 250px;
+                 margin-bottom: 0;
+            }
+        }
+        .repo-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .repo-desc {
+            color: #00c132;
+        }
+        .repo-lang {
+            color: #008f25;
+            font-style: italic;
+        }
+        .footer {
+            margin-top: 4rem;
+            text-align: center;
+            font-size: 1rem;
+            color: #008f25;
+        }
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.25rem;
+            background-color: #00ff41;
+            animation: blink 1s step-end infinite;
+            vertical-align: bottom;
+        }
+
+        /* --- Keyframe Animations --- */
+
+        /* Blinking cursor */
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: #00ff41; }
+        }
+
+        /* Simulates phosphor glow, color decay, and voltage flicker of a CRT */
+        @keyframes text-glow-flicker {
+            0% {
+                text-shadow: 0 0 5px #00ff41;
+                color: #00ff41;
+            }
+            48% { /* Long stable period */
+                text-shadow: 0 0 5px #00ff41;
+                color: #00ff41;
+            }
+            50% { /* Quick flicker */
+                text-shadow: 0 0 2px #33ff77;
+                color: #66ff99;
+            }
+            52% { /* Return to normal */
+                text-shadow: 0 0 5px #00ff41;
+                color: #00ff41;
+            }
+            98% { /* Another quick flicker before loop */
+                text-shadow: none;
+                color: #00c132;
+            }
+            100% {
+                text-shadow: 0 0 5px #00ff41;
+                color: #00ff41;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container">
+
+        <!-- Header ASCII Art -->
+        <header>
+            <div class="header-art">
+:::::::::  ::::::::::   :::    :::::::: 
+:+:    :+: :+:        :+:+:   :+:    :+: 
++:+    +:+ +:+          +:+         +:+  
++#+    +:+ :#::+::#     +#+       +#+    
++#+    +#+ +#+          +#+     +#+      
+#+#    #+# #+#          #+#    #+#       
+#########  ###        ####### ########## 
+            </div>
+            <h1 class="text-3xl sm:text-4xl text-center mb-8">DF12 PRODUCTIONS</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Introduction Section -->
+            <section>
+                <h2 class="section-title">> STATUS_</h2>
+                <p class="mb-4">SYSTEM ONLINE. ALL CIRCUITS FUNCTIONAL.</p>
+                <p>BUILDING TOOLING FOR AUTONOMOUS AGENTS, RAG PIPELINES, AND OTHER SYSTEMS THAT TALK TO THEMSELVES. INVENTING PROTOCOLS I’LL REGRET. OBSESSING OVER OBSERVABILITY, SERIALIZATION, AND NICHE MERMAID LINTING PROBLEMS. EVERYTHING’S A TEMPLATE; NOTHING’S FINISHED.</p>
+            </section>
+
+            <!-- Repositories Section -->
+            <section class="mt-8">
+                <h2 class="section-title">> EXECUTE: list_repositories --all --categorize</h2>
+                <div id="repo-list">
+                    <!-- Repository items will be injected here by JavaScript -->
+                </div>
+            </section>
+
+            <p>UNSTABLE SYSTEMS FOR UNSTABLE TIMES. DEMONS THAT LOG THEMSELVES. PROMPTS THAT MUTATE. CONFIGS THAT INHERIT TRAUMA. IF IT SERIALIZES, I’LL INSTRUMENT IT.</p>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>// SESSION_TERMINATED</p>
+            <p>READY<span class="cursor"></span></p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Data for the repositories, taken from the provided index.
+        const repositories = {
+            "// 2025–2013: current & recent work": [
+                { name: "mxd", description: "Marrakesh Express background daemon.", lang: "Rust" },
+                { name: "falcon-pachinko", description: "Web-socket routing extension for the Falcon framework.", lang: "Python" },
+                { name: "wireframe", description: "Experimental server/client toolkit for custom binary protocols.", lang: "Rust" },
+                { name: "agent-template-python", description: "Copier template for agentic Python projects.", lang: "Jinja" },
+                { name: "femtologging", description: "“Rust remake of picologging”; Python wrapper with a Rust extension.", lang: "Python / Rust" },
+                { name: "bournemouth", description: "“Raggy Graph Chat” — a small RAG demo.", lang: "Python" },
+                { name: "falcon-correlate", description: "Minimal Copier stub showing request-correlation middleware.", lang: "Python" },
+                { name: "agent-template-rust", description: "Copier template that spits out a ready-to-lint Rust crate + CI.", lang: "Python / Jinja" },
+                { name: "nixie", description: "CLI that hunts Markdown files and validates inline Mermaid diagrams.", lang: "Python" },
+                { name: "ortho-config", description: "Orthographic config loader (CLI args ⇆ env vars ⇆ files) for Rust apps.", lang: "Rust" },
+                { name: "vk", description: "ViewKoments — light-weight commenting server.", lang: "Rust" },
+                { name: "lille", description: "RTS engine prototype.", lang: "Rust" },
+                { name: "msgspec-crockford", description: "Crockford-style UUID support for the msgspec serializer.", lang: "Python" },
+                { name: "synhx-client", description: "GTK/CLI Hotline chat-client revival.", lang: "C" },
+                { name: "craic", description: "Web-based audio-book studio (Vite + Bun tool-chain).", lang: "TypeScript" },
+                { name: "novelcrafter-prompts", description: "A bundle of reusable Novelcrafter AI-prompts.", lang: "Makefile" },
+                { name: "nc-prompt-tools", description: "Linter / converter for Novelcrafter prompt blobs.", lang: "Python" },
+                { name: "parliament", description: "Successor to Converse: client/server threaded message board.", lang: "Rust" }
+            ],
+            "// Older & forked work (2012-2024)": [
+                { name: "ansible (fork)", urlName: "ansible", description: "Mirror of the Ansible automation platform.", lang: "Python" },
+                { name: "tornado-elasticsearch (fork)", urlName: "tornado-elasticsearch", description: "Asynchronous ES client for Tornado.", lang: "Python" },
+                { name: "cog", description: "Community-garden management tool.", lang: "Rust" },
+                { name: "tornado (fork)", urlName: "tornado", description: "Tornado web framework.", lang: "Python" },
+                { name: "check_ssl_cert (fork)", urlName: "check_ssl_cert", description: "Nagios plug-in for X.509 checks.", lang: "Shell" },
+                { name: "nanorc (fork)", urlName: "nanorc", description: "Rich syntax-highlighting set for nano.", lang: "Makefile" },
+                { name: "pysimplesoap (fork)", urlName: "pysimplesoap", description: "Simple SOAP library.", lang: "Python" },
+                { name: "nim-port", description: "FreeBSD port skeleton for Nimrod/Nim.", lang: "Nim" },
+                { name: "comrade-docker", description: "Dockerised COMRADE canvassing suite.", lang: "Python" },
+                { name: "canvassing (fork)", urlName: "canvassing", description: "Scottish Socialist Party canvassing app.", lang: "Python" },
+                { name: "el-takeaway", description: "Data-export helper for the (now-defunct) Ello network.", lang: "Shell" },
+                { name: "gambit", description: "Browser-based tactical RPG prototype.", lang: "JavaScript" }
+            ],
+            "// Very early JavaScript / Ruby utilities (2013 and earlier)": [
+                { name: "loeber", description: "Browser player for Loebner-Prize chat transcripts (2010 format).", lang: "JavaScript" },
+                { name: "converse", description: "Original message-board (pre-Parliament).", lang: "JavaScript" },
+                { name: "suboffset", description: "Small tool to shift ASS/SSA subtitles in time.", lang: "Ruby" }
+            ]
+        };
+
+        // Function to create and append repo items to the list
+        function displayRepos() {
+            const repoListContainer = document.getElementById('repo-list');
+            if (!repoListContainer) return;
+
+            const base_url = "https://github.com/leynos/";
+
+            for (const category in repositories) {
+                // Create a title for the category
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = category;
+                repoListContainer.appendChild(categoryTitle);
+
+                // Loop through repos in the current category
+                repositories[category].forEach(repo => {
+                    // Create the main container for the repo item
+                    const item = document.createElement('div');
+                    item.className = 'repo-item';
+
+                    // Determine the correct name for the URL
+                    const repoUrlName = repo.urlName || repo.name;
+
+                    // Create the name/link element
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'repo-name';
+                    
+                    const link = document.createElement('a');
+                    link.href = `${base_url}${repoUrlName}`;
+                    link.textContent = `> ${repo.name}`;
+                    link.className = 'repo-link';
+                    link.target = '_blank'; // Open in new tab
+                    link.rel = 'noopener noreferrer';
+                    
+                    nameDiv.appendChild(link);
+
+                    // Create a container for description and language
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'repo-details';
+
+                    // Create the description element
+                    const descDiv = document.createElement('p');
+                    descDiv.className = 'repo-desc';
+                    descDiv.textContent = repo.description;
+
+                    // Create the language element
+                    const langDiv = document.createElement('p');
+                    langDiv.className = 'repo-lang';
+                    langDiv.textContent = `[ ${repo.lang} ]`;
+
+                    // Append description and language to the details container
+                    detailsDiv.appendChild(descDiv);
+                    detailsDiv.appendChild(langDiv);
+
+                    // Append name and details to the item
+                    item.appendChild(nameDiv);
+                    item.appendChild(detailsDiv);
+
+                    // Append the item to the main list container
+                    repoListContainer.appendChild(item);
+                });
+            }
+        }
+
+        // Run the function when the page loads
+        document.addEventListener('DOMContentLoaded', displayRepos);
+    </script>
+
+</body>
+</html>

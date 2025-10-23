@@ -20,6 +20,7 @@
   body {
     background-color: #f3f4f6;
     background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+    @apply font-sans tracking-tight text-base-content;
   }
 
   a:focus-visible,
@@ -68,12 +69,16 @@
     @apply text-4xl font-bold leading-[1.05] md:text-6xl;
   }
 
+  .cta {
+    @apply inline-flex items-center justify-center rounded-xl px-10 py-4 font-mono text-lg font-bold;
+  }
+
   .cta-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-primary px-10 py-4 font-mono text-lg font-bold text-primary-content;
+    @apply bg-primary text-primary-content;
   }
 
   .cta-secondary {
-    @apply inline-flex items-center justify-center rounded-xl border border-primary bg-white px-10 py-4 font-mono text-lg font-bold text-primary hover:bg-primary/10;
+    @apply border border-primary bg-white text-primary hover:bg-primary/10;
   }
 
   .section-title {
@@ -109,6 +114,10 @@
     @apply relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11;
   }
 
+  .product-card__content {
+    @apply flex h-full items-start gap-4;
+  }
+
   .product-card__title {
     @apply font-mono text-2xl font-bold text-base-content;
   }
@@ -131,12 +140,45 @@
     @apply flex flex-col justify-center;
   }
 
+  .world-card__header {
+    @apply flex items-center gap-4;
+  }
+
+  .world-card__icon {
+    @apply flex h-6 w-6 items-center justify-center text-accent;
+  }
+
+  .world-card__cta {
+    @apply mt-6 inline-flex items-center gap-2 font-mono text-sm text-accent;
+  }
+
   .world-card--media-after .world-card__media {
     order: 2;
   }
 
   .world-card--media-after .world-card__body {
     order: 1;
+  }
+
+  .footer-link {
+    @apply inline-flex items-center gap-2;
+  }
+
+  #footer h2,
+  #footer h3 {
+    @apply font-mono text-sm font-semibold uppercase tracking-wide text-base-content/90;
+  }
+
+  #footer a.footer-link {
+    @apply text-base-content/90 transition-colors duration-200;
+  }
+
+  #footer a.footer-link:hover {
+    @apply text-primary;
+  }
+
+  #footer a.footer-link[data-variant="accent"]:hover {
+    @apply text-accent;
   }
 }
 
@@ -212,6 +254,20 @@
   .cq {
     container-type: inline-size;
   }
+
+  .layout-shell {
+    @apply mx-auto max-w-6xl;
+  }
+
+  .link-arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .group:hover .link-arrow,
+  .group:focus-visible .link-arrow {
+    transform: translateX(0.25rem);
+  }
+
 }
 
 @plugin "daisyui/theme" {

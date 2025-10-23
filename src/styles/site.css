@@ -118,6 +118,10 @@
     @apply flex h-full items-start gap-4;
   }
 
+  .product-logo {
+    @apply h-8 w-8;
+  }
+
   .product-card__title {
     @apply font-mono text-2xl font-bold text-base-content;
   }

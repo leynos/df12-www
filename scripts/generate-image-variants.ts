@@ -5,8 +5,22 @@ import sharp from "sharp";
 const IMAGE_ROOT = join(process.cwd(), "public", "images");
 const TARGET_EXTENSIONS = new Set([".png"]);
 const OUTPUT_FORMATS = [
-  { format: "webp", options: { quality: 80 } },
-  { format: "avif", options: { quality: 45 } },
+  {
+    format: "webp",
+    options: {
+      quality: 92,
+      effort: 6,
+      nearLossless: false,
+    },
+  },
+  {
+    format: "avif",
+    options: {
+      quality: 70,
+      effort: 6,
+      chromaSubsampling: "4:4:4",
+    },
+  },
 ] as const;
 
 async function findPngs(dir: string, results: string[] = []): Promise<string[]> {

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://biomejs.dev/schemas/stable/schema.json",
+  "files": {
+    "includes": [
+      "**/*",
+      "!node_modules",
+      "!dist",
+      "!.bin",
+      "!.pnpm-store",
+      "!.cache",
+      "!.artifacts",
+      "!.act-stubs",
+      "!public/assets"
+    ],
+    "ignoreUnknown": true
+  },
+  "vcs": { "useIgnoreFile": true },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "jsxRuntime": "transparent",
+    "formatter": {
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "bracketSpacing": true,
+      "jsxQuoteStyle": "double",
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noConsole": "off"
+      },
+      "style": {
+        "useForOf": "error"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.d.ts"],
+      "formatter": { "enabled": false },
+      "linter": { "enabled": false }
+    },
+    {
+      "includes": ["**/*.html"],
+      "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 2
+      }
+    },
+    {
+      "includes": ["**/*.css"],
+      "linter": { "enabled": false }
+    }
+  ]
+}

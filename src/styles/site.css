@@ -3,7 +3,9 @@
 
 /* daisyUI v5 plugin */
 @plugin "daisyui" {
-  themes: df12 --default, dracula --prefersdark;
+  themes:
+    df12 --default,
+    dracula --prefersdark;
   logs: false;
 }
 
@@ -14,7 +16,7 @@
 
 @layer base {
   :root {
-    --focus-ring-color: #FF00FF;
+    --focus-ring-color: #ff00ff;
   }
 
   body {
@@ -43,7 +45,9 @@
     font-family: var(--font-sans);
     font-weight: 600;
     z-index: 1000;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
     opacity: 0;
   }
 
@@ -232,7 +236,10 @@
   }
 
   .glyph {
-    transition: transform 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      fill 0.3s ease,
+      stroke 0.3s ease;
     transform: rotate(0deg);
     transform-origin: 50% 50%;
   }
@@ -310,7 +317,6 @@
   .group:focus-visible .link-arrow {
     transform: translateX(0.25rem);
   }
-
 }
 
 @plugin "daisyui/theme" {
@@ -319,27 +325,27 @@
   prefersdark: false;
   color-scheme: light;
 
-  --color-primary: #005C73;
-  --color-primary-content: #F4FDFF;
+  --color-primary: #005c73;
+  --color-primary-content: #f4fdff;
 
-  --color-secondary: #0F172A;
-  --color-secondary-content: #F8FAFC;
+  --color-secondary: #0f172a;
+  --color-secondary-content: #f8fafc;
 
-  --color-accent: #FF66FF;
-  --color-accent-content: #2E1337;
+  --color-accent: #ff66ff;
+  --color-accent-content: #2e1337;
 
   --color-neutral: #111111;
-  --color-neutral-content: #F5F5F5;
+  --color-neutral-content: #f5f5f5;
 
-  --color-base-100: #F3F4F6;
-  --color-base-200: #E5E7EB;
-  --color-base-300: #D1D5DB;
+  --color-base-100: #f3f4f6;
+  --color-base-200: #e5e7eb;
+  --color-base-300: #d1d5db;
   --color-base-content: #111111;
 
-  --color-info: #2563EB;
-  --color-success: #16A34A;
-  --color-warning: #D97706;
-  --color-error: #DC2626;
+  --color-info: #2563eb;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
 
   --radius-box: 1.5rem;
   --radius-btn: 0.9rem;

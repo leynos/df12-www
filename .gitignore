@@ -4,6 +4,9 @@ node_modules
 # output
 out
 dist
+public/assets/site.css
+public/images/*.webp
+public/images/*.avif
 *.tgz
 
 # code coverage

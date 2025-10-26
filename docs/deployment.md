@@ -1,6 +1,6 @@
 # Deployment Guide — df12 Static Site
 
-_Updated: 23 October 2025_
+_Updated: 26 October 2025_
 
 This guide explains how to configure, build, and deploy the df12 static site
 using the OpenTofu infrastructure stack. It also calls out best practices for
@@ -78,15 +78,22 @@ If `cloud_provider = "scaleway"`, populate the additional variables:
 
 ## 3. Build the Site Assets
 
-Before deploying, ensure the compiled CSS is up-to-date:
+Before planning or applying infrastructure, refresh the static assets so the
+deployment module can upload the latest bundle:
 
 ```bash
 bun run build
 ```
 
-This generates `public/assets/site.css`. Commit the output if you maintain
-built assets in source control; otherwise ensure the deploy module pulls the
-latest build artifacts.
+This pipeline:
+
+- Compiles Tailwind into `public/assets/site.css`.
+- Generates `.webp` and `.avif` variants alongside every `.png` in
+  `public/images/` (see `scripts/generate-image-variants.ts`).
+
+These artifacts are intentionally `.gitignore`d; they must exist on disk when
+the deployment runs (locally or in CI) so the provisioners can sync them to the
+target bucket/CDN.
 
 ## 4. OpenTofu Workflow
 
@@ -132,10 +139,11 @@ All commands below assume the repo root as the working directory.
    automatically via the Cloudflare DNS records.
 
 5. **Deploy site content**
-   - The `modules/deploy` module clones the repo at the specified commit and
-     runs `aws s3 sync` plus a CloudFront invalidation. Ensure the GitHub PAT
-     remains valid and that `site_path` contains the built `index.html`,
-     `assets/`, and `images/` directories.
+   - The `modules/deploy` module clones the repo at the specified commit,
+     runs `bun install`, executes `bun run build`, and then uploads the
+     resulting assets with `aws s3 sync` and a CloudFront invalidation. Ensure
+     the GitHub PAT remains valid and that `site_path` points to the freshly
+     built `public/` directory.
 
 ### Scaleway flow
 
@@ -148,9 +156,48 @@ The workflow mirrors AWS with a few provider-specific changes:
    `scaleway_cockpit` activation.
 4. Run `tofu apply -var-file=...` to provision the bucket, website
    configuration, Cloudflare DNS, and Cockpit.
-5. The `modules/deploy_scaleway` module syncs the `site_path` directory using
-   AWS CLI against the Scaleway S3-compatible endpoint and purges the
+5. The `modules/deploy_scaleway` module clones the repo, installs
+   dependencies, runs `bun run build`, syncs the `site_path` directory using
+   AWS CLI against the Scaleway S3-compatible endpoint, and purges the
    Cloudflare cache so changes propagate immediately.
+
+### CI integration (GitHub Actions example)
+
+Use the provided `deploy.tofu` as the GitHub Actions entrypoint. A basic
+workflow should perform the following steps:
+
+```yaml
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "1.1.21"
+      - name: Install dependencies
+        run: bun install
+      - name: Build static assets
+        run: bun run build
+      - name: OpenTofu init/plan/apply
+        env:
+          GITHUB_TOKEN: ${{ secrets.SITE_REPO_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          tofu init
+          tofu plan -var-file="terraform.tfvars.prod"
+          tofu apply -auto-approve -var-file="terraform.tfvars.prod"
+```
+
+Key tips for CI:
+
+- Use environment-scoped `terraform.tfvars.*` files stored securely (e.g.
+  encrypted GitHub Actions secrets or S3 + KMS). Do not commit them.
+- Configure cache steps for Bun’s package cache if builds get slow.
+- Export `BUN_TMPDIR` and `BUN_INSTALL` if the default temporary directories
+  are not writable in your runner environment.
 
 ## 5. Post-Deployment Verification
 
@@ -190,8 +237,9 @@ The workflow mirrors AWS with a few provider-specific changes:
   deployment.
 - Limit IAM permissions of the AWS credentials running OpenTofu to only the
   services required.
-- Store `.terraform.lock.hcl` under version control to guarantee provider
-  pinning and reproducible plans.
+- Regenerate provider locks with `tofu init` in each environment when needed;
+  `.terraform.lock.hcl` is ignored to keep workspace-only state artefacts out
+  of the repository.
 - Review GitHub PAT scopes and prefer deploy keys or GitHub App tokens for
   automation where possible.
 

@@ -12,5 +12,5 @@
       "style": "ordered"
     }
   },
-  "ignores": ["**/.venv/**", "**/node_modules/**", "./target/**"]
+  "ignores": ["**/.venv/**", "**/node_modules/**", "**/.terraform/**", "**/.terraform.lock.hcl", "./target/**"]
 }

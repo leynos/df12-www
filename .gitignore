@@ -7,6 +7,8 @@ dist
 public/assets/site.css
 public/images/*.webp
 public/images/*.avif
+.bun_tmp
+.bun_install
 *.tgz
 
 # code coverage
@@ -38,6 +40,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Local .terraform directories
 .terraform/
+.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate

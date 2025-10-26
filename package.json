@@ -4,13 +4,16 @@
   "type": "module",
   "scripts": {
     "dev": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --watch",
-    "build": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
+    "build": "bun run build:css && bun run build:images",
+    "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
+    "build:images": "bun run scripts/generate-image-variants.ts",
     "serve": "bun run build && bunx http-server public -p 8080"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.15",
     "@types/bun": "latest",
     "daisyui": "^5.3.7",
+    "sharp": "^0.34.4",
     "tailwindcss": "^4.1.15"
   }
 }

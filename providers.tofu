@@ -1,5 +1,15 @@
+locals {
+  provider_use_scaleway = lower(trimspace(var.cloud_provider)) == "scaleway"
+  aws_provider_region   = local.provider_use_scaleway ? "us-east-1" : var.aws_region
+}
+
 provider "aws" {
-  region = var.aws_region
+  region                      = local.aws_provider_region
+  access_key                  = local.provider_use_scaleway ? "not-used" : null
+  secret_key                  = local.provider_use_scaleway ? "not-used" : null
+  skip_credentials_validation = local.provider_use_scaleway
+  skip_metadata_api_check     = local.provider_use_scaleway
+  skip_requesting_account_id  = local.provider_use_scaleway
 
   default_tags {
     tags = {
@@ -11,8 +21,13 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias  = "useast1"
-  region = "us-east-1"
+  alias                       = "useast1"
+  region                      = "us-east-1"
+  access_key                  = local.provider_use_scaleway ? "not-used" : null
+  secret_key                  = local.provider_use_scaleway ? "not-used" : null
+  skip_credentials_validation = local.provider_use_scaleway
+  skip_metadata_api_check     = local.provider_use_scaleway
+  skip_requesting_account_id  = local.provider_use_scaleway
 }
 
 provider "cloudflare" {
@@ -26,8 +41,4 @@ provider "scaleway" {
   organization_id = var.scaleway_organization_id
   region          = var.scaleway_region
   zone            = var.scaleway_zone
-}
-
-provider "github" {
-  token = var.github_token
 }

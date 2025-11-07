@@ -63,12 +63,21 @@ variable "github_branch" {
 variable "github_token" {
   description = "Personal access token used for authenticated git (HTTPS) clones"
   type        = string
-  nullable    = false
+  default     = ""
   sensitive   = true
-  validation {
-    condition     = length(var.github_token) > 0
-    error_message = "github_token must be a non-empty string"
-  }
+}
+
+variable "github_ssh_private_key" {
+  description = "PEM-formatted private key used for SSH clones when github_token is empty"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "github_known_hosts" {
+  description = "Optional known_hosts entries for GitHub; leave empty to run ssh-keyscan at runtime"
+  type        = string
+  default     = ""
 }
 
 variable "site_path" {

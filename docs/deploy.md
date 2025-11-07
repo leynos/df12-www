@@ -10,9 +10,9 @@ automation, and rollback strategies.
 ## 1. Prerequisites
 
 - **Tooling**
-  - [Bun](https://bun.sh) ≥ 1.1 for building the Tailwind bundle.
+  - [Bun](https://bun.sh) ≥ 1.1 for building the Tailwind bundle (the deploy modules now run `bun install`/`bun run build` during `apply`, so Bun must exist on the host executing OpenTofu).
   - [OpenTofu CLI](https://opentofu.org) ≥ 1.6.0.
-  - AWS CLI (for manual verification or troubleshooting when targeting AWS).
+  - AWS CLI (required: used both for AWS deploys *and* for Scaleway uploads via the S3-compatible endpoint).
   - Optional: Scaleway CLI (`scw`) for ad-hoc diagnostics when targeting Scaleway.
 - **Accounts & credentials**
   - AWS account with permissions to manage S3, CloudFront, ACM, IAM, and Budgets
@@ -42,7 +42,9 @@ and populate the required variables:
 | `environment`                                  | Environment label used in tagging (e.g. `dev`, `prod`).                                   |
 | `project_name`                                 | Tag prefix for identifying resources (defaults to `df12-www`).                            |
 | `github_owner`, `github_repo`, `github_branch` | Repository information for fetching the built site.                                       |
-| `github_token`                                 | PAT with `repo` scope for authenticated clones. Treat as sensitive.                       |
+| `github_token`                                 | PAT with `repo` scope for authenticated HTTPS clones (set to empty when using SSH).       |
+| `github_ssh_private_key`                       | Optional PEM-formatted private key for `git@github.com` clones when no PAT is supplied.   |
+| `github_known_hosts`                           | Optional newline-delimited `known_hosts` entries; defaults to `ssh-keyscan github.com`.   |
 | `site_path`                                    | Relative path to the built static site (defaults to `public`).                            |
 | `cloudflare_api_token`                         | API token with DNS edit permissions for the zone.                                         |
 | `cloudflare_zone_id`                           | 32-character Cloudflare zone identifier for `root_domain`.                                |
@@ -65,10 +67,11 @@ Additional variables for `cloud_provider = "scaleway"`:
 
 ### Secrets Management
 
-- Store secrets (GitHub token, Cloudflare token, provider credentials) outside
+- Store secrets (GitHub token, optional GitHub SSH private key, Cloudflare token, provider credentials) outside
   version control.
   - Pass them as environment variables when running commands locally:
-    `tofu plan -var="github_token=$GITHUB_TOKEN"`.
+    `tofu plan -var="github_token=$GITHUB_TOKEN"` or
+    `tofu plan -var="github_ssh_private_key=$(cat ~/.ssh/id_ed25519)"`.
   - Keep encrypted `.tfvars` files using tools such as `sops` if you must
     persist them.
   - In CI, rely on the platform’s secrets store (e.g. GitHub Actions secrets)
@@ -150,8 +153,17 @@ All commands below assume the repo root as the working directory.
    configuration, Cloudflare DNS, and Cockpit.
 5. The `modules/deploy_scaleway` module clones the repo, installs
    dependencies, runs `bun run build`, syncs the `site_path` directory via
-   the AWS CLI to the Scaleway S3-compatible endpoint, and purges the
+   the AWS CLI to the Scaleway S3-compatible endpoint with `--acl public-read`,
+   and purges the
    Cloudflare cache so changes propagate immediately.
+6. To force a fresh content upload (for example after changing ACL flags or
+   build tooling), re-run apply with the deploy resource replaced:
+   ```bash
+   tofu apply -var-file="terraform.tfvars.prod" \
+     -replace="module.deploy_scaleway[0].null_resource.deploy"
+   ```
+   This re-executes the clone/build/sync/purge steps without touching the
+   infrastructure resources.
 
 ## 5. CI Integration (GitHub Actions Example)
 
@@ -259,4 +271,3 @@ required before destruction.
 Following these steps ensures reproducible deployments and safe handling of
 secrets across environments. Update this guide whenever configuration inputs or
 provider usage changes.
-

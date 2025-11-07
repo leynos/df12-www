@@ -31,8 +31,21 @@ variable "github_branch" {
 variable "github_token" {
   description = "GitHub personal access token"
   type        = string
-  nullable    = false
+  default     = ""
   sensitive   = true
+}
+
+variable "github_ssh_private_key" {
+  description = "PEM-formatted private key for SSH git clones (optional alternative to github_token)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "github_known_hosts" {
+  description = "Optional known_hosts entries for GitHub; when empty the deploy module runs ssh-keyscan github.com"
+  type        = string
+  default     = ""
 }
 
 variable "site_path" {

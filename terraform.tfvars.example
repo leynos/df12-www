@@ -29,6 +29,18 @@ github_branch = "main"
 # Store real tokens securely (e.g. environment variables or a secrets manager).
 github_token = "ghp_your_pat_here"
 
+# Optional PEM-formatted private key for SSH-based git clones (leave commented to use PAT)
+# github_ssh_private_key = <<-EOT
+# -----BEGIN OPENSSH PRIVATE KEY-----
+# ...
+# -----END OPENSSH PRIVATE KEY-----
+# EOT
+
+# Optional known_hosts entries for GitHub SSH cloning
+# github_known_hosts = <<-EOT
+# github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkWEbgxeqDR0QzkGrhfmUK7d1YfG0svJ+9syG5b
+# EOT
+
 # Local directory with site files relative to this repo
 site_path = "public"
 

@@ -89,6 +89,19 @@ variable "github_token" {
   default     = ""
 }
 
+variable "github_ssh_private_key" {
+  description = "PEM-formatted private key used for SSH cloning (leave empty to use github_token)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "github_known_hosts" {
+  description = "Optional newline-delimited known_hosts entries for GitHub; if empty, ssh-keyscan github.com is used at runtime"
+  type        = string
+  default     = ""
+}
+
 variable "site_path" {
   description = "Local path containing the built static site (relative to the repo root)"
   type        = string

@@ -36,31 +36,35 @@ module "site_scaleway" {
 }
 
 module "deploy_aws" {
-  count           = local.use_aws ? 1 : 0
-  source          = "./modules/deploy"
-  bucket_name     = module.site_aws[0].bucket_name
-  distribution_id = module.site_aws[0].distribution_id
-  github_owner    = var.github_owner
-  github_repo     = var.github_repo
-  github_branch   = var.github_branch
-  github_token    = var.github_token
-  site_path       = var.site_path
+  count                  = local.use_aws ? 1 : 0
+  source                 = "./modules/deploy"
+  bucket_name            = module.site_aws[0].bucket_name
+  distribution_id        = module.site_aws[0].distribution_id
+  github_owner           = var.github_owner
+  github_repo            = var.github_repo
+  github_branch          = var.github_branch
+  github_token           = var.github_token
+  github_ssh_private_key = var.github_ssh_private_key
+  github_known_hosts     = var.github_known_hosts
+  site_path              = var.site_path
 }
 
 module "deploy_scaleway" {
-  count                = local.use_scaleway ? 1 : 0
-  source               = "./modules/deploy_scaleway"
-  bucket_name          = module.site_scaleway[0].bucket_name
-  bucket_region        = var.scaleway_region
-  github_owner         = var.github_owner
-  github_repo          = var.github_repo
-  github_branch        = var.github_branch
-  github_token         = var.github_token
-  site_path            = var.site_path
-  scaleway_access_key  = var.scaleway_access_key
-  scaleway_secret_key  = var.scaleway_secret_key
-  cloudflare_api_token = var.cloudflare_api_token
-  cloudflare_zone_id   = var.cloudflare_zone_id
+  count                  = local.use_scaleway ? 1 : 0
+  source                 = "./modules/deploy_scaleway"
+  bucket_name            = module.site_scaleway[0].bucket_name
+  bucket_region          = var.scaleway_region
+  github_owner           = var.github_owner
+  github_repo            = var.github_repo
+  github_branch          = var.github_branch
+  github_token           = var.github_token
+  github_ssh_private_key = var.github_ssh_private_key
+  github_known_hosts     = var.github_known_hosts
+  site_path              = var.site_path
+  scaleway_access_key    = var.scaleway_access_key
+  scaleway_secret_key    = var.scaleway_secret_key
+  cloudflare_api_token   = var.cloudflare_api_token
+  cloudflare_zone_id     = var.cloudflare_zone_id
 }
 
 module "monitoring_aws" {
@@ -72,14 +76,4 @@ module "monitoring_aws" {
   budget_limit_gbp = var.budget_limit_gbp
   budget_email     = var.budget_email
   environment      = var.environment
-}
-
-module "monitoring_scaleway" {
-  count          = local.use_scaleway ? 1 : 0
-  source         = "./modules/monitoring_scaleway"
-  domain_name    = var.domain_name
-  bucket_name    = module.site_scaleway[0].bucket_name
-  region         = var.scaleway_region
-  project_id     = var.scaleway_project_id
-  alert_contacts = [var.budget_email]
 }

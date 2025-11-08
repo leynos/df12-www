@@ -21,5 +21,28 @@ The `modules/deploy` script automates publishing site content:
 See [docs/deploy.md](docs/deploy.md) for detailed configuration steps and
 options.
 
+## Netsuke documentation pages
+
+The `scripts/netsuke_docs/` library fetches the upstream Netsuke user guide,
+parses each second-level section, and renders Tailwind/DaisyUI themed HTML into
+`public/`. The layouts for special sections (numbered steps, split code/text
+panels, etc.) live in `docs/netsuke-section-layouts.yaml` so designers can tweak
+them without touching Python.
+
+To refresh the docs, install the Python requirements (or rely on the embedded
+`uv` metadata) and run the generator:
+
+```bash
+pip install -r requirements.txt  # optional when not using `uv run`
+uv run scripts/generate_netsuke_docs.py
+```
+
+The CLI uses Cyclopts and honours environment variables prefixed with
+`INPUT_`. For example, `INPUT_OUTPUT_DIR=dist uv run scripts/generate_netsuke_docs.py`
+will emit to `dist/`. By default, files such as
+`public/docs-netsuke-getting-started.html` share the same design language as
+`public/index.html` and automatically pick up Pygments styling for fenced code
+blocks.
+
 This project is released under the
 [GNU Affero General Public License v3.0](LICENSE).

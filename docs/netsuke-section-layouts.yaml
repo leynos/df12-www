@@ -1,0 +1,37 @@
+# Layout metadata for Netsuke documentation rendering.
+# Each key in `layouts` should match the slug derived from the section heading
+# (the markdown heading text lowercased, digits removed, spaces -> dashes).
+
+defaults:
+  output_dir: public
+  filename_prefix: docs-netsuke-
+  pygments_style: monokai
+  hero_eyebrow: Netsuke Documentation
+  hero_tagline: Declarative build tooling for ambitious teams
+  doc_label: Docs
+  site_name: df12 Productions
+
+layouts:
+  getting-started:
+    device: numbered_steps
+    step_order:
+      - Installation
+      - Basic Usage
+  the-netsukefile-manifest:
+    device: split_panel
+    emphasized_code_block: 0
+  defining-rules:
+    device: split_panel
+  defining-targets-and-actions:
+    device: split_panel
+  jinja-templating-in-netsuke:
+    device: split_panel
+    emphasized_code_block: 1
+  netsuke-standard-library-stdlib:
+    device: split_panel
+  command-line-interface-cli:
+    device: numbered_steps
+    step_order:
+      - Global Options
+      - Commands
+      - Exit Codes

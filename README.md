@@ -26,7 +26,8 @@ options.
 The `df12_pages` package fetches remote Markdown sources, parses each
 second-level section, and renders Tailwind/DaisyUI themed HTML into `public/`.
 Page-specific metadata (source URL, layout devices, theming) lives in
-`config/pages.yaml`, which now supports multiple page bundles.
+`config/pages.yaml` (YAML 1.2, parsed via `ruamel.yaml`), which now supports
+multiple page bundles.
 
 To refresh the docs, install the Python requirements (or rely on the embedded
 `uv` metadata) and run the `pages` CLI:

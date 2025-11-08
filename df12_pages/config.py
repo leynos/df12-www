@@ -6,7 +6,7 @@ import dataclasses as dc
 from pathlib import Path
 import typing as typ
 
-import yaml
+from ruamel.yaml import YAML
 
 
 @dc.dataclass(slots=True)
@@ -74,7 +74,14 @@ def load_site_config(path: Path) -> SiteConfig:
         msg = f"Configuration file '{path}' not found."
         raise FileNotFoundError(msg)
 
-    raw: dict[str, typ.Any] = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    loader = YAML(typ="safe")
+    loader.version = (1, 2)
+    with path.open("r", encoding="utf-8") as handle:
+        loaded = loader.load(handle) or {}
+    if not isinstance(loaded, dict):  # pragma: no cover - config error guard
+        msg = "Top-level YAML structure must be a mapping."
+        raise TypeError(msg)
+    raw: dict[str, typ.Any] = dict(loaded)
     defaults = raw.get("defaults", {}) or {}
 
     default_theme = _build_theme_config(defaults.get("theme", {}) or {})

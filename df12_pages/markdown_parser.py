@@ -1,23 +1,22 @@
-"""Parsing helpers for Netsuke markdown content."""
+"""Parsing helpers for Markdown-driven documentation pages."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import dataclasses as dc
 import re
-from typing import List, Tuple
-
+import typing as typ
 
 SECTION_PATTERN = re.compile(r"^##\s+(.*)", re.MULTILINE)
 SUBSECTION_PATTERN = re.compile(r"^###\s+(.*)", re.MULTILINE)
 
 
-@dataclass(slots=True)
+@dc.dataclass(slots=True)
 class Subsection:
     title: str
     markdown: str
 
 
-@dataclass(slots=True)
+@dc.dataclass(slots=True)
 class Section:
     title: str
     short_title: str
@@ -25,19 +24,16 @@ class Section:
     order: int
     markdown: str
     intro_markdown: str
-    subsections: List[Subsection]
+    subsections: list[Subsection]
 
 
 def _clean_heading(text: str) -> str:
-    cleaned = text.replace("\\", "").strip()
-    return cleaned
+    return text.replace("\\", "").strip()
 
 
 def _slugify(title: str) -> str:
-    import re as _re
-
-    no_number = _re.sub(r"^\d+\.?\s*", "", title.lower())
-    slug = _re.sub(r"[^a-z0-9]+", "-", no_number).strip("-")
+    no_number = re.sub(r"^\d+\.?\s*", "", title.lower())
+    slug = re.sub(r"[^a-z0-9]+", "-", no_number).strip("-")
     return slug or "section"
 
 
@@ -51,13 +47,13 @@ def _unique_slug(base: str, used: set[str]) -> str:
     return candidate
 
 
-def _split_subsections(body: str) -> Tuple[str, List[Subsection]]:
+def _split_subsections(body: str) -> tuple[str, list[Subsection]]:
     matches = list(SUBSECTION_PATTERN.finditer(body))
     if not matches:
         return body.strip(), []
 
     intro = body[: matches[0].start()].strip()
-    subsections: List[Subsection] = []
+    subsections: list[Subsection] = []
     for idx, match in enumerate(matches):
         start = match.end()
         end = matches[idx + 1].start() if idx + 1 < len(matches) else len(body)
@@ -67,14 +63,14 @@ def _split_subsections(body: str) -> Tuple[str, List[Subsection]]:
     return intro, subsections
 
 
-def parse_sections(markdown_text: str) -> List[Section]:
+def parse_sections(markdown_text: str) -> list[Section]:
     """Split the upstream markdown file into ordered sections."""
 
     entries = list(SECTION_PATTERN.finditer(markdown_text))
-    sections: List[Section] = []
     if not entries:
-        return sections
+        return []
 
+    sections: list[Section] = []
     used_slugs: set[str] = set()
     for idx, match in enumerate(entries):
         start = match.end()

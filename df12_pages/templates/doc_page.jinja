@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="assets/site.css" rel="stylesheet" />
-  <title>df12 — {{ section.short_title }} | Netsuke Docs</title>
+  <title>{{ html_title }}</title>
   <style>
     {{ pygments_css }}
 
@@ -181,7 +181,7 @@
       </article>
 
       <div class="doc-footer">
-        <p>Source: <a class="link" href="{{ source_url }}" target="_blank" rel="noopener">Netsuke User Guide (main)</a></p>
+        <p>Source: <a class="link" href="{{ source_url }}" target="_blank" rel="noopener">{{ source_label }}</a></p>
         <p class="mt-1">Generated {{ generated_at.strftime('%B %d, %Y at %H:%M %Z') }}</p>
       </div>
     </section>
@@ -190,7 +190,7 @@
   <footer id="footer" class="border-t border-base-200 bg-base-100">
     <div class="layout-shell flex flex-col gap-4 px-4 py-10 text-sm text-base-content/70 md:flex-row md:items-center md:justify-between">
       <p class="font-mono uppercase tracking-[0.25em]">{{ theme.site_name }}</p>
-      <p>&copy; {{ generated_at.year }} {{ theme.site_name }}. Built with Netsuke.</p>
+      <p>&copy; {{ generated_at.year }} {{ theme.site_name }}{% if footer_note %}. {{ footer_note }}{% endif %}</p>
     </div>
   </footer>
 </body>

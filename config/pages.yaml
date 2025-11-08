@@ -1,0 +1,53 @@
+# Layout metadata for documentation rendering. Supports multiple page bundles
+# via the `pages` mapping. Each page entry may override defaults and define its
+# own section layout preferences.
+
+defaults:
+  output_dir: public
+  filename_prefix: docs-
+  pygments_style: monokai
+  page_title_suffix: "df12 Docs"
+  source_label: "Source material"
+  footer_note: "Serious tools, playful worlds."
+  default_page: netsuke
+  theme:
+    hero_eyebrow: df12 Documentation
+    hero_tagline: Tools for ambitious engineering teams
+    doc_label: Docs
+    site_name: df12 Productions
+
+pages:
+  netsuke:
+    label: "Netsuke Docs"
+    source_url: https://raw.githubusercontent.com/leynos/netsuke/refs/heads/main/docs/users-guide.md
+    source_label: "Netsuke User Guide (main)"
+    page_title_suffix: "Netsuke Docs"
+    filename_prefix: docs-netsuke-
+    footer_note: "Built with Netsuke."
+    theme:
+      hero_eyebrow: Netsuke Documentation
+      hero_tagline: Declarative build tooling for ambitious teams
+    layouts:
+      getting-started:
+        device: numbered_steps
+        step_order:
+          - Installation
+          - Basic Usage
+      the-netsukefile-manifest:
+        device: split_panel
+        emphasized_code_block: 0
+      defining-rules:
+        device: split_panel
+      defining-targets-and-actions:
+        device: split_panel
+      jinja-templating-in-netsuke:
+        device: split_panel
+        emphasized_code_block: 1
+      netsuke-standard-library-stdlib:
+        device: split_panel
+      command-line-interface-cli:
+        device: numbered_steps
+        step_order:
+          - Global Options
+          - Commands
+          - Exit Codes

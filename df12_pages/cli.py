@@ -9,6 +9,7 @@ import cyclopts
 from cyclopts import App, Parameter
 
 from .config import load_site_config
+from .docs_index import DocsIndexBuilder
 from .generator import PageContentGenerator
 
 DEFAULT_CONFIG = Path("config/pages.yaml")
@@ -39,6 +40,8 @@ def generate(
     written = generator.run()
     for path in written:
         print(f"wrote {_format_path(path)}")
+    docs_index_path = DocsIndexBuilder(site_config).run()
+    print(f"wrote {_format_path(docs_index_path)}")
 
 
 def main() -> None:

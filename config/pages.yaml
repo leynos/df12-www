@@ -10,6 +10,9 @@ defaults:
   source_label: "Source material"
   footer_note: "Serious tools, playful worlds."
   default_page: netsuke
+  branch: main
+  doc_path: docs/users-guide.md
+  docs_index_output: public/docs.html
   theme:
     hero_eyebrow: df12 Documentation
     hero_tagline: Tools for ambitious engineering teams
@@ -19,7 +22,8 @@ defaults:
 pages:
   netsuke:
     label: "Netsuke Docs"
-    source_url: https://raw.githubusercontent.com/leynos/netsuke/refs/heads/main/docs/users-guide.md
+    repo: leynos/netsuke
+    language: rust
     source_label: "Netsuke User Guide (main)"
     page_title_suffix: "Netsuke Docs"
     filename_prefix: docs-netsuke-

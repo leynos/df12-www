@@ -26,6 +26,14 @@ class ThemeConfig:
     site_name: str = "df12 Productions"
 
 
+DEFAULT_DOC_PATH = "docs/users-guide.md"
+LANGUAGE_MANIFESTS: dict[str, str] = {
+    "rust": "Cargo.toml",
+    "python": "pyproject.toml",
+    "typescript": "package.json",
+}
+
+
 @dc.dataclass(slots=True)
 class PageConfig:
     key: str
@@ -39,12 +47,19 @@ class PageConfig:
     footer_note: str
     theme: ThemeConfig
     layouts: dict[str, SectionLayout]
+    repo: str | None
+    branch: str
+    language: str | None
+    manifest_url: str | None
+    description_override: str | None
 
 
 @dc.dataclass(slots=True)
 class SiteConfig:
     pages: dict[str, PageConfig]
     default_page: str | None = None
+    docs_index_output: Path = Path("public/docs.html")
+    theme: ThemeConfig | None = None
 
     def get_page(self, page_id: str | None) -> PageConfig:
         """Return the requested page or fall back to the configured default."""
@@ -92,6 +107,11 @@ def load_site_config(path: Path) -> SiteConfig:
     default_source_label = defaults.get("source_label", "Source material")
     default_footer_note = defaults.get("footer_note", "")
     default_page = defaults.get("default_page")
+    default_branch = defaults.get("branch", "main")
+    default_doc_path = defaults.get("doc_path", DEFAULT_DOC_PATH)
+    default_repo = defaults.get("repo")
+    default_language = defaults.get("language")
+    docs_index_output = Path(defaults.get("docs_index_output", "public/docs.html"))
 
     shared_layouts = raw.get("layouts", {}) or {}
     pages_raw = raw.get("pages") or {}
@@ -102,9 +122,15 @@ def load_site_config(path: Path) -> SiteConfig:
     for key, payload in pages_raw.items():
         if not isinstance(payload, dict):
             continue
+        repo = payload.get("repo", default_repo)
+        branch = payload.get("branch", default_branch)
+        language = payload.get("language", default_language)
+        doc_path = payload.get("doc_path", default_doc_path)
         source_url = payload.get("source_url")
+        if not source_url and repo:
+            source_url = _build_repo_url(repo, branch, doc_path)
         if not source_url:
-            raise ValueError(f"Page '{key}' is missing required 'source_url'.")
+            raise ValueError(f"Page '{key}' is missing 'source_url' or 'repo'.")
 
         label = payload.get("label") or key.replace("-", " ").title()
         source_label = payload.get("source_label", default_source_label)
@@ -116,6 +142,14 @@ def load_site_config(path: Path) -> SiteConfig:
         theme = _merge_theme(default_theme, payload.get("theme"))
 
         layouts = _merge_layouts(shared_layouts, payload.get("layouts"))
+
+        manifest_url = payload.get("manifest_url")
+        if not manifest_url and repo:
+            manifest_path = payload.get("manifest_path") or _default_manifest_path(language)
+            if manifest_path:
+                manifest_url = _build_repo_url(repo, branch, manifest_path)
+
+        description_override = payload.get("description")
 
         pages[key] = PageConfig(
             key=key,
@@ -129,9 +163,25 @@ def load_site_config(path: Path) -> SiteConfig:
             footer_note=footer_note,
             theme=theme,
             layouts=layouts,
+            repo=repo,
+            branch=branch,
+            language=language.lower() if isinstance(language, str) else language,
+            manifest_url=manifest_url,
+            description_override=description_override,
         )
 
-    return SiteConfig(pages=pages, default_page=default_page)
+    return SiteConfig(pages=pages, default_page=default_page, docs_index_output=docs_index_output, theme=default_theme)
+
+
+def _build_repo_url(repo: str, branch: str, path: str) -> str:
+    normalized = path.lstrip("/")
+    return f"https://raw.githubusercontent.com/{repo}/refs/heads/{branch}/{normalized}"
+
+
+def _default_manifest_path(language: str | None) -> str | None:
+    if not language:
+        return None
+    return LANGUAGE_MANIFESTS.get(language.lower())
 
 
 def _merge_theme(base: ThemeConfig, override: typ.Mapping[str, typ.Any] | None) -> ThemeConfig:

@@ -8,6 +8,7 @@ import typing as typ
 
 SECTION_PATTERN = re.compile(r"^##\s+(.*)", re.MULTILINE)
 SUBSECTION_PATTERN = re.compile(r"^###\s+(.*)", re.MULTILINE)
+BOLD_HEADING_PATTERN = re.compile(r"^\s*\*\*(.+?)\*\*\s*$", re.MULTILINE)
 
 
 @dc.dataclass(slots=True)
@@ -47,7 +48,16 @@ def _unique_slug(base: str, used: set[str]) -> str:
     return candidate
 
 
+def _promote_bold_headings(body: str) -> str:
+    def _replace(match: re.Match[str]) -> str:
+        title = match.group(1).strip()
+        return f"### {title}" if title else match.group(0)
+
+    return BOLD_HEADING_PATTERN.sub(_replace, body)
+
+
 def _split_subsections(body: str) -> tuple[str, list[Subsection]]:
+    body = _promote_bold_headings(body)
     matches = list(SUBSECTION_PATTERN.finditer(body))
     if not matches:
         return body.strip(), []

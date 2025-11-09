@@ -26,6 +26,7 @@ dev = [
     "pytest-timeout",
     "pytest-bdd",
     "parse_type",
+    "beautifulsoup4",
 ]
 
 [tool.ruff]

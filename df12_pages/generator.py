@@ -69,6 +69,8 @@ class SectionModel:
     default_html: str
     numbered_steps: list[dict[str, str]]
     split_panel: dict[str, str]
+    subsections: list[dict[str, str]]
+    toc_items: list[dict[str, str]]
 
 
 class PageContentGenerator:
@@ -107,16 +109,20 @@ class PageContentGenerator:
         out_dir = self.output_dir_override or self.page.output_dir
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        nav_items = self._build_nav(sections)
-        written: list[Path] = []
         generated_at = datetime.now(timezone.utc)
+        section_bundle: list[tuple[Section, SectionModel, str]] = []
         for section in sections:
             layout = self._resolve_layout(section.slug)
             section_model = self._build_section_model(section, layout)
             html_title = self._format_page_title(section)
+            section_bundle.append((section, section_model, html_title))
+
+        nav_groups = self._build_nav_groups([bundle[1] for bundle in section_bundle])
+        written: list[Path] = []
+        for section, section_model, html_title in section_bundle:
             context = {
                 "section": section_model,
-                "nav_items": nav_items,
+                "nav_groups": nav_groups,
                 "theme": self.page.theme,
                 "generated_at": generated_at,
                 "source_url": self.source_url,
@@ -138,17 +144,31 @@ class PageContentGenerator:
         resp.raise_for_status()
         return resp.text
 
-    def _build_nav(self, sections: typ.Iterable[Section]) -> list[dict[str, str]]:
-        nav = []
-        for section in sections:
-            nav.append(
+    def _build_nav_groups(self, section_models: list[SectionModel]) -> list[dict[str, typ.Any]]:
+        groups: list[dict[str, typ.Any]] = []
+        for model in section_models:
+            page_url = f"{self.page.filename_prefix}{model.slug}.html"
+            entries: list[dict[str, typ.Any]] = [
                 {
-                    "label": section.short_title,
-                    "href": f"{self.page.filename_prefix}{section.slug}.html",
-                    "slug": section.slug,
+                    "label": model.short_title,
+                    "href": page_url,
+                    "section_slug": model.slug,
+                    "is_primary": True,
                 }
-            )
-        return nav
+            ]
+            if model.subsections:
+                for block in model.subsections:
+                    href = f"{page_url}#{block['anchor']}"
+                    entries.append(
+                        {
+                            "label": block["title"],
+                            "href": href,
+                            "section_slug": model.slug,
+                            "is_primary": False,
+                        }
+                    )
+            groups.append({"label": model.short_title, "slug": model.slug, "entries": entries})
+        return groups
 
     def _resolve_layout(self, slug: str) -> SectionLayout:
         return self.page.layouts.get(slug, SectionLayout())
@@ -158,12 +178,22 @@ class PageContentGenerator:
         default_html = self.renderer.markdown(section.markdown)
         numbered_steps: list[dict[str, str]] = []
         split_panel = {"primary_html": "", "secondary_html": ""}
+        subsections = self._build_subsection_blocks(section)
+        toc_items = [
+            {"label": block["title"], "anchor": block["anchor"]}
+            for block in subsections
+        ]
         resolved_layout = layout.device
 
         if layout.device == "numbered_steps":
             numbered_steps = self._prepare_numbered_steps(section, layout)
             if not numbered_steps:
                 resolved_layout = "default"
+            else:
+                toc_items = [
+                    {"label": step["title"], "anchor": step["anchor"]}
+                    for step in numbered_steps
+                ]
         elif layout.device == "split_panel":
             split_panel = self._prepare_split_panel(section, layout)
             if not split_panel.get("secondary_html"):
@@ -179,6 +209,8 @@ class PageContentGenerator:
             default_html=default_html,
             numbered_steps=numbered_steps,
             split_panel=split_panel,
+            subsections=subsections,
+            toc_items=toc_items,
         )
 
     def _prepare_numbered_steps(self, section: Section, layout: SectionLayout) -> list[dict[str, str]]:
@@ -234,3 +266,40 @@ class PageContentGenerator:
         site_name = self.page.theme.site_name
         suffix = self.page.page_title_suffix
         return f"{site_name} — {section.short_title} | {suffix}"
+
+    def _build_subsection_blocks(self, section: Section) -> list[dict[str, str]]:
+        if not section.subsections:
+            return []
+
+        blocks: list[dict[str, str]] = []
+        used: set[str] = set()
+        for idx, sub in enumerate(section.subsections, start=1):
+            anchor = self._section_anchor(section.slug, sub.title, idx, used)
+            html = self.renderer.markdown(sub.markdown)
+            blocks.append({"title": sub.title, "anchor": anchor, "html": html})
+        return blocks
+
+    def _section_anchor(
+        self, section_slug: str, title: str, index: int, used: set[str]
+    ) -> str:
+        base_title = self._slugify(title)
+        if base_title:
+            base = f"{section_slug}-{base_title}"
+        else:
+            base = f"{section_slug}-part-{index}"
+        return self._unique_anchor(base, used)
+
+    @staticmethod
+    def _unique_anchor(base: str, used: set[str]) -> str:
+        candidate = base
+        suffix = 2
+        while candidate in used:
+            candidate = f"{base}-{suffix}"
+            suffix += 1
+        used.add(candidate)
+        return candidate
+
+    @staticmethod
+    def _slugify(value: str) -> str:
+        slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+        return slug

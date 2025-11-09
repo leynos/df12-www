@@ -95,98 +95,29 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .codehilite .vm { color: #F8F8F2 } /* Name.Variable.Magic */
 .codehilite .il { color: #AE81FF } /* Literal.Number.Integer.Long */
 
-    .doc-shell {
-      padding-top: 6rem;
-      padding-bottom: 6rem;
-    }
-
-    .rich-text :is(p, ul, ol, h3, h4) {
-      margin-bottom: 1rem;
-      color: hsl(var(--bc) / 0.9);
-      line-height: 1.7;
-    }
-
-    .rich-text ul {
-      list-style: disc;
-      padding-left: 1.5rem;
-    }
-
-    .doc-numbered-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      margin-top: 2.5rem;
-    }
-
-    .doc-step {
-      display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
-      padding: 1.5rem;
-      border-radius: 1.5rem;
-      border: 1px solid hsl(var(--b3));
-      background: hsl(var(--b1));
-    }
-
-    .doc-step__index {
-      width: 3rem;
-      height: 3rem;
-      border-radius: 9999px;
-      border: 2px solid hsl(var(--a));
-      font-family: "IBM Plex Mono", monospace;
-      font-weight: 700;
-      font-size: 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: hsl(var(--a));
-      flex-shrink: 0;
-    }
-
-    .doc-split-grid {
-      margin-top: 3rem;
-      display: grid;
-      gap: 2rem;
-    }
-
-    @media (min-width: 1024px) {
-      .doc-split-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      .doc-shell {
-        padding-top: 8rem;
-        padding-bottom: 8rem;
-      }
-    }
-
     .codehilite {
       border-radius: 1.5rem;
       padding: 1.5rem;
-      background: #0f172a;
-      font-size: 0.9rem;
+      background: #070c1a;
+      font-size: 0.95rem;
+      color: #f8fafc;
       overflow: auto;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     }
 
-    .doc-card {
-      border: 1px solid hsl(var(--b3));
-      border-radius: 2rem;
-      padding: 2.5rem;
-      background: hsl(var(--b1));
-    }
-
-    .doc-footer {
-      border-top: 1px solid hsl(var(--b2));
-      margin-top: 4rem;
-      padding-top: 2rem;
-      color: hsl(var(--bc) / 0.7);
+    .codehilite pre {
+      margin: 0;
+      background: transparent;
+      font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: inherit;
     }
   </style>
 </head>
-<body class="bg-base-100 text-base-content">
+<body class="doc-page">
   <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
 
   <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-base-200 bg-base-100/80 backdrop-blur supports-[backdrop-filter]:bg-base-100/60">
-    <div class="layout-shell flex w-full items-center justify-between px-4 py-4 md:px-8">
+    <div class="layout-shell layout-shell--docs flex w-full items-center justify-between px-4 py-4 md:px-8">
       <a href="index.html" class="group flex items-center gap-3 font-mono text-lg font-bold uppercase tracking-[0.35em] text-base-content">
         <span class="flex h-9 w-9 items-center justify-center transition-transform duration-300 group-hover:rotate-45">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -198,89 +129,466 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <nav aria-label="Primary navigation" class="hidden items-center gap-8 md:flex">
         <a href="index.html#systems" class="nav-link hit-target">Tools</a>
         <a href="index.html#worlds" class="nav-link hit-target" data-variant="accent">Creative</a>
-        <a href="#" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
+        <a href="docs.html" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
       </nav>
       <div class="md:hidden">
         <details class="dropdown dropdown-end">
           <summary class="btn btn-ghost btn-sm font-mono uppercase tracking-[0.3em]">Menu</summary>
-          <ul class="menu dropdown-content menu-sm z-[1] mt-2 w-44 rounded-box bg-base-100 p-2 shadow">
+          <ul class="menu dropdown-content menu-sm z-[1] mt-2 w-48 rounded-box bg-base-100 p-2 shadow">
             <li><a href="index.html#systems" class="nav-link hit-target w-full justify-start">Tools</a></li>
             <li><a href="index.html#worlds" class="nav-link hit-target w-full justify-start" data-variant="accent">Creative</a></li>
-            <li><a class="nav-link hit-target w-full justify-start" aria-current="page">Docs</a></li>
+            <li><a href="docs.html" class="nav-link hit-target w-full justify-start" aria-current="page">Docs</a></li>
           </ul>
         </details>
       </div>
     </div>
   </header>
 
-  <main id="main-content" class="flex flex-col">
-    <section class="doc-shell layout-shell">
-      <p class="eyebrow text-primary/80">Netsuke Documentation</p>
-      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 class="section-title">2. Getting Started</h1>
-          <p class="mt-3 text-lg text-base-content/70 max-w-3xl">Declarative build tooling for ambitious teams</p>
+  <main id="main-content" class="px-4 pb-24 pt-32">
+    <div class="layout-shell layout-shell--docs doc-grid">
+      <aside class="doc-sidebar" aria-label="Documentation navigation">
+        <div class="doc-sidebar__panel">
+          <a href="docs.html" class="doc-sidebar__back">
+            <svg class="svg-inline--fa fa-arrow-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"></path></svg>
+            Back to docs
+          </a>
+          <div>
+            <p class="doc-sidebar__eyebrow">Netsuke</p>
+            <p class="doc-sidebar__body">Declarative build tooling for ambitious teams</p>
+          </div>
+          <div class="doc-sidebar__groups">
+              <div class="doc-nav-group" aria-label="Introduction: What is Netsuke?">
+                <h3 class="doc-nav-group__title ">Introduction: What is Netsuke?</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-introduction-what-is-netsuke.html"
+                         class="doc-nav__link "
+>
+                        <span>Introduction: What is Netsuke?</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-introduction-what-is-netsuke.html#introduction-what-is-netsuke-core-philosophy"
+                         class="doc-nav__link "
+>
+                        <span>Core Philosophy:</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Getting Started">
+                <h3 class="doc-nav-group__title is-active">Getting Started</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-getting-started.html"
+                         class="doc-nav__link doc-nav__link--active"
+aria-current="page">
+                        <span>Getting Started</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-getting-started.html#getting-started-installation"
+                         class="doc-nav__link "
+>
+                        <span>Installation</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-getting-started.html#getting-started-basic-usage"
+                         class="doc-nav__link "
+>
+                        <span>Basic Usage</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="The Netsukefile Manifest">
+                <h3 class="doc-nav-group__title ">The Netsukefile Manifest</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-the-netsukefile-manifest.html"
+                         class="doc-nav__link "
+>
+                        <span>The Netsukefile Manifest</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-the-netsukefile-manifest.html#the-netsukefile-manifest-top-level-structure"
+                         class="doc-nav__link "
+>
+                        <span>Top-Level Structure</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-the-netsukefile-manifest.html#the-netsukefile-manifest-key-sections-explained"
+                         class="doc-nav__link "
+>
+                        <span>Key Sections Explained</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Defining Rules">
+                <h3 class="doc-nav-group__title ">Defining Rules</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-defining-rules.html"
+                         class="doc-nav__link "
+>
+                        <span>Defining Rules</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Defining Targets and Actions">
+                <h3 class="doc-nav-group__title ">Defining Targets and Actions</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-defining-targets-and-actions.html"
+                         class="doc-nav__link "
+>
+                        <span>Defining Targets and Actions</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Jinja Templating in Netsuke">
+                <h3 class="doc-nav-group__title ">Jinja Templating in Netsuke</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html"
+                         class="doc-nav__link "
+>
+                        <span>Jinja Templating in Netsuke</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-basic-syntax"
+                         class="doc-nav__link "
+>
+                        <span>Basic Syntax</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-processing-order"
+                         class="doc-nav__link "
+>
+                        <span>Processing Order</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-foreach-and-when"
+                         class="doc-nav__link "
+>
+                        <span>`foreach` and `when`</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-user-defined-macros"
+                         class="doc-nav__link "
+>
+                        <span>User-defined Macros</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Netsuke Standard Library (Stdlib)">
+                <h3 class="doc-nav-group__title ">Netsuke Standard Library (Stdlib)</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html"
+                         class="doc-nav__link "
+>
+                        <span>Netsuke Standard Library (Stdlib)</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-key-functions"
+                         class="doc-nav__link "
+>
+                        <span>Key Functions</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-key-filters"
+                         class="doc-nav__link "
+>
+                        <span>Key Filters</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-path-file-filters"
+                         class="doc-nav__link "
+>
+                        <span>Path & File Filters:</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-collection-filters"
+                         class="doc-nav__link "
+>
+                        <span>Collection Filters:</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-command-filters-impure"
+                         class="doc-nav__link "
+>
+                        <span>Command Filters (Impure):</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-key-tests"
+                         class="doc-nav__link "
+>
+                        <span>Key Tests</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Command-Line Interface (CLI)">
+                <h3 class="doc-nav-group__title ">Command-Line Interface (CLI)</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html"
+                         class="doc-nav__link "
+>
+                        <span>Command-Line Interface (CLI)</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-global-options"
+                         class="doc-nav__link "
+>
+                        <span>Global Options</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-commands"
+                         class="doc-nav__link "
+>
+                        <span>Commands</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-exit-codes"
+                         class="doc-nav__link "
+>
+                        <span>Exit Codes</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Examples in Practice">
+                <h3 class="doc-nav-group__title ">Examples in Practice</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-examples-in-practice.html"
+                         class="doc-nav__link "
+>
+                        <span>Examples in Practice</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Error Handling">
+                <h3 class="doc-nav-group__title ">Error Handling</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-error-handling.html"
+                         class="doc-nav__link "
+>
+                        <span>Error Handling</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Security Considerations">
+                <h3 class="doc-nav-group__title ">Security Considerations</h3>
+                <ul class="doc-nav__list" role="list">
+                    <li>
+                      <a href="docs-netsuke-security-considerations.html"
+                         class="doc-nav__link "
+>
+                        <span>Security Considerations</span>
+                      </a>
+                    </li>
+                </ul>
+              </div>
+          </div>
+          <div>
+            <p class="doc-sidebar__section-label">Source</p>
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/netsuke/refs/heads/main/docs/users-guide.md" target="_blank" rel="noopener">
+              View markdown
+              <span aria-hidden="true">↗</span>
+            </a>
+            <p class="mt-1 text-xs text-base-content/60">Netsuke User Guide (main)</p>
+          </div>
         </div>
-        <div class="flex flex-wrap gap-3 text-sm font-mono uppercase tracking-[0.3em] text-base-content/60">
-          <span>Section 02</span>
-          <span>Updated Nov 08, 2025</span>
-        </div>
-      </div>
+      </aside>
 
-      <div class="mt-8 flex flex-wrap gap-3">
-          <a href="docs-netsuke-introduction-what-is-netsuke.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Introduction: What is Netsuke?
-          </a>
-          <a href="docs-netsuke-getting-started.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-primary">
-            Getting Started
-          </a>
-          <a href="docs-netsuke-the-netsukefile-manifest.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            The Netsukefile Manifest
-          </a>
-          <a href="docs-netsuke-defining-rules.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Defining Rules
-          </a>
-          <a href="docs-netsuke-defining-targets-and-actions.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Defining Targets and Actions
-          </a>
-          <a href="docs-netsuke-jinja-templating-in-netsuke.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Jinja Templating in Netsuke
-          </a>
-          <a href="docs-netsuke-netsuke-standard-library-stdlib.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Netsuke Standard Library (Stdlib)
-          </a>
-          <a href="docs-netsuke-command-line-interface-cli.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Command-Line Interface (CLI)
-          </a>
-          <a href="docs-netsuke-examples-in-practice.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Examples in Practice
-          </a>
-          <a href="docs-netsuke-error-handling.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Error Handling
-          </a>
-          <a href="docs-netsuke-security-considerations.html"
-             class="btn btn-sm font-mono uppercase tracking-[0.3em] btn-ghost">
-            Security Considerations
-          </a>
-      </div>
+      <section class="space-y-6" id="getting-started">
+        <nav class="doc-mobile-nav" aria-labelledby="mobile-sections-label">
+          <p id="mobile-sections-label" class="doc-sidebar__section-label">Contents</p>
+          <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Introduction: What is Netsuke?</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-introduction-what-is-netsuke.html" class="doc-nav__link">Introduction: What is Netsuke?</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-introduction-what-is-netsuke.html#introduction-what-is-netsuke-core-philosophy" class="doc-nav__link">Core Philosophy:</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Getting Started</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-getting-started.html" class="doc-nav__link">Getting Started</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-getting-started.html#getting-started-installation" class="doc-nav__link">Installation</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-getting-started.html#getting-started-basic-usage" class="doc-nav__link">Basic Usage</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">The Netsukefile Manifest</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-the-netsukefile-manifest.html" class="doc-nav__link">The Netsukefile Manifest</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-the-netsukefile-manifest.html#the-netsukefile-manifest-top-level-structure" class="doc-nav__link">Top-Level Structure</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-the-netsukefile-manifest.html#the-netsukefile-manifest-key-sections-explained" class="doc-nav__link">Key Sections Explained</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Defining Rules</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-defining-rules.html" class="doc-nav__link">Defining Rules</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Defining Targets and Actions</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-defining-targets-and-actions.html" class="doc-nav__link">Defining Targets and Actions</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Jinja Templating in Netsuke</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html" class="doc-nav__link">Jinja Templating in Netsuke</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-basic-syntax" class="doc-nav__link">Basic Syntax</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-processing-order" class="doc-nav__link">Processing Order</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-foreach-and-when" class="doc-nav__link">`foreach` and `when`</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-jinja-templating-in-netsuke.html#jinja-templating-in-netsuke-user-defined-macros" class="doc-nav__link">User-defined Macros</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Netsuke Standard Library (Stdlib)</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html" class="doc-nav__link">Netsuke Standard Library (Stdlib)</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-key-functions" class="doc-nav__link">Key Functions</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-key-filters" class="doc-nav__link">Key Filters</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-path-file-filters" class="doc-nav__link">Path & File Filters:</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-collection-filters" class="doc-nav__link">Collection Filters:</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-command-filters-impure" class="doc-nav__link">Command Filters (Impure):</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-key-tests" class="doc-nav__link">Key Tests</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Command-Line Interface (CLI)</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html" class="doc-nav__link">Command-Line Interface (CLI)</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-global-options" class="doc-nav__link">Global Options</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-commands" class="doc-nav__link">Commands</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-exit-codes" class="doc-nav__link">Exit Codes</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Examples in Practice</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-examples-in-practice.html" class="doc-nav__link">Examples in Practice</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Error Handling</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-error-handling.html" class="doc-nav__link">Error Handling</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Security Considerations</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-netsuke-security-considerations.html" class="doc-nav__link">Security Considerations</a>
+                    </li>
+                </ul>
+              </li>
+          </ul>
+        </nav>
 
-      <article class="doc-card mt-10">
-          <div class="doc-numbered-steps">
-              <div class="doc-step" id="getting-started-step-1">
-                <div class="doc-step__index">01</div>
-                <div>
-                  <h3 class="font-mono text-xl font-semibold text-base-content">Installation</h3>
-                  <div class="rich-text mt-3"><p>Netsuke is typically built from source using Cargo:</p>
+        <header class="doc-hero" id="doc-title">
+          <h1 class="doc-hero__title">2. Getting Started</h1>
+          <div class="doc-meta-list">
+            <span class="doc-meta-list__item">Updated Nov 09, 2025</span>
+          </div>
+        </header>
+
+        <article class="doc-article">
+            <ol class="doc-steps">
+                <li id="getting-started-step-1" class="doc-step">
+                  <p class="doc-step__index">Step 01</p>
+                  <p class="doc-step__title">Installation</p>
+                  <div class="mt-4 doc-prose"><p>Netsuke is typically built from source using Cargo:</p>
 <div class="codehilite"><pre><span></span><code>cargo<span class="w"> </span>build<span class="w"> </span>--release
 <span class="c1"># The executable will be in target/release/netsuke</span>
 </code></pre></div>
@@ -288,13 +596,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p>Refer to the project's <code>README.md</code> or release pages for pre-compiled binaries
 if available. Ensure the <code>ninja</code> executable is also installed and available in
 your system's <code>PATH</code>.</p></div>
-                </div>
-              </div>
-              <div class="doc-step" id="getting-started-step-2">
-                <div class="doc-step__index">02</div>
-                <div>
-                  <h3 class="font-mono text-xl font-semibold text-base-content">Basic Usage</h3>
-                  <div class="rich-text mt-3"><p>The primary way to use Netsuke is through its command-line interface (CLI). The
+                </li>
+                <li id="getting-started-step-2" class="doc-step">
+                  <p class="doc-step__index">Step 02</p>
+                  <p class="doc-step__title">Basic Usage</p>
+                  <div class="mt-4 doc-prose"><p>The primary way to use Netsuke is through its command-line interface (CLI). The
 default command is <code>build</code>.</p>
 <ol>
 <li>
@@ -311,22 +617,22 @@ netsuke<span class="w"> </span>build<span class="w"> </span>target_name<span cla
 
 <p>If no <code>Netsukefile</code> is found, Netsuke will provide a helpful error message
 guiding you.</p></div>
-                </div>
-              </div>
-          </div>
-      </article>
+                </li>
+            </ol>
+        </article>
 
-      <div class="doc-footer">
-        <p>Source: <a class="link" href="https://raw.githubusercontent.com/leynos/netsuke/refs/heads/main/docs/users-guide.md" target="_blank" rel="noopener">Netsuke User Guide (main)</a></p>
-        <p class="mt-1">Generated November 08, 2025 at 14:08 UTC</p>
-      </div>
-    </section>
+        <div class="doc-footer">
+          <p>Generated November 09, 2025 at 01:21 UTC</p>
+            <p class="mt-1">Built with Netsuke.</p>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer id="footer" class="border-t border-base-200 bg-base-100">
     <div class="layout-shell flex flex-col gap-4 px-4 py-10 text-sm text-base-content/70 md:flex-row md:items-center md:justify-between">
       <p class="font-mono uppercase tracking-[0.25em]">df12 Productions</p>
-      <p>&copy; 2025 df12 Productions. Built with Netsuke.</p>
+          <p>&copy; 2025 df12 Productions. </p>
     </div>
   </footer>
 </body>

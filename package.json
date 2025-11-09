@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.15",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/bun": "latest",
     "daisyui": "^5.3.7",
     "sharp": "^0.34.4",

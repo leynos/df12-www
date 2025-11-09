@@ -10,6 +10,7 @@
 }
 
 @plugin "@tailwindcss/typography";
+@plugin "./plugins/doc-inline-code.js";
 
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -199,17 +200,6 @@
     @apply font-mono text-base-content;
   }
 
-  .doc-prose code:not(pre code) {
-    background-color: var(--color-gray-200);
-    border: 0 solid var(--color-gray-200);
-    border-radius: 0.25rem;
-    color: rgb(75 85 99);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: var(--text-sm--line-height);
-    padding-inline: 0.25rem;
-    padding-block: 0.125rem;
-  }
 
   .doc-prose pre {
     @apply rounded-xl border border-neutral bg-neutral text-neutral-content p-5 shadow-lg shadow-neutral/40;

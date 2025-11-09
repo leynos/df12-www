@@ -7,7 +7,6 @@ import subprocess
 import typing as typ
 from pathlib import Path
 
-import jqpy
 import msgspec.json as msgspec_json
 import pytest
 from bs4 import BeautifulSoup
@@ -167,6 +166,20 @@ def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -
     assert hero_title == "Introduction"
 
 
+def _extract_nodes_by_tag(
+    tree: dict[str, typ.Any], tag: str
+) -> list[dict[str, typ.Any]]:
+    matches: list[dict[str, typ.Any]] = []
+    stack: list[dict[str, typ.Any]] = [tree]
+    while stack:
+        node = stack.pop()
+        if node.get("tag") == tag:
+            matches.append(node)
+        children = node.get("children", []) or []
+        stack.extend(child for child in children if isinstance(child, dict))
+    return matches
+
+
 @pytest.mark.timeout(120)
 @pytest.mark.xdist_group(name="css-view")
 def test_doc_prose_code_spans_have_expected_computed_style(
@@ -187,12 +200,8 @@ def test_doc_prose_code_spans_have_expected_computed_style(
         capture_output=True,
     )
     payload = msgspec_json.decode(result.stdout)
-    nodes_result = jqpy.jq('.payload.tree | .. | select(.tag? == "code")', payload)
-    code_nodes: list[dict[str, typ.Any]] = [
-        node
-        for node in typ.cast("list[typ.Any]", nodes_result)
-        if isinstance(node, dict)
-    ]
+    tree = typ.cast("dict[str, typ.Any]", payload["payload"]["tree"])
+    code_nodes = _extract_nodes_by_tag(tree, "code")
     inline_node = next(
         node for node in code_nodes if node.get("text") == INLINE_CODE_LABEL
     )

@@ -123,7 +123,7 @@
         </nav>
 
         <header class="doc-hero" id="doc-title">
-          <h1 class="doc-hero__title">{{ section.title }}</h1>
+          <h1 class="doc-hero__title">{{ section.short_title.rstrip(':') }}</h1>
           <div class="doc-meta-list">
             <span class="doc-meta-list__item">Updated {{ generated_at.strftime('%b %d, %Y') }}</span>
           </div>

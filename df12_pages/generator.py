@@ -148,9 +148,10 @@ class PageContentGenerator:
         groups: list[dict[str, typ.Any]] = []
         for model in section_models:
             page_url = f"{self.page.filename_prefix}{model.slug}.html"
+            group_label = self._clean_nav_label(model.short_title)
             entries: list[dict[str, typ.Any]] = [
                 {
-                    "label": model.short_title,
+                    "label": group_label,
                     "href": page_url,
                     "section_slug": model.slug,
                     "is_primary": True,
@@ -161,13 +162,13 @@ class PageContentGenerator:
                     href = f"{page_url}#{block['anchor']}"
                     entries.append(
                         {
-                            "label": block["title"],
+                            "label": self._clean_nav_label(block["title"]),
                             "href": href,
                             "section_slug": model.slug,
                             "is_primary": False,
                         }
                     )
-            groups.append({"label": model.short_title, "slug": model.slug, "entries": entries})
+            groups.append({"label": group_label, "slug": model.slug, "entries": entries})
         return groups
 
     def _resolve_layout(self, slug: str) -> SectionLayout:
@@ -303,3 +304,7 @@ class PageContentGenerator:
     def _slugify(value: str) -> str:
         slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
         return slug
+
+    @staticmethod
+    def _clean_nav_label(label: str) -> str:
+        return label.strip().rstrip(":").strip()

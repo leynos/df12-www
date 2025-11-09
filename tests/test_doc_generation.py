@@ -19,6 +19,8 @@ def sample_markdown() -> str:
         "Intro details.\n\n"
         "**Capabilities**\n"
         "Bullet list of capabilities.\n\n"
+        "### Core Philosophy:\n"
+        "Why decisions matter.\n\n"
         "## 2. Getting Started\n"
         "### Install\n"
         "Install steps here.\n\n"
@@ -85,10 +87,11 @@ def test_sidebar_groups_include_top_and_child_links(generated_docs: dict[str, Be
         "Getting Started",
     ]
 
-    intro_links = [a["href"] for a in groups[0].select("a")]
-    assert intro_links[0].endswith("docs-test-introduction.html")
-    assert "#introduction-overview" in intro_links[1]
-    assert "#introduction-capabilities" in intro_links[2]
+    intro_links = [a.get_text(strip=True) for a in groups[0].select("a")]
+    assert intro_links[0] == "Introduction"
+    assert "Overview" in intro_links[1]
+    assert "Capabilities" in intro_links[2]
+    assert "Core Philosophy" in intro_links[3]
 
 
 def test_only_one_sidebar_link_flagged_active(generated_docs: dict[str, BeautifulSoup]) -> None:
@@ -101,4 +104,11 @@ def test_only_one_sidebar_link_flagged_active(generated_docs: dict[str, Beautifu
 def test_bold_heading_promoted_to_nav_entry(generated_docs: dict[str, BeautifulSoup]) -> None:
     soup = generated_docs["docs-test-introduction.html"]
     nav_labels = [span.get_text(strip=True) for span in soup.select(".doc-nav__list a span")]
-    assert any(label == "Capabilities" for label in nav_labels)
+    assert "Capabilities" in nav_labels
+    assert "Core Philosophy" in nav_labels
+
+
+def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -> None:
+    soup = generated_docs["docs-test-introduction.html"]
+    hero_title = soup.select_one(".doc-hero__title").get_text(strip=True)
+    assert hero_title == "Introduction"

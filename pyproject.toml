@@ -27,6 +27,8 @@ dev = [
     "pytest-bdd",
     "parse_type",
     "beautifulsoup4",
+    "msgspec",
+    "jqpy",
 ]
 
 [tool.ruff]

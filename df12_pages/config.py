@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import dataclasses as dc
-from pathlib import Path
 import typing as typ
+from pathlib import Path
 
 from ruamel.yaml import YAML
+
+
+class SiteConfigError(ValueError):
+    """Raised when the site configuration is invalid or incomplete."""
 
 
 @dc.dataclass(slots=True)
@@ -20,6 +24,8 @@ class SectionLayout:
 
 @dc.dataclass(slots=True)
 class ThemeConfig:
+    """Visual theming applied to generated documentation."""
+
     hero_eyebrow: str = "df12"
     hero_tagline: str = "Documentation"
     doc_label: str = "Docs"
@@ -36,6 +42,8 @@ LANGUAGE_MANIFESTS: dict[str, str] = {
 
 @dc.dataclass(slots=True)
 class PageConfig:
+    """A fully resolved page definition sourced from YAML config."""
+
     key: str
     label: str
     source_url: str
@@ -56,6 +64,8 @@ class PageConfig:
 
 @dc.dataclass(slots=True)
 class SiteConfig:
+    """Collection of page configs alongside shared defaults."""
+
     pages: dict[str, PageConfig]
     default_page: str | None = None
     docs_index_output: Path = Path("public/docs.html")
@@ -63,7 +73,6 @@ class SiteConfig:
 
     def get_page(self, page_id: str | None) -> PageConfig:
         """Return the requested page or fall back to the configured default."""
-
         if page_id is None:
             return self._get_default_page()
         try:
@@ -77,14 +86,14 @@ class SiteConfig:
         if self.default_page and self.default_page in self.pages:
             return self.pages[self.default_page]
         if not self.pages:  # pragma: no cover - configuration error
-            raise ValueError("No pages configured in layout file.")
+            msg = "No pages configured in layout file."
+            raise SiteConfigError(msg)
         first_key = next(iter(self.pages))
         return self.pages[first_key]
 
 
 def load_site_config(path: Path) -> SiteConfig:
     """Load the YAML configuration describing page/site layout choices."""
-
     if not path.exists():
         msg = f"Configuration file '{path}' not found."
         raise FileNotFoundError(msg)
@@ -116,7 +125,8 @@ def load_site_config(path: Path) -> SiteConfig:
     shared_layouts = raw.get("layouts", {}) or {}
     pages_raw = raw.get("pages") or {}
     if not pages_raw:
-        raise ValueError("No pages defined in layout configuration.")
+        msg = "No pages defined in layout configuration."
+        raise SiteConfigError(msg)
 
     pages: dict[str, PageConfig] = {}
     for key, payload in pages_raw.items():
@@ -130,7 +140,8 @@ def load_site_config(path: Path) -> SiteConfig:
         if not source_url and repo:
             source_url = _build_repo_url(repo, branch, doc_path)
         if not source_url:
-            raise ValueError(f"Page '{key}' is missing 'source_url' or 'repo'.")
+            msg = f"Page '{key}' is missing 'source_url' or 'repo'."
+            raise SiteConfigError(msg)
 
         label = payload.get("label") or key.replace("-", " ").title()
         source_label = payload.get("source_label", default_source_label)
@@ -145,7 +156,9 @@ def load_site_config(path: Path) -> SiteConfig:
 
         manifest_url = payload.get("manifest_url")
         if not manifest_url and repo:
-            manifest_path = payload.get("manifest_path") or _default_manifest_path(language)
+            manifest_path = payload.get("manifest_path") or _default_manifest_path(
+                language
+            )
             if manifest_path:
                 manifest_url = _build_repo_url(repo, branch, manifest_path)
 
@@ -170,7 +183,12 @@ def load_site_config(path: Path) -> SiteConfig:
             description_override=description_override,
         )
 
-    return SiteConfig(pages=pages, default_page=default_page, docs_index_output=docs_index_output, theme=default_theme)
+    return SiteConfig(
+        pages=pages,
+        default_page=default_page,
+        docs_index_output=docs_index_output,
+        theme=default_theme,
+    )
 
 
 def _build_repo_url(repo: str, branch: str, path: str) -> str:
@@ -184,7 +202,9 @@ def _default_manifest_path(language: str | None) -> str | None:
     return LANGUAGE_MANIFESTS.get(language.lower())
 
 
-def _merge_theme(base: ThemeConfig, override: typ.Mapping[str, typ.Any] | None) -> ThemeConfig:
+def _merge_theme(
+    base: ThemeConfig, override: typ.Mapping[str, typ.Any] | None
+) -> ThemeConfig:
     if not override:
         return base
     return ThemeConfig(

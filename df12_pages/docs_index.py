@@ -2,23 +2,26 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
-from datetime import datetime, timezone
-from pathlib import Path
+import tomllib
 import typing as typ
+from pathlib import Path
 
 import requests
-import tomllib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from .config import PageConfig, SiteConfig
+if typ.TYPE_CHECKING:  # pragma: no cover - import for type hints only
+    from .config import PageConfig, SiteConfig
 
 
 class DocsIndexBuilder:
     """Render a landing page enumerating generated documentation bundles."""
 
-    def __init__(self, site_config: SiteConfig, *, templates_dir: Path | None = None) -> None:
+    def __init__(
+        self, site_config: SiteConfig, *, templates_dir: Path | None = None
+    ) -> None:
         self.site_config = site_config
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
         self.env = Environment(
@@ -31,8 +34,9 @@ class DocsIndexBuilder:
         self.description_resolver = ManifestDescriptionResolver()
 
     def run(self) -> Path:
+        """Render the docs index HTML file to the configured output path."""
         entries = self._gather_entries()
-        generated_at = datetime.now(timezone.utc)
+        generated_at = dt.datetime.now(dt.UTC)
         output_path = self.site_config.docs_index_output
         output_path.parent.mkdir(parents=True, exist_ok=True)
         context = {
@@ -51,7 +55,9 @@ class DocsIndexBuilder:
             link = _discover_entry_href(page, docs_root)
             if not link:
                 continue
-            description = page.description_override or self.description_resolver.resolve(page)
+            description = (
+                page.description_override or self.description_resolver.resolve(page)
+            )
             entries.append(
                 {
                     "label": page.label,
@@ -89,6 +95,7 @@ class ManifestDescriptionResolver:
         self._cache: dict[str, str] = {}
 
     def resolve(self, page: PageConfig) -> str:
+        """Provide a description for the supplied page, caching results."""
         url = page.manifest_url
         if not url:
             return f"Reference docs for {page.label}."
@@ -101,7 +108,7 @@ class ManifestDescriptionResolver:
             return f"Reference docs for {page.label}."
         try:
             description = _extract_description(resp.text, page.language, url)
-        except Exception:  # pragma: no cover - manifest parse failure fallback
+        except (ValueError, TypeError):  # pragma: no cover - parse failure fallback
             description = None
         if not description:
             description = f"Reference docs for {page.label}."

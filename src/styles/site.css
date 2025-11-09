@@ -199,8 +199,8 @@
     @apply font-mono text-base-content;
   }
 
-  .doc-prose code {
-    @apply rounded-md bg-base-200 px-1.5 py-0.5 font-mono text-sm;
+  .doc-prose :where(code):not(:where(pre code)) {
+    @apply rounded bg-gray-200 px-1 py-0.5 font-mono text-sm;
   }
 
   .doc-prose pre {

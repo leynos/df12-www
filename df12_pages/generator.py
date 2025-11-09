@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 import dataclasses as dc
-from datetime import datetime, timezone
-from pathlib import Path
+import datetime as dt
 import re
 import typing as typ
+from pathlib import Path
 
 import requests
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown import Markdown
 from pygments import highlight
-from pygments.formatters import HtmlFormatter
+from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
@@ -31,9 +31,11 @@ class HtmlContentRenderer:
 
     @property
     def stylesheet(self) -> str:
+        """Return the CSS used for highlighted code blocks."""
         return self._formatter.get_style_defs(".codehilite")
 
     def markdown(self, text: str) -> str:
+        """Render markdown into HTML using the configured extensions."""
         if not text.strip():
             return ""
         md = Markdown(
@@ -50,6 +52,7 @@ class HtmlContentRenderer:
         return md.convert(text)
 
     def code_block(self, code: str, language: str | None = None) -> str:
+        """Highlight fenced code blocks with pygments."""
         lang = language or "text"
         try:
             lexer = get_lexer_by_name(lang)
@@ -60,6 +63,8 @@ class HtmlContentRenderer:
 
 @dc.dataclass(slots=True)
 class SectionModel:
+    """Structured data passed to the doc section template."""
+
     title: str
     short_title: str
     slug: str
@@ -99,7 +104,6 @@ class PageContentGenerator:
 
     def run(self) -> list[Path]:
         """Generate HTML files, returning the written paths."""
-
         markdown_source = self._fetch_markdown()
         sections = parse_sections(markdown_source)
         if not sections:
@@ -109,7 +113,7 @@ class PageContentGenerator:
         out_dir = self.output_dir_override or self.page.output_dir
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        generated_at = datetime.now(timezone.utc)
+        generated_at = dt.datetime.now(dt.UTC)
         section_bundle: list[tuple[Section, SectionModel, str]] = []
         for section in sections:
             layout = self._resolve_layout(section.slug)
@@ -144,7 +148,9 @@ class PageContentGenerator:
         resp.raise_for_status()
         return resp.text
 
-    def _build_nav_groups(self, section_models: list[SectionModel]) -> list[dict[str, typ.Any]]:
+    def _build_nav_groups(
+        self, section_models: list[SectionModel]
+    ) -> list[dict[str, typ.Any]]:
         groups: list[dict[str, typ.Any]] = []
         for model in section_models:
             page_url = f"{self.page.filename_prefix}{model.slug}.html"
@@ -168,13 +174,17 @@ class PageContentGenerator:
                             "is_primary": False,
                         }
                     )
-            groups.append({"label": group_label, "slug": model.slug, "entries": entries})
+            groups.append(
+                {"label": group_label, "slug": model.slug, "entries": entries}
+            )
         return groups
 
     def _resolve_layout(self, slug: str) -> SectionLayout:
         return self.page.layouts.get(slug, SectionLayout())
 
-    def _build_section_model(self, section: Section, layout: SectionLayout) -> SectionModel:
+    def _build_section_model(
+        self, section: Section, layout: SectionLayout
+    ) -> SectionModel:
         intro_html = self.renderer.markdown(section.intro_markdown)
         default_html = self.renderer.markdown(section.markdown)
         numbered_steps: list[dict[str, str]] = []
@@ -214,7 +224,9 @@ class PageContentGenerator:
             toc_items=toc_items,
         )
 
-    def _prepare_numbered_steps(self, section: Section, layout: SectionLayout) -> list[dict[str, str]]:
+    def _prepare_numbered_steps(
+        self, section: Section, layout: SectionLayout
+    ) -> list[dict[str, str]]:
         subsections = list(section.subsections)
         if not subsections:
             return []
@@ -244,10 +256,15 @@ class PageContentGenerator:
             )
         return steps
 
-    def _prepare_split_panel(self, section: Section, layout: SectionLayout) -> dict[str, str]:
+    def _prepare_split_panel(
+        self, section: Section, layout: SectionLayout
+    ) -> dict[str, str]:
         matches = list(CODE_BLOCK_PATTERN.finditer(section.markdown))
         if not matches:
-            return {"primary_html": self.renderer.markdown(section.markdown), "secondary_html": ""}
+            return {
+                "primary_html": self.renderer.markdown(section.markdown),
+                "secondary_html": "",
+            }
 
         index = layout.emphasized_code_block or 0
         if index >= len(matches):
@@ -302,8 +319,7 @@ class PageContentGenerator:
 
     @staticmethod
     def _slugify(value: str) -> str:
-        slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
-        return slug
+        return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
     @staticmethod
     def _clean_nav_label(label: str) -> str:

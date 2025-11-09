@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import dataclasses as dc
 import re
-import typing as typ
 
 SECTION_PATTERN = re.compile(r"^##\s+(.*)", re.MULTILINE)
 SUBSECTION_PATTERN = re.compile(r"^###\s+(.*)", re.MULTILINE)
@@ -13,12 +12,16 @@ BOLD_HEADING_PATTERN = re.compile(r"^\s*\*\*(.+?)\*\*\s*$", re.MULTILINE)
 
 @dc.dataclass(slots=True)
 class Subsection:
+    """Represents a third-level heading and its body HTML."""
+
     title: str
     markdown: str
 
 
 @dc.dataclass(slots=True)
 class Section:
+    """Represents a second-level heading and its derived metadata."""
+
     title: str
     short_title: str
     slug: str
@@ -75,7 +78,6 @@ def _split_subsections(body: str) -> tuple[str, list[Subsection]]:
 
 def parse_sections(markdown_text: str) -> list[Section]:
     """Split the upstream markdown file into ordered sections."""
-
     entries = list(SECTION_PATTERN.finditer(markdown_text))
     if not entries:
         return []

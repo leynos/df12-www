@@ -6,6 +6,7 @@ import dataclasses as dc
 import datetime as dt
 import re
 import typing as typ
+from html import escape
 from pathlib import Path
 
 import requests
@@ -19,7 +20,8 @@ from pygments.util import ClassNotFound
 from .config import PageConfig, SectionLayout
 from .markdown_parser import Section, Subsection, parse_sections
 
-CODE_BLOCK_PATTERN = re.compile(r"```(\w+)?\n(.*?)```", re.DOTALL)
+CODE_BLOCK_PATTERN = re.compile(r"```([A-Za-z0-9_+#.-]+)?[^\n]*\n(.*?)```", re.DOTALL)
+CODEHILITE_OPEN_TAG = re.compile(r'<div class="codehilite">')
 
 
 class HtmlContentRenderer:
@@ -49,7 +51,8 @@ class HtmlContentRenderer:
                 }
             },
         )
-        return md.convert(text)
+        html = md.convert(text)
+        return self._annotate_codehilite(html, text)
 
     def code_block(self, code: str, language: str | None = None) -> str:
         """Highlight fenced code blocks with pygments."""
@@ -58,7 +61,31 @@ class HtmlContentRenderer:
             lexer = get_lexer_by_name(lang)
         except ClassNotFound:
             lexer = get_lexer_by_name("text")
-        return highlight(code, lexer, self._formatter)
+        html = highlight(code, lexer, self._formatter)
+        return self._attach_language_attribute(html, lang)
+
+    def _annotate_codehilite(self, html: str, source_markdown: str) -> str:
+        """Attach language metadata to each highlighted block in converted markdown."""
+        languages = [match.group(1) or "text" for match in CODE_BLOCK_PATTERN.finditer(source_markdown)]
+        if not languages:
+            return html
+        lang_iter = iter(languages)
+
+        def _repl(match: re.Match[str]) -> str:
+            lang = next(lang_iter, "text")
+            return f'<div class="codehilite" data-language="{escape(lang, quote=True)}">'
+
+        return CODEHILITE_OPEN_TAG.sub(_repl, html, len(languages))
+
+    @staticmethod
+    def _attach_language_attribute(html: str, language: str) -> str:
+        """Add a single language attribute to an already highlighted block."""
+        safe_lang = escape(language or "text", quote=True)
+
+        def _repl(match: re.Match[str]) -> str:
+            return f'<div class="codehilite" data-language="{safe_lang}">' 
+
+        return CODEHILITE_OPEN_TAG.sub(_repl, html, 1)
 
 
 @dc.dataclass(slots=True)

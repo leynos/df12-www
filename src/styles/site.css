@@ -54,6 +54,7 @@
 
   .doc-sidebar {
     @apply hidden self-start lg:block;
+    width: 16rem;
   }
 
   .doc-sidebar__panel {
@@ -518,6 +519,10 @@
 
   .layout-shell.layout-shell--docs {
     max-width: var(--container-7xl, 96rem);
+  }
+
+  .layout-shell.layout-shell--docs > section {
+    margin-left: 6rem;
   }
 
   .link-arrow {

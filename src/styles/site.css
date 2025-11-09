@@ -199,8 +199,16 @@
     @apply font-mono text-base-content;
   }
 
-  .doc-prose :where(code):not(:where(pre code)) {
-    @apply rounded bg-gray-200 px-1 py-0.5 font-mono text-sm;
+  .doc-prose code:not(pre code) {
+    background-color: var(--color-gray-200);
+    border: 0 solid var(--color-gray-200);
+    border-radius: 0.25rem;
+    color: rgb(75 85 99);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    padding-inline: 0.25rem;
+    padding-block: 0.125rem;
   }
 
   .doc-prose pre {

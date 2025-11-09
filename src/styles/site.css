@@ -90,7 +90,8 @@
   }
 
   .doc-nav__link {
-    @apply flex flex-col gap-1 border-l-2 border-transparent pl-3 text-sm text-base-content/70 transition hover:border-base-200 hover:text-base-content;
+    @apply flex flex-col gap-1 border-l-2 border-transparent text-sm text-base-content/70 transition hover:border-base-200 hover:text-base-content;
+    padding-inline-start: 0.75rem;
     font-weight: var(--font-weight-medium, 500);
   }
 
@@ -522,7 +523,7 @@
   }
 
   .layout-shell.layout-shell--docs > section {
-    margin-left: 6rem;
+    margin-inline-start: 6rem;
   }
 
   .link-arrow {

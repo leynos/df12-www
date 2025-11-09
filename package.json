@@ -3,10 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --watch",
-    "build": "bun run build:css && bun run build:images",
+    "dev": "watchexec -w src -w df12_pages -w pyproject.toml --exts css,py -- bun run build",
+    "build": "bun run build:css && bun run build:images && bun run build:pages",
     "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
     "build:images": "bun run scripts/generate-image-variants.ts",
+	"build:pages": "uv run pages generate",
     "serve": "bun run build && bunx http-server public -p 8080"
   },
   "devDependencies": {

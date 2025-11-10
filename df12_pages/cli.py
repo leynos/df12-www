@@ -46,13 +46,24 @@ def generate(
 ) -> None:
     """Generate documentation pages for the requested site configuration."""
     site_config = load_site_config(config)
-    page_config = site_config.get_page(page)
-    generator = PageContentGenerator(
-        page_config, source_url=source_url, output_dir=output_dir
-    )
-    written = generator.run()
-    for path in written:
-        print(f"wrote {_format_path(path)}")
+
+    if page:
+        target_pages = [site_config.get_page(page)]
+    else:
+        target_pages = list(site_config.pages.values())
+
+    if len(target_pages) > 1 and (source_url or output_dir):
+        raise ValueError(
+            "Cannot override source_url/output_dir when generating multiple pages."
+        )
+
+    for page_config in target_pages:
+        generator = PageContentGenerator(
+            page_config, source_url=source_url, output_dir=output_dir
+        )
+        written = generator.run()
+        for path in written:
+            print(f"wrote {_format_path(path)}")
     docs_index_path = DocsIndexBuilder(site_config).run()
     print(f"wrote {_format_path(docs_index_path)}")
 

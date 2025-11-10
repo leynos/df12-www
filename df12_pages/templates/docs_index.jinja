@@ -50,12 +50,12 @@
           {% for entry in entries %}
             <article class="product-card pressable flex flex-col justify-between">
               <div>
-                <h2 class="text-2xl font-semibold">{{ entry.label }}</h2>
-                <p class="mt-3 text-base-content/70">{{ entry.description }}</p>
+                <h3 class="product-card__title">{{ entry.label }}</h2>
+                <p class="mt-3 text-base-content/80">{{ entry.description }}</p>
               </div>
               <div class="mt-6 flex items-center justify-between">
-                <div class="text-sm font-mono uppercase tracking-[0.3em] text-base-content/60">{{ entry.repo }}</div>
-                <a href="{{ entry.href }}" class="btn btn-primary btn-sm font-mono uppercase tracking-[0.3em]">Open</a>
+                <div class="text-sm font-mono uppercase text-base-content/60">{{ entry.repo }}</div>
+                <a href="{{ entry.href }}" class="product-card__meta">Open Docs <span aria-hidden="true" class="link-arrow">→</span></a>
               </div>
             </article>
           {% endfor %}

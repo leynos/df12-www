@@ -55,3 +55,43 @@ pages:
           - Global Options
           - Commands
           - Exit Codes
+
+  rstest-bdd:
+    label: "rstest-bdd Docs"
+    repo: leynos/rstest-bdd
+    language: rust
+    filename_prefix: docs-rstest-bdd-
+    page_title_suffix: "rstest-bdd Docs"
+    description: "Behavior-driven testing macros layered on top of rstest."
+
+  ortho-config:
+    label: "Ortho Config Docs"
+    repo: leynos/ortho-config
+    language: rust
+    filename_prefix: docs-ortho-config-
+    page_title_suffix: "Ortho Config Docs"
+    description: "Esbuild-inspired configuration management for Rust services."
+
+  pg-embedded-setup-unpriv:
+    label: "pg-embedded-setup-unpriv Docs"
+    repo: leynos/pg-embedded-setup-unpriv
+    language: rust
+    filename_prefix: docs-pg-embedded-
+    page_title_suffix: "pg-embedded-setup-unpriv Docs"
+    description: "Bootstrap postgresql_embedded clusters as root while delegating filesystem work to unprivileged users."
+
+  wireframe:
+    label: "Wireframe Docs"
+    repo: leynos/wireframe
+    language: rust
+    filename_prefix: docs-wireframe-
+    page_title_suffix: "Wireframe Docs"
+    description: "Helpers for building binary protocol servers and clients in Rust."
+
+  chutoro:
+    label: "Chutoro Docs"
+    repo: leynos/chutoro
+    language: rust
+    filename_prefix: docs-chutoro-
+    page_title_suffix: "Chutoro Docs"
+    description: "Experimental orchestration runtime and tooling for dense + text providers."

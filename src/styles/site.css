@@ -173,7 +173,7 @@
   }
 
   .doc-article {
-    @apply space-y-12 pt-10;
+    @apply space-y-12;
   }
 
   .doc-section {

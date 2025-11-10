@@ -139,8 +139,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       align-items: center;
       gap: 0.35rem;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      background: rgba(255, 255, 255, 0.08);
       color: var(--color-neutral-content);
       font-family: inherit;
       font-size: 0.65rem;
@@ -167,6 +165,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       height: 0.85rem;
       display: block;
     }
+
+    .svg-inline--fa {
+      display: inline;
+	}
   </style>
 </head>
 <body class="doc-page">
@@ -423,6 +425,13 @@ aria-current="page">
                       </a>
                     </li>
                     <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits"
+                         class="doc-nav__link "
+>
+                        <span>Preserving `clap` display exits</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors"
                          class="doc-nav__link "
 >
@@ -596,6 +605,9 @@ aria-current="page">
                       <a href="docs-ortho-config-error-handling.html" class="doc-nav__link">Error handling</a>
                     </li>
                     <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits" class="doc-nav__link">Preserving `clap` display exits</a>
+                    </li>
+                    <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors" class="doc-nav__link">Aggregating multiple errors</a>
                     </li>
                     <li>
@@ -717,19 +729,18 @@ setting. Global options such as <code>--recipient</code> or <code>--salutation</
 variables beneath any CLI overrides. The <code>greet</code> subcommand adds optional
 behaviour like a preamble (<code>--preamble "Good morning"</code>) or custom punctuation
 while reusing the merged global configuration. The <code>take-leave</code> subcommand
-combines switches and optional arguments
-(<code>--wave</code>, <code>--gift</code>, <code>--channel email</code>, <code>--remind-in 15</code>) alongside greeting
-adjustments (<code>--preamble "Until next time"</code>, <code>--punctuation ?</code>) to describe how
-the farewell should unfold. Each subcommand struct derives <code>OrthoConfig</code> so
+combines switches and optional arguments (<code>--wave</code>, <code>--gift</code>,
+<code>--channel email</code>, <code>--remind-in 15</code>) alongside greeting adjustments
+(<code>--preamble "Until next time"</code>, <code>--punctuation ?</code>) to describe how the
+farewell should unfold. Each subcommand struct derives <code>OrthoConfig</code> so
 defaults from <code>[cmds.greet]</code> or <code>[cmds.take-leave]</code> merge automatically when
 <code>load_and_merge()</code> is called.</p>
 <p>Behavioural tests in <code>examples/hello_world/tests</code> exercise scenarios such as
 <code>hello_world greet --preamble "Good morning"</code> and running
-<code>hello_world --is-excited take-leave</code> with
-<code>--gift biscuits</code>, <code>--remind-in 15</code>, <code>--channel email</code>, and <code>--wave</code>. These
-end-to-end checks verify that CLI arguments override configuration files and
-that validation errors surface cleanly when callers provide blank strings or
-conflicting switches.</p>
+<code>hello_world --is-excited take-leave</code> with <code>--gift biscuits</code>, <code>--remind-in 15</code>,
+<code>--channel email</code>, and <code>--wave</code>. These end-to-end checks verify that CLI
+arguments override configuration files and that validation errors surface
+cleanly when callers provide blank strings or conflicting switches.</p>
 <p>Sample configuration files live in <code>examples/hello_world/config</code>. The
 <code>baseline.toml</code> defaults underpin both the automated tests and the demo
 scripts, while <code>overrides.toml</code> extends the baseline to demonstrate inheritance
@@ -752,11 +763,6 @@ function can be called on each variant before dispatching. See the
 for a complete example.</p></div>
                 </section>
         </article>
-
-        <div class="doc-footer">
-          <p>Generated November 10, 2025 at 03:50 UTC</p>
-            <p class="mt-1">Serious tools, playful worlds.</p>
-        </div>
       </section>
     </div>
   </main>
@@ -797,6 +803,7 @@ for a complete example.</p></div>
             </a>
           </li>
         </ul>
+        <p class="mt-8">Generated November 10, 2025 at 13:06 UTC</p>
         <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12 Productions.</p>
       </div>
     </div>

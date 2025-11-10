@@ -139,8 +139,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       align-items: center;
       gap: 0.35rem;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      background: rgba(255, 255, 255, 0.08);
       color: var(--color-neutral-content);
       font-family: inherit;
       font-size: 0.65rem;
@@ -167,6 +165,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       height: 0.85rem;
       display: block;
     }
+
+    .svg-inline--fa {
+      display: inline;
+	}
   </style>
 </head>
 <body class="doc-page">
@@ -423,6 +425,13 @@ aria-current="page">
                       </a>
                     </li>
                     <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits"
+                         class="doc-nav__link "
+>
+                        <span>Preserving `clap` display exits</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors"
                          class="doc-nav__link "
 >
@@ -594,6 +603,9 @@ aria-current="page">
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-ortho-config-error-handling.html" class="doc-nav__link">Error handling</a>
+                    </li>
+                    <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits" class="doc-nav__link">Preserving `clap` display exits</a>
                     </li>
                     <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors" class="doc-nav__link">Aggregating multiple errors</a>
@@ -783,10 +795,9 @@ CLI values.</p></div>
                   <div class="doc-prose"><p>Environment variables are upper‑cased and use underscores. The struct‑level
 prefix (if supplied) is prepended without any separator, and nested fields are
 separated by double underscores. For the <code>AppConfig</code> and <code>DatabaseConfig</code>
-example above, valid environment variables include
-<code>APP_LOG_LEVEL</code>, <code>APP_PORT</code>, <code>APP_DATABASE__URL</code> and <code>APP_DATABASE__POOL_SIZE</code>.
-If the nested struct has its own prefix (<code>DB</code>), then the environment variable
-becomes <code>APP_DB_URL</code>.</p>
+example above, valid environment variables include <code>APP_LOG_LEVEL</code>, <code>APP_PORT</code>,
+<code>APP_DATABASE__URL</code> and <code>APP_DATABASE__POOL_SIZE</code>. If the nested struct has its
+own prefix (<code>DB</code>), then the environment variable becomes <code>APP_DB_URL</code>.</p>
 <p>Comma-separated values such as <code>DDLINT_RULES=A,B,C</code> are parsed as lists. The
 loader converts these strings into arrays before merging, so array fields
 behave the same across environment variables, CLI arguments and configuration
@@ -794,11 +805,6 @@ files. Values containing literal commas must be wrapped in quotes or brackets
 to disable list parsing.</p></div>
                 </section>
         </article>
-
-        <div class="doc-footer">
-          <p>Generated November 10, 2025 at 03:50 UTC</p>
-            <p class="mt-1">Serious tools, playful worlds.</p>
-        </div>
       </section>
     </div>
   </main>
@@ -839,6 +845,7 @@ to disable list parsing.</p></div>
             </a>
           </li>
         </ul>
+        <p class="mt-8">Generated November 10, 2025 at 13:06 UTC</p>
         <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12 Productions.</p>
       </div>
     </div>

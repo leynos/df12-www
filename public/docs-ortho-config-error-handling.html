@@ -139,8 +139,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       align-items: center;
       gap: 0.35rem;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      background: rgba(255, 255, 255, 0.08);
       color: var(--color-neutral-content);
       font-family: inherit;
       font-size: 0.65rem;
@@ -167,6 +165,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       height: 0.85rem;
       display: block;
     }
+
+    .svg-inline--fa {
+      display: inline;
+	}
   </style>
 </head>
 <body class="doc-page">
@@ -423,6 +425,13 @@ aria-current="page">
                       </a>
                     </li>
                     <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits"
+                         class="doc-nav__link "
+>
+                        <span>Preserving `clap` display exits</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors"
                          class="doc-nav__link "
 >
@@ -596,6 +605,9 @@ aria-current="page">
                       <a href="docs-ortho-config-error-handling.html" class="doc-nav__link">Error handling</a>
                     </li>
                     <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits" class="doc-nav__link">Preserving `clap` display exits</a>
+                    </li>
+                    <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors" class="doc-nav__link">Aggregating multiple errors</a>
                     </li>
                     <li>
@@ -646,6 +658,37 @@ example:</p>
   sample_value (use --sample-value, SAMPLE_VALUE, or file entry)
 </code></pre></div></div>
               </section>
+                <section id="error-handling-preserving-clap-display-exits" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>Preserving `clap` display exits</h2>
+                  </div>
+                  <div class="doc-prose"><p>When a user passes <code>--help</code> or <code>--version</code>, <code>clap</code> surfaces specialised
+<code>ErrorKind::DisplayHelp</code> / <code>DisplayVersion</code> errors so applications can print
+usage text and exit successfully. Deriving <code>OrthoConfig</code> often goes hand in
+hand with <code>Cli::try_parse()</code> so applications can map errors into their own
+types. Before performing that conversion, call
+<code>ortho_config::is_display_request</code> to detect these cases and delegate to
+<code>err.exit()</code>:</p>
+<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">clap</span><span class="p">::</span><span class="n">Parser</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">ortho_config</span><span class="p">::{</span><span class="n">is_display_request</span><span class="p">,</span><span class="w"> </span><span class="n">OrthoConfig</span><span class="p">};</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">parse_cli</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="n">MyCli</span><span class="p">,</span><span class="w"> </span><span class="n">CliError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="n">MyCli</span><span class="p">::</span><span class="n">try_parse</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">cli</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="n">cli</span><span class="p">),</span>
+<span class="w">        </span><span class="nb">Err</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">is_display_request</span><span class="p">(</span><span class="o">&amp;</span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">err</span><span class="p">.</span><span class="n">exit</span><span class="p">();</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="nb">Err</span><span class="p">(</span><span class="n">CliError</span><span class="p">::</span><span class="n">ArgumentParsing</span><span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="n">into</span><span class="p">()))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The <code>examples/hello_world</code> crate applies this pattern in <code>main.rs</code>. Behavioural
+tests assert that both <code>--help</code> and <code>--version</code> exit with code 0 so regressions
+are caught automatically.</p></div>
+                </section>
                 <section id="error-handling-aggregating-multiple-errors" class="doc-section">
                   <div class="doc-section__heading">
                     <h2>Aggregating multiple errors</h2>
@@ -704,11 +747,6 @@ small extension traits:</p>
 </code></pre></div></div>
                 </section>
         </article>
-
-        <div class="doc-footer">
-          <p>Generated November 10, 2025 at 03:50 UTC</p>
-            <p class="mt-1">Serious tools, playful worlds.</p>
-        </div>
       </section>
     </div>
   </main>
@@ -749,6 +787,7 @@ small extension traits:</p>
             </a>
           </li>
         </ul>
+        <p class="mt-8">Generated November 10, 2025 at 13:06 UTC</p>
         <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12 Productions.</p>
       </div>
     </div>

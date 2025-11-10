@@ -139,8 +139,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       align-items: center;
       gap: 0.35rem;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      background: rgba(255, 255, 255, 0.08);
       color: var(--color-neutral-content);
       font-family: inherit;
       font-size: 0.65rem;
@@ -167,6 +165,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       height: 0.85rem;
       display: block;
     }
+
+    .svg-inline--fa {
+      display: inline;
+	}
   </style>
 </head>
 <body class="doc-page">
@@ -423,6 +425,13 @@ aria-current="page">
                       </a>
                     </li>
                     <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits"
+                         class="doc-nav__link "
+>
+                        <span>Preserving `clap` display exits</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors"
                          class="doc-nav__link "
 >
@@ -596,6 +605,9 @@ aria-current="page">
                       <a href="docs-ortho-config-error-handling.html" class="doc-nav__link">Error handling</a>
                     </li>
                     <li>
+                      <a href="docs-ortho-config-error-handling.html#error-handling-preserving-clap-display-exits" class="doc-nav__link">Preserving `clap` display exits</a>
+                    </li>
+                    <li>
                       <a href="docs-ortho-config-error-handling.html#error-handling-aggregating-multiple-errors" class="doc-nav__link">Aggregating multiple errors</a>
                     </li>
                     <li>
@@ -661,11 +673,6 @@ These defaults are extended (not replaced) by environment variables and CLI
 flags via the <code>append</code> merge strategy.</p></div>
               </section>
         </article>
-
-        <div class="doc-footer">
-          <p>Generated November 10, 2025 at 03:50 UTC</p>
-            <p class="mt-1">Serious tools, playful worlds.</p>
-        </div>
       </section>
     </div>
   </main>
@@ -706,6 +713,7 @@ flags via the <code>append</code> merge strategy.</p></div>
             </a>
           </li>
         </ul>
+        <p class="mt-8">Generated November 10, 2025 at 13:06 UTC</p>
         <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12 Productions.</p>
       </div>
     </div>

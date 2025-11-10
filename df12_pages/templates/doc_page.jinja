@@ -235,13 +235,6 @@
             {% endif %}
           {% endif %}
         </article>
-
-        <div class="doc-footer">
-          <p>Generated {{ generated_at.strftime('%B %d, %Y at %H:%M %Z') }}</p>
-          {% if footer_note %}
-            <p class="mt-1">{{ footer_note }}</p>
-          {% endif %}
-        </div>
       </section>
     </div>
   </main>
@@ -282,6 +275,7 @@
             </a>
           </li>
         </ul>
+        <p class="mt-8">Generated {{ generated_at.strftime('%B %d, %Y at %H:%M %Z') }}</p>
         <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;{{ generated_at.year }}&nbsp;{{ theme.site_name }}.</p>
       </div>
     </div>

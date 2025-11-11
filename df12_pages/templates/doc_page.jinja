@@ -134,18 +134,22 @@
             {% for group in nav_groups %}
               {% set is_active_group = group.slug == section.slug %}
               <div class="doc-nav-group" aria-label="{{ group.label }}">
-                <h3 class="doc-nav-group__title {{ 'is-active' if is_active_group else '' }}">{{ group.label }}</h3>
+                <h3 class="doc-nav-group__title {{ 'is-active' if is_active_group else '' }}" {% if is_active_link %}aria-current="page"{% endif %}>
+				  <a href="{{ group.entries[0].href }}">{{ group.label }}</a>
+				</h3>
                 <ul class="doc-nav__list" role="list">
-                  {% for item in group.entries %}
-                    {% set is_active_link = (group.slug == section.slug and item.is_primary) %}
-                    <li>
-                      <a href="{{ item.href }}"
-                         class="doc-nav__link {{ 'doc-nav__link--active' if is_active_link else '' }}"
-                         {% if is_active_link %}aria-current="page"{% endif %}>
-                        <span>{{ item.label }}</span>
-                      </a>
-                    </li>
-                  {% endfor %}
+				  {% if group.entries | length > 1 %}
+                    {% for item in group.entries[1:] %}
+                      {% set is_active_link = (group.slug == section.slug and item.is_primary) %}
+                      <li>
+                        <a href="{{ item.href }}"
+                           class="doc-nav__link {{ 'doc-nav__link--active' if is_active_link else '' }}"
+                           {% if is_active_link %}aria-current="page"{% endif %}>
+                          <span>{{ item.label }}</span>
+                        </a>
+                      </li>
+                    {% endfor %}
+                  {% endif %}
                 </ul>
               </div>
             {% endfor %}
@@ -280,7 +284,7 @@
             </a>
           </li>
         </ul>
-        <p class="mt-8">Generated {{ generated_at.strftime('%B %d, %Y at %H:%M %Z') }}</p>
+        <p class="mt-6 text-xs text-base-content/80">Generated {{ generated_at.strftime('%B %d, %Y at %H:%M %Z') }}</p>
         <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;{{ generated_at.year }}&nbsp;{{ theme.site_name }}.</p>
       </div>
     </div>

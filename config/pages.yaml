@@ -264,3 +264,42 @@ pages:
       In progress FISHDBC engine in Rust fusing a rayon-driven CPU path, rust-cuda GPU
       kernels, and a versioned C-ABI plugin system to deliver safe, extensible, state-of-the-art
       iterative clustering.
+
+  cmd-mox:
+    label: "CmdMox"
+    repo: leynos/cmd-mox
+    latest_release: v0.1.0
+    latest_release_published_at: '2025-10-26T02:10:36Z'
+    language: python
+    filename_prefix: docs-cmd-mox-
+    page_title_suffix: "CmdMox"
+    description: >
+      Python-native command mocking harness that intercepts external processes over Unix domain
+      sockets so pytest suites can spy, stub, and replay shell workflows without brittle bash
+      fixtures.
+
+  femtologging:
+    label: "femtologging"
+    repo: leynos/femtologging
+    latest_release: v0.2.0
+    latest_release_published_at: '2023-09-27T17:35:09Z'
+    language: python
+    filename_prefix: docs-femtologging-
+    page_title_suffix: "femtologging"
+    description: >
+      Hybrid Python/Rust logging library that ports picologging-inspired ideas into a PyO3
+      extension, pushing log records through crossbeam-channel workers for thread-friendly,
+      low-overhead structured logging.
+
+  falcon-pachinko:
+    label: "Falcon Pachinko"
+    repo: leynos/falcon-pachinko
+    latest_release: v0.3.0
+    latest_release_published_at: '2024-04-18T04:09:21Z'
+    language: python
+    filename_prefix: docs-falcon-pachinko-
+    page_title_suffix: "Falcon Pachinko"
+    description: >
+      Falcon extension that adds structured WebSocket routing, msgspec-based payload schemas, and
+      background worker orchestration so ASGI apps can manage rooms, broadcast events, and monitor
+      connections with minimal boilerplate.

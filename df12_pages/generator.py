@@ -4,15 +4,19 @@ from __future__ import annotations
 
 import dataclasses as dc
 import datetime as dt
+import posixpath
 import re
 import typing as typ
 from html import escape
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import requests
 from email.utils import parsedate_to_datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown import Markdown
+from markdown.extensions import Extension
+from markdown.treeprocessors import Treeprocessor
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
@@ -31,9 +35,12 @@ CODEHILITE_OPEN_TAG = re.compile(r'<div class="codehilite">')
 class HtmlContentRenderer:
     """Render markdown and code snippets with consistent styling."""
 
-    def __init__(self, pygments_style: str = "monokai") -> None:
+    def __init__(
+        self, pygments_style: str = "monokai", link_extension: Extension | None = None
+    ) -> None:
         self.pygments_style = pygments_style
         self._formatter = HtmlFormatter(style=pygments_style, cssclass="codehilite")
+        self._link_extension = link_extension
 
     @property
     def stylesheet(self) -> str:
@@ -45,8 +52,16 @@ class HtmlContentRenderer:
         normalized = self._normalize_fenced_blocks(text)
         if not normalized.strip():
             return ""
+        extensions: list[Extension | str] = [
+            "fenced_code",
+            "codehilite",
+            "tables",
+            "sane_lists",
+        ]
+        if self._link_extension:
+            extensions.append(self._link_extension)
         md = Markdown(
-            extensions=["fenced_code", "codehilite", "tables", "sane_lists"],
+            extensions=extensions,
             extension_configs={
                 "codehilite": {
                     "linenums": False,
@@ -136,7 +151,9 @@ class PageContentGenerator:
         self.source_url = source_url or page_config.source_url
         self.output_dir_override = output_dir
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
-        self.renderer = HtmlContentRenderer(page_config.pygments_style)
+        self.renderer = HtmlContentRenderer(
+            page_config.pygments_style, link_extension=_build_link_rewriter(page_config)
+        )
         self.description_resolver = ManifestDescriptionResolver()
         self.page_description = self._resolve_description()
         self.doc_version: str | None = None
@@ -420,3 +437,69 @@ class PageContentGenerator:
 def _build_release_url(repo: str, tag: str, path: str) -> str:
     normalized = path.lstrip("/")
     return f"https://raw.githubusercontent.com/{repo}/refs/tags/{tag}/{normalized}"
+
+
+def _build_link_rewriter(page: PageConfig) -> Extension | None:
+    if not page.repo:
+        return None
+    ref = page.latest_release or page.branch
+    base_dir = posixpath.dirname(page.doc_path)
+    return RelativeLinkExtension(page.repo, ref, base_dir)
+
+
+class RelativeLinkExtension(Extension):
+    def __init__(self, repo: str, ref: str, base_dir: str) -> None:
+        self.repo = repo
+        self.ref = ref
+        self.base_dir = base_dir
+
+    def extendMarkdown(self, md: Markdown) -> None:  # type: ignore[override]
+        processor = RelativeLinkTreeprocessor(md, self.repo, self.ref, self.base_dir)
+        md.treeprocessors.register(processor, "df12_relative_links", 15)
+
+
+class RelativeLinkTreeprocessor(Treeprocessor):
+    def __init__(self, md: Markdown, repo: str, ref: str, base_dir: str) -> None:
+        super().__init__(md)
+        self.repo = repo
+        self.ref = ref
+        self.base_dir = base_dir
+
+    def run(self, root: typ.Any) -> typ.Any:  # pragma: no cover - Markdown API
+        for element in root.iter():
+            if element.tag == "a":
+                href = element.get("href")
+                rewritten = self._rewrite(href)
+                if rewritten:
+                    element.set("href", rewritten)
+        return root
+
+    def _rewrite(self, target: str | None) -> str | None:
+        if not target:
+            return None
+        lower = target.lower()
+        if lower.startswith(("http://", "https://", "mailto:", "tel:", "data:", "javascript:")):
+            return None
+        if target.startswith(("#", "//")):
+            return None
+        if "://" in target:
+            return None
+
+        parsed = urlsplit(target)
+        if parsed.scheme or parsed.netloc or (not parsed.path and parsed.fragment):
+            return None
+        if parsed.path.startswith("/"):
+            return None
+
+        joined = posixpath.normpath(posixpath.join(self.base_dir, parsed.path))
+        while joined.startswith("../"):
+            joined = joined[3:]
+        if joined in (".", ""):
+            return None
+
+        url = f"https://github.com/{self.repo}/blob/{self.ref}/{joined}"
+        if parsed.query:
+            url = f"{url}?{parsed.query}"
+        if parsed.fragment:
+            url = f"{url}#{parsed.fragment}"
+        return url

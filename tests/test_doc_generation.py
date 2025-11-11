@@ -38,7 +38,7 @@ def sample_markdown() -> str:
         "Intro details.\n\n"
         f"Use the `{INLINE_CODE_LABEL}` tool for bootstrapping.\n\n"
         "**Capabilities**\n"
-        "Bullet list of capabilities.\n\n"
+        "Bullet list of capabilities. For more, see the [CLI reference](../cli.md#flags).\n\n"
         "### Core Philosophy:\n"
         "Why decisions matter.\n\n"
         "- **Sanitized providers** – The `sanitized_provider` helper returns a Figment\n"
@@ -80,7 +80,7 @@ def page_config(tmp_path_factory: pytest.TempPathFactory) -> PageConfig:
         footer_note="",
         theme=theme,
         layouts={},
-        repo=None,
+        repo="df12/testdocs",
         branch="main",
         language=None,
         manifest_url=None,
@@ -230,6 +230,16 @@ def test_default_layout_content_not_duplicated(
     soup = generated_docs["docs-test-introduction.html"]
     html = soup.select_one(".doc-article").decode_contents()
     assert html.count("Sanitized providers") == 1
+
+
+def test_relative_links_rewritten_to_github(
+    generated_docs: dict[str, BeautifulSoup],
+) -> None:
+    """Relative links should point to the original GitHub repository blob URL."""
+    soup = generated_docs["docs-test-introduction.html"]
+    link = soup.select_one("a[href*='github.com']")
+    assert link is not None
+    assert link["href"] == "https://github.com/df12/testdocs/blob/main/cli.md#flags"
 
 
 def test_sidebar_shows_label_and_description(

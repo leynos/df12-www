@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses as dc
 import datetime as dt
 import json
+import os
 import posixpath
 import re
 import typing as typ
@@ -160,7 +161,7 @@ class PageContentGenerator:
         self.page_description = self._resolve_description()
         self.doc_version: str | None = None
         self.doc_version_display: str | None = None
-        self.doc_updated_at: dt.datetime | None = page_config.latest_release_published_at
+        self.doc_updated_at: dt.datetime | None = self._resolve_doc_updated_at()
         self.env = Environment(
             loader=FileSystemLoader(str(self.templates_dir)),
             autoescape=select_autoescape(["html", "xml"]),
@@ -216,6 +217,48 @@ class PageContentGenerator:
         if written:
             self._write_metadata(written[0].name)
         return written
+
+    def _resolve_doc_updated_at(self) -> dt.datetime | None:
+        if self.page.latest_release_published_at:
+            return self.page.latest_release_published_at
+        return self._fetch_doc_commit_date()
+
+    def _fetch_doc_commit_date(self) -> dt.datetime | None:
+        repo = self.page.repo
+        if not repo:
+            return None
+        branch = self.page.branch or "main"
+        doc_path = self.page.doc_path.lstrip("/")
+        url = f"https://api.github.com/repos/{repo}/commits"
+        params = {
+            "path": doc_path,
+            "sha": branch,
+            "per_page": 1,
+        }
+        headers = {"Accept": "application/vnd.github+json"}
+        token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=15)
+            response.raise_for_status()
+        except requests.RequestException:
+            return None
+        try:
+            payload = response.json()
+        except json.JSONDecodeError:
+            return None
+        if not payload:
+            return None
+        commit = payload[0].get("commit", {})
+        date_str = commit.get("author", {}).get("date") or commit.get("committer", {}).get("date")
+        if not date_str:
+            return None
+        sanitized = date_str.replace("Z", "+00:00")
+        try:
+            return dt.datetime.fromisoformat(sanitized)
+        except ValueError:
+            return None
 
     def _fetch_markdown(self) -> str:
         resp = requests.get(self.source_url, timeout=30)

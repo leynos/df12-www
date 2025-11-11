@@ -318,7 +318,7 @@
   }
 
   .nav-link[data-variant="neutral"]:hover {
-    @apply text-base-content;
+    @apply text-primary;
   }
 
   .product-card {

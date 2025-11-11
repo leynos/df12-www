@@ -12,6 +12,7 @@ from cyclopts import App, Parameter
 from .bump import bump_latest_release_metadata
 from .config import load_site_config
 from .docs_index import DocsIndexBuilder
+from .homepage import HomePageBuilder
 from .generator import PageContentGenerator
 from .releases import GitHubReleaseClient
 
@@ -69,6 +70,9 @@ def generate(
             print(f"wrote {_format_path(path)}")
     docs_index_path = DocsIndexBuilder(site_config).run()
     print(f"wrote {_format_path(docs_index_path)}")
+    if site_config.homepage:
+        homepage_path = HomePageBuilder(site_config.homepage).run()
+        print(f"wrote {_format_path(homepage_path)}")
 
 
 @app.command(help="Record the latest GitHub release tag for each configured page.")

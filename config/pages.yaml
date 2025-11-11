@@ -19,6 +19,163 @@ defaults:
     doc_label: Docs
     site_name: df12 Productions
 
+homepage:
+  output: public/index.html
+  title: "df12 — Serious tools, playful worlds."
+  navigation:
+    links:
+      - label: Tools
+        href: "#systems"
+        nav_target: systems
+      - label: Creative
+        href: "#worlds"
+        nav_target: worlds
+        variant: accent
+      - label: Docs
+        href: "docs.html"
+        variant: neutral
+  hero:
+    brand_text: df12
+    eyebrow: Productions
+    title_primary: "Serious tools,"
+    title_secondary: playful
+    accent_text: "worlds."
+    description: >-
+      We build tools that make ambitious engineering calmer and craft stories that map the strange,
+      human edges of complex networks.
+    ctas:
+      - label: Explore Tools
+        href: "#systems"
+        variant: primary
+      - label: Browse Worlds
+        href: "#worlds"
+        variant: secondary
+  systems:
+    heading: Systems We Build
+    kicker: Fast, elegant, and open by design.
+    cards:
+      - label: Limela
+        description: Cluster email fast. Turn inboxes into a navigable knowledge spine.
+        href: "https://github.com/leynos/limela"
+        icon: limela
+        meta_label: View on GitHub
+        external: true
+      - label: Netsuke
+        description: YAML-first builds (Ninja × Jinja). Fast, reproducible, readable.
+        href: "https://github.com/leynos/netsuke"
+        icon: netsuke
+        meta_label: View on GitHub
+        external: true
+      - label: mxd
+        description: Hotline-style daemon for joyful file-sharing and retro chat.
+        href: "https://github.com/leynos/mxd"
+        icon: mxd
+        meta_label: View on GitHub
+        external: true
+      - label: Episodic
+        description: Agentic podcast studio with human-in-the-loop polish.
+        href: "https://github.com/leynos/episodic"
+        icon: episodic
+        meta_label: View on GitHub
+        external: true
+  worlds:
+    heading: Worlds We Dream
+    kicker: Narratives that map the strange and human in the system.
+    cards:
+      - label: Wildside
+        description: Serendipity for urban wanderers. Late-night drift; unexpected connections.
+        href: "https://github.com/leynos/wildside"
+        external: true
+        classes:
+          - group
+          - cq
+          - world-card
+          - pressable
+        image:
+          avif: images/wildside-alley.avif
+          webp: images/wildside-alley.webp
+          fallback: images/wildside-alley.png
+          alt: >-
+            A moody, atmospheric image of a neon-lit city street at night, noir style, magenta and cyan highlights
+            reflecting on wet pavement, cinematic photography.
+          width: 1536
+          height: 1024
+          sizes: "(min-width: 768px) 50vw, 100vw"
+        cta_label: Read the pitch
+      - label: Pentagon
+        description: "Retro-cyberpunk Moscow, 2002: hackers, hardware, and the cost of genius."
+        href: "mailto:hello@df12.studio?subject=Pentagon%20Pitch%20Request"
+        external: false
+        classes:
+          - group
+          - cq
+          - world-card
+          - world-card--media-after
+          - pressable
+          - border-accent/20
+          - bg-neutral/40
+        image:
+          avif: images/pentagon-cafe-bytes.avif
+          webp: images/pentagon-cafe-bytes.webp
+          fallback: images/pentagon-cafe-bytes.png
+          alt: A dimly lit workspace filled with vintage computer hardware glowing with neon accents.
+          width: 1536
+          height: 1024
+          sizes: "(min-width: 768px) 50vw, 100vw"
+        cta_label: Request the pitch deck
+      - label: Messy Secrets
+        description: 1980s Hollywood noir where reputation is the most volatile asset.
+        href: "mailto:hello@df12.studio?subject=Messy%20Secrets%20Pitch%20Request"
+        external: false
+        classes:
+          - group
+          - cq
+          - world-card
+          - world-card--media-after
+          - pressable
+          - border-accent/20
+          - bg-neutral/40
+        image:
+          avif: images/messy-secrets-pager2.avif
+          webp: images/messy-secrets-pager2.webp
+          fallback: images/messy-secrets-pager2.png
+          alt: A noir-inspired street scene with vintage neon signs glowing through mist.
+          width: 1089
+          height: 957
+          sizes: "(min-width: 768px) 50vw, 100vw"
+        cta_label: Request the pitch deck
+  footer:
+    site_name: df12 Productions
+    blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.
+    oss_heading: "OSS & Licences"
+    contact_heading: Stay in touch
+    closing_lede: Built for curious builders and storytellers everywhere.
+    copyright_year: 2025
+    oss_links:
+      - label: "Limela — licence"
+        href: "https://github.com/leynos/limela/blob/main/LICENSE"
+      - label: "Netsuke — licence"
+        href: "https://github.com/leynos/netsuke/blob/main/LICENSE"
+      - label: "mxd — licence"
+        href: "https://github.com/leynos/mxd/blob/main/LICENSE"
+      - label: "Episodic — licence"
+        href: "https://github.com/leynos/episodic/blob/main/LICENSE"
+    contact_links:
+      - label: hello@df12.studio
+        href: "mailto:hello@df12.studio"
+        variant: accent
+        external: false
+      - label: GitHub
+        href: "https://github.com/leynos"
+        variant: accent
+        icon: carbon:logo-github
+        external: true
+      - label: Bluesky
+        href: "https://bsky.app/profile/df12.studio"
+        variant: accent
+        icon: carbon:logo-bluesky
+        external: true
+
 pages:
   netsuke:
     label: "Netsuke"

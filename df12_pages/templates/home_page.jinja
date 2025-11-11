@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en" data-theme="df12">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="assets/site.css" rel="stylesheet" />
+  <title>{{ homepage.title }}</title>
+</head>
+<body class="bg-base-100">
+  <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
+
+  <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-base-200 bg-base-100/80 backdrop-blur supports-[backdrop-filter]:bg-base-100/60">
+    <div class="layout-shell flex w-full items-center justify-between px-4 py-4 md:px-8">
+      <a href="#hero" class="group flex items-center gap-3 font-mono text-lg font-bold uppercase tracking-[0.35em] text-base-content">
+        <span class="flex h-9 w-9 items-center justify-center transition-transform duration-300 group-hover:rotate-45">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" />
+          </svg>
+        </span>
+        {{ homepage.hero.brand_text }}
+      </a>
+      <nav aria-label="Primary navigation" class="hidden items-center gap-8 md:flex">
+{% for link in homepage.nav_links %}
+        <a href="{{ link.href }}" class="nav-link hit-target"{% if link.variant %} data-variant="{{ link.variant }}"{% endif %}{% if link.nav_target %} data-nav-target="{{ link.nav_target }}"{% endif %}>{{ link.label }}</a>
+{% endfor %}
+      </nav>
+      <div class="md:hidden">
+        <details class="dropdown dropdown-end">
+          <summary class="btn btn-ghost btn-sm font-mono uppercase tracking-[0.3em]">Menu</summary>
+          <ul class="menu dropdown-content menu-sm z-[1] mt-2 w-44 rounded-box bg-base-100 p-2 shadow">
+{% for link in homepage.nav_links %}
+            <li><a href="{{ link.href }}" class="nav-link hit-target w-full justify-start"{% if link.variant %} data-variant="{{ link.variant }}"{% endif %}{% if link.nav_target %} data-nav-target="{{ link.nav_target }}"{% endif %}>{{ link.label }}</a></li>
+{% endfor %}
+          </ul>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="flex flex-col pb-24 pt-32">
+    <section id="hero" class="flex min-h-[90vh] items-center justify-center px-6 text-center">
+      <div class="flex max-w-4xl flex-col items-center gap-10">
+          <div class="flex flex-col items-center gap-4">
+            <div class="brand-lockup">
+              <span class="font-mono text-7xl font-bold tracking-tight text-neutral-content md:text-8xl">{{ homepage.hero.brand_text }}</span>
+            </div>
+            <p class="eyebrow">{{ homepage.hero.eyebrow }}</p>
+          </div>
+        <h1 class="hero-title">
+          {{ homepage.hero.title_primary }}<br class="hidden sm:block" />
+          {{ homepage.hero.title_secondary }} <span class="text-accent neon-pulse">{{ homepage.hero.accent_text }}</span>
+        </h1>
+        <p class="max-w-2xl text-base-content/80 md:text-lg">
+          {{ homepage.hero.description }}
+        </p>
+        <div class="flex flex-col items-center gap-6">
+          <div class="h-0.5 w-48 border-b-2 border-dashed border-primary"></div>
+          <div class="flex flex-col gap-4 sm:flex-row">
+{% for cta in homepage.hero.ctas %}
+            <a href="{{ cta.href }}" class="cta cta-{{ cta.variant }} pressable">
+              {{ cta.label }}
+            </a>
+{% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="systems" class="bg-white px-4 md:px-8">
+      <div class="layout-shell py-20">
+        <div class="text-center">
+          <h2 class="section-title">{{ homepage.systems.heading }}</h2>
+          <p class="mt-4 section-kicker">{{ homepage.systems.kicker }}</p>
+        </div>
+        <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+{% for card in homepage.systems.cards %}
+          <a href="{{ card.href }}"{% if card.external %} target="_blank" rel="noopener noreferrer"{% endif %} class="group product-card pressable">
+            <div class="product-card__content">
+              <div class="mt-1 flex-none text-primary">
+{% if card.icon == 'limela' %}
+                <svg class="product-logo product-logo--limela" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <circle cx="10" cy="8" r="2" fill="currentColor" />
+                  <circle cx="6" cy="13" r="2" fill="currentColor" />
+                  <circle cx="8" cy="19" r="2" fill="currentColor" />
+                  <circle cx="13" cy="23" r="2" fill="currentColor" />
+                  <circle cx="19" cy="24" r="2" fill="currentColor" />
+                  <circle cx="25" cy="22" r="2" fill="currentColor" />
+                  <circle cx="28" cy="17" r="2" fill="currentColor" />
+                </svg>
+{% elif card.icon == 'netsuke' %}
+                <svg class="product-logo product-logo--netsuke" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  <circle class="product-logo__netsuke-bead" cx="16" cy="16" r="3" fill="currentColor" />
+                </svg>
+{% elif card.icon == 'mxd' %}
+                <svg class="product-logo product-logo--mxd" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <circle class="product-logo__mxd-center" cx="16" cy="16" r="2.5" fill="currentColor" />
+                  <circle cx="8" cy="16" r="1.5" fill="currentColor" />
+                  <circle cx="24" cy="16" r="1.5" fill="currentColor" />
+                  <circle cx="16" cy="8" r="1.5" fill="currentColor" />
+                  <circle cx="16" cy="24" r="1.5" fill="currentColor" />
+                </svg>
+{% elif card.icon == 'episodic' %}
+                <svg class="product-logo product-logo--episodic" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <line class="product-logo__episodic-track product-logo__episodic-track--1" x1="6" y1="10" x2="22" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  <line class="product-logo__episodic-track product-logo__episodic-track--2" x1="6" y1="16" x2="26" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  <line class="product-logo__episodic-track product-logo__episodic-track--3" x1="6" y1="22" x2="18" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  <circle cx="28" cy="16" r="2" fill="currentColor" />
+                </svg>
+{% endif %}
+              </div>
+              <div class="flex flex-1 flex-col">
+                <h3 class="product-card__title">{{ card.label }}</h3>
+                <p class="mt-3 text-base-content/80">{{ card.description }}</p>
+                <span class="product-card__meta">
+                  {{ card.meta_label }}
+                  <span aria-hidden="true" class="link-arrow">→</span>
+                </span>
+              </div>
+            </div>
+          </a>
+{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section id="worlds" class="bg-neutral text-neutral-content">
+      <div class="layout-shell px-4 py-24 md:px-8">
+        <div class="text-center">
+          <h2 class="section-title text-neutral-content">{{ homepage.worlds.heading }}</h2>
+          <p class="mt-4 section-kicker text-neutral-content/90">{{ homepage.worlds.kicker }}</p>
+        </div>
+        <div class="mt-12 space-y-16">
+{% for world in homepage.worlds.cards %}
+          <a href="{{ world.href }}"{% if world.external %} target="_blank" rel="noopener noreferrer"{% endif %} class="{{ world.classes | join(' ') }}">
+            <figure class="world-card__media">
+              <picture>
+                <source srcset="{{ world.image.avif }}" type="image/avif" />
+                <source srcset="{{ world.image.webp }}" type="image/webp" />
+                <img class="h-full w-full object-cover" src="{{ world.image.fallback }}" alt="{{ world.image.alt }}" loading="lazy" decoding="async" width="{{ world.image.width }}" height="{{ world.image.height }}" sizes="{{ world.image.sizes }}" />
+              </picture>
+            </figure>
+            <div class="world-card__body">
+              <div class="world-card__header">
+                <span class="world-card__icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="glyph glyph--creative" aria-hidden="true">
+                    <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2" />
+                  </svg>
+                </span>
+                <h3 class="font-mono text-3xl font-bold">{{ world.label }}</h3>
+              </div>
+              <p class="mt-4 text-neutral-content/90">{{ world.description }}</p>
+              <span class="world-card__cta">
+                {{ world.cta_label }}
+                <span aria-hidden="true" class="link-arrow">→</span>
+              </span>
+            </div>
+          </a>
+{% endfor %}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" class="border-t border-base-200 bg-base-100">
+    <div class="layout-shell grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16">
+      <div>
+        <p class="font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90">{{ homepage.footer.site_name }}</p>
+        <p class="mt-4 text-sm text-base-content/90">{{ homepage.footer.blurb }}</p>
+      </div>
+      <div>
+        <h2>{{ homepage.footer.oss_heading }}</h2>
+        <ul class="mt-4 space-y-2 text-sm">
+{% for link in homepage.footer.oss_links %}
+          <li><a class="footer-link" href="{{ link.href }}"{% if link.external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.label }}</a></li>
+{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3>{{ homepage.footer.contact_heading }}</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+{% for link in homepage.footer.contact_links %}
+{% if link.icon %}
+          <li>
+            <a class="footer-link"{% if link.variant %} data-variant="{{ link.variant }}"{% endif %} href="{{ link.href }}"{% if link.external %} target="_blank" rel="noopener noreferrer"{% endif %}>
+              <iconify-icon icon="{{ link.icon }}" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+              {{ link.label }}
+            </a>
+          </li>
+{% else %}
+          <li><a class="footer-link"{% if link.variant %} data-variant="{{ link.variant }}"{% endif %} href="{{ link.href }}"{% if link.external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.label }}</a></li>
+{% endif %}
+{% endfor %}
+        </ul>
+        <p class="mt-4 text-xs text-base-content/80">{{ homepage.footer.closing_lede }} ©&nbsp;{{ homepage.footer.copyright_year }}&nbsp;{{ homepage.footer.site_name.replace(' ', '&nbsp;') | safe }}.</p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (() => {
+      const initNavHighlight = () => {
+        const navLinks = Array.from(document.querySelectorAll('[data-nav-target]'));
+        if (!navLinks.length) {
+          return;
+        }
+
+        const sectionMap = navLinks
+          .map((link) => {
+            const id = link.dataset.navTarget;
+            const section = document.getElementById(id);
+            return section ? { id, section } : null;
+          })
+          .filter(Boolean);
+
+        if (!sectionMap.length) {
+          return;
+        }
+
+        const setActive = (targetId) => {
+          navLinks.forEach((link) => {
+            const isActive = link.dataset.navTarget === targetId;
+            link.classList.toggle('nav-link--active', isActive);
+            if (isActive) {
+              link.setAttribute('aria-current', 'page');
+            } else {
+              link.removeAttribute('aria-current');
+            }
+          });
+        };
+
+        if ('IntersectionObserver' in window) {
+          const ratios = Object.fromEntries(sectionMap.map(({ id }) => [id, 0]));
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                ratios[entry.target.id] = entry.intersectionRatio;
+              });
+              const [topEntry] = Object.entries(ratios).sort((a, b) => b[1] - a[1]);
+              if (topEntry) {
+                setActive(topEntry[0]);
+              }
+            },
+            {
+              rootMargin: '-35% 0px -50% 0px',
+              threshold: [0, 0.25, 0.5, 0.75, 1],
+            }
+          );
+
+          sectionMap.forEach(({ section }) => observer.observe(section));
+        } else {
+          const handleScroll = () => {
+            const scrollPos = window.scrollY + window.innerHeight * 0.35;
+            let current = sectionMap[0].id;
+            sectionMap.forEach(({ id, section }) => {
+              if (section.offsetTop <= scrollPos) {
+                current = id;
+              }
+            });
+            setActive(current);
+          };
+          window.addEventListener('scroll', handleScroll, { passive: true });
+          handleScroll();
+        }
+      };
+
+      window.addEventListener('load', initNavHighlight);
+    })();
+  </script>
+  <script src="assets/components.js" defer></script>
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+</body>
+</html>

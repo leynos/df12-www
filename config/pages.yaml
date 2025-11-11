@@ -270,6 +270,8 @@ pages:
     repo: leynos/cmd-mox
     latest_release: v0.1.0
     latest_release_published_at: '2025-10-26T02:10:36Z'
+    branch: refs/tags/v0.1.0
+    doc_path: docs/usage-guide.md
     language: python
     filename_prefix: docs-cmd-mox-
     page_title_suffix: "CmdMox"

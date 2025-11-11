@@ -36,6 +36,9 @@ pages:
   ordering:
     label: Ordering Docs
     source_url: https://example.invalid/docs.md
+    repo: df12/zebra
+    language: rust
+    latest_release: v1.2.3
         """.strip()
         + "\n",
         encoding="utf-8",
@@ -81,3 +84,15 @@ def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
     href = entry.get("href")
     assert href is not None
     assert href.endswith("docs-zebra-start.html")
+
+
+@then("the docs card exposes repo, release, and registry links")
+def then_card_has_external_links(scenario_state: dict[str, object]) -> None:
+    index_path: Path = scenario_state["index_path"]  # type: ignore[assignment]
+    soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
+    repo_link = soup.select_one("[data-test='docs-card-repo']")
+    release_link = soup.select_one("[data-test='docs-card-release']")
+    package_link = soup.select_one("[data-test='docs-card-package']")
+    assert repo_link and repo_link["href"] == "https://github.com/df12/zebra"
+    assert release_link and release_link["href"] == "https://github.com/df12/zebra/releases/tag/v1.2.3"
+    assert package_link and package_link["href"] == "https://crates.io/crates/zebra"

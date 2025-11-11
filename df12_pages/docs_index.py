@@ -66,6 +66,11 @@ class DocsIndexBuilder:
                     "description": description,
                     "href": link,
                     "repo": page.repo or "",
+                    "repo_url": _build_repo_url(page.repo),
+                    "latest_release": page.latest_release,
+                    "release_url": _build_release_link(page.repo, page.latest_release),
+                    "package_url": _build_package_url(page),
+                    "package_label": _package_label(page.language),
                 }
             )
         return entries
@@ -119,6 +124,53 @@ def _relativize(target: Path, relative_to: Path) -> str | None:
     except ValueError:  # pragma: no cover - different drives
         return None
     return rel_path.as_posix()
+
+
+def _build_repo_url(repo: str | None) -> str | None:
+    if not repo:
+        return None
+    return f"https://github.com/{repo}"
+
+
+def _build_release_link(repo: str | None, tag: str | None) -> str | None:
+    if not repo or not tag:
+        return None
+    return f"https://github.com/{repo}/releases/tag/{tag}"
+
+
+def _package_slug(page: PageConfig) -> str | None:
+    if page.repo:
+        return page.repo.split("/", 1)[-1]
+    return page.key
+
+
+def _build_package_url(page: PageConfig) -> str | None:
+    if not page.latest_release:
+        return None
+    slug = _package_slug(page)
+    if not slug or not page.language:
+        return None
+    lang = page.language.lower()
+    if lang == "rust":
+        return f"https://crates.io/crates/{slug}"
+    if lang == "python":
+        return f"https://pypi.org/project/{slug}/"
+    if lang in {"typescript", "javascript"}:
+        return f"https://www.npmjs.com/package/{slug}"
+    return None
+
+
+def _package_label(language: str | None) -> str | None:
+    if not language:
+        return None
+    lang = language.lower()
+    if lang == "rust":
+        return "crates.io"
+    if lang == "python":
+        return "PyPI"
+    if lang in {"typescript", "javascript"}:
+        return "npm"
+    return None
 
 
 class ManifestDescriptionResolver:

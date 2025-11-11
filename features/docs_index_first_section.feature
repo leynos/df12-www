@@ -4,3 +4,4 @@ Feature: Docs index uses canonical first section links
     And markdown with out-of-order section names is stubbed
     When I render the docs and build the index
     Then the docs index entry links to the true first section
+    And the docs card exposes repo, release, and registry links

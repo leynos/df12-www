@@ -207,77 +207,61 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <aside class="doc-sidebar" aria-label="Documentation navigation">
         <div class="doc-sidebar__panel">
           <a href="docs.html" class="doc-sidebar__back">
-            <svg class="svg-inline--fa fa-arrow-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"></path></svg>
+            <iconify-icon icon="carbon:arrow-left" class="h-4 w-4" aria-hidden="true"></iconify-icon>
             Back to docs
           </a>
           <div>
             <p class="doc-sidebar__eyebrow">Chutoro</p>
-            <p class="doc-sidebar__body">In progress FISHDBC engine in Rust that will fuse a rayon-driven CPU path, rust-cuda GPU kernels, and a versioned C-ABI plugin system to deliver safe, extensible, state-of-the-art clustering throughput from laptops to HPC clusters."
+            <p class="doc-sidebar__body">In progress FISHDBC engine in Rust fusing a rayon-driven CPU path, rust-cuda GPU kernels, and a versioned C-ABI plugin system to deliver safe, extensible, state-of-the-art iterative clustering.
 </p>
           </div>
           <div class="doc-sidebar__groups">
               <div class="doc-nav-group" aria-label="Audience and scope">
                 <h3 class="doc-nav-group__title " >
-				  <a href="docs-chutoro-audience-and-scope.html">Audience and scope</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                  <a href="docs-chutoro-audience-and-scope.html">Audience and scope</a>
+                </h3>
               </div>
               <div class="doc-nav-group" aria-label="Adding the crate">
                 <h3 class="doc-nav-group__title " >
-				  <a href="docs-chutoro-adding-the-crate.html">Adding the crate</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                  <a href="docs-chutoro-adding-the-crate.html">Adding the crate</a>
+                </h3>
               </div>
               <div class="doc-nav-group" aria-label="Running the clustering pipeline">
                 <h3 class="doc-nav-group__title " >
-				  <a href="docs-chutoro-running-the-clustering-pipeline.html">Running the clustering pipeline</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                  <a href="docs-chutoro-running-the-clustering-pipeline.html">Running the clustering pipeline</a>
+                </h3>
               </div>
               <div class="doc-nav-group" aria-label="Implementing data sources">
                 <h3 class="doc-nav-group__title " >
-				  <a href="docs-chutoro-implementing-data-sources.html">Implementing data sources</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                  <a href="docs-chutoro-implementing-data-sources.html">Implementing data sources</a>
+                </h3>
               </div>
               <div class="doc-nav-group" aria-label="Results and assignments">
                 <h3 class="doc-nav-group__title " >
-				  <a href="docs-chutoro-results-and-assignments.html">Results and assignments</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                  <a href="docs-chutoro-results-and-assignments.html">Results and assignments</a>
+                </h3>
               </div>
               <div class="doc-nav-group" aria-label="Error handling">
                 <h3 class="doc-nav-group__title " >
-				  <a href="docs-chutoro-error-handling.html">Error handling</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                  <a href="docs-chutoro-error-handling.html">Error handling</a>
+                </h3>
               </div>
               <div class="doc-nav-group" aria-label="Distance helpers">
-                <h3 class="doc-nav-group__title is-active" >
-				  <a href="docs-chutoro-distance-helpers.html">Distance helpers</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                <h3 class="doc-nav-group__title is-active" aria-current="page">
+                  <a href="docs-chutoro-distance-helpers.html">Distance helpers</a>
+                </h3>
               </div>
               <div class="doc-nav-group" aria-label="Feature flags and execution strategies">
                 <h3 class="doc-nav-group__title " >
-				  <a href="docs-chutoro-feature-flags-and-execution-strategies.html">Feature flags and execution strategies</a>
-				</h3>
-                <ul class="doc-nav__list" role="list">
-                </ul>
+                  <a href="docs-chutoro-feature-flags-and-execution-strategies.html">Feature flags and execution strategies</a>
+                </h3>
               </div>
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
             <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/chutoro/refs/heads/main/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
-              <span aria-hidden="true">↗</span>
+              <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
             <p class="mt-1 text-xs text-base-content/60">Source material</p>
           </div>
@@ -373,16 +357,6 @@ L2 norms for cosine distance. Reuse the cached norms across repeated queries to
 avoid redundant work; the cosine helper verifies cached values before it
 performs the final calculation.</p></div>
               </section>
-              <section class="doc-section">
-                <div class="doc-prose"><p><code>chutoro-core</code> also ships scalar Euclidean and cosine distance helpers. Both
-validate inputs for finite values, matching dimensions, and positive lengths
-before computing the distance. The functions return the <code>Distance</code> newtype,
-which dereferences to <code>f32</code> and exposes the raw value through <code>value()</code>.</p>
-<p>Use <code>CosineNorms::from_vectors</code> or <code>CosineNorms::new</code> to pre-compute validated
-L2 norms for cosine distance. Reuse the cached norms across repeated queries to
-avoid redundant work; the cosine helper verifies cached values before it
-performs the final calculation.</p></div>
-              </section>
         </article>
       </section>
     </div>
@@ -409,22 +383,18 @@ performs the final calculation.</p></div>
           <li><a class="footer-link" data-variant="accent" href="mailto:hello@df12.studio">hello@df12.studio</a></li>
           <li>
             <a class="footer-link" data-variant="accent" href="https://github.com/leynos" target="_blank" rel="noopener noreferrer">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.38 7.86 10.9.58.11.79-.25.79-.56 0-.27-.01-1.16-.02-2.1-3.2.7-3.88-1.37-3.88-1.37-.53-1.35-1.29-1.71-1.29-1.71-1.05-.72.08-.71.08-.71 1.16.08 1.78 1.19 1.78 1.19 1.03 1.77 2.7 1.26 3.36.96.11-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.19-3.07-.12-.29-.52-1.46.11-3.05 0 0 .98-.31 3.2 1.17.93-.26 1.93-.39 2.92-.39.99 0 1.99.13 2.92.39 2.21-1.48 3.19-1.17 3.19-1.17.63 1.59.23 2.76.11 3.05.74.8 1.19 1.82 1.19 3.07 0 4.41-2.68 5.39-5.24 5.67.41.36.78 1.06.78 2.14 0 1.54-.01 2.78-.01 3.16 0 .31.21.68.79.56C20.21 21.37 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5Z" />
-              </svg>
+              <iconify-icon icon="carbon:logo-github" class="h-4 w-4" aria-hidden="true"></iconify-icon>
               GitHub
             </a>
           </li>
           <li>
             <a class="footer-link" data-variant="accent" href="https://bsky.app/profile/df12.studio" target="_blank" rel="noopener noreferrer">
-              <svg class="h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cloud" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
-                <path fill="currentColor" d="M0 336c0 79.5 64.5 144 144 144H512c70.7 0 128-57.3 128-128c0-61.9-44-113.6-102.4-125.4c4.1-10.7 6.4-22.4 6.4-34.6c0-53-43-96-96-96c-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32C167.6 32 96 103.6 96 192c0 2.7 .1 5.4 .2 8.1C40.2 219.8 0 273.2 0 336z"></path>
-              </svg>
+              <iconify-icon icon="carbon:logo-bluesky" class="h-4 w-4" aria-hidden="true"></iconify-icon>
               Bluesky
             </a>
           </li>
         </ul>
-        <p class="mt-6 text-xs text-base-content/80">Generated November 11, 2025 at 02:53 UTC</p>
+        <p class="mt-6 text-xs text-base-content/80">Generated November 11, 2025 at 15:37 UTC</p>
         <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12 Productions.</p>
       </div>
     </div>
@@ -503,10 +473,7 @@ performs the final calculation.</p></div>
         copyButton.setAttribute('aria-label', `Copy ${readableLang} code snippet`);
         copyButton.innerHTML = `
           <span class="codehilite__copy-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 2C6.34315 2 5 3.34315 5 5V15C5 16.6569 6.34315 18 8 18H16C17.6569 18 19 16.6569 19 15V5C19 3.34315 17.6569 2 16 2H8ZM7 5C7 4.44772 7.44772 4 8 4H16C16.5523 4 17 4.44772 17 5V15C17 15.5523 16.5523 16 16 16H8C7.44772 16 7 15.5523 7 15V5Z" />
-              <path d="M4 7C4 6.44772 3.55228 6 3 6C1.34315 6 0 7.34315 0 9V19C0 20.6569 1.34315 22 3 22H11C12.6569 22 14 20.6569 14 19C14 18.4477 13.5523 18 13 18C12.4477 18 12 18.4477 12 19C12 19.5523 11.5523 20 11 20H3C2.44772 20 2 19.5523 2 19V9C2 8.44772 2.44772 8 3 8C3.55228 8 4 7.55228 4 7Z" />
-            </svg>
+            <iconify-icon icon="carbon:copy" class="h-4 w-4"></iconify-icon>
           </span>
           <span class="codehilite__copy-text">Copy</span>
         `;
@@ -549,5 +516,6 @@ performs the final calculation.</p></div>
       });
     })();
   </script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </body>
 </html>

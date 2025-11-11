@@ -3,17 +3,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "watchexec -w src -w df12_pages -w config -w pyproject.toml --exts css,py,yml,toml -- bun run build",
+    "dev": "bunx chokidar-cli \"src/**/*\" \"df12_pages/**/*\" \"config/**/*\" \"scripts/**/*\" \"pyproject.toml\" --initial -i \"**/*.pyc\" -i \"**/__pycache__/**\" -c \"bun run build\"",
     "build": "bun run build:css && bun run build:images && bun run build:pages",
     "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
     "build:images": "bun run scripts/generate-image-variants.ts",
-	"build:pages": "uv run pages bump && uv run pages generate",
-    "serve": "bun run build && bunx http-server public -p 8080"
+	"build:pages": "uv run pages generate",
+    "serve": "bun run build && bunx http-server public -p 8080",
+	"bump": "uv run pages bump"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.15",
     "@tailwindcss/typography": "^0.5.19",
     "@types/bun": "latest",
+    "chokidar-cli": "^3.0.0",
     "daisyui": "^5.3.7",
     "sharp": "^0.34.4",
     "tailwindcss": "^4.1.15"

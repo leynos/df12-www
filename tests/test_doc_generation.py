@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import dataclasses as dc
+import datetime as dt
 import shutil
 import subprocess
 import typing as typ
@@ -73,23 +75,48 @@ def page_config(tmp_path_factory: pytest.TempPathFactory) -> PageConfig:
         branch="main",
         language=None,
         manifest_url=None,
-        description_override=None,
+        description_override="Fixture Description",
+        doc_path="docs/users-guide.md",
+        latest_release=None,
+        latest_release_published_at=None,
     )
 
 
 @pytest.fixture
+def markdown_response(
+    sample_markdown: str, monkeypatch: pytest.MonkeyPatch
+) -> dict[str, typ.Any]:
+    state: dict[str, typ.Any] = {
+        "last_modified": "Tue, 11 Nov 2025 00:00:00 GMT",
+        "calls": [],
+    }
+
+    class _Response:
+        def __init__(self, body: str, headers: dict[str, str]) -> None:
+            self.text = body
+            self.headers = headers
+
+        def raise_for_status(self) -> None:  # pragma: no cover - stub
+            return None
+
+    def fake_get(url: str, timeout: int = 30) -> _Response:  # noqa: ARG001
+        state["calls"].append(url)
+        return _Response(sample_markdown, {"Last-Modified": state["last_modified"]})
+
+    def set_last_modified(value: str) -> None:
+        state["last_modified"] = value
+
+    state["set_last_modified"] = set_last_modified
+    monkeypatch.setattr("df12_pages.generator.requests.get", fake_get)
+    return state
+
+
+@pytest.fixture
 def generated_doc_paths(
-    sample_markdown: str,
     page_config: PageConfig,
-    monkeypatch: pytest.MonkeyPatch,
+    markdown_response: dict[str, typ.Any],  # noqa: ARG001
 ) -> dict[str, Path]:
     """Generate HTML pages from the sample markdown and return their paths."""
-    monkeypatch.setattr(
-        PageContentGenerator,
-        "_fetch_markdown",
-        lambda self: sample_markdown,
-        raising=False,
-    )
     generator = PageContentGenerator(page_config)
     written_paths = generator.run()
     return {path.name: path for path in written_paths}
@@ -166,6 +193,28 @@ def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -
     assert hero_title == "Introduction"
 
 
+def test_doc_meta_uses_source_mtime(generated_docs: dict[str, BeautifulSoup]) -> None:
+    """Fallback metadata should derive from the source document mtime."""
+    soup = generated_docs["docs-test-introduction.html"]
+    meta_items = [
+        span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
+    ]
+    assert meta_items == ["Updated Nov 11, 2025"]
+
+
+def test_sidebar_shows_label_and_description(
+    generated_docs: dict[str, BeautifulSoup],
+) -> None:
+    """Sidebar should highlight the tool label and description."""
+    soup = generated_docs["docs-test-introduction.html"]
+    eyebrow = soup.select_one(".doc-sidebar__eyebrow")
+    assert eyebrow is not None
+    assert eyebrow.get_text(strip=True) == "Test Docs"
+    body = soup.select_one(".doc-sidebar__body")
+    assert body is not None
+    assert body.get_text(strip=True) == "Fixture Description"
+
+
 def _extract_nodes_by_tag(
     tree: dict[str, typ.Any], tag: str
 ) -> list[dict[str, typ.Any]]:
@@ -180,6 +229,7 @@ def _extract_nodes_by_tag(
     return matches
 
 
+@pytest.mark.playwright
 @pytest.mark.timeout(120)
 @pytest.mark.xdist_group(name="css-view")
 def test_doc_prose_code_spans_have_expected_computed_style(
@@ -212,3 +262,34 @@ def test_doc_prose_code_spans_have_expected_computed_style(
     assert style["font-size"] == "14px"
     assert style["padding-inline-start"] == style["padding-inline-end"]
     assert style["padding-block-start"] == style["padding-block-end"]
+
+
+def test_release_version_and_date_prefer_tag_metadata(
+    page_config: PageConfig,
+    sample_markdown: str,
+    markdown_response: dict[str, typ.Any],
+) -> None:
+    """Release tags should drive the source URL and metadata badges."""
+
+    release_config = dc.replace(
+        page_config,
+        repo="octo/tool",
+        source_url=page_config.source_url,
+        doc_path="docs/users-guide.md",
+        latest_release="v9.9.9",
+        latest_release_published_at=dt.datetime(2024, 12, 25, tzinfo=dt.timezone.utc),
+    )
+    markdown_response["set_last_modified"]("Mon, 01 Jan 2024 12:00:00 GMT")
+
+    generator = PageContentGenerator(release_config)
+    written = generator.run()
+    intro_path = next(path for path in written if path.name.endswith("introduction.html"))
+    html = intro_path.read_text(encoding="utf-8")
+    soup = BeautifulSoup(html, "html.parser")
+    meta_items = [
+        span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
+    ]
+    assert meta_items == ["Version 9.9.9", "Updated Dec 25, 2024"]
+
+    requested_url = markdown_response["calls"][0]
+    assert "refs/tags/v9.9.9" in requested_url

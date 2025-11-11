@@ -75,6 +75,7 @@ def test_bump_workflow_updates_yaml(tmp_path: Path) -> None:
               second:
                 repo: owner/beta
                 latest_release: prune-me
+                latest_release_published_at: 2024-01-01T00:00:00Z
             """
         ).strip()
         + "\n",
@@ -89,16 +90,25 @@ def test_bump_workflow_updates_yaml(tmp_path: Path) -> None:
         def fetch_latest(self, repo: str) -> ReleaseInfo | None:
             self.calls.append(repo)
             if repo == "owner/alpha":
-                return ReleaseInfo(tag_name="v9.9.9")
+                return ReleaseInfo(
+                    tag_name="v9.9.9", published_at="2025-11-01T00:00:00Z"
+                )
             return None
 
     client = StubClient()
     result = bump_latest_release_metadata(config_path=config_path, client=client)
 
-    assert result == {"first": "v9.9.9", "second": None}
+    assert result["second"] is None
+    assert result["first"] is not None
+    assert result["first"].tag_name == "v9.9.9"
+    assert result["first"].published_at == "2025-11-01T00:00:00Z"
     assert client.calls == ["owner/alpha", "owner/beta"]
 
     yaml = YAML(typ="safe")
     parsed = yaml.load(config_path.read_text(encoding="utf-8"))
     assert parsed["pages"]["first"]["latest_release"] == "v9.9.9"
+    assert (
+        parsed["pages"]["first"]["latest_release_published_at"]
+        == "2025-11-01T00:00:00Z"
+    )
     assert "latest_release" not in parsed["pages"]["second"]

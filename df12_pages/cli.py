@@ -94,9 +94,12 @@ def bump(
     token = github_token or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
     client = GitHubReleaseClient(token=token, api_base=github_api_url)
     results = bump_latest_release_metadata(config_path=config, client=client)
-    for page_key, tag in sorted(results.items()):
-        if tag:
-            print(f"{page_key}: {tag}")
+    for page_key, release in sorted(results.items()):
+        if release:
+            label = release.tag_name
+            if release.published_at:
+                label = f"{label} ({release.published_at})"
+            print(f"{page_key}: {label}")
         else:
             print(f"{page_key}: no releases found")
 

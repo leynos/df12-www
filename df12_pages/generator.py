@@ -10,6 +10,7 @@ from html import escape
 from pathlib import Path
 
 import requests
+from email.utils import parsedate_to_datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown import Markdown
 from pygments import highlight
@@ -18,6 +19,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
 from .config import PageConfig, SectionLayout
+from .docs_index import ManifestDescriptionResolver
 from .markdown_parser import Section, Subsection, parse_sections
 
 CODE_BLOCK_PATTERN = re.compile(r"```([A-Za-z0-9_+#.-]+)?[^\n]*\n(.*?)```", re.DOTALL)
@@ -121,6 +123,11 @@ class PageContentGenerator:
         self.output_dir_override = output_dir
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
         self.renderer = HtmlContentRenderer(page_config.pygments_style)
+        self.description_resolver = ManifestDescriptionResolver()
+        self.page_description = self._resolve_description()
+        self.doc_version: str | None = None
+        self.doc_version_display: str | None = None
+        self.doc_updated_at: dt.datetime | None = page_config.latest_release_published_at
         self.env = Environment(
             loader=FileSystemLoader(str(self.templates_dir)),
             autoescape=select_autoescape(["html", "xml"]),
@@ -128,6 +135,7 @@ class PageContentGenerator:
             lstrip_blocks=True,
         )
         self.template = self.env.get_template("doc_page.jinja")
+        self.source_url = self._resolve_source_url(source_url)
 
     def run(self) -> list[Path]:
         """Generate HTML files, returning the written paths."""
@@ -141,6 +149,7 @@ class PageContentGenerator:
         out_dir.mkdir(parents=True, exist_ok=True)
 
         generated_at = dt.datetime.now(dt.UTC)
+        doc_updated_at = self.doc_updated_at or generated_at
         section_bundle: list[tuple[Section, SectionModel, str]] = []
         for section in sections:
             layout = self._resolve_layout(section.slug)
@@ -156,10 +165,13 @@ class PageContentGenerator:
                 "nav_groups": nav_groups,
                 "theme": self.page.theme,
                 "generated_at": generated_at,
+                "doc_updated_at": doc_updated_at,
+                "doc_version": self.doc_version_display,
                 "source_url": self.source_url,
                 "source_label": self.page.source_label,
                 "pygments_css": self.renderer.stylesheet,
                 "page": self.page,
+                "page_description": self.page_description,
                 "html_title": html_title,
                 "footer_note": self.page.footer_note,
             }
@@ -173,7 +185,45 @@ class PageContentGenerator:
     def _fetch_markdown(self) -> str:
         resp = requests.get(self.source_url, timeout=30)
         resp.raise_for_status()
+        if not self.doc_updated_at:
+            self.doc_updated_at = self._extract_timestamp(resp.headers.get("Last-Modified"))
         return resp.text
+
+    def _resolve_source_url(self, override: str | None) -> str:
+        if override:
+            return override
+        if self.page.repo and self.page.latest_release:
+            self.doc_version = self.page.latest_release
+            self.doc_version_display = self._strip_version_prefix(self.doc_version)
+            return _build_release_url(
+                self.page.repo, self.page.latest_release, self.page.doc_path
+            )
+        return self.page.source_url
+
+    def _extract_timestamp(self, header_value: str | None) -> dt.datetime:
+        if header_value:
+            try:
+                parsed = parsedate_to_datetime(header_value)
+            except (TypeError, ValueError):
+                parsed = None
+            if parsed is not None:
+                if parsed.tzinfo is None:
+                    parsed = parsed.replace(tzinfo=dt.timezone.utc)
+                return parsed.astimezone(dt.timezone.utc)
+        return dt.datetime.now(dt.UTC)
+
+    def _resolve_description(self) -> str:
+        if self.page.description_override:
+            return self.page.description_override
+        return self.description_resolver.resolve(self.page)
+
+    @staticmethod
+    def _strip_version_prefix(tag: str | None) -> str | None:
+        if not tag:
+            return None
+        if tag and tag.upper().startswith("V") and len(tag) > 1:
+            return tag[1:]
+        return tag
 
     def _build_nav_groups(
         self, section_models: list[SectionModel]
@@ -351,3 +401,8 @@ class PageContentGenerator:
     @staticmethod
     def _clean_nav_label(label: str) -> str:
         return label.strip().rstrip(":").strip()
+
+
+def _build_release_url(repo: str, tag: str, path: str) -> str:
+    normalized = path.lstrip("/")
+    return f"https://raw.githubusercontent.com/{repo}/refs/tags/{tag}/{normalized}"

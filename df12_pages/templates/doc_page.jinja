@@ -127,8 +127,8 @@
             Back to docs
           </a>
           <div>
-            <p class="doc-sidebar__eyebrow">{{ theme.hero_eyebrow.replace('Documentation', '').strip() }}</p>
-            <p class="doc-sidebar__body">{{ theme.hero_tagline }}</p>
+            <p class="doc-sidebar__eyebrow">{{ page.label }}</p>
+            <p class="doc-sidebar__body">{{ page_description }}</p>
           </div>
           <div class="doc-sidebar__groups">
             {% for group in nav_groups %}
@@ -183,7 +183,10 @@
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">{{ section.short_title.rstrip(':') }}</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated {{ generated_at.strftime('%b %d, %Y') }}</span>
+            {% if doc_version %}
+              <span class="doc-meta-list__item">Version {{ doc_version }}</span>
+            {% endif %}
+            <span class="doc-meta-list__item">Updated {{ (doc_updated_at or generated_at).strftime('%b %d, %Y') }}</span>
           </div>
         </header>
 

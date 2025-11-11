@@ -17,12 +17,12 @@ class PagesConfigError(ValueError):
 
 def bump_latest_release_metadata(
     *, config_path: Path, client: GitHubReleaseClient
-) -> dict[str, str | None]:
+) -> dict[str, ReleaseInfo | None]:
     """Fetch latest releases for each page repo and update the YAML file.
 
-    Returns a mapping of page keys to the tag recorded (``None`` when no
-    release exists). The YAML document is always re-serialized so that removals
-    of ``latest_release`` keys are persisted as well.
+    Returns a mapping of page keys to their recorded :class:`ReleaseInfo`
+    (``None`` when no release exists). The YAML document is always re-serialized
+    so that removals of release metadata are persisted as well.
     """
 
     yaml = _build_roundtrip_yaml()
@@ -41,7 +41,7 @@ def bump_latest_release_metadata(
         msg = "No pages defined in layout configuration"
         raise PagesConfigError(msg)
 
-    results: dict[str, str | None] = {}
+    results: dict[str, ReleaseInfo | None] = {}
     for key, page_payload in pages.items():
         if not isinstance(page_payload, CommentedMap):
             continue
@@ -49,8 +49,8 @@ def bump_latest_release_metadata(
         if not repo:
             continue
         release = client.fetch_latest(repo)
-        tag = _record_release(page_payload, release)
-        results[key] = tag
+        stored = _record_release(page_payload, release)
+        results[key] = stored
 
     with config_path.open("w", encoding="utf-8") as handle:
         yaml.dump(document, handle)
@@ -75,29 +75,41 @@ def _resolve_repo(
     return str(repo)
 
 
-def _record_release(page_payload: CommentedMap, release: ReleaseInfo | None) -> str | None:
+def _record_release(page_payload: CommentedMap, release: ReleaseInfo | None) -> ReleaseInfo | None:
     if release:
-        _upsert_latest_release(page_payload, release.tag_name)
-        return release.tag_name
-    if "latest_release" in page_payload:
-        del page_payload["latest_release"]
+        _upsert_key(page_payload, "latest_release", release.tag_name, ("repo", "language"))
+        if release.published_at:
+            _upsert_key(
+                page_payload,
+                "latest_release_published_at",
+                release.published_at,
+                ("latest_release", "repo", "language"),
+            )
+        elif "latest_release_published_at" in page_payload:
+            del page_payload["latest_release_published_at"]
+        return release
+
+    for key in ("latest_release", "latest_release_published_at"):
+        if key in page_payload:
+            del page_payload[key]
     return None
 
 
-def _upsert_latest_release(page_payload: CommentedMap, tag: str) -> None:
-    if "latest_release" in page_payload:
-        page_payload["latest_release"] = tag
+def _upsert_key(
+    page_payload: CommentedMap, key: str, value: str, anchors: tuple[str, ...]
+) -> None:
+    if key in page_payload:
+        page_payload[key] = value
         return
 
     insert_index = None
     existing_keys = list(page_payload.keys())
-    if "repo" in page_payload:
-        insert_index = existing_keys.index("repo") + 1
-    elif "language" in page_payload:
-        insert_index = existing_keys.index("language") + 1
+    for anchor in anchors:
+        if anchor in page_payload:
+            insert_index = existing_keys.index(anchor) + 1
+            break
 
     if insert_index is None:
-        page_payload["latest_release"] = tag
+        page_payload[key] = value
     else:
-        page_payload.insert(insert_index, "latest_release", tag)
-
+        page_payload.insert(insert_index, key, value)

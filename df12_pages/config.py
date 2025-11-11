@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses as dc
 import typing as typ
+import datetime as dt
 from pathlib import Path
 
 from ruamel.yaml import YAML
@@ -60,6 +61,9 @@ class PageConfig:
     language: str | None
     manifest_url: str | None
     description_override: str | None
+    doc_path: str
+    latest_release: str | None
+    latest_release_published_at: dt.datetime | None
 
 
 @dc.dataclass(slots=True)
@@ -163,6 +167,10 @@ def load_site_config(path: Path) -> SiteConfig:
                 manifest_url = _build_repo_url(repo, branch, manifest_path)
 
         description_override = payload.get("description")
+        latest_release = payload.get("latest_release")
+        latest_release_published_at = _parse_timestamp(
+            payload.get("latest_release_published_at")
+        )
 
         pages[key] = PageConfig(
             key=key,
@@ -181,6 +189,9 @@ def load_site_config(path: Path) -> SiteConfig:
             language=language.lower() if isinstance(language, str) else language,
             manifest_url=manifest_url,
             description_override=description_override,
+            doc_path=doc_path,
+            latest_release=latest_release,
+            latest_release_published_at=latest_release_published_at,
         )
 
     return SiteConfig(
@@ -191,9 +202,10 @@ def load_site_config(path: Path) -> SiteConfig:
     )
 
 
-def _build_repo_url(repo: str, branch: str, path: str) -> str:
+def _build_repo_url(repo: str, ref: str, path: str) -> str:
     normalized = path.lstrip("/")
-    return f"https://raw.githubusercontent.com/{repo}/refs/heads/{branch}/{normalized}"
+    ref_segment = ref if ref.startswith("refs/") else f"refs/heads/{ref}"
+    return f"https://raw.githubusercontent.com/{repo}/{ref_segment}/{normalized}"
 
 
 def _default_manifest_path(language: str | None) -> str | None:
@@ -242,3 +254,23 @@ def _merge_layouts(
             emphasized_code_block=payload.get("emphasized_code_block"),
         )
     return result
+
+
+def _parse_timestamp(value: typ.Any) -> dt.datetime | None:
+    if isinstance(value, dt.datetime):
+        parsed = value
+    elif isinstance(value, str):
+        sanitized = value.strip()
+        if not sanitized:
+            return None
+        if sanitized.endswith("Z"):
+            sanitized = sanitized[:-1] + "+00:00"
+        try:
+            parsed = dt.datetime.fromisoformat(sanitized)
+        except ValueError:
+            return None
+    else:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)

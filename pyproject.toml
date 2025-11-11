@@ -100,6 +100,9 @@ convention = "numpy"
 [tool.pytest.ini_options]
 # Tests automatically killed after seconds elapsed
 timeout = 30
+markers = [
+    "playwright: marks tests that require Playwright/browser tooling",
+]
 
 [tool.uv]
 package = true

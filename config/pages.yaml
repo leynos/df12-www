@@ -6,7 +6,7 @@ defaults:
   output_dir: public
   filename_prefix: docs-
   pygments_style: monokai
-  page_title_suffix: "df12 Docs"
+  page_title_suffix: "df12 Reference Library"
   source_label: "Source material"
   footer_note: "Serious tools, playful worlds."
   default_page: netsuke
@@ -21,11 +21,11 @@ defaults:
 
 pages:
   netsuke:
-    label: "Netsuke Docs"
+    label: "Netsuke"
     repo: leynos/netsuke
     language: rust
     source_label: "Netsuke User Guide (main)"
-    page_title_suffix: "Netsuke Docs"
+    page_title_suffix: "Netsuke"
     filename_prefix: docs-netsuke-
     footer_note: "Built with Netsuke."
     theme:
@@ -57,46 +57,46 @@ pages:
           - Exit Codes
 
   rstest-bdd:
-    label: "rstest-bdd Docs"
+    label: "rstest-bdd"
     repo: leynos/rstest-bdd
     language: rust
     filename_prefix: docs-rstest-bdd-
-    page_title_suffix: "rstest-bdd Docs"
+    page_title_suffix: "rstest-bdd"
     description: "Behavior-driven testing macros layered on top of rstest."
 
   ortho-config:
-    label: "Ortho Config Docs"
+    label: "Ortho Config"
     repo: leynos/ortho-config
     language: rust
     filename_prefix: docs-ortho-config-
-    page_title_suffix: "Ortho Config Docs"
+    page_title_suffix: "Ortho Config"
     description: "Esbuild-inspired configuration management for Rust services."
 
   pg-embedded-setup-unpriv:
-    label: "pg-embedded-setup-unpriv Docs"
+    label: "pg-embedded-setup-unpriv"
     repo: leynos/pg-embedded-setup-unpriv
     language: rust
     filename_prefix: docs-pg-embedded-
-    page_title_suffix: "pg-embedded-setup-unpriv Docs"
+    page_title_suffix: "pg-embedded-setup-unpriv"
     description: >
       Bootstrap postgresql_embedded clusters as root while delegating filesystem work to
       unprivileged users.
 
   wireframe:
-    label: "Wireframe Docs"
+    label: "Wireframe"
     repo: leynos/wireframe
     language: rust
     filename_prefix: docs-wireframe-
-    page_title_suffix: "Wireframe Docs"
+    page_title_suffix: "Wireframe"
     description: >
       Framework for building binary protocol servers and clients in Rust, inspired by Actix Web.
 
   chutoro:
-    label: "Chutoro Docs"
+    label: "Chutoro"
     repo: leynos/chutoro
     language: rust
     filename_prefix: docs-chutoro-
-    page_title_suffix: "Chutoro Docs"
+    page_title_suffix: "Chutoro"
     description: >
       In progress FISHDBC engine in Rust that will fuse a rayon-driven CPU path, rust-cuda GPU
       kernels, and a versioned C-ABI plugin system to deliver safe, extensible, state-of-the-art

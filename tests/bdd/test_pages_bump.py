@@ -96,5 +96,8 @@ def then_config_records_expected(scenario_state: ScenarioState) -> None:
     parsed = yaml.load(config_path.read_text(encoding="utf-8"))
 
     for page, expected_tag in EXPECTED_TAGS.items():
-        assert result[page] == expected_tag
+        release = result[page]
+        assert release is not None
+        assert release.tag_name == expected_tag
         assert parsed["pages"][page]["latest_release"] == expected_tag
+        assert "latest_release_published_at" in parsed["pages"][page]

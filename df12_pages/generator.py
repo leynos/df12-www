@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses as dc
 import datetime as dt
+import json
 import posixpath
 import re
 import typing as typ
@@ -22,6 +23,7 @@ from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
+from ._constants import PAGE_META_TEMPLATE
 from .config import PageConfig, SectionLayout
 from .docs_index import ManifestDescriptionResolver
 from .markdown_parser import Section, Subsection, parse_sections
@@ -211,6 +213,8 @@ class PageContentGenerator:
             output_path = out_dir / filename
             output_path.write_text(html, encoding="utf-8")
             written.append(output_path)
+        if written:
+            self._write_metadata(written[0].name)
         return written
 
     def _fetch_markdown(self) -> str:
@@ -255,6 +259,18 @@ class PageContentGenerator:
         if tag and tag.upper().startswith("V") and len(tag) > 1:
             return tag[1:]
         return tag
+
+    def _metadata_path(self) -> Path:
+        filename = PAGE_META_TEMPLATE.format(key=self.page.key)
+        return self.page.output_dir / filename
+
+    def _write_metadata(self, first_filename: str) -> None:
+        metadata = {"first_file": first_filename}
+        path = self._metadata_path()
+        try:
+            path.write_text(json.dumps(metadata), encoding="utf-8")
+        except OSError:  # pragma: no cover - IO issues
+            return
 
     def _build_nav_groups(
         self, section_models: list[SectionModel]

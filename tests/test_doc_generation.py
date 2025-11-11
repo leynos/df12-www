@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses as dc
 import datetime as dt
+import json
 import shutil
 import subprocess
 import typing as typ
@@ -13,6 +14,7 @@ import msgspec.json as msgspec_json
 import pytest
 from bs4 import BeautifulSoup
 
+from df12_pages._constants import PAGE_META_TEMPLATE
 from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.generator import PageContentGenerator
 
@@ -240,6 +242,16 @@ def test_relative_links_rewritten_to_github(
     link = soup.select_one("a[href*='github.com']")
     assert link is not None
     assert link["href"] == "https://github.com/df12/testdocs/blob/main/cli.md#flags"
+
+
+def test_first_section_metadata_written(
+    page_config: PageConfig,
+    generated_doc_paths: dict[str, Path],
+) -> None:
+    meta_path = page_config.output_dir / PAGE_META_TEMPLATE.format(key=page_config.key)
+    assert meta_path.exists()
+    metadata = json.loads(meta_path.read_text(encoding="utf-8"))
+    assert metadata["first_file"] == "docs-test-introduction.html"
 
 
 def test_sidebar_shows_label_and_description(

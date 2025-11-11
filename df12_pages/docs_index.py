@@ -12,6 +12,8 @@ from pathlib import Path
 import requests
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from ._constants import PAGE_META_TEMPLATE
+
 if typ.TYPE_CHECKING:  # pragma: no cover - import for type hints only
     from .config import PageConfig, SiteConfig
 
@@ -70,6 +72,12 @@ class DocsIndexBuilder:
 
 
 def _discover_entry_href(page: PageConfig, relative_to: Path) -> str | None:
+    meta_candidate = _read_page_metadata(page)
+    if meta_candidate:
+        rel = _relativize(meta_candidate, relative_to)
+        if rel:
+            return rel
+
     pattern = f"{page.filename_prefix}*.html"
     files = sorted(page.output_dir.glob(pattern), key=_doc_file_score)
     if not files:
@@ -86,6 +94,31 @@ def _doc_file_score(path: Path) -> tuple[int, str]:
     if "getting-started" in name:
         return (1, name)
     return (2, name)
+
+
+def _read_page_metadata(page: PageConfig) -> Path | None:
+    meta_path = page.output_dir / PAGE_META_TEMPLATE.format(key=page.key)
+    if not meta_path.exists():
+        return None
+    try:
+        payload = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):  # pragma: no cover - IO guard
+        return None
+    candidate = payload.get("first_file")
+    if not candidate:
+        return None
+    full_path = page.output_dir / candidate
+    if not full_path.exists():
+        return None
+    return full_path
+
+
+def _relativize(target: Path, relative_to: Path) -> str | None:
+    try:
+        rel_path = Path(os.path.relpath(target, start=relative_to))
+    except ValueError:  # pragma: no cover - different drives
+        return None
+    return rel_path.as_posix()
 
 
 class ManifestDescriptionResolver:

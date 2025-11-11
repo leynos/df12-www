@@ -63,7 +63,7 @@ def _split_subsections(body: str) -> tuple[str, list[Subsection]]:
     body = _promote_bold_headings(body)
     matches = list(SUBSECTION_PATTERN.finditer(body))
     if not matches:
-        return body.strip(), []
+        return "", []
 
     intro = body[: matches[0].start()].strip()
     subsections: list[Subsection] = []

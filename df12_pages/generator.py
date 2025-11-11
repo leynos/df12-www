@@ -23,6 +23,8 @@ from .docs_index import ManifestDescriptionResolver
 from .markdown_parser import Section, Subsection, parse_sections
 
 CODE_BLOCK_PATTERN = re.compile(r"```([A-Za-z0-9_+#.-]+)?[^\n]*\n(.*?)```", re.DOTALL)
+FENCED_INDENT_PATTERN = re.compile(r"^[ ]{1,3}([`~]{3,})", re.MULTILINE)
+FENCE_LABEL_PATTERN = re.compile(r"^([`~]{3,})([A-Za-z0-9_+#.-]+)?(,[^\r\n]+)$", re.MULTILINE)
 CODEHILITE_OPEN_TAG = re.compile(r'<div class="codehilite">')
 
 
@@ -40,7 +42,8 @@ class HtmlContentRenderer:
 
     def markdown(self, text: str) -> str:
         """Render markdown into HTML using the configured extensions."""
-        if not text.strip():
+        normalized = self._normalize_fenced_blocks(text)
+        if not normalized.strip():
             return ""
         md = Markdown(
             extensions=["fenced_code", "codehilite", "tables", "sane_lists"],
@@ -53,8 +56,8 @@ class HtmlContentRenderer:
                 }
             },
         )
-        html = md.convert(text)
-        return self._annotate_codehilite(html, text)
+        html = md.convert(normalized)
+        return self._annotate_codehilite(html, normalized)
 
     def code_block(self, code: str, language: str | None = None) -> str:
         """Highlight fenced code blocks with pygments."""
@@ -88,6 +91,17 @@ class HtmlContentRenderer:
             return f'<div class="codehilite" data-language="{safe_lang}">' 
 
         return CODEHILITE_OPEN_TAG.sub(_repl, html, 1)
+
+    @staticmethod
+    def _normalize_fenced_blocks(text: str) -> str:
+        without_indent = FENCED_INDENT_PATTERN.sub(r"\1", text)
+
+        def _strip_labels(match: re.Match[str]) -> str:
+            fence, language, _extras = match.groups()
+            label = language or ""
+            return f"{fence}{label}"
+
+        return FENCE_LABEL_PATTERN.sub(_strip_labels, without_indent)
 
 
 @dc.dataclass(slots=True)

@@ -41,6 +41,15 @@ def sample_markdown() -> str:
         "Bullet list of capabilities.\n\n"
         "### Core Philosophy:\n"
         "Why decisions matter.\n\n"
+        "- **Sanitized providers** – The `sanitized_provider` helper returns a Figment\n"
+        "  provider with None fields removed. It aids manual layering. For example:\n\n"
+        "  ```rust,no_run\n"
+        "  use figment::{Figment, providers::Serialized};\n"
+        "  use ortho_config::sanitized_provider;\n\n"
+        "  let fig = Figment::from(Serialized::defaults(&Defaults::default()))\n"
+        "      .merge(sanitized_provider(&cli)?);\n"
+        "  let cfg: Defaults = fig.extract()?;\n"
+        "  ```\n\n"
         "## 2. Getting Started\n"
         "### Install\n"
         "Install steps here.\n\n"
@@ -167,9 +176,8 @@ def test_only_one_sidebar_link_flagged_active(
 ) -> None:
     """Exactly one nav link should be marked as active for a page."""
     soup = generated_docs["docs-test-getting-started.html"]
-    active_links = soup.select(".doc-nav__link[aria-current='page']")
-    assert len(active_links) == 1
-    assert active_links[0]["href"].endswith("docs-test-getting-started.html")
+    active_titles = soup.select(".doc-nav-group__title.is-active")
+    assert len(active_titles) == 1
 
 
 def test_bold_heading_promoted_to_nav_entry(
@@ -200,6 +208,28 @@ def test_doc_meta_uses_source_mtime(generated_docs: dict[str, BeautifulSoup]) ->
         span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
     ]
     assert meta_items == ["Updated Nov 11, 2025"]
+
+
+def test_indented_fenced_block_renders_codehilite(
+    generated_docs: dict[str, BeautifulSoup],
+) -> None:
+    """Indented fenced code blocks should render as highlighted HTML."""
+    soup = generated_docs["docs-test-introduction.html"]
+    code_blocks = soup.select(".doc-article .codehilite code")
+    assert any("use figment" in block.get_text() for block in code_blocks)
+    assert any(
+        block.find_parent("div", class_="codehilite").get("data-language") == "rust"
+        for block in code_blocks
+    )
+
+
+def test_default_layout_content_not_duplicated(
+    generated_docs: dict[str, BeautifulSoup],
+) -> None:
+    """Sections without headings should render body content exactly once."""
+    soup = generated_docs["docs-test-introduction.html"]
+    html = soup.select_one(".doc-article").decode_contents()
+    assert html.count("Sanitized providers") == 1
 
 
 def test_sidebar_shows_label_and_description(

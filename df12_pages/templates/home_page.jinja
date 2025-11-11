@@ -10,7 +10,7 @@
   <title>{{ homepage.title }}</title>
 </head>
 <body class="bg-base-100">
-  {% from "partials/site_macros.jinja" import site_header, marketing_footer %}
+  {% from "partials/site_macros.jinja" import site_header, site_footer %}
   <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
 
 {{ site_header('#hero', homepage.hero.brand_text, homepage.nav_links) | indent(2, true) }}
@@ -140,7 +140,17 @@
     </section>
   </main>
 
-{{ marketing_footer(homepage.footer, generated_at) | indent(2, true) }}
+  {% set footer_closing = homepage.footer.closing_lede ~ ' ©&nbsp;' ~ homepage.footer.copyright_year ~ '&nbsp;' ~ homepage.footer.site_name.replace(' ', '&nbsp;') ~ '.' %}
+{{ site_footer(
+  homepage.footer.site_name,
+  homepage.footer.blurb,
+  homepage.footer.oss_heading,
+  homepage.footer.oss_links,
+  homepage.footer.contact_heading,
+  homepage.footer.contact_links,
+  footer_closing,
+  'layout-shell grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16'
+) | indent(2, true) }}
   <script>
     (() => {
       const initNavHighlight = () => {

@@ -10,13 +10,27 @@
   <title>df12 — Documentation</title>
 </head>
 <body class="bg-base-100 text-base-content">
-  {% from "partials/site_macros.jinja" import site_header, docs_footer %}
+  {% from "partials/site_macros.jinja" import site_header, site_footer %}
   {% set doc_label = theme.doc_label if theme and theme.doc_label else 'Docs' %}
   {% set docs_nav_links = [
     {'label': 'Tools', 'href': 'index.html#systems'},
     {'label': 'Creative', 'href': 'index.html#worlds', 'variant': 'accent'},
     {'label': doc_label, 'href': '#main-content', 'variant': 'neutral', 'current': True}
   ] %}
+  {% set docs_site_name = theme.site_name if theme and theme.site_name else 'df12 Productions' %}
+  {% set docs_blurb = 'Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.' %}
+  {% set docs_oss_links = [
+    {'label': 'Limela — licence', 'href': 'https://github.com/leynos/limela/blob/main/LICENSE', 'external': True},
+    {'label': 'Netsuke — licence', 'href': 'https://github.com/leynos/netsuke/blob/main/LICENSE', 'external': True},
+    {'label': 'mxd — licence', 'href': 'https://github.com/leynos/mxd/blob/main/LICENSE', 'external': True},
+    {'label': 'Episodic — licence', 'href': 'https://github.com/leynos/episodic/blob/main/LICENSE', 'external': True}
+  ] %}
+  {% set docs_contact_links = [
+    {'label': 'hello@df12.studio', 'href': 'mailto:hello@df12.studio', 'variant': 'accent'},
+    {'label': 'GitHub', 'href': 'https://github.com/leynos', 'variant': 'accent', 'icon': 'carbon:logo-github', 'external': True},
+    {'label': 'Bluesky', 'href': 'https://bsky.app/profile/df12.studio', 'variant': 'accent', 'icon': 'carbon:logo-bluesky', 'external': True}
+  ] %}
+  {% set docs_closing = 'Built for curious builders and storytellers everywhere. ©&nbsp;' ~ generated_at.year ~ '&nbsp;' ~ docs_site_name.replace(' ', '&nbsp;') ~ '.' %}
   <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
 {{ site_header('index.html', 'df12', docs_nav_links) | indent(2, true) }}
   <main id="main-content" class="flex flex-col pb-24 pt-28">
@@ -74,7 +88,16 @@
       </div>
     </section>
   </main>
-{{ docs_footer(theme.site_name if theme else 'df12 Productions', generated_at) | indent(2, true) }}
+{{ site_footer(
+  docs_site_name,
+  docs_blurb,
+  'OSS &amp; Licences',
+  docs_oss_links,
+  'Stay in touch',
+  docs_contact_links,
+  docs_closing,
+  'layout-shell grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16'
+) | indent(2, true) }}
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </body>
 </html>

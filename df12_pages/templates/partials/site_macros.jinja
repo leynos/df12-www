@@ -28,25 +28,25 @@
 </header>
 {%- endmacro %}
 
-{% macro marketing_footer(footer, generated_at) -%}
+{% macro site_footer(site_name, blurb, oss_heading, oss_links, contact_heading, contact_links, closing_line, grid_class='layout-shell grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16') -%}
 <footer id="footer" class="border-t border-base-200 bg-base-100">
-  <div class="layout-shell grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16">
+  <div class="{{ grid_class }}">
     <div>
-      <p class="font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90">{{ footer.site_name }}</p>
-      <p class="mt-4 text-sm text-base-content/90">{{ footer.blurb }}</p>
+      <p class="font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90">{{ site_name }}</p>
+      <p class="mt-4 text-sm text-base-content/90">{{ blurb }}</p>
     </div>
     <div>
-      <h2>{{ footer.oss_heading }}</h2>
+      <h2>{{ oss_heading }}</h2>
       <ul class="mt-4 space-y-2 text-sm">
-{% for link in footer.oss_links %}
+{% for link in oss_links %}
         <li><a class="footer-link" href="{{ link.href }}"{% if link.external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.label }}</a></li>
 {% endfor %}
       </ul>
     </div>
     <div>
-      <h3>{{ footer.contact_heading }}</h3>
+      <h3>{{ contact_heading }}</h3>
       <ul class="mt-4 space-y-2 text-sm">
-{% for link in footer.contact_links %}
+{% for link in contact_links %}
 {% if link.icon %}
         <li>
           <a class="footer-link"{% if link.variant %} data-variant="{{ link.variant }}"{% endif %} href="{{ link.href }}"{% if link.external %} target="_blank" rel="noopener noreferrer"{% endif %}>
@@ -59,47 +59,7 @@
 {% endif %}
 {% endfor %}
       </ul>
-      <p class="mt-4 text-xs text-base-content/80">{{ footer.closing_lede }} ©&nbsp;{{ footer.copyright_year }}&nbsp;{{ footer.site_name.replace(' ', '&nbsp;') | safe }}.</p>
-    </div>
-  </div>
-</footer>
-{%- endmacro %}
-
-{% macro docs_footer(site_name, generated_at, shell_class='layout-shell') -%}
-<footer id="footer" class="border-t border-base-200 bg-base-100">
-  <div class="{{ shell_class }} grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16">
-    <div>
-      <p class="font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90">{{ site_name }}</p>
-      <p class="mt-4 text-sm text-base-content/90">Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.</p>
-    </div>
-    <div>
-      <h2>OSS &amp; Licences</h2>
-      <ul class="mt-4 space-y-2 text-sm">
-        <li><a class="footer-link" href="https://github.com/leynos/limela/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Limela — licence</a></li>
-        <li><a class="footer-link" href="https://github.com/leynos/netsuke/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Netsuke — licence</a></li>
-        <li><a class="footer-link" href="https://github.com/leynos/mxd/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">mxd — licence</a></li>
-        <li><a class="footer-link" href="https://github.com/leynos/episodic/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Episodic — licence</a></li>
-      </ul>
-    </div>
-    <div>
-      <h3>Stay in touch</h3>
-      <ul class="mt-4 space-y-2 text-sm">
-        <li><a class="footer-link" data-variant="accent" href="mailto:hello@df12.studio">hello@df12.studio</a></li>
-        <li>
-          <a class="footer-link" data-variant="accent" href="https://github.com/leynos" target="_blank" rel="noopener noreferrer">
-            <iconify-icon icon="carbon:logo-github" class="h-4 w-4" aria-hidden="true"></iconify-icon>
-            GitHub
-          </a>
-        </li>
-        <li>
-          <a class="footer-link" data-variant="accent" href="https://bsky.app/profile/df12.studio" target="_blank" rel="noopener noreferrer">
-            <iconify-icon icon="carbon:logo-bluesky" class="h-4 w-4" aria-hidden="true"></iconify-icon>
-            Bluesky
-          </a>
-        </li>
-      </ul>
-      <p class="mt-6 text-xs text-base-content/80">Generated {{ generated_at.strftime('%B %d, %Y at %H:%M %Z') }}</p>
-      <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;{{ generated_at.year }}&nbsp;{{ site_name }}.</p>
+      <p class="mt-4 text-xs text-base-content/80">{{ closing_line | safe }}</p>
     </div>
   </div>
 </footer>

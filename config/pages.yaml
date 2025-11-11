@@ -104,6 +104,6 @@ pages:
     filename_prefix: docs-chutoro-
     page_title_suffix: "Chutoro"
     description: >
-      In progress FISHDBC engine in Rust that will fuse a rayon-driven CPU path, rust-cuda GPU
+      In progress FISHDBC engine in Rust fusing a rayon-driven CPU path, rust-cuda GPU
       kernels, and a versioned C-ABI plugin system to deliver safe, extensible, state-of-the-art
-      clustering throughput from laptops to HPC clusters."
+      iterative clustering.

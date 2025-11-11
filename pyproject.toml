@@ -22,9 +22,11 @@ pages = "df12_pages:main"
 dev = [
     "pytest",
 	"pytest-xdist",
+    "pytest-mock",
     "ruff",
     "pytest-timeout",
     "pytest-bdd",
+    "betamax",
     "parse_type",
     "beautifulsoup4",
     "msgspec",

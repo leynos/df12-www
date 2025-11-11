@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+import os
 import typing as typ
 from pathlib import Path
 
 import cyclopts
 from cyclopts import App, Parameter
 
+from .bump import bump_latest_release_metadata
 from .config import load_site_config
 from .docs_index import DocsIndexBuilder
 from .generator import PageContentGenerator
+from .releases import GitHubReleaseClient
 
 DEFAULT_CONFIG = Path("config/pages.yaml")
 
@@ -66,6 +69,36 @@ def generate(
             print(f"wrote {_format_path(path)}")
     docs_index_path = DocsIndexBuilder(site_config).run()
     print(f"wrote {_format_path(docs_index_path)}")
+
+
+@app.command(help="Record the latest GitHub release tag for each configured page.")
+def bump(
+    *,
+    config: typ.Annotated[
+        Path, Parameter(help="Path to site config", env_var="INPUT_CONFIG")
+    ] = DEFAULT_CONFIG,
+    github_token: typ.Annotated[
+        str | None,
+        Parameter(
+            help="Optional GitHub token (falls back to GITHUB_TOKEN)",
+            env_var="INPUT_GITHUB_TOKEN",
+        ),
+    ] = None,
+    github_api_url: typ.Annotated[
+        str,
+        Parameter(
+            help="Override the GitHub API base URL", env_var="INPUT_GITHUB_API_URL"
+        ),
+    ] = GitHubReleaseClient.default_api_base,
+) -> None:
+    token = github_token or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    client = GitHubReleaseClient(token=token, api_base=github_api_url)
+    results = bump_latest_release_metadata(config_path=config, client=client)
+    for page_key, tag in sorted(results.items()):
+        if tag:
+            print(f"{page_key}: {tag}")
+        else:
+            print(f"{page_key}: no releases found")
 
 
 def main() -> None:

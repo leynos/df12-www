@@ -288,8 +288,12 @@
                     
                     const link = document.createElement('a');
                     link.href = `${base_url}${repoUrlName}`;
-                    link.textContent = `> ${repo.name}`;
                     link.className = 'repo-link';
+                    const arrowIcon = document.createElement('iconify-icon');
+                    arrowIcon.setAttribute('icon', 'carbon:arrow-right');
+                    arrowIcon.className = 'inline-icon';
+                    link.appendChild(arrowIcon);
+                    link.appendChild(document.createTextNode(repo.name));
                     link.target = '_blank'; // Open in new tab
                     link.rel = 'noopener noreferrer';
                     
@@ -327,5 +331,13 @@
         document.addEventListener('DOMContentLoaded', displayRepos);
     </script>
 
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </body>
 </html>
+        iconify-icon.inline-icon {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+            color: #00ff41;
+        }

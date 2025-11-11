@@ -14,6 +14,8 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 import requests
+from github3 import GitHub
+from github3 import exceptions as gh_exc
 from email.utils import parsedate_to_datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown import Markdown
@@ -161,6 +163,7 @@ class PageContentGenerator:
         self.page_description = self._resolve_description()
         self.doc_version: str | None = None
         self.doc_version_display: str | None = None
+        self._github_client: GitHub | None = None
         self.doc_updated_at: dt.datetime | None = self._resolve_doc_updated_at()
         self.env = Environment(
             loader=FileSystemLoader(str(self.templates_dir)),
@@ -223,42 +226,85 @@ class PageContentGenerator:
             return self.page.latest_release_published_at
         return self._fetch_doc_commit_date()
 
+    def _github(self) -> GitHub:
+        if self._github_client is None:
+            token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+            self._github_client = GitHub(token=token)
+        return self._github_client
+
     def _fetch_doc_commit_date(self) -> dt.datetime | None:
-        repo = self.page.repo
-        if not repo:
-            return None
-        branch = self.page.branch or "main"
-        doc_path = self.page.doc_path.lstrip("/")
-        url = f"https://api.github.com/repos/{repo}/commits"
-        params = {
-            "path": doc_path,
-            "sha": branch,
-            "per_page": 1,
-        }
-        headers = {"Accept": "application/vnd.github+json"}
-        token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-        try:
-            response = requests.get(url, params=params, headers=headers, timeout=15)
-            response.raise_for_status()
-        except requests.RequestException:
+        repo_slug = self.page.repo
+        if not repo_slug:
             return None
         try:
-            payload = response.json()
-        except json.JSONDecodeError:
-            return None
-        if not payload:
-            return None
-        commit = payload[0].get("commit", {})
-        date_str = commit.get("author", {}).get("date") or commit.get("committer", {}).get("date")
-        if not date_str:
-            return None
-        sanitized = date_str.replace("Z", "+00:00")
-        try:
-            return dt.datetime.fromisoformat(sanitized)
+            owner, name = repo_slug.split("/", 1)
         except ValueError:
             return None
+
+        branch = self.page.branch or "main"
+        doc_path = self.page.doc_path.lstrip("/")
+
+        try:
+            repository = self._github().repository(owner, name)
+        except gh_exc.GitHubException:
+            return None
+        if repository is None:
+            return None
+        try:
+            commits = repository.commits(path=doc_path, sha=branch)
+        except gh_exc.GitHubException:
+            return None
+
+        latest_commit = next(iter(commits), None)
+        if not latest_commit:
+            return None
+        return self._extract_commit_timestamp(latest_commit)
+
+    def _extract_commit_timestamp(self, commit: typ.Any) -> dt.datetime | None:
+        commit_payload = getattr(commit, "commit", None)
+        if commit_payload is None and isinstance(commit, dict):
+            commit_payload = commit.get("commit")
+        if commit_payload is None:
+            return None
+
+        actors: list[typ.Any] = []
+        for attr in ("author", "committer"):
+            actor = getattr(commit_payload, attr, None)
+            if actor is None and isinstance(commit_payload, dict):
+                actor = commit_payload.get(attr)
+            if actor is not None:
+                actors.append(actor)
+
+        for actor in actors:
+            date_value = getattr(actor, "date", None)
+            if date_value is None and isinstance(actor, dict):
+                date_value = actor.get("date")
+            normalized = self._normalize_commit_date(date_value)
+            if normalized:
+                return normalized
+        return None
+
+    @staticmethod
+    def _normalize_commit_date(value: typ.Any) -> dt.datetime | None:
+        if value is None:
+            return None
+        if isinstance(value, dt.datetime):
+            if value.tzinfo is None:
+                return value.replace(tzinfo=dt.timezone.utc)
+            return value.astimezone(dt.timezone.utc)
+        if isinstance(value, str):
+            sanitized = value.strip()
+            if not sanitized:
+                return None
+            sanitized = sanitized.replace("Z", "+00:00")
+            try:
+                parsed = dt.datetime.fromisoformat(sanitized)
+            except ValueError:
+                return None
+            if parsed.tzinfo is None:
+                return parsed.replace(tzinfo=dt.timezone.utc)
+            return parsed.astimezone(dt.timezone.utc)
+        return None
 
     def _fetch_markdown(self) -> str:
         resp = requests.get(self.source_url, timeout=30)

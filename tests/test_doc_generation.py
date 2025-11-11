@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import typing as typ
 from pathlib import Path
+from types import SimpleNamespace
 
 import msgspec.json as msgspec_json
 import pytest
@@ -122,6 +123,26 @@ def markdown_response(
     return state
 
 
+@pytest.fixture(autouse=True)
+def github_commit_mock(mocker: typ.Any) -> dict[str, typ.Any]:
+    commit_date = dt.datetime(2025, 10, 5, 14, 30, tzinfo=dt.timezone.utc)
+    author = SimpleNamespace(date=commit_date)
+    committer = SimpleNamespace(date=None)
+    commit_payload = SimpleNamespace(author=author, committer=committer)
+    latest_commit = SimpleNamespace(commit=commit_payload)
+
+    mock_repo = mocker.Mock()
+    mock_repo.commits.return_value = iter([latest_commit])
+    mock_client = mocker.Mock()
+    mock_client.repository.return_value = mock_repo
+    mocker.patch("df12_pages.generator.GitHub", return_value=mock_client)
+
+    def set_date(value: dt.datetime) -> None:
+        author.date = value
+
+    return {"set_date": set_date}
+
+
 @pytest.fixture
 def generated_doc_paths(
     page_config: PageConfig,
@@ -203,13 +224,23 @@ def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -
     assert hero_title == "Introduction"
 
 
-def test_doc_meta_uses_source_mtime(generated_docs: dict[str, BeautifulSoup]) -> None:
-    """Fallback metadata should derive from the source document mtime."""
-    soup = generated_docs["docs-test-introduction.html"]
+def test_doc_meta_uses_commit_date(
+    page_config: PageConfig,
+    markdown_response: dict[str, typ.Any],
+    github_commit_mock: dict[str, typ.Any],
+) -> None:
+    """When releases are absent, rely on the last commit timestamp."""
+    commit_dt = dt.datetime(2025, 10, 9, 9, 0, tzinfo=dt.timezone.utc)
+    github_commit_mock["set_date"](commit_dt)
+
+    generator = PageContentGenerator(page_config)
+    written = generator.run()
+    intro_path = next(path for path in written if path.name.endswith("introduction.html"))
+    soup = BeautifulSoup(intro_path.read_text(encoding="utf-8"), "html.parser")
     meta_items = [
         span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
     ]
-    assert meta_items == ["Updated Nov 11, 2025"]
+    assert meta_items == ["Updated Oct 09, 2025"]
 
 
 def test_indented_fenced_block_renders_codehilite(

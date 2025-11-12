@@ -639,7 +639,22 @@ class RelativeLinkExtension(Extension):
 
 
 class RelativeLinkTreeprocessor(Treeprocessor):
+    """Treeprocessor that rewrites relative markdown links to point at GitHub raw blobs."""
+
     def __init__(self, md: Markdown, repo: str, ref: str, base_dir: str) -> None:
+        """Store repo metadata for rewriting relative links.
+
+        Parameters
+        ----------
+        md : Markdown
+            The Markdown instance the processor extends.
+        repo : str
+            Repository slug used to form GitHub URLs.
+        ref : str
+            Branch or tag name serving as the content reference.
+        base_dir : str
+            Directory path within the repository that contains the Markdown file.
+        """
         super().__init__(md)
         self.repo = repo
         self.ref = ref
@@ -655,6 +670,20 @@ class RelativeLinkTreeprocessor(Treeprocessor):
         return root
 
     def _rewrite(self, target: str | None) -> str | None:
+        """Rewrite a relative link target into a GitHub raw URL when applicable.
+
+        Parameters
+        ----------
+        target : str or None
+            Original link target from the markdown document.
+
+        Returns
+        -------
+        str or None
+            Absolute GitHub raw URL when the link is relative to the source
+            document; ``None`` for external schemes, anchors, double-slash URLs,
+            or other non-relative targets.
+        """
         if not target:
             return None
         lower = target.lower()

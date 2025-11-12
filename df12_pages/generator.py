@@ -14,6 +14,9 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 import requests
+from requests import Session
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from github3 import GitHub
 from github3 import exceptions as gh_exc
 from email.utils import parsedate_to_datetime
@@ -320,11 +323,26 @@ class PageContentGenerator:
         return None
 
     def _fetch_markdown(self) -> str:
-        resp = requests.get(self.source_url, timeout=30)
-        resp.raise_for_status()
-        if not self.doc_updated_at:
-            self.doc_updated_at = self._extract_timestamp(resp.headers.get("Last-Modified"))
-        return resp.text
+        session = requests.Session()
+        retry = Retry(
+            total=5,
+            read=5,
+            connect=3,
+            backoff_factor=0.5,
+            status_forcelist=(500, 502, 503, 504),
+            allowed_methods=("GET", "HEAD"),
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        try:
+            resp = session.get(self.source_url, timeout=30)
+            resp.raise_for_status()
+            if not self.doc_updated_at:
+                self.doc_updated_at = self._extract_timestamp(resp.headers.get("Last-Modified"))
+            return resp.text
+        finally:
+            session.close()
 
     def _resolve_source_url(self, override: str | None) -> str:
         if override:

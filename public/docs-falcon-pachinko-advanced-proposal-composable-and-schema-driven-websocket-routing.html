@@ -1,0 +1,1470 @@
+<!doctype html>
+<html lang="en" data-theme="df12">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="assets/site.css" rel="stylesheet" />
+  <title>df12 Productions — Advanced Proposal: Composable and Schema-Driven WebSocket Routing | Falcon Pachinko</title>
+  <style>
+    pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #49483e }
+.codehilite { background: #272822; color: #F8F8F2 }
+.codehilite .c { color: #959077 } /* Comment */
+.codehilite .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.codehilite .esc { color: #F8F8F2 } /* Escape */
+.codehilite .g { color: #F8F8F2 } /* Generic */
+.codehilite .k { color: #66D9EF } /* Keyword */
+.codehilite .l { color: #AE81FF } /* Literal */
+.codehilite .n { color: #F8F8F2 } /* Name */
+.codehilite .o { color: #FF4689 } /* Operator */
+.codehilite .x { color: #F8F8F2 } /* Other */
+.codehilite .p { color: #F8F8F2 } /* Punctuation */
+.codehilite .ch { color: #959077 } /* Comment.Hashbang */
+.codehilite .cm { color: #959077 } /* Comment.Multiline */
+.codehilite .cp { color: #959077 } /* Comment.Preproc */
+.codehilite .cpf { color: #959077 } /* Comment.PreprocFile */
+.codehilite .c1 { color: #959077 } /* Comment.Single */
+.codehilite .cs { color: #959077 } /* Comment.Special */
+.codehilite .gd { color: #FF4689 } /* Generic.Deleted */
+.codehilite .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.codehilite .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F8F8F2 } /* Generic.Error */
+.codehilite .gh { color: #F8F8F2 } /* Generic.Heading */
+.codehilite .gi { color: #A6E22E } /* Generic.Inserted */
+.codehilite .go { color: #66D9EF } /* Generic.Output */
+.codehilite .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #959077 } /* Generic.Subheading */
+.codehilite .gt { color: #F8F8F2 } /* Generic.Traceback */
+.codehilite .kc { color: #66D9EF } /* Keyword.Constant */
+.codehilite .kd { color: #66D9EF } /* Keyword.Declaration */
+.codehilite .kn { color: #FF4689 } /* Keyword.Namespace */
+.codehilite .kp { color: #66D9EF } /* Keyword.Pseudo */
+.codehilite .kr { color: #66D9EF } /* Keyword.Reserved */
+.codehilite .kt { color: #66D9EF } /* Keyword.Type */
+.codehilite .ld { color: #E6DB74 } /* Literal.Date */
+.codehilite .m { color: #AE81FF } /* Literal.Number */
+.codehilite .s { color: #E6DB74 } /* Literal.String */
+.codehilite .na { color: #A6E22E } /* Name.Attribute */
+.codehilite .nb { color: #F8F8F2 } /* Name.Builtin */
+.codehilite .nc { color: #A6E22E } /* Name.Class */
+.codehilite .no { color: #66D9EF } /* Name.Constant */
+.codehilite .nd { color: #A6E22E } /* Name.Decorator */
+.codehilite .ni { color: #F8F8F2 } /* Name.Entity */
+.codehilite .ne { color: #A6E22E } /* Name.Exception */
+.codehilite .nf { color: #A6E22E } /* Name.Function */
+.codehilite .nl { color: #F8F8F2 } /* Name.Label */
+.codehilite .nn { color: #F8F8F2 } /* Name.Namespace */
+.codehilite .nx { color: #A6E22E } /* Name.Other */
+.codehilite .py { color: #F8F8F2 } /* Name.Property */
+.codehilite .nt { color: #FF4689 } /* Name.Tag */
+.codehilite .nv { color: #F8F8F2 } /* Name.Variable */
+.codehilite .ow { color: #FF4689 } /* Operator.Word */
+.codehilite .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.codehilite .w { color: #F8F8F2 } /* Text.Whitespace */
+.codehilite .mb { color: #AE81FF } /* Literal.Number.Bin */
+.codehilite .mf { color: #AE81FF } /* Literal.Number.Float */
+.codehilite .mh { color: #AE81FF } /* Literal.Number.Hex */
+.codehilite .mi { color: #AE81FF } /* Literal.Number.Integer */
+.codehilite .mo { color: #AE81FF } /* Literal.Number.Oct */
+.codehilite .sa { color: #E6DB74 } /* Literal.String.Affix */
+.codehilite .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.codehilite .sc { color: #E6DB74 } /* Literal.String.Char */
+.codehilite .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #E6DB74 } /* Literal.String.Doc */
+.codehilite .s2 { color: #E6DB74 } /* Literal.String.Double */
+.codehilite .se { color: #AE81FF } /* Literal.String.Escape */
+.codehilite .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.codehilite .si { color: #E6DB74 } /* Literal.String.Interpol */
+.codehilite .sx { color: #E6DB74 } /* Literal.String.Other */
+.codehilite .sr { color: #E6DB74 } /* Literal.String.Regex */
+.codehilite .s1 { color: #E6DB74 } /* Literal.String.Single */
+.codehilite .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.codehilite .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #A6E22E } /* Name.Function.Magic */
+.codehilite .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.codehilite .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.codehilite .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.codehilite .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.codehilite .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+
+    .codehilite {
+      background-color: var(--color-neutral);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      color: var(--color-neutral-content);
+      font-family: "IBM Plex Mono", monospace;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+
+    .codehilite pre {
+      margin: 0;
+      background: transparent;
+      font-family: inherit;
+      font-size: inherit;
+      border: none;
+      padding: 0;
+      box-shadow: none;
+      overflow-x: auto;
+    }
+
+    .codehilite__chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      gap: 1rem;
+    }
+
+    .codehilite__language {
+      white-space: nowrap;
+    }
+
+    .codehilite__copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      color: var(--color-neutral-content);
+      font-family: inherit;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 0.2rem 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .codehilite__copy:hover,
+    .codehilite__copy:focus-visible {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .codehilite__copy[data-state="copied"] {
+      background: var(--color-accent);
+      color: var(--color-accent-content);
+      border-color: transparent;
+    }
+
+    .codehilite__copy-icon {
+      width: 0.85rem;
+      height: 0.85rem;
+      display: block;
+    }
+
+    .svg-inline--fa {
+      display: inline;
+	}
+  </style>
+</head>
+<body class="doc-page">
+  <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
+
+  <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-base-200 bg-base-100/80 backdrop-blur supports-[backdrop-filter]:bg-base-100/60">
+    <div class="layout-shell layout-shell--docs flex w-full items-center justify-between px-4 py-4 md:px-8">
+      <a href="index.html" class="group flex items-center gap-3 font-mono text-lg font-bold uppercase tracking-[0.35em] text-base-content">
+        <span class="flex h-9 w-9 items-center justify-center transition-transform duration-300 group-hover:rotate-45">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" />
+          </svg>
+        </span>
+        df12
+      </a>
+      <nav aria-label="Primary navigation" class="hidden items-center gap-8 md:flex">
+        <a href="index.html#systems" class="nav-link hit-target">Tools</a>
+        <a href="index.html#worlds" class="nav-link hit-target" data-variant="accent">Creative</a>
+        <a href="docs.html" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
+      </nav>
+      <div class="md:hidden">
+        <details class="dropdown dropdown-end">
+          <summary class="btn btn-ghost btn-sm font-mono uppercase tracking-[0.3em]">Menu</summary>
+          <ul class="menu dropdown-content menu-sm z-[1] mt-2 w-44 rounded-box bg-base-100 p-2 shadow">
+            <li><a href="index.html#systems" class="nav-link hit-target w-full justify-start">Tools</a></li>
+            <li><a href="index.html#worlds" class="nav-link hit-target w-full justify-start" data-variant="accent">Creative</a></li>
+            <li><a href="docs.html" class="nav-link hit-target w-full justify-start" data-variant="neutral" aria-current="page">Docs</a></li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="px-4 pb-24 pt-32">
+    <div class="layout-shell layout-shell--docs doc-grid">
+      <aside class="doc-sidebar" aria-label="Documentation navigation">
+        <div class="doc-sidebar__panel">
+          <a href="docs.html" class="doc-sidebar__back">
+            <iconify-icon icon="carbon:arrow-left" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+            Back to docs
+          </a>
+          <div>
+            <p class="doc-sidebar__eyebrow">Falcon Pachinko</p>
+            <p class="doc-sidebar__body">Falcon extension that adds structured WebSocket routing, msgspec-based payload schemas, and background worker orchestration so ASGI apps can manage rooms, broadcast events, and monitor connections with minimal boilerplate.
+</p>
+          </div>
+          <div class="doc-sidebar__groups">
+              <div class="doc-nav-group" aria-label="Introduction">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-introduction.html">Introduction</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Literature Survey and Existing Solutions">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html">Literature Survey and Existing Solutions</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-1-falcon-s-native-websocket-capabilities"
+                           class="doc-nav__link "
+>
+                          <span>2.1. Falcon's Native WebSocket Capabilities</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-2-starlette"
+                           class="doc-nav__link "
+>
+                          <span>2.2. Starlette</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-3-django-channels"
+                           class="doc-nav__link "
+>
+                          <span>2.3. Django Channels</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-4-fastapi"
+                           class="doc-nav__link "
+>
+                          <span>2.4. FastAPI</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-5-websockets-library"
+                           class="doc-nav__link "
+>
+                          <span>2.5. `websockets` Library</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-6-gap-analysis-and-opportunity"
+                           class="doc-nav__link "
+>
+                          <span>2.6. Gap Analysis and Opportunity</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html">Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-1-core-principles"
+                           class="doc-nav__link "
+>
+                          <span>3.1. Core Principles</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-2-key-components"
+                           class="doc-nav__link "
+>
+                          <span>3.2. Key Components</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-3-application-integration"
+                           class="doc-nav__link "
+>
+                          <span>3.3. Application Integration</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-4-routing-websocket-connections"
+                           class="doc-nav__link "
+>
+                          <span>3.4. Routing WebSocket Connections</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-5-the-websocketresource-class"
+                           class="doc-nav__link "
+>
+                          <span>3.5. The `WebSocketResource` Class</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-6-message-handling-and-dispatch"
+                           class="doc-nav__link "
+>
+                          <span>3.6. Message Handling and Dispatch</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-7-websocketconnectionmanager"
+                           class="doc-nav__link "
+>
+                          <span>3.7. `WebSocketConnectionManager`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-8-background-worker-integration-via-asgi-lifespan"
+                           class="doc-nav__link "
+>
+                          <span>3.8. Background Worker Integration via ASGI Lifespan</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-9-api-overview"
+                           class="doc-nav__link "
+>
+                          <span>3.9. API Overview</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Illustrative Usecase: Real-time Chat Application">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html">Illustrative Usecase: Real-time Chat Application</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-1-scenario-overview"
+                           class="doc-nav__link "
+>
+                          <span>4.1. Scenario Overview</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-2-defining-the-chat-websocket-resource"
+                           class="doc-nav__link "
+>
+                          <span>4.2. Defining the Chat WebSocket Resource</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-3-routing-and-application-setup"
+                           class="doc-nav__link "
+>
+                          <span>4.3. Routing and Application Setup</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-4-client-side-interaction-conceptual"
+                           class="doc-nav__link "
+>
+                          <span>4.4. Client-Side Interaction (Conceptual)</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Advanced Proposal: Composable and Schema-Driven WebSocket Routing">
+                <h3 class="doc-nav-group__title is-active" aria-current="page">
+                  <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html">Advanced Proposal: Composable and Schema-Driven WebSocket Routing</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-1-the-websocketrouter-as-a-composable-falcon-resource"
+                           class="doc-nav__link "
+>
+                          <span>5.1. The `WebSocketRouter` as a Composable Falcon Resource</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-2-composable-architecture-nested-resources"
+                           class="doc-nav__link "
+>
+                          <span>5.2. Composable Architecture: Nested Resources</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-3-high-performance-schema-driven-dispatch-with-msgspec"
+                           class="doc-nav__link "
+>
+                          <span>5.3. High-Performance Schema-Driven Dispatch with `msgspec`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-4-a-multi-tiered-middleware-and-hook-system"
+                           class="doc-nav__link "
+>
+                          <span>5.4. A Multi-Tiered Middleware and Hook System</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-5-architectural-implications"
+                           class="doc-nav__link "
+>
+                          <span>5.5. Architectural Implications</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Future Considerations and Potential Enhancements">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html">Future Considerations and Potential Enhancements</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-1-advanced-subprotocol-handling"
+                           class="doc-nav__link "
+>
+                          <span>6.1. Advanced Subprotocol Handling</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-2-compression-extensions"
+                           class="doc-nav__link "
+>
+                          <span>6.2. Compression Extensions</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-3-enhanced-connection-grouping-and-targeting"
+                           class="doc-nav__link "
+>
+                          <span>6.3. Enhanced Connection Grouping and Targeting</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-4-scalability-for-distributed-systems"
+                           class="doc-nav__link "
+>
+                          <span>6.4. Scalability for Distributed Systems</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-5-testing-utilities"
+                           class="doc-nav__link "
+>
+                          <span>6.5. Testing Utilities</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-6-automatic-asyncapi-documentation-generation-ambitious"
+                           class="doc-nav__link "
+>
+                          <span>6.6. Automatic AsyncAPI Documentation Generation (Ambitious)</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Conclusion">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-conclusion.html">Conclusion</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-1-summary-of-the-proposed-design"
+                           class="doc-nav__link "
+>
+                          <span>7.1. Summary of the Proposed Design</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-2-benefits-and-advantages"
+                           class="doc-nav__link "
+>
+                          <span>7.2. Benefits and Advantages</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-3-meeting-user-requirements"
+                           class="doc-nav__link "
+>
+                          <span>7.3. Meeting User Requirements</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-4-final-thoughts"
+                           class="doc-nav__link "
+>
+                          <span>7.4. Final Thoughts</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+          <div>
+            <p class="doc-sidebar__section-label">Source</p>
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/falcon-pachinko/refs/heads/main/docs/falcon-websocket-extension-design.md" target="_blank" rel="noopener">
+              View markdown
+              <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
+            </a>
+            <p class="mt-1 text-xs text-base-content/60">Source material</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="space-y-6" id="advanced-proposal-composable-and-schema-driven-websocket-routing">
+        <nav class="doc-mobile-nav" aria-labelledby="mobile-sections-label">
+          <p id="mobile-sections-label" class="doc-sidebar__section-label">Contents</p>
+          <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Introduction</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-introduction.html" class="doc-nav__link">Introduction</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Literature Survey and Existing Solutions</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html" class="doc-nav__link">Literature Survey and Existing Solutions</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-1-falcon-s-native-websocket-capabilities" class="doc-nav__link">2.1. Falcon's Native WebSocket Capabilities</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-2-starlette" class="doc-nav__link">2.2. Starlette</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-3-django-channels" class="doc-nav__link">2.3. Django Channels</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-4-fastapi" class="doc-nav__link">2.4. FastAPI</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-5-websockets-library" class="doc-nav__link">2.5. `websockets` Library</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-6-gap-analysis-and-opportunity" class="doc-nav__link">2.6. Gap Analysis and Opportunity</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html" class="doc-nav__link">Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-1-core-principles" class="doc-nav__link">3.1. Core Principles</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-2-key-components" class="doc-nav__link">3.2. Key Components</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-3-application-integration" class="doc-nav__link">3.3. Application Integration</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-4-routing-websocket-connections" class="doc-nav__link">3.4. Routing WebSocket Connections</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-5-the-websocketresource-class" class="doc-nav__link">3.5. The `WebSocketResource` Class</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-6-message-handling-and-dispatch" class="doc-nav__link">3.6. Message Handling and Dispatch</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-7-websocketconnectionmanager" class="doc-nav__link">3.7. `WebSocketConnectionManager`</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-8-background-worker-integration-via-asgi-lifespan" class="doc-nav__link">3.8. Background Worker Integration via ASGI Lifespan</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-9-api-overview" class="doc-nav__link">3.9. API Overview</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Illustrative Usecase: Real-time Chat Application</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html" class="doc-nav__link">Illustrative Usecase: Real-time Chat Application</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-1-scenario-overview" class="doc-nav__link">4.1. Scenario Overview</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-2-defining-the-chat-websocket-resource" class="doc-nav__link">4.2. Defining the Chat WebSocket Resource</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-3-routing-and-application-setup" class="doc-nav__link">4.3. Routing and Application Setup</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-4-client-side-interaction-conceptual" class="doc-nav__link">4.4. Client-Side Interaction (Conceptual)</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Advanced Proposal: Composable and Schema-Driven WebSocket Routing</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html" class="doc-nav__link">Advanced Proposal: Composable and Schema-Driven WebSocket Routing</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-1-the-websocketrouter-as-a-composable-falcon-resource" class="doc-nav__link">5.1. The `WebSocketRouter` as a Composable Falcon Resource</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-2-composable-architecture-nested-resources" class="doc-nav__link">5.2. Composable Architecture: Nested Resources</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-3-high-performance-schema-driven-dispatch-with-msgspec" class="doc-nav__link">5.3. High-Performance Schema-Driven Dispatch with `msgspec`</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-4-a-multi-tiered-middleware-and-hook-system" class="doc-nav__link">5.4. A Multi-Tiered Middleware and Hook System</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-5-architectural-implications" class="doc-nav__link">5.5. Architectural Implications</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Future Considerations and Potential Enhancements</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html" class="doc-nav__link">Future Considerations and Potential Enhancements</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-1-advanced-subprotocol-handling" class="doc-nav__link">6.1. Advanced Subprotocol Handling</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-2-compression-extensions" class="doc-nav__link">6.2. Compression Extensions</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-3-enhanced-connection-grouping-and-targeting" class="doc-nav__link">6.3. Enhanced Connection Grouping and Targeting</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-4-scalability-for-distributed-systems" class="doc-nav__link">6.4. Scalability for Distributed Systems</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-5-testing-utilities" class="doc-nav__link">6.5. Testing Utilities</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-6-automatic-asyncapi-documentation-generation-ambitious" class="doc-nav__link">6.6. Automatic AsyncAPI Documentation Generation (Ambitious)</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Conclusion</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html" class="doc-nav__link">Conclusion</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-1-summary-of-the-proposed-design" class="doc-nav__link">7.1. Summary of the Proposed Design</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-2-benefits-and-advantages" class="doc-nav__link">7.2. Benefits and Advantages</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-3-meeting-user-requirements" class="doc-nav__link">7.3. Meeting User Requirements</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-4-final-thoughts" class="doc-nav__link">7.4. Final Thoughts</a>
+                    </li>
+                </ul>
+              </li>
+          </ul>
+        </nav>
+
+        <header class="doc-hero" id="doc-title">
+          <h1 class="doc-hero__title">Advanced Proposal: Composable and Schema-Driven WebSocket Routing</h1>
+          <div class="doc-meta-list">
+            <span class="doc-meta-list__item">Updated Oct 31, 2025</span>
+          </div>
+        </header>
+
+        <article class="doc-article">
+              <section class="doc-section">
+                <div class="doc-prose"><p>Building upon the foundational concepts outlined above, this section details a
+more advanced, composable architecture for WebSocket handling. This evolved
+design introduces a dedicated <code>WebSocketRouter</code>, support for nested resources,
+and a high-performance, schema-driven message dispatch mechanism. Its primary
+goal is to achieve true ergonomic parity with Falcon's acclaimed HTTP routing
+while enabling highly structured, maintainable, and performant real-time
+applications.</p>
+<p>The following diagram provides a high-level overview of the main classes and
+their relationships within this advanced proposal.</p>
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>classDiagram
+    class App {
+        +add_route(path, resource)
+    }
+    class WebSocketRouter {
+        &lt;&lt;Falcon Resource&gt;&gt;
+        +on_websocket(req, ws)
+        +add_route(path, resource_cls, *args, **kwargs)
+        +url_for(name, **params)
+    }
+    class WebSocketResource {
+        +schema: TaggedUnion
+        +state: dict
+        +on_&lt;tag&gt;()
+        +on_unhandled()
+        +on_connect()
+        +on_disconnect()
+    }
+    class TaggedUnion {
+        &lt;&lt;msgspec tagged union&gt;&gt;
+    }
+    App &quot;1&quot; --o &quot;*&quot; WebSocketRouter : mounts
+    WebSocketRouter &quot;1&quot; --o &quot;*&quot; WebSocketResource : routes
+    WebSocketResource ..&gt; TaggedUnion : uses for schema
+</code></pre></div></div>
+              </section>
+                <section id="advanced-proposal-composable-and-schema-driven-websocket-routing-5-1-the-websocketrouter-as-a-composable-falcon-resource" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>5.1. The `WebSocketRouter` as a Composable Falcon Resource</h2>
+                  </div>
+                  <div class="doc-prose"><p>To provide a cleaner separation of concerns and a more powerful, composable
+API, this proposal treats the <code>WebSocketRouter</code> as a standard Falcon resource.
+This allows routers to be mounted on the main application, enabling the
+creation of modular, hierarchical WebSocket APIs.</p>
+<h4>5.1.1. Mounting the Router</h4>
+<p>Instead of assigning a router to a special application attribute, it is mounted
+at a URL prefix using Falcon's standard <code>app.add_route()</code> method. This makes
+the <code>WebSocketRouter</code> a first-class citizen in Falcon's routing tree.</p>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">falcon.asgi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">falcon_pachinko.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocketRouter</span> <span class="c1"># New component</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">falcon</span><span class="o">.</span><span class="n">asgi</span><span class="o">.</span><span class="n">App</span><span class="p">()</span>
+<span class="n">chat_router</span> <span class="o">=</span> <span class="n">WebSocketRouter</span><span class="p">()</span>
+
+<span class="c1"># The WebSocketRouter instance is mounted like any other Falcon resource.</span>
+<span class="c1"># It will handle all WebSocket connections under the &#39;/ws/chat/&#39; prefix.</span>
+<span class="n">app</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;/ws/chat&#39;</span><span class="p">,</span> <span class="n">chat_router</span><span class="p">)</span>
+
+<span class="c1"># To achieve this, the WebSocketRouter will implement the on_websocket</span>
+<span class="c1"># responder method, which will contain the logic to dispatch the connection</span>
+<span class="c1"># to the correct sub-route defined on the router itself.</span>
+</code></pre></div>
+
+<p>This creates a clean architectural boundary and leverages Falcon's existing,
+well-understood routing mechanism for composition.</p>
+<h4>5.1.2. <code>add_route</code> API, Factories, and URL Reversal</h4>
+<p>The <code>WebSocketRouter</code> features its own <code>add_route()</code> method for defining
+sub-routes. These paths are <em>relative</em> to the router's mount point.</p>
+<ul>
+<li>
+<p><strong>Resource Factories</strong>: To mirror Falcon's flexibility, <code>add_route</code> will
+  accept not only <code>WebSocketResource</code> subclasses but also <strong>callable
+  factories</strong>. A factory is any callable that accepts the same arguments as a
+  resource's constructor and returns a resource instance. This keeps the
+  barrier to entry low for simple, functional use cases.</p>
+</li>
+<li>
+<p><strong>Resource Initialization</strong>: The method accepts <code>*args</code> and <code>**kwargs</code> to be
+  passed to the resource's constructor (or factory), allowing for
+  route-specific configuration.</p>
+</li>
+<li>
+<p><strong>URL Reversal</strong>: To discourage hard-coding paths, the router will provide a
+  <code>url_for(name, **params)</code> helper to generate URLs for its routes, similar to
+  other modern web frameworks.</p>
+</li>
+</ul>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="c1"># Continuing the previous example:</span>
+<span class="n">chat_router</span> <span class="o">=</span> <span class="n">WebSocketRouter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;chat&#39;</span><span class="p">)</span> <span class="c1"># Give the router a name for reversal</span>
+
+<span class="c1"># Add a route to the router, giving it a name for url_for.</span>
+<span class="n">chat_router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span>
+    <span class="s1">&#39;/</span><span class="si">{room_id}</span><span class="s1">&#39;</span><span class="p">,</span> 
+    <span class="n">ChatResource</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;room&#39;</span><span class="p">,</span>
+    <span class="n">init_args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;history_size&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;/ws/chat&#39;</span><span class="p">,</span> <span class="n">chat_router</span><span class="p">)</span>
+
+<span class="c1"># Generate a URL:</span>
+<span class="c1"># url = app.url_for(&#39;chat:room&#39;, room_id=&#39;general&#39;) # Hypothetical top-level reversal</span>
+<span class="c1"># -&gt; &#39;/ws/chat/general&#39;</span>
+</code></pre></div>
+
+<p>The router is responsible for matching the incoming connection URI against its
+registered routes, parsing any path parameters (like <code>{room_id}</code>),
+instantiating the correct <code>WebSocketResource</code> with its specific initialization
+arguments, and handing off control of the connection.</p>
+<h4>5.1.3. Router Flow and Structure</h4>
+<p>The diagrams below illustrate the flow of a WebSocket connection through the
+router and the relationships between the main classes.</p>
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>sequenceDiagram
+    participant Client
+    participant FalconApp
+    participant WebSocketRouter
+    participant WebSocketResource
+
+    Client-&gt;&gt;FalconApp: Initiate WebSocket connection (URL)
+    FalconApp-&gt;&gt;WebSocketRouter: on_websocket(req, ws)
+    WebSocketRouter-&gt;&gt;WebSocketRouter: Match URL to route
+    WebSocketRouter-&gt;&gt;WebSocketResource: Instantiate resource
+    WebSocketRouter-&gt;&gt;WebSocketResource: on_connect(req, ws, **params)
+    alt on_connect returns False
+        WebSocketRouter-&gt;&gt;Client: Close WebSocket
+    else on_connect returns True
+        WebSocketRouter-&gt;&gt;Client: Accept WebSocket
+    end
+</code></pre></div>
+
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>erDiagram
+    WEBSOCKETROUTER ||--o{ ROUTE : registers
+    ROUTE {
+        string path
+        regex pattern
+        callable factory
+    }
+    WEBSOCKETROUTER {
+        string name
+        dict names
+    }
+    ROUTE }o--|| WEBSOCKETRESOURCE : instantiates
+    WEBSOCKETRESOURCE {
+        method on_connect
+    }
+</code></pre></div>
+
+<!-- markdownlint-disable MD013 -->
+
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>classDiagram
+    class WebSocketRouter {
+        - _routes: list[tuple[str, re.Pattern[str], Callable[..., WebSocketResource]]]
+        - _names: dict[str, str]
+        - name: str | None
+        + __init__(name: str | None = None)
+        + add_route(path: str, resource: type[WebSocketResource] | Callable[..., WebSocketResource], name: str | None = None, args: tuple = (), kwargs: dict | None = None)
+        + url_for(name: str, **params: object) str
+        + on_websocket(req: falcon.Request, ws: WebSocketLike)
+    }
+    class WebSocketResource {
+        + on_connect(req: falcon.Request, ws: WebSocketLike, **params)
+    }
+    class WebSocketLike
+    class falcon.Request
+
+    WebSocketRouter --&gt; WebSocketResource : creates
+    WebSocketRouter ..&gt; WebSocketLike : uses
+    WebSocketRouter ..&gt; falcon.Request : uses
+    WebSocketResource ..&gt; WebSocketLike : uses
+    WebSocketResource ..&gt; falcon.Request : uses
+</code></pre></div>
+
+<!-- markdownlint-enable MD013 --></div>
+                </section>
+                <section id="advanced-proposal-composable-and-schema-driven-websocket-routing-5-2-composable-architecture-nested-resources" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>5.2. Composable Architecture: Nested Resources</h2>
+                  </div>
+                  <div class="doc-prose"><p>To facilitate the creation of modular and hierarchical applications, this
+design introduces the concept of nested resources via an <code>add_subroute</code> method
+on a resource instance. This allows developers to organize complex, related
+functionality into distinct, reusable classes.</p>
+<h4>5.2.1. The <code>add_subroute</code> Mechanism</h4>
+<p>A parent resource can mount a sub-resource at a relative path, promoting a
+logical code hierarchy.</p>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="c1"># --- In project_resource.py ---</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProjectResource</span><span class="p">(</span><span class="n">WebSocketResource</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">ws</span><span class="p">)</span>
+        <span class="c1"># ... project-specific setup using project_id ...</span>
+
+        <span class="c1"># Mount sub-resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subroute</span><span class="p">(</span><span class="s1">&#39;tasks&#39;</span><span class="p">,</span> <span class="n">TasksResource</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subroute</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">,</span> <span class="n">FilesResource</span><span class="p">)</span>
+
+<span class="c1"># --- In the main application ---</span>
+<span class="c1"># This assumes a router is already defined.</span>
+<span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span><span class="s1">&#39;/projects/</span><span class="si">{project_id}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ProjectResource</span><span class="p">)</span>
+
+<span class="c1"># A connection to &quot;ws://.../projects/123/tasks&quot; would be handled</span>
+<span class="c1"># by an instance of TasksResource, with the context of project &quot;123&quot;.</span>
+</code></pre></div>
+
+<h4>5.2.2. Path Composition and State Management</h4>
+<p>The <code>WebSocketRouter</code> must resolve these composite paths. A trie (prefix tree)
+is the natural data structure for this task. When resolving a path like
+<code>/projects/123/tasks</code>, the router would first match <code>/projects/{project_id}</code>
+and instantiate <code>ProjectResource</code>, passing it the <code>project_id</code>. The
+<code>ProjectResource</code> constructor would then call <code>add_subroute</code>, registering
+<code>TasksResource</code>. The router would then match the <code>tasks</code> segment and
+instantiate <code>TasksResource</code>.</p>
+<p>A critical aspect is <strong>context passing</strong>. The router must facilitate passing
+state from parent to child. A robust implementation would involve the router
+instantiating the entire resource chain, allowing parent resources to pass
+relevant state (or <code>self</code>) into the constructors of their children.</p>
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>sequenceDiagram
+    participant Client
+    participant FalconRequest as Falcon Request
+    participant WebSocketRouter
+    participant ResourceFactory
+
+    Client-&gt;&gt;FalconRequest: Initiates WebSocket request
+    FalconRequest-&gt;&gt;WebSocketRouter: on_websocket(req, ws)
+    WebSocketRouter-&gt;&gt;WebSocketRouter: Check req.path_template == _mount_prefix
+    WebSocketRouter-&gt;&gt;WebSocketRouter: Match full request path against compiled routes
+    alt Match found
+        WebSocketRouter-&gt;&gt;ResourceFactory: Instantiate resource
+        ResourceFactory--&gt;&gt;WebSocketRouter: Resource instance
+        WebSocketRouter-&gt;&gt;ResourceFactory: Call resource handler
+    else No match
+        WebSocketRouter-&gt;&gt;FalconRequest: Raise 404
+    end
+</code></pre></div>
+
+<h4>5.2.3. Context-Passing for Nested Resources</h4>
+<p>Explicit context handoff keeps nested resources predictable and mirrors
+Falcon's philosophy of avoiding hidden state. Each parent resource controls
+what data flows to its children, allowing shared state without resorting to
+globals.</p>
+<ol>
+<li><strong>Per-resource context provider</strong></li>
+</ol>
+<p>Add an overridable <code>get_child_context()</code> method to <code>WebSocketResource</code>. The
+   router calls this hook after instantiating the parent to obtain keyword
+   arguments for the next child. The default implementation returns <code>{}</code>, so
+   resources opt in to sharing.</p>
+<div class="codehilite" data-language="python"><pre><span></span><code>   <span class="k">def</span><span class="w"> </span><span class="nf">get_child_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">       </span><span class="sd">&quot;&quot;&quot;Return kwargs to be forwarded to the immediate child resource.&quot;&quot;&quot;</span>
+       <span class="k">return</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>A concrete signature signals that callers can rely on a plain dict and keeps
+   the hook symmetric with Falcon's HTTP-style <code>get_child_scope()</code> patterns.</p>
+<ol start="2">
+<li><strong>Shared state object</strong></li>
+</ol>
+<p>Pass the same connection-scoped <code>state</code> proxy down the chain. The router
+   sets <code>child.state = parent.state</code> unless the parent supplies an alternative
+   via <code>get_child_context()</code>.</p>
+<ol start="3">
+<li><strong>Router chain instantiation</strong></li>
+</ol>
+<p>For each path segment the router will:</p>
+<ul>
+<li>Instantiate the parent with path parameters and static init args.</li>
+<li>Invoke <code>get_child_context()</code> to obtain context for the child.</li>
+<li>Instantiate the child, merging path params with the context
+     kwargs.</li>
+<li>Propagate the shared <code>state</code> proxy.</li>
+</ul>
+<ol start="4">
+<li><strong>Convenience API</strong></li>
+</ol>
+<p><code>add_subroute()</code> records the child factory along with any static
+   positional/keyword args and retains a reference to the parent. This enables
+   the router to look up subroutes while composing the resource chain.</p>
+<ol start="5">
+<li><strong>Testing and docs</strong></li>
+</ol>
+<p>Provide examples where a parent loads a <code>project</code> object and injects it into
+   <code>TasksResource</code>, verifying that the child receives the object and both
+   modify the shared <code>state</code>.</p>
+<p>The relationships and runtime behavior are illustrated below.</p>
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>   classDiagram
+       class WebSocketResource {
+           +get_child_context() kwargs
+           state
+       }
+       class WebSocketRouter {
+           +instantiate_resource_chain(path_segments, path_params, static_args)
+           +add_subroute(child_factory, *args, **kwargs)
+       }
+       WebSocketResource &lt;|-- ParentResource
+       WebSocketResource &lt;|-- ChildResource
+       WebSocketRouter o-- WebSocketResource : instantiates
+       ParentResource o-- ChildResource : add_subroute
+       ParentResource --&gt; ChildResource : get_child_context()
+       ParentResource --&gt; ChildResource : state (shared)
+</code></pre></div>
+
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>   sequenceDiagram
+       participant Router as WebSocketRouter
+       participant Parent as ParentResource
+       participant Child as ChildResource
+       Router-&gt;&gt;Parent: Instantiate with path params, static args
+       Router-&gt;&gt;Parent: get_child_context()
+       Parent--&gt;&gt;Router: context kwargs
+       Router-&gt;&gt;Child: Instantiate with path params + context kwargs
+       Router-&gt;&gt;Child: Set child.state = parent.state (unless overridden)
+</code></pre></div></div>
+                </section>
+                <section id="advanced-proposal-composable-and-schema-driven-websocket-routing-5-3-high-performance-schema-driven-dispatch-with-msgspec" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>5.3. High-Performance Schema-Driven Dispatch with `msgspec`</h2>
+                  </div>
+                  <div class="doc-prose"><p>This proposal elevates the dispatch mechanism using <code>msgspec</code> and its support
+for tagged unions. This moves from simple dispatch to a declarative,
+schema-driven approach.</p>
+<h4>5.3.1. Declaring Message Schemas</h4>
+<p>A resource defines its message schema using a <code>typ.Union</code> of <code>ms.Struct</code> types,
+where each <code>Struct</code> represents a distinct message.</p>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">msgspec</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ms</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">typ</span>
+
+<span class="c1"># Define individual message structures</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Join</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Struct</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;join&#39;</span><span class="p">):</span>
+    <span class="n">room</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SendMessage</span><span class="p">(</span><span class="n">ms</span><span class="o">.</span><span class="n">Struct</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s1">&#39;sendMessage&#39;</span><span class="p">):</span> <span class="c1"># Note CamelCase tag</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="c1"># Create a tagged union of all possible messages</span>
+<span class="n">MessageUnion</span> <span class="o">=</span> <span class="n">typ</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">Join</span><span class="p">,</span> <span class="n">SendMessage</span><span class="p">]</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatResource</span><span class="p">(</span><span class="n">WebSocketResource</span><span class="p">):</span>
+    <span class="c1"># Associate the schema with the resource</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="n">MessageUnion</span>
+
+    <span class="c1"># Handler by decorator (canonical) for tag=&#39;join&#39;</span>
+    <span class="nd">@handles_message</span><span class="p">(</span><span class="s1">&#39;join&#39;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="n">Join</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Joining room: </span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">room</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Handler by convention (convenience) for tag=&#39;sendMessage&#39;</span>
+    <span class="c1"># The framework converts &#39;sendMessage&#39; to &#39;on_send_message&#39;</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="n">SendMessage</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Message received: </span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h4>5.3.2. Automated Dispatch Logic</h4>
+<p>The base <code>WebSocketResource</code> would contain a receive loop that performs the
+following steps:</p>
+<ol>
+<li>
+<p>Receive a raw message from the WebSocket.</p>
+</li>
+<li>
+<p>Decode the message using <code>msgspec.json.decode(message, type=self.schema)</code>.
+   <code>msgspec</code>'s tagged union support automatically inspects a tag field in the
+   JSON to select the correct <code>Struct</code> for decoding.</p>
+</li>
+<li>
+<p>Inspect the <code>tag</code> of the resulting <code>Struct</code> instance.</p>
+</li>
+<li>
+<p>Find a handler registered with <code>@handles_message</code> for that tag. If not found,
+   attempt to find a handler by the <code>on_{tag}</code> naming convention.</p>
+</li>
+<li>
+<p>Dynamically invoke the handler, e.g.,
+   <code>await self.on_send_message(req, ws, msg)</code>.</p>
+</li>
+</ol>
+<p>This schema-driven design completely eliminates boilerplate dispatch logic and
+provides "zero-cost" validation via <code>msgspec</code>.</p>
+<h4>5.3.3. Error Handling</h4>
+<p>The framework must gracefully handle dispatch errors.</p>
+<ul>
+<li>
+<p>A <code>msgspec.ValidationError</code> raised during decoding should be caught, and a
+  customisable error hook should be invoked.</p>
+</li>
+<li>
+<p>If a message has a valid tag that does not correspond to any registered
+  handler, the <code>on_unhandled(self, req, ws, msg)</code> fallback method on the base
+  resource should be called.</p>
+</li>
+</ul></div>
+                </section>
+                <section id="advanced-proposal-composable-and-schema-driven-websocket-routing-5-4-a-multi-tiered-middleware-and-hook-system" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>5.4. A Multi-Tiered Middleware and Hook System</h2>
+                  </div>
+                  <div class="doc-prose"><p>To handle cross-cutting concerns like authentication, logging, and metrics, a
+flexible, multi-layered hook system is proposed.</p>
+<h4>5.4.1. Global and Per-Resource Hooks</h4>
+<ul>
+<li>
+<p><strong>Global Hooks:</strong> Registered on the <code>WebSocketRouter</code> (<code>router.global_hooks</code>),
+  these apply to every connection handled by that router. They are ideal for
+  universal concerns like authentication or establishing database connections.</p>
+</li>
+<li>
+<p><strong>Per-Resource Hooks:</strong> Registered on a <code>WebSocketResource</code> class
+  (<code>resource.hooks</code>), these apply only to that resource and any of its
+  sub-resources. This allows for specific logic, such as permissions checks for
+  a particular channel.</p>
+</li>
+</ul>
+<h4>5.4.2. Lifecycle Events and Execution Order</h4>
+<p>The hooks correspond to the WebSocket lifecycle: <code>before_connect</code>,
+<code>after_connect</code>, <code>before_receive</code>, <code>after_receive</code>, and <code>before_disconnect</code>.
+The execution order follows a layered, "onion-style" model for any given event,
+as illustrated below.</p>
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>flowchart TD
+    A[WebSocket Event] --&gt; B[Global Hook]
+    B --&gt; C[Resource Hook]
+    C --&gt; D[Handler Logic]
+    D --&gt; E[After Hooks]
+    E --&gt; F[Cleanup/Error Handling]
+</code></pre></div>
+
+<p>The specific sequence is as follows:</p>
+<ol>
+<li>
+<p>Global <code>before_*</code> hook(s)</p>
+</li>
+<li>
+<p>Parent Resource <code>before_*</code> hook(s) (if nested)</p>
+</li>
+<li>
+<p>Resource-specific <code>before_*</code> hook(s)</p>
+</li>
+<li>
+<p>The core handler logic (e.g., <code>on_connect</code> or an <code>on_&lt;tag&gt;</code> message handler)</p>
+</li>
+<li>
+<p>Resource-specific <code>after_*</code> hook(s)</p>
+</li>
+<li>
+<p>Parent Resource <code>after_*</code> hook(s) (if nested)</p>
+</li>
+<li>
+<p>Global <code>after_*</code> hook(s)</p>
+</li>
+</ol>
+<p>This provides maximum control, allowing outer layers to act as setup/teardown
+guards for inner layers. An exception in a <code>before_*</code> hook should terminate the
+connection attempt immediately.</p></div>
+                </section>
+                <section id="advanced-proposal-composable-and-schema-driven-websocket-routing-5-5-architectural-implications" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>5.5. Architectural Implications</h2>
+                  </div>
+                  <div class="doc-prose"><h4>5.5.1. Stateful Per-Connection Resources and Dependency Injection</h4>
+<p>This design solidifies the paradigm of a <strong>stateful, per-connection resource
+instance</strong>, a shift from Falcon's traditional stateless HTTP model. The
+resource instance itself becomes the container for connection-specific state.
+This raises a critical architectural question: how do these ephemeral resource
+instances get access to long-lived, shared services (like database connection
+pools)?</p>
+<p>To keep the solution Falcon-idiomatic and testable, we adopt an explicit
+<strong>router-level resource factory</strong> strategy. Rather than hiding DI concerns
+behind global registries or magical decorators, the router gains an optional
+<code>resource_factory</code> callable that participates in every instantiation.</p>
+<h5>Problem Statement and Goals</h5>
+<p><code>WebSocketResource</code> instances are short-lived by design—they exist for the
+duration of a single connection. They frequently require access to long-lived
+services (database pools, metrics clients, configuration providers) that should
+be created once per process. The DI approach must therefore:</p>
+<ul>
+<li>Make dependencies explicit at the resource boundary.</li>
+<li>Allow the application to decide how shared services are created and reused.</li>
+<li>Support simple manual factories as well as full-featured DI containers.</li>
+<li>Remain easy to override in tests by providing alternate factories.</li>
+</ul>
+<h5>Router-Level Resource Factory</h5>
+<p><code>WebSocketRouter.__init__</code> accepts an optional <code>resource_factory</code> argument.
+When omitted, the router preserves the current behaviour—calling the per-route
+factory captured by <code>add_route()</code> with no extra indirection. When provided, the
+callable receives that per-route factory (typically a <code>functools.partial</code>
+wrapping the resource class and static <code>init_args</code>) and returns a fully
+constructed <code>WebSocketResource</code> instance. This indirection allows the
+application to inspect the resource signature, resolve dependencies from a DI
+container, merge them with static route configuration, and return the
+constructed instance. The public :class:<code>ResourceFactory</code> type alias documents
+the expected call signature for these factories so applications can annotate
+their DI hooks consistently.</p>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">falcon_pachinko.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceFactory</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WebSocketRouter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">resource_factory</span><span class="p">:</span> <span class="n">ResourceFactory</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">...</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resource_factory</span> <span class="o">=</span> <span class="n">resource_factory</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">factory</span><span class="p">:</span> <span class="n">factory</span><span class="p">())</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_instantiate_resource</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">route_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">WebSocketResource</span><span class="p">],</span>
+        <span class="n">ws</span><span class="p">:</span> <span class="n">WebSocketLike</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WebSocketResource</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_factory</span><span class="p">(</span><span class="n">route_factory</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">ws</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">exc</span><span class="o">.</span><span class="n">_pachinko_factory_closed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">raise</span>
+</code></pre></div>
+
+<h5>Example Container Integration</h5>
+<p>Applications can wire a custom container by passing the resolver to the router.
+The library ships with a small helper, <code>falcon_pachinko.di.ServiceContainer</code>,
+that demonstrates one possible integration:</p>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">falcon_pachinko.di</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceContainer</span>
+
+<span class="n">container</span> <span class="o">=</span> <span class="n">ServiceContainer</span><span class="p">()</span>
+<span class="n">router</span> <span class="o">=</span> <span class="n">WebSocketRouter</span><span class="p">(</span><span class="n">resource_factory</span><span class="o">=</span><span class="n">container</span><span class="o">.</span><span class="n">create_resource</span><span class="p">)</span>
+
+<span class="n">router</span><span class="o">.</span><span class="n">add_route</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{room_id}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">ChatResource</span><span class="p">,</span>
+    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;history_size&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p><code>ServiceContainer.create_resource()</code> receives the partial generated by
+<code>add_route()</code>, inspects the target class, and injects dependencies (for example
+<code>db</code> or <code>analytics</code> attributes on the container) before instantiating the
+resource. Internally the helper caches each computed <code>inspect.Signature</code> in the
+private <code>_signature_cache</code> mapping so repeated instantiation does not redo
+reflection. Should a dependency be missing, <code>ServiceContainer.resolve()</code> raises
+<code>ServiceNotFoundError</code> (a <code>LookupError</code> subclass) to make failures
+explicit. Because the router delegates instantiation, unit tests can supply a
+lightweight factory that injects mocks, while production code can reuse
+existing DI infrastructure.</p>
+<h5>Component Relationships</h5>
+<p>The following class diagram illustrates how the sample <code>ServiceContainer</code>
+coordinates dependency injection for both HTTP and WebSocket endpoints in the
+random status example:</p>
+<div class="codehilite" data-language="mermaid"><pre><span></span><code>classDiagram
+    class ServiceContainer {
+        -_services: dict[str, object]
+        +register(name: str, value: object)
+        +resolve(name: str) -&gt; object
+        +create_resource(route_factory: Callable[..., WebSocketResource]) -&gt; WebSocketResource
+    }
+    class StatusResource {
+        -_conn_mgr: WebSocketConnectionManager
+        -_db: aiosqlite.Connection
+        -_conn_id: str | None
+        +__init__(conn_mgr: WebSocketConnectionManager, db: aiosqlite.Connection)
+        +on_connect(ws: WebSocketLike)
+        +on_disconnect(ws: WebSocketLike, close_code: int)
+        +update_status(ws: WebSocketLike, payload: StatusPayload)
+    }
+    class StatusEndpoint {
+        -_container: ServiceContainer
+        +__init__(container: ServiceContainer)
+        +on_get(req: falcon.Request, resp: falcon.Response)
+    }
+    ServiceContainer --&gt; StatusEndpoint : provides dependencies
+    ServiceContainer --&gt; StatusResource : provides dependencies
+    StatusEndpoint --&gt; ServiceContainer : resolves &#39;db&#39;
+    StatusResource --&gt; WebSocketConnectionManager
+    StatusResource --&gt; aiosqlite.Connection
+</code></pre></div>
+
+<h5>Usage Patterns</h5>
+<p>Practical usage of the resource-factory pattern falls into two complementary
+scenarios:</p>
+<ol>
+<li>
+<p><strong>Application wiring.</strong> The <code>examples/random_status/server.py</code> module now
+   demonstrates the shared <code>ServiceContainer</code> that registers process-wide
+   dependencies at startup and exposes a <code>create_resource()</code> hook to the
+   router. The container mirrors the behaviour described above—capturing the
+   target callable from the route's partial, merging static kwargs with
+   registered services, reusing cached signatures, and returning the final
+   resource instance. A lightweight <code>RouterEndpoint</code> adapter wraps the router
+   so it can be registered via <code>app.add_websocket_route()</code> while still
+   delegating connection handling to the router itself. Both WebSocket
+   resources and regular HTTP endpoints resolve dependencies from the same
+   container, ensuring a single source of truth for shared services.</p>
+</li>
+<li>
+<p><strong>Test-specific factories.</strong> Behavioural and unit tests use lightweight
+   factories to inject fakes without bootstrapping the full container. The
+   <code>falcon_pachinko.unittests.resource_factories.resource_factory()</code> helper
+   returns a callable compatible with <code>WebSocketRouter</code> that simply merges a
+   provided dependency into the stored partial's kwargs. Tests can therefore
+   inject spies or mock services while still exercising the router's lifecycle
+   exactly as production code would.</p>
+</li>
+</ol>
+<p>Both patterns emphasize explicit construction and keep the dependency graph
+outside the framework core, maintaining Falcon's principle of explicitness.</p>
+<h5>Benefits</h5>
+<ul>
+<li><strong>Decoupling:</strong> Resource classes simply declare constructor arguments—the
+  router decides how those arguments are provided.</li>
+<li><strong>Flexibility:</strong> Any DI approach (manual factories, dataclass-style wiring,
+  external containers such as <code>dependency-injector</code>) can participate without
+  additional framework support.</li>
+<li><strong>Testability:</strong> Tests provide bespoke factories to inject fakes or spies.</li>
+<li><strong>Backward Compatibility:</strong> Existing codebases that rely solely on
+  <code>add_route()</code> behaviour require no changes because the default factory still
+  calls the stored partial directly.</li>
+</ul>
+<h4>5.5.2. Enabling a "Schema-First" Workflow</h4>
+<p>The combination of AsyncAPI-aligned routing and <code>msgspec</code> schemas enables a
+powerful <strong>"Schema-First"</strong> development workflow. Teams can define their API
+contract in an <code>asyncapi.yaml</code> file, use tooling to generate <code>msgspec.Struct</code>
+classes and resource skeletons, and then implement the business logic. The
+framework, at runtime, uses these same schemas to enforce the contract,
+preventing drift between implementation and documentation. This is a
+significant strategic advantage.</p></div>
+                </section>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <footer id="footer" class="border-t border-base-200 bg-base-100">
+    <div class="layout-shell layout-shell--docs grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16">
+      <div>
+        <p class="font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90">df12 Productions</p>
+        <p class="mt-4 text-sm text-base-content/90">Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.</p>
+      </div>
+      <div>
+        <h2>OSS &amp; Licences</h2>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li><a class="footer-link" href="https://github.com/leynos/limela/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Limela — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/netsuke/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Netsuke — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/mxd/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">mxd — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/episodic/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Episodic — licence</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Stay in touch</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li><a class="footer-link" data-variant="accent" href="mailto:hello@df12.studio">hello@df12.studio</a></li>
+          <li>
+            <a class="footer-link" data-variant="accent" href="https://github.com/leynos" target="_blank" rel="noopener noreferrer">
+              <iconify-icon icon="carbon:logo-github" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a class="footer-link" data-variant="accent" href="https://bsky.app/profile/df12.studio" target="_blank" rel="noopener noreferrer">
+              <iconify-icon icon="carbon:logo-bluesky" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+              Bluesky
+            </a>
+          </li>
+        </ul>
+        <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const blocks = document.querySelectorAll('.codehilite');
+      if (!blocks.length) {
+        return;
+      }
+
+      const formatLanguage = (raw) => {
+        const value = (raw || '').trim();
+        if (!value || value.toLowerCase() === 'text') {
+          return 'Plain Text';
+        }
+        return value
+          .replace(/[._-]+/g, ' ')
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+      };
+
+      const writeClipboard = async (text) => {
+        if (!text) {
+          return false;
+        }
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch (error) {
+          /* fall back */
+        }
+
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', 'readonly');
+          textarea.style.position = 'absolute';
+          textarea.style.left = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          const success = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          return success;
+        } catch (error) {
+          return false;
+        }
+      };
+
+      blocks.forEach((block) => {
+        if (block.dataset.enhanced === 'true') {
+          return;
+        }
+        const pre = block.querySelector('pre');
+        const code = block.querySelector('code') || pre;
+        if (!pre || !code) {
+          return;
+        }
+
+        block.dataset.enhanced = 'true';
+
+        const chrome = document.createElement('div');
+        chrome.className = 'codehilite__chrome';
+
+        const languageLabel = document.createElement('span');
+        languageLabel.className = 'codehilite__language';
+        const lang = block.dataset.language || '';
+        const readableLang = formatLanguage(lang);
+        languageLabel.textContent = readableLang;
+
+        const copyButton = document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'codehilite__copy';
+        copyButton.setAttribute('aria-label', `Copy ${readableLang} code snippet`);
+        copyButton.innerHTML = `
+          <span class="codehilite__copy-icon" aria-hidden="true">
+            <iconify-icon icon="carbon:copy" class="h-4 w-4"></iconify-icon>
+          </span>
+          <span class="codehilite__copy-text">Copy</span>
+        `;
+
+        chrome.appendChild(languageLabel);
+        chrome.appendChild(copyButton);
+        block.insertBefore(chrome, pre);
+
+        const copyTextLabel = copyButton.querySelector('.codehilite__copy-text');
+        let resetTimer;
+
+        copyButton.addEventListener('click', async () => {
+          const textContent = code.textContent || '';
+          const didCopy = await writeClipboard(textContent.trimEnd());
+          if (!didCopy) {
+            if (copyTextLabel) {
+              copyTextLabel.textContent = 'Press ⌘/Ctrl+C';
+            }
+            clearTimeout(resetTimer);
+            resetTimer = setTimeout(() => {
+              copyButton.removeAttribute('data-state');
+              if (copyTextLabel) {
+                copyTextLabel.textContent = 'Copy';
+              }
+            }, 2500);
+            return;
+          }
+          copyButton.dataset.state = 'copied';
+          if (copyTextLabel) {
+            copyTextLabel.textContent = 'Copied';
+          }
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(() => {
+            copyButton.removeAttribute('data-state');
+            if (copyTextLabel) {
+              copyTextLabel.textContent = 'Copy';
+            }
+          }, 2500);
+        });
+      });
+    })();
+  </script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en" data-theme="df12">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="assets/site.css" rel="stylesheet" />
+  <title>df12 Productions — Literature Survey and Existing Solutions | Falcon Pachinko</title>
+  <style>
+    pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #49483e }
+.codehilite { background: #272822; color: #F8F8F2 }
+.codehilite .c { color: #959077 } /* Comment */
+.codehilite .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.codehilite .esc { color: #F8F8F2 } /* Escape */
+.codehilite .g { color: #F8F8F2 } /* Generic */
+.codehilite .k { color: #66D9EF } /* Keyword */
+.codehilite .l { color: #AE81FF } /* Literal */
+.codehilite .n { color: #F8F8F2 } /* Name */
+.codehilite .o { color: #FF4689 } /* Operator */
+.codehilite .x { color: #F8F8F2 } /* Other */
+.codehilite .p { color: #F8F8F2 } /* Punctuation */
+.codehilite .ch { color: #959077 } /* Comment.Hashbang */
+.codehilite .cm { color: #959077 } /* Comment.Multiline */
+.codehilite .cp { color: #959077 } /* Comment.Preproc */
+.codehilite .cpf { color: #959077 } /* Comment.PreprocFile */
+.codehilite .c1 { color: #959077 } /* Comment.Single */
+.codehilite .cs { color: #959077 } /* Comment.Special */
+.codehilite .gd { color: #FF4689 } /* Generic.Deleted */
+.codehilite .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.codehilite .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F8F8F2 } /* Generic.Error */
+.codehilite .gh { color: #F8F8F2 } /* Generic.Heading */
+.codehilite .gi { color: #A6E22E } /* Generic.Inserted */
+.codehilite .go { color: #66D9EF } /* Generic.Output */
+.codehilite .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #959077 } /* Generic.Subheading */
+.codehilite .gt { color: #F8F8F2 } /* Generic.Traceback */
+.codehilite .kc { color: #66D9EF } /* Keyword.Constant */
+.codehilite .kd { color: #66D9EF } /* Keyword.Declaration */
+.codehilite .kn { color: #FF4689 } /* Keyword.Namespace */
+.codehilite .kp { color: #66D9EF } /* Keyword.Pseudo */
+.codehilite .kr { color: #66D9EF } /* Keyword.Reserved */
+.codehilite .kt { color: #66D9EF } /* Keyword.Type */
+.codehilite .ld { color: #E6DB74 } /* Literal.Date */
+.codehilite .m { color: #AE81FF } /* Literal.Number */
+.codehilite .s { color: #E6DB74 } /* Literal.String */
+.codehilite .na { color: #A6E22E } /* Name.Attribute */
+.codehilite .nb { color: #F8F8F2 } /* Name.Builtin */
+.codehilite .nc { color: #A6E22E } /* Name.Class */
+.codehilite .no { color: #66D9EF } /* Name.Constant */
+.codehilite .nd { color: #A6E22E } /* Name.Decorator */
+.codehilite .ni { color: #F8F8F2 } /* Name.Entity */
+.codehilite .ne { color: #A6E22E } /* Name.Exception */
+.codehilite .nf { color: #A6E22E } /* Name.Function */
+.codehilite .nl { color: #F8F8F2 } /* Name.Label */
+.codehilite .nn { color: #F8F8F2 } /* Name.Namespace */
+.codehilite .nx { color: #A6E22E } /* Name.Other */
+.codehilite .py { color: #F8F8F2 } /* Name.Property */
+.codehilite .nt { color: #FF4689 } /* Name.Tag */
+.codehilite .nv { color: #F8F8F2 } /* Name.Variable */
+.codehilite .ow { color: #FF4689 } /* Operator.Word */
+.codehilite .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.codehilite .w { color: #F8F8F2 } /* Text.Whitespace */
+.codehilite .mb { color: #AE81FF } /* Literal.Number.Bin */
+.codehilite .mf { color: #AE81FF } /* Literal.Number.Float */
+.codehilite .mh { color: #AE81FF } /* Literal.Number.Hex */
+.codehilite .mi { color: #AE81FF } /* Literal.Number.Integer */
+.codehilite .mo { color: #AE81FF } /* Literal.Number.Oct */
+.codehilite .sa { color: #E6DB74 } /* Literal.String.Affix */
+.codehilite .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.codehilite .sc { color: #E6DB74 } /* Literal.String.Char */
+.codehilite .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #E6DB74 } /* Literal.String.Doc */
+.codehilite .s2 { color: #E6DB74 } /* Literal.String.Double */
+.codehilite .se { color: #AE81FF } /* Literal.String.Escape */
+.codehilite .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.codehilite .si { color: #E6DB74 } /* Literal.String.Interpol */
+.codehilite .sx { color: #E6DB74 } /* Literal.String.Other */
+.codehilite .sr { color: #E6DB74 } /* Literal.String.Regex */
+.codehilite .s1 { color: #E6DB74 } /* Literal.String.Single */
+.codehilite .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.codehilite .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #A6E22E } /* Name.Function.Magic */
+.codehilite .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.codehilite .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.codehilite .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.codehilite .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.codehilite .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+
+    .codehilite {
+      background-color: var(--color-neutral);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      color: var(--color-neutral-content);
+      font-family: "IBM Plex Mono", monospace;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+
+    .codehilite pre {
+      margin: 0;
+      background: transparent;
+      font-family: inherit;
+      font-size: inherit;
+      border: none;
+      padding: 0;
+      box-shadow: none;
+      overflow-x: auto;
+    }
+
+    .codehilite__chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      gap: 1rem;
+    }
+
+    .codehilite__language {
+      white-space: nowrap;
+    }
+
+    .codehilite__copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      color: var(--color-neutral-content);
+      font-family: inherit;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 0.2rem 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .codehilite__copy:hover,
+    .codehilite__copy:focus-visible {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .codehilite__copy[data-state="copied"] {
+      background: var(--color-accent);
+      color: var(--color-accent-content);
+      border-color: transparent;
+    }
+
+    .codehilite__copy-icon {
+      width: 0.85rem;
+      height: 0.85rem;
+      display: block;
+    }
+
+    .svg-inline--fa {
+      display: inline;
+	}
+  </style>
+</head>
+<body class="doc-page">
+  <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
+
+  <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-base-200 bg-base-100/80 backdrop-blur supports-[backdrop-filter]:bg-base-100/60">
+    <div class="layout-shell layout-shell--docs flex w-full items-center justify-between px-4 py-4 md:px-8">
+      <a href="index.html" class="group flex items-center gap-3 font-mono text-lg font-bold uppercase tracking-[0.35em] text-base-content">
+        <span class="flex h-9 w-9 items-center justify-center transition-transform duration-300 group-hover:rotate-45">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" />
+          </svg>
+        </span>
+        df12
+      </a>
+      <nav aria-label="Primary navigation" class="hidden items-center gap-8 md:flex">
+        <a href="index.html#systems" class="nav-link hit-target">Tools</a>
+        <a href="index.html#worlds" class="nav-link hit-target" data-variant="accent">Creative</a>
+        <a href="docs.html" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
+      </nav>
+      <div class="md:hidden">
+        <details class="dropdown dropdown-end">
+          <summary class="btn btn-ghost btn-sm font-mono uppercase tracking-[0.3em]">Menu</summary>
+          <ul class="menu dropdown-content menu-sm z-[1] mt-2 w-44 rounded-box bg-base-100 p-2 shadow">
+            <li><a href="index.html#systems" class="nav-link hit-target w-full justify-start">Tools</a></li>
+            <li><a href="index.html#worlds" class="nav-link hit-target w-full justify-start" data-variant="accent">Creative</a></li>
+            <li><a href="docs.html" class="nav-link hit-target w-full justify-start" data-variant="neutral" aria-current="page">Docs</a></li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="px-4 pb-24 pt-32">
+    <div class="layout-shell layout-shell--docs doc-grid">
+      <aside class="doc-sidebar" aria-label="Documentation navigation">
+        <div class="doc-sidebar__panel">
+          <a href="docs.html" class="doc-sidebar__back">
+            <iconify-icon icon="carbon:arrow-left" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+            Back to docs
+          </a>
+          <div>
+            <p class="doc-sidebar__eyebrow">Falcon Pachinko</p>
+            <p class="doc-sidebar__body">Falcon extension that adds structured WebSocket routing, msgspec-based payload schemas, and background worker orchestration so ASGI apps can manage rooms, broadcast events, and monitor connections with minimal boilerplate.
+</p>
+          </div>
+          <div class="doc-sidebar__groups">
+              <div class="doc-nav-group" aria-label="Introduction">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-introduction.html">Introduction</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Literature Survey and Existing Solutions">
+                <h3 class="doc-nav-group__title is-active" aria-current="page">
+                  <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html">Literature Survey and Existing Solutions</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-1-falcon-s-native-websocket-capabilities"
+                           class="doc-nav__link "
+>
+                          <span>2.1. Falcon's Native WebSocket Capabilities</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-2-starlette"
+                           class="doc-nav__link "
+>
+                          <span>2.2. Starlette</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-3-django-channels"
+                           class="doc-nav__link "
+>
+                          <span>2.3. Django Channels</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-4-fastapi"
+                           class="doc-nav__link "
+>
+                          <span>2.4. FastAPI</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-5-websockets-library"
+                           class="doc-nav__link "
+>
+                          <span>2.5. `websockets` Library</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-6-gap-analysis-and-opportunity"
+                           class="doc-nav__link "
+>
+                          <span>2.6. Gap Analysis and Opportunity</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html">Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-1-core-principles"
+                           class="doc-nav__link "
+>
+                          <span>3.1. Core Principles</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-2-key-components"
+                           class="doc-nav__link "
+>
+                          <span>3.2. Key Components</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-3-application-integration"
+                           class="doc-nav__link "
+>
+                          <span>3.3. Application Integration</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-4-routing-websocket-connections"
+                           class="doc-nav__link "
+>
+                          <span>3.4. Routing WebSocket Connections</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-5-the-websocketresource-class"
+                           class="doc-nav__link "
+>
+                          <span>3.5. The `WebSocketResource` Class</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-6-message-handling-and-dispatch"
+                           class="doc-nav__link "
+>
+                          <span>3.6. Message Handling and Dispatch</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-7-websocketconnectionmanager"
+                           class="doc-nav__link "
+>
+                          <span>3.7. `WebSocketConnectionManager`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-8-background-worker-integration-via-asgi-lifespan"
+                           class="doc-nav__link "
+>
+                          <span>3.8. Background Worker Integration via ASGI Lifespan</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-9-api-overview"
+                           class="doc-nav__link "
+>
+                          <span>3.9. API Overview</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Illustrative Usecase: Real-time Chat Application">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html">Illustrative Usecase: Real-time Chat Application</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-1-scenario-overview"
+                           class="doc-nav__link "
+>
+                          <span>4.1. Scenario Overview</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-2-defining-the-chat-websocket-resource"
+                           class="doc-nav__link "
+>
+                          <span>4.2. Defining the Chat WebSocket Resource</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-3-routing-and-application-setup"
+                           class="doc-nav__link "
+>
+                          <span>4.3. Routing and Application Setup</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-4-client-side-interaction-conceptual"
+                           class="doc-nav__link "
+>
+                          <span>4.4. Client-Side Interaction (Conceptual)</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Advanced Proposal: Composable and Schema-Driven WebSocket Routing">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html">Advanced Proposal: Composable and Schema-Driven WebSocket Routing</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-1-the-websocketrouter-as-a-composable-falcon-resource"
+                           class="doc-nav__link "
+>
+                          <span>5.1. The `WebSocketRouter` as a Composable Falcon Resource</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-2-composable-architecture-nested-resources"
+                           class="doc-nav__link "
+>
+                          <span>5.2. Composable Architecture: Nested Resources</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-3-high-performance-schema-driven-dispatch-with-msgspec"
+                           class="doc-nav__link "
+>
+                          <span>5.3. High-Performance Schema-Driven Dispatch with `msgspec`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-4-a-multi-tiered-middleware-and-hook-system"
+                           class="doc-nav__link "
+>
+                          <span>5.4. A Multi-Tiered Middleware and Hook System</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-5-architectural-implications"
+                           class="doc-nav__link "
+>
+                          <span>5.5. Architectural Implications</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Future Considerations and Potential Enhancements">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html">Future Considerations and Potential Enhancements</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-1-advanced-subprotocol-handling"
+                           class="doc-nav__link "
+>
+                          <span>6.1. Advanced Subprotocol Handling</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-2-compression-extensions"
+                           class="doc-nav__link "
+>
+                          <span>6.2. Compression Extensions</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-3-enhanced-connection-grouping-and-targeting"
+                           class="doc-nav__link "
+>
+                          <span>6.3. Enhanced Connection Grouping and Targeting</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-4-scalability-for-distributed-systems"
+                           class="doc-nav__link "
+>
+                          <span>6.4. Scalability for Distributed Systems</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-5-testing-utilities"
+                           class="doc-nav__link "
+>
+                          <span>6.5. Testing Utilities</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-6-automatic-asyncapi-documentation-generation-ambitious"
+                           class="doc-nav__link "
+>
+                          <span>6.6. Automatic AsyncAPI Documentation Generation (Ambitious)</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Conclusion">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-falcon-pachinko-conclusion.html">Conclusion</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-1-summary-of-the-proposed-design"
+                           class="doc-nav__link "
+>
+                          <span>7.1. Summary of the Proposed Design</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-2-benefits-and-advantages"
+                           class="doc-nav__link "
+>
+                          <span>7.2. Benefits and Advantages</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-3-meeting-user-requirements"
+                           class="doc-nav__link "
+>
+                          <span>7.3. Meeting User Requirements</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-4-final-thoughts"
+                           class="doc-nav__link "
+>
+                          <span>7.4. Final Thoughts</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+          <div>
+            <p class="doc-sidebar__section-label">Source</p>
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/falcon-pachinko/refs/heads/main/docs/falcon-websocket-extension-design.md" target="_blank" rel="noopener">
+              View markdown
+              <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
+            </a>
+            <p class="mt-1 text-xs text-base-content/60">Source material</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="space-y-6" id="literature-survey-and-existing-solutions">
+        <nav class="doc-mobile-nav" aria-labelledby="mobile-sections-label">
+          <p id="mobile-sections-label" class="doc-sidebar__section-label">Contents</p>
+          <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Introduction</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-introduction.html" class="doc-nav__link">Introduction</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Literature Survey and Existing Solutions</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html" class="doc-nav__link">Literature Survey and Existing Solutions</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-1-falcon-s-native-websocket-capabilities" class="doc-nav__link">2.1. Falcon's Native WebSocket Capabilities</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-2-starlette" class="doc-nav__link">2.2. Starlette</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-3-django-channels" class="doc-nav__link">2.3. Django Channels</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-4-fastapi" class="doc-nav__link">2.4. FastAPI</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-5-websockets-library" class="doc-nav__link">2.5. `websockets` Library</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-literature-survey-and-existing-solutions.html#literature-survey-and-existing-solutions-2-6-gap-analysis-and-opportunity" class="doc-nav__link">2.6. Gap Analysis and Opportunity</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html" class="doc-nav__link">Proposed Design for Falcon WebSocket Extension ("Falcon-Pachinko")</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-1-core-principles" class="doc-nav__link">3.1. Core Principles</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-2-key-components" class="doc-nav__link">3.2. Key Components</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-3-application-integration" class="doc-nav__link">3.3. Application Integration</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-4-routing-websocket-connections" class="doc-nav__link">3.4. Routing WebSocket Connections</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-5-the-websocketresource-class" class="doc-nav__link">3.5. The `WebSocketResource` Class</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-6-message-handling-and-dispatch" class="doc-nav__link">3.6. Message Handling and Dispatch</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-7-websocketconnectionmanager" class="doc-nav__link">3.7. `WebSocketConnectionManager`</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-8-background-worker-integration-via-asgi-lifespan" class="doc-nav__link">3.8. Background Worker Integration via ASGI Lifespan</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-proposed-design-for-falcon-websocket-extension-falcon-pachinko.html#proposed-design-for-falcon-websocket-extension-falcon-pachinko-3-9-api-overview" class="doc-nav__link">3.9. API Overview</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Illustrative Usecase: Real-time Chat Application</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html" class="doc-nav__link">Illustrative Usecase: Real-time Chat Application</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-1-scenario-overview" class="doc-nav__link">4.1. Scenario Overview</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-2-defining-the-chat-websocket-resource" class="doc-nav__link">4.2. Defining the Chat WebSocket Resource</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-3-routing-and-application-setup" class="doc-nav__link">4.3. Routing and Application Setup</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-illustrative-usecase-real-time-chat-application.html#illustrative-usecase-real-time-chat-application-4-4-client-side-interaction-conceptual" class="doc-nav__link">4.4. Client-Side Interaction (Conceptual)</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Advanced Proposal: Composable and Schema-Driven WebSocket Routing</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html" class="doc-nav__link">Advanced Proposal: Composable and Schema-Driven WebSocket Routing</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-1-the-websocketrouter-as-a-composable-falcon-resource" class="doc-nav__link">5.1. The `WebSocketRouter` as a Composable Falcon Resource</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-2-composable-architecture-nested-resources" class="doc-nav__link">5.2. Composable Architecture: Nested Resources</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-3-high-performance-schema-driven-dispatch-with-msgspec" class="doc-nav__link">5.3. High-Performance Schema-Driven Dispatch with `msgspec`</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-4-a-multi-tiered-middleware-and-hook-system" class="doc-nav__link">5.4. A Multi-Tiered Middleware and Hook System</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-advanced-proposal-composable-and-schema-driven-websocket-routing.html#advanced-proposal-composable-and-schema-driven-websocket-routing-5-5-architectural-implications" class="doc-nav__link">5.5. Architectural Implications</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Future Considerations and Potential Enhancements</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html" class="doc-nav__link">Future Considerations and Potential Enhancements</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-1-advanced-subprotocol-handling" class="doc-nav__link">6.1. Advanced Subprotocol Handling</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-2-compression-extensions" class="doc-nav__link">6.2. Compression Extensions</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-3-enhanced-connection-grouping-and-targeting" class="doc-nav__link">6.3. Enhanced Connection Grouping and Targeting</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-4-scalability-for-distributed-systems" class="doc-nav__link">6.4. Scalability for Distributed Systems</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-5-testing-utilities" class="doc-nav__link">6.5. Testing Utilities</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-future-considerations-and-potential-enhancements.html#future-considerations-and-potential-enhancements-6-6-automatic-asyncapi-documentation-generation-ambitious" class="doc-nav__link">6.6. Automatic AsyncAPI Documentation Generation (Ambitious)</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Conclusion</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html" class="doc-nav__link">Conclusion</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-1-summary-of-the-proposed-design" class="doc-nav__link">7.1. Summary of the Proposed Design</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-2-benefits-and-advantages" class="doc-nav__link">7.2. Benefits and Advantages</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-3-meeting-user-requirements" class="doc-nav__link">7.3. Meeting User Requirements</a>
+                    </li>
+                    <li>
+                      <a href="docs-falcon-pachinko-conclusion.html#conclusion-7-4-final-thoughts" class="doc-nav__link">7.4. Final Thoughts</a>
+                    </li>
+                </ul>
+              </li>
+          </ul>
+        </nav>
+
+        <header class="doc-hero" id="doc-title">
+          <h1 class="doc-hero__title">Literature Survey and Existing Solutions</h1>
+          <div class="doc-meta-list">
+            <span class="doc-meta-list__item">Updated Oct 31, 2025</span>
+          </div>
+        </header>
+
+        <article class="doc-article">
+              <section class="doc-section">
+                <div class="doc-prose"><p>Before detailing the proposed design, it is pertinent to survey existing
+WebSocket handling mechanisms within Falcon and other relevant Python web
+frameworks and libraries. This provides context and helps identify established
+patterns and potential areas for improvement.</p></div>
+              </section>
+                <section id="literature-survey-and-existing-solutions-2-1-falcon-s-native-websocket-capabilities" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>2.1. Falcon's Native WebSocket Capabilities</h2>
+                  </div>
+                  <div class="doc-prose"><p>Falcon's support for WebSockets is built upon the ASGI WebSocket Specification
+and is available in its ASGI applications.[^2] Developers can add WebSocket
+support to a route by implementing an
+<code>async def on_websocket(self, req, websocket)</code> responder method within a
+resource class.[^1] This method is invoked when a WebSocket handshake request
+is successfully routed.</p>
+<p>The <code>falcon.asgi.WebSocket</code> object provided to this responder offers methods
+for managing the connection lifecycle, such as <code>accept()</code>, <code>close()</code>,
+<code>receive_text()</code>, <code>receive_data()</code>, <code>send_text()</code>, and <code>send_data()</code>. [^2]
+Falcon also handles events like lost connections by raising a
+<code>WebSocketDisconnected</code> exception. Middleware components and media handlers can
+be used to augment WebSocket flows, similar to regular HTTP requests.[^2]</p>
+<p>However, Falcon's native support routes an entire WebSocket connection to a
+single <code>on_websocket</code> handler. For applications requiring dispatch based on
+incoming message types (e.g., in a chat application with different commands
+like 'send_message', 'user_typing', etc.), developers must implement this logic
+manually within the <code>on_websocket</code> method. This can lead to large, complex
+conditional structures that are difficult to maintain and test.</p></div>
+                </section>
+                <section id="literature-survey-and-existing-solutions-2-2-starlette" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>2.2. Starlette</h2>
+                  </div>
+                  <div class="doc-prose"><p>Starlette, a lightweight ASGI framework, provides robust WebSocket support. It
+uses <code>WebSocketRoute</code> for defining WebSocket endpoints, which can be an <code>async</code>
+function or an ASGI class like <code>WebSocketEndpoint</code>.[^3] The <code>WebSocketEndpoint</code>
+class typically offers methods like <code>on_connect</code>, <code>on_receive</code>, and
+<code>on_disconnect</code> to handle different phases of the WebSocket lifecycle, although
+the specifics of <code>WebSocketEndpoint</code> are not fully detailed in the reviewed
+material.[^3] The <code>starlette.websockets.WebSocket</code> class itself provides
+comprehensive methods for interaction, including <code>accept()</code>, <code>close()</code>, various
+<code>send_*</code> and <code>receive_*</code> methods (for text, bytes, JSON), and iterators for
+messages.[^4] Starlette's routing is path-based; message content-based dispatch
+within an endpoint remains a manual task for the developer.</p></div>
+                </section>
+                <section id="literature-survey-and-existing-solutions-2-3-django-channels" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>2.3. Django Channels</h2>
+                  </div>
+                  <div class="doc-prose"><p>Django Channels extends Django to handle WebSockets and other protocols beyond
+HTTP, built on ASGI.[^5] It introduces concepts like <code>Consumers</code> (analogous to
+Django views but for WebSockets and other protocols) which handle the lifecycle
+of a connection (e.g., <code>connect</code>, <code>disconnect</code>, <code>receive</code>).[^6] Routing is
+managed by <code>ProtocolTypeRouter</code> (to distinguish between HTTP, WebSocket, etc.)
+and <code>URLRouter</code> (for path-based routing to consumers).[^5] A key feature of
+Channels is the "channel layer," an abstraction for inter-process communication
+(often backed by Redis), allowing different parts of an application, including
+background tasks, to send messages to WebSockets.[^5] While powerful, Django
+Channels is a comprehensive system deeply integrated with Django, representing
+a more heavyweight solution than what is typically sought for a Falcon
+extension.</p></div>
+                </section>
+                <section id="literature-survey-and-existing-solutions-2-4-fastapi" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>2.4. FastAPI</h2>
+                  </div>
+                  <div class="doc-prose"><p>FastAPI, built on Starlette, leverages Starlette's WebSocket capabilities.[^7]
+It provides a decorator, <code>@app.websocket("/ws")</code>, to define WebSocket
+endpoints.[^7] Similar to Falcon and Starlette's basic function endpoints, this
+decorator typically maps a path to a single asynchronous function that manages
+the entire WebSocket connection lifecycle, including accepting the connection,
+receiving messages in a loop, and sending responses.[^7] Message dispatch based
+on content within this function is a manual implementation detail.</p></div>
+                </section>
+                <section id="literature-survey-and-existing-solutions-2-5-websockets-library" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>2.5. `websockets` Library</h2>
+                  </div>
+                  <div class="doc-prose"><p>The <code>websockets</code> library is a focused Python library for building WebSocket
+servers and clients, emphasizing correctness, simplicity, and performance.[^8]
+It is built on <code>asyncio</code> and provides a coroutine-based API. While excellent
+for implementing the WebSocket protocol itself (e.g., <code>serve</code> for servers,
+<code>connect</code> for clients), it is not a web framework extension and does not offer
+higher-level routing or integration with framework components like Falcon's
+resources or request objects.[^8] Its primary goal is protocol implementation
+rather than framework-level application structure.</p></div>
+                </section>
+                <section id="literature-survey-and-existing-solutions-2-6-gap-analysis-and-opportunity" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>2.6. Gap Analysis and Opportunity</h2>
+                  </div>
+                  <div class="doc-prose"><p>The survey reveals that while Falcon has basic ASGI WebSocket support, it lacks
+a dedicated mechanism for structured message routing and handling within a
+WebSocket connection that is analogous to its HTTP request handling. Frameworks
+like Django Channels offer very comprehensive solutions but come with
+significant architectural overhead. Starlette and FastAPI provide clean
+WebSocket endpoint definitions but still require manual message dispatch logic
+within those endpoints.</p>
+<p>This identifies a clear opportunity for a Falcon extension that:</p>
+<ol>
+<li>
+<p>Provides a routing mechanism for incoming WebSocket messages based on their
+   content (e.g., a 'type' field).</p>
+</li>
+<li>
+<p>Offers a class-based structure for WebSocket handlers, similar to Falcon's
+   HTTP resources, promoting organization and reusability.</p>
+</li>
+<li>
+<p>Integrates a system for managing active connections to allow background
+   workers to easily send messages to specific clients or groups of clients.</p>
+</li>
+<li>
+<p>Achieves this in a lightweight, Falcon-idiomatic manner, consistent with the
+   framework's philosophy of minimalism and developer experience.</p>
+</li>
+</ol>
+<p>The proposed Falcon-Pachinko library aims to fill this gap.</p></div>
+                </section>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <footer id="footer" class="border-t border-base-200 bg-base-100">
+    <div class="layout-shell layout-shell--docs grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16">
+      <div>
+        <p class="font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90">df12 Productions</p>
+        <p class="mt-4 text-sm text-base-content/90">Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.</p>
+      </div>
+      <div>
+        <h2>OSS &amp; Licences</h2>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li><a class="footer-link" href="https://github.com/leynos/limela/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Limela — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/netsuke/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Netsuke — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/mxd/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">mxd — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/episodic/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Episodic — licence</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Stay in touch</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li><a class="footer-link" data-variant="accent" href="mailto:hello@df12.studio">hello@df12.studio</a></li>
+          <li>
+            <a class="footer-link" data-variant="accent" href="https://github.com/leynos" target="_blank" rel="noopener noreferrer">
+              <iconify-icon icon="carbon:logo-github" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a class="footer-link" data-variant="accent" href="https://bsky.app/profile/df12.studio" target="_blank" rel="noopener noreferrer">
+              <iconify-icon icon="carbon:logo-bluesky" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+              Bluesky
+            </a>
+          </li>
+        </ul>
+        <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const blocks = document.querySelectorAll('.codehilite');
+      if (!blocks.length) {
+        return;
+      }
+
+      const formatLanguage = (raw) => {
+        const value = (raw || '').trim();
+        if (!value || value.toLowerCase() === 'text') {
+          return 'Plain Text';
+        }
+        return value
+          .replace(/[._-]+/g, ' ')
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+      };
+
+      const writeClipboard = async (text) => {
+        if (!text) {
+          return false;
+        }
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch (error) {
+          /* fall back */
+        }
+
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', 'readonly');
+          textarea.style.position = 'absolute';
+          textarea.style.left = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          const success = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          return success;
+        } catch (error) {
+          return false;
+        }
+      };
+
+      blocks.forEach((block) => {
+        if (block.dataset.enhanced === 'true') {
+          return;
+        }
+        const pre = block.querySelector('pre');
+        const code = block.querySelector('code') || pre;
+        if (!pre || !code) {
+          return;
+        }
+
+        block.dataset.enhanced = 'true';
+
+        const chrome = document.createElement('div');
+        chrome.className = 'codehilite__chrome';
+
+        const languageLabel = document.createElement('span');
+        languageLabel.className = 'codehilite__language';
+        const lang = block.dataset.language || '';
+        const readableLang = formatLanguage(lang);
+        languageLabel.textContent = readableLang;
+
+        const copyButton = document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'codehilite__copy';
+        copyButton.setAttribute('aria-label', `Copy ${readableLang} code snippet`);
+        copyButton.innerHTML = `
+          <span class="codehilite__copy-icon" aria-hidden="true">
+            <iconify-icon icon="carbon:copy" class="h-4 w-4"></iconify-icon>
+          </span>
+          <span class="codehilite__copy-text">Copy</span>
+        `;
+
+        chrome.appendChild(languageLabel);
+        chrome.appendChild(copyButton);
+        block.insertBefore(chrome, pre);
+
+        const copyTextLabel = copyButton.querySelector('.codehilite__copy-text');
+        let resetTimer;
+
+        copyButton.addEventListener('click', async () => {
+          const textContent = code.textContent || '';
+          const didCopy = await writeClipboard(textContent.trimEnd());
+          if (!didCopy) {
+            if (copyTextLabel) {
+              copyTextLabel.textContent = 'Press ⌘/Ctrl+C';
+            }
+            clearTimeout(resetTimer);
+            resetTimer = setTimeout(() => {
+              copyButton.removeAttribute('data-state');
+              if (copyTextLabel) {
+                copyTextLabel.textContent = 'Copy';
+              }
+            }, 2500);
+            return;
+          }
+          copyButton.dataset.state = 'copied';
+          if (copyTextLabel) {
+            copyTextLabel.textContent = 'Copied';
+          }
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(() => {
+            copyButton.removeAttribute('data-state');
+            if (copyTextLabel) {
+              copyTextLabel.textContent = 'Copy';
+            }
+          }, 2500);
+        });
+      });
+    })();
+  </script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+</body>
+</html>

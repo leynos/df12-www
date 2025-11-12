@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en" data-theme="df12">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="assets/site.css" rel="stylesheet" />
+  <title>df12 Productions — Using the IPC server directly | CmdMox</title>
+  <style>
+    pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.codehilite .hll { background-color: #49483e }
+.codehilite { background: #272822; color: #F8F8F2 }
+.codehilite .c { color: #959077 } /* Comment */
+.codehilite .err { color: #ED007E; background-color: #1E0010 } /* Error */
+.codehilite .esc { color: #F8F8F2 } /* Escape */
+.codehilite .g { color: #F8F8F2 } /* Generic */
+.codehilite .k { color: #66D9EF } /* Keyword */
+.codehilite .l { color: #AE81FF } /* Literal */
+.codehilite .n { color: #F8F8F2 } /* Name */
+.codehilite .o { color: #FF4689 } /* Operator */
+.codehilite .x { color: #F8F8F2 } /* Other */
+.codehilite .p { color: #F8F8F2 } /* Punctuation */
+.codehilite .ch { color: #959077 } /* Comment.Hashbang */
+.codehilite .cm { color: #959077 } /* Comment.Multiline */
+.codehilite .cp { color: #959077 } /* Comment.Preproc */
+.codehilite .cpf { color: #959077 } /* Comment.PreprocFile */
+.codehilite .c1 { color: #959077 } /* Comment.Single */
+.codehilite .cs { color: #959077 } /* Comment.Special */
+.codehilite .gd { color: #FF4689 } /* Generic.Deleted */
+.codehilite .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+.codehilite .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.codehilite .gr { color: #F8F8F2 } /* Generic.Error */
+.codehilite .gh { color: #F8F8F2 } /* Generic.Heading */
+.codehilite .gi { color: #A6E22E } /* Generic.Inserted */
+.codehilite .go { color: #66D9EF } /* Generic.Output */
+.codehilite .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #959077 } /* Generic.Subheading */
+.codehilite .gt { color: #F8F8F2 } /* Generic.Traceback */
+.codehilite .kc { color: #66D9EF } /* Keyword.Constant */
+.codehilite .kd { color: #66D9EF } /* Keyword.Declaration */
+.codehilite .kn { color: #FF4689 } /* Keyword.Namespace */
+.codehilite .kp { color: #66D9EF } /* Keyword.Pseudo */
+.codehilite .kr { color: #66D9EF } /* Keyword.Reserved */
+.codehilite .kt { color: #66D9EF } /* Keyword.Type */
+.codehilite .ld { color: #E6DB74 } /* Literal.Date */
+.codehilite .m { color: #AE81FF } /* Literal.Number */
+.codehilite .s { color: #E6DB74 } /* Literal.String */
+.codehilite .na { color: #A6E22E } /* Name.Attribute */
+.codehilite .nb { color: #F8F8F2 } /* Name.Builtin */
+.codehilite .nc { color: #A6E22E } /* Name.Class */
+.codehilite .no { color: #66D9EF } /* Name.Constant */
+.codehilite .nd { color: #A6E22E } /* Name.Decorator */
+.codehilite .ni { color: #F8F8F2 } /* Name.Entity */
+.codehilite .ne { color: #A6E22E } /* Name.Exception */
+.codehilite .nf { color: #A6E22E } /* Name.Function */
+.codehilite .nl { color: #F8F8F2 } /* Name.Label */
+.codehilite .nn { color: #F8F8F2 } /* Name.Namespace */
+.codehilite .nx { color: #A6E22E } /* Name.Other */
+.codehilite .py { color: #F8F8F2 } /* Name.Property */
+.codehilite .nt { color: #FF4689 } /* Name.Tag */
+.codehilite .nv { color: #F8F8F2 } /* Name.Variable */
+.codehilite .ow { color: #FF4689 } /* Operator.Word */
+.codehilite .pm { color: #F8F8F2 } /* Punctuation.Marker */
+.codehilite .w { color: #F8F8F2 } /* Text.Whitespace */
+.codehilite .mb { color: #AE81FF } /* Literal.Number.Bin */
+.codehilite .mf { color: #AE81FF } /* Literal.Number.Float */
+.codehilite .mh { color: #AE81FF } /* Literal.Number.Hex */
+.codehilite .mi { color: #AE81FF } /* Literal.Number.Integer */
+.codehilite .mo { color: #AE81FF } /* Literal.Number.Oct */
+.codehilite .sa { color: #E6DB74 } /* Literal.String.Affix */
+.codehilite .sb { color: #E6DB74 } /* Literal.String.Backtick */
+.codehilite .sc { color: #E6DB74 } /* Literal.String.Char */
+.codehilite .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+.codehilite .sd { color: #E6DB74 } /* Literal.String.Doc */
+.codehilite .s2 { color: #E6DB74 } /* Literal.String.Double */
+.codehilite .se { color: #AE81FF } /* Literal.String.Escape */
+.codehilite .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+.codehilite .si { color: #E6DB74 } /* Literal.String.Interpol */
+.codehilite .sx { color: #E6DB74 } /* Literal.String.Other */
+.codehilite .sr { color: #E6DB74 } /* Literal.String.Regex */
+.codehilite .s1 { color: #E6DB74 } /* Literal.String.Single */
+.codehilite .ss { color: #E6DB74 } /* Literal.String.Symbol */
+.codehilite .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+.codehilite .fm { color: #A6E22E } /* Name.Function.Magic */
+.codehilite .vc { color: #F8F8F2 } /* Name.Variable.Class */
+.codehilite .vg { color: #F8F8F2 } /* Name.Variable.Global */
+.codehilite .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+.codehilite .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+.codehilite .il { color: #AE81FF } /* Literal.Number.Integer.Long */
+
+    .codehilite {
+      background-color: var(--color-neutral);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      color: var(--color-neutral-content);
+      font-family: "IBM Plex Mono", monospace;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+
+    .codehilite pre {
+      margin: 0;
+      background: transparent;
+      font-family: inherit;
+      font-size: inherit;
+      border: none;
+      padding: 0;
+      box-shadow: none;
+      overflow-x: auto;
+    }
+
+    .codehilite__chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      gap: 1rem;
+    }
+
+    .codehilite__language {
+      white-space: nowrap;
+    }
+
+    .codehilite__copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      color: var(--color-neutral-content);
+      font-family: inherit;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 0.2rem 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .codehilite__copy:hover,
+    .codehilite__copy:focus-visible {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .codehilite__copy[data-state="copied"] {
+      background: var(--color-accent);
+      color: var(--color-accent-content);
+      border-color: transparent;
+    }
+
+    .codehilite__copy-icon {
+      width: 0.85rem;
+      height: 0.85rem;
+      display: block;
+    }
+
+    .svg-inline--fa {
+      display: inline;
+	}
+  </style>
+</head>
+<body class="doc-page">
+  <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
+
+  <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-base-200 bg-base-100/80 backdrop-blur supports-[backdrop-filter]:bg-base-100/60">
+    <div class="layout-shell layout-shell--docs flex w-full items-center justify-between px-4 py-4 md:px-8">
+      <a href="index.html" class="group flex items-center gap-3 font-mono text-lg font-bold uppercase tracking-[0.35em] text-base-content">
+        <span class="flex h-9 w-9 items-center justify-center transition-transform duration-300 group-hover:rotate-45">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="12" width="16.9706" height="16.9706" transform="rotate(45 12 0)" />
+          </svg>
+        </span>
+        df12
+      </a>
+      <nav aria-label="Primary navigation" class="hidden items-center gap-8 md:flex">
+        <a href="index.html#systems" class="nav-link hit-target">Tools</a>
+        <a href="index.html#worlds" class="nav-link hit-target" data-variant="accent">Creative</a>
+        <a href="docs.html" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
+      </nav>
+      <div class="md:hidden">
+        <details class="dropdown dropdown-end">
+          <summary class="btn btn-ghost btn-sm font-mono uppercase tracking-[0.3em]">Menu</summary>
+          <ul class="menu dropdown-content menu-sm z-[1] mt-2 w-44 rounded-box bg-base-100 p-2 shadow">
+            <li><a href="index.html#systems" class="nav-link hit-target w-full justify-start">Tools</a></li>
+            <li><a href="index.html#worlds" class="nav-link hit-target w-full justify-start" data-variant="accent">Creative</a></li>
+            <li><a href="docs.html" class="nav-link hit-target w-full justify-start" data-variant="neutral" aria-current="page">Docs</a></li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="px-4 pb-24 pt-32">
+    <div class="layout-shell layout-shell--docs doc-grid">
+      <aside class="doc-sidebar" aria-label="Documentation navigation">
+        <div class="doc-sidebar__panel">
+          <a href="docs.html" class="doc-sidebar__back">
+            <iconify-icon icon="carbon:arrow-left" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+            Back to docs
+          </a>
+          <div>
+            <p class="doc-sidebar__eyebrow">CmdMox</p>
+            <p class="doc-sidebar__body">Python-native command mocking harness that intercepts external processes over Unix domain sockets so pytest suites can spy, stub, and replay shell workflows without brittle bash fixtures.
+</p>
+          </div>
+          <div class="doc-sidebar__groups">
+              <div class="doc-nav-group" aria-label="Getting started">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-getting-started.html">Getting started</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Platform support">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-platform-support.html">Platform support</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Basic workflow">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-basic-workflow.html">Basic workflow</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Stubs, mocks and spies">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-stubs-mocks-and-spies.html">Stubs, mocks and spies</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Defining expectations">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-defining-expectations.html">Defining expectations</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Running tests">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-running-tests.html">Running tests</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Parallel execution and isolation">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-parallel-execution-and-isolation.html">Parallel execution and isolation</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Spies and passthrough mode">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-spies-and-passthrough-mode.html">Spies and passthrough mode</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Controller configuration and journals">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-controller-configuration-and-journals.html">Controller configuration and journals</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Fluent API reference">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-fluent-api-reference.html">Fluent API reference</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Using the IPC server directly">
+                <h3 class="doc-nav-group__title is-active" aria-current="page">
+                  <a href="docs-cmd-mox-using-the-ipc-server-directly.html">Using the IPC server directly</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Environment variables">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-cmd-mox-environment-variables.html">Environment variables</a>
+                </h3>
+              </div>
+          </div>
+          <div>
+            <p class="doc-sidebar__section-label">Source</p>
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.1.0/docs/usage-guide.md" target="_blank" rel="noopener">
+              View markdown
+              <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
+            </a>
+            <p class="mt-1 text-xs text-base-content/60">Source material</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="space-y-6" id="using-the-ipc-server-directly">
+        <nav class="doc-mobile-nav" aria-labelledby="mobile-sections-label">
+          <p id="mobile-sections-label" class="doc-sidebar__section-label">Contents</p>
+          <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Getting started</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-getting-started.html" class="doc-nav__link">Getting started</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Platform support</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-platform-support.html" class="doc-nav__link">Platform support</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Basic workflow</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-basic-workflow.html" class="doc-nav__link">Basic workflow</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Stubs, mocks and spies</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-stubs-mocks-and-spies.html" class="doc-nav__link">Stubs, mocks and spies</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Defining expectations</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-defining-expectations.html" class="doc-nav__link">Defining expectations</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Running tests</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-running-tests.html" class="doc-nav__link">Running tests</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Parallel execution and isolation</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-parallel-execution-and-isolation.html" class="doc-nav__link">Parallel execution and isolation</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Spies and passthrough mode</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-spies-and-passthrough-mode.html" class="doc-nav__link">Spies and passthrough mode</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Controller configuration and journals</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-controller-configuration-and-journals.html" class="doc-nav__link">Controller configuration and journals</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Fluent API reference</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-fluent-api-reference.html" class="doc-nav__link">Fluent API reference</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Using the IPC server directly</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-using-the-ipc-server-directly.html" class="doc-nav__link">Using the IPC server directly</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Environment variables</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-cmd-mox-environment-variables.html" class="doc-nav__link">Environment variables</a>
+                    </li>
+                </ul>
+              </li>
+          </ul>
+        </nav>
+
+        <header class="doc-hero" id="doc-title">
+          <h1 class="doc-hero__title">Using the IPC server directly</h1>
+          <div class="doc-meta-list">
+              <span class="doc-meta-list__item">Version 0.1.0</span>
+            <span class="doc-meta-list__item">Updated Oct 26, 2025</span>
+          </div>
+        </header>
+
+        <article class="doc-article">
+              <section class="doc-section">
+                <div class="doc-prose"><p>Most projects interact with the IPC server through <code>CmdMox</code>, but advanced
+scenarios can instantiate <code>cmd_mox.ipc.IPCServer</code> themselves. The server
+accepts optional callbacks so invocation handling can be customised without
+subclassing:</p>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cmd_mox.ipc</span><span class="w"> </span><span class="kn">import</span> <span class="n">IPCHandlers</span><span class="p">,</span> <span class="n">IPCServer</span><span class="p">,</span> <span class="n">Response</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="n">invocation</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="s2">&quot;custom output&quot;</span><span class="p">)</span>
+
+<span class="n">handlers</span> <span class="o">=</span> <span class="n">IPCHandlers</span><span class="p">(</span><span class="n">handler</span><span class="o">=</span><span class="n">handle</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">IPCServer</span><span class="p">(</span><span class="n">socket_path</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="n">handlers</span><span class="p">):</span>
+    <span class="o">...</span>
+</code></pre></div>
+
+<p>Providing <code>passthrough_handler=</code> to <code>IPCHandlers</code> intercepts passthrough
+completions in the same fashion. When no callbacks are supplied the server
+keeps its default echo behaviour, so existing code continues to work unchanged.</p>
+<p>Projects that rely on :class:<code>CallbackIPCServer</code> can still customise startup
+and accept timeouts by passing a :class:<code>TimeoutConfig</code> dataclass:</p>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cmd_mox.ipc</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackIPCServer</span><span class="p">,</span> <span class="n">IPCHandlers</span><span class="p">,</span> <span class="n">TimeoutConfig</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">CallbackIPCServer</span><span class="p">(</span>
+    <span class="n">socket_path</span><span class="p">,</span>
+    <span class="n">handler</span><span class="o">=</span><span class="n">handle</span><span class="p">,</span>
+    <span class="n">passthrough_handler</span><span class="o">=</span><span class="n">handle_passthrough</span><span class="p">,</span>
+    <span class="n">timeouts</span><span class="o">=</span><span class="n">TimeoutConfig</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">accept_timeout</span><span class="o">=</span><span class="mf">0.05</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div></div>
+              </section>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <footer id="footer" class="border-t border-base-200 bg-base-100">
+    <div class="layout-shell layout-shell--docs grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16">
+      <div>
+        <p class="font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90">df12 Productions</p>
+        <p class="mt-4 text-sm text-base-content/90">Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.</p>
+      </div>
+      <div>
+        <h2>OSS &amp; Licences</h2>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li><a class="footer-link" href="https://github.com/leynos/limela/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Limela — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/netsuke/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Netsuke — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/mxd/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">mxd — licence</a></li>
+          <li><a class="footer-link" href="https://github.com/leynos/episodic/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Episodic — licence</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Stay in touch</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li><a class="footer-link" data-variant="accent" href="mailto:hello@df12.studio">hello@df12.studio</a></li>
+          <li>
+            <a class="footer-link" data-variant="accent" href="https://github.com/leynos" target="_blank" rel="noopener noreferrer">
+              <iconify-icon icon="carbon:logo-github" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a class="footer-link" data-variant="accent" href="https://bsky.app/profile/df12.studio" target="_blank" rel="noopener noreferrer">
+              <iconify-icon icon="carbon:logo-bluesky" class="h-4 w-4" aria-hidden="true"></iconify-icon>
+              Bluesky
+            </a>
+          </li>
+        </ul>
+        <p class="mt-4 text-xs text-base-content/80">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const blocks = document.querySelectorAll('.codehilite');
+      if (!blocks.length) {
+        return;
+      }
+
+      const formatLanguage = (raw) => {
+        const value = (raw || '').trim();
+        if (!value || value.toLowerCase() === 'text') {
+          return 'Plain Text';
+        }
+        return value
+          .replace(/[._-]+/g, ' ')
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+      };
+
+      const writeClipboard = async (text) => {
+        if (!text) {
+          return false;
+        }
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch (error) {
+          /* fall back */
+        }
+
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', 'readonly');
+          textarea.style.position = 'absolute';
+          textarea.style.left = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          const success = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          return success;
+        } catch (error) {
+          return false;
+        }
+      };
+
+      blocks.forEach((block) => {
+        if (block.dataset.enhanced === 'true') {
+          return;
+        }
+        const pre = block.querySelector('pre');
+        const code = block.querySelector('code') || pre;
+        if (!pre || !code) {
+          return;
+        }
+
+        block.dataset.enhanced = 'true';
+
+        const chrome = document.createElement('div');
+        chrome.className = 'codehilite__chrome';
+
+        const languageLabel = document.createElement('span');
+        languageLabel.className = 'codehilite__language';
+        const lang = block.dataset.language || '';
+        const readableLang = formatLanguage(lang);
+        languageLabel.textContent = readableLang;
+
+        const copyButton = document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'codehilite__copy';
+        copyButton.setAttribute('aria-label', `Copy ${readableLang} code snippet`);
+        copyButton.innerHTML = `
+          <span class="codehilite__copy-icon" aria-hidden="true">
+            <iconify-icon icon="carbon:copy" class="h-4 w-4"></iconify-icon>
+          </span>
+          <span class="codehilite__copy-text">Copy</span>
+        `;
+
+        chrome.appendChild(languageLabel);
+        chrome.appendChild(copyButton);
+        block.insertBefore(chrome, pre);
+
+        const copyTextLabel = copyButton.querySelector('.codehilite__copy-text');
+        let resetTimer;
+
+        copyButton.addEventListener('click', async () => {
+          const textContent = code.textContent || '';
+          const didCopy = await writeClipboard(textContent.trimEnd());
+          if (!didCopy) {
+            if (copyTextLabel) {
+              copyTextLabel.textContent = 'Press ⌘/Ctrl+C';
+            }
+            clearTimeout(resetTimer);
+            resetTimer = setTimeout(() => {
+              copyButton.removeAttribute('data-state');
+              if (copyTextLabel) {
+                copyTextLabel.textContent = 'Copy';
+              }
+            }, 2500);
+            return;
+          }
+          copyButton.dataset.state = 'copied';
+          if (copyTextLabel) {
+            copyTextLabel.textContent = 'Copied';
+          }
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(() => {
+            copyButton.removeAttribute('data-state');
+            if (copyTextLabel) {
+              copyTextLabel.textContent = 'Copy';
+            }
+          }, 2500);
+        });
+      });
+    })();
+  </script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+</body>
+</html>

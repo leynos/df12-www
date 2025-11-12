@@ -306,8 +306,8 @@ class PageContentGenerator:
             return None
         if isinstance(value, dt.datetime):
             if value.tzinfo is None:
-                return value.replace(tzinfo=dt.timezone.utc)
-            return value.astimezone(dt.timezone.utc)
+                return value.replace(tzinfo=dt.UTC)
+            return value.astimezone(dt.UTC)
         if isinstance(value, str):
             sanitized = value.strip()
             if not sanitized:
@@ -318,8 +318,8 @@ class PageContentGenerator:
             except ValueError:
                 return None
             if parsed.tzinfo is None:
-                return parsed.replace(tzinfo=dt.timezone.utc)
-            return parsed.astimezone(dt.timezone.utc)
+                return parsed.replace(tzinfo=dt.UTC)
+            return parsed.astimezone(dt.UTC)
         return None
 
     def _fetch_markdown(self) -> str:
@@ -363,8 +363,8 @@ class PageContentGenerator:
                 parsed = None
             if parsed is not None:
                 if parsed.tzinfo is None:
-                    parsed = parsed.replace(tzinfo=dt.timezone.utc)
-                return parsed.astimezone(dt.timezone.utc)
+                    parsed = parsed.replace(tzinfo=dt.UTC)
+                return parsed.astimezone(dt.UTC)
         return dt.datetime.now(dt.UTC)
 
     def _resolve_description(self) -> str:

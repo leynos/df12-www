@@ -22,7 +22,7 @@ pages = "df12_pages:main"
 [dependency-groups]
 dev = [
     "pytest",
-	"pytest-xdist",
+    "pytest-xdist",
     "pytest-mock",
     "ruff",
     "pytest-timeout",
@@ -36,7 +36,7 @@ dev = [
 
 [tool.ruff]
 line-length = 88
-target-version = "py311"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [

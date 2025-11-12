@@ -40,14 +40,14 @@ exploratory research only—no implementation has been attempted yet.
 
 - **Feature gaps** – WAF is GA but still labelled as feature-limited; Edge
   Services currently restricts origins to Scaleway Object Storage or Load
-  Balancer. If you rely on AWS Shield, Route 53 health checks, or Lambda@Edge,
-  there is no direct counterpart.
+  Balancer. AWS Shield, Route 53 health checks, and Lambda@Edge have no direct
+  Scaleway counterparts.
 - **Tooling pivots** – Terraform modules should be refactored so every AWS
   resource has a Scaleway analogue controlled by a `cloud_provider` flag. Edge
   Services cache purges and Cockpit alert definitions require new automation.
 - **Currency & reporting** – All billing automation is euro-only. If GBP
-  reporting (current budget limit) is required, you will need conversion logic
-  or third-party FinOps tooling (e.g. Holori).
+  reporting (current budget limit) is required, conversion logic or third-party
+  FinOps tooling (e.g. Holori) will be needed.
 
 ## Suggested Next Steps
 

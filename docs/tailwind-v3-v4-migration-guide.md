@@ -1,11 +1,13 @@
-Here is what you need to know about Tailwind CSS v4 (May 2025)
+# Tailwind CSS v4 Migration Guide
 
-### I. Core Architecture & Performance
+This guide summarizes important changes in Tailwind CSS v4 (May 2025).
+
+## I. Core Architecture & Performance
 
 1.  **New Engine - Performance First:**
     *   V4 ships with a completely rewritten engine. Expect drastically reduced build times – typically sub-10ms for most projects, even large ones often under 100ms. This is achieved by more efficiently parsing sources and generating CSS on-demand.
 2.  **CSS-First Configuration via `@theme`:**
-    *   The primary configuration mechanism shifts from `tailwind.config.js` (for theme values) to your main CSS file using the `@theme` directive.
+    *   The primary configuration mechanism shifts from `tailwind.config.js` (for theme values) to the main CSS file using the `@theme` directive.
         ```css
         /* app.css */
         @import "tailwindcss";
@@ -23,7 +25,7 @@ Here is what you need to know about Tailwind CSS v4 (May 2025)
     *   Targets **Safari 16.4+, Chrome 111+, Firefox 128+**. This is non-negotiable as v4 relies on features like `@property`, `color-mix()`, and modern cascade layers. Older browser support requires sticking to v3.4.
     *   The default color palette leverages OKLCH for more vibrant, perceptually uniform colors out-of-the-box.
 
-### II. Build & Integration
+## II. Build & Integration
 
 1.  **Simplified Imports:**
     *   The `@tailwind base; @tailwind components; @tailwind utilities;` directives are deprecated. A single `@import "tailwindcss";` now handles the injection of base styles (Preflight), theme variables, and utilities into their respective cascade layers.
@@ -34,7 +36,7 @@ Here is what you need to know about Tailwind CSS v4 (May 2025)
 3.  **Internalized Processing:**
     *   `postcss-import` and `autoprefixer` are generally no longer required as separate dependencies. Tailwind v4 handles CSS bundling and vendor prefixing (via Lightning CSS) internally.
 
-### III. Key Migration Considerations & API Changes (v3 -> v4)
+## III. Key Migration Considerations & API Changes (v3 -> v4)
 
 1.  **Configuration File Shift:**
     *   While `tailwind.config.js` can still be used for plugin definitions or complex setups (loaded via `@config "path/to/config.js";`), theme customization (colors, spacing, fonts, breakpoints) should primarily occur in CSS via `@theme`.
@@ -45,7 +47,7 @@ Here is what you need to know about Tailwind CSS v4 (May 2025)
     *   Scales for `shadow`, `rounded`, and `blur` have been normalized (e.g., `shadow` -> `shadow-sm`, `shadow-sm` -> `shadow-xs`).
     *   `ring` default width is now `1px` (was `3px`); use `ring-3` for the old default.
 3.  **Default Value Adjustments:**
-    *   Default border color is now `currentColor`. Explicitly add color classes like `border-gray-200` if you relied on the v3 default gray.
+    *   Default border color is now `currentColor`. Explicitly add color classes like `border-gray-200` whenever the v3 default gray was previously required.
     *   Default ring color is `currentColor` (was `blue-500`).
 4.  **Selector Modifications:**
     *   `space-x-*`/`space-y-*` utilities now use `margin-bottom`/`margin-right` on `:not(:last-child)` for performance. This might affect inline elements or layouts with existing tweaked margins. Flex/grid `gap` is often a better alternative.
@@ -61,14 +63,14 @@ Here is what you need to know about Tailwind CSS v4 (May 2025)
     *   Functional utilities (e.g., `tab-*` matching `tab-2`, `tab-github`) are defined using `@utility` with a `--value()` function to parse arguments and match theme keys or arbitrary values.
 6.  **`@apply` in Scoped Styles (Vue SFCs, Svelte, CSS Modules):**
     *   Due to isolated processing of these style blocks by build tools, theme variables, custom utilities, and variants defined in global CSS are not automatically available.
-    *   Use `@reference "../path/to/your/main.css";` *inside* the scoped style block to make these available without duplicating CSS output.
+    *   Use `@reference "../path/to/main.css";` *inside* the scoped style block to make these available without duplicating CSS output.
     *   Alternatively, directly use CSS variables (`var(--color-brand-500)`) instead of `@apply` for better performance and simpler processing.
 7.  **Prefix Syntax:**
     *   Utility prefixes are now variant-like: `tw:bg-red-500`. Theme variables in `@theme` remain unprefixed, but generated CSS variables *will* be prefixed (e.g., `--tw-color-red-500`).
 8.  **Arbitrary Value Syntax for CSS Variables:**
     *   Using CSS variables in arbitrary values now uses parentheses: `bg-(--my-brand-color)` instead of `bg-[--my-brand-color]`. This resolves ambiguity with other arbitrary value types.
 
-### IV. Advanced Capabilities & Modern CSS Integration
+## IV. Advanced Capabilities & Modern CSS Integration
 
 1.  **Enhanced Variant System:**
     *   Comprehensive support for ARIA attributes (`aria-checked:`, `aria-disabled:`). Custom `aria-*` variants can be defined.
@@ -84,7 +86,7 @@ Here is what you need to know about Tailwind CSS v4 (May 2025)
 3.  **Native CSS Features:**
     *   Tailwind v4 is built upon and encourages the use of native CSS variables, nesting (processed by Lightning CSS), `color-mix()`, `calc()`, etc.
 
-### V. Workflow Adjustments & Deprecations
+## V. Workflow Adjustments & Deprecations
 
 1.  **Preprocessors (Sass/Less/Stylus):**
     *   Not designed for use with Tailwind v4. Tailwind itself, with its CSS-native features and internal processing via Lightning CSS, fulfills most preprocessor roles.

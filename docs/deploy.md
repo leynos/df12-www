@@ -224,7 +224,7 @@ CI tips:
 
 - Push changes to the configured branch; the next deployment (CI or manual)
   will rebuild assets and sync the bucket/CDN.
-- You can trigger a manual redeploy anytime with `tofu apply`.
+- Trigger a manual redeploy anytime with `tofu apply`.
 - The deploy modules rely on the GitHub PAT injected at runtime. Ensure it has
   read access to the repository and rotate it periodically.
 

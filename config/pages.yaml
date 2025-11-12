@@ -283,8 +283,6 @@ pages:
   femtologging:
     label: "femtologging"
     repo: leynos/femtologging
-    latest_release: v0.2.0
-    latest_release_published_at: '2023-09-27T17:35:09Z'
     language: python
     filename_prefix: docs-femtologging-
     page_title_suffix: "femtologging"
@@ -296,8 +294,7 @@ pages:
   falcon-pachinko:
     label: "Falcon Pachinko"
     repo: leynos/falcon-pachinko
-    latest_release: v0.3.0
-    latest_release_published_at: '2024-04-18T04:09:21Z'
+    doc_path: docs/falcon-websocket-extension-design.md
     language: python
     filename_prefix: docs-falcon-pachinko-
     page_title_suffix: "Falcon Pachinko"

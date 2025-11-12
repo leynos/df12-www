@@ -168,7 +168,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
     .svg-inline--fa {
       display: inline;
-	}
+    }
   </style>
 </head>
 <body class="doc-page">
@@ -495,8 +495,32 @@ error codes via <code>DataSourceError::code()</code>.</p></div>
           const textContent = code.textContent || '';
           const didCopy = await writeClipboard(textContent.trimEnd());
           if (!didCopy) {
+            let selectionApplied = false;
+            if (window.getSelection && document.createRange) {
+              const selection = window.getSelection();
+              if (selection) {
+                try {
+                  const range = document.createRange();
+                  range.selectNodeContents(code);
+                  selection.removeAllRanges();
+                  selection.addRange(range);
+                  selectionApplied = true;
+                  const focusTarget = block.querySelector('pre');
+                  if (focusTarget) {
+                    if (focusTarget.tabIndex < 0) {
+                      focusTarget.tabIndex = -1;
+                    }
+                    focusTarget.focus({ preventScroll: true });
+                  }
+                } catch (err) {
+                  selectionApplied = false;
+                }
+              }
+            }
             if (copyTextLabel) {
-              copyTextLabel.textContent = 'Press ⌘/Ctrl+C';
+              copyTextLabel.textContent = selectionApplied
+                ? 'Press ⌘/Ctrl+C'
+                : 'Select the code and press ⌘/Ctrl+C';
             }
             clearTimeout(resetTimer);
             resetTimer = setTimeout(() => {
@@ -522,6 +546,11 @@ error codes via <code>DataSourceError::code()</code>.</p></div>
       });
     })();
   </script>
-<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+<script
+  src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"
+  defer
+  integrity="sha384-GPb5RlngihS9H0z1D137JsvzmeZ7tCpWEF4t5YDoTZyMsPP8S7h7vFDh4XhheU83"
+  crossorigin="anonymous"
+></script>
 </body>
 </html>

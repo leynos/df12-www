@@ -74,11 +74,24 @@ def when_render_docs(
     recorder = scenario_state["recorder"]
     calls: list[str] = []
 
-    def session_get(url: str, timeout: int = 30):  # noqa: ARG001
-        calls.append(url)
-        return session.get(url, timeout=timeout)
+    class _RecordingSession:
+        def __init__(self, delegate: requests.Session) -> None:
+            self._delegate = delegate
 
-    monkeypatch.setattr("df12_pages.generator.requests.get", session_get)
+        def mount(self, *args: object, **kwargs: object) -> None:  # pragma: no cover - passthrough
+            self._delegate.mount(*args, **kwargs)
+
+        def get(self, url: str, timeout: int = 30):
+            calls.append(url)
+            return self._delegate.get(url, timeout=timeout)
+
+        def close(self) -> None:  # pragma: no cover - betamax handles lifecycle
+            return None
+
+    monkeypatch.setattr(
+        "df12_pages.generator.requests.Session",
+        lambda: _RecordingSession(session),
+    )
 
     generator = PageContentGenerator(page, output_dir=output_dir)
     with recorder.use_cassette("docs_release/render"):

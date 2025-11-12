@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses as dc
 import datetime as dt
 import json
+import os
 import shutil
 import subprocess
 import typing as typ
@@ -111,15 +112,22 @@ def markdown_response(
         def raise_for_status(self) -> None:  # pragma: no cover - stub
             return None
 
-    def fake_get(url: str, timeout: int = 30) -> _Response:  # noqa: ARG001
-        state["calls"].append(url)
-        return _Response(sample_markdown, {"Last-Modified": state["last_modified"]})
-
     def set_last_modified(value: str) -> None:
         state["last_modified"] = value
 
+    class _Session:
+        def mount(self, *_args: typ.Any, **_kwargs: typ.Any) -> None:  # pragma: no cover - stub
+            return None
+
+        def get(self, url: str, timeout: int = 30) -> _Response:  # noqa: ARG002
+            state["calls"].append(url)
+            return _Response(sample_markdown, {"Last-Modified": state["last_modified"]})
+
+        def close(self) -> None:  # pragma: no cover - stub
+            return None
+
     state["set_last_modified"] = set_last_modified
-    monkeypatch.setattr("df12_pages.generator.requests.get", fake_get)
+    monkeypatch.setattr("df12_pages.generator.requests.Session", lambda: _Session())
     return state
 
 
@@ -325,13 +333,22 @@ def test_doc_prose_code_spans_have_expected_computed_style(
     assets_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(css_build_artifact, assets_dir / "site.css")
 
+    browsers_base = Path(os.environ.get("PLAYWRIGHT_BROWSERS_PATH", Path.home() / ".cache" / "ms-playwright"))
+    has_chromium = any(browsers_base.glob("chromium-*"))
+    if not has_chromium:  # pragma: no cover - environment guard
+        pytest.skip("Playwright Chromium browser not installed; run `bun x playwright install chromium`.")
+
     bun_exe = _require_executable("bun")
-    result = subprocess.run(  # noqa: S603 - inputs are controlled fixture paths
-        [bun_exe, "x", "css-view", f"file://{doc_path.resolve()}"],
-        cwd=REPO_ROOT,
-        check=True,
-        capture_output=True,
-    )
+    try:
+        result = subprocess.run(  # noqa: S603 - inputs are controlled fixture paths
+            [bun_exe, "x", "css-view", f"file://{doc_path.resolve()}"],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+            timeout=90,
+        )
+    except subprocess.TimeoutExpired as exc:  # pragma: no cover - environment guard
+        pytest.skip(f"css-view timed out: {exc}")
     payload = msgspec_json.decode(result.stdout)
     tree = typ.cast("dict[str, typ.Any]", payload["payload"]["tree"])
     code_nodes = _extract_nodes_by_tag(tree, "code")

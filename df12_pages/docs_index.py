@@ -11,6 +11,7 @@ from pathlib import Path
 
 import requests
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from markdown import markdown
 
 from ._constants import PAGE_META_TEMPLATE
 
@@ -34,6 +35,7 @@ class DocsIndexBuilder:
         )
         self.template = self.env.get_template("docs_index.jinja")
         self.description_resolver = ManifestDescriptionResolver()
+        self._markdown_extensions = ["sane_lists", "tables", "fenced_code"]
 
     def run(self) -> Path:
         """Render the docs index HTML file to the configured output path."""
@@ -64,6 +66,7 @@ class DocsIndexBuilder:
                 {
                     "label": page.label,
                     "description": description,
+                    "description_html": self._render_description(description),
                     "href": link,
                     "repo": page.repo or "",
                     "repo_url": _build_repo_url(page.repo),
@@ -74,6 +77,16 @@ class DocsIndexBuilder:
                 }
             )
         return entries
+
+    def _render_description(self, text: str) -> str:
+        normalized = (text or "").strip()
+        if not normalized:
+            return ""
+        return markdown(
+            normalized,
+            extensions=self._markdown_extensions,
+            output_format="html5",
+        )
 
 
 def _discover_entry_href(page: PageConfig, relative_to: Path) -> str | None:

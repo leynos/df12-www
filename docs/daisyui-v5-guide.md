@@ -32,15 +32,15 @@ daisyUI 5 provides class names for common UI components
 ```
 
 ## daisyUI 5 usage rules
-1. We can give styles to a HTML element by adding daisyUI class names to it. By adding a component class name, part class names (if there's any available for that component), and modifier class names (if there's any available for that component)
+1. Apply styles to an HTML element by adding daisyUI class names. Combine the component class name, any available part class names, and modifier class names for that component.
 2. Components can be customized using Tailwind CSS utility classes if the customization is not possible using the existing daisyUI classes. For example `btn px-10` sets a custom horizontal padding to a `btn`
-3. If customization of daisyUI styles using Tailwind CSS utility classes didn't work because of CSS specificity issues, you can use the `!` at the end of the Tailwind CSS utility class to override the existing styles. For example `btn bg-red-500!` sets a custom background color to a `btn` forcefully. This is a last resort solution and should be used sparingly
-4. If a specific component or something similar to it doesn't exist in daisyUI, you can create your own component using Tailwind CSS utility
-5. when using Tailwind CSS `flex` and `grid` for layout, it should be responsive using Tailwind CSS responsive utility prefixes.
+3. If customization of daisyUI styles using Tailwind CSS utility classes fails because of CSS specificity, append `!` to the Tailwind utility class to override the existing styles. For example `btn bg-red-500!` forcefully sets a custom background color on a `btn`. Use this last-resort technique sparingly.
+4. When a specific component (or close equivalent) does not exist in daisyUI, create a bespoke component with Tailwind CSS utilities.
+5. When using Tailwind CSS `flex` and `grid` for layout, ensure the result stays responsive by applying the responsive utility prefixes.
 6. Only allowed class names are existing daisyUI class names or Tailwind CSS utility classes.
-7. Ideally, you won't need to write any custom CSS. Using daisyUI class names or Tailwind CSS utility classes is preferred.
-8. suggested - if you need placeholder images, use https://picsum.photos/200/300 with the size you want
-9. suggested - when designing , don't add a custom font unless it's necessary
+7. Ideally, no custom CSS is necessary; lean on daisyUI class names or Tailwind CSS utilities.
+8. suggested - when placeholder images are needed, use https://picsum.photos/200/300 at the desired size.
+9. suggested - when designing, avoid adding a custom font unless it is necessary.
 10. don't add `bg-base-100 text-base-content` to body unless it's necessary
 11. For design decisions, use Refactoring UI book best practices
 
@@ -178,11 +178,11 @@ A CSS file with Tailwind CSS, daisyUI and a custom daisyUI theme looks like this
 #### Rules
 - All CSS variables above are required
 - Colors can be OKLCH or hex or other formats
-- If you're generating a custom theme, do not include the comments from the example above. Just provide the code.
+- When generating a custom theme, do not include the comments from the example above. Just provide the code.
 
 People can use https://daisyui.com/theme-generator/ visual tool to create their own theme.
 
-## daisyUI 5 components
+### daisyUI 5 components
 
 ### accordion
 Accordion is used for showing and hiding content but only one item can stay open at a time
@@ -1742,4 +1742,3 @@ Validator class changes the color of form elements to error or success based on 
 
 #### Rules
 - Use with `input`, `select`, `textarea`
-

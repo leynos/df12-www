@@ -9,6 +9,7 @@ import os
 import posixpath
 import re
 import typing as typ
+from email.utils import parsedate_to_datetime
 from html import escape
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -19,7 +20,6 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from github3 import GitHub
 from github3 import exceptions as gh_exc
-from email.utils import parsedate_to_datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown import Markdown
 from markdown.extensions import Extension
@@ -168,8 +168,20 @@ class PageContentGenerator:
         source_url: str | None = None,
         output_dir: Path | None = None,
     ) -> None:
+        """Initialize the generator with configuration and template context.
+
+        Parameters
+        ----------
+        page_config : PageConfig
+            Page configuration describing repo details, theming, and layout.
+        templates_dir : Path, optional
+            Directory containing Jinja templates; defaults to the package templates.
+        source_url : str, optional
+            Override for the document source URL; falls back to the page config.
+        output_dir : Path, optional
+            Override for the HTML output directory; defaults to the page config output.
+        """
         self.page = page_config
-        self.source_url = source_url or page_config.source_url
         self.output_dir_override = output_dir
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
         self.renderer = HtmlContentRenderer(

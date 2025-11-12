@@ -191,7 +191,23 @@ class PageContentGenerator:
         self.source_url = self._resolve_source_url(source_url)
 
     def run(self) -> list[Path]:
-        """Generate HTML files, returning the written paths."""
+        """Render every section into themed HTML files on disk.
+
+        Returns
+        -------
+        list[Path]
+            Paths to the generated HTML documents, ordered by section.
+
+        Raises
+        ------
+        RuntimeError
+            Raised when the source markdown contains no second-level sections to render.
+
+        Notes
+        -----
+        Side effects include writing HTML files and metadata artifacts into the
+        configured output directory.
+        """
         markdown_source = self._fetch_markdown()
         sections = parse_sections(markdown_source)
         if not sections:

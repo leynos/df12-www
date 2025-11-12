@@ -45,7 +45,7 @@
           {% for entry in entries %}
             <article class="product-card pressable flex flex-col justify-between">
               <div>
-                <h3 class="product-card__title">{{ entry.label }}</h2>
+                <h3 class="product-card__title">{{ entry.label }}</h3>
                 <p class="mt-3 text-base-content/80">{{ entry.description }}</p>
               </div>
               <div class="mt-6 flex text-sm grow-1 flex-col items-start justify-end mb-4">
@@ -98,6 +98,11 @@
   docs_closing,
   'layout-shell grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16'
 ) | indent(2, true) }}
-<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+<script
+  src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"
+  defer
+  integrity="sha384-GPb5RlngihS9H0z1D137JsvzmeZ7tCpWEF4t5YDoTZyMsPP8S7h7vFDh4XhheU83"
+  crossorigin="anonymous"
+></script>
 </body>
 </html>

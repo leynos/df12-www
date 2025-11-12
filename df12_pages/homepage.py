@@ -1,4 +1,24 @@
-"""Homepage builder for df12 marketing site."""
+"""df12 homepage rendering pipeline.
+
+This module encapsulates the logic for turning the structured homepage entry in
+``config/pages.yaml`` into the static ``public/index.html`` artifact. It wires
+the configuration model, Jinja environment, and filesystem writes required to
+render the marketing splash page. The main entry point is ``HomePageBuilder``,
+which loads the shared template macros, injects the homepage data model, and
+persists the generated HTML.
+
+Typical usage mirrors the build pipeline:
+
+>>> from df12_pages.config import load_homepage
+>>> builder = HomePageBuilder(load_homepage())
+>>> output_path = builder.run()
+>>> print(output_path)
+
+The builder expects templates to reside under ``df12_pages/templates`` unless a
+custom directory is provided. It relies on Jinja2 with autoescape enabled and
+produces UTF-8 encoded files. Side effects include reading template files and
+writing the rendered HTML to disk.
+"""
 
 from __future__ import annotations
 
@@ -14,10 +34,29 @@ class HomePageBuilder:
     """Render the marketing homepage from structured config data."""
 
     def __init__(self, homepage: HomepageConfig, *, templates_dir: Path | None = None) -> None:
+        """Initialize the builder and Jinja environment.
+
+        Parameters
+        ----------
+        homepage : HomepageConfig
+            Parsed homepage block from ``config/pages.yaml``; provides navigation
+            links, hero content, systems/worlds cards, and footer metadata.
+        templates_dir : Path, optional
+            Directory containing Jinja templates. Defaults to
+            ``df12_pages/templates`` when not supplied, ensuring the build uses
+            the checked-in macros and partials.
+
+        Notes
+        -----
+        Instantiating the builder resolves the template directory, configures a
+        Jinja2 ``Environment`` (autoescape, trimmed blocks), and eagerly loads
+        the ``home_page.jinja`` template so later ``run`` calls only handle
+        rendering and filesystem writes.
+        """
         self.homepage = homepage
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
         self.env = Environment(
-            loader=FileSystemLoader(str(self.templates_dir)),
+            loader=FileSystemLoader(self.templates_dir),
             autoescape=True,
             trim_blocks=True,
             lstrip_blocks=True,

@@ -212,13 +212,23 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </a>
           <div>
             <p class="doc-sidebar__eyebrow">Ortho Config</p>
-            <p class="doc-sidebar__body">Esbuild-inspired configuration management for Rust services.</p>
+            <p class="doc-sidebar__body">Configuration engine inspired by esbuild’s ergonomics—one schema, many surfaces. Generate matching CLI flags, env vars, and config files for Rust services without losing type safety or your mind.
+</p>
           </div>
           <div class="doc-sidebar__groups">
               <div class="doc-nav-group" aria-label="Core concepts and motivation">
                 <h3 class="doc-nav-group__title " >
                   <a href="docs-ortho-config-core-concepts-and-motivation.html">Core concepts and motivation</a>
                 </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-ortho-config-core-concepts-and-motivation.html#core-concepts-and-motivation-declarative-merging"
+                           class="doc-nav__link "
+>
+                          <span>Declarative merging</span>
+                        </a>
+                      </li>
+                  </ul>
               </div>
               <div class="doc-nav-group" aria-label="Installation and dependencies">
                 <h3 class="doc-nav-group__title " >
@@ -384,7 +394,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/ortho-config/refs/tags/v0.5.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/ortho-config/refs/tags/v0.6.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -402,6 +412,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-ortho-config-core-concepts-and-motivation.html" class="doc-nav__link">Core concepts and motivation</a>
+                    </li>
+                    <li>
+                      <a href="docs-ortho-config-core-concepts-and-motivation.html#core-concepts-and-motivation-declarative-merging" class="doc-nav__link">Declarative merging</a>
                     </li>
                 </ul>
               </li>
@@ -541,8 +554,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Subcommand configuration</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.5.0</span>
-            <span class="doc-meta-list__item">Updated Oct 09, 2025</span>
+              <span class="doc-meta-list__item">Version 0.6.0</span>
+            <span class="doc-meta-list__item">Updated Nov 12, 2025</span>
           </div>
         </header>
 
@@ -551,11 +564,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <div class="doc-prose"><p>Many CLI applications use <code>clap</code> subcommands to perform different operations.
 <code>OrthoConfig</code> supports per‑subcommand defaults via a dedicated <code>cmds</code>
 namespace. The helper function <code>load_and_merge_subcommand_for</code> loads defaults
-for a specific subcommand and merges them beneath the CLI values. The legacy
-<code>load_subcommand_config</code> and <code>load_subcommand_config_for</code> helpers were removed
-in v0.5.0. The merged struct is returned as a new instance; the original <code>cli</code>
-struct remains unchanged. CLI fields left unset (<code>None</code>) do not override
-environment or file defaults, avoiding accidental loss of configuration.</p></div>
+for a specific subcommand and merges them beneath the CLI values. The merged
+struct is returned as a new instance; the original <code>cli</code> struct remains
+unchanged. CLI fields left unset (<code>None</code>) do not override environment or file
+defaults, avoiding accidental loss of configuration.</p></div>
               </section>
                 <section id="subcommand-configuration-how-it-works" class="doc-section">
                   <div class="doc-section__heading">
@@ -628,24 +640,26 @@ tool continues using the CLI value instead of exiting with an error.</p></div>
                   <div class="doc-section__heading">
                     <h2>Hello world walkthrough</h2>
                   </div>
-                  <div class="doc-prose"><p>The <code>hello_world</code> example crate demonstrates these patterns in a compact
+                  <div class="doc-prose"><p><a href="https://github.com/leynos/ortho-config/tree/main/examples/hello_world">https://github.com/leynos/ortho-config/tree/main/examples/hello_world</a></p>
+<p>The <code>hello_world</code> example crate demonstrates these patterns in a compact
 setting. Global options such as <code>--recipient</code> or <code>--salutation</code> are parsed via
 <code>load_global_config</code>, which layers configuration files and environment
 variables beneath any CLI overrides. The <code>greet</code> subcommand adds optional
 behaviour like a preamble (<code>--preamble "Good morning"</code>) or custom punctuation
 while reusing the merged global configuration. The <code>take-leave</code> subcommand
-combines switches and optional arguments (<code>--wave</code>, <code>--gift</code>,
-<code>--channel email</code>, <code>--remind-in 15</code>) alongside greeting adjustments
-(<code>--preamble "Until next time"</code>, <code>--punctuation ?</code>) to describe how the
-farewell should unfold. Each subcommand struct derives <code>OrthoConfig</code> so
+combines switches and optional arguments
+(<code>--wave</code>, <code>--gift</code>, <code>--channel email</code>, <code>--remind-in 15</code>) alongside greeting
+adjustments (<code>--preamble "Until next time"</code>, <code>--punctuation ?</code>) to describe how
+the farewell should unfold. Each subcommand struct derives <code>OrthoConfig</code> so
 defaults from <code>[cmds.greet]</code> or <code>[cmds.take-leave]</code> merge automatically when
 <code>load_and_merge()</code> is called.</p>
 <p>Behavioural tests in <code>examples/hello_world/tests</code> exercise scenarios such as
 <code>hello_world greet --preamble "Good morning"</code> and running
-<code>hello_world --is-excited take-leave</code> with <code>--gift biscuits</code>, <code>--remind-in 15</code>,
-<code>--channel email</code>, and <code>--wave</code>. These end-to-end checks verify that CLI
-arguments override configuration files and that validation errors surface
-cleanly when callers provide blank strings or conflicting switches.</p>
+<code>hello_world --is-excited take-leave</code> with
+<code>--gift biscuits</code>, <code>--remind-in 15</code>, <code>--channel email</code>, and <code>--wave</code>. These
+end-to-end checks verify that CLI arguments override configuration files and
+that validation errors surface cleanly when callers provide blank strings or
+conflicting switches.</p>
 <p>Sample configuration files live in <code>examples/hello_world/config</code>. The
 <code>baseline.toml</code> defaults underpin both the automated tests and the demo
 scripts, while <code>overrides.toml</code> extends the baseline to demonstrate inheritance
@@ -664,7 +678,7 @@ subcommand execution. Each subcommand struct implements a trait defining the
 action to perform. An enum of subcommands is annotated with
 <code>#[clap_dispatch(fn run(...))]</code>, and the <code>load_and_merge_subcommand_for</code>
 function can be called on each variant before dispatching. See the
-<code>Subcommand Configuration</code> section of the <code>OrthoConfig</code> <a href="https://github.com/leynos/ortho-config/blob/v0.5.0/README.md">README</a>
+<code>Subcommand Configuration</code> section of the <code>OrthoConfig</code> <a href="https://github.com/leynos/ortho-config/blob/v0.6.0/README.md">README</a>
 for a complete example.</p></div>
                 </section>
         </article>

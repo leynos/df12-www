@@ -212,13 +212,23 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </a>
           <div>
             <p class="doc-sidebar__eyebrow">Ortho Config</p>
-            <p class="doc-sidebar__body">Esbuild-inspired configuration management for Rust services.</p>
+            <p class="doc-sidebar__body">Configuration engine inspired by esbuild’s ergonomics—one schema, many surfaces. Generate matching CLI flags, env vars, and config files for Rust services without losing type safety or your mind.
+</p>
           </div>
           <div class="doc-sidebar__groups">
               <div class="doc-nav-group" aria-label="Core concepts and motivation">
                 <h3 class="doc-nav-group__title " >
                   <a href="docs-ortho-config-core-concepts-and-motivation.html">Core concepts and motivation</a>
                 </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-ortho-config-core-concepts-and-motivation.html#core-concepts-and-motivation-declarative-merging"
+                           class="doc-nav__link "
+>
+                          <span>Declarative merging</span>
+                        </a>
+                      </li>
+                  </ul>
               </div>
               <div class="doc-nav-group" aria-label="Installation and dependencies">
                 <h3 class="doc-nav-group__title is-active" aria-current="page">
@@ -384,7 +394,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/ortho-config/refs/tags/v0.5.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/ortho-config/refs/tags/v0.6.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -402,6 +412,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-ortho-config-core-concepts-and-motivation.html" class="doc-nav__link">Core concepts and motivation</a>
+                    </li>
+                    <li>
+                      <a href="docs-ortho-config-core-concepts-and-motivation.html#core-concepts-and-motivation-declarative-merging" class="doc-nav__link">Declarative merging</a>
                     </li>
                 </ul>
               </li>
@@ -541,8 +554,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Installation and dependencies</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.5.0</span>
-            <span class="doc-meta-list__item">Updated Oct 09, 2025</span>
+              <span class="doc-meta-list__item">Version 0.6.0</span>
+            <span class="doc-meta-list__item">Updated Nov 12, 2025</span>
           </div>
         </header>
 
@@ -550,7 +563,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
               <section class="doc-section">
                 <div class="doc-prose"><p>Add <code>ortho_config</code> as a dependency in <code>Cargo.toml</code> along with <code>serde</code>:</p>
 <div class="codehilite" data-language="toml"><pre><span></span><code><span class="k">[dependencies]</span>
-<span class="n">ortho_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.5.0&quot;</span><span class="w">            </span><span class="c1"># replace with the latest version</span>
+<span class="n">ortho_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.6.0&quot;</span><span class="w">            </span><span class="c1"># replace with the latest version</span>
 <span class="n">serde</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;derive&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
 <span class="n">clap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;4&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;derive&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w">    </span><span class="c1"># required for CLI support</span>
 </code></pre></div>
@@ -559,7 +572,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 (<code>.json</code> and <code>.json5</code>) and YAML (<code>.yaml</code> and <code>.yml</code>) support, enable the
 corresponding cargo features:</p>
 <div class="codehilite" data-language="toml"><pre><span></span><code><span class="k">[dependencies]</span>
-<span class="n">ortho_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;0.5.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;json5&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;yaml&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">ortho_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;0.6.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;json5&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;yaml&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
 <span class="c1"># Enabling these features expands file formats; precedence stays: defaults &lt; file &lt; env &lt; CLI.</span>
 </code></pre></div>
 
@@ -570,8 +583,17 @@ similarly enables <code>.yaml</code> and <code>.yml</code> files; without it, su
 during discovery and do not cause errors if present.</p>
 <p><code>ortho_config</code> re-exports its parsing dependencies, so consumers do not need to
 declare them directly. Access <code>figment</code>, <code>uncased</code>, <code>xdg</code> (on Unix-like and
-Redox targets), and the optional parsers (<code>figment_json5</code>, <code>json5</code>,
-<code>serde_yaml</code>, <code>toml</code>) via <code>ortho_config::</code> paths.</p></div>
+Redox targets), and the optional parsers
+(<code>figment_json5</code>, <code>json5</code>, <code>serde_saphyr</code>, <code>toml</code>) via <code>ortho_config::</code> paths.
+The <code>serde_json</code> re-export is enabled by default because the crate relies on it
+internally; disable default features only when explicitly opting back into
+<code>serde_json</code>.</p>
+<p>YAML parsing is handled by the pure-Rust <code>serde-saphyr</code> crate. It adheres to
+the YAML 1.2 specification, so unquoted scalars such as <code>yes</code>, <code>on</code>, and <code>off</code>
+remain strings. The provider enables <code>Options::strict_booleans</code>, ensuring only
+<code>true</code> and <code>false</code> deserialize as booleans, while legacy YAML 1.1 literals are
+treated as plain strings. Duplicate mapping keys surface as parsing errors
+instead of silently accepting the last entry, helping catch typos early.</p></div>
               </section>
         </article>
       </section>

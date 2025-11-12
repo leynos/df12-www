@@ -146,7 +146,8 @@ homepage:
         cta_label: Request the pitch deck
   footer:
     site_name: df12 Productions
-    blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of complex networks.
+    blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of 
+      complex networks.
     oss_heading: "OSS & Licences"
     contact_heading: Stay in touch
     closing_lede: Built for curious builders and storytellers everywhere.
@@ -232,8 +233,8 @@ pages:
   ortho-config:
     label: "Ortho Config"
     repo: leynos/ortho-config
-    latest_release: v0.5.0
-    latest_release_published_at: '2025-10-09T23:13:05Z'
+    latest_release: v0.6.0
+    latest_release_published_at: '2025-11-12T02:07:16Z'
     language: rust
     filename_prefix: docs-ortho-config-
     page_title_suffix: "Ortho Config"
@@ -282,7 +283,7 @@ pages:
     label: "CmdMox"
     repo: leynos/cmd-mox
     latest_release: v0.1.0
-    latest_release_published_at: '2025-10-26T02:10:36Z'
+    latest_release_published_at: '2025-10-26T02:10:19Z'
     branch: refs/tags/v0.1.0
     doc_path: docs/usage-guide.md
     language: python

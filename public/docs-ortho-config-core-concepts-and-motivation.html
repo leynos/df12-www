@@ -212,13 +212,23 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </a>
           <div>
             <p class="doc-sidebar__eyebrow">Ortho Config</p>
-            <p class="doc-sidebar__body">Esbuild-inspired configuration management for Rust services.</p>
+            <p class="doc-sidebar__body">Configuration engine inspired by esbuild’s ergonomics—one schema, many surfaces. Generate matching CLI flags, env vars, and config files for Rust services without losing type safety or your mind.
+</p>
           </div>
           <div class="doc-sidebar__groups">
               <div class="doc-nav-group" aria-label="Core concepts and motivation">
                 <h3 class="doc-nav-group__title is-active" aria-current="page">
                   <a href="docs-ortho-config-core-concepts-and-motivation.html">Core concepts and motivation</a>
                 </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-ortho-config-core-concepts-and-motivation.html#core-concepts-and-motivation-declarative-merging"
+                           class="doc-nav__link "
+>
+                          <span>Declarative merging</span>
+                        </a>
+                      </li>
+                  </ul>
               </div>
               <div class="doc-nav-group" aria-label="Installation and dependencies">
                 <h3 class="doc-nav-group__title " >
@@ -384,7 +394,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/ortho-config/refs/tags/v0.5.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/ortho-config/refs/tags/v0.6.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -402,6 +412,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-ortho-config-core-concepts-and-motivation.html" class="doc-nav__link">Core concepts and motivation</a>
+                    </li>
+                    <li>
+                      <a href="docs-ortho-config-core-concepts-and-motivation.html#core-concepts-and-motivation-declarative-merging" class="doc-nav__link">Declarative merging</a>
                     </li>
                 </ul>
               </li>
@@ -541,8 +554,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Core concepts and motivation</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.5.0</span>
-            <span class="doc-meta-list__item">Updated Oct 09, 2025</span>
+              <span class="doc-meta-list__item">Version 0.6.0</span>
+            <span class="doc-meta-list__item">Updated Nov 12, 2025</span>
           </div>
         </header>
 
@@ -582,10 +595,16 @@ values from multiple sources. The core features are:</p>
   <code>cli_short</code>, and <code>merge_strategy</code> provide fine‑grained control over naming
   and merging behaviour.</p>
 </li>
+<li><strong>Declarative merge tooling</strong> – Every configuration struct exposes a
+  <code>merge_from_layers</code> helper along with <code>MergeComposer</code>, making it simple to
+  compose defaults, files, environment captures, and CLI values in unit tests
+  or bespoke loaders without instantiating the CLI parser. Vector fields honour
+  the append strategy by default, so defaults flow through alongside
+  environment and CLI additions.</li>
 </ul>
 <p>The workspace bundles an executable Hello World example under
 <code>examples/hello_world</code>. It layers defaults, environment variables, and CLI
-flags via the derive macro; see its <a href="https://github.com/leynos/ortho-config/blob/v0.5.0/examples/hello_world/README.md">README</a>
+flags via the derive macro; see its <a href="https://github.com/leynos/ortho-config/blob/v0.6.0/examples/hello_world/README.md">README</a>
 for a step-by-step walkthrough and the Cucumber scenarios that validate
 behaviour end-to-end.</p>
 <p>Run <code>make test</code> to execute the example’s coverage. The unit suite uses <code>rstest</code>
@@ -630,6 +649,48 @@ without manual conversions:</p>
 preamble, and swap the greet punctuation for <code>!!!</code>. Behavioural tests and demo
 scripts assert the uppercase output to guard this layering.</p></div>
               </section>
+                <section id="core-concepts-and-motivation-declarative-merging" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>Declarative merging</h2>
+                  </div>
+                  <div class="doc-prose"><p>The derive macro now emits helpers for composing configuration layers without
+going through Figment directly. <code>MergeComposer</code> collects <code>MergeLayer</code> instances
+for defaults, files, environment, and CLI input; once constructed, pass the
+layers to <code>YourConfig::merge_from_layers</code> to build the final struct:</p>
+<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">ortho_config</span><span class="p">::{</span><span class="n">MergeComposer</span><span class="p">,</span><span class="w"> </span><span class="n">OrthoConfig</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">serde</span><span class="p">::</span><span class="n">Deserialize</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">serde_json</span><span class="p">::</span><span class="n">json</span><span class="p">;</span>
+
+<span class="cp">#[derive(Debug, Deserialize, OrthoConfig)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">AppConfig</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">recipient</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span><span class="p">,</span>
+<span class="w">    </span><span class="n">salutations</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">composer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MergeComposer</span><span class="p">::</span><span class="n">new</span><span class="p">();</span>
+<span class="n">composer</span><span class="p">.</span><span class="n">push_defaults</span><span class="p">(</span><span class="n">json</span><span class="o">!</span><span class="p">({</span><span class="s">&quot;recipient&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Defaults&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;salutations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;Hi&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}));</span>
+<span class="n">composer</span><span class="p">.</span><span class="n">push_environment</span><span class="p">(</span><span class="n">json</span><span class="o">!</span><span class="p">({</span><span class="s">&quot;salutations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;Env&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}));</span>
+<span class="n">composer</span><span class="p">.</span><span class="n">push_cli</span><span class="p">(</span><span class="n">json</span><span class="o">!</span><span class="p">({</span><span class="s">&quot;recipient&quot;</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Cli&quot;</span><span class="w"> </span><span class="p">}));</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">merged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">::</span><span class="n">merge_from_layers</span><span class="p">(</span><span class="n">composer</span><span class="p">.</span><span class="n">layers</span><span class="p">())</span><span class="o">?</span><span class="p">;</span>
+<span class="fm">assert_eq!</span><span class="p">(</span><span class="n">merged</span><span class="p">.</span><span class="n">recipient</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Cli&quot;</span><span class="p">);</span>
+<span class="fm">assert_eq!</span><span class="p">(</span>
+<span class="w">    </span><span class="n">merged</span><span class="p">.</span><span class="n">salutations</span><span class="p">,</span>
+<span class="w">    </span><span class="fm">vec!</span><span class="p">[</span><span class="nb">String</span><span class="p">::</span><span class="n">from</span><span class="p">(</span><span class="s">&quot;Hi&quot;</span><span class="p">),</span><span class="w"> </span><span class="nb">String</span><span class="p">::</span><span class="n">from</span><span class="p">(</span><span class="s">&quot;Env&quot;</span><span class="p">)]</span>
+<span class="p">);</span>
+</code></pre></div>
+
+<p>This API surfaces the same precedence as the generated <code>load()</code> method while
+making it trivial to drive unit and behavioural tests with hand-crafted layers.
+<code>Vec&lt;_&gt;</code> fields accumulate values from each layer in order, so defaults can
+coexist with environment or CLI extensions. The Hello World example’s
+behavioural suite includes a dedicated scenario that parses JSON descriptors
+into <code>MergeLayer</code> values and asserts the merged configuration via these
+helpers. Unit tests can mirror this approach with <code>rstest</code> fixtures: define
+fixtures for default payloads, then enumerate cases for file, environment, and
+CLI layers. This validates every precedence permutation without copy-pasting
+setup.</p></div>
+                </section>
         </article>
       </section>
     </div>

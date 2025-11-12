@@ -146,7 +146,7 @@ homepage:
         cta_label: Request the pitch deck
   footer:
     site_name: df12 Productions
-    blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of 
+    blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of
       complex networks.
     oss_heading: "OSS & Licences"
     contact_heading: Stay in touch
@@ -301,7 +301,7 @@ pages:
     filename_prefix: docs-femtologging-
     page_title_suffix: "femtologging"
     description: >
-      Hybrid Python/Rust logging library that that channels picologging’s
+      Hybrid Python/Rust logging library that channels picologging’s
       minimalism through PyO3. Log records stream through crossbeam-channel
       workers for thread-friendly, low-latency structured logging.
 

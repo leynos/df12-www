@@ -576,6 +576,20 @@ def _build_release_url(repo: str, tag: str, path: str) -> str:
 
 
 def _build_link_rewriter(page: PageConfig) -> Extension | None:
+    """Create a markdown extension that rewrites relative links to GitHub raw URLs.
+
+    Parameters
+    ----------
+    page : PageConfig
+        Page configuration containing the repo slug, release/branch ref, and
+        markdown path used to derive relative link bases.
+
+    Returns
+    -------
+    Extension or None
+        RelativeLinkExtension configured for the page context, or ``None`` when
+        the page does not originate from a GitHub repository.
+    """
     if not page.repo:
         return None
     ref = page.latest_release or page.branch

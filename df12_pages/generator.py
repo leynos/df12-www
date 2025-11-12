@@ -376,7 +376,7 @@ class PageContentGenerator:
     def _strip_version_prefix(tag: str | None) -> str | None:
         if not tag:
             return None
-        if tag and tag.upper().startswith("V") and len(tag) > 1:
+        if tag.upper().startswith("V") and len(tag) > 1:
             return tag[1:]
         return tag
 

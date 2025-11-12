@@ -584,12 +584,26 @@ def _build_link_rewriter(page: PageConfig) -> Extension | None:
 
 
 class RelativeLinkExtension(Extension):
+    """Markdown extension that rewrites relative links to GitHub sources."""
+
     def __init__(self, repo: str, ref: str, base_dir: str) -> None:
+        """Initialize the link rewriter.
+
+        Parameters
+        ----------
+        repo : str
+            Owner/repository slug (e.g., ``leynos/netsuke``).
+        ref : str
+            Git reference (tag or branch) the document was fetched from.
+        base_dir : str
+            Directory path inside the repo that contains the markdown source.
+        """
         self.repo = repo
         self.ref = ref
         self.base_dir = base_dir
 
     def extendMarkdown(self, md: Markdown) -> None:  # type: ignore[override]
+        """Register the relative-link treeprocessor on the provided Markdown instance."""
         processor = RelativeLinkTreeprocessor(md, self.repo, self.ref, self.base_dir)
         md.treeprocessors.register(processor, "df12_relative_links", 15)
 

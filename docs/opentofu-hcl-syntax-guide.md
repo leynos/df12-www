@@ -485,24 +485,25 @@ features, often configured via nested blocks.
 
 - `timeouts` **Block**: For resources that involve long-running operations
   (like creating a large database), some providers expose a `timeouts` block.
-  This allows you to specify custom time limits for `create`, `update`, and
-  `delete` operations, overriding the provider's defaults.7
+  This block allows custom time limits for `create`, `update`, and `delete`
+  operations, overriding the provider's defaults.7
 
 - `removed` **Block**: Introduced to simplify refactoring, the `removed` block
-  allows you to decouple a resource from the OpenTofu state without destroying
-  the actual remote object. If you delete a resource from your configuration,
-  you can replace it with a `removed` block pointing to its address (e.g.,
+  decouples a resource from the OpenTofu state without destroying the actual
+  remote object. When a resource is deleted from the configuration, it can be
+  replaced with a `removed` block pointing to its address (e.g.,
   `removed { from = aws_instance.web }`). On the next apply, OpenTofu will
   remove the resource from its state file but leave the real infrastructure
   intact.7
 
-- `import` **Block**: To bring existing, manually-created infrastructure under
-  OpenTofu's management, you can use an `import` block. You specify the target
-  resource address (`to`) and the resource's unique import ID (`id`). After
-  running `tofu plan -generate-config-out=generated.tofu`, OpenTofu will
-  inspect the existing resource and generate a corresponding HCL configuration
-  file. This generated code serves as a starting point that can be reviewed and
-  integrated into your main configuration.3
+- `import` **Block**: Existing, manually-created infrastructure can be brought
+  under OpenTofu's management with an `import` block. The target resource
+  address (`to`) and the resource's unique import ID (`id`) are specified to
+  identify what should be imported. After running
+  `tofu plan -generate-config-out=generated.tofu`, OpenTofu inspects the
+  existing resource and generates a corresponding HCL configuration file. The
+  generated code serves as a starting point that can be reviewed and
+  integrated into the main configuration.3
 
 ### 2.2 variable: Parameterizing Configurations
 
@@ -698,8 +699,8 @@ This top-level block configures core OpenTofu settings.
   with the configuration (e.g., `required_version = ">= 1.6.0"`).
 
 - `required_providers`: This nested block is the modern and mandatory way to
-  declare all providers used by the module. For each provider, you must specify
-  its `source` (e.g., `"hashicorp/aws"`) and a `version` constraint (e.g.,
+  declare all providers used by the module. Each provider entry specifies its
+  `source` (e.g., `"hashicorp/aws"`) and a `version` constraint (e.g.,
   `"~> 5.0"`). This practice is critical for ensuring predictable behavior by
   preventing providers from being upgraded unexpectedly to a new version with
   breaking changes.13
@@ -908,7 +909,7 @@ Table 3.1: `count` vs. `for_each` - A Comparative Analysis
 ### 3.2 Advanced Expressions and Functions
 
 OpenTofu's expression language provides powerful tools for transforming data
-and implementing complex logic within your configurations.
+and implementing complex logic within OpenTofu configurations.
 
 - **Conditional Expressions**: The ternary operator
   (`condition? true_val : false_val`) is a cornerstone of dynamic
@@ -925,7 +926,7 @@ and implementing complex logic within your configurations.
   collection types. They are invaluable for preparing data structures for use
   with `for_each`. The syntax is
   `[for item in collection : transform(item) if condition(item)]`.9 For
-  example, you can transform a list of objects into a map suitable for
+  example, a list of objects can be transformed into a map suitable for
 
   `for_each`: `for_each = { for user in var.users : user.name => user }`.29
 
@@ -1150,8 +1151,8 @@ anti-patterns that lead to brittle, insecure, or unmaintainable configurations.
   grow to manage hundreds or thousands of resources is another common pitfall.
   Large state files make `plan` and `apply` operations slow, as OpenTofu must
   refresh the status of every resource. They also increase the "blast radius":
-  an error or misconfiguration can potentially affect a huge portion of your
-  infrastructure.26
+  an error or misconfiguration can potentially affect a huge portion of the
+  infrastructure estate.26
 
   - **Best Practice**: Split state files logically. Common strategies include
     separating state by environment (dev, staging, prod), by region (us-east-1,
@@ -1213,14 +1214,14 @@ number), and the context (e.g., the specific resource or module that failed).
 
   - **Likely Cause**: This is a security feature. It means the provider package
     OpenTofu downloaded does not have a checksum that matches any of the
-    trusted checksums recorded in your `.terraform.lock.hcl` file. This could
+    trusted checksums recorded in the `.terraform.lock.hcl` file. This could
     be caused by a corrupted download, a man-in-the-middle attack, or a
     mismatch between the provider source that generated the lock file entry and
     the one being used now (e.g., official registry vs. a local mirror).42
 
-  - **Recommended Solution**: First, verify the integrity of your network and
-    the provider source. If you have intentionally changed the provider version
-    or source, you may need to update the lock file. You can do this by running
+  - **Recommended Solution**: First, verify the integrity of the network path
+    and the provider source. When the provider version or source has been
+    intentionally changed, update the lock file by running
     `tofu init -upgrade`. For teams working across different operating systems,
     ensure the lock file has hashes for all required platforms by using
     `tofu providers lock`.42
@@ -1239,8 +1240,8 @@ number), and the context (e.g., the specific resource or module that failed).
     `aws_instance.server["key"].id`).30
 
   - **Recommended Solution**: Carefully check the spelling of the reference.
-    Ensure that you are using the correct index `[...]` or key `["..."]` syntax
-    for resources managed by `count` or `for_each`.
+    Ensure the correct index `[...]` or key `["..."]` syntax is used for
+    resources managed by `count` or `for_each`.
 
 - **Error:** `Error: Unsupported argument` or
   `An argument named "..." is not expected here.`
@@ -1340,10 +1341,10 @@ to configurations that are robust, maintainable, secure, and scalable.
 
  4. **Keep It DRY with Modules**: Abstract any repeated infrastructure pattern
     into a reusable, focused module. This reduces code duplication, enforces
-    standardization, and improves the overall maintainability of your codebase.8
+    standardization, and improves overall codebase maintainability.8
 
- 5. **Document Your Intent**: Use the `description` field for all variables and
-    outputs to create a self-documenting interface for your modules. Add
+ 5. **Document Intent**: Use the `description` field for all variables and
+    outputs to create a self-documenting interface for modules. Add
     comments to explain any non-obvious logic, especially for "hidden"
     dependencies that require the use of `depends_on`.8
 
@@ -1356,20 +1357,20 @@ to configurations that are robust, maintainable, secure, and scalable.
     resources and variables are not optional; they are essential for long-term
     maintainability and collaboration.8
 
- 8. **Validate Your Inputs**: Create robust module interfaces by using `type`
-    constraints and `validation` blocks for your input variables. This catches
+ 8. **Validate Inputs**: Create robust module interfaces by using `type`
+    constraints and `validation` blocks for module input variables. This catches
     configuration errors early and provides clear, actionable feedback to the
     module's users.11
 
  9. **Leverage the Ecosystem**: OpenTofu's core language is powerful, but its
     capabilities are extended by a rich ecosystem of third-party tools.
     Integrate static analysis tools like `tflint` (for best practices and
-    style) and `checkov` or `tfsec` (for security scanning) into your CI/CD
+    style) and `checkov` or `tfsec` (for security scanning) into CI/CD
     pipelines to catch issues before they reach production.45
 
- 10. **Read the Plan**: The `tofu plan` command is your most important safety
+ 10. **Read the Plan**: The `tofu plan` command is the most important safety
     mechanism. Always review the plan output carefully to ensure the proposed
-    changes match your intent before running `tofu apply`. For teams, this
+    changes match the intended outcome before running `tofu apply`. For teams, this
     review should be a mandatory part of the pull request process.4
 
 ### 5.2 Recommendations for Further Learning

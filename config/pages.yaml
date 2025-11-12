@@ -185,6 +185,10 @@ pages:
     page_title_suffix: "Netsuke"
     filename_prefix: docs-netsuke-
     footer_note: "Built with Netsuke."
+    description: >
+      YAML-powered build system that fuses the minimalism of Ninja with the
+      templating nous of Jinja. Write once, build anywhere—reproducible,
+      declarative, and just opinionated enough to keep you honest.
     theme:
       hero_eyebrow: Netsuke Documentation
       hero_tagline: Declarative build tooling for ambitious teams
@@ -221,7 +225,9 @@ pages:
     language: rust
     filename_prefix: docs-rstest-bdd-
     page_title_suffix: "rstest-bdd"
-    description: "Behavior-driven testing macros layered on top of rstest."
+    description: >
+      Behavior-driven testing macros layered on top of `rstest`. Narrative
+      clarity without the ceremony.
 
   ortho-config:
     label: "Ortho Config"
@@ -231,7 +237,10 @@ pages:
     language: rust
     filename_prefix: docs-ortho-config-
     page_title_suffix: "Ortho Config"
-    description: "Esbuild-inspired configuration management for Rust services."
+    description: >
+      Configuration engine inspired by esbuild’s ergonomics—one schema, many
+      surfaces. Generate matching CLI flags, env vars, and config files for
+      Rust services without losing type safety or your mind.
 
   pg-embedded-setup-unpriv:
     label: "pg-embedded-setup-unpriv"
@@ -242,8 +251,9 @@ pages:
     filename_prefix: docs-pg-embedded-
     page_title_suffix: "pg-embedded-setup-unpriv"
     description: >
-      Bootstrap postgresql_embedded clusters as root while delegating filesystem work to
-      unprivileged users.
+      Bootstrap `postgresql_embedded` clusters as root while delegating
+      filesystem work to unprivileged users. Keep CI environments reproducible
+      without burning down your permissions tree.
 
   wireframe:
     label: "Wireframe"
@@ -252,7 +262,9 @@ pages:
     filename_prefix: docs-wireframe-
     page_title_suffix: "Wireframe"
     description: >
-      Framework for building binary protocol servers and clients in Rust, inspired by Actix Web.
+      Framework for building binary protocol servers and clients in
+      Rust—think Actix Web, but for everything not HTTP. Message routing,
+      framing, and backpressure included; bring your own transport.
 
   chutoro:
     label: "Chutoro"
@@ -261,9 +273,10 @@ pages:
     filename_prefix: docs-chutoro-
     page_title_suffix: "Chutoro"
     description: >
-      In progress FISHDBC engine in Rust fusing a rayon-driven CPU path, rust-cuda GPU
-      kernels, and a versioned C-ABI plugin system to deliver safe, extensible, state-of-the-art
-      iterative clustering.
+      Work-in-progress FISHDBC engine written in Rust that merges a
+      rayon-driven CPU path, Rust-CUDA kernels, and a C-ABI plugin system.
+      Built for safe, iterative clustering across heterogeneous
+      hardware—sushi-grade data science.
 
   cmd-mox:
     label: "CmdMox"
@@ -276,9 +289,9 @@ pages:
     filename_prefix: docs-cmd-mox-
     page_title_suffix: "CmdMox"
     description: >
-      Python-native command mocking harness that intercepts external processes over Unix domain
-      sockets so pytest suites can spy, stub, and replay shell workflows without brittle bash
-      fixtures.
+      Python-native command mocking harness that intercepts external processes
+      over Unix domain sockets so pytest suites can spy, stub, and replay shell
+      workflows without brittle bash fixtures.
 
   femtologging:
     label: "femtologging"
@@ -287,9 +300,9 @@ pages:
     filename_prefix: docs-femtologging-
     page_title_suffix: "femtologging"
     description: >
-      Hybrid Python/Rust logging library that ports picologging-inspired ideas into a PyO3
-      extension, pushing log records through crossbeam-channel workers for thread-friendly,
-      low-overhead structured logging.
+      Hybrid Python/Rust logging library that that channels picologging’s
+      minimalism through PyO3. Log records stream through crossbeam-channel
+      workers for thread-friendly, low-latency structured logging.
 
   falcon-pachinko:
     label: "Falcon Pachinko"
@@ -299,6 +312,7 @@ pages:
     filename_prefix: docs-falcon-pachinko-
     page_title_suffix: "Falcon Pachinko"
     description: >
-      Falcon extension that adds structured WebSocket routing, msgspec-based payload schemas, and
-      background worker orchestration so ASGI apps can manage rooms, broadcast events, and monitor
-      connections with minimal boilerplate.
+      Falcon extension for structured WebSocket routing and event
+      orchestration. Define msgspec payload schemas, spin up background
+      workers, and broadcast updates to rooms—all without turning your ASGI
+      app into spaghetti.

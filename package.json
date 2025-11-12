@@ -7,9 +7,9 @@
     "build": "bun run build:css && bun run build:images && bun run build:pages",
     "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
     "build:images": "bun run scripts/generate-image-variants.ts",
-	"build:pages": "uv run pages generate",
+    "build:pages": "uv run pages generate",
     "serve": "bun run build && bunx http-server public -p 8080",
-	"bump": "uv run pages bump"
+    "bump": "uv run pages bump"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.15",

@@ -53,7 +53,20 @@ class HtmlContentRenderer:
         return self._formatter.get_style_defs(".codehilite")
 
     def markdown(self, text: str) -> str:
-        """Render markdown into HTML using the configured extensions."""
+        """Render markdown into HTML using the configured extensions.
+
+        Parameters
+        ----------
+        text : str
+            Raw markdown content to render. Empty or whitespace-only strings
+            return an empty result.
+
+        Returns
+        -------
+        str
+            HTML string with code blocks annotated for the df12 codehilite
+            styling.
+        """
         normalized = self._normalize_fenced_blocks(text)
         if not normalized.strip():
             return ""

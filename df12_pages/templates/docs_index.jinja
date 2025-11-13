@@ -33,7 +33,7 @@
   {% set docs_closing = 'Built for curious builders and storytellers everywhere. ©&nbsp;' ~ generated_at.year ~ '&nbsp;' ~ docs_site_name.replace(' ', '&nbsp;') ~ '.' %}
   <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
 {{ site_header('index.html', 'df12', docs_nav_links) | indent(2, true) }}
-  <main id="main-content" class="flex flex-col pb-24 pt-28">
+  <main id="main-content" class="site-main site-main--docs-index">
     <section class="layout-shell px-4 md:px-8">
       <div class="text-center">
         <p class="eyebrow text-primary/80">Documentation</p>
@@ -99,8 +99,7 @@
   docs_oss_links,
   'Stay in touch',
   docs_contact_links,
-  docs_closing,
-  'layout-shell grid gap-12 px-6 py-16 md:grid-cols-3 md:px-16'
+  docs_closing
 ) | indent(2, true) }}
 <script
   src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"

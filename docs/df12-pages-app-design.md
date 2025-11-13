@@ -127,6 +127,26 @@ checked-in configuration record that guarantees reproducible builds.
 This approach keeps presentation concerns declarative, makes templates more
 readable, and reduces churn whenever Tailwind/DaisyUI upgrades land.
 
+### Site Chrome Semantics
+
+- The shared header/footer macros now rely on dedicated utility classes
+  defined in `src/styles/site.css`—e.g., `.site-header`,
+  `.site-header__inner`, `.site-header__brand`, `.site-header__nav`, and the
+  corresponding `.site-footer*` helpers. This follows the Tailwind v4 and
+  DaisyUI guidance referenced in `docs/tailwind-v4-guide.md` and
+  `docs/daisyui-v5-guide.md`, keeping repeated utility stacks out of the
+  templates.
+- Main-content shells across `index.html`, `docs.html`, and every `docs-*.html`
+  now use a shared `.site-main` base (padding, stacking context) with
+  modifiers like `.site-main--home`, `.site-main--docs-index`, and
+  `.site-main--doc` to encode their spacing/layout differences. When a new
+  page variant appears, extend the semantic helper set instead of sprinkling
+  raw `pt-*`/`flex` utilities so the macros keep these surfaces consistent.
+- When extending the chrome, add new semantic helpers to the stylesheet once
+  (instead of sprinkling raw utilities) and reference them via
+  `partials/site_macros.jinja`. This ensures the landing page, docs index, and
+  individual docs stay visually aligned while remaining easy to audit.
+
 ## OpenTofu Deployment Modules & Scripts
 
 The infrastructure portion of df12 Pages lives under `modules/` and `deploy.tofu`.

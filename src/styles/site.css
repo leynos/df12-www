@@ -321,6 +321,62 @@
     @apply text-primary;
   }
 
+  .site-main {
+    @apply pb-24;
+  }
+
+  .site-main--home {
+    @apply flex flex-col pt-32;
+  }
+
+  .site-main--docs-index {
+    @apply flex flex-col pt-28;
+  }
+
+  .site-main--doc {
+    @apply px-4 pt-32;
+  }
+
+  .site-header {
+    @apply fixed inset-x-0 top-0 z-50 border-b border-base-200 bg-base-100/80 backdrop-blur;
+  }
+
+  @supports (backdrop-filter: blur(0.5rem)) {
+    .site-header {
+      @apply bg-base-100/60;
+    }
+  }
+
+  .site-header__inner {
+    @apply flex w-full items-center justify-between px-4 py-4 md:px-8;
+  }
+
+  .site-header__brand {
+    @apply inline-flex items-center gap-3 font-mono text-lg font-bold uppercase tracking-[0.35em] text-base-content;
+  }
+
+  .site-header__logo-mark {
+    @apply flex h-9 w-9 items-center justify-center transition-transform duration-300;
+    transform: rotate(0deg);
+  }
+
+  .group:hover .site-header__logo-mark,
+  .group:focus-visible .site-header__logo-mark {
+    transform: rotate(45deg);
+  }
+
+  .site-header__nav {
+    @apply hidden items-center gap-8 md:flex;
+  }
+
+  .site-header__menu-button {
+    @apply font-mono uppercase tracking-[0.3em];
+  }
+
+  .site-header__mobile-link {
+    @apply w-full justify-start;
+  }
+
   .product-card {
     @apply relative block h-full rounded-2xl border border-base-300 bg-white px-8 py-11;
   }
@@ -412,6 +468,35 @@
 
   .world-card--media-after .world-card__body {
     order: 1;
+  }
+
+  .site-footer {
+    @apply border-t border-base-200 bg-base-100;
+  }
+
+  .site-footer__grid {
+    @apply mx-auto grid max-w-6xl gap-12 px-6 py-16 md:grid-cols-3 md:px-16;
+  }
+
+  .site-footer__grid--docs {
+    width: 100%;
+    max-width: var(--container-7xl, 96rem);
+  }
+
+  .site-footer__brand {
+    @apply font-mono text-sm font-semibold tracking-[0.3em] text-base-content/90;
+  }
+
+  .site-footer__text {
+    @apply mt-4 text-sm text-base-content/90;
+  }
+
+  .site-footer__list {
+    @apply mt-4 space-y-2 text-sm;
+  }
+
+  .site-footer__closing {
+    @apply mt-4 text-xs text-base-content/80;
   }
 
   .footer-link {

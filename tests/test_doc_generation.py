@@ -1,4 +1,75 @@
-"""Tests for documentation generation layout and navigation."""
+"""End-to-end tests for df12 Pages HTML documentation generation.
+
+This module exercises the full documentation pipeline driven by
+``df12_pages.generator.PageContentGenerator``. The tests use a
+representative markdown fixture together with a minimal ``PageConfig``
+to verify that the generated ``docs-*.html`` pages:
+
+* Render the sidebar layout correctly, including grouped navigation
+  for top-level sections and their subsections.
+* Promote bold headings into table-of-contents style navigation
+  entries so important concepts remain discoverable.
+* Produce sensible hero titles derived from numbered markdown
+  headings (for example, stripping numeric prefixes like ``"1."``).
+* Emit consistent metadata badges (version / updated dates) based on
+  release tags and/or the latest Git commit, and write the
+  ``PAGE_META_TEMPLATE`` JSON file with the expected first-file
+  reference.
+* Rewrite relative links in the markdown body to canonical GitHub
+  ``blob`` URLs pointing at the underlying repository.
+* Preserve fenced code blocks and language annotations, ensuring they
+  are rendered as ``codehilite`` blocks with the correct
+  ``data-language`` attribute.
+* Apply the expected DaisyUI/Tailwind capsule styling to inline code
+  tokens, which is validated via the external ``css-view`` helper and
+  a Playwright-powered computed-style snapshot.
+
+The module relies on several pytest fixtures:
+
+* ``sample_markdown`` defines the markdown used to exercise headings,
+  inline code, links, and code blocks.
+* ``page_config`` builds a temporary ``PageConfig`` rooted in a
+  per-test output directory.
+* ``markdown_response`` stubs ``requests.Session`` so content is
+  served from in-memory strings while still exposing ``Last-Modified``
+  headers.
+* ``github_commit_mock`` injects a fake GitHub client, allowing tests
+  to control the commit date used in metadata badges without hitting
+  the real API.
+* ``generated_doc_paths`` and ``generated_docs`` run the generator and
+  expose the written HTML pages as ``pathlib.Path`` objects and
+  ``BeautifulSoup`` trees respectively.
+* ``css_build_artifact`` ensures the Tailwind/DaisyUI CSS bundle
+  exists (by invoking ``bun run build``) so the css-view assertions
+  reflect the real production styles.
+
+These tests are typically executed as part of the standard test
+suite:
+
+* To run everything (including doc generation tests), use::
+
+    make test
+
+* To focus on this module only::
+
+    pytest tests/test_doc_generation.py
+
+The css-view / Playwright test is marked with ``@pytest.mark.playwright``
+and requires additional tooling:
+
+* ``bun`` must be available on ``PATH`` to build CSS and run
+  ``css-view``.
+* Playwright Chromium must be installed, for example via::
+
+    bun x playwright install chromium
+
+Related test data lives entirely within the fixtures in this module;
+no external files from ``features/`` or other directories are
+required. When extending these tests, prefer augmenting the
+``sample_markdown`` fixture and reusing the existing fixtures so new
+assertions share the same generation pipeline and remain easy to
+reason about.
+"""
 
 from __future__ import annotations
 

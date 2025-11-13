@@ -61,7 +61,7 @@ def when_render_docs(
     config = load_site_config(scenario_state["config_path"])
     page = config.get_page("sample")
 
-    def _fake_fetch(self: PageContentGenerator) -> str:  # noqa: D401
+    def _fake_fetch(self: PageContentGenerator) -> str:  # noqa: D401  # TODO: bypass D401; test doubles mirror production method signature
         return scenario_state["markdown"]  # type: ignore[index]
 
     monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", _fake_fetch)

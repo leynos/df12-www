@@ -204,6 +204,14 @@ def markdown_response(
 
 @pytest.fixture(autouse=True)
 def github_commit_mock(mocker: typ.Any) -> dict[str, typ.Any]:
+    """Mock GitHub client and repo commits for all tests.
+
+    This autouse fixture stubs ``df12_pages.generator.GitHub`` with a client
+    that exposes a single "latest" commit and returns a small helper
+    dictionary containing ``set_date`` so individual tests can adjust the
+    commit timestamp used in metadata badges without calling the real GitHub
+    API.
+    """
     commit_date = dt.datetime(2025, 10, 5, 14, 30, tzinfo=dt.timezone.utc)
     author = SimpleNamespace(date=commit_date)
     committer = SimpleNamespace(date=None)

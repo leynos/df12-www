@@ -37,7 +37,7 @@ EOF
 ${var.github_ssh_private_key}
 EOF
     chmod 600 "$DIR/github_key"
-    cat >"$DIR/ssh_config" <<'EOF'
+    cat >"$DIR/ssh_config" <<EOF
     Host github.com
       HostName github.com
       IdentityFile "$DIR/github_key"
@@ -86,19 +86,103 @@ resource "null_resource" "deploy" {
       ${local.git_clone_cmd}
       git -C "$REPO_DIR" checkout -q "${data.external.git_sync.result.commit}"
       echo "Installing dependencies..."
-      bun install --cwd "$REPO_DIR" >/dev/null
+      bun install --cwd "$REPO_DIR"
       echo "Building static assets..."
-      bun run --cwd "$REPO_DIR" build >/dev/null
+      bun run --cwd "$REPO_DIR" build
       test -d "$REPO_DIR/${var.site_path}" || { echo "Site path '$REPO_DIR/${var.site_path}' not found" >&2; exit 1; }
       test -f "$REPO_DIR/${var.site_path}/index.html" || { echo "Expected index.html at '$REPO_DIR/${var.site_path}/index.html'" >&2; exit 1; }
       test -d "$REPO_DIR/${var.site_path}/assets" || { echo "Expected assets directory at '$REPO_DIR/${var.site_path}/assets'" >&2; exit 1; }
       test -d "$REPO_DIR/${var.site_path}/images" || { echo "Expected images directory at '$REPO_DIR/${var.site_path}/images'" >&2; exit 1; }
-      aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" --delete --exclude ".DS_Store" --acl public-read
+      if ! env | grep -q '^MIN_SITE_FILES='; then
+        MIN_SITE_FILES=10
+      fi
+      FILE_COUNT="$(find "$REPO_DIR/${var.site_path}" -type f ! -name '.DS_Store' ! -name '.*' 2>/dev/null | wc -l || echo 0)"
+      if [ "$FILE_COUNT" -lt "$MIN_SITE_FILES" ]; then
+        echo "Refusing to sync: only $FILE_COUNT files under '$REPO_DIR/${var.site_path}' (minimum $MIN_SITE_FILES required)" >&2
+        exit 1
+      fi
+      S3_DELETE_FLAG="--delete"
+      if env | grep -q '^DRY_RUN='; then
+        if [ "$DRY_RUN" != "0" ]; then
+          echo "DRY_RUN enabled; running S3 sync without --delete"
+          S3_DELETE_FLAG=""
+        fi
+      fi
+      echo "Syncing versioned static assets with long-lived cache headers..."
+      if [ -n "$S3_DELETE_FLAG" ]; then
+        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
+          --delete \
+          --exclude ".DS_Store" \
+          --exclude "*.html" \
+          --cache-control "public, max-age=31536000, immutable" \
+          --acl public-read
+      else
+        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
+          --exclude ".DS_Store" \
+          --exclude "*.html" \
+          --cache-control "public, max-age=31536000, immutable" \
+          --acl public-read
+      fi
+      echo "Syncing HTML documents with short-lived cache headers..."
+      if [ -n "$S3_DELETE_FLAG" ]; then
+        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
+          --delete \
+          --exclude ".DS_Store" \
+          --exclude "*" \
+          --include "index.html" \
+          --include "*.html" \
+          --cache-control "public, max-age=0, must-revalidate" \
+          --acl public-read
+      else
+        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
+          --exclude ".DS_Store" \
+          --exclude "*" \
+          --include "index.html" \
+          --include "*.html" \
+          --cache-control "public, max-age=0, must-revalidate" \
+          --acl public-read
+      fi
       echo "Purging Cloudflare cache..."
-      curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${var.cloudflare_zone_id}/purge_cache" \
+      CF_RESP_FILE="$DIR/cf_purge_response.json"
+      CF_HEADER_FILE="$DIR/cf_purge_headers.txt"
+      curl -sS -o "$CF_RESP_FILE" -D "$CF_HEADER_FILE" \
+        -X POST "https://api.cloudflare.com/client/v4/zones/${var.cloudflare_zone_id}/purge_cache" \
         -H "Authorization: Bearer $CF_API_TOKEN" \
         -H "Content-Type: application/json" \
-        --data '{"purge_everything":true}' >/dev/null
+        --data '{"purge_everything":true}'
+      CF_STATUS="$(awk 'NR==1 {print $2}' "$CF_HEADER_FILE")"
+      command -v python3 >/dev/null 2>&1 || { echo "python3 not found; cannot validate Cloudflare response" >&2; exit 1; }
+      python3 - "$CF_RESP_FILE" "$CF_STATUS" <<'PY'
+import json
+import sys
+from typing import Any
+
+response_path, status_text = sys.argv[1], sys.argv[2]
+
+try:
+    status_code = int(status_text)
+except ValueError:
+    print(f"Invalid HTTP status from curl: {status_text!r}", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    with open(response_path, encoding="utf-8") as handle:
+        payload: dict[str, Any] = json.load(handle)
+except Exception as exc:  # pragma: no cover - diagnostic path
+    print(f"Failed to parse Cloudflare response JSON: {exc!r}", file=sys.stderr)
+    sys.exit(1)
+
+success = payload.get("success")
+errors = payload.get("errors") or []
+
+if status_code != 200 or not success or errors:
+    print(
+        f"Cloudflare purge failed with status {status_code}: {payload!r}",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+PY
+      echo "Cloudflare cache purge succeeded."
       echo "Deployment complete."
     EOT
     working_dir = path.module

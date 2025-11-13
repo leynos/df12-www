@@ -28,6 +28,14 @@ provider "aws" {
   skip_credentials_validation = local.provider_use_scaleway
   skip_metadata_api_check     = local.provider_use_scaleway
   skip_requesting_account_id  = local.provider_use_scaleway
+
+  default_tags {
+    tags = {
+      ManagedBy   = "OpenTofu"
+      Environment = var.environment
+      Project     = var.project_name
+    }
+  }
 }
 
 provider "cloudflare" {

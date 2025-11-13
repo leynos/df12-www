@@ -19,11 +19,13 @@ scenarios(FEATURE_FILE)
 
 @pytest.fixture
 def scenario_state() -> dict[str, object]:
+    """Return a mutable dict used to share scenario state across BDD steps."""
     return {}
 
 
 @given("a docs config referencing a release-tagged repo")
 def given_release_config(tmp_path: Path, scenario_state: dict[str, object]) -> None:
+    """Set up a docs config pointing to a release-tagged repository."""
     output_dir = tmp_path / "docs"
     output_dir.mkdir()
     config_path = tmp_path / "pages.yaml"
@@ -51,6 +53,7 @@ pages:
 
 @given("documentation fetches are replayed via betamax")
 def given_betamax_session(scenario_state: dict[str, object], tmp_path: Path) -> None:
+    """Configure a Betamax-backed requests session for replaying HTTP fetches."""
     session = requests.Session()
     cassette_dir = Path(__file__).resolve().parents[1] / "cassettes"
     recorder = Betamax(
@@ -67,6 +70,7 @@ def when_render_docs(
     scenario_state: dict[str, object],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Render the docs page under test using a recorded HTTP session."""
     config = load_site_config(scenario_state["config_path"])
     page = config.get_page("requests-docs")
     output_dir = scenario_state["output_dir"]
@@ -78,10 +82,12 @@ def when_render_docs(
         def __init__(self, delegate: requests.Session) -> None:
             self._delegate = delegate
 
-        def mount(self, *args: object, **kwargs: object) -> None:  # pragma: no cover - passthrough
+        def mount(
+            self, *args: object, **kwargs: object
+        ) -> None:  # pragma: no cover - passthrough
             self._delegate.mount(*args, **kwargs)
 
-        def get(self, url: str, timeout: int = 30):
+        def get(self, url: str, timeout: int = 30) -> requests.Response:
             calls.append(url)
             return self._delegate.get(url, timeout=timeout)
 
@@ -103,6 +109,7 @@ def when_render_docs(
 
 @then("the HTML shows the release version and tag date")
 def then_release_metadata_present(scenario_state: dict[str, object]) -> None:
+    """Verify the rendered HTML includes the release version and tag date."""
     written: list[Path] = scenario_state["written"]
     html = written[0].read_text(encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")
@@ -113,8 +120,10 @@ def then_release_metadata_present(scenario_state: dict[str, object]) -> None:
 
     eyebrow = soup.select_one(".doc-sidebar__eyebrow")
     body = soup.select_one(".doc-sidebar__body")
-    assert eyebrow is not None and eyebrow.get_text(strip=True) == "Requests Docs"
-    assert body is not None and body.get_text(strip=True) == "HTTP for Humans"
+    assert eyebrow is not None
+    assert eyebrow.get_text(strip=True) == "Requests Docs"
+    assert body is not None
+    assert body.get_text(strip=True) == "HTTP for Humans"
 
     calls: list[str] = scenario_state["calls"]
     assert any("refs/tags/v2.32.5" in url for url in calls)

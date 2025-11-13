@@ -2,22 +2,25 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+import typing as typ
 from textwrap import dedent
 
 import requests
-from pytest_mock import MockerFixture
 from ruamel.yaml import YAML
 
 from df12_pages.bump import bump_latest_release_metadata
 from df12_pages.releases import GitHubReleaseClient, ReleaseInfo
+
+if typ.TYPE_CHECKING:
+    from pathlib import Path
+
+    from pytest_mock import MockerFixture
 
 
 def test_github_release_client_fetches_release_and_uses_token(
     mocker: MockerFixture,
 ) -> None:
     """The GitHub client should pass auth headers and parse release payloads."""
-
     session = mocker.Mock(spec=requests.Session)
     response = mocker.Mock()
     response.status_code = 200
@@ -48,7 +51,6 @@ def test_github_release_client_returns_none_for_missing_release(
     mocker: MockerFixture,
 ) -> None:
     """GitHub returns HTTP 404 when no releases exist; treat that as None."""
-
     session = mocker.Mock(spec=requests.Session)
     response = mocker.Mock()
     response.status_code = 404
@@ -61,7 +63,6 @@ def test_github_release_client_returns_none_for_missing_release(
 
 def test_bump_workflow_updates_yaml(tmp_path: Path) -> None:
     """Latest release values should be inserted or removed per repo."""
-
     config_path = tmp_path / "pages.yaml"
     config_path.write_text(
         dedent(

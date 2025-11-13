@@ -111,10 +111,7 @@ def given_markdown_stub(scenario_state: dict[str, object]) -> None:
         value.
     """
     scenario_state["markdown"] = (
-        "## Zebra Start\n"
-        "Zebra body.\n\n"
-        "## Alpha Next\n"
-        "Alpha body.\n"
+        "## Zebra Start\nZebra body.\n\n## Alpha Next\nAlpha body.\n"
     )
 
 
@@ -163,14 +160,14 @@ def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
     index_path: Path = scenario_state["index_path"]  # type: ignore[assignment]
     soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
     entry = soup.select_one(".product-card a.product-card__meta")
-    assert (
-        entry is not None
-    ), "expected product-card meta link in docs index for first section"
+    assert entry is not None, (
+        "expected product-card meta link in docs index for first section"
+    )
     href = entry.get("href")
     assert href is not None, "expected href attribute on product-card meta link"
-    assert href.endswith(
-        "docs-zebra-start.html"
-    ), f"expected href to end with 'docs-zebra-start.html', got {href!r}"
+    assert href.endswith("docs-zebra-start.html"), (
+        f"expected href to end with 'docs-zebra-start.html', got {href!r}"
+    )
 
 
 @then("the docs card exposes repo, release, and registry links")
@@ -182,25 +179,20 @@ def then_card_has_external_links(scenario_state: dict[str, object]) -> None:
     release_link = soup.select_one("[data-test='docs-card-release']")
     package_link = soup.select_one("[data-test='docs-card-package']")
     assert repo_link is not None, "expected a repo link element on the docs card"
-    assert (
-        repo_link.get("href") == "https://github.com/df12/zebra"
-    ), (
+    assert repo_link.get("href") == "https://github.com/df12/zebra", (
         "expected repo link href to be 'https://github.com/df12/zebra', "
         f"got {repo_link.get('href')!r}"
     )
     assert release_link is not None, "expected a release link element on the docs card"
     assert (
-        release_link.get("href")
-        == "https://github.com/df12/zebra/releases/tag/v1.2.3"
+        release_link.get("href") == "https://github.com/df12/zebra/releases/tag/v1.2.3"
     ), (
         "expected release link href to be "
         "'https://github.com/df12/zebra/releases/tag/v1.2.3', "
         f"got {release_link.get('href')!r}"
     )
     assert package_link is not None, "expected a package link element on the docs card"
-    assert (
-        package_link.get("href") == "https://crates.io/crates/zebra"
-    ), (
+    assert package_link.get("href") == "https://crates.io/crates/zebra", (
         "expected package link href to be 'https://crates.io/crates/zebra', "
         f"got {package_link.get('href')!r}"
     )

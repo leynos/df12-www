@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import dataclasses as dc
 import json
-from typing import Any
+from http import HTTPStatus
 
 import requests
 
@@ -64,7 +64,6 @@ class GitHubReleaseClient:
             The newest release, or ``None`` when no releases exist (GitHub
             responds with HTTP 404 in that case).
         """
-
         normalized = repo.strip()
         if not normalized:
             msg = "Repository name cannot be empty"
@@ -72,14 +71,16 @@ class GitHubReleaseClient:
 
         url = f"{self._api_base}/repos/{normalized}/releases/latest"
         try:
-            response = self._session.get(url, headers=self._headers, timeout=self.timeout)
+            response = self._session.get(
+                url, headers=self._headers, timeout=self.timeout
+            )
         except requests.RequestException as exc:  # pragma: no cover - requests guard
             msg = f"Failed to reach GitHub releases for '{normalized}': {exc}"
             raise GitHubReleaseError(msg) from exc
 
-        if response.status_code == 404:
+        if response.status_code == HTTPStatus.NOT_FOUND:
             return None
-        if response.status_code >= 400:
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
             snippet = response.text[:200]
             msg = (
                 f"GitHub release lookup for '{normalized}' failed with "
@@ -105,10 +106,9 @@ class GitHubReleaseClient:
         )
 
 
-def _coerce_str(value: Any) -> str | None:
+def _coerce_str(value: object) -> str | None:
     if value is None:
         return None
     if isinstance(value, str):
         return value
     return str(value)
-

@@ -23,17 +23,21 @@ writing the rendered HTML to disk.
 from __future__ import annotations
 
 import datetime as dt
+import typing as typ
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from .config import HomepageConfig
+if typ.TYPE_CHECKING:
+    from .config import HomepageConfig
 
 
 class HomePageBuilder:
     """Render the marketing homepage from structured config data."""
 
-    def __init__(self, homepage: HomepageConfig, *, templates_dir: Path | None = None) -> None:
+    def __init__(
+        self, homepage: HomepageConfig, *, templates_dir: Path | None = None
+    ) -> None:
         """Initialize the builder and Jinja environment.
 
         Parameters

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import dataclasses as dc
-import typing as typ
 import datetime as dt
+import typing as typ
 from pathlib import Path
 
 from ruamel.yaml import YAML
@@ -214,6 +214,7 @@ class SiteConfig:
             raise KeyError(msg) from exc
 
     def _get_default_page(self) -> PageConfig:
+        """Return the configured default page or the first defined page."""
         if self.default_page and self.default_page in self.pages:
             return self.pages[self.default_page]
         if not self.pages:  # pragma: no cover - configuration error
@@ -224,7 +225,42 @@ class SiteConfig:
 
 
 def load_site_config(path: Path) -> SiteConfig:
-    """Load the YAML configuration describing page/site layout choices."""
+    """Load the YAML configuration describing page and site layout choices.
+
+    Parameters
+    ----------
+    path : Path
+        Filesystem path to the YAML layout configuration file (for example,
+        ``pages.yaml``).
+
+    Returns
+    -------
+    SiteConfig
+        Parsed site configuration, including page definitions, default theme,
+        docs index output path, and optional homepage configuration.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the configuration file does not exist at ``path``.
+    TypeError
+        If the top-level YAML structure is not a mapping.
+    SiteConfigError
+        If required sections or fields are missing or invalid in the
+        configuration (for example, no pages are defined).
+    YAMLError
+        If the YAML content cannot be parsed by the underlying loader.
+
+    Examples
+    --------
+    Load a site configuration from the default layout file:
+
+    >>> from pathlib import Path
+    >>> from df12_pages.config import load_site_config
+    >>> config = load_site_config(Path("pages.yaml"))
+    >>> sorted(config.pages.keys())[:1]
+    ['getting-started']
+    """
     if not path.exists():
         msg = f"Configuration file '{path}' not found."
         raise FileNotFoundError(msg)
@@ -264,62 +300,21 @@ def load_site_config(path: Path) -> SiteConfig:
     for key, payload in pages_raw.items():
         if not isinstance(payload, dict):
             continue
-        repo = payload.get("repo", default_repo)
-        branch = payload.get("branch", default_branch)
-        language = payload.get("language", default_language)
-        doc_path = payload.get("doc_path", default_doc_path)
-        source_url = payload.get("source_url")
-        if not source_url and repo:
-            source_url = _build_repo_url(repo, branch, doc_path)
-        if not source_url:
-            msg = f"Page '{key}' is missing 'source_url' or 'repo'."
-            raise SiteConfigError(msg)
-
-        label = payload.get("label") or key.replace("-", " ").title()
-        source_label = payload.get("source_label", default_source_label)
-        title_suffix = payload.get("page_title_suffix", default_page_title_suffix)
-        filename_prefix = payload.get("filename_prefix", default_filename_prefix)
-        output_dir = Path(payload.get("output_dir", default_output_dir))
-        pygments_style = payload.get("pygments_style", default_pygments_style)
-        footer_note = payload.get("footer_note", default_footer_note)
-        theme = _merge_theme(default_theme, payload.get("theme"))
-
-        layouts = _merge_layouts(shared_layouts, payload.get("layouts"))
-
-        manifest_url = payload.get("manifest_url")
-        if not manifest_url and repo:
-            manifest_path = payload.get("manifest_path") or _default_manifest_path(
-                language
-            )
-            if manifest_path:
-                manifest_url = _build_repo_url(repo, branch, manifest_path)
-
-        description_override = payload.get("description")
-        latest_release = payload.get("latest_release")
-        latest_release_published_at = _parse_timestamp(
-            payload.get("latest_release_published_at")
-        )
-
-        pages[key] = PageConfig(
+        pages[key] = _build_page_config(
             key=key,
-            label=label,
-            source_url=source_url,
-            source_label=source_label,
-            page_title_suffix=title_suffix,
-            filename_prefix=filename_prefix,
-            output_dir=output_dir,
-            pygments_style=pygments_style,
-            footer_note=footer_note,
-            theme=theme,
-            layouts=layouts,
-            repo=repo,
-            branch=branch,
-            language=language.lower() if isinstance(language, str) else language,
-            manifest_url=manifest_url,
-            description_override=description_override,
-            doc_path=doc_path,
-            latest_release=latest_release,
-            latest_release_published_at=latest_release_published_at,
+            payload=payload,
+            default_theme=default_theme,
+            default_output_dir=default_output_dir,
+            default_filename_prefix=default_filename_prefix,
+            default_pygments_style=default_pygments_style,
+            default_page_title_suffix=default_page_title_suffix,
+            default_source_label=default_source_label,
+            default_footer_note=default_footer_note,
+            default_branch=default_branch,
+            default_doc_path=default_doc_path,
+            default_repo=default_repo,
+            default_language=default_language,
+            shared_layouts=shared_layouts,
         )
 
     homepage_config = _build_homepage_config(homepage_raw) if homepage_raw else None
@@ -333,7 +328,83 @@ def load_site_config(path: Path) -> SiteConfig:
     )
 
 
+def _build_page_config(
+    *,
+    key: str,
+    payload: typ.Mapping[str, typ.Any],
+    default_theme: ThemeConfig,
+    default_output_dir: Path,
+    default_filename_prefix: str,
+    default_pygments_style: str,
+    default_page_title_suffix: str,
+    default_source_label: str,
+    default_footer_note: str,
+    default_branch: str,
+    default_doc_path: str,
+    default_repo: str | None,
+    default_language: str | None,
+    shared_layouts: typ.Mapping[str, typ.Any],
+) -> PageConfig:
+    """Build a PageConfig for a single page entry using defaults and overrides."""
+    repo = payload.get("repo", default_repo)
+    branch = payload.get("branch", default_branch)
+    language = payload.get("language", default_language)
+    doc_path = payload.get("doc_path", default_doc_path)
+    source_url = payload.get("source_url")
+    if not source_url and repo:
+        source_url = _build_repo_url(repo, branch, doc_path)
+    if not source_url:
+        msg = f"Page '{key}' is missing 'source_url' or 'repo'."
+        raise SiteConfigError(msg)
+
+    label = payload.get("label") or key.replace("-", " ").title()
+    source_label = payload.get("source_label", default_source_label)
+    title_suffix = payload.get("page_title_suffix", default_page_title_suffix)
+    filename_prefix = payload.get("filename_prefix", default_filename_prefix)
+    output_dir = Path(payload.get("output_dir", default_output_dir))
+    pygments_style = payload.get("pygments_style", default_pygments_style)
+    footer_note = payload.get("footer_note", default_footer_note)
+    theme = _merge_theme(default_theme, payload.get("theme"))
+
+    layouts = _merge_layouts(shared_layouts, payload.get("layouts"))
+
+    manifest_url = payload.get("manifest_url")
+    if not manifest_url and repo:
+        manifest_path = payload.get("manifest_path") or _default_manifest_path(language)
+        if manifest_path:
+            manifest_url = _build_repo_url(repo, branch, manifest_path)
+
+    description_override = payload.get("description")
+    latest_release = payload.get("latest_release")
+    latest_release_published_at = _parse_timestamp(
+        payload.get("latest_release_published_at")
+    )
+
+    return PageConfig(
+        key=key,
+        label=label,
+        source_url=source_url,
+        source_label=source_label,
+        page_title_suffix=title_suffix,
+        filename_prefix=filename_prefix,
+        output_dir=output_dir,
+        pygments_style=pygments_style,
+        footer_note=footer_note,
+        theme=theme,
+        layouts=layouts,
+        repo=repo,
+        branch=branch,
+        language=language.lower() if isinstance(language, str) else language,
+        manifest_url=manifest_url,
+        description_override=description_override,
+        doc_path=doc_path,
+        latest_release=latest_release,
+        latest_release_published_at=latest_release_published_at,
+    )
+
+
 def _build_homepage_config(payload: typ.Mapping[str, typ.Any]) -> HomepageConfig:
+    """Build the homepage configuration from the provided payload."""
     if not isinstance(payload, dict):
         msg = "Homepage configuration must be a mapping."
         raise SiteConfigError(msg)
@@ -366,7 +437,10 @@ def _build_homepage_config(payload: typ.Mapping[str, typ.Any]) -> HomepageConfig
     )
 
 
-def _build_nav_links(entries: typ.Any) -> list[NavLinkConfig]:
+def _build_nav_links(
+    entries: list[typ.Mapping[str, object]] | None,
+) -> list[NavLinkConfig]:
+    """Build navigation link configurations for the homepage."""
     links: list[NavLinkConfig] = []
     if not isinstance(entries, list):
         return links
@@ -389,7 +463,8 @@ def _build_nav_links(entries: typ.Any) -> list[NavLinkConfig]:
     return links
 
 
-def _build_hero_config(payload: typ.Any) -> HeroConfig:
+def _build_hero_config(payload: typ.Mapping[str, object] | None) -> HeroConfig:
+    """Build the hero section configuration for the homepage."""
     if not isinstance(payload, dict):
         msg = "Homepage hero configuration must be a mapping."
         raise SiteConfigError(msg)
@@ -420,7 +495,10 @@ def _build_hero_config(payload: typ.Any) -> HeroConfig:
     )
 
 
-def _build_ctas(entries: typ.Any) -> list[CTAButtonConfig]:
+def _build_ctas(
+    entries: list[typ.Mapping[str, object]] | None,
+) -> list[CTAButtonConfig]:
+    """Build call-to-action button configurations for the hero section."""
     buttons: list[CTAButtonConfig] = []
     if not isinstance(entries, list):
         return buttons
@@ -433,11 +511,16 @@ def _build_ctas(entries: typ.Any) -> list[CTAButtonConfig]:
         if not (label and href and variant):
             msg = "CTA entries require 'label', 'href', and 'variant'."
             raise SiteConfigError(msg)
-        buttons.append(CTAButtonConfig(label=str(label), href=str(href), variant=str(variant)))
+        buttons.append(
+            CTAButtonConfig(label=str(label), href=str(href), variant=str(variant))
+        )
     return buttons
 
 
-def _build_systems_config(payload: typ.Any) -> SystemsSectionConfig:
+def _build_systems_config(
+    payload: typ.Mapping[str, object] | None,
+) -> SystemsSectionConfig:
+    """Build the systems section configuration for the homepage."""
     if not isinstance(payload, dict):
         msg = "Homepage systems configuration must be a mapping."
         raise SiteConfigError(msg)
@@ -453,7 +536,10 @@ def _build_systems_config(payload: typ.Any) -> SystemsSectionConfig:
     return SystemsSectionConfig(heading=str(heading), kicker=str(kicker), cards=cards)
 
 
-def _build_system_cards(entries: typ.Any) -> list[SystemCardConfig]:
+def _build_system_cards(
+    entries: list[typ.Mapping[str, object]] | None,
+) -> list[SystemCardConfig]:
+    """Build system card configurations for the systems section."""
     cards: list[SystemCardConfig] = []
     if not isinstance(entries, list):
         return cards
@@ -466,7 +552,10 @@ def _build_system_cards(entries: typ.Any) -> list[SystemCardConfig]:
         icon = entry.get("icon")
         meta_label = entry.get("meta_label")
         if not (label and description and href and icon and meta_label):
-            msg = "System cards require 'label', 'description', 'href', 'icon', and 'meta_label'."
+            msg = (
+                "System cards require 'label', 'description', 'href', 'icon', "
+                "and 'meta_label'."
+            )
             raise SiteConfigError(msg)
         external = entry.get("external", True)
         cards.append(
@@ -482,7 +571,10 @@ def _build_system_cards(entries: typ.Any) -> list[SystemCardConfig]:
     return cards
 
 
-def _build_worlds_config(payload: typ.Any) -> WorldsSectionConfig:
+def _build_worlds_config(
+    payload: typ.Mapping[str, object] | None,
+) -> WorldsSectionConfig:
+    """Build the worlds section configuration for the homepage."""
     if not isinstance(payload, dict):
         msg = "Homepage worlds configuration must be a mapping."
         raise SiteConfigError(msg)
@@ -498,7 +590,10 @@ def _build_worlds_config(payload: typ.Any) -> WorldsSectionConfig:
     return WorldsSectionConfig(heading=str(heading), kicker=str(kicker), cards=cards)
 
 
-def _build_world_cards(entries: typ.Any) -> list[WorldCardConfig]:
+def _build_world_cards(
+    entries: list[typ.Mapping[str, object]] | None,
+) -> list[WorldCardConfig]:
+    """Build world card configurations for the worlds section."""
     cards: list[WorldCardConfig] = []
     if not isinstance(entries, list):
         return cards
@@ -532,7 +627,10 @@ def _build_world_cards(entries: typ.Any) -> list[WorldCardConfig]:
     return cards
 
 
-def _build_world_image(payload: typ.Any, label: str) -> WorldImageConfig:
+def _build_world_image(
+    payload: typ.Mapping[str, object] | None, label: str
+) -> WorldImageConfig:
+    """Build world image configuration for a specific world card."""
     if not isinstance(payload, dict):
         msg = f"World card '{label}' must define an image mapping."
         raise SiteConfigError(msg)
@@ -558,7 +656,10 @@ def _build_world_image(payload: typ.Any, label: str) -> WorldImageConfig:
     )
 
 
-def _build_footer_config(payload: typ.Any) -> FooterConfig:
+def _build_footer_config(
+    payload: typ.Mapping[str, object] | None,
+) -> FooterConfig:
+    """Build the footer configuration for the homepage."""
     if not isinstance(payload, dict):
         msg = "Homepage footer configuration must be a mapping."
         raise SiteConfigError(msg)
@@ -575,7 +676,9 @@ def _build_footer_config(payload: typ.Any) -> FooterConfig:
             msg = f"Homepage footer is missing '{key}'."
             raise SiteConfigError(msg)
     oss_links = _build_footer_links(payload.get("oss_links"), default_external=True)
-    contact_links = _build_footer_links(payload.get("contact_links"), default_external=False)
+    contact_links = _build_footer_links(
+        payload.get("contact_links"), default_external=False
+    )
     if not oss_links or not contact_links:
         msg = "Homepage footer requires OSS and contact links."
         raise SiteConfigError(msg)
@@ -596,7 +699,10 @@ def _build_footer_config(payload: typ.Any) -> FooterConfig:
     )
 
 
-def _build_footer_links(entries: typ.Any, *, default_external: bool) -> list[FooterLinkConfig]:
+def _build_footer_links(
+    entries: list[typ.Mapping[str, object]] | None, *, default_external: bool
+) -> list[FooterLinkConfig]:
+    """Build footer link configurations with an optional default external flag."""
     links: list[FooterLinkConfig] = []
     if not isinstance(entries, list):
         return links
@@ -623,16 +729,17 @@ def _build_footer_links(entries: typ.Any, *, default_external: bool) -> list[Foo
     return links
 
 
-def _normalize_classes(value: typ.Any) -> list[str]:
+def _normalize_classes(value: str | list[object] | None) -> list[str]:
+    """Normalize class definitions into a list of non-empty strings."""
     if isinstance(value, str):
         return [segment for segment in value.split() if segment]
     if isinstance(value, list):
-        classes = [str(segment).strip() for segment in value if str(segment).strip()]
-        return classes
+        return [str(segment).strip() for segment in value if str(segment).strip()]
     return []
 
 
-def _optional_str(value: typ.Any) -> str | None:
+def _optional_str(value: object | None) -> str | None:
+    """Return a stripped string value or None when empty."""
     if value is None:
         return None
     text = str(value).strip()
@@ -640,12 +747,14 @@ def _optional_str(value: typ.Any) -> str | None:
 
 
 def _build_repo_url(repo: str, ref: str, path: str) -> str:
+    """Build the raw GitHub URL for a file at the given ref and path."""
     normalized = path.lstrip("/")
     ref_segment = ref if ref.startswith("refs/") else f"refs/heads/{ref}"
     return f"https://raw.githubusercontent.com/{repo}/{ref_segment}/{normalized}"
 
 
 def _default_manifest_path(language: str | None) -> str | None:
+    """Return the default manifest path for the given language, if any."""
     if not language:
         return None
     return LANGUAGE_MANIFESTS.get(language.lower())
@@ -654,6 +763,7 @@ def _default_manifest_path(language: str | None) -> str | None:
 def _merge_theme(
     base: ThemeConfig, override: typ.Mapping[str, typ.Any] | None
 ) -> ThemeConfig:
+    """Merge an override theme mapping into the base ThemeConfig."""
     if not override:
         return base
     return ThemeConfig(
@@ -665,6 +775,7 @@ def _merge_theme(
 
 
 def _build_theme_config(payload: typ.Mapping[str, typ.Any]) -> ThemeConfig:
+    """Build a ThemeConfig instance from the provided mapping payload."""
     base = ThemeConfig()
     return ThemeConfig(
         hero_eyebrow=payload.get("hero_eyebrow", base.hero_eyebrow),
@@ -678,6 +789,7 @@ def _merge_layouts(
     shared_layouts: typ.Mapping[str, typ.Any],
     page_layouts: typ.Mapping[str, typ.Any] | None,
 ) -> dict[str, SectionLayout]:
+    """Merge shared and page-specific layout mappings into section layouts."""
     result: dict[str, SectionLayout] = {}
     combined: dict[str, typ.Any] = dict(shared_layouts)
     if page_layouts:
@@ -693,7 +805,8 @@ def _merge_layouts(
     return result
 
 
-def _parse_timestamp(value: typ.Any) -> dt.datetime | None:
+def _parse_timestamp(value: dt.datetime | str | None) -> dt.datetime | None:
+    """Parse a timestamp value into a timezone-aware UTC datetime, if possible."""
     if isinstance(value, dt.datetime):
         parsed = value
     elif isinstance(value, str):
@@ -709,5 +822,5 @@ def _parse_timestamp(value: typ.Any) -> dt.datetime | None:
     else:
         return None
     if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=dt.timezone.utc)
-    return parsed.astimezone(dt.timezone.utc)
+        return parsed.replace(tzinfo=dt.UTC)
+    return parsed.astimezone(dt.UTC)

@@ -25,6 +25,7 @@ class DocsIndexBuilder:
     def __init__(
         self, site_config: SiteConfig, *, templates_dir: Path | None = None
     ) -> None:
+        """Initialize DocsIndexBuilder with site config and templates."""
         self.site_config = site_config
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
         self.env = Environment(
@@ -53,6 +54,7 @@ class DocsIndexBuilder:
         return output_path
 
     def _gather_entries(self) -> list[dict[str, str]]:
+        """Collect and return documentation entry dictionaries for the site."""
         entries: list[dict[str, str]] = []
         docs_root = self.site_config.docs_index_output.parent
         for page in self.site_config.pages.values():
@@ -133,6 +135,8 @@ def _read_page_metadata(page: PageConfig) -> Path | None:
 
 def _relativize(target: Path, relative_to: Path) -> str | None:
     try:
+        # Use os.path.relpath instead of Path.relative_to for cross-drive and
+        # non-parent relationships, where Path.relative_to would raise ValueError.
         rel_path = Path(os.path.relpath(target, start=relative_to))
     except ValueError:  # pragma: no cover - different drives
         return None

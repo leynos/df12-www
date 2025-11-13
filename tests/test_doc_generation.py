@@ -113,10 +113,12 @@ def sample_markdown() -> str:
         "Intro details.\n\n"
         f"Use the `{INLINE_CODE_LABEL}` tool for bootstrapping.\n\n"
         "**Capabilities**\n"
-        "Bullet list of capabilities. For more, see the [CLI reference](../cli.md#flags).\n\n"
+        "Bullet list of capabilities. For more, see the "
+        "[CLI reference](../cli.md#flags).\n\n"
         "### Core Philosophy:\n"
         "Why decisions matter.\n\n"
-        "- **Sanitized providers** – The `sanitized_provider` helper returns a Figment\n"
+        "- **Sanitized providers** - The `sanitized_provider` helper returns a "
+        "Figment\n"
         "  provider with None fields removed. It aids manual layering. For example:\n\n"
         "  ```rust,no_run\n"
         "  use figment::{Figment, providers::Serialized};\n"
@@ -170,6 +172,7 @@ def page_config(tmp_path_factory: pytest.TempPathFactory) -> PageConfig:
 def markdown_response(
     sample_markdown: str, monkeypatch: pytest.MonkeyPatch
 ) -> dict[str, typ.Any]:
+    """Provide a fake HTTP response and session state for markdown fetch tests."""
     state: dict[str, typ.Any] = {
         "last_modified": "Tue, 11 Nov 2025 00:00:00 GMT",
         "calls": [],
@@ -187,10 +190,12 @@ def markdown_response(
         state["last_modified"] = value
 
     class _Session:
-        def mount(self, *_args: typ.Any, **_kwargs: typ.Any) -> None:  # pragma: no cover - stub
+        def mount(
+            self, *_args: object, **_kwargs: object
+        ) -> None:  # pragma: no cover - stub
             return None
 
-        def get(self, url: str, timeout: int = 30) -> _Response:  # noqa: ARG002
+        def get(self, url: str, timeout: int = 30) -> _Response:
             state["calls"].append(url)
             return _Response(sample_markdown, {"Last-Modified": state["last_modified"]})
 
@@ -203,7 +208,7 @@ def markdown_response(
 
 
 @pytest.fixture(autouse=True)
-def github_commit_mock(mocker: typ.Any) -> dict[str, typ.Any]:
+def github_commit_mock(mocker: object) -> dict[str, typ.Any]:
     """Mock GitHub client and repo commits for all tests.
 
     This autouse fixture stubs ``df12_pages.generator.GitHub`` with a client
@@ -212,7 +217,7 @@ def github_commit_mock(mocker: typ.Any) -> dict[str, typ.Any]:
     commit timestamp used in metadata badges without calling the real GitHub
     API.
     """
-    commit_date = dt.datetime(2025, 10, 5, 14, 30, tzinfo=dt.timezone.utc)
+    commit_date = dt.datetime(2025, 10, 5, 14, 30, tzinfo=dt.UTC)
     author = SimpleNamespace(date=commit_date)
     committer = SimpleNamespace(date=None)
     commit_payload = SimpleNamespace(author=author, committer=committer)
@@ -233,7 +238,7 @@ def github_commit_mock(mocker: typ.Any) -> dict[str, typ.Any]:
 @pytest.fixture
 def generated_doc_paths(
     page_config: PageConfig,
-    markdown_response: dict[str, typ.Any],  # noqa: ARG001
+    markdown_response: dict[str, typ.Any],
 ) -> dict[str, Path]:
     """Generate HTML pages from the sample markdown and return their paths."""
     generator = PageContentGenerator(page_config)
@@ -273,20 +278,26 @@ def test_sidebar_groups_include_top_and_child_links(
     assert headings == [
         "Introduction",
         "Getting Started",
-    ], f"expected sidebar groups to be ['Introduction', 'Getting Started'], got {headings!r}"
+    ], (
+        "expected sidebar groups to be ['Introduction', 'Getting Started'], "
+        f"got {headings!r}"
+    )
 
     intro_links = [a.get_text(strip=True) for a in groups[0].select("a")]
     assert intro_links[0] == "Introduction", (
         f"expected first intro link to be 'Introduction', got {intro_links[0]!r}"
     )
     assert "Overview" in intro_links[1], (
-        f"expected 'Overview' to be present in second intro link, got {intro_links[1]!r}"
+        "expected 'Overview' to be present in second intro link, "
+        f"got {intro_links[1]!r}"
     )
     assert "Capabilities" in intro_links[2], (
-        f"expected 'Capabilities' to be present in third intro link, got {intro_links[2]!r}"
+        "expected 'Capabilities' to be present in third intro link, "
+        f"got {intro_links[2]!r}"
     )
     assert "Core Philosophy" in intro_links[3], (
-        f"expected 'Core Philosophy' to be present in fourth intro link, got {intro_links[3]!r}"
+        "expected 'Core Philosophy' to be present in fourth intro link, "
+        f"got {intro_links[3]!r}"
     )
 
 
@@ -310,8 +321,12 @@ def test_bold_heading_promoted_to_nav_entry(
     nav_labels = [
         span.get_text(strip=True) for span in soup.select(".doc-nav__list a span")
     ]
-    assert "Capabilities" in nav_labels, "expected 'Capabilities' to be present in nav labels"
-    assert "Core Philosophy" in nav_labels, "expected 'Core Philosophy' to be present in nav labels"
+    assert "Capabilities" in nav_labels, (
+        "expected 'Capabilities' to be present in nav labels"
+    )
+    assert "Core Philosophy" in nav_labels, (
+        "expected 'Core Philosophy' to be present in nav labels"
+    )
 
 
 def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -> None:
@@ -332,19 +347,21 @@ def test_doc_meta_uses_commit_date(
     github_commit_mock: dict[str, typ.Any],
 ) -> None:
     """When releases are absent, rely on the last commit timestamp."""
-    commit_dt = dt.datetime(2025, 10, 9, 9, 0, tzinfo=dt.timezone.utc)
+    commit_dt = dt.datetime(2025, 10, 9, 9, 0, tzinfo=dt.UTC)
     github_commit_mock["set_date"](commit_dt)
 
     generator = PageContentGenerator(page_config)
     written = generator.run()
-    intro_path = next(path for path in written if path.name.endswith("introduction.html"))
+    intro_path = next(
+        path for path in written if path.name.endswith("introduction.html")
+    )
     soup = BeautifulSoup(intro_path.read_text(encoding="utf-8"), "html.parser")
     meta_items = [
         span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
     ]
-    assert meta_items == [
-        "Updated Oct 09, 2025"
-    ], f"unexpected meta_items: {meta_items!r} (expected ['Updated Oct 09, 2025'])"
+    assert meta_items == ["Updated Oct 09, 2025"], (
+        f"unexpected meta_items: {meta_items!r} (expected ['Updated Oct 09, 2025'])"
+    )
 
 
 def test_indented_fenced_block_renders_codehilite(
@@ -353,9 +370,9 @@ def test_indented_fenced_block_renders_codehilite(
     """Indented fenced code blocks should render as highlighted HTML."""
     soup = generated_docs["docs-test-introduction.html"]
     code_blocks = soup.select(".doc-article .codehilite code")
-    assert any(
-        "use figment" in block.get_text() for block in code_blocks
-    ), "expected at least one code block to contain 'use figment'"
+    assert any("use figment" in block.get_text() for block in code_blocks), (
+        "expected at least one code block to contain 'use figment'"
+    )
     assert any(
         block.find_parent("div", class_="codehilite").get("data-language") == "rust"
         for block in code_blocks
@@ -383,8 +400,7 @@ def test_relative_links_rewritten_to_github(
     href = link.get("href")
     assert href is not None, "expected GitHub link to have href attribute"
     assert href == "https://github.com/df12/testdocs/blob/main/cli.md#flags", (
-        "expected href to match original GitHub blob URL, "
-        f"got {href!r}"
+        f"expected href to match original GitHub blob URL, got {href!r}"
     )
 
 
@@ -392,12 +408,14 @@ def test_first_section_metadata_written(
     page_config: PageConfig,
     generated_doc_paths: dict[str, Path],
 ) -> None:
+    """Ensure first section metadata is written alongside generated docs."""
     meta_path = page_config.output_dir / PAGE_META_TEMPLATE.format(key=page_config.key)
     assert meta_path.exists(), f"expected meta file to exist at {meta_path!s}"
     metadata = json.loads(meta_path.read_text(encoding="utf-8"))
-    assert (
-        metadata.get("first_file") == "docs-test-introduction.html"
-    ), f"expected metadata['first_file'] to be 'docs-test-introduction.html', got {metadata.get('first_file')!r} in {metadata!r}"
+    assert metadata.get("first_file") == "docs-test-introduction.html", (
+        "expected metadata['first_file'] to be 'docs-test-introduction.html', "
+        f"got {metadata.get('first_file')!r} in {metadata!r}"
+    )
 
 
 def test_sidebar_shows_label_and_description(
@@ -413,8 +431,7 @@ def test_sidebar_shows_label_and_description(
     body = soup.select_one(".doc-sidebar__body")
     assert body is not None, "expected .doc-sidebar__body element to be present"
     assert body.get_text(strip=True) == "Fixture Description", (
-        "expected body text 'Fixture Description', "
-        f"got {body.get_text(strip=True)!r}"
+        f"expected body text 'Fixture Description', got {body.get_text(strip=True)!r}"
     )
 
 
@@ -445,10 +462,17 @@ def test_doc_prose_code_spans_have_expected_computed_style(
     assets_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(css_build_artifact, assets_dir / "site.css")
 
-    browsers_base = Path(os.environ.get("PLAYWRIGHT_BROWSERS_PATH", Path.home() / ".cache" / "ms-playwright"))
+    browsers_base = Path(
+        os.environ.get(
+            "PLAYWRIGHT_BROWSERS_PATH", Path.home() / ".cache" / "ms-playwright"
+        )
+    )
     has_chromium = any(browsers_base.glob("chromium-*"))
     if not has_chromium:  # pragma: no cover - environment guard
-        pytest.skip("Playwright Chromium browser not installed; run `bun x playwright install chromium`.")
+        pytest.skip(
+            "Playwright Chromium browser not installed; "
+            "run `bun x playwright install chromium`."
+        )
 
     bun_exe = _require_executable("bun")
     try:
@@ -482,20 +506,21 @@ def test_release_version_and_date_prefer_tag_metadata(
     markdown_response: dict[str, typ.Any],
 ) -> None:
     """Release tags should drive the source URL and metadata badges."""
-
     release_config = dc.replace(
         page_config,
         repo="octo/tool",
         source_url=page_config.source_url,
         doc_path="docs/users-guide.md",
         latest_release="v9.9.9",
-        latest_release_published_at=dt.datetime(2024, 12, 25, tzinfo=dt.timezone.utc),
+        latest_release_published_at=dt.datetime(2024, 12, 25, tzinfo=dt.UTC),
     )
     markdown_response["set_last_modified"]("Mon, 01 Jan 2024 12:00:00 GMT")
 
     generator = PageContentGenerator(release_config)
     written = generator.run()
-    intro_path = next(path for path in written if path.name.endswith("introduction.html"))
+    intro_path = next(
+        path for path in written if path.name.endswith("introduction.html")
+    )
     html = intro_path.read_text(encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")
     meta_items = [
@@ -504,7 +529,10 @@ def test_release_version_and_date_prefer_tag_metadata(
     assert meta_items == [
         "Version 9.9.9",
         "Updated Dec 25, 2024",
-    ], f"expected meta items to be ['Version 9.9.9', 'Updated Dec 25, 2024'], got {meta_items!r}"
+    ], (
+        "expected meta items to be ['Version 9.9.9', 'Updated Dec 25, 2024'], "
+        f"got {meta_items!r}"
+    )
 
     requested_url = markdown_response["calls"][0]
     assert "refs/tags/v9.9.9" in requested_url, (

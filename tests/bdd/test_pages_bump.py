@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import typing as typ
 from pathlib import Path
 from textwrap import dedent
-import typing as typ
 
 import pytest
 import requests
@@ -28,6 +28,7 @@ ScenarioState = dict[str, typ.Any]
 
 @pytest.fixture(scope="session")
 def cassette_dir() -> Path:
+    """Return the directory where Betamax cassettes are stored for this test suite."""
     path = Path(__file__).resolve().parents[1] / "cassettes"
     path.mkdir(parents=True, exist_ok=True)
     return path
@@ -35,11 +36,13 @@ def cassette_dir() -> Path:
 
 @pytest.fixture
 def scenario_state() -> ScenarioState:
+    """Return a mutable dict used to share scenario state across BDD steps."""
     return {}
 
 
 @given("a pages config referencing public repositories")
 def given_pages_config(tmp_path: Path, scenario_state: ScenarioState) -> None:
+    """Write a pages.yaml config that references multiple public repositories."""
     config_path = tmp_path / "pages.yaml"
     config_path.write_text(
         dedent(
@@ -63,6 +66,7 @@ def given_pages_config(tmp_path: Path, scenario_state: ScenarioState) -> None:
 
 @given("GitHub responses are replayed via betamax")
 def given_betamax(scenario_state: ScenarioState, cassette_dir: Path) -> None:
+    """Configure a Betamax-backed session to replay GitHub API responses."""
     session = requests.Session()
     recorder = Betamax(
         session,
@@ -75,9 +79,10 @@ def given_betamax(scenario_state: ScenarioState, cassette_dir: Path) -> None:
 
 @when("I run the pages bump workflow")
 def when_run_bump(scenario_state: ScenarioState) -> None:
-    config_path = typ.cast(Path, scenario_state["config_path"])
-    session = typ.cast(requests.Session, scenario_state["session"])
-    recorder = typ.cast(Betamax, scenario_state["recorder"])
+    """Execute the pages bump workflow using the configured GitHub client."""
+    config_path = typ.cast("Path", scenario_state["config_path"])
+    session = typ.cast("requests.Session", scenario_state["session"])
+    recorder = typ.cast("Betamax", scenario_state["recorder"])
     client = GitHubReleaseClient(session=session)
 
     cassette_name = "pages_bump/latest_release_tags"
@@ -89,8 +94,9 @@ def when_run_bump(scenario_state: ScenarioState) -> None:
 
 @then("the config records the expected release tags")
 def then_config_records_expected(scenario_state: ScenarioState) -> None:
-    config_path = typ.cast(Path, scenario_state["config_path"])
-    result = typ.cast(dict[str, str | None], scenario_state["result"])
+    """Verify the pages config and results capture the expected release tags."""
+    config_path = typ.cast("Path", scenario_state["config_path"])
+    result = typ.cast("dict[str, str | None]", scenario_state["result"])
 
     yaml = YAML(typ="safe")
     parsed = yaml.load(config_path.read_text(encoding="utf-8"))

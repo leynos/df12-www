@@ -11,17 +11,21 @@ from pytest_bdd import given, scenarios, then, when
 from df12_pages.config import load_site_config
 from df12_pages.generator import PageContentGenerator
 
-FEATURE_FILE = Path(__file__).resolve().parents[2] / "features" / "indented_code_blocks.feature"
+FEATURE_FILE = (
+    Path(__file__).resolve().parents[2] / "features" / "indented_code_blocks.feature"
+)
 scenarios(FEATURE_FILE)
 
 
 @pytest.fixture
 def scenario_state() -> dict[str, object]:
+    """Return a mutable dict used to share scenario state across BDD steps."""
     return {}
 
 
 @given("a docs config for indented code blocks")
 def given_config(tmp_path: Path, scenario_state: dict[str, object]) -> None:
+    """Set up a docs config used to exercise indented fenced code blocks."""
     output_dir = tmp_path / "docs"
     output_dir.mkdir()
     config_path = tmp_path / "pages.yaml"
@@ -44,6 +48,7 @@ pages:
 
 @given("markdown content with indented fenced code blocks is stubbed")
 def given_stubbed_markdown(scenario_state: dict[str, object]) -> None:
+    """Populate scenario state with stubbed markdown containing indented code blocks."""
     scenario_state["markdown"] = (
         "## Intro\n"
         "- **Example** demonstrates inline code\n\n"
@@ -58,10 +63,12 @@ def when_render_docs(
     scenario_state: dict[str, object],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Render the sample docs page for the indented code blocks scenario."""
     config = load_site_config(scenario_state["config_path"])
     page = config.get_page("sample")
 
-    def _fake_fetch(self: PageContentGenerator) -> str:  # noqa: D401  # TODO: bypass D401; test doubles mirror production method signature
+    def _fake_fetch(self: PageContentGenerator) -> str:
+        """Return stubbed markdown content for indented code block tests."""
         return scenario_state["markdown"]  # type: ignore[index]
 
     monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", _fake_fetch)
@@ -72,6 +79,7 @@ def when_render_docs(
 
 @then("the HTML includes a highlighted code block for the sample")
 def then_html_has_code_block(scenario_state: dict[str, object]) -> None:
+    """Verify the rendered HTML includes a highlighted Rust code block."""
     written: list[Path] = scenario_state["written"]  # type: ignore[assignment]
     html = written[0].read_text(encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")

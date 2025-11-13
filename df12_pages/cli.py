@@ -12,8 +12,8 @@ from cyclopts import App, Parameter
 from .bump import bump_latest_release_metadata
 from .config import load_site_config
 from .docs_index import DocsIndexBuilder
-from .homepage import HomePageBuilder
 from .generator import PageContentGenerator
+from .homepage import HomePageBuilder
 from .releases import GitHubReleaseClient
 
 DEFAULT_CONFIG = Path("config/pages.yaml")
@@ -57,9 +57,8 @@ def generate(
         target_pages = list(site_config.pages.values())
 
     if len(target_pages) > 1 and (source_url or output_dir):
-        raise ValueError(
-            "Cannot override source_url/output_dir when generating multiple pages."
-        )
+        msg = "Cannot override source_url/output_dir when generating multiple pages."
+        raise ValueError(msg)
 
     for page_config in target_pages:
         generator = PageContentGenerator(
@@ -95,6 +94,7 @@ def bump(
         ),
     ] = GitHubReleaseClient.default_api_base,
 ) -> None:
+    """Update page configs with the latest GitHub release tags."""
     token = github_token or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
     client = GitHubReleaseClient(token=token, api_base=github_api_url)
     results = bump_latest_release_metadata(config_path=config, client=client)

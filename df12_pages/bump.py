@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Mapping
+import collections.abc as cabc
+import typing as typ
 
 from ruamel.yaml import YAML
 from ruamel.yaml.comments import CommentedMap
 
-from .releases import GitHubReleaseClient, ReleaseInfo
+if typ.TYPE_CHECKING:
+    from pathlib import Path
+
+    from .releases import GitHubReleaseClient, ReleaseInfo
 
 
 class PagesConfigError(ValueError):
@@ -24,7 +27,6 @@ def bump_latest_release_metadata(
     (``None`` when no release exists). The YAML document is always re-serialized
     so that removals of release metadata are persisted as well.
     """
-
     yaml = _build_roundtrip_yaml()
     with config_path.open("r", encoding="utf-8") as handle:
         document = yaml.load(handle) or CommentedMap()
@@ -33,7 +35,7 @@ def bump_latest_release_metadata(
         raise PagesConfigError(msg)
 
     defaults = document.get("defaults")
-    if not isinstance(defaults, Mapping):
+    if not isinstance(defaults, cabc.Mapping):
         defaults = {}
 
     pages = document.get("pages")
@@ -67,7 +69,7 @@ def _build_roundtrip_yaml() -> YAML:
 
 
 def _resolve_repo(
-    page_payload: Mapping[str, Any], defaults: Mapping[str, Any]
+    page_payload: cabc.Mapping[str, typ.Any], defaults: cabc.Mapping[str, typ.Any]
 ) -> str | None:
     repo = page_payload.get("repo") or defaults.get("repo")
     if not repo:
@@ -75,9 +77,13 @@ def _resolve_repo(
     return str(repo)
 
 
-def _record_release(page_payload: CommentedMap, release: ReleaseInfo | None) -> ReleaseInfo | None:
+def _record_release(
+    page_payload: CommentedMap, release: ReleaseInfo | None
+) -> ReleaseInfo | None:
     if release:
-        _upsert_key(page_payload, "latest_release", release.tag_name, ("repo", "language"))
+        _upsert_key(
+            page_payload, "latest_release", release.tag_name, ("repo", "language")
+        )
         if release.published_at:
             _upsert_key(
                 page_payload,

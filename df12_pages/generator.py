@@ -15,9 +15,6 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 import requests
-from requests import Session
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 from github3 import GitHub
 from github3 import exceptions as gh_exc
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -28,6 +25,8 @@ from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from ._constants import PAGE_META_TEMPLATE
 from .config import PageConfig, SectionLayout
@@ -36,7 +35,9 @@ from .markdown_parser import Section, Subsection, parse_sections
 
 CODE_BLOCK_PATTERN = re.compile(r"```([A-Za-z0-9_+#.-]+)?[^\n]*\n(.*?)```", re.DOTALL)
 FENCED_INDENT_PATTERN = re.compile(r"^[ ]{1,3}([`~]{3,})", re.MULTILINE)
-FENCE_LABEL_PATTERN = re.compile(r"^([`~]{3,})([A-Za-z0-9_+#.-]+)?(,[^\r\n]+)$", re.MULTILINE)
+FENCE_LABEL_PATTERN = re.compile(
+    r"^([`~]{3,})([A-Za-z0-9_+#.-]+)?(,[^\r\n]+)$", re.MULTILINE
+)
 CODEHILITE_OPEN_TAG = re.compile(r'<div class="codehilite">')
 
 
@@ -107,14 +108,19 @@ class HtmlContentRenderer:
 
     def _annotate_codehilite(self, html: str, source_markdown: str) -> str:
         """Attach language metadata to each highlighted block in converted markdown."""
-        languages = [match.group(1) or "text" for match in CODE_BLOCK_PATTERN.finditer(source_markdown)]
+        languages = [
+            match.group(1) or "text"
+            for match in CODE_BLOCK_PATTERN.finditer(source_markdown)
+        ]
         if not languages:
             return html
         lang_iter = iter(languages)
 
         def _repl(match: re.Match[str]) -> str:
             lang = next(lang_iter, "text")
-            return f'<div class="codehilite" data-language="{escape(lang, quote=True)}">'
+            return (
+                f'<div class="codehilite" data-language="{escape(lang, quote=True)}">'
+            )
 
         return CODEHILITE_OPEN_TAG.sub(_repl, html, len(languages))
 
@@ -124,7 +130,7 @@ class HtmlContentRenderer:
         safe_lang = escape(language or "text", quote=True)
 
         def _repl(match: re.Match[str]) -> str:
-            return f'<div class="codehilite" data-language="{safe_lang}">' 
+            return f'<div class="codehilite" data-language="{safe_lang}">'
 
         return CODEHILITE_OPEN_TAG.sub(_repl, html, 1)
 
@@ -304,7 +310,7 @@ class PageContentGenerator:
             return None
         return self._extract_commit_timestamp(latest_commit)
 
-    def _extract_commit_timestamp(self, commit: typ.Any) -> dt.datetime | None:
+    def _extract_commit_timestamp(self, commit: object) -> dt.datetime | None:
         commit_payload = getattr(commit, "commit", None)
         if commit_payload is None and isinstance(commit, dict):
             commit_payload = commit.get("commit")
@@ -329,7 +335,7 @@ class PageContentGenerator:
         return None
 
     @staticmethod
-    def _normalize_commit_date(value: typ.Any) -> dt.datetime | None:
+    def _normalize_commit_date(value: object) -> dt.datetime | None:
         if value is None:
             return None
         if isinstance(value, dt.datetime):
@@ -367,7 +373,9 @@ class PageContentGenerator:
             resp = session.get(self.source_url, timeout=30)
             resp.raise_for_status()
             if not self.doc_updated_at:
-                self.doc_updated_at = self._extract_timestamp(resp.headers.get("Last-Modified"))
+                self.doc_updated_at = self._extract_timestamp(
+                    resp.headers.get("Last-Modified")
+                )
             return resp.text
         finally:
             session.close()
@@ -645,13 +653,13 @@ class RelativeLinkExtension(Extension):
         self.base_dir = base_dir
 
     def extendMarkdown(self, md: Markdown) -> None:  # type: ignore[override]
-        """Register the relative-link treeprocessor on the provided Markdown instance."""
+        """Register the relative-link treeprocessor on the Markdown instance."""
         processor = RelativeLinkTreeprocessor(md, self.repo, self.ref, self.base_dir)
         md.treeprocessors.register(processor, "df12_relative_links", 15)
 
 
 class RelativeLinkTreeprocessor(Treeprocessor):
-    """Treeprocessor that rewrites relative markdown links to point at GitHub raw blobs."""
+    """Rewrite relative markdown links to point at GitHub raw blobs."""
 
     def __init__(self, md: Markdown, repo: str, ref: str, base_dir: str) -> None:
         """Store repo metadata for rewriting relative links.
@@ -672,7 +680,8 @@ class RelativeLinkTreeprocessor(Treeprocessor):
         self.ref = ref
         self.base_dir = base_dir
 
-    def run(self, root: typ.Any) -> typ.Any:  # pragma: no cover - Markdown API
+    def run(self, root: object) -> object:  # pragma: no cover - Markdown API
+        """Rewrite relative anchors in the parsed markdown tree to GitHub URLs."""
         for element in root.iter():
             if element.tag == "a":
                 href = element.get("href")
@@ -699,7 +708,9 @@ class RelativeLinkTreeprocessor(Treeprocessor):
         if not target:
             return None
         lower = target.lower()
-        if lower.startswith(("http://", "https://", "mailto:", "tel:", "data:", "javascript:")):
+        if lower.startswith(
+            ("http://", "https://", "mailto:", "tel:", "data:", "javascript:")
+        ):
             return None
         if target.startswith(("#", "//")):
             return None

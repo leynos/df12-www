@@ -37,7 +37,7 @@ EOF
 ${var.github_ssh_private_key}
 EOF
     chmod 600 "$DIR/github_key"
-    cat >"$DIR/ssh_config" <<'EOF'
+    cat >"$DIR/ssh_config" <<EOF
     Host github.com
       HostName github.com
       IdentityFile "$DIR/github_key"
@@ -87,9 +87,9 @@ resource "null_resource" "deploy" {
       ${local.git_clone_cmd}
       git -C "$REPO_DIR" checkout -q "${data.external.git_sync.result.commit}"
       echo "Installing dependencies..."
-      bun install --cwd "$REPO_DIR" >/dev/null
+      bun install --cwd "$REPO_DIR"
       echo "Building static assets..."
-      bun run --cwd "$REPO_DIR" build >/dev/null
+      bun run --cwd "$REPO_DIR" build
       test -d "$REPO_DIR/${var.site_path}" || { echo "Site path '$REPO_DIR/${var.site_path}' not found" >&2; exit 1; }
       test -f "$REPO_DIR/${var.site_path}/index.html" || { echo "Expected index.html at '$REPO_DIR/${var.site_path}/index.html'" >&2; exit 1; }
       test -d "$REPO_DIR/${var.site_path}/assets" || { echo "Expected assets directory at '$REPO_DIR/${var.site_path}/assets'" >&2; exit 1; }

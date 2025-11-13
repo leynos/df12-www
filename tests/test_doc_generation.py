@@ -413,7 +413,7 @@ def test_doc_prose_code_spans_have_expected_computed_style(
 
     bun_exe = _require_executable("bun")
     try:
-        result = subprocess.run(  # noqa: S603 - inputs are controlled fixture paths
+        result = subprocess.run(  # noqa: S603 - FIXME: inputs are controlled fixture paths in tests; no user-provided arguments
             [bun_exe, "x", "css-view", f"file://{doc_path.resolve()}"],
             cwd=REPO_ROOT,
             check=True,

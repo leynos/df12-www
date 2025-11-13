@@ -296,6 +296,21 @@ def load_site_config(path: Path) -> SiteConfig:
         msg = "No pages defined in layout configuration."
         raise SiteConfigError(msg)
 
+    page_defaults = _PageDefaults(
+        theme=default_theme,
+        output_dir=default_output_dir,
+        filename_prefix=default_filename_prefix,
+        pygments_style=default_pygments_style,
+        page_title_suffix=default_page_title_suffix,
+        source_label=default_source_label,
+        footer_note=default_footer_note,
+        branch=default_branch,
+        doc_path=default_doc_path,
+        repo=default_repo,
+        language=default_language,
+        shared_layouts=shared_layouts,
+    )
+
     pages: dict[str, PageConfig] = {}
     for key, payload in pages_raw.items():
         if not isinstance(payload, dict):
@@ -303,18 +318,7 @@ def load_site_config(path: Path) -> SiteConfig:
         pages[key] = _build_page_config(
             key=key,
             payload=payload,
-            default_theme=default_theme,
-            default_output_dir=default_output_dir,
-            default_filename_prefix=default_filename_prefix,
-            default_pygments_style=default_pygments_style,
-            default_page_title_suffix=default_page_title_suffix,
-            default_source_label=default_source_label,
-            default_footer_note=default_footer_note,
-            default_branch=default_branch,
-            default_doc_path=default_doc_path,
-            default_repo=default_repo,
-            default_language=default_language,
-            shared_layouts=shared_layouts,
+            defaults=page_defaults,
         )
 
     homepage_config = _build_homepage_config(homepage_raw) if homepage_raw else None
@@ -328,28 +332,35 @@ def load_site_config(path: Path) -> SiteConfig:
     )
 
 
+@dc.dataclass(slots=True)
+class _PageDefaults:
+    """Internal container for page default configuration values."""
+
+    theme: ThemeConfig
+    output_dir: Path
+    filename_prefix: str
+    pygments_style: str
+    page_title_suffix: str
+    source_label: str
+    footer_note: str
+    branch: str
+    doc_path: str
+    repo: str | None
+    language: str | None
+    shared_layouts: typ.Mapping[str, typ.Any]
+
+
 def _build_page_config(
     *,
     key: str,
     payload: typ.Mapping[str, typ.Any],
-    default_theme: ThemeConfig,
-    default_output_dir: Path,
-    default_filename_prefix: str,
-    default_pygments_style: str,
-    default_page_title_suffix: str,
-    default_source_label: str,
-    default_footer_note: str,
-    default_branch: str,
-    default_doc_path: str,
-    default_repo: str | None,
-    default_language: str | None,
-    shared_layouts: typ.Mapping[str, typ.Any],
+    defaults: _PageDefaults,
 ) -> PageConfig:
     """Build a PageConfig for a single page entry using defaults and overrides."""
-    repo = payload.get("repo", default_repo)
-    branch = payload.get("branch", default_branch)
-    language = payload.get("language", default_language)
-    doc_path = payload.get("doc_path", default_doc_path)
+    repo = payload.get("repo", defaults.repo)
+    branch = payload.get("branch", defaults.branch)
+    language = payload.get("language", defaults.language)
+    doc_path = payload.get("doc_path", defaults.doc_path)
     source_url = payload.get("source_url")
     if not source_url and repo:
         source_url = _build_repo_url(repo, branch, doc_path)
@@ -358,15 +369,15 @@ def _build_page_config(
         raise SiteConfigError(msg)
 
     label = payload.get("label") or key.replace("-", " ").title()
-    source_label = payload.get("source_label", default_source_label)
-    title_suffix = payload.get("page_title_suffix", default_page_title_suffix)
-    filename_prefix = payload.get("filename_prefix", default_filename_prefix)
-    output_dir = Path(payload.get("output_dir", default_output_dir))
-    pygments_style = payload.get("pygments_style", default_pygments_style)
-    footer_note = payload.get("footer_note", default_footer_note)
-    theme = _merge_theme(default_theme, payload.get("theme"))
+    source_label = payload.get("source_label", defaults.source_label)
+    title_suffix = payload.get("page_title_suffix", defaults.page_title_suffix)
+    filename_prefix = payload.get("filename_prefix", defaults.filename_prefix)
+    output_dir = Path(payload.get("output_dir", defaults.output_dir))
+    pygments_style = payload.get("pygments_style", defaults.pygments_style)
+    footer_note = payload.get("footer_note", defaults.footer_note)
+    theme = _merge_theme(defaults.theme, payload.get("theme"))
 
-    layouts = _merge_layouts(shared_layouts, payload.get("layouts"))
+    layouts = _merge_layouts(defaults.shared_layouts, payload.get("layouts"))
 
     manifest_url = payload.get("manifest_url")
     if not manifest_url and repo:
@@ -637,9 +648,9 @@ def _build_world_image(
     try:
         width = int(payload.get("width"))
         height = int(payload.get("height"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError) as exc:
         msg = f"World card '{label}' image requires numeric 'width' and 'height'."
-        raise SiteConfigError(msg)
+        raise SiteConfigError(msg) from exc
     required = ["avif", "webp", "fallback", "alt", "sizes"]
     for key in required:
         if not payload.get(key):
@@ -684,9 +695,9 @@ def _build_footer_config(
         raise SiteConfigError(msg)
     try:
         copyright_year = int(payload.get("copyright_year"))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError) as exc:
         msg = "Homepage footer 'copyright_year' must be numeric."
-        raise SiteConfigError(msg)
+        raise SiteConfigError(msg) from exc
     return FooterConfig(
         site_name=str(payload["site_name"]),
         blurb=str(payload["blurb"]),

@@ -283,32 +283,35 @@ class PageContentGenerator:
         return self._github_client
 
     def _fetch_doc_commit_date(self) -> dt.datetime | None:
+        """Return the commit date for the document, if available."""
+        result: dt.datetime | None = None
         repo_slug = self.page.repo
-        if not repo_slug:
-            return None
-        try:
-            owner, name = repo_slug.split("/", 1)
-        except ValueError:
-            return None
+        if repo_slug:
+            try:
+                owner, name = repo_slug.split("/", 1)
+            except ValueError:
+                owner = name = None
 
-        branch = self.page.branch or "main"
-        doc_path = self.page.doc_path.lstrip("/")
+            if owner and name:
+                branch = self.page.branch or "main"
+                doc_path = self.page.doc_path.lstrip("/")
+                try:
+                    repository = self._github().repository(owner, name)
+                except gh_exc.GitHubException:
+                    repository = None
 
-        try:
-            repository = self._github().repository(owner, name)
-        except gh_exc.GitHubException:
-            return None
-        if repository is None:
-            return None
-        try:
-            commits = repository.commits(path=doc_path, sha=branch)
-        except gh_exc.GitHubException:
-            return None
+                if repository is not None:
+                    try:
+                        commits = repository.commits(path=doc_path, sha=branch)
+                    except gh_exc.GitHubException:
+                        commits = None
 
-        latest_commit = next(iter(commits), None)
-        if not latest_commit:
-            return None
-        return self._extract_commit_timestamp(latest_commit)
+                    if commits is not None:
+                        latest_commit = next(iter(commits), None)
+                        if latest_commit:
+                            result = self._extract_commit_timestamp(latest_commit)
+
+        return result
 
     def _extract_commit_timestamp(self, commit: object) -> dt.datetime | None:
         commit_payload = getattr(commit, "commit", None)
@@ -336,25 +339,29 @@ class PageContentGenerator:
 
     @staticmethod
     def _normalize_commit_date(value: object) -> dt.datetime | None:
+        """Normalize a commit timestamp value into a UTC datetime, if possible."""
+        result: dt.datetime | None = None
         if value is None:
-            return None
-        if isinstance(value, dt.datetime):
+            result = None
+        elif isinstance(value, dt.datetime):
             if value.tzinfo is None:
-                return value.replace(tzinfo=dt.UTC)
-            return value.astimezone(dt.UTC)
-        if isinstance(value, str):
+                result = value.replace(tzinfo=dt.UTC)
+            else:
+                result = value.astimezone(dt.UTC)
+        elif isinstance(value, str):
             sanitized = value.strip()
-            if not sanitized:
-                return None
-            sanitized = sanitized.replace("Z", "+00:00")
-            try:
-                parsed = dt.datetime.fromisoformat(sanitized)
-            except ValueError:
-                return None
-            if parsed.tzinfo is None:
-                return parsed.replace(tzinfo=dt.UTC)
-            return parsed.astimezone(dt.UTC)
-        return None
+            if sanitized:
+                sanitized = sanitized.replace("Z", "+00:00")
+                try:
+                    parsed = dt.datetime.fromisoformat(sanitized)
+                except ValueError:
+                    parsed = None
+                if parsed is not None:
+                    if parsed.tzinfo is None:
+                        result = parsed.replace(tzinfo=dt.UTC)
+                    else:
+                        result = parsed.astimezone(dt.UTC)
+        return result
 
     def _fetch_markdown(self) -> str:
         session = requests.Session()
@@ -652,7 +659,7 @@ class RelativeLinkExtension(Extension):
         self.ref = ref
         self.base_dir = base_dir
 
-    def extendMarkdown(self, md: Markdown) -> None:  # type: ignore[override]
+    def extendMarkdown(self, md: Markdown) -> None:  # type: ignore[override]  # noqa: N802 - required by Markdown extension API
         """Register the relative-link treeprocessor on the Markdown instance."""
         processor = RelativeLinkTreeprocessor(md, self.repo, self.ref, self.base_dir)
         md.treeprocessors.register(processor, "df12_relative_links", 15)
@@ -707,26 +714,31 @@ class RelativeLinkTreeprocessor(Treeprocessor):
         """
         if not target:
             return None
+
         lower = target.lower()
-        if lower.startswith(
+        invalid = lower.startswith(
             ("http://", "https://", "mailto:", "tel:", "data:", "javascript:")
-        ):
-            return None
-        if target.startswith(("#", "//")):
-            return None
-        if "://" in target:
-            return None
+        )
+        if target.startswith(("#", "//")) or "://" in target:
+            invalid = True
 
-        parsed = urlsplit(target)
-        if parsed.scheme or parsed.netloc or (not parsed.path and parsed.fragment):
-            return None
-        if parsed.path.startswith("/"):
-            return None
+        parsed = None
+        if not invalid:
+            parsed = urlsplit(target)
+            if parsed.scheme or parsed.netloc or (not parsed.path and parsed.fragment):
+                invalid = True
+            elif parsed.path.startswith("/"):
+                invalid = True
 
-        joined = posixpath.normpath(posixpath.join(self.base_dir, parsed.path))
-        while joined.startswith("../"):
-            joined = joined[3:]
-        if joined in (".", ""):
+        joined = None
+        if not invalid and parsed is not None:
+            joined = posixpath.normpath(posixpath.join(self.base_dir, parsed.path))
+            while joined.startswith("../"):
+                joined = joined[3:]
+            if joined in (".", ""):
+                invalid = True
+
+        if invalid or parsed is None or joined is None:
             return None
 
         url = f"https://github.com/{self.repo}/blob/{self.ref}/{joined}"

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import collections.abc as cabc
 import typing as typ
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.docs_index import _build_package_url
 
 if typ.TYPE_CHECKING:
+    import collections.abc as cabc
     Mapping = cabc.Mapping
 
 

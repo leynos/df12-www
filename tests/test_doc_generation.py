@@ -290,8 +290,8 @@ def test_bold_heading_promoted_to_nav_entry(
     nav_labels = [
         span.get_text(strip=True) for span in soup.select(".doc-nav__list a span")
     ]
-    assert "Capabilities" in nav_labels
-    assert "Core Philosophy" in nav_labels
+    assert "Capabilities" in nav_labels, "expected 'Capabilities' to be present in nav labels"
+    assert "Core Philosophy" in nav_labels, "expected 'Core Philosophy' to be present in nav labels"
 
 
 def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -> None:

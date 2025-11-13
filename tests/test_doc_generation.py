@@ -333,11 +333,13 @@ def test_indented_fenced_block_renders_codehilite(
     """Indented fenced code blocks should render as highlighted HTML."""
     soup = generated_docs["docs-test-introduction.html"]
     code_blocks = soup.select(".doc-article .codehilite code")
-    assert any("use figment" in block.get_text() for block in code_blocks)
+    assert any(
+        "use figment" in block.get_text() for block in code_blocks
+    ), "expected at least one code block to contain 'use figment'"
     assert any(
         block.find_parent("div", class_="codehilite").get("data-language") == "rust"
         for block in code_blocks
-    )
+    ), "expected at least one code block parent div to have data-language='rust'"
 
 
 def test_default_layout_content_not_duplicated(

@@ -469,7 +469,12 @@ def test_release_version_and_date_prefer_tag_metadata(
     meta_items = [
         span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
     ]
-    assert meta_items == ["Version 9.9.9", "Updated Dec 25, 2024"]
+    assert meta_items == [
+        "Version 9.9.9",
+        "Updated Dec 25, 2024",
+    ], f"expected meta items to be ['Version 9.9.9', 'Updated Dec 25, 2024'], got {meta_items!r}"
 
     requested_url = markdown_response["calls"][0]
-    assert "refs/tags/v9.9.9" in requested_url
+    assert "refs/tags/v9.9.9" in requested_url, (
+        f"expected request URL {requested_url!r} to reference release tag 'v9.9.9'"
+    )

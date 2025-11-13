@@ -359,9 +359,11 @@ def test_first_section_metadata_written(
     generated_doc_paths: dict[str, Path],
 ) -> None:
     meta_path = page_config.output_dir / PAGE_META_TEMPLATE.format(key=page_config.key)
-    assert meta_path.exists()
+    assert meta_path.exists(), f"expected meta file to exist at {meta_path!s}"
     metadata = json.loads(meta_path.read_text(encoding="utf-8"))
-    assert metadata["first_file"] == "docs-test-introduction.html"
+    assert (
+        metadata.get("first_file") == "docs-test-introduction.html"
+    ), f"expected metadata['first_file'] to be 'docs-test-introduction.html', got {metadata.get('first_file')!r} in {metadata!r}"
 
 
 def test_sidebar_shows_label_and_description(

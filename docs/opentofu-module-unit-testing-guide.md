@@ -155,8 +155,7 @@ integration testing capabilities but can also be used to validate plan files.
 
 This flexibility means that the tool or command name alone does not define the
 type of test being performed. The crucial differentiator is the *practitioner's
-intent*. The fundamental question an engineer must ask is: "What am I trying to
-validate?"
+intent*. The fundamental question to clarify is: "What is being validated?"
 
 - If the goal is to verify the module's internal logic, its conditional
   branches, or its variable handling *in isolation*, then it is a **unit
@@ -794,7 +793,7 @@ COMMAND=$(jq -r '.resource_changes |
 
 # Assert that the command is what we expect
 EXPECTED_COMMAND="echo hello-world > /tmp/message.txt"
-if; then
+if [ "$COMMAND" != "$EXPECTED_COMMAND" ]; then
   echo "Assertion failed!"
   echo "Expected: $EXPECTED_COMMAND"
   echo "Got:      $COMMAND"

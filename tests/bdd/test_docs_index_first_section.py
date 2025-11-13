@@ -88,11 +88,27 @@ def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
 
 @then("the docs card exposes repo, release, and registry links")
 def then_card_has_external_links(scenario_state: dict[str, object]) -> None:
+    """Verify docs card exposes repo, release, and registry links."""
     index_path: Path = scenario_state["index_path"]  # type: ignore[assignment]
     soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
     repo_link = soup.select_one("[data-test='docs-card-repo']")
     release_link = soup.select_one("[data-test='docs-card-release']")
     package_link = soup.select_one("[data-test='docs-card-package']")
-    assert repo_link and repo_link["href"] == "https://github.com/df12/zebra"
-    assert release_link and release_link["href"] == "https://github.com/df12/zebra/releases/tag/v1.2.3"
-    assert package_link and package_link["href"] == "https://crates.io/crates/zebra"
+    assert repo_link is not None, "expected a repo link element on the docs card"
+    assert (
+        repo_link.get("href") == "https://github.com/df12/zebra"
+    ), f"expected repo link href to be 'https://github.com/df12/zebra', got {repo_link.get('href')!r}"
+    assert release_link is not None, "expected a release link element on the docs card"
+    assert (
+        release_link.get("href") == "https://github.com/df12/zebra/releases/tag/v1.2.3"
+    ), (
+        "expected release link href to be 'https://github.com/df12/zebra/releases/tag/v1.2.3', "
+        f"got {release_link.get('href')!r}"
+    )
+    assert package_link is not None, "expected a package link element on the docs card"
+    assert (
+        package_link.get("href") == "https://crates.io/crates/zebra"
+    ), (
+        "expected package link href to be 'https://crates.io/crates/zebra', "
+        f"got {package_link.get('href')!r}"
+    )

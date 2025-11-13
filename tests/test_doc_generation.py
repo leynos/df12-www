@@ -279,7 +279,10 @@ def test_only_one_sidebar_link_flagged_active(
     """Exactly one nav link should be marked as active for a page."""
     soup = generated_docs["docs-test-getting-started.html"]
     active_titles = soup.select(".doc-nav-group__title.is-active")
-    assert len(active_titles) == 1
+    assert len(active_titles) == 1, (
+        "Expected exactly one active nav title in 'docs-test-getting-started.html', "
+        f"found {len(active_titles)}"
+    )
 
 
 def test_bold_heading_promoted_to_nav_entry(

@@ -359,8 +359,13 @@ def test_relative_links_rewritten_to_github(
     """Relative links should point to the original GitHub repository blob URL."""
     soup = generated_docs["docs-test-introduction.html"]
     link = soup.select_one("a[href*='github.com']")
-    assert link is not None
-    assert link["href"] == "https://github.com/df12/testdocs/blob/main/cli.md#flags"
+    assert link is not None, "expected GitHub link in generated docs"
+    href = link.get("href")
+    assert href is not None, "expected GitHub link to have href attribute"
+    assert href == "https://github.com/df12/testdocs/blob/main/cli.md#flags", (
+        "expected href to match original GitHub blob URL, "
+        f"got {href!r}"
+    )
 
 
 def test_first_section_metadata_written(
@@ -381,11 +386,16 @@ def test_sidebar_shows_label_and_description(
     """Sidebar should highlight the tool label and description."""
     soup = generated_docs["docs-test-introduction.html"]
     eyebrow = soup.select_one(".doc-sidebar__eyebrow")
-    assert eyebrow is not None
-    assert eyebrow.get_text(strip=True) == "Test Docs"
+    assert eyebrow is not None, "expected .doc-sidebar__eyebrow element to be present"
+    assert eyebrow.get_text(strip=True) == "Test Docs", (
+        f"expected eyebrow text 'Test Docs', got {eyebrow.get_text(strip=True)!r}"
+    )
     body = soup.select_one(".doc-sidebar__body")
-    assert body is not None
-    assert body.get_text(strip=True) == "Fixture Description"
+    assert body is not None, "expected .doc-sidebar__body element to be present"
+    assert body.get_text(strip=True) == "Fixture Description", (
+        "expected body text 'Fixture Description', "
+        f"got {body.get_text(strip=True)!r}"
+    )
 
 
 def _extract_nodes_by_tag(

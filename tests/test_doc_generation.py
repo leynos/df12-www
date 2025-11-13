@@ -348,7 +348,9 @@ def test_default_layout_content_not_duplicated(
     """Sections without headings should render body content exactly once."""
     soup = generated_docs["docs-test-introduction.html"]
     html = soup.select_one(".doc-article").decode_contents()
-    assert html.count("Sanitized providers") == 1
+    assert html.count("Sanitized providers") == 1, (
+        "expected 'Sanitized providers' to appear exactly once in generated doc HTML"
+    )
 
 
 def test_relative_links_rewritten_to_github(

@@ -298,9 +298,12 @@ def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -
     """Hero titles should omit numbering prefixes from H2 markdown."""
     soup = generated_docs["docs-test-introduction.html"]
     title_tag = soup.select_one(".doc-hero__title")
-    assert title_tag is not None
+    assert title_tag is not None, "Expected hero title element to exist"
     hero_title = title_tag.get_text(strip=True)
-    assert hero_title == "Introduction"
+    assert hero_title, "Expected hero title text to be non-empty"
+    assert hero_title == "Introduction", (
+        f"Expected hero title to equal 'Introduction' but got {hero_title!r}"
+    )
 
 
 def test_doc_meta_uses_commit_date(
@@ -319,7 +322,9 @@ def test_doc_meta_uses_commit_date(
     meta_items = [
         span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
     ]
-    assert meta_items == ["Updated Oct 09, 2025"]
+    assert meta_items == [
+        "Updated Oct 09, 2025"
+    ], f"unexpected meta_items: {meta_items!r} (expected ['Updated Oct 09, 2025'])"
 
 
 def test_indented_fenced_block_renders_codehilite(

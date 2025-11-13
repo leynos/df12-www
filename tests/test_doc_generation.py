@@ -261,16 +261,25 @@ def test_sidebar_groups_include_top_and_child_links(
     """Sidebar groups should render top-level sections plus subsections."""
     soup = generated_docs["docs-test-introduction.html"]
     groups = soup.select(".doc-sidebar__groups .doc-nav-group")
-    assert [g.select_one("h3").get_text(strip=True) for g in groups] == [
+    headings = [g.select_one("h3").get_text(strip=True) for g in groups]
+    assert headings == [
         "Introduction",
         "Getting Started",
-    ]
+    ], f"expected sidebar groups to be ['Introduction', 'Getting Started'], got {headings!r}"
 
     intro_links = [a.get_text(strip=True) for a in groups[0].select("a")]
-    assert intro_links[0] == "Introduction"
-    assert "Overview" in intro_links[1]
-    assert "Capabilities" in intro_links[2]
-    assert "Core Philosophy" in intro_links[3]
+    assert intro_links[0] == "Introduction", (
+        f"expected first intro link to be 'Introduction', got {intro_links[0]!r}"
+    )
+    assert "Overview" in intro_links[1], (
+        f"expected 'Overview' to be present in second intro link, got {intro_links[1]!r}"
+    )
+    assert "Capabilities" in intro_links[2], (
+        f"expected 'Capabilities' to be present in third intro link, got {intro_links[2]!r}"
+    )
+    assert "Core Philosophy" in intro_links[3], (
+        f"expected 'Core Philosophy' to be present in fourth intro link, got {intro_links[3]!r}"
+    )
 
 
 def test_only_one_sidebar_link_flagged_active(

@@ -69,7 +69,34 @@ def generate(
         Parameter(help="Override the output folder", env_var="INPUT_OUTPUT_DIR"),
     ] = None,
 ) -> None:
-    """Generate documentation pages for the requested site configuration."""
+    """Generate documentation pages for the requested site configuration.
+
+    Parameters
+    ----------
+    page : str or None, optional
+        Specific page key to render; when ``None`` (default) all pages are
+        rendered.
+    config : Path, optional
+        Path to the ``pages.yaml`` configuration file (overridable via
+        ``INPUT_CONFIG``).
+    source_url : str or None, optional
+        Override markdown source URL for single-page rendering (ignored when
+        multiple pages are selected).
+    output_dir : Path or None, optional
+        Override output directory for single-page rendering (ignored when
+        multiple pages are selected).
+
+    Returns
+    -------
+    None
+        Writes rendered artifacts and logs the generated paths.
+
+    Raises
+    ------
+    ValueError
+        If ``source_url`` or ``output_dir`` overrides are supplied when more
+        than one page is requested.
+    """
     site_config = load_site_config(config)
 
     if page:

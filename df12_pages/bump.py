@@ -57,30 +57,41 @@ def bump_latest_release_metadata(
     """
     yaml = _build_roundtrip_yaml()
     with config_path.open("r", encoding="utf-8") as handle:
-        document = yaml.load(handle) or CommentedMap()
-    if not isinstance(document, CommentedMap):
-        msg = "Top-level configuration must be a mapping"
-        raise PagesConfigError(msg)
+    document = yaml.load(handle) or CommentedMap()
+    match document:
+        case CommentedMap():
+            pass
+        case _:
+            msg = "Top-level configuration must be a mapping"
+            raise PagesConfigError(msg)
 
     defaults = document.get("defaults")
-    if not isinstance(defaults, cabc.Mapping):
-        defaults = {}
+    match defaults:
+        case cabc.Mapping():
+            pass
+        case _:
+            defaults = {}
 
     pages = document.get("pages")
-    if not isinstance(pages, CommentedMap) or not pages:
-        msg = "No pages defined in layout configuration"
-        raise PagesConfigError(msg)
+    match pages:
+        case CommentedMap() if pages:
+            pass
+        case _:
+            msg = "No pages defined in layout configuration"
+            raise PagesConfigError(msg)
 
     results: dict[str, ReleaseInfo | None] = {}
     for key, page_payload in pages.items():
-        if not isinstance(page_payload, CommentedMap):
-            continue
-        repo = _resolve_repo(page_payload, defaults)
-        if not repo:
-            continue
-        release = client.fetch_latest(repo)
-        stored = _record_release(page_payload, release)
-        results[key] = stored
+        match page_payload:
+            case CommentedMap():
+                repo = _resolve_repo(page_payload, defaults)
+                if not repo:
+                    continue
+                release = client.fetch_latest(repo)
+                stored = _record_release(page_payload, release)
+                results[key] = stored
+            case _:
+                continue
 
     with config_path.open("w", encoding="utf-8") as handle:
         yaml.dump(document, handle)

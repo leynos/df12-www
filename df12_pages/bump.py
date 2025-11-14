@@ -1,4 +1,32 @@
-"""Helpers for updating latest release metadata inside pages config."""
+"""Helpers for updating release metadata in site configuration files.
+
+This module fetches the latest GitHub release tag for each documentation
+page defined in a ``pages.yaml`` site configuration and persists that
+release metadata back into the YAML. The primary entry point is
+``bump_latest_release_metadata``, which accepts a ``pathlib.Path`` to the
+config file and an instantiated :class:`GitHubReleaseClient`. It returns a
+mapping of page keys to :class:`ReleaseInfo` objects (or ``None`` when a
+repository has no releases), allowing callers to verify which pages were
+updated.
+
+Example
+-------
+.. code-block:: python
+
+    from pathlib import Path
+    from df12_pages.bump import bump_latest_release_metadata
+    from df12_pages.releases import GitHubReleaseClient
+
+    client = GitHubReleaseClient(token="ghp_exampletoken", api_base="https://api.github.com")
+    results = bump_latest_release_metadata(
+        config_path=Path("config/pages.yaml"),
+        client=client,
+    )
+    for page, info in results.items():
+        if info:
+            print(f"{page} -> {info.tag_name}")
+
+"""
 
 from __future__ import annotations
 

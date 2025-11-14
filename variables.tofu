@@ -49,6 +49,18 @@ variable "project_name" {
   }
 }
 
+variable "state_bucket_name" {
+  description = "Name of the S3 bucket that stores OpenTofu state"
+  type        = string
+  default     = "df12-www-state"
+  nullable    = false
+
+  validation {
+    condition     = length(trimspace(var.state_bucket_name)) > 0 && can(regex("^[a-z0-9.-]+$", var.state_bucket_name))
+    error_message = "state_bucket_name must be lowercase letters, digits, dots, and hyphens."
+  }
+}
+
 variable "github_owner" {
   description = "GitHub organization or user that owns the repository"
   type        = string

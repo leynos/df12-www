@@ -77,3 +77,12 @@ module "monitoring_aws" {
   budget_email     = var.budget_email
   environment      = var.environment
 }
+
+module "state_bucket" {
+  source      = "./modules/state_bucket"
+  bucket_name = var.state_bucket_name
+
+  providers = {
+    aws = aws
+  }
+}

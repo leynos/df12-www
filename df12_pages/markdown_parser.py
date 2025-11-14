@@ -1,4 +1,16 @@
-"""Parsing helpers for Markdown-driven documentation pages."""
+r"""Parse Markdown-driven documentation into structured sections.
+
+This module powers df12's documentation generator by splitting Markdown into
+ordered sections and subsections, normalising headings, and returning
+dataclasses that the HTML renderer consumes.
+
+Example
+-------
+>>> from df12_pages.markdown_parser import parse_sections
+>>> sections = parse_sections("## Intro\nBody text\n\n### Details\nMore")
+>>> sections[0].title
+'Intro'
+"""
 
 from __future__ import annotations
 
@@ -12,7 +24,15 @@ BOLD_HEADING_PATTERN = re.compile(r"^\s*\*\*(.+?)\*\*\s*$", re.MULTILINE)
 
 @dc.dataclass(slots=True)
 class Subsection:
-    """Represents a third-level heading and its body HTML."""
+    """Third-level heading and rendered Markdown body.
+
+    Attributes
+    ----------
+    title : str
+        Text content of the subsection heading.
+    markdown : str
+        Markdown (sans heading) that belongs to this subsection.
+    """
 
     title: str
     markdown: str
@@ -20,7 +40,25 @@ class Subsection:
 
 @dc.dataclass(slots=True)
 class Section:
-    """Represents a second-level heading and its derived metadata."""
+    """Second-level heading metadata and child subsections.
+
+    Attributes
+    ----------
+    title : str
+        Full section heading (including numbering).
+    short_title : str
+        Heading with numbering stripped for navigation.
+    slug : str
+        URL-safe identifier unique within the document.
+    order : int
+        1-based order of the section in the document.
+    markdown : str
+        Markdown content for the section (excluding the heading itself).
+    intro_markdown : str
+        Text preceding the first subsection; may be empty.
+    subsections : list[Subsection]
+        Parsed third-level subsections within this section.
+    """
 
     title: str
     short_title: str
@@ -32,6 +70,7 @@ class Section:
 
 
 def _clean_heading(text: str) -> str:
+    """Return a cleaned heading, removing escapes and whitespace."""
     return text.replace("\\", "").strip()
 
 
@@ -42,6 +81,7 @@ def _slugify(title: str) -> str:
 
 
 def _unique_slug(base: str, used: set[str]) -> str:
+    """Generate a unique slug, appending numeric suffixes when needed."""
     candidate = base
     suffix = 2
     while candidate in used:
@@ -52,7 +92,10 @@ def _unique_slug(base: str, used: set[str]) -> str:
 
 
 def _promote_bold_headings(body: str) -> str:
+    """Convert bold-only lines into level-three headings for parsing."""
+
     def _replace(match: re.Match[str]) -> str:
+        """Turn a regex match into a promoted heading or passthrough."""
         title = match.group(1).strip()
         return f"### {title}" if title else match.group(0)
 
@@ -60,6 +103,7 @@ def _promote_bold_headings(body: str) -> str:
 
 
 def _split_subsections(body: str) -> tuple[str, list[Subsection]]:
+    """Return intro text and parsed Subsections from section body."""
     body = _promote_bold_headings(body)
     matches = list(SUBSECTION_PATTERN.finditer(body))
     if not matches:
@@ -77,7 +121,21 @@ def _split_subsections(body: str) -> tuple[str, list[Subsection]]:
 
 
 def parse_sections(markdown_text: str) -> list[Section]:
-    """Split the upstream markdown file into ordered sections."""
+    """Split markdown into ordered Section objects with subsections.
+
+    Parameters
+    ----------
+    markdown_text : str
+        Raw markdown content with ``##`` section headings and optional
+        ``###`` subsections.
+
+    Returns
+    -------
+    list[Section]
+        Parsed sections including titles, slugs, intro markdown, and their
+        associated ``Subsection`` entries. Returns an empty list when no
+        second-level headings are present.
+    """
     entries = list(SECTION_PATTERN.finditer(markdown_text))
     if not entries:
         return []

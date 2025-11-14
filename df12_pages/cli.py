@@ -115,7 +115,27 @@ def bump(
         ),
     ] = GitHubReleaseClient.default_api_base,
 ) -> None:
-    """Update page configs with the latest GitHub release tags."""
+    """Update page configs with the latest GitHub release tags.
+
+    Parameters
+    ----------
+    config : Path, optional
+        Path to the site configuration file; defaults to ``config/pages.yaml``
+        and can be overridden via ``INPUT_CONFIG``.
+    github_token : str or None, optional
+        GitHub token for authenticated release queries. If ``None``, the
+        function falls back to ``GITHUB_TOKEN`` or ``GH_TOKEN`` environment
+        variables before making unauthenticated requests.
+    github_api_url : str, optional
+        Base URL for the GitHub API, defaulting to ``https://api.github.com``;
+        override when targeting GitHub Enterprise (``INPUT_GITHUB_API_URL``).
+
+    Returns
+    -------
+    None
+        Releases are recorded in-place within the configuration file and a
+        list of updated pages is printed to stdout.
+    """
     token = github_token or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
     client = GitHubReleaseClient(token=token, api_base=github_api_url)
     results = bump_latest_release_metadata(config_path=config, client=client)

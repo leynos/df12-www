@@ -140,7 +140,7 @@ if __name__ == "__main__":
     app()
 ```
 
-Guidance:
+#### Guidance
 
 - Parameter names should be descriptive and stable. Where a legacy flag name
   must remain available, add an alias:

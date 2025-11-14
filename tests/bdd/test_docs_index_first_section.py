@@ -174,7 +174,18 @@ def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
 
 @then("the docs card exposes repo, release, and registry links")
 def then_card_has_external_links(scenario_state: dict[str, object]) -> None:
-    """Verify docs card exposes repo, release, and registry links."""
+    """Check that the docs card renders expected external links.
+
+    Parameters
+    ----------
+    scenario_state : dict[str, object]
+        Shared fixture storing paths written during the scenario.
+
+    Returns
+    -------
+    None
+        Raises AssertionError if required anchors are missing or incorrect.
+    """
     index_path = typ.cast("Path", scenario_state["index_path"])
     soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
     repo_link = soup.select_one("[data-test='docs-card-repo']")

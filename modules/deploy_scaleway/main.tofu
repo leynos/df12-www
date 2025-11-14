@@ -108,40 +108,30 @@ resource "null_resource" "deploy" {
           S3_DELETE_FLAG=""
         fi
       fi
+      sync_to_s3() {
+        local cache_control="$1"
+        shift
+        local cmd=(aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}")
+        if [ -n "$S3_DELETE_FLAG" ]; then
+          cmd+=("$S3_DELETE_FLAG")
+        fi
+        if [ "$#" -gt 0 ]; then
+          local args=("$@")
+          cmd+=("${args[@]}")
+        fi
+        cmd+=(--cache-control "$cache_control" --acl public-read)
+        "${cmd[@]}"
+      }
       echo "Syncing versioned static assets with long-lived cache headers..."
-      if [ -n "$S3_DELETE_FLAG" ]; then
-        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
-          --delete \
-          --exclude ".DS_Store" \
-          --exclude "*.html" \
-          --cache-control "public, max-age=31536000, immutable" \
-          --acl public-read
-      else
-        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
-          --exclude ".DS_Store" \
-          --exclude "*.html" \
-          --cache-control "public, max-age=31536000, immutable" \
-          --acl public-read
-      fi
+      sync_to_s3 "public, max-age=31536000, immutable" \
+        --exclude ".DS_Store" \
+        --exclude "*.html"
       echo "Syncing HTML documents with short-lived cache headers..."
-      if [ -n "$S3_DELETE_FLAG" ]; then
-        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
-          --delete \
-          --exclude ".DS_Store" \
-          --exclude "*" \
-          --include "index.html" \
-          --include "*.html" \
-          --cache-control "public, max-age=0, must-revalidate" \
-          --acl public-read
-      else
-        aws --endpoint-url "$AWS_S3_ENDPOINT" s3 sync "$REPO_DIR/${var.site_path}/" "s3://${var.bucket_name}" \
-          --exclude ".DS_Store" \
-          --exclude "*" \
-          --include "index.html" \
-          --include "*.html" \
-          --cache-control "public, max-age=0, must-revalidate" \
-          --acl public-read
-      fi
+      sync_to_s3 "public, max-age=0, must-revalidate" \
+        --exclude ".DS_Store" \
+        --exclude "*" \
+        --include "index.html" \
+        --include "*.html"
       echo "Purging Cloudflare cache..."
       CF_RESP_FILE="$DIR/cf_purge_response.json"
       CF_HEADER_FILE="$DIR/cf_purge_headers.txt"

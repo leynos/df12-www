@@ -1,4 +1,18 @@
-"""Utilities for interrogating GitHub releases."""
+r"""Utilities for interrogating GitHub releases.
+
+This module wraps the portions of the GitHub REST API needed to fetch release
+metadata for df12 deployments. It exposes helper classes to retrieve the
+latest release tag, surface HTTP errors, and normalise GitHub payloads into
+project-friendly dataclasses.
+
+Example
+-------
+>>> from df12_pages.releases import GitHubReleaseClient
+>>> client = GitHubReleaseClient(token="ghp_example", timeout=5)  # doctest: +SKIP
+>>> latest = client.fetch_latest("psf/requests")  # doctest: +SKIP
+>>> latest.tag_name  # doctest: +SKIP
+'v2.32.3'
+"""
 
 from __future__ import annotations
 
@@ -18,7 +32,19 @@ class GitHubReleaseError(RuntimeError):
 
 @dc.dataclass(slots=True)
 class ReleaseInfo:
-    """Minimal metadata captured from a GitHub release object."""
+    """Metadata captured from a GitHub release object.
+
+    Attributes
+    ----------
+    tag_name : str
+        Git tag associated with the release.
+    name : str | None
+        Human-friendly release title if provided.
+    html_url : str | None
+        URL to the release page for user-facing navigation.
+    published_at : str | None
+        ISO8601 timestamp indicating when the release was published.
+    """
 
     tag_name: str
     name: str | None = None
@@ -27,7 +53,13 @@ class ReleaseInfo:
 
 
 class GitHubReleaseClient:
-    """Thin wrapper around the GitHub REST API release endpoints."""
+    """Thin wrapper around GitHub release endpoints.
+
+    This client centralises authentication, timeouts, and error handling when
+    querying ``/repos/:owner/:repo/releases`` in the GitHub REST API. It is
+    lightweight and safe to reuse across threads when the provided session is
+    thread-safe.
+    """
 
     default_api_base = DEFAULT_API_BASE
 
@@ -39,6 +71,28 @@ class GitHubReleaseClient:
         session: requests.Session | None = None,
         timeout: float = 10.0,
     ) -> None:
+        """Initialise the client with optional authentication and transport.
+
+        Parameters
+        ----------
+        token : str | None, optional
+            Personal access token or GitHub app token; enables higher rate
+            limits and private repo access when provided. Defaults to ``None``.
+        api_base : str, optional
+            Base URL for the GitHub API; override for GitHub Enterprise
+            instances. Defaults to ``DEFAULT_API_BASE``.
+        session : requests.Session, optional
+            Preconfigured ``requests.Session`` to reuse connections. Defaults
+            to a new session per client.
+        timeout : float, optional
+            Per-request timeout in seconds. Defaults to ``10.0``.
+
+        Notes
+        -----
+        When ``token`` is provided the appropriate ``Authorization`` header is
+        added. The client does not retry failed requests; callers should wrap
+        usage in higher-level retry logic if desired.
+        """
         self._token = token
         self._api_base = api_base.rstrip("/") or DEFAULT_API_BASE
         self._session = session or requests.Session()
@@ -107,6 +161,7 @@ class GitHubReleaseClient:
 
 
 def _coerce_str(value: object) -> str | None:
+    """Return the string representation of ``value`` or None."""
     if value is None:
         return None
     if isinstance(value, str):

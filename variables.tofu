@@ -165,9 +165,11 @@ variable "cloud_provider" {
   description = "Infrastructure provider to deploy the site to (aws or scaleway)"
   type        = string
   default     = "aws"
+  nullable    = false
+
   validation {
     condition     = contains(["aws", "scaleway"], lower(trimspace(var.cloud_provider)))
-    error_message = "cloud_provider must be either \"aws\" or \"scaleway\"."
+    error_message = "cloud_provider must be either 'aws' or 'scaleway'."
   }
 }
 
@@ -225,4 +227,32 @@ variable "log_retention_days" {
   description = "Retention period in days for CloudFront logs"
   type        = number
   default     = 14
+}
+
+variable "sse_algorithm" {
+  description = "Server-side encryption algorithm for the AWS static site bucket (valid values: AES256, aws:kms)"
+  type        = string
+  default     = "AES256"
+  nullable    = false
+
+  validation {
+    condition     = contains(["AES256", "aws:kms"], var.sse_algorithm)
+    error_message = "sse_algorithm must be either 'AES256' or 'aws:kms'."
+  }
+}
+
+variable "sse_kms_key_id" {
+  description = "Optional KMS key identifier used when sse_algorithm is 'aws:kms'. Accepts a Key ID (UUID), Key ARN, Alias ARN, or alias/... name."
+  type        = string
+  default     = null
+  sensitive   = true
+
+  validation {
+    condition = var.sse_kms_key_id == null || (
+      can(regex("^arn:(aws|aws-us-gov|aws-cn):kms:[a-z0-9-]+:[0-9]{12}:(key|alias)/[^\\s]+$", var.sse_kms_key_id)) ||
+      can(regex("^[0-9a-fA-F-]{36}$", var.sse_kms_key_id)) ||
+      can(regex("^alias/[A-Za-z0-9/_-]+$", var.sse_kms_key_id))
+    )
+    error_message = "When provided, sse_kms_key_id must be a Key ID (UUID), Key ARN, Alias ARN, or alias/... reference."
+  }
 }

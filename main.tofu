@@ -11,6 +11,8 @@ module "site_aws" {
   log_retention_days = var.log_retention_days
   cloudflare_zone_id = var.cloudflare_zone_id
   cloudflare_proxied = var.cloudflare_proxied
+  sse_algorithm      = var.sse_algorithm
+  sse_kms_key_id     = var.sse_kms_key_id
 
   providers = {
     aws         = aws

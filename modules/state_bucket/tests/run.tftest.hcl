@@ -18,7 +18,7 @@ run "plan" {
   }
 
   assert {
-    condition     = strcontains(jsonencode(aws_s3_bucket_server_side_encryption_configuration.state), "\"sse_algorithm\":\"AES256\"")
+    condition     = length(aws_s3_bucket_server_side_encryption_configuration.state) == 1 && strcontains(jsonencode(aws_s3_bucket_server_side_encryption_configuration.state[0]), "\"sse_algorithm\":\"AES256\"")
     error_message = "state bucket must use AES256 server-side encryption by default"
   }
 

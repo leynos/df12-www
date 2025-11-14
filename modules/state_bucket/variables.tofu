@@ -10,3 +10,8 @@ variable "bucket_name" {
   }
 }
 
+variable "enable_bucket_encryption" {
+  description = "Whether to enable default server-side encryption on the state bucket"
+  type        = bool
+  default     = true
+}

@@ -1,6 +1,6 @@
 locals {
   bucket_name   = replace(lower(var.domain_name), "_", "-")
-  subdomain     = trimsuffix(trimsuffix(var.domain_name, ".${var.root_domain}."), ".${var.root_domain}")
+  subdomain     = trimsuffix(var.domain_name, ".${var.root_domain}")
   bucket_domain = "${replace(lower(var.domain_name), "_", "-")}.s3.${var.scaleway_region}.scw.cloud"
 }
 

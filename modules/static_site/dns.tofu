@@ -1,5 +1,5 @@
 locals {
-  subdomain = trimsuffix(trimsuffix(var.domain_name, ".${var.root_domain}."), ".${var.root_domain}")
+  subdomain = trimsuffix(var.domain_name, ".${var.root_domain}")
 }
 
 resource "cloudflare_dns_record" "acm_validation" {

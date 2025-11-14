@@ -1,4 +1,24 @@
-"""Cyclopts-powered CLI for df12 page generation."""
+"""Cyclopts CLI entrypoint for generating df12 documentation and metadata artifacts.
+
+The ``pages`` console script defined here can render static HTML from Markdown,
+rebuild the docs index and homepage, and update release metadata in
+``pages.yaml`` by talking to the GitHub API. Typical usage involves running
+``pages generate`` locally or in CI to regenerate docs, and ``pages bump`` to
+persist the latest GitHub releases so the docs can reference the current
+version tag.
+
+Examples
+--------
+Generate all pages for the default configuration:
+
+>>> from df12_pages.cli import main
+>>> main()  # doctest: +SKIP
+
+Regenerate a single page into a custom directory:
+
+>>> from df12_pages.cli import app
+>>> app.run(["generate", "--page", "getting-started", "--output-dir", "dist"])  # doctest: +SKIP
+"""
 
 from __future__ import annotations
 

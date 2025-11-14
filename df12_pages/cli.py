@@ -110,7 +110,22 @@ def bump(
 
 
 def main() -> None:
-    """Entrypoint used by the `pages` console script."""
+    """Invoke the Cyclopts application that powers the `pages` console command.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    None
+        This function executes for its side effects of parsing CLI arguments
+        and running the requested subcommand.
+
+    Examples
+    --------
+    >>> main()  # doctest: +SKIP
+    """
     app()
 
 

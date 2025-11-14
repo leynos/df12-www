@@ -36,7 +36,7 @@
       <p class="site-footer__text">{{ blurb }}</p>
     </div>
     <div>
-      <h2>{{ oss_heading }}</h2>
+      <h3>{{ oss_heading }}</h3>
       <ul class="site-footer__list">
 {% for link in oss_links %}
         <li><a class="footer-link" href="{{ link.href }}"{% if link.external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.label }}</a></li>

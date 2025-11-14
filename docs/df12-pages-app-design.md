@@ -1,14 +1,14 @@
 # df12 Pages Application Design
 
 This living document captures the architectural conventions for the df12
-Pages generator, with a focus on how we talk to upstream services and how we
-test those integrations reliably.
+Pages generator, with a focus on how the application interacts with upstream services and how those
+integrations are tested reliably.
 
 ## GitHub API Access
 
 ### Client Library
 
-- We use [`github3.py`](https://github3py.readthedocs.io/) for **all** GitHub
+- The application uses [`github3.py`](https://github3py.readthedocs.io/) for **all** GitHub
   interactions. Direct `requests` calls to `api.github.com` are not permitted.
 - Instantiate a single `github3.GitHub` client per generator instance and reuse
   it across calls. This keeps connection pooling efficient and simplifies
@@ -18,12 +18,12 @@ test those integrations reliably.
   - Anonymous requests are allowed when neither variable is present, but code
     must handle rate‑limit or auth failures gracefully.
 - Handle `github3` exceptions explicitly. Any `GitHubException` should be
-  caught and translated into a soft failure (e.g., returning `None`) so we can
-  continue rendering docs without hard crashing.
+  caught and translated into a soft failure (e.g., returning `None`) to allow
+  continued rendering without hard crashing.
 
 ### Commit Metadata Lookup
 
-When a documentation page does not have a release tag, we fall back to the
+When a documentation page does not have a release tag, the system falls back to the
 timestamp of the most recent commit touching the source Markdown path:
 
 1. Split `owner/repo` from the page config.
@@ -64,7 +64,7 @@ changed, eliminating churn caused by build timestamps.
 | Unit                 | `pytest`, `pytest-mock`        | Fast validation of commit-date logic         |
 | Behaviour / BDD      | `pytest-bdd`, `Betamax`        | Full pipeline with recorded HTTP responses   |
 
-Following these patterns keeps our GitHub integration robust while preventing
+Following these patterns keeps the GitHub integration robust while preventing
 flaky network-dependent tests.
 
 ## Pages Generation Strategy
@@ -74,7 +74,7 @@ flaky network-dependent tests.
      (default `main`), and a Markdown entrypoint (`doc_path`).
    - Release metadata (latest tag, published date) is discovered directly from
      the upstream repo using `github3.py`. When provided, release data drives
-     version badges and release URLs; when absent we fall back to commit
+     version badges and release URLs; when absent the system falls back to commit
      history as described earlier.
    - Optional manifest files (Cargo manifests, `pyproject.toml`, etc.) are
      fetched to build descriptive blurbs for the docs index.
@@ -99,7 +99,7 @@ flaky network-dependent tests.
      reruns are deterministic: the rendered site only changes when GitHub
      content or the snapshot does.
 
-This workflow lets GitHub stay the source of truth for docs while giving us a
+This workflow lets GitHub stay the source of truth for docs while providing a
 checked-in configuration record that guarantees reproducible builds.
 
 ## Styling & Semantic Classes
@@ -150,7 +150,7 @@ readable, and reduces churn whenever Tailwind/DaisyUI upgrades land.
 ## OpenTofu Deployment Modules & Scripts
 
 The infrastructure portion of df12 Pages lives under `modules/` and `deploy.tofu`.
-We follow three core ideas:
+The infrastructure follows three core ideas:
 
 1. **Split responsibilities by concern and provider.**
    - `modules/static_site` stands up the AWS primitives (S3 bucket, CloudFront,
@@ -159,8 +159,8 @@ We follow three core ideas:
    - `modules/deploy` (and its Scaleway sibling) performs the Git clone → Bun
      build → asset sync workflow using `null_resource` + `local-exec`, keeping
      build logic in deterministic shell scripts embedded in locals.
-   - `modules/monitoring` hangs alarms on the distribution/Bucket endpoints so
-     we get signal when deploys regress.
+   - `modules/monitoring` hangs alarms on the distribution/Bucket endpoints to
+     provide signal when deploys regress.
 
 2. **Treat GitHub + Bun builds as part of the apply.**
    - The deploy module reads repo/branch/commit metadata from variables,
@@ -178,6 +178,6 @@ We follow three core ideas:
    - Scripts embedded in locals share a consistent structure (mktemp dir → clone
      repo → run commands → cleanup) so they’re easy to lint and reason about.
 
-This modular layout lets us keep infrastructure code declarative, reuse deploy
+This modular layout maintains infrastructure code declarative, reuse deploy
 logic across providers, and ensure the build pipeline remains reproducible from
 source to CDN.

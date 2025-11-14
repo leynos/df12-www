@@ -380,7 +380,7 @@ secondary, special-purpose dialect.
    departure from native HCL where these can be more dynamic.
 
 2. **The "Attributes as Blocks" Limitation**: Some resource types have a
-   special behavior where an argument can be specified using either argument
+   special behaviour where an argument can be specified using either argument
    syntax (`example = [...]`) or nested block syntax (`example {... }`). This
    feature, known as "attributes as blocks," is designed for readability in
    native HCL. However, due to the ambiguity it would create in JSON, this
@@ -414,7 +414,7 @@ ______________________________________________________________________
 
 This section provides a deep dive into each of the fundamental top-level blocks
 used in OpenTofu. It moves beyond basic syntax to cover their specific
-arguments, behaviors, advanced features, and best practices in detail.
+arguments, behaviours, advanced features, and best practices in detail.
 
 ### 2.1 resource: The Heart of Infrastructure Definition
 
@@ -443,7 +443,7 @@ resource. These arguments are primarily divided into two categories:
    include `ami` and `instance_type`.7
 
 2. **Meta-Arguments**: These are defined by the OpenTofu language itself and
-   can be used with any resource type to change its behavior. Key
+   can be used with any resource type to change its behaviour. Key
    meta-arguments include `count`, `for_each`, `provider`, `depends_on`, and
    `lifecycle`.7
 
@@ -507,7 +507,7 @@ features, often configured via nested blocks.
 
 ### 2.2 variable: Parameterizing Configurations
 
-Input variables are the parameters of an OpenTofu module, allowing its behavior
+Input variables are the parameters of an OpenTofu module, allowing its behaviour
 to be customized without modifying its source code. They are analogous to
 function arguments in traditional programming.11 Each input variable is
 declared using a
@@ -518,7 +518,7 @@ declared using a
 
 The basic syntax is `variable "<NAME>" {... }`, where `<NAME>` is the unique
 name for the variable within the module.11 The block body can contain several
-arguments to define the variable's behavior:
+arguments to define the variable's behaviour:
 
 - `type`: This argument enforces type safety by restricting the type of value
   that can be assigned to the variable. While optional, specifying a type is a
@@ -628,7 +628,7 @@ provider's API.2 A data source is declared using a
 
 `data` block.
 
-#### Syntax and Behavior
+#### Syntax and Behaviour
 
 The syntax is `data "<PROVIDER>_<TYPE>" "<NAME>" {... }`.25
 
@@ -638,7 +638,7 @@ The syntax is `data "<PROVIDER>_<TYPE>" "<NAME>" {... }`.25
   For example, a data source for an AWS AMI might accept filters for the AMI
   name or tags.25
 
-A key aspect of data source behavior is its evaluation timing. OpenTofu
+A key aspect of data source behaviour is its evaluation timing. OpenTofu
 attempts to read data sources during the `plan` phase. However, if any of a
 data source's arguments depend on a value that is not yet known (i.e., a
 "computed value" from a resource that has not been created yet), the reading of
@@ -687,7 +687,7 @@ themselves clean and readable.13
 
 ### 2.6 provider and terraform Blocks: Configuration Metadata
 
-These two blocks are used to configure OpenTofu's own behavior and its
+These two blocks are used to configure OpenTofu's own behaviour and its
 interaction with providers, rather than defining infrastructure resources
 directly.
 
@@ -701,7 +701,7 @@ This top-level block configures core OpenTofu settings.
 - `required_providers`: This nested block is the modern and mandatory way to
   declare all providers used by the module. Each provider entry specifies its
   `source` (e.g., `"hashicorp/aws"`) and a `version` constraint (e.g.,
-  `"~> 5.0"`). This practice is critical for ensuring predictable behavior by
+  `"~> 5.0"`). This practice is critical for ensuring predictable behaviour by
   preventing providers from being upgraded unexpectedly to a new version with
   breaking changes.13
 
@@ -768,7 +768,7 @@ of the resource or module.5
 
 - **Syntax**: `count = <WHOLE_NUMBER>`
 
-- **Behavior**: It is best suited for creating multiple copies of a resource
+- **Behaviour**: It is best suited for creating multiple copies of a resource
   that are identical or vary only in ways that can be derived from a simple
   numeric index.
 
@@ -818,8 +818,8 @@ evaluates the `subnet_id` for each instance:
 
 The result is that OpenTofu plans to **change** the subnet for the instance at
 index 1 (from `subnet-def` to `subnet-ghi`) and **destroy** the instance at
-index 2. This is often not the desired behavior; the user likely intended only
-to destroy the instance associated with `subnet-def`. This re-indexing behavior
+index 2. This is often not the desired behaviour; the user likely intended only
+to destroy the instance associated with `subnet-def`. This re-indexing behaviour
 makes `count` fragile for managing dynamic collections.2
 
 #### The `for_each` Meta-Argument
@@ -830,7 +830,7 @@ in the collection.29
 
 - **Syntax**: `for_each = <MAP_OR_SET_OF_STRINGS>`
 
-- **Behavior**: It creates a more stable association between the configuration
+- **Behaviour**: It creates a more stable association between the configuration
   and the real-world resource. Each instance is tracked by the map key or set
   value, not by a transient numeric index.
 
@@ -1100,7 +1100,7 @@ ______________________________________________________________________
 ## Section 4: Troubleshooting: Pitfalls, Gotchas, and Error Resolution
 
 Writing HCL is an iterative process, and encountering errors or unexpected
-behavior is a natural part of development. This section provides a practical
+behaviour is a natural part of development. This section provides a practical
 guide to the common challenges, anti-patterns, and error messages that
 developers face when working with OpenTofu.
 
@@ -1136,7 +1136,7 @@ anti-patterns that lead to brittle, insecure, or unmaintainable configurations.
 
 #### State Management
 
-- **Using Local State**: The default behavior of storing the state file locally
+- **Using Local State**: The default behaviour of storing the state file locally
   (`terraform.tfstate`) is only suitable for experimentation. For any
   collaborative or production work, it is a significant anti-pattern. Local
   state makes collaboration impossible, risks accidental deletion, and can lead

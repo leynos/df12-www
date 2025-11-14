@@ -104,9 +104,9 @@ root scrollbar gutter is excluded. `daisy-` prefix is used for all daisyUI class
 - `accent-content`: Foreground content color to use on accent color
 - `neutral`: Neutral dark color, For not-saturated parts of UI
 - `neutral-content`: Foreground content color to use on neutral color
-- `base-100`:-100 Base surface color of page, used for blank backgrounds
-- `base-200`:-200 Base color, darker shade, to create elevations
-- `base-300`:-300 Base color, even more darker shade, to create elevations
+- `base-100`: Base surface color of page, used for blank backgrounds
+- `base-200`: Base color, darker shade, to create elevations
+- `base-300`: Base color, even more darker shade, to create elevations
 - `base-content`: Foreground content color to use on base color
 - `info`: Info color, For informative/helpful messages
 - `info-content`: Foreground content color to use on info color
@@ -608,7 +608,7 @@ Example: This sidebar is always visible on large screen, can be toggled on small
 </div>
 ```
 
-Example: This sidebar is always visible. When it's close we only see iocns, when it's open we see icons and text
+Example: This sidebar is always visible. When it's close we only see icons, when it's open we see icons and text
 ```html
 <div class="drawer lg:drawer-open">
   <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
@@ -705,7 +705,7 @@ FAB (Floating Action Button) stays in the bottom corner of screen. It includes a
 - modifier: `fab-flower`
 
 #### Syntax
-A single FAB in the corder of screen
+A single FAB in the corner of the screen
 ```html
 <div class="fab">
   <button class="btn btn-lg btn-circle">{IconOriginal}</button>
@@ -1344,7 +1344,7 @@ Radial progress can be used to show the progress of a task or to show the passin
 
 #### Rules
 - The `--value` CSS variable and text must be a number between 0 and 100
-- you need to add `aria-valuenow="{value}"`, `aria-valuenow={value}` so screen readers can properly read value and also show that its a progress element to them
+- you need to add `aria-valuenow="{value}"`, `aria-valuenow={value}` so screen readers can properly read value and also show that it's a progress element to them
 - Use `div` instead of progress because browsers can't show text inside progress tag
 - Use `--size` for setting size (default 5rem) and `--thickness` to set how thick the indicator is
 

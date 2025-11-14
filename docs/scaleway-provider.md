@@ -62,7 +62,7 @@ exploratory research only—no implementation has been attempted yet.
    signal quality to AWS Budgets; decide whether external FinOps tooling is
    needed.
 5. **Plan DNS implications** – When running entirely on Scaleway, ensure
-   Cloudflare (or alternate DNS) points at the correct CDN endpoint and that
+   Cloudflare (or alternative DNS) points at the correct CDN endpoint and that
    certificates remain valid.
 
 Once these pieces are proven, the platform should be able to flip between AWS

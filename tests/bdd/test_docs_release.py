@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing as typ
 from pathlib import Path
 
 import pytest
@@ -71,11 +72,12 @@ def when_render_docs(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Render the docs page under test using a recorded HTTP session."""
-    config = load_site_config(scenario_state["config_path"])
+    config_path = typ.cast("Path", scenario_state["config_path"])
+    config = load_site_config(config_path)
     page = config.get_page("requests-docs")
-    output_dir = scenario_state["output_dir"]
-    session = scenario_state["session"]
-    recorder = scenario_state["recorder"]
+    output_dir = typ.cast("Path", scenario_state["output_dir"])
+    session = typ.cast("requests.Session", scenario_state["session"])
+    recorder = typ.cast("Betamax", scenario_state["recorder"])
     calls: list[str] = []
 
     class _RecordingSession:
@@ -95,7 +97,7 @@ def when_render_docs(
             return None
 
     monkeypatch.setattr(
-        "df12_pages.generator.requests.Session",
+        "df12_pages.generator.page_generator.requests.Session",
         lambda: _RecordingSession(session),
     )
 
@@ -110,7 +112,7 @@ def when_render_docs(
 @then("the HTML shows the release version and tag date")
 def then_release_metadata_present(scenario_state: dict[str, object]) -> None:
     """Verify the rendered HTML includes the release version and tag date."""
-    written: list[Path] = scenario_state["written"]
+    written = typ.cast("list[Path]", scenario_state["written"])
     html = written[0].read_text(encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")
     meta_items = [
@@ -125,5 +127,5 @@ def then_release_metadata_present(scenario_state: dict[str, object]) -> None:
     assert body is not None
     assert body.get_text(strip=True) == "HTTP for Humans"
 
-    calls: list[str] = scenario_state["calls"]
+    calls = typ.cast("list[str]", scenario_state["calls"])
     assert any("refs/tags/v2.32.5" in url for url in calls)

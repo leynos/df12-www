@@ -1,4 +1,27 @@
-"""Docs index builder for df12 documentation bundles."""
+"""Build and render the df12 documentation index landing page.
+
+This module takes a fully resolved :class:`~df12_pages.config.SiteConfig` and
+produces ``public/docs.html`` (or the configured output path) listing every
+generated documentation bundle. It stitches together metadata, release
+information, manifest descriptions, and package links so readers can discover
+docs quickly.
+
+Typical usage pairs the loader with a site config:
+
+>>> from pathlib import Path
+>>> from df12_pages.config import load_site_config
+>>> from df12_pages.docs_index import DocsIndexBuilder
+>>> site = load_site_config(Path("config/pages.yaml"))  # doctest: +SKIP
+>>> builder = DocsIndexBuilder(site)  # doctest: +SKIP
+>>> output_path = builder.run()  # doctest: +SKIP
+>>> print(output_path)  # doctest: +SKIP
+public/docs.html
+
+The builder reads Jinja templates from ``df12_pages/templates`` by default,
+fetches manifest descriptions as needed, and writes UTF-8 encoded HTML. Side
+effects include HTTP fetches (with caching) for manifest files and disk writes
+to the docs output directory.
+"""
 
 from __future__ import annotations
 
@@ -25,7 +48,17 @@ class DocsIndexBuilder:
     def __init__(
         self, site_config: SiteConfig, *, templates_dir: Path | None = None
     ) -> None:
-        """Initialize DocsIndexBuilder with site config and templates."""
+        """Initialize the docs index builder.
+
+        Parameters
+        ----------
+        site_config : SiteConfig
+            Parsed site configuration containing all page definitions and
+            defaults (produced by :func:`df12_pages.config.load_site_config`).
+        templates_dir : Path, optional
+            Directory containing the Jinja templates. Defaults to the
+            ``df12_pages/templates`` directory when ``None``.
+        """
         self.site_config = site_config
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
         self.env = Environment(
@@ -92,6 +125,30 @@ class DocsIndexBuilder:
 
 
 def _discover_entry_href(page: PageConfig, relative_to: Path) -> str | None:
+    """Resolve the href used by docs index cards.
+
+    Parameters
+    ----------
+    page : PageConfig
+        Fully resolved page metadata whose generated HTML files live under
+        ``page.output_dir``.
+    relative_to : Path
+        Directory that serves as the reference for relative hyperlinks in the
+        docs index (typically ``public``).
+
+    Returns
+    -------
+    str | None
+        Relative POSIX path to the best candidate HTML file, or ``None`` when no
+        generated documents exist for the page.
+
+    Notes
+    -----
+    The function favors explicit metadata recorded in
+    ``docs-<key>.meta.json`` (via ``first_file``) and only falls back to
+    globbing the ``page.output_dir`` for ``{filename_prefix}*.html`` when that
+    metadata is absent or stale.
+    """
     meta_candidate = _read_page_metadata(page)
     if meta_candidate:
         rel = _relativize(meta_candidate, relative_to)
@@ -108,6 +165,7 @@ def _discover_entry_href(page: PageConfig, relative_to: Path) -> str | None:
 
 
 def _doc_file_score(path: Path) -> tuple[int, str]:
+    """Return a sorting key (priority, name) for documentation files."""
     name = path.name.lower()
     if "introduction" in name:
         return (0, name)
@@ -117,6 +175,7 @@ def _doc_file_score(path: Path) -> tuple[int, str]:
 
 
 def _read_page_metadata(page: PageConfig) -> Path | None:
+    """Return the first rendered file path recorded in page metadata, if present."""
     meta_path = page.output_dir / PAGE_META_TEMPLATE.format(key=page.key)
     if not meta_path.exists():
         return None
@@ -134,6 +193,7 @@ def _read_page_metadata(page: PageConfig) -> Path | None:
 
 
 def _relativize(target: Path, relative_to: Path) -> str | None:
+    """Return the POSIX-relative path from ``relative_to`` to ``target`` or None."""
     try:
         # Use os.path.relpath instead of Path.relative_to for cross-drive and
         # non-parent relationships, where Path.relative_to would raise ValueError.
@@ -144,50 +204,56 @@ def _relativize(target: Path, relative_to: Path) -> str | None:
 
 
 def _build_repo_url(repo: str | None) -> str | None:
+    """Return the GitHub repository URL built from ``repo`` (owner/repo)."""
     if not repo:
         return None
     return f"https://github.com/{repo}"
 
 
 def _build_release_link(repo: str | None, tag: str | None) -> str | None:
+    """Return the GitHub release URL for ``repo`` and ``tag``, or None if missing."""
     if not repo or not tag:
         return None
     return f"https://github.com/{repo}/releases/tag/{tag}"
 
 
 def _package_slug(page: PageConfig) -> str | None:
+    """Return the package/repo slug derived from ``page.repo`` or fallback key."""
     if page.repo:
         return page.repo.split("/", 1)[-1]
     return page.key
 
 
 def _build_package_url(page: PageConfig) -> str | None:
+    """Return the package registry URL for the page language and slug."""
     if not page.latest_release:
         return None
     slug = _package_slug(page)
     if not slug or not page.language:
         return None
-    lang = page.language.lower()
-    if lang == "rust":
-        return f"https://crates.io/crates/{slug}"
-    if lang == "python":
-        return f"https://pypi.org/project/{slug}/"
-    if lang in {"typescript", "javascript"}:
-        return f"https://www.npmjs.com/package/{slug}"
-    return None
+    templates = {
+        "rust": "https://crates.io/crates/{slug}",
+        "python": "https://pypi.org/project/{slug}/",
+        "typescript": "https://www.npmjs.com/package/{slug}",
+        "javascript": "https://www.npmjs.com/package/{slug}",
+    }
+    template = templates.get(page.language.lower())
+    if not template:
+        return None
+    return template.format(slug=slug)
 
 
 def _package_label(language: str | None) -> str | None:
+    """Return the package registry label (crates.io/PyPI/npm) for the language."""
     if not language:
         return None
-    lang = language.lower()
-    if lang == "rust":
-        return "crates.io"
-    if lang == "python":
-        return "PyPI"
-    if lang in {"typescript", "javascript"}:
-        return "npm"
-    return None
+    mapping = {
+        "rust": "crates.io",
+        "python": "PyPI",
+        "typescript": "npm",
+        "javascript": "npm",
+    }
+    return mapping.get(language.lower())
 
 
 class ManifestDescriptionResolver:
@@ -197,7 +263,27 @@ class ManifestDescriptionResolver:
         self._cache: dict[str, str] = {}
 
     def resolve(self, page: PageConfig) -> str:
-        """Provide a description for the supplied page, caching results."""
+        """Resolve or fetch a manifest description for the provided page.
+
+        Parameters
+        ----------
+        page : PageConfig
+            Page metadata containing label, manifest URL, and language hints
+            used to locate the appropriate manifest file.
+
+        Returns
+        -------
+        str
+            Either the manifest-provided description or a fallback string of
+            the form ``"Reference docs for <label>."`` when fetching/parsing
+            fails.
+
+        Notes
+        -----
+        Results are cached per manifest URL to avoid repeated HTTP requests.
+        Network or parsing errors are swallowed and replaced with the fallback
+        description to keep docs generation resilient.
+        """
         url = page.manifest_url
         if not url:
             return f"Reference docs for {page.label}."
@@ -219,6 +305,7 @@ class ManifestDescriptionResolver:
 
 
 def _extract_description(text: str, language: str | None, url: str) -> str | None:
+    """Return a manifest-derived description string based on language hints."""
     lang = (language or "").lower()
     if lang in {"rust", "python"} or url.endswith(".toml"):
         data = tomllib.loads(text)

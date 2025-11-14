@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing as typ
 from pathlib import Path
 
 import pytest
@@ -64,15 +65,17 @@ def when_render_docs(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Render the sample docs page for the indented code blocks scenario."""
-    config = load_site_config(scenario_state["config_path"])
+    config_path = typ.cast("Path", scenario_state["config_path"])
+    config = load_site_config(config_path)
     page = config.get_page("sample")
 
     def _fake_fetch(self: PageContentGenerator) -> str:
         """Return stubbed markdown content for indented code block tests."""
-        return scenario_state["markdown"]  # type: ignore[index]
+        return typ.cast("str", scenario_state["markdown"])
 
     monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", _fake_fetch)
-    generator = PageContentGenerator(page, output_dir=scenario_state["output_dir"])
+    output_dir = typ.cast("Path", scenario_state["output_dir"])
+    generator = PageContentGenerator(page, output_dir=output_dir)
     written = generator.run()
     scenario_state["written"] = written
 
@@ -80,7 +83,7 @@ def when_render_docs(
 @then("the HTML includes a highlighted code block for the sample")
 def then_html_has_code_block(scenario_state: dict[str, object]) -> None:
     """Verify the rendered HTML includes a highlighted Rust code block."""
-    written: list[Path] = scenario_state["written"]  # type: ignore[assignment]
+    written = typ.cast("list[Path]", scenario_state["written"])
     html = written[0].read_text(encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")
     code_blocks = soup.select(".codehilite code")

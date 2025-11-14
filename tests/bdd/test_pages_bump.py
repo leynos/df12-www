@@ -13,7 +13,7 @@ from pytest_bdd import given, scenarios, then, when
 from ruamel.yaml import YAML
 
 from df12_pages.bump import bump_latest_release_metadata
-from df12_pages.releases import GitHubReleaseClient
+from df12_pages.releases import GitHubReleaseClient, ReleaseInfo
 
 FEATURE_FILE = Path(__file__).resolve().parents[2] / "features" / "pages_bump.feature"
 scenarios(FEATURE_FILE)
@@ -96,7 +96,7 @@ def when_run_bump(scenario_state: ScenarioState) -> None:
 def then_config_records_expected(scenario_state: ScenarioState) -> None:
     """Verify the pages config and results capture the expected release tags."""
     config_path = typ.cast("Path", scenario_state["config_path"])
-    result = typ.cast("dict[str, str | None]", scenario_state["result"])
+    result = typ.cast("dict[str, ReleaseInfo | None]", scenario_state["result"])
 
     yaml = YAML(typ="safe")
     parsed = yaml.load(config_path.read_text(encoding="utf-8"))

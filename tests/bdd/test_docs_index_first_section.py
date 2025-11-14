@@ -29,6 +29,7 @@ Prerequisites:
 
 from __future__ import annotations
 
+import typing as typ
 from pathlib import Path
 
 import pytest
@@ -138,12 +139,13 @@ def when_render_and_index(
         This step mutates ``scenario_state`` in place by setting the
         ``index_path`` key and does not return a value.
     """
-    config = load_site_config(scenario_state["config_path"])
+    config_path = typ.cast("Path", scenario_state["config_path"])
+    config = load_site_config(config_path)
     page = config.get_page("ordering")
 
     def _fake_fetch(self: PageContentGenerator) -> str:
         """Fetch fake page content for the docs index tests."""
-        return scenario_state["markdown"]  # type: ignore[index]
+        return typ.cast("str", scenario_state["markdown"])
 
     monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", _fake_fetch)
     generator = PageContentGenerator(page)
@@ -157,7 +159,7 @@ def when_render_and_index(
 @then("the docs index entry links to the true first section")
 def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
     """Verify docs index entry links to the true first section."""
-    index_path: Path = scenario_state["index_path"]  # type: ignore[assignment]
+    index_path = typ.cast("Path", scenario_state["index_path"])
     soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
     entry = soup.select_one(".product-card a.product-card__meta")
     assert entry is not None, (
@@ -173,7 +175,7 @@ def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
 @then("the docs card exposes repo, release, and registry links")
 def then_card_has_external_links(scenario_state: dict[str, object]) -> None:
     """Verify docs card exposes repo, release, and registry links."""
-    index_path: Path = scenario_state["index_path"]  # type: ignore[assignment]
+    index_path = typ.cast("Path", scenario_state["index_path"])
     soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
     repo_link = soup.select_one("[data-test='docs-card-repo']")
     release_link = soup.select_one("[data-test='docs-card-release']")

@@ -57,7 +57,7 @@ def bump_latest_release_metadata(
     """
     yaml = _build_roundtrip_yaml()
     with config_path.open("r", encoding="utf-8") as handle:
-    document = yaml.load(handle) or CommentedMap()
+        document = yaml.load(handle) or CommentedMap()
     match document:
         case CommentedMap():
             pass

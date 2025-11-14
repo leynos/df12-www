@@ -10,6 +10,7 @@ from df12_pages.docs_index import _build_package_url
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
+
     Mapping = cabc.Mapping
 
 
@@ -19,30 +20,31 @@ def _base_page(
     overrides: cabc.Mapping[str, typ.Any] | None = None,
 ) -> PageConfig:
     """Construct a minimal PageConfig fixture for docs index tests."""
-    base_kwargs: dict[str, typ.Any] = {
-        "key": "test",
-        "label": "Test",
-        "source_url": "https://example.invalid/docs.md",
-        "source_label": "src",
-        "page_title_suffix": "suffix",
-        "filename_prefix": "docs-test-",
-        "output_dir": Path("tmp"),
-        "pygments_style": "monokai",
-        "footer_note": "",
-        "theme": ThemeConfig("eyebrow", "tagline", "Docs", "df12"),
-        "layouts": {},
-        "repo": "owner/pkg",
-        "branch": "main",
-        "language": "rust",
-        "manifest_url": None,
-        "description_override": None,
-        "doc_path": "docs.md",
-        "latest_release": latest_release,
-        "latest_release_published_at": None,
-    }
+    page = PageConfig(
+        key="test",
+        label="Test",
+        source_url="https://example.invalid/docs.md",
+        source_label="src",
+        page_title_suffix="suffix",
+        filename_prefix="docs-test-",
+        output_dir=Path("tmp"),
+        pygments_style="monokai",
+        footer_note="",
+        theme=ThemeConfig("eyebrow", "tagline", "Docs", "df12"),
+        layouts={},
+        repo="owner/pkg",
+        branch="main",
+        language="rust",
+        manifest_url=None,
+        description_override=None,
+        doc_path="docs.md",
+        latest_release=latest_release,
+        latest_release_published_at=None,
+    )
     if overrides:
-        base_kwargs.update(overrides)
-    return PageConfig(**base_kwargs)
+        for key, value in overrides.items():
+            setattr(page, key, value)
+    return page
 
 
 def test_package_url_requires_release() -> None:

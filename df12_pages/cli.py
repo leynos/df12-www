@@ -17,7 +17,9 @@ Generate all pages for the default configuration:
 Regenerate a single page into a custom directory:
 
 >>> from df12_pages.cli import app
->>> app.run(["generate", "--page", "getting-started", "--output-dir", "dist"])  # doctest: +SKIP
+>>> app.run(
+...     ["generate", "--page", "getting-started", "--output-dir", "dist"]
+... )  # doctest: +SKIP
 """
 
 from __future__ import annotations
@@ -42,7 +44,7 @@ app = App(name="pages", config=cyclopts.config.Env("INPUT_", command=False))  # 
 
 
 def _format_path(path: Path) -> str:
-    """Return the given path relative to cwd when possible, otherwise an absolute string."""
+    """Return a cwd-relative path when possible, otherwise the absolute path."""
     if path.is_absolute():
         try:
             return str(path.relative_to(Path.cwd()))

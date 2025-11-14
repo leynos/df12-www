@@ -94,6 +94,11 @@ from df12_pages.generator import PageContentGenerator
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INLINE_CODE_LABEL = "introctl"
 
+if typ.TYPE_CHECKING:
+    from pytest_mock import MockerFixture
+else:  # pragma: no cover - typing fallback
+    MockerFixture = typ.Any
+
 
 def _require_executable(name: str) -> str:
     """Resolve an executable on PATH, raising a descriptive error if missing."""
@@ -203,16 +208,18 @@ def markdown_response(
             return None
 
     state["set_last_modified"] = set_last_modified
-    monkeypatch.setattr("df12_pages.generator.requests.Session", lambda: _Session())
+    monkeypatch.setattr(
+        "df12_pages.generator.page_generator.requests.Session", lambda: _Session()
+    )
     return state
 
 
 @pytest.fixture(autouse=True)
-def github_commit_mock(mocker: object) -> dict[str, typ.Any]:
+def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
     """Mock GitHub client and repo commits for all tests.
 
-    This autouse fixture stubs ``df12_pages.generator.GitHub`` with a client
-    that exposes a single "latest" commit and returns a small helper
+    This autouse fixture stubs ``df12_pages.generator.page_generator.GitHub``
+    with a client that exposes a single "latest" commit and returns a small helper
     dictionary containing ``set_date`` so individual tests can adjust the
     commit timestamp used in metadata badges without calling the real GitHub
     API.
@@ -227,7 +234,7 @@ def github_commit_mock(mocker: object) -> dict[str, typ.Any]:
     mock_repo.commits.return_value = iter([latest_commit])
     mock_client = mocker.Mock()
     mock_client.repository.return_value = mock_repo
-    mocker.patch("df12_pages.generator.GitHub", return_value=mock_client)
+    mocker.patch("df12_pages.generator.page_generator.GitHub", return_value=mock_client)
 
     def set_date(value: dt.datetime) -> None:
         author.date = value
@@ -384,7 +391,9 @@ def test_default_layout_content_not_duplicated(
 ) -> None:
     """Sections without headings should render body content exactly once."""
     soup = generated_docs["docs-test-introduction.html"]
-    html = soup.select_one(".doc-article").decode_contents()
+    article = soup.select_one(".doc-article")
+    assert article is not None, "expected .doc-article element in generated doc"
+    html = article.decode_contents()
     assert html.count("Sanitized providers") == 1, (
         "expected 'Sanitized providers' to appear exactly once in generated doc HTML"
     )

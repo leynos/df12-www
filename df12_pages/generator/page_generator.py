@@ -1,166 +1,48 @@
-"""High-level orchestration for documentation page generation."""
+"""High-level orchestration for documentation page generation.
+
+This module coordinates fetching markdown from GitHub (optionally pinned to a
+release), rendering it with shared templates, and writing themed HTML bundles.
+It exposes :class:`PageContentGenerator`, which consumes a
+:class:`~df12_pages.config.PageConfig`, renders each section with
+``HtmlContentRenderer``, and persists both HTML and metadata that power
+``public/docs-*.html`` and ``docs.html``.
+
+Example
+-------
+>>> from pathlib import Path
+>>> from df12_pages.config import load_site_config
+>>> from df12_pages.generator import PageContentGenerator
+>>> config = load_site_config(Path("config/pages.yaml"))  # doctest: +SKIP
+>>> page = config.get_page("getting-started")  # doctest: +SKIP
+>>> generator = PageContentGenerator(page)  # doctest: +SKIP
+>>> generator.run()  # doctest: +SKIP
+[PosixPath('public/docs-getting-started.html'), ...]
+"""
 
 from __future__ import annotations
 
-import dataclasses as dc
 import datetime as dt
 import json
 import os
-import posixpath
 import re
 import typing as typ
 from email.utils import parsedate_to_datetime
-from html import escape
 from pathlib import Path
-from urllib.parse import urlsplit
 
 import requests
 from github3 import GitHub
 from github3 import exceptions as gh_exc
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from markdown import Markdown
-from markdown.extensions import Extension
-from markdown.treeprocessors import Treeprocessor
-from pygments import highlight
-from pygments.formatters.html import HtmlFormatter
-from pygments.lexers import get_lexer_by_name
-from pygments.util import ClassNotFound
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from ._constants import PAGE_META_TEMPLATE
-from .config import PageConfig, SectionLayout
-from .docs_index import ManifestDescriptionResolver
-from .markdown_parser import Section, Subsection, parse_sections
-
-CODE_BLOCK_PATTERN = re.compile(r"```([A-Za-z0-9_+#.-]+)?[^\n]*\n(.*?)```", re.DOTALL)
-FENCED_INDENT_PATTERN = re.compile(r"^[ ]{1,3}([`~]{3,})", re.MULTILINE)
-FENCE_LABEL_PATTERN = re.compile(
-    r"^([`~]{3,})([A-Za-z0-9_+#.-]+)?(,[^\r\n]+)$", re.MULTILINE
-)
-CODEHILITE_OPEN_TAG = re.compile(r'<div class="codehilite">')
-
-
-class HtmlContentRenderer:
-    """Render markdown and code snippets with consistent styling."""
-
-    def __init__(
-        self, pygments_style: str = "monokai", link_extension: Extension | None = None
-    ) -> None:
-        self.pygments_style = pygments_style
-        self._formatter = HtmlFormatter(style=pygments_style, cssclass="codehilite")
-        self._link_extension = link_extension
-
-    @property
-    def stylesheet(self) -> str:
-        """Return the CSS used for highlighted code blocks."""
-        return self._formatter.get_style_defs(".codehilite")
-
-    def markdown(self, text: str) -> str:
-        """Render markdown into HTML using the configured extensions.
-
-        Parameters
-        ----------
-        text : str
-            Raw markdown content to render. Empty or whitespace-only strings
-            return an empty result.
-
-        Returns
-        -------
-        str
-            HTML string with code blocks annotated for the df12 codehilite
-            styling.
-        """
-        normalized = self._normalize_fenced_blocks(text)
-        if not normalized.strip():
-            return ""
-        extensions: list[Extension | str] = [
-            "fenced_code",
-            "codehilite",
-            "tables",
-            "sane_lists",
-        ]
-        if self._link_extension:
-            extensions.append(self._link_extension)
-        md = Markdown(
-            extensions=extensions,
-            extension_configs={
-                "codehilite": {
-                    "linenums": False,
-                    "guess_lang": False,
-                    "css_class": "codehilite",
-                    "pygments_style": self.pygments_style,
-                }
-            },
-        )
-        html = md.convert(normalized)
-        return self._annotate_codehilite(html, normalized)
-
-    def code_block(self, code: str, language: str | None = None) -> str:
-        """Highlight fenced code blocks with pygments."""
-        lang = language or "text"
-        try:
-            lexer = get_lexer_by_name(lang)
-        except ClassNotFound:
-            lexer = get_lexer_by_name("text")
-        html = highlight(code, lexer, self._formatter)
-        return self._attach_language_attribute(html, lang)
-
-    def _annotate_codehilite(self, html: str, source_markdown: str) -> str:
-        """Attach language metadata to each highlighted block in converted markdown."""
-        languages = [
-            match.group(1) or "text"
-            for match in CODE_BLOCK_PATTERN.finditer(source_markdown)
-        ]
-        if not languages:
-            return html
-        lang_iter = iter(languages)
-
-        def _repl(match: re.Match[str]) -> str:
-            lang = next(lang_iter, "text")
-            return (
-                f'<div class="codehilite" data-language="{escape(lang, quote=True)}">'
-            )
-
-        return CODEHILITE_OPEN_TAG.sub(_repl, html, len(languages))
-
-    @staticmethod
-    def _attach_language_attribute(html: str, language: str) -> str:
-        """Add a single language attribute to an already highlighted block."""
-        safe_lang = escape(language or "text", quote=True)
-
-        def _repl(match: re.Match[str]) -> str:
-            return f'<div class="codehilite" data-language="{safe_lang}">'
-
-        return CODEHILITE_OPEN_TAG.sub(_repl, html, 1)
-
-    @staticmethod
-    def _normalize_fenced_blocks(text: str) -> str:
-        without_indent = FENCED_INDENT_PATTERN.sub(r"\1", text)
-
-        def _strip_labels(match: re.Match[str]) -> str:
-            fence, language, _extras = match.groups()
-            label = language or ""
-            return f"{fence}{label}"
-
-        return FENCE_LABEL_PATTERN.sub(_strip_labels, without_indent)
-
-
-@dc.dataclass(slots=True)
-class SectionModel:
-    """Structured data passed to the doc section template."""
-
-    title: str
-    short_title: str
-    slug: str
-    order: int
-    layout: str
-    intro_html: str
-    default_html: str
-    numbered_steps: list[dict[str, str]]
-    split_panel: dict[str, str]
-    subsections: list[dict[str, str]]
-    toc_items: list[dict[str, str]]
+from df12_pages._constants import PAGE_META_TEMPLATE
+from df12_pages.config import PageConfig, SectionLayout
+from df12_pages.docs_index import ManifestDescriptionResolver
+from df12_pages.generator.link_rewriter import _build_link_rewriter
+from df12_pages.generator.models import SectionModel
+from df12_pages.generator.renderer import CODE_BLOCK_PATTERN, HtmlContentRenderer
+from df12_pages.markdown_parser import Section, Subsection, parse_sections
 
 
 class PageContentGenerator:
@@ -189,7 +71,8 @@ class PageContentGenerator:
         """
         self.page = page_config
         self.output_dir_override = output_dir
-        self.templates_dir = templates_dir or Path(__file__).parent / "templates"
+        default_templates = Path(__file__).resolve().parents[1] / "templates"
+        self.templates_dir = templates_dir or default_templates
         self.renderer = HtmlContentRenderer(
             page_config.pygments_style, link_extension=_build_link_rewriter(page_config)
         )
@@ -277,13 +160,14 @@ class PageContentGenerator:
         return self._fetch_doc_commit_date()
 
     def _github(self) -> GitHub:
+        """Return a cached github3.py client, lazily configured from env tokens."""
         if self._github_client is None:
             token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
             self._github_client = GitHub(token=token)
         return self._github_client
 
     def _fetch_doc_commit_date(self) -> dt.datetime | None:
-        """Return the commit date for the document, if available."""
+        """Return the latest commit timestamp for the page repo or None on errors."""
         result: dt.datetime | None = None
         repo_slug = self.page.repo
         if repo_slug:
@@ -314,9 +198,22 @@ class PageContentGenerator:
         return result
 
     def _extract_commit_timestamp(self, commit: object) -> dt.datetime | None:
+        """Extract a commit datetime from github3 objects or dict payloads.
+
+        Parameters
+        ----------
+        commit : object
+            Commit object or dictionary exposing ``commit.author``/``committer``
+            with ``date`` attributes.
+
+        Returns
+        -------
+        datetime | None
+            The first normalized commit timestamp, or ``None`` when unavailable.
+        """
         commit_payload = getattr(commit, "commit", None)
         if commit_payload is None and isinstance(commit, dict):
-            commit_payload = commit.get("commit")
+            commit_payload = typ.cast("dict[str, typ.Any]", commit).get("commit")
         if commit_payload is None:
             return None
 
@@ -364,6 +261,7 @@ class PageContentGenerator:
         return result
 
     def _fetch_markdown(self) -> str:
+        """Download markdown from the resolved source URL, updating doc timestamps."""
         session = requests.Session()
         retry = Retry(
             total=5,
@@ -388,6 +286,7 @@ class PageContentGenerator:
             session.close()
 
     def _resolve_source_url(self, override: str | None) -> str:
+        """Return the effective markdown source URL, tracking release versions."""
         if override:
             return override
         if self.page.repo and self.page.latest_release:
@@ -399,6 +298,7 @@ class PageContentGenerator:
         return self.page.source_url
 
     def _extract_timestamp(self, header_value: str | None) -> dt.datetime:
+        """Parse an HTTP Last-Modified header into a timezone-aware UTC datetime."""
         if header_value:
             try:
                 parsed = parsedate_to_datetime(header_value)
@@ -411,6 +311,7 @@ class PageContentGenerator:
         return dt.datetime.now(dt.UTC)
 
     def _resolve_description(self) -> str:
+        """Return the page description override or fetch it from the manifest."""
         if self.page.description_override:
             return self.page.description_override
         return self.description_resolver.resolve(self.page)
@@ -424,10 +325,12 @@ class PageContentGenerator:
         return tag
 
     def _metadata_path(self) -> Path:
+        """Return the path to the metadata JSON file for this page."""
         filename = PAGE_META_TEMPLATE.format(key=self.page.key)
         return self.page.output_dir / filename
 
     def _write_metadata(self, first_filename: str) -> None:
+        """Persist the metadata JSON that records the first generated filename."""
         metadata = {"first_file": first_filename}
         path = self._metadata_path()
         try:
@@ -438,6 +341,7 @@ class PageContentGenerator:
     def _build_nav_groups(
         self, section_models: list[SectionModel]
     ) -> list[dict[str, typ.Any]]:
+        """Build sidebar navigation groups and entries for the rendered sections."""
         groups: list[dict[str, typ.Any]] = []
         for model in section_models:
             page_url = f"{self.page.filename_prefix}{model.slug}.html"
@@ -467,11 +371,13 @@ class PageContentGenerator:
         return groups
 
     def _resolve_layout(self, slug: str) -> SectionLayout:
+        """Return the configured SectionLayout for ``slug`` or a default layout."""
         return self.page.layouts.get(slug, SectionLayout())
 
     def _build_section_model(
         self, section: Section, layout: SectionLayout
     ) -> SectionModel:
+        """Construct a SectionModel with rendered HTML and layout metadata."""
         intro_html = self.renderer.markdown(section.intro_markdown)
         default_html = self.renderer.markdown(section.markdown)
         numbered_steps: list[dict[str, str]] = []
@@ -514,6 +420,7 @@ class PageContentGenerator:
     def _prepare_numbered_steps(
         self, section: Section, layout: SectionLayout
     ) -> list[dict[str, str]]:
+        """Return numbered step data for ``section`` based on the provided layout."""
         subsections = list(section.subsections)
         if not subsections:
             return []
@@ -546,6 +453,7 @@ class PageContentGenerator:
     def _prepare_split_panel(
         self, section: Section, layout: SectionLayout
     ) -> dict[str, str]:
+        """Render split-panel HTML blocks for the section based on layout hints."""
         matches = list(CODE_BLOCK_PATTERN.finditer(section.markdown))
         if not matches:
             return {
@@ -568,11 +476,13 @@ class PageContentGenerator:
         }
 
     def _format_page_title(self, section: Section) -> str:
+        """Compose the HTML title using site name, section, and configured suffix."""
         site_name = self.page.theme.site_name
         suffix = self.page.page_title_suffix
         return f"{site_name} — {section.short_title} | {suffix}"
 
     def _build_subsection_blocks(self, section: Section) -> list[dict[str, str]]:
+        """Return rendered subsection blocks with unique anchors for ``section``."""
         if not section.subsections:
             return []
 
@@ -587,6 +497,7 @@ class PageContentGenerator:
     def _section_anchor(
         self, section_slug: str, title: str, index: int, used: set[str]
     ) -> str:
+        """Return a unique anchor combining section slug, slugified title, and index."""
         base_title = self._slugify(title)
         if base_title:
             base = f"{section_slug}-{base_title}"
@@ -596,6 +507,7 @@ class PageContentGenerator:
 
     @staticmethod
     def _unique_anchor(base: str, used: set[str]) -> str:
+        """Return a unique anchor, appending numeric suffixes and mutating ``used``."""
         candidate = base
         suffix = 2
         while candidate in used:
@@ -606,144 +518,16 @@ class PageContentGenerator:
 
     @staticmethod
     def _slugify(value: str) -> str:
+        """Convert a string into a lowercase hyphen-separated slug."""
         return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
     @staticmethod
     def _clean_nav_label(label: str) -> str:
+        """Trim surrounding whitespace and trailing colons from nav labels."""
         return label.strip().rstrip(":").strip()
 
 
 def _build_release_url(repo: str, tag: str, path: str) -> str:
+    """Return the raw GitHub URL for the file at ``path`` within a tagged release."""
     normalized = path.lstrip("/")
     return f"https://raw.githubusercontent.com/{repo}/refs/tags/{tag}/{normalized}"
-
-
-def _build_link_rewriter(page: PageConfig) -> Extension | None:
-    """Create a markdown extension that rewrites relative links to GitHub raw URLs.
-
-    Parameters
-    ----------
-    page : PageConfig
-        Page configuration containing the repo slug, release/branch ref, and
-        markdown path used to derive relative link bases.
-
-    Returns
-    -------
-    Extension or None
-        RelativeLinkExtension configured for the page context, or ``None`` when
-        the page does not originate from a GitHub repository.
-    """
-    if not page.repo:
-        return None
-    ref = page.latest_release or page.branch
-    base_dir = posixpath.dirname(page.doc_path)
-    return RelativeLinkExtension(page.repo, ref, base_dir)
-
-
-class RelativeLinkExtension(Extension):
-    """Markdown extension that rewrites relative links to GitHub sources."""
-
-    def __init__(self, repo: str, ref: str, base_dir: str) -> None:
-        """Initialize the link rewriter.
-
-        Parameters
-        ----------
-        repo : str
-            Owner/repository slug (e.g., ``leynos/netsuke``).
-        ref : str
-            Git reference (tag or branch) the document was fetched from.
-        base_dir : str
-            Directory path inside the repo that contains the markdown source.
-        """
-        self.repo = repo
-        self.ref = ref
-        self.base_dir = base_dir
-
-    def extendMarkdown(self, md: Markdown) -> None:  # type: ignore[override]  # noqa: N802 - required by Markdown extension API
-        """Register the relative-link treeprocessor on the Markdown instance."""
-        processor = RelativeLinkTreeprocessor(md, self.repo, self.ref, self.base_dir)
-        md.treeprocessors.register(processor, "df12_relative_links", 15)
-
-
-class RelativeLinkTreeprocessor(Treeprocessor):
-    """Rewrite relative markdown links to point at GitHub raw blobs."""
-
-    def __init__(self, md: Markdown, repo: str, ref: str, base_dir: str) -> None:
-        """Store repo metadata for rewriting relative links.
-
-        Parameters
-        ----------
-        md : Markdown
-            The Markdown instance the processor extends.
-        repo : str
-            Repository slug used to form GitHub URLs.
-        ref : str
-            Branch or tag name serving as the content reference.
-        base_dir : str
-            Directory path within the repository that contains the Markdown file.
-        """
-        super().__init__(md)
-        self.repo = repo
-        self.ref = ref
-        self.base_dir = base_dir
-
-    def run(self, root: object) -> object:  # pragma: no cover - Markdown API
-        """Rewrite relative anchors in the parsed markdown tree to GitHub URLs."""
-        for element in root.iter():
-            if element.tag == "a":
-                href = element.get("href")
-                rewritten = self._rewrite(href)
-                if rewritten:
-                    element.set("href", rewritten)
-        return root
-
-    def _rewrite(self, target: str | None) -> str | None:
-        """Rewrite a relative link target into a GitHub raw URL when applicable.
-
-        Parameters
-        ----------
-        target : str or None
-            Original link target from the markdown document.
-
-        Returns
-        -------
-        str or None
-            Absolute GitHub raw URL when the link is relative to the source
-            document; ``None`` for external schemes, anchors, double-slash URLs,
-            or other non-relative targets.
-        """
-        if not target:
-            return None
-
-        lower = target.lower()
-        invalid = lower.startswith(
-            ("http://", "https://", "mailto:", "tel:", "data:", "javascript:")
-        )
-        if target.startswith(("#", "//")) or "://" in target:
-            invalid = True
-
-        parsed = None
-        if not invalid:
-            parsed = urlsplit(target)
-            if parsed.scheme or parsed.netloc or (not parsed.path and parsed.fragment):
-                invalid = True
-            elif parsed.path.startswith("/"):
-                invalid = True
-
-        joined = None
-        if not invalid and parsed is not None:
-            joined = posixpath.normpath(posixpath.join(self.base_dir, parsed.path))
-            while joined.startswith("../"):
-                joined = joined[3:]
-            if joined in (".", ""):
-                invalid = True
-
-        if invalid or parsed is None or joined is None:
-            return None
-
-        url = f"https://github.com/{self.repo}/blob/{self.ref}/{joined}"
-        if parsed.query:
-            url = f"{url}?{parsed.query}"
-        if parsed.fragment:
-            url = f"{url}#{parsed.fragment}"
-        return url

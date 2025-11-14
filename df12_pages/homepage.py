@@ -1,7 +1,7 @@
 """df12 homepage rendering pipeline.
 
 This module encapsulates the logic for turning the structured homepage entry in
-``config/pages.yaml`` into the static ``public/index.html`` artifact. It wires
+``config/pages.yaml`` into the static ``public/index.html`` artefact. It wires
 the configuration model, Jinja environment, and filesystem writes required to
 render the marketing splash page. The main entry point is ``HomePageBuilder``,
 which loads the shared template macros, injects the homepage data model, and
@@ -68,7 +68,20 @@ class HomePageBuilder:
         self.template = self.env.get_template("home_page.jinja")
 
     def run(self) -> Path:
-        """Render the homepage HTML to the configured output path."""
+        """Render and write the homepage HTML, returning the output path.
+
+        Returns
+        -------
+        Path
+            Filesystem path to the rendered homepage HTML file.
+
+        Notes
+        -----
+        This method creates parent directories as needed, renders the Jinja
+        template with the homepage context, ensures the output ends with a
+        newline, writes UTF-8 text to ``homepage.output``, and bubbles up any
+        filesystem errors that arise during writing.
+        """
         output_path = self.homepage.output
         output_path.parent.mkdir(parents=True, exist_ok=True)
         context = {

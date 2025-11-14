@@ -89,6 +89,7 @@ def bump_latest_release_metadata(
 
 
 def _build_roundtrip_yaml() -> YAML:
+    """Return a configured ruamel.yaml YAML instance for round-trip editing."""
     yaml = YAML()
     yaml.preserve_quotes = True
     yaml.width = 120
@@ -99,6 +100,7 @@ def _build_roundtrip_yaml() -> YAML:
 def _resolve_repo(
     page_payload: cabc.Mapping[str, typ.Any], defaults: cabc.Mapping[str, typ.Any]
 ) -> str | None:
+    """Resolve the repository slug from a page payload or defaults."""
     repo = page_payload.get("repo") or defaults.get("repo")
     if not repo:
         return None
@@ -108,6 +110,7 @@ def _resolve_repo(
 def _record_release(
     page_payload: CommentedMap, release: ReleaseInfo | None
 ) -> ReleaseInfo | None:
+    """Record or remove release metadata on the page payload and return the info."""
     if release:
         _upsert_key(
             page_payload, "latest_release", release.tag_name, ("repo", "language")
@@ -132,6 +135,7 @@ def _record_release(
 def _upsert_key(
     page_payload: CommentedMap, key: str, value: str, anchors: tuple[str, ...]
 ) -> None:
+    """Insert or update a key in the commented map near the provided anchors."""
     if key in page_payload:
         page_payload[key] = value
         return

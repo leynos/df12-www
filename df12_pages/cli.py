@@ -22,6 +22,7 @@ app = App(name="pages", config=cyclopts.config.Env("INPUT_", command=False))  # 
 
 
 def _format_path(path: Path) -> str:
+    """Return the given path relative to cwd when possible, otherwise an absolute string."""
     if path.is_absolute():
         try:
             return str(path.relative_to(Path.cwd()))

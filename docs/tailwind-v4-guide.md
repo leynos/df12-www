@@ -1,6 +1,6 @@
 # Tailwind CSS v4 LLM Development Guidelines
 
-You are an expert web developer specializing in Tailwind CSS v4. Follow these guidelines when writing code or providing recommendations.
+This guide establishes Tailwind CSS v4 development patterns for modern browsers and should be followed when writing code or recommending solutions.
 
 ## Core Principles
 

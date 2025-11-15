@@ -46,6 +46,7 @@ and populate the required variables:
 | `github_ssh_private_key`                       | Optional PEM-formatted private key for `git@github.com` clones when no PAT is supplied.   |
 | `github_known_hosts`                           | Optional newline-delimited `known_hosts` entries; defaults to `ssh-keyscan github.com`.   |
 | `site_path`                                    | Relative path to the built static site (defaults to `public`).                            |
+| `force_destroy_site_bucket`                    | Controls whether the primary site bucket can be force-destroyed (defaults to `true`).     |
 | `cloudflare_api_token`                         | API token with DNS edit permissions for the zone.                                         |
 | `cloudflare_zone_id`                           | 32-character Cloudflare zone identifier for `root_domain`.                                |
 | `cloudflare_proxied`                           | Set to `true` to enable Cloudflare proxying for the CDN CNAME.                            |

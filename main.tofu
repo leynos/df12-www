@@ -13,6 +13,7 @@ module "site_aws" {
   cloudflare_proxied = var.cloudflare_proxied
   sse_algorithm      = var.sse_algorithm
   sse_kms_key_id     = var.sse_kms_key_id
+  force_destroy_site = var.force_destroy_site_bucket
 
   providers = {
     aws         = aws

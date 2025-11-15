@@ -229,6 +229,12 @@ variable "log_retention_days" {
   default     = 14
 }
 
+variable "force_destroy_site_bucket" {
+  description = "Whether to force-destroy the primary site bucket (set false for production)."
+  type        = bool
+  default     = true
+}
+
 variable "sse_algorithm" {
   description = "Server-side encryption algorithm for the AWS static site bucket (valid values: AES256, aws:kms)"
   type        = string

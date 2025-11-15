@@ -61,6 +61,12 @@ variable "force_destroy_logs" {
   description = "Whether to force-destroy the logs bucket and its contents."
 }
 
+variable "force_destroy_site" {
+  description = "Whether to force-destroy the primary site bucket when deleting the stack."
+  type        = bool
+  default     = false
+}
+
 variable "sse_algorithm" {
   description = "Server-side encryption algorithm for S3 bucket (valid values: AES256, aws:kms)"
   type        = string

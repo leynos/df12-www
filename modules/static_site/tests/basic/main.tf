@@ -11,6 +11,19 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = "us-west-2"
+}
+
+provider "aws" {
+  alias  = "useast1"
+  region = "us-east-1"
+}
+
+provider "cloudflare" {
+  api_token = "dummy"
+}
+
 module "static_site" {
   source = "../"
 
@@ -24,17 +37,4 @@ module "static_site" {
     aws.useast1 = aws.useast1
     cloudflare  = cloudflare
   }
-}
-
-provider "aws" {
-  region = "us-west-2"
-}
-
-provider "aws" {
-  alias  = "useast1"
-  region = "us-east-1"
-}
-
-provider "cloudflare" {
-  api_token = "dummy"
 }

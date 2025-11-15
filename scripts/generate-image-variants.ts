@@ -74,11 +74,19 @@ async function main() {
     return;
   }
 
-  for (const filePath of pngFiles) {
-    for (const format of OUTPUT_FORMATS) {
-      await generateVariant(filePath, format);
-    }
+  const tasks = pngFiles.flatMap((filePath) =>
+    OUTPUT_FORMATS.map((format) => generateVariant(filePath, format))
+  );
+
+  const results = await Promise.allSettled(tasks);
+  const failures = results.filter((r) => r.status === "rejected");
+  if (failures.length > 0) {
+    console.error(`Failed to generate ${failures.length} variants.`);
   }
+
+  console.log(
+    `Image variant generation completed (${pngFiles.length} files, ${OUTPUT_FORMATS.length} formats).`
+  );
 }
 
 main().catch((error) => {

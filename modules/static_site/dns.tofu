@@ -1,5 +1,5 @@
 locals {
-  subdomain = trimsuffix(var.domain_name, ".${var.root_domain}")
+  subdomain = trimsuffix(local.domain_name_clean, ".${local.root_domain_clean}")
 }
 
 resource "cloudflare_dns_record" "acm_validation" {
@@ -11,7 +11,7 @@ resource "cloudflare_dns_record" "acm_validation" {
     }
   }
 
-  zone_id = var.cloudflare_zone_id
+  zone_id = local.cloudflare_zone_id_clean
   name    = trimsuffix(each.value.name, ".")
   type    = each.value.type
   content = trimsuffix(each.value.value, ".")
@@ -20,7 +20,7 @@ resource "cloudflare_dns_record" "acm_validation" {
 
   lifecycle {
     precondition {
-      condition     = endswith(var.domain_name, var.root_domain)
+      condition     = endswith(local.domain_name_clean, local.root_domain_clean)
       error_message = "domain_name must end with root_domain"
     }
   }
@@ -28,7 +28,7 @@ resource "cloudflare_dns_record" "acm_validation" {
 
 resource "cloudflare_dns_record" "cdn_cname" {
   count   = local.subdomain == "" ? 0 : 1
-  zone_id = var.cloudflare_zone_id
+  zone_id = local.cloudflare_zone_id_clean
   name    = local.subdomain
   type    = "CNAME"
   content = aws_cloudfront_distribution.cdn.domain_name
@@ -37,7 +37,7 @@ resource "cloudflare_dns_record" "cdn_cname" {
 
   lifecycle {
     precondition {
-      condition     = endswith(var.domain_name, var.root_domain)
+      condition     = endswith(local.domain_name_clean, local.root_domain_clean)
       error_message = "domain_name must end with root_domain"
     }
   }

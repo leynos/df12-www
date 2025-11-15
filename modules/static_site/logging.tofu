@@ -1,5 +1,5 @@
 locals {
-  logs_bucket_name = "${replace(lower(replace(trimsuffix(var.domain_name, "."), "*.", "")), "_", "-")}-logs"
+  logs_bucket_name = "${replace(lower(replace(trimsuffix(local.domain_name_clean, "."), "*.", "")), "_", "-")}-logs"
   logs_kms_key_arn = var.sse_kms_key_id != null ? var.sse_kms_key_id : (var.sse_algorithm == "aws:kms" ? aws_kms_key.logs[0].arn : null)
 }
 

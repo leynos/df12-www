@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "site" {
-  bucket        = var.domain_name
+  bucket        = local.domain_name_clean
   force_destroy = var.force_destroy_site
   tags = {
-    Name = "${var.domain_name}-site"
+    Name = "${local.domain_name_clean}-site"
   }
 
   lifecycle {

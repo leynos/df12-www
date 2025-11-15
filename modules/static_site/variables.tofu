@@ -5,11 +5,10 @@ variable "domain_name" {
 
   validation {
     condition = (
-      length(var.domain_name) > 0 &&
-      can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", var.domain_name)) &&
-      endswith(var.domain_name, var.root_domain)
+      length(trimspace(var.domain_name)) > 0 &&
+      can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", trimspace(var.domain_name)))
     )
-    error_message = "Domain name must be a valid hostname and subdomain of root_domain"
+    error_message = "Domain name must be a valid hostname"
   }
 }
 
@@ -20,15 +19,15 @@ variable "root_domain" {
 
   validation {
     condition = (
-      length(var.root_domain) > 0 &&
-      can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", var.root_domain))
+      length(trimspace(var.root_domain)) > 0 &&
+      can(regex("^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?[.])+[a-zA-Z]{2,}$", trimspace(var.root_domain)))
     )
     error_message = "Root domain must be a valid hostname"
   }
 }
 
 variable "cloudflare_zone_id" {
-  description = "Cloudflare zone ID that owns the root domain"
+  description = "Cloudflare zone ID that owns the root domain (whitespace trimmed automatically)"
   type        = string
   nullable    = false
 
@@ -79,7 +78,7 @@ variable "sse_algorithm" {
 }
 
 variable "sse_kms_key_id" {
-  description = "KMS key identifier for SSE-KMS. When sse_algorithm is 'aws:kms', supply one of: Key ID (UUID), Key ARN, Alias ARN or Alias name (alias/...); when omitted, a key is created with log-delivery permissions."
+  description = "KMS key identifier for SSE-KMS (Key ID UUID, Key ARN, Alias ARN, or alias/... name)."
   type        = string
   default     = null
   sensitive   = true
@@ -92,4 +91,10 @@ variable "sse_kms_key_id" {
     )
     error_message = "When provided, sse_kms_key_id must be a Key ID (UUID), Key ARN, Alias ARN or Alias name (alias/...)."
   }
+}
+
+locals {
+  domain_name_clean        = trimspace(var.domain_name)
+  root_domain_clean        = trimspace(var.root_domain)
+  cloudflare_zone_id_clean = trimspace(var.cloudflare_zone_id)
 }

@@ -1,6 +1,11 @@
 locals {
   provider_use_scaleway = lower(trimspace(var.cloud_provider)) == "scaleway"
   aws_provider_region   = local.provider_use_scaleway ? "us-east-1" : var.aws_region
+  default_tags = {
+    ManagedBy   = "OpenTofu"
+    Environment = var.environment
+    Project     = var.project_name
+  }
 }
 
 provider "aws" {
@@ -12,11 +17,7 @@ provider "aws" {
   skip_requesting_account_id  = local.provider_use_scaleway
 
   default_tags {
-    tags = {
-      ManagedBy   = "OpenTofu"
-      Environment = var.environment
-      Project     = var.project_name
-    }
+    tags = local.default_tags
   }
 }
 
@@ -30,11 +31,7 @@ provider "aws" {
   skip_requesting_account_id  = local.provider_use_scaleway
 
   default_tags {
-    tags = {
-      ManagedBy   = "OpenTofu"
-      Environment = var.environment
-      Project     = var.project_name
-    }
+    tags = local.default_tags
   }
 }
 

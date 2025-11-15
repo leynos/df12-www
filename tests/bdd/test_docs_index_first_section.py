@@ -50,7 +50,13 @@ scenarios(FEATURE_FILE)
 
 @pytest.fixture
 def scenario_state() -> dict[str, object]:
-    """Return a mutable dict used to share scenario state across BDD steps."""
+    """Share mutable per-scenario state between pytest-bdd steps.
+
+    Returns
+    -------
+    dict[str, object]
+        Mutable dictionary used to share scenario state across BDD steps.
+    """
     return {}
 
 
@@ -158,7 +164,19 @@ def when_render_and_index(
 
 @then("the docs index entry links to the true first section")
 def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
-    """Verify docs index entry links to the true first section."""
+    """Ensure the docs index entry links to the first markdown section.
+
+    Parameters
+    ----------
+    scenario_state : dict[str, object]
+        Shared state dictionary containing the rendered docs index path.
+
+    Returns
+    -------
+    None
+        Raises AssertionError if the docs index entry does not target the first
+        section link.
+    """
     index_path = typ.cast("Path", scenario_state["index_path"])
     soup = BeautifulSoup(index_path.read_text(encoding="utf-8"), "html.parser")
     entry = soup.select_one(".product-card a.product-card__meta")

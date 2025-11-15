@@ -1,4 +1,19 @@
-"""Behaviour tests for rendering documentation from release tags."""
+"""Behaviour tests for rendering documentation from release tags.
+
+These pytest-bdd scenarios verify that pages sourced from release tags render
+the correct metadata and sidebar content using recorded Betamax cassettes.
+They exercise the ``docs_release.feature`` file to ensure the release-tag
+code path uses cached HTTP responses when replaying GitHub fetches.
+
+Usage examples
+--------------
+Run all scenarios with ``pytest tests/bdd/test_docs_release.py -v``. To
+re-record HTTP interactions, set ``BETAMAX_RECORD_MODE=all`` and ensure the
+``features/docs_release.feature`` and ``tests/cassettes`` directories are
+available. Individual scenarios can be executed via
+``pytest -k "docs release"`` while Betamax automatically handles cassette
+creation for the ``docs_release/render`` recording.
+"""
 
 from __future__ import annotations
 
@@ -118,14 +133,23 @@ def then_release_metadata_present(scenario_state: dict[str, object]) -> None:
     meta_items = [
         span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
     ]
-    assert meta_items == ["Version 2.32.5", "Updated Aug 19, 2025"]
+    assert meta_items == [
+        "Version 2.32.5",
+        "Updated Aug 19, 2025",
+    ], "expected release version and tag date in meta_items"
 
     eyebrow = soup.select_one(".doc-sidebar__eyebrow")
     body = soup.select_one(".doc-sidebar__body")
-    assert eyebrow is not None
-    assert eyebrow.get_text(strip=True) == "Requests Docs"
-    assert body is not None
-    assert body.get_text(strip=True) == "HTTP for Humans"
+    assert eyebrow is not None, "expected sidebar eyebrow element to be present"
+    assert eyebrow.get_text(strip=True) == "Requests Docs", (
+        "expected eyebrow text to be 'Requests Docs'"
+    )
+    assert body is not None, "expected sidebar body element to be present"
+    assert body.get_text(strip=True) == "HTTP for Humans", (
+        "expected body text to be 'HTTP for Humans'"
+    )
 
     calls = typ.cast("list[str]", scenario_state["calls"])
-    assert any("refs/tags/v2.32.5" in url for url in calls)
+    assert any("refs/tags/v2.32.5" in url for url in calls), (
+        "expected a call containing 'refs/tags/v2.32.5'"
+    )

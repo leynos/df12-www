@@ -173,14 +173,23 @@ def page_config(tmp_path_factory: pytest.TempPathFactory) -> PageConfig:
     )
 
 
+class MarkdownResponseState(typ.TypedDict):
+    """State shared by markdown response fixtures."""
+
+    last_modified: str
+    calls: list[str]
+    set_last_modified: typ.Callable[[str], None]
+
+
 @pytest.fixture
 def markdown_response(
     sample_markdown: str, monkeypatch: pytest.MonkeyPatch
-) -> dict[str, typ.Any]:
+) -> MarkdownResponseState:
     """Provide a fake HTTP response and session state for markdown fetch tests."""
-    state: dict[str, typ.Any] = {
+    state: MarkdownResponseState = {
         "last_modified": "Tue, 11 Nov 2025 00:00:00 GMT",
         "calls": [],
+        "set_last_modified": lambda value: None,
     }
 
     class _Response:
@@ -245,7 +254,7 @@ def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
 @pytest.fixture
 def generated_doc_paths(
     page_config: PageConfig,
-    markdown_response: dict[str, typ.Any],
+    markdown_response: MarkdownResponseState,
 ) -> dict[str, Path]:
     """Generate HTML pages from the sample markdown and return their paths."""
     generator = PageContentGenerator(page_config)
@@ -350,7 +359,7 @@ def test_hero_title_strips_numbering(generated_docs: dict[str, BeautifulSoup]) -
 
 def test_doc_meta_uses_commit_date(
     page_config: PageConfig,
-    markdown_response: dict[str, typ.Any],
+    markdown_response: MarkdownResponseState,
     github_commit_mock: dict[str, typ.Any],
 ) -> None:
     """When releases are absent, rely on the last commit timestamp."""
@@ -453,8 +462,12 @@ def _extract_nodes_by_tag(
         node = stack.pop()
         if node.get("tag") == tag:
             matches.append(node)
-        children = node.get("children", []) or []
-        stack.extend(child for child in children if isinstance(child, dict))
+        for child in node.get("children", []) or []:
+            match child:
+                case dict():
+                    stack.append(child)
+                case _:
+                    continue
     return matches
 
 
@@ -512,7 +525,7 @@ def test_doc_prose_code_spans_have_expected_computed_style(
 def test_release_version_and_date_prefer_tag_metadata(
     page_config: PageConfig,
     sample_markdown: str,
-    markdown_response: dict[str, typ.Any],
+    markdown_response: MarkdownResponseState,
 ) -> None:
     """Release tags should drive the source URL and metadata badges."""
     release_config = dc.replace(

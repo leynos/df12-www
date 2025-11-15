@@ -1,4 +1,18 @@
-"""Behaviour tests for indented fenced code blocks."""
+"""Behaviour tests for indented fenced code blocks.
+
+These pytest-bdd scenarios prove that indented fenced code samples render with
+syntax highlighting when Markdown is processed via ``PageContentGenerator``.
+The feature file ``indented_code_blocks.feature`` drives the scenario to ensure
+Rust snippets nested inside lists retain their ``codehilite`` metadata so they
+display the expected language label.
+
+Usage
+-----
+Run ``pytest tests/bdd/test_indented_code_blocks.py -v`` after installing the
+dev dependencies (``uv sync --group dev``). The scenario relies on the
+``scenario_state`` fixture and stubs ``PageContentGenerator._fetch_markdown`` to
+avoid network calls, so no external services are required.
+"""
 
 from __future__ import annotations
 
@@ -87,8 +101,10 @@ def then_html_has_code_block(scenario_state: dict[str, object]) -> None:
     html = written[0].read_text(encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")
     code_blocks = soup.select(".codehilite code")
-    assert any("fn main" in block.get_text() for block in code_blocks)
+    assert any("fn main" in block.get_text() for block in code_blocks), (
+        "expected a highlighted code block containing 'fn main' in the rendered HTML"
+    )
     assert any(
         block.find_parent("div", class_="codehilite").get("data-language") == "rust"
         for block in code_blocks
-    )
+    ), "expected a codehilite block with data-language='rust'"

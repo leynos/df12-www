@@ -37,14 +37,20 @@ def test_github_release_client_fetches_release_and_uses_token(
     )
     release = client.fetch_latest("owner/repo")
 
-    assert release is not None
-    assert release.tag_name == "v1.2.3"
+    assert release is not None, "expected ReleaseInfo when GitHub returns 200"
+    assert release.tag_name == "v1.2.3", (
+        f"expected tag_name 'v1.2.3', got {release.tag_name!r}"
+    )
 
     session.get.assert_called_once()
     called_url = session.get.call_args.args[0]
-    assert called_url == "https://example.invalid/repos/owner/repo/releases/latest"
+    assert called_url == "https://example.invalid/repos/owner/repo/releases/latest", (
+        f"expected latest releases endpoint to be requested, got {called_url!r}"
+    )
     headers = session.get.call_args.kwargs["headers"]
-    assert headers["Authorization"] == "Bearer secret-token"
+    assert headers["Authorization"] == "Bearer secret-token", (
+        "expected Authorization header to include Bearer token"
+    )
 
 
 def test_github_release_client_returns_none_for_missing_release(
@@ -58,7 +64,9 @@ def test_github_release_client_returns_none_for_missing_release(
     session.get.return_value = response
 
     client = GitHubReleaseClient(session=session)
-    assert client.fetch_latest("owner/missing") is None
+    assert client.fetch_latest("owner/missing") is None, (
+        "expected None for repositories without releases (HTTP 404)"
+    )
 
 
 def test_bump_workflow_updates_yaml(tmp_path: Path) -> None:
@@ -99,17 +107,29 @@ def test_bump_workflow_updates_yaml(tmp_path: Path) -> None:
     client = StubClient()
     result = bump_latest_release_metadata(config_path=config_path, client=client)
 
-    assert result["second"] is None
-    assert result["first"] is not None
-    assert result["first"].tag_name == "v9.9.9"
-    assert result["first"].published_at == "2025-11-01T00:00:00Z"
-    assert client.calls == ["owner/alpha", "owner/beta"]
+    assert result["second"] is None, "expected second repo to remain unset"
+    assert result["first"] is not None, "expected first repo release to be set"
+    assert result["first"].tag_name == "v9.9.9", (
+        f"expected tag_name 'v9.9.9', got {result['first'].tag_name!r}"
+    )
+    assert result["first"].published_at == "2025-11-01T00:00:00Z", (
+        "expected published_at '2025-11-01T00:00:00Z', "
+        f"got {result['first'].published_at!r}"
+    )
+    assert client.calls == ["owner/alpha", "owner/beta"], (
+        f"expected client to fetch both repos once, got {client.calls!r}"
+    )
 
     yaml = YAML(typ="safe")
     parsed = yaml.load(config_path.read_text(encoding="utf-8"))
-    assert parsed["pages"]["first"]["latest_release"] == "v9.9.9"
-    assert (
-        parsed["pages"]["first"]["latest_release_published_at"]
-        == "2025-11-01T00:00:00Z"
+    first_page = parsed["pages"]["first"]
+    assert first_page["latest_release"] == "v9.9.9", (
+        f"expected latest_release 'v9.9.9', got {first_page.get('latest_release')!r}"
     )
-    assert "latest_release" not in parsed["pages"]["second"]
+    assert first_page["latest_release_published_at"] == "2025-11-01T00:00:00Z", (
+        "expected latest_release_published_at '2025-11-01T00:00:00Z', "
+        f"got {first_page.get('latest_release_published_at')!r}"
+    )
+    assert "latest_release" not in parsed["pages"]["second"], (
+        "expected second repo latest_release entry to be removed"
+    )

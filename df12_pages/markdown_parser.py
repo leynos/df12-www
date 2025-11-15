@@ -75,6 +75,7 @@ def _clean_heading(text: str) -> str:
 
 
 def _slugify(title: str) -> str:
+    """Convert a title to a URL-safe slug."""
     no_number = re.sub(r"^\d+\.?\s*", "", title.lower())
     slug = re.sub(r"[^a-z0-9]+", "-", no_number).strip("-")
     return slug or "section"

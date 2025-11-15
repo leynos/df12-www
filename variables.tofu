@@ -99,6 +99,11 @@ variable "github_token" {
   type        = string
   sensitive   = true
   default     = ""
+
+  validation {
+    condition     = var.github_token != "" || var.github_ssh_private_key != ""
+    error_message = "Either github_token or github_ssh_private_key must be provided for GitHub authentication"
+  }
 }
 
 variable "github_ssh_private_key" {
@@ -130,6 +135,11 @@ variable "budget_email" {
   description = "Email for budget alerts"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", trimspace(var.budget_email)))
+    error_message = "budget_email must be a valid email address"
+  }
 }
 
 variable "cloudflare_api_token" {
@@ -227,6 +237,11 @@ variable "log_retention_days" {
   description = "Retention period in days for CloudFront logs"
   type        = number
   default     = 14
+
+  validation {
+    condition     = var.log_retention_days >= 1 && var.log_retention_days <= 3650
+    error_message = "log_retention_days must be between 1 and 3650 days"
+  }
 }
 
 variable "force_destroy_site_bucket" {

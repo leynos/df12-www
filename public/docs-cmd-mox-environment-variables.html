@@ -281,7 +281,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.1.0/docs/usage-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.2.0/docs/usage-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -396,8 +396,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Environment variables</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Oct 26, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Nov 27, 2025</span>
           </div>
         </header>
 
@@ -406,14 +406,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <div class="doc-prose"><p>CmdMox exposes two environment variables to coordinate shims with the IPC
 server.</p>
 <ul>
-<li><code>CMOX_IPC_SOCKET</code> – path to the Unix domain socket used by shims. Entering an
-  <code>EnvironmentManager</code> sets this automatically and <code>IPCServer.start()</code>
-  refreshes it, so manual overrides are rarely needed. Shims exit with an error
+<li><code>CMOX_IPC_SOCKET</code> – path to the Unix domain socket used by shims on POSIX
+  systems. Entering an <code>EnvironmentManager</code> sets this automatically and
+  <code>IPCServer.start()</code> refreshes it, so manual overrides are rarely needed. On
+  Windows <code>EnvironmentManager.export_ipc_environment</code> still exports a logical
+  socket path, and the IPC layer hashes that path into a deterministic named
+  pipe so existing PATH-filtering logic keeps working. Shims exit with an error
   if the variable is missing.</li>
 <li><code>CMOX_IPC_TIMEOUT</code> – communication timeout in seconds. When the IPC server
   starts under an active <code>EnvironmentManager</code>, the configured timeout is
-  exported automatically (default <code>5.0</code>). Override this to tune connection
-  waits.</li>
+  exported automatically (default <code>5.0</code>). Override this to tune how long
+  clients wait for each connect/send/receive attempt before raising a
+  <code>TimeoutError</code>.</li>
 </ul>
 <p>Most tests should rely on the fixture to manage these variables.</p></div>
               </section>

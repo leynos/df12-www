@@ -421,7 +421,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Running servers</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Nov 24, 2025</span>
+            <span class="doc-meta-list__item">Updated Nov 26, 2025</span>
           </div>
         </header>
 
@@ -438,8 +438,10 @@ the supplied future resolves.[^18] Each worker runs <code>accept_loop</code>, wh
 the factory, rewinds leftover preamble bytes, and hands the stream to the
 application. Transient accept failures trigger exponential backoff capped by
 the configured maximum delay.[^18][^19] Preamble hooks support asynchronous
-success handlers and synchronous failure callbacks, letting you reject
-connections or log decode errors before the application runs.[^20]</p>
+success handlers and asynchronous failure callbacks that receive the stream,
+enabling replies or decode-error logging before the application runs. An
+optional <code>preamble_timeout</code> caps how long <code>read_preamble</code> waits; timeouts use
+the failure callback path.[^20]</p>
 <p><code>spawn_connection_task</code> wraps each accepted stream in <code>read_preamble</code> and
 <code>RewindStream</code>, records connection panics, and logs failures without crashing
 worker tasks.[^20][^37][^38] <code>ServerError</code> surfaces bind and accept failures as

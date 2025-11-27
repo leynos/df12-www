@@ -281,7 +281,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.1.0/docs/usage-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.2.0/docs/usage-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -396,8 +396,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Using the IPC server directly</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Oct 26, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Nov 27, 2025</span>
           </div>
         </header>
 
@@ -420,12 +420,28 @@ subclassing:</p>
 
 <p>Providing <code>passthrough_handler=</code> to <code>IPCHandlers</code> intercepts passthrough
 completions in the same fashion. When no callbacks are supplied the server
-keeps its default echo behaviour, so existing code continues to work unchanged.</p>
+keeps its default echo behaviour, so existing code continues to work unchanged.
+On Windows the transport can be forced explicitly by swapping <code>IPCServer</code> for
+:class:<code>NamedPipeServer</code>; <code>CmdMox</code> selects it automatically based on
+<code>os.name</code>.</p>
 <p>Projects that rely on :class:<code>CallbackIPCServer</code> can still customise startup
 and accept timeouts by passing a :class:<code>TimeoutConfig</code> dataclass:</p>
-<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cmd_mox.ipc</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackIPCServer</span><span class="p">,</span> <span class="n">IPCHandlers</span><span class="p">,</span> <span class="n">TimeoutConfig</span>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">server</span> <span class="o">=</span> <span class="n">CallbackIPCServer</span><span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cmd_mox.ipc</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CallbackIPCServer</span><span class="p">,</span>
+    <span class="n">CallbackNamedPipeServer</span><span class="p">,</span>
+    <span class="n">IPCHandlers</span><span class="p">,</span>
+    <span class="n">TimeoutConfig</span><span class="p">,</span>
+    <span class="n">Response</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">Server</span> <span class="o">=</span> <span class="n">CallbackNamedPipeServer</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span> <span class="k">else</span> <span class="n">CallbackIPCServer</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_passthrough</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">exit_code</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="p">)</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">Server</span><span class="p">(</span>
     <span class="n">socket_path</span><span class="p">,</span>
     <span class="n">handler</span><span class="o">=</span><span class="n">handle</span><span class="p">,</span>
     <span class="n">passthrough_handler</span><span class="o">=</span><span class="n">handle_passthrough</span><span class="p">,</span>

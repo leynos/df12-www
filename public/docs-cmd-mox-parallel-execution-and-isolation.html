@@ -281,7 +281,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.1.0/docs/usage-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.2.0/docs/usage-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -396,8 +396,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Parallel execution and isolation</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Oct 26, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Nov 27, 2025</span>
           </div>
         </header>
 
@@ -416,6 +416,14 @@ multiple workers:</p>
 <div class="codehilite" data-language="bash"><pre><span></span><code>pytest<span class="w"> </span>-n<span class="w"> </span>auto
 </code></pre></div>
 
+<p>On Windows the dedicated smoke workflow that powers CI can be run via the
+Makefile:</p>
+<div class="codehilite" data-language="bash"><pre><span></span><code>make<span class="w"> </span>windows-smoke
+</code></pre></div>
+
+<p>The target captures IPC debug output in <code>windows-ipc.log</code>, facilitating
+attachment of shim diagnostics to CI artefacts or reproduction of
+Windows-specific issues locally.</p>
 <p>Each test continues to receive an independent <code>cmd_mox</code> fixture; the
 environmental changes are scoped to the worker process, so tests cannot observe
 one another's shims or sockets. When controllers are constructed manually

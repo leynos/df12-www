@@ -281,7 +281,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.1.0/docs/usage-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/cmd-mox/refs/tags/v0.2.0/docs/usage-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -396,17 +396,41 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Platform support</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Oct 26, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Nov 27, 2025</span>
           </div>
         </header>
 
         <article class="doc-article">
               <section class="doc-section">
-                <div class="doc-prose"><p>CmdMox targets POSIX systems today. Windows remains unsupported, and attempting
-to use the fixture there will now skip the test automatically with a clear
-message. You can therefore declare the plug-in unconditionally in
-<code>pytest_plugins</code> without wrapping it in platform checks.</p>
+                <div class="doc-prose"><p>CmdMox supports Linux, macOS and Windows. Shims are generated as POSIX symlinks
+on Unix-like systems and as <code>.cmd</code> launchers on Windows so that <code>CreateProcess</code>
+resolves them via <code>PATHEXT</code>. The batch launchers embed the active Python
+interpreter and forward all arguments to the shared <code>shim.py</code>, so no additional
+wrappers or entry points are required.</p>
+<p>When CmdMox enters replay mode on Windows it ensures <code>.CMD</code> is present in the
+effective <code>PATHEXT</code> value, even if developers customised their shell to omit
+the extension. The generated launchers always emit CRLF line endings and escape
+carets/percent signs so the Windows command processor parses them consistently
+with native batch scripts, even when arguments or installation paths include
+spaces and other metacharacters. CmdMox also filters duplicate command names on
+case-insensitive filesystems so two mocks whose names only differ by casing
+cannot trample each other's shim files. At runtime the shim collapses doubled
+carets (<code>^^</code>) in Windows arguments into single carets so multi-layer batch
+escaping does not leak into IPC payloads. Arguments that genuinely need
+repeated carets will therefore reach the server with a single literal caret.</p>
+<p>Deeply nested workspaces can easily exceed the traditional <code>MAX_PATH</code> limit on
+Windows. The environment manager now asks the filesystem for a short (8.3)
+alias whenever the shim directory path would overflow the limit, ensuring shims
+remain invokable while still cleaning up the real directory afterwards. PATH
+filtering honours the underlying filesystem semantics too, so variations in
+casing no longer leave behind duplicate entries when passthrough spies merge
+their lookup paths.</p>
+<p>Importing :mod:<code>cmd_mox.shim</code> no longer mutates <code>sys.path</code> or
+<code>sys.modules</code>. The bootstrap that prefers stdlib modules over editable
+installs runs only when the shim entrypoint executes. When shim helpers are
+reused directly, <code>cmd_mox._shim_bootstrap.bootstrap_shim_path()</code> should be
+called during setup first.</p>
 <p>When you need to make an explicit decision in a test module (for instance when
 using the context manager API), import the helper re-exported from the package:</p>
 <div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cmd_mox</span><span class="w"> </span><span class="kn">import</span> <span class="n">skip_if_unsupported</span>
@@ -418,7 +442,8 @@ using the context manager API), import the helper re-exported from the package:<
 only need to gate a code path, <code>cmd_mox.is_supported_platform()</code> returns a
 boolean instead. Advanced tests can override the detected platform by setting
 the <code>CMD_MOX_PLATFORM_OVERRIDE</code> environment variable, which is primarily useful
-for simulating Windows behaviour inside CI pipelines.</p>
+for simulating alternative environments inside CI pipelines (for example to
+exercise Windows-specific shims from a Linux runner).</p>
 <p>The cmd-mox test suite also uses the <code>pytest.mark.requires_unix_sockets</code> marker
 for scenarios that need to bind a Unix domain socket. Marking these tests keeps
 them green on platforms (or CI sandboxes) that disallow Unix sockets entirely.</p></div>

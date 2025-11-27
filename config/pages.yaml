@@ -147,10 +147,9 @@ homepage:
           height: 957
           sizes: "(min-width: 768px) 50vw, 100vw"
         cta_label: Request the pitch deck
-  footer:
-    &site_footer
+  footer: &site_footer
     site_name: df12 Productions
-    blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of
+    blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of 
       complex networks.
     oss_heading: "OSS & Licences"
     contact_heading: Stay in touch
@@ -241,11 +240,14 @@ about:
       - title: Small, Sharp Tools
         description: Each tool does one thing exceptionally well. No bloat, no feature creep, just focused utility.
       - title: 5-Minute Success Path
-        description: From installation to first successful run in under five minutes. Every tool includes quickstart documentation.
+        description: From installation to first successful run in under five minutes. Every tool includes quickstart 
+          documentation.
       - title: Repeatability Over Magic
-        description: Predictable behavior across environments. Green-path repeatability means fewer surprises in production.
+        description: Predictable behavior across environments. Green-path repeatability means fewer surprises in 
+          production.
       - title: Respect Cognitive Load
-        description: Systems should be transparent and understandable. Complexity exists in the implementation, not the interface.
+        description: Systems should be transparent and understandable. Complexity exists in the implementation, not the 
+          interface.
   footer: *site_footer
 
 pages:
@@ -353,8 +355,8 @@ pages:
   cmd-mox:
     label: "CmdMox"
     repo: leynos/cmd-mox
-    latest_release: v0.1.0
-    latest_release_published_at: '2025-10-26T02:10:19Z'
+    latest_release: v0.2.0
+    latest_release_published_at: '2025-11-27T02:51:36Z'
     branch: refs/tags/v0.1.0
     doc_path: docs/usage-guide.md
     language: python

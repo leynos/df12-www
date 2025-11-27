@@ -18,6 +18,7 @@ from .helpers import (
     _parse_timestamp,
 )
 from .homepage import _build_homepage_config
+from .about import _build_about_config
 from .models import PageConfig, SiteConfig, SiteConfigError, ThemeConfig
 
 
@@ -121,6 +122,9 @@ def load_site_config(path: Path) -> SiteConfig:
                 continue
 
     homepage_config = _build_homepage_config(homepage_raw) if homepage_raw else None
+    about_config = _build_about_config(
+        raw.get("about"), fallback_footer=homepage_config.footer if homepage_config else None
+    )
 
     return SiteConfig(
         pages=pages,
@@ -128,6 +132,7 @@ def load_site_config(path: Path) -> SiteConfig:
         docs_index_output=docs_index_output,
         theme=default_theme,
         homepage=homepage_config,
+        about=about_config,
     )
 
 

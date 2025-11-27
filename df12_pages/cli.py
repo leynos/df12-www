@@ -36,6 +36,7 @@ from .config import load_site_config
 from .docs_index import DocsIndexBuilder
 from .generator import PageContentGenerator
 from .homepage import HomePageBuilder
+from .about_page import AboutPageBuilder
 from .releases import GitHubReleaseClient
 
 DEFAULT_CONFIG = Path("config/pages.yaml")
@@ -122,6 +123,9 @@ def generate(
     if site_config.homepage:
         homepage_path = HomePageBuilder(site_config.homepage).run()
         print(f"wrote {_format_path(homepage_path)}")
+    if site_config.about:
+        about_path = AboutPageBuilder(site_config.about).run()
+        print(f"wrote {_format_path(about_path)}")
 
 
 @app.command(help="Record the latest GitHub release tag for each configured page.")

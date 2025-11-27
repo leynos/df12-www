@@ -34,6 +34,9 @@ homepage:
       - label: Docs
         href: "docs.html"
         variant: neutral
+      - label: About
+        href: "about.html"
+        variant: neutral
   hero:
     brand_text: df12
     eyebrow: Productions
@@ -145,6 +148,7 @@ homepage:
           sizes: "(min-width: 768px) 50vw, 100vw"
         cta_label: Request the pitch deck
   footer:
+    &site_footer
     site_name: df12 Productions
     blurb: Serious systems, playful worlds. We ship tools that cut build times and stories that map the human edge of
       complex networks.
@@ -176,6 +180,73 @@ homepage:
         variant: accent
         icon: carbon:logo-bluesky
         external: true
+
+about:
+  output: public/about.html
+  title: "About — df12"
+  navigation:
+    brand_href: "index.html"
+    brand_text: df12
+    links:
+      - label: Tools
+        href: "index.html#systems"
+        nav_target: systems
+      - label: Creative
+        href: "index.html#worlds"
+        nav_target: worlds
+        variant: accent
+      - label: Docs
+        href: "docs.html"
+        variant: neutral
+      - label: About
+        href: "about.html"
+        current: true
+        variant: neutral
+  hero:
+    name: Payton McIntosh
+    email: pmcintosh@df12.net
+    intro: >-
+      The software gremlin behind df12, building small sharp tools, humane infra and retro-tinted experiments in code,
+      maps, audio and story.
+    avatar:
+      src: images/payton-mcintosh.png
+      alt: Portrait of Payton McIntosh
+      width: 480
+      height: 480
+  about:
+    blurb: >-
+      Payton cares about humane infra, observability and making AI workflows safer, calmer and less brittle. They've
+      spent years leading teams in big organisations; df12 is their way of turning that experience into a coherent
+      boutique studio instead of a junkyard of side projects.
+    location:
+      title: Based in Edinburgh, Scotland
+      description: Mediaeval skyline, liminal closes, and a surprisingly feral little tech scene.
+      icon: carbon:location
+  focus:
+    cards:
+      - title: Humane Infrastructure
+        description: Building systems that respect developer time and cognitive load.
+        icon: carbon:person-favorite
+        tone: primary
+      - title: Observability
+        description: Making complex systems transparent and understandable.
+        icon: carbon:cloud-monitoring
+        tone: accent
+      - title: Safer AI Workflows
+        description: Reducing brittleness in AI-powered systems and tooling.
+        icon: carbon:ai-governance-lifecycle
+        tone: neutral
+  principles:
+    items:
+      - title: Small, Sharp Tools
+        description: Each tool does one thing exceptionally well. No bloat, no feature creep, just focused utility.
+      - title: 5-Minute Success Path
+        description: From installation to first successful run in under five minutes. Every tool includes quickstart documentation.
+      - title: Repeatability Over Magic
+        description: Predictable behavior across environments. Green-path repeatability means fewer surprises in production.
+      - title: Respect Cognitive Load
+        description: Systems should be transparent and understandable. Complexity exists in the implementation, not the interface.
+  footer: *site_footer
 
 pages:
   netsuke:

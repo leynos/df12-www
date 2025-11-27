@@ -321,8 +321,45 @@
     @apply text-primary;
   }
 
+  iconify-icon {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .icon-inline {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    display: inline-block;
+  }
+
+  .icon-well {
+    @apply inline-flex items-center justify-center;
+  }
+
+  .icon-well .icon-badge {
+    width: auto;
+    height: auto;
+    display: block;
+    transform: scale(1.4);
+  }
+
+  .about-banner-contact .icon-badge {
+    width: auto;
+    height: auto;
+    transform: scale(1.25);
+  }
+
   .site-main {
     @apply pb-24;
+  }
+
+  .about-main {
+    padding-bottom: 0;
+  }
+
+  .index-main {
+    padding-bottom: 0;
   }
 
   .site-main--home {

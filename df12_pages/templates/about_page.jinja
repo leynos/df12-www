@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" data-theme="df12">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="assets/site.css" rel="stylesheet" />
+  <title>{{ about.title }}</title>
+</head>
+<body class="bg-base-100 text-base-content">
+  {% from "partials/site_macros.jinja" import site_header, site_footer %}
+  <a href="#main-content" class="skip-link sr-only-focusable">Skip to content</a>
+
+{{ site_header(about.brand_href, about.brand_text, about.nav_links) | indent(2, true) }}
+
+  <main id="main-content" class="site-main about-main pt-32">
+    <section class="px-4 pb-14 md:px-8">
+      <div class="layout-shell flex flex-col gap-8 md:flex-row md:items-center">
+        <div class="shrink-0">
+          <div class="relative h-44 w-44 overflow-hidden rounded-full ring-4 ring-primary shadow-xl md:h-48 md:w-48">
+            <picture>
+              <source srcset="{{ about.avatar.src_avif }}" type="image/avif" />
+              <source srcset="{{ about.avatar.src_webp }}" type="image/webp" />
+              <img
+                src="{{ about.avatar.src }}"
+                alt="{{ about.avatar.alt }}"
+                width="{{ about.avatar.width }}"
+                height="{{ about.avatar.height }}"
+                loading="lazy"
+                decoding="async"
+                class="h-full w-full object-cover"
+              />
+            </picture>
+          </div>
+        </div>
+        <div class="space-y-3 md:space-y-4">
+          <p class="eyebrow text-primary/80">df12</p>
+          <h1 class="font-mono text-4xl font-bold leading-tight text-base-content md:text-5xl">
+            {{ about.hero_name }}
+          </h1>
+          <a href="mailto:{{ about.hero_email }}" class="about-banner-contact inline-flex items-center gap-2 font-mono text-lg text-primary transition hover:text-accent">
+            <iconify-icon icon="carbon:email" class="icon-badge" aria-hidden="true"></iconify-icon>
+            <span>{{ about.hero_email }}</span>
+          </a>
+          <p class="max-w-3xl text-lg leading-relaxed text-base-content/80">
+            {{ about.hero_intro }}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-base-200/70 py-14">
+      <div class="layout-shell px-4 md:px-8">
+        <h2 class="section-title">About</h2>
+        <div class="mt-8 rounded-2xl border border-base-300 bg-white p-8 shadow-sm">
+          <p class="text-lg leading-relaxed text-base-content/80">
+            {{ about.about_blurb }}
+          </p>
+          <div class="mt-6 flex items-start gap-4 text-base-content">
+            <span class="icon-well mt-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-accent">
+              <iconify-icon icon="{{ about.location.icon }}" class="icon-badge" aria-hidden="true"></iconify-icon>
+            </span>
+            <div>
+              <p class="font-mono text-base font-semibold text-base-content">
+                {{ about.location.title }}
+              </p>
+              <p class="text-base-content/70">{{ about.location.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white py-16">
+      <div class="layout-shell px-4 md:px-8">
+        <h2 class="section-title">Focus Areas</h2>
+        <div class="mt-8 grid gap-6 md:grid-cols-3">
+{% set tone_bg = {
+  'accent': 'bg-accent/10 text-accent',
+  'neutral': 'bg-base-content/10 text-base-content',
+  'slate': 'bg-neutral/10 text-neutral-content',
+  'primary': 'bg-primary/10 text-primary'
+} %}
+{% for card in about.focus_cards %}
+          <article class="group rounded-2xl border border-base-300 bg-base-100 p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+            <div class="icon-well mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg {{ tone_bg.get(card.tone, tone_bg['primary']) }}">
+              <iconify-icon icon="{{ card.icon }}" class="icon-badge" aria-hidden="true"></iconify-icon>
+            </div>
+            <h3 class="font-mono text-lg font-bold text-base-content">{{ card.title }}</h3>
+            <p class="mt-2 text-sm text-base-content/70">
+              {{ card.description }}
+            </p>
+          </article>
+{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-base-200/70 py-16">
+      <div class="layout-shell px-4 md:px-8">
+        <h2 class="section-title">Design Principles</h2>
+        <div class="mt-8 rounded-2xl border border-base-300 bg-white p-8 shadow-sm">
+          <ol class="space-y-6">
+{% for principle in about.principles %}
+            <li class="flex items-start gap-4">
+              <span class="mt-1 inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-content font-mono text-sm font-bold">
+                {{ loop.index }}
+              </span>
+              <div class="space-y-1">
+                <p class="font-mono text-lg font-semibold text-base-content">{{ principle.title }}</p>
+                <p class="text-base-content/70">{{ principle.description }}</p>
+              </div>
+            </li>
+{% endfor %}
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+{% set footer_closing = about.footer.closing_lede ~ ' ©&nbsp;' ~ about.footer.copyright_year ~ '&nbsp;' ~ about.footer.site_name.replace(' ', '&nbsp;') ~ '.' %}
+{{ site_footer(
+  about.footer.site_name,
+  about.footer.blurb,
+  about.footer.oss_heading,
+  about.footer.oss_links,
+  about.footer.contact_heading,
+  about.footer.contact_links,
+  footer_closing
+) | indent(2, true) }}
+<script
+  src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"
+  defer
+  integrity="sha384-GPb5RlngihS9H0z1D137JsvzmeZ7tCpWEF4t5YDoTZyMsPP8S7h7vFDh4XhheU83"
+  crossorigin="anonymous"
+></script>
+</body>
+</html>

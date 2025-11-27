@@ -188,6 +188,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <a href="index.html#systems" class="nav-link hit-target">Tools</a>
         <a href="index.html#worlds" class="nav-link hit-target" data-variant="accent">Creative</a>
         <a href="docs.html" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
+        <a href="about.html" class="nav-link hit-target" data-variant="neutral">About</a>
       </nav>
       <div class="md:hidden">
         <details class="dropdown dropdown-end">
@@ -196,6 +197,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <li><a href="index.html#systems" class="nav-link hit-target site-header__mobile-link">Tools</a></li>
             <li><a href="index.html#worlds" class="nav-link hit-target site-header__mobile-link" data-variant="accent">Creative</a></li>
             <li><a href="docs.html" class="nav-link hit-target site-header__mobile-link" data-variant="neutral" aria-current="page">Docs</a></li>
+            <li><a href="about.html" class="nav-link hit-target site-header__mobile-link" data-variant="neutral">About</a></li>
           </ul>
         </details>
       </div>
@@ -355,6 +357,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                            class="doc-nav__link "
 >
                           <span>Command Filters (Impure)</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-executable-discovery-which"
+                           class="doc-nav__link "
+>
+                          <span>Executable Discovery (`which`)</span>
                         </a>
                       </li>
                       <li>
@@ -522,6 +531,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-command-filters-impure" class="doc-nav__link">Command Filters (Impure)</a>
                     </li>
                     <li>
+                      <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-executable-discovery-which" class="doc-nav__link">Executable Discovery (`which`)</a>
+                    </li>
+                    <li>
                       <a href="docs-netsuke-netsuke-standard-library-stdlib.html#netsuke-standard-library-stdlib-key-tests" class="doc-nav__link">Key Tests</a>
                     </li>
                 </ul>
@@ -573,7 +585,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Netsuke Standard Library (Stdlib)</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Nov 08, 2025</span>
+            <span class="doc-meta-list__item">Updated Nov 24, 2025</span>
           </div>
         </header>
 
@@ -729,6 +741,31 @@ templates.</p></div>
   <code>shell</code>. Marks template as impure. The same output and streaming limits apply
   when <code>grep</code> emits large result sets.</p>
 </li>
+</ul></div>
+                </section>
+                <section id="netsuke-standard-library-stdlib-executable-discovery-which" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>Executable Discovery (`which`):</h2>
+                  </div>
+                  <div class="doc-prose"><ul>
+<li><code>which</code> filter/function: Resolves executables using the current <code>PATH</code>
+  without marking the template as impure. Example: <code>{{ 'clang++' | which }}</code>
+  returns the first matching binary; the function alias
+  <code>{{ which('clang++') }}</code> is available if piping would be awkward.</li>
+<li>Keyword arguments:</li>
+<li><code>all</code> (default <code>false</code>): Return every match, ordered by <code>PATH</code>.</li>
+<li><code>canonical</code> (default <code>false</code>): Resolve symlinks and deduplicate entries by
+    their canonical path.</li>
+<li><code>fresh</code> (default <code>false</code>): Bypass the resolver cache for this lookup while
+    keeping previous entries available for future renders.</li>
+<li><code>cwd_mode</code> (<code>auto</code> | <code>always</code> | <code>never</code>, default <code>auto</code>): Control whether
+    empty <code>PATH</code> segments (and, on Windows, the implicit current-directory
+    search) are honoured. Use <code>"always"</code> to force the working directory into
+    the search order when <code>PATH</code> is empty.</li>
+<li>Errors include actionable diagnostic codes such as
+  <code>netsuke::jinja::which::not_found</code> along with a preview of the scanned
+  <code>PATH</code>. Supplying unknown keyword arguments or invalid values raises
+  <code>netsuke::jinja::which::args</code>.</li>
 </ul>
 <p><strong>Impurity:</strong> Filters like <code>shell</code> and functions like <code>fetch</code> interact with the
 outside world. Netsuke tracks this "impurity". Impure templates might affect

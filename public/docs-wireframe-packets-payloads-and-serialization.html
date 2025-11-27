@@ -188,6 +188,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <a href="index.html#systems" class="nav-link hit-target">Tools</a>
         <a href="index.html#worlds" class="nav-link hit-target" data-variant="accent">Creative</a>
         <a href="docs.html" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
+        <a href="about.html" class="nav-link hit-target" data-variant="neutral">About</a>
       </nav>
       <div class="md:hidden">
         <details class="dropdown dropdown-end">
@@ -196,6 +197,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <li><a href="index.html#systems" class="nav-link hit-target site-header__mobile-link">Tools</a></li>
             <li><a href="index.html#worlds" class="nav-link hit-target site-header__mobile-link" data-variant="accent">Creative</a></li>
             <li><a href="docs.html" class="nav-link hit-target site-header__mobile-link" data-variant="neutral" aria-current="page">Docs</a></li>
+            <li><a href="about.html" class="nav-link hit-target site-header__mobile-link" data-variant="neutral">About</a></li>
           </ul>
         </details>
       </div>
@@ -225,6 +227,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <h3 class="doc-nav-group__title is-active" aria-current="page">
                   <a href="docs-wireframe-packets-payloads-and-serialization.html">Packets, payloads, and serialization</a>
                 </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-fragmentation-metadata"
+                           class="doc-nav__link "
+>
+                          <span>Fragmentation metadata</span>
+                        </a>
+                      </li>
+                  </ul>
               </div>
               <div class="doc-nav-group" aria-label="Working with requests and middleware">
                 <h3 class="doc-nav-group__title " >
@@ -310,6 +321,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-wireframe-packets-payloads-and-serialization.html" class="doc-nav__link">Packets, payloads, and serialization</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-fragmentation-metadata" class="doc-nav__link">Fragmentation metadata</a>
                     </li>
                 </ul>
               </li>
@@ -407,7 +421,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Packets, payloads, and serialization</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Oct 08, 2025</span>
+            <span class="doc-meta-list__item">Updated Nov 24, 2025</span>
           </div>
         </header>
 
@@ -426,6 +440,51 @@ full deserialization.[^9][^6] Application messages implement the <code>Message</
 trait, gaining <code>to_bytes</code> and <code>from_bytes</code> helpers that use bincode with the
 standard configuration.[^10]</p></div>
               </section>
+                <section id="packets-payloads-and-serialization-fragmentation-metadata" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>Fragmentation metadata</h2>
+                  </div>
+                  <div class="doc-prose"><p><code>wireframe::fragment</code> exposes small, copy-friendly structs to describe the
+transport-level fragmentation state.[^41]</p>
+<ul>
+<li><code>MessageId</code> uniquely identifies the logical message a fragment belongs to.</li>
+<li><code>FragmentIndex</code> records the fragment's zero-based order.</li>
+<li><code>FragmentHeader</code> bundles the identifier, index, and a boolean that signals
+  whether the fragment is the last one in the sequence.</li>
+<li><code>FragmentSeries</code> tracks the next expected fragment index and reports
+  mismatches via structured errors.</li>
+</ul>
+<p>Protocol implementers can emit a <code>FragmentHeader</code> for every physical frame and
+feed the header back into <code>FragmentSeries</code> to guarantee ordering before a fully
+re-assembled message is surfaced to handlers. Behavioural tests can reuse the
+same types to assert that new codecs obey the transport invariants without
+spinning up a full server.[^42][^43]</p>
+<p>The standalone <code>Fragmenter</code> helper now slices oversized payloads into capped
+fragments while stamping the shared <code>MessageId</code> and sequential <code>FragmentIndex</code>.
+Each call returns a <code>FragmentBatch</code> that reports whether the message required
+fragmentation and yields individual <code>FragmentFrame</code> values for serialization or
+logging. This keeps transport experiments lightweight while the full adapter
+layer evolves. The helper is fallible—<code>FragmentationError</code> surfaces encoding
+failures or index overflows—so production code should bubble the error up or
+log it rather than unwrapping.</p>
+<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">num</span><span class="p">::</span><span class="n">NonZeroUsize</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">wireframe</span><span class="p">::</span><span class="n">fragment</span><span class="p">::</span><span class="n">Fragmenter</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">fragmenter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Fragmenter</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">NonZeroUsize</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">512</span><span class="p">).</span><span class="n">unwrap</span><span class="p">());</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">0_</span><span class="k">u8</span><span class="p">;</span><span class="w"> </span><span class="mi">1400</span><span class="p">];</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fragmenter</span><span class="p">.</span><span class="n">fragment_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">payload</span><span class="p">).</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;fragment&quot;</span><span class="p">);</span>
+<span class="fm">assert_eq!</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">len</span><span class="p">(),</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+
+<span class="k">for</span><span class="w"> </span><span class="n">fragment</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">batch</span><span class="p">.</span><span class="n">fragments</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">tracing</span><span class="p">::</span><span class="n">info</span><span class="o">!</span><span class="p">(</span>
+<span class="w">        </span><span class="n">msg_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fragment</span><span class="p">.</span><span class="n">header</span><span class="p">().</span><span class="n">message_id</span><span class="p">().</span><span class="n">get</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fragment</span><span class="p">.</span><span class="n">header</span><span class="p">().</span><span class="n">fragment_index</span><span class="p">().</span><span class="n">get</span><span class="p">(),</span>
+<span class="w">        </span><span class="kr">final</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fragment</span><span class="p">.</span><span class="n">header</span><span class="p">().</span><span class="n">is_last_fragment</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">payload_len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fragment</span><span class="p">.</span><span class="n">payload</span><span class="p">().</span><span class="n">len</span><span class="p">(),</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+                </section>
         </article>
       </section>
     </div>

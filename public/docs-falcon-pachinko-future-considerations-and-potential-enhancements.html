@@ -188,6 +188,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <a href="index.html#systems" class="nav-link hit-target">Tools</a>
         <a href="index.html#worlds" class="nav-link hit-target" data-variant="accent">Creative</a>
         <a href="docs.html" class="nav-link hit-target" data-variant="neutral" aria-current="page">Docs</a>
+        <a href="about.html" class="nav-link hit-target" data-variant="neutral">About</a>
       </nav>
       <div class="md:hidden">
         <details class="dropdown dropdown-end">
@@ -196,6 +197,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <li><a href="index.html#systems" class="nav-link hit-target site-header__mobile-link">Tools</a></li>
             <li><a href="index.html#worlds" class="nav-link hit-target site-header__mobile-link" data-variant="accent">Creative</a></li>
             <li><a href="docs.html" class="nav-link hit-target site-header__mobile-link" data-variant="neutral" aria-current="page">Docs</a></li>
+            <li><a href="about.html" class="nav-link hit-target site-header__mobile-link" data-variant="neutral">About</a></li>
           </ul>
         </details>
       </div>
@@ -681,7 +683,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Future Considerations and Potential Enhancements</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Nov 15, 2025</span>
+            <span class="doc-meta-list__item">Updated Nov 18, 2025</span>
           </div>
         </header>
 
@@ -774,8 +776,7 @@ already provides a reliable asyncio client with excellent RFC coverage.</p>
 <li>
 <p><strong>Instantiation</strong>: <code>WebSocketTestClient(app_url: str, *, headers: dict | None,
   subprotocols: list[str] | None, allow_insecure: bool =
-  False)</code> stores the base URL and defaults, requiring opt-in for local <code>ws://</code>
-  use.</p>
+  False)</code> stores the base URL and defaults, requiring opt-in for local <code>ws://</code> use.</p>
 </li>
 <li>
 <p><strong>Connection Context</strong>: <code>async with client.connect(path)</code> opens a connection
@@ -790,7 +791,7 @@ already provides a reliable asyncio client with excellent RFC coverage.</p>
 </li>
 </ul>
 <div class="codehilite" data-language="python"><pre><span></span><code>  <span class="k">async</span> <span class="k">with</span> <span class="n">WebSocketTestClient</span><span class="p">(</span>
-      <span class="s2">&quot;ws://localhost:8000&quot;</span><span class="p">,</span> <span class="n">allow_insecure</span><span class="o">=</span><span class="kc">True</span>
+      <span class="s2">&quot;wss://example.com&quot;</span><span class="p">,</span> <span class="n">allow_insecure</span><span class="o">=</span><span class="kc">True</span>
   <span class="p">)</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;/ws/chat&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
       <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">send_json</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;ping&quot;</span><span class="p">})</span>
       <span class="n">reply</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">receive_json</span><span class="p">()</span>

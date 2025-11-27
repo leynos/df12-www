@@ -38,6 +38,7 @@ class NavLinkConfig:
     href: str
     variant: str | None = None
     nav_target: str | None = None
+    current: bool = False
 
 
 @dc.dataclass(slots=True)
@@ -157,6 +158,71 @@ class HomepageConfig:
 
 
 @dc.dataclass(slots=True)
+class AvatarConfig:
+    """Profile photo metadata for the about page."""
+
+    src: str
+    alt: str
+    width: int
+    height: int
+
+    @property
+    def src_webp(self) -> str:
+        return self.src.rsplit(".", 1)[0] + ".webp"
+
+    @property
+    def src_avif(self) -> str:
+        return self.src.rsplit(".", 1)[0] + ".avif"
+
+
+@dc.dataclass(slots=True)
+class AboutLocationConfig:
+    """Location blurb displayed in the about section."""
+
+    title: str
+    description: str
+    icon: str
+
+
+@dc.dataclass(slots=True)
+class FocusCardConfig:
+    """Highlight card describing a focus area."""
+
+    title: str
+    description: str
+    icon: str
+    tone: str
+
+
+@dc.dataclass(slots=True)
+class PrincipleConfig:
+    """Design principle entry with title and supporting copy."""
+
+    title: str
+    description: str
+
+
+@dc.dataclass(slots=True)
+class AboutPageConfig:
+    """Content model for the df12 about page."""
+
+    output: Path
+    title: str
+    nav_links: list[NavLinkConfig]
+    hero_name: str
+    hero_email: str
+    hero_intro: str
+    avatar: AvatarConfig
+    about_blurb: str
+    location: AboutLocationConfig
+    focus_cards: list[FocusCardConfig]
+    principles: list[PrincipleConfig]
+    footer: FooterConfig
+    brand_href: str = "index.html"
+    brand_text: str = "df12"
+
+
+@dc.dataclass(slots=True)
 class PageConfig:
     """A fully resolved page definition sourced from YAML config."""
 
@@ -190,6 +256,7 @@ class SiteConfig:
     docs_index_output: Path = Path("public/docs.html")
     theme: ThemeConfig | None = None
     homepage: HomepageConfig | None = None
+    about: AboutPageConfig | None = None
 
     def get_page(self, page_id: str | None) -> PageConfig:
         """Return the requested page or fall back to the configured default."""
@@ -219,6 +286,11 @@ __all__ = [
     "FooterLinkConfig",
     "HeroConfig",
     "HomepageConfig",
+    "AvatarConfig",
+    "AboutLocationConfig",
+    "FocusCardConfig",
+    "PrincipleConfig",
+    "AboutPageConfig",
     "NavLinkConfig",
     "PageConfig",
     "SectionLayout",

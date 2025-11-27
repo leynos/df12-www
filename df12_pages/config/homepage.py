@@ -82,6 +82,7 @@ def _build_nav_links(
                 href=str(href),
                 variant=_optional_str(rest.get("variant")),
                 nav_target=_optional_str(rest.get("nav_target")),
+                current=bool(rest.get("current", False)),
             )
         )
     return links

@@ -21,6 +21,18 @@ The `modules/deploy` script automates publishing site content:
 See [docs/deploy.md](docs/deploy.md) for detailed configuration steps and
 options.
 
+## Backend initialization (Scaleway)
+
+The S3 backend points to Scaleway Object Storage. To run `tofu init` without
+pre-setting AWS-style environment variables, copy `backend.scaleway.tfbackend.example`
+to `backend.scaleway.tfbackend`, fill in your Scaleway access/secret keys, and run:
+
+```bash
+tofu init -backend-config=backend.scaleway.tfbackend -var-file=terraform.tfvars.prod
+```
+
+The `.tfbackend` file is gitignored; keep your real keys out of version control.
+
 ## Documentation pages
 
 The `df12_pages` package fetches remote Markdown sources, parses each

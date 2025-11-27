@@ -34,6 +34,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 *.tfstate.*
 *.tfvars
 *.tfvars.json
+*.tfbackend
 override.tf
 override.tf.json
 *_override.tf

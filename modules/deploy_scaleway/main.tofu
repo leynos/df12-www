@@ -117,10 +117,10 @@ resource "null_resource" "deploy" {
         fi
         if [ "$#" -gt 0 ]; then
           local args=("$@")
-          cmd+=("${args[@]}")
+          cmd+=("$${args[@]}")
         fi
         cmd+=(--cache-control "$cache_control" --acl public-read)
-        "${cmd[@]}"
+        "$${cmd[@]}"
       }
       echo "Syncing versioned static assets with long-lived cache headers..."
       sync_to_s3 "public, max-age=31536000, immutable" \

@@ -1,0 +1,21 @@
+# Copy to `backend.scaleway.tfbackend`, replace placeholders, and keep the copy out
+# of version control. Use it with:
+#   tofu init -backend-config=backend.scaleway.tfbackend -var-file=terraform.tfvars.prod
+bucket = "df12-www-state"
+key    = "envs/prod/terraform.tfstate"
+
+region = "fr-par"
+endpoints = {
+  s3 = "https://s3.fr-par.scw.cloud"
+}
+
+skip_region_validation      = true
+skip_requesting_account_id  = true
+skip_credentials_validation = true
+use_path_style              = true
+use_lockfile                = true
+encrypt                     = true
+
+# Populate with your Scaleway object storage API keys
+access_key = "<SCW_ACCESS_KEY_ID>"
+secret_key = "<SCW_SECRET_KEY>"

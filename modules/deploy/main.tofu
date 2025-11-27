@@ -91,7 +91,7 @@ data "external" "git_sync" {
         if "$@"; then
           return 0
         fi
-        log "WARN" "command failed (attempt $try/$attempts); retrying after ${delay}s"
+        log "WARN" "command failed (attempt $try/$attempts); retrying after $${delay}s"
         sleep "$delay"
         delay=$((delay * 2))
         try=$((try + 1))
@@ -159,7 +159,7 @@ resource "null_resource" "deploy" {
           if "$@"; then
             return 0
           fi
-          log "WARN" "command failed (attempt $try/$attempts); retrying after ${delay}s"
+          log "WARN" "command failed (attempt $try/$attempts); retrying after $${delay}s"
           sleep "$delay"
           delay=$((delay * 2))
           try=$((try + 1))

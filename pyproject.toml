@@ -14,6 +14,7 @@ dependencies = [
     "github3.py>=4.0",
     "requests>=2.32",
     "ruamel.yaml>=0.18",
+    "python-hcl2>=4.3",
 ]
 
 [project.scripts]

@@ -34,6 +34,15 @@ from cyclopts import App, Parameter
 from .bump import bump_latest_release_metadata
 from .config import load_site_config
 from .docs_index import DocsIndexBuilder
+from .deploy import (
+    DEFAULT_BACKEND_FILE,
+    DEFAULT_CONFIG_PATH,
+    DEFAULT_VAR_FILE,
+    apply_stack,
+    init_stack,
+    plan_stack,
+    resolve_credentials,
+)
 from .generator import PageContentGenerator
 from .homepage import HomePageBuilder
 from .about_page import AboutPageBuilder
@@ -180,6 +189,117 @@ def bump(
             print(f"{page_key}: {label}")
         else:
             print(f"{page_key}: no releases found")
+
+
+@app.command(help="Initialize OpenTofu backend and providers with managed creds.")
+def init(
+    *,
+    var_file: typ.Annotated[
+        Path, Parameter(help="Path to tfvars file")
+    ] = DEFAULT_VAR_FILE,
+    backend_config: typ.Annotated[
+        Path, Parameter(help="Path to backend .tfbackend file")
+    ] = DEFAULT_BACKEND_FILE,
+    config_path: typ.Annotated[
+        Path,
+        Parameter(
+            help="Where to store credentials (TOML)",
+            env_var="DF12_CONFIG_FILE",
+        ),
+    ] = DEFAULT_CONFIG_PATH,
+    aws_access_key_id: str | None = None,
+    aws_secret_access_key: str | None = None,
+    scw_access_key: str | None = None,
+    scw_secret_key: str | None = None,
+    cloudflare_api_token: str | None = None,
+    github_token: str | None = None,
+    region: str | None = None,
+    s3_endpoint: str | None = None,
+    save: bool = True,
+) -> None:
+    """Wrapper around `tofu init` that also bootstraps the backend bucket."""
+    creds = resolve_credentials(
+        config_path=config_path,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+        scw_access_key=scw_access_key,
+        scw_secret_key=scw_secret_key,
+        cloudflare_api_token=cloudflare_api_token,
+        github_token=github_token,
+        region=region,
+        s3_endpoint=s3_endpoint,
+        save=save,
+    )
+    init_stack(
+        var_file=var_file,
+        backend_config=backend_config,
+        config_path=config_path,
+        credentials=creds,
+        save_credentials_flag=save,
+        ensure_bucket=True,
+    )
+
+
+@app.command(help="Generate a plan using stored credentials.")
+def plan(
+    *,
+    var_file: typ.Annotated[
+        Path, Parameter(help="Path to tfvars file")
+    ] = DEFAULT_VAR_FILE,
+    backend_config: typ.Annotated[
+        Path, Parameter(help="Path to backend .tfbackend file")
+    ] = DEFAULT_BACKEND_FILE,
+    plan_file: typ.Annotated[
+        Path, Parameter(help="Where to write the binary plan")
+    ] = Path("plan.out"),
+    config_path: typ.Annotated[
+        Path,
+        Parameter(
+            help="Where to store credentials (TOML)",
+            env_var="DF12_CONFIG_FILE",
+        ),
+    ] = DEFAULT_CONFIG_PATH,
+    run_init: bool = True,
+) -> None:
+    """Wrapper around `tofu plan` that ensures the backend bucket exists."""
+    plan_stack(
+        var_file=var_file,
+        backend_config=backend_config,
+        plan_file=plan_file,
+        config_path=config_path,
+        run_init=run_init,
+    )
+
+
+@app.command(help="Apply changes using stored credentials.")
+def apply(
+    *,
+    var_file: typ.Annotated[
+        Path, Parameter(help="Path to tfvars file")
+    ] = DEFAULT_VAR_FILE,
+    backend_config: typ.Annotated[
+        Path, Parameter(help="Path to backend .tfbackend file")
+    ] = DEFAULT_BACKEND_FILE,
+    plan_file: typ.Annotated[
+        Path | None, Parameter(help="Optional plan file to apply")
+    ] = None,
+    config_path: typ.Annotated[
+        Path,
+        Parameter(
+            help="Where to store credentials (TOML)",
+            env_var="DF12_CONFIG_FILE",
+        ),
+    ] = DEFAULT_CONFIG_PATH,
+    run_init: bool = True,
+) -> None:
+    """Wrapper around `tofu apply` that reuses managed credentials."""
+    apply_stack(
+        var_file=var_file,
+        backend_config=backend_config,
+        plan_file=plan_file,
+        config_path=config_path,
+        run_init=run_init,
+    )
 
 
 def main() -> None:

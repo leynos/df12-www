@@ -80,6 +80,40 @@ Additional variables for `cloud_provider = "scaleway"`:
 - `.gitignore` already excludes `*.tfvars` and `.terraform/`.
 - Rotate tokens regularly and scope them to the minimum required access.
 
+### One-command wrappers (pages init/plan/apply)
+
+The `pages` CLI now wraps OpenTofu with credential management and backend
+bootstrapping:
+
+```bash
+# persists secrets to ~/.config/df12-www/config.toml (0600) and creates the
+# Scaleway S3 backend bucket if missing.
+pages init --var-file terraform.tfvars.prod --backend-config backend.scaleway.tfbackend \
+  --aws-access-key-id "$SCW_ACCESS_KEY_ID" \
+  --aws-secret-access-key "$SCW_SECRET_KEY" \
+  --cloudflare-api-token "$CLOUDFLARE_API_TOKEN" \
+  --github-token "$GITHUB_TOKEN"
+
+# produce a plan (runs init first by default)
+pages plan --var-file terraform.tfvars.prod --backend-config backend.scaleway.tfbackend --plan-file plan.out
+
+# apply either from a plan file or directly from tfvars
+pages apply --plan-file plan.out
+```
+
+What it does:
+
+- Reads/writes `~/.config/df12-www/config.toml` so credentials are supplied once
+  (optional overrides via CLI flags or env vars).
+- Sets `AWS_*` / `SCW_*` / `TF_VAR_*` / `CLOUDFLARE_API_TOKEN` / `GITHUB_TOKEN`
+  for both the backend and providers.
+- Parses the `.tfbackend` file to discover the Scaleway S3 endpoint/region,
+  creates the backend bucket if it does not exist (using AWS CLI against the
+  Scaleway endpoint), then runs the appropriate `tofu` subcommand.
+
+Configuration path can be overridden with `DF12_CONFIG_FILE` if you prefer an
+alternate location.
+
 ## 3. Build the Site Assets
 
 Before planning or applying infrastructure, refresh the static assets so the

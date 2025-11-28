@@ -110,6 +110,10 @@ What it does:
 - Parses the `.tfbackend` file to discover the Scaleway S3 endpoint/region,
   creates the backend bucket if it does not exist (using AWS CLI against the
   Scaleway endpoint), then runs the appropriate `tofu` subcommand.
+  - SSE is disabled automatically for Scaleway endpoints (`encrypt = false`).
+  - When `cloud_provider = scaleway`, the AWS state bucket module is skipped.
+  - Cloudflare purge is best-effort: if the token is missing or invalid the
+    deploy will log the error but continue.
 
 Configuration path can be overridden with `DF12_CONFIG_FILE` if you prefer an
 alternate location.
@@ -144,6 +148,17 @@ github_token = "ghp_example"
 region = "fr-par"
 s3_endpoint = "https://s3.fr-par.scw.cloud"
 ```
+
+#### Cloudflare token scopes
+
+The token used for cache purge must include, at minimum, for the target zone:
+
+- Zone → Cache Purge (write)
+- Zone → Zone (read)
+
+If the token is missing these scopes or belongs to a different account/zone,
+Cloudflare returns HTTP 403. The deploy step will now continue even if purge
+fails, but use a correctly scoped token to ensure caches are cleared.
 
 ## 3. Build the Site Assets
 

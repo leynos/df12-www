@@ -138,6 +138,7 @@ def save_credentials(creds: CredentialSet, path: Path = DEFAULT_CONFIG_PATH) -> 
 def resolve_credentials(
     *,
     config_path: Path = DEFAULT_CONFIG_PATH,
+    var_file: Path | None = None,
     aws_access_key_id: str | None = None,
     aws_secret_access_key: str | None = None,
     scw_access_key: str | None = None,
@@ -148,31 +149,51 @@ def resolve_credentials(
     s3_endpoint: str | None = None,
     save: bool = True,
 ) -> CredentialSet:
-    """Merge CLI, environment, and stored credentials."""
+    """Merge CLI, environment, stored credentials, and optional tfvars content."""
     stored = _read_config(config_path)
+    tfvars: dict[str, typ.Any] = {}
+    if var_file and var_file.exists():
+        with var_file.open("r", encoding="utf-8") as handle:
+            tfvars = hcl2.load(handle)
+
     resolved = CredentialSet(
         aws_access_key_id=aws_access_key_id
         or os.getenv("AWS_ACCESS_KEY_ID")
-        or stored.aws_access_key_id,
+        or stored.aws_access_key_id
+        or tfvars.get("scaleway_access_key")
+        or tfvars.get("aws_access_key_id"),
         aws_secret_access_key=aws_secret_access_key
         or os.getenv("AWS_SECRET_ACCESS_KEY")
-        or stored.aws_secret_access_key,
+        or stored.aws_secret_access_key
+        or tfvars.get("scaleway_secret_key")
+        or tfvars.get("aws_secret_access_key"),
         scw_access_key=scw_access_key
         or os.getenv("SCW_ACCESS_KEY")
-        or stored.scw_access_key,
+        or stored.scw_access_key
+        or tfvars.get("scaleway_access_key"),
         scw_secret_key=scw_secret_key
         or os.getenv("SCW_SECRET_KEY")
-        or stored.scw_secret_key,
+        or stored.scw_secret_key
+        or tfvars.get("scaleway_secret_key"),
         cloudflare_api_token=cloudflare_api_token
         or os.getenv("CLOUDFLARE_API_TOKEN")
         or os.getenv("CF_API_TOKEN")
-        or stored.cloudflare_api_token,
+        or stored.cloudflare_api_token
+        or tfvars.get("cloudflare_api_token"),
         github_token=github_token
         or os.getenv("GITHUB_TOKEN")
         or os.getenv("GH_TOKEN")
-        or stored.github_token,
-        region=region or os.getenv("AWS_DEFAULT_REGION") or stored.region,
-        s3_endpoint=s3_endpoint or os.getenv("AWS_S3_ENDPOINT") or stored.s3_endpoint,
+        or stored.github_token
+        or tfvars.get("github_token"),
+        region=region
+        or os.getenv("AWS_DEFAULT_REGION")
+        or stored.region
+        or tfvars.get("scaleway_region")
+        or tfvars.get("aws_region"),
+        s3_endpoint=s3_endpoint
+        or os.getenv("AWS_S3_ENDPOINT")
+        or stored.s3_endpoint
+        or tfvars.get("scaleway_s3_endpoint"),
     ).with_fallbacks()
     if not resolved.aws_access_key_id or not resolved.aws_secret_access_key:
         msg = (
@@ -185,16 +206,20 @@ def resolve_credentials(
     return resolved
 
 
-def build_env(creds: CredentialSet) -> dict[str, str]:
+def build_env(
+    creds: CredentialSet, *, backend_region: str | None = None, backend_endpoint: str | None = None
+) -> dict[str, str]:
     """Construct an environment dict for OpenTofu and provider commands."""
     env = os.environ.copy()
     env["AWS_ACCESS_KEY_ID"] = creds.aws_access_key_id or ""
     env["AWS_SECRET_ACCESS_KEY"] = creds.aws_secret_access_key or ""
-    if creds.region:
-        env.setdefault("AWS_DEFAULT_REGION", creds.region)
-        env.setdefault("SCW_DEFAULT_REGION", creds.region)
-    if creds.s3_endpoint:
-        env.setdefault("AWS_S3_ENDPOINT", creds.s3_endpoint)
+    region = creds.region or backend_region
+    if region:
+        env.setdefault("AWS_DEFAULT_REGION", region)
+        env.setdefault("SCW_DEFAULT_REGION", region)
+    endpoint = creds.s3_endpoint or backend_endpoint
+    if endpoint:
+        env.setdefault("AWS_S3_ENDPOINT", endpoint)
     if creds.scw_access_key:
         env.setdefault("SCW_ACCESS_KEY", creds.scw_access_key)
     if creds.scw_secret_key:
@@ -271,9 +296,11 @@ def init_stack(
     ensure_bucket: bool = True,
 ) -> None:
     """Initialize the backend and providers using managed credentials."""
-    creds = credentials or resolve_credentials(config_path=config_path, save=save_credentials_flag)
-    env = build_env(creds)
     backend = BackendConfig.from_file(backend_config)
+    creds = credentials or resolve_credentials(
+        config_path=config_path, var_file=var_file, save=save_credentials_flag
+    )
+    env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
     if ensure_bucket:
         ensure_backend_bucket(backend, env)
     run_tofu(
@@ -299,9 +326,11 @@ def plan_stack(
     run_init: bool = True,
 ) -> None:
     """Generate an OpenTofu plan using stored credentials."""
-    creds = credentials or resolve_credentials(config_path=config_path, save=save_credentials_flag)
-    env = build_env(creds)
     backend = BackendConfig.from_file(backend_config)
+    creds = credentials or resolve_credentials(
+        config_path=config_path, var_file=var_file, save=save_credentials_flag
+    )
+    env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
     ensure_backend_bucket(backend, env)
     if run_init:
         run_tofu(
@@ -337,9 +366,11 @@ def apply_stack(
     run_init: bool = True,
 ) -> None:
     """Apply infrastructure changes using managed credentials."""
-    creds = credentials or resolve_credentials(config_path=config_path, save=save_credentials_flag)
-    env = build_env(creds)
     backend = BackendConfig.from_file(backend_config)
+    creds = credentials or resolve_credentials(
+        config_path=config_path, var_file=var_file, save=save_credentials_flag
+    )
+    env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
     ensure_backend_bucket(backend, env)
     if run_init:
         run_tofu(

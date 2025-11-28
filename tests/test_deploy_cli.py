@@ -68,6 +68,26 @@ def test_backend_config_parses_tfbackend(tmp_path: Path) -> None:
     assert backend.endpoint == "https://s3.fr-par.scw.cloud"
 
 
+def test_resolve_credentials_reads_tfvars(tmp_path: Path) -> None:
+    tfvars = tmp_path / "terraform.tfvars"
+    tfvars.write_text(
+        'scaleway_access_key = "SCW_TFVARS"\n'
+        'scaleway_secret_key = "SCW_SECRET_TFVARS"\n'
+        'cloudflare_api_token = "cf_token_from_tfvars"\n'
+        'github_token = "gh_token_from_tfvars"\n'
+        'scaleway_region = "fr-par"\n'
+        'scaleway_s3_endpoint = "https://s3.fr-par.scw.cloud"\n',
+        encoding="utf-8",
+    )
+    creds = deploy.resolve_credentials(config_path=tmp_path / "missing.toml", var_file=tfvars, save=False)
+    assert creds.scw_access_key == "SCW_TFVARS"
+    assert creds.aws_access_key_id == "SCW_TFVARS"
+    assert creds.cloudflare_api_token == "cf_token_from_tfvars"
+    assert creds.github_token == "gh_token_from_tfvars"
+    assert creds.region == "fr-par"
+    assert creds.s3_endpoint == "https://s3.fr-par.scw.cloud"
+
+
 def test_ensure_backend_bucket_creates_when_missing(monkeypatch: pytest.MonkeyPatch) -> None:
     backend = deploy.BackendConfig(
         bucket="df12-test", region="fr-par", endpoint="https://s3.fr-par.scw.cloud"

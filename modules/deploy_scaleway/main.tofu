@@ -125,13 +125,15 @@ resource "null_resource" "deploy" {
       echo "Syncing versioned static assets with long-lived cache headers..."
       sync_to_s3 "public, max-age=31536000, immutable" \
         --exclude ".DS_Store" \
-        --exclude "*.html"
+        --exclude "*.html" \
+        --exclude "assets/site.css"
       echo "Syncing HTML documents with short-lived cache headers..."
       sync_to_s3 "public, max-age=0, must-revalidate" \
         --exclude ".DS_Store" \
         --exclude "*" \
         --include "index.html" \
-        --include "*.html"
+        --include "*.html" \
+        --include "assets/site.css"
       echo "Purging Cloudflare cache..."
       CF_RESP_FILE="$DIR/cf_purge_response.json"
       CF_HEADER_FILE="$DIR/cf_purge_headers.txt"

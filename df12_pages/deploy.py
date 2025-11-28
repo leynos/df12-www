@@ -17,6 +17,7 @@ import dataclasses as dc
 import os
 import shutil
 import subprocess
+import tempfile
 import tomllib
 import typing as typ
 from pathlib import Path
@@ -73,6 +74,8 @@ class BackendConfig:
     bucket: str
     region: str
     endpoint: str | None = None
+    access_key: str | None = None
+    secret_key: str | None = None
 
     @classmethod
     def from_file(cls, path: Path) -> "BackendConfig":
@@ -88,7 +91,19 @@ class BackendConfig:
         endpoints = typ.cast(dict[str, typ.Any], data.get("endpoints") or {})
         if "s3" in endpoints:
             endpoint = typ.cast(str, endpoints["s3"])
-        return cls(bucket=bucket, region=region, endpoint=endpoint)
+        access_key = data.get("access_key")
+        secret_key = data.get("secret_key")
+        if isinstance(access_key, str) and access_key.startswith("<"):
+            access_key = None
+        if isinstance(secret_key, str) and secret_key.startswith("<"):
+            secret_key = None
+        return cls(
+            bucket=bucket,
+            region=region,
+            endpoint=endpoint,
+            access_key=typ.cast(str | None, access_key),
+            secret_key=typ.cast(str | None, secret_key),
+        )
 
 
 def _read_config(path: Path) -> CredentialSet:
@@ -238,6 +253,42 @@ def build_env(
     return env
 
 
+def _materialize_backend_file(
+    source: Path, creds: CredentialSet, backend: BackendConfig
+) -> Path:
+    """Return a temp backend file with concrete access/secret keys.
+
+    If the source already contains real keys, they are preserved; placeholder
+    values like "<SCW_ACCESS_KEY_ID>" are replaced with the resolved creds.
+    """
+    lines = source.read_text(encoding="utf-8").splitlines()
+    has_access = False
+    has_secret = False
+    new_lines: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("access_key"):
+            has_access = True
+            new_lines.append(f'access_key = "{creds.aws_access_key_id}"')
+        elif stripped.startswith("secret_key"):
+            has_secret = True
+            new_lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
+        else:
+            new_lines.append(line)
+    if not has_access:
+        new_lines.append(f'access_key = "{creds.aws_access_key_id}"')
+    if not has_secret:
+        new_lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
+
+    fd, tmp_path = tempfile.mkstemp(
+        prefix="df12-backend-", suffix=".tfbackend", text=True
+    )
+    tmp = Path(tmp_path)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        handle.write("\n".join(new_lines) + "\n")
+    return tmp
+
+
 def ensure_backend_bucket(
     backend: BackendConfig, env: dict[str, str], *, aws_exe: str | None = None
 ) -> None:
@@ -296,18 +347,19 @@ def init_stack(
     ensure_bucket: bool = True,
 ) -> None:
     """Initialize the backend and providers using managed credentials."""
-    backend = BackendConfig.from_file(backend_config)
     creds = credentials or resolve_credentials(
         config_path=config_path, var_file=var_file, save=save_credentials_flag
     )
+    backend = BackendConfig.from_file(backend_config)
     env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
+    materialized_backend = _materialize_backend_file(backend_config, creds, backend)
     if ensure_bucket:
         ensure_backend_bucket(backend, env)
     run_tofu(
         [
             "init",
             "-backend-config",
-            str(backend_config),
+            str(materialized_backend),
             "-var-file",
             str(var_file),
         ],
@@ -326,10 +378,11 @@ def plan_stack(
     run_init: bool = True,
 ) -> None:
     """Generate an OpenTofu plan using stored credentials."""
-    backend = BackendConfig.from_file(backend_config)
     creds = credentials or resolve_credentials(
         config_path=config_path, var_file=var_file, save=save_credentials_flag
     )
+    backend = BackendConfig.from_file(backend_config)
+    materialized_backend = _materialize_backend_file(backend_config, creds, backend)
     env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
     ensure_backend_bucket(backend, env)
     if run_init:
@@ -337,7 +390,7 @@ def plan_stack(
             [
                 "init",
                 "-backend-config",
-                str(backend_config),
+                str(materialized_backend),
                 "-var-file",
                 str(var_file),
             ],
@@ -366,10 +419,11 @@ def apply_stack(
     run_init: bool = True,
 ) -> None:
     """Apply infrastructure changes using managed credentials."""
-    backend = BackendConfig.from_file(backend_config)
     creds = credentials or resolve_credentials(
         config_path=config_path, var_file=var_file, save=save_credentials_flag
     )
+    backend = BackendConfig.from_file(backend_config)
+    materialized_backend = _materialize_backend_file(backend_config, creds, backend)
     env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
     ensure_backend_bucket(backend, env)
     if run_init:
@@ -377,7 +431,7 @@ def apply_stack(
             [
                 "init",
                 "-backend-config",
-                str(backend_config),
+                str(materialized_backend),
                 "-var-file",
                 str(var_file),
             ],

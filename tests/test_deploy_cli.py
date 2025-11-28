@@ -59,13 +59,17 @@ def test_backend_config_parses_tfbackend(tmp_path: Path) -> None:
     backend_path.write_text(
         'bucket = "df12-test"\n'
         'region = "fr-par"\n'
-        'endpoints = { s3 = "https://s3.fr-par.scw.cloud" }\n',
+        'endpoints = { s3 = "https://s3.fr-par.scw.cloud" }\n'
+        'access_key = "<SCW_ACCESS_KEY_ID>"\n'
+        'secret_key = "<SCW_SECRET_KEY>"\n',
         encoding="utf-8",
     )
     backend = deploy.BackendConfig.from_file(backend_path)
     assert backend.bucket == "df12-test"
     assert backend.region == "fr-par"
     assert backend.endpoint == "https://s3.fr-par.scw.cloud"
+    assert backend.access_key is None
+    assert backend.secret_key is None
 
 
 def test_resolve_credentials_reads_tfvars(tmp_path: Path) -> None:
@@ -115,7 +119,9 @@ def _write_backend(tmp_path: Path) -> Path:
     path.write_text(
         'bucket = "df12-test"\n'
         'region = "fr-par"\n'
-        'endpoints = { s3 = "https://s3.fr-par.scw.cloud" }\n',
+        'endpoints = { s3 = "https://s3.fr-par.scw.cloud" }\n'
+        'access_key = "<SCW_ACCESS_KEY_ID>"\n'
+        'secret_key = "<SCW_SECRET_KEY>"\n',
         encoding="utf-8",
     )
     return path
@@ -126,6 +132,7 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     var_file = tmp_path / "terraform.tfvars"
     var_file.write_text('cloud_provider = "scaleway"\n', encoding="utf-8")
     calls: list[list[str]] = []
+    materialized: list[str] = []
 
     monkeypatch.setattr(deploy, "ensure_backend_bucket", lambda *args, **kwargs: calls.append(["ensure"]))
 
@@ -134,6 +141,11 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
+    monkeypatch.setattr(
+        deploy,
+        "_materialize_backend_file",
+        lambda src, creds, backend: materialized.append(str(src)) or src,
+    )
     creds = deploy.CredentialSet(
         aws_access_key_id="AKIA",
         aws_secret_access_key="SECRET",
@@ -152,6 +164,7 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     )
     assert calls[0] == ["ensure"]
     assert ["init", "-backend-config", str(backend_path), "-var-file", str(var_file)] in calls
+    assert materialized
 
 
 def test_plan_stack_runs_init_and_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -159,6 +172,7 @@ def test_plan_stack_runs_init_and_plan(monkeypatch: pytest.MonkeyPatch, tmp_path
     var_file = tmp_path / "terraform.tfvars"
     var_file.write_text('cloud_provider = "scaleway"\n', encoding="utf-8")
     calls: list[list[str]] = []
+    materialized: list[str] = []
     monkeypatch.setattr(deploy, "ensure_backend_bucket", lambda *args, **kwargs: calls.append(["ensure"]))
 
     def fake_run(args: list[str], env: dict[str, str]):
@@ -166,6 +180,11 @@ def test_plan_stack_runs_init_and_plan(monkeypatch: pytest.MonkeyPatch, tmp_path
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
+    monkeypatch.setattr(
+        deploy,
+        "_materialize_backend_file",
+        lambda src, creds, backend: materialized.append(str(src)) or src,
+    )
     creds = deploy.CredentialSet(
         aws_access_key_id="AKIA",
         aws_secret_access_key="SECRET",
@@ -183,6 +202,7 @@ def test_plan_stack_runs_init_and_plan(monkeypatch: pytest.MonkeyPatch, tmp_path
     assert calls[0] == ["ensure"]
     assert ["init", "-backend-config", str(backend_path), "-var-file", str(var_file)] in calls
     assert ["plan", "-var-file", str(var_file), "-out", str(tmp_path / "plan.out")] in calls
+    assert materialized
 
 
 def test_apply_stack_uses_plan_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -190,6 +210,7 @@ def test_apply_stack_uses_plan_file(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     var_file = tmp_path / "terraform.tfvars"
     var_file.write_text('cloud_provider = "scaleway"\n', encoding="utf-8")
     calls: list[list[str]] = []
+    materialized: list[str] = []
     monkeypatch.setattr(deploy, "ensure_backend_bucket", lambda *args, **kwargs: calls.append(["ensure"]))
 
     def fake_run(args: list[str], env: dict[str, str]):
@@ -197,6 +218,11 @@ def test_apply_stack_uses_plan_file(monkeypatch: pytest.MonkeyPatch, tmp_path: P
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
+    monkeypatch.setattr(
+        deploy,
+        "_materialize_backend_file",
+        lambda src, creds, backend: materialized.append(str(src)) or src,
+    )
     creds = deploy.CredentialSet(
         aws_access_key_id="AKIA",
         aws_secret_access_key="SECRET",
@@ -213,3 +239,4 @@ def test_apply_stack_uses_plan_file(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     assert calls[0] == ["ensure"]
     assert ["init", "-backend-config", str(backend_path), "-var-file", str(var_file)] in calls
     assert ["apply", str(plan_file)] in calls
+    assert materialized

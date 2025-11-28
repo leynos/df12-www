@@ -82,6 +82,7 @@ module "monitoring_aws" {
 }
 
 module "state_bucket" {
+  count       = local.use_aws ? 1 : 0
   source      = "./modules/state_bucket"
   bucket_name = var.state_bucket_name
 

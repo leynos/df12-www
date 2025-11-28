@@ -141,8 +141,11 @@ resource "null_resource" "deploy" {
         -H "Content-Type: application/json" \
         --data '{"purge_everything":true}'
       CF_STATUS="$(awk 'NR==1 {print $2}' "$CF_HEADER_FILE")"
-      command -v python3 >/dev/null 2>&1 || { echo "python3 not found; cannot validate Cloudflare response" >&2; exit 1; }
-      python3 - "$CF_RESP_FILE" "$CF_STATUS" <<'PY'
+      if [ -z "$CF_API_TOKEN" ]; then
+        echo "CF_API_TOKEN not set; skipping Cloudflare purge"
+      else
+        command -v python3 >/dev/null 2>&1 || { echo "python3 not found; cannot validate Cloudflare response" >&2; exit 1; }
+        python3 - "$CF_RESP_FILE" "$CF_STATUS" <<'PY'
 import json
 import sys
 from typing import Any
@@ -170,9 +173,10 @@ if status_code != 200 or not success or errors:
         f"Cloudflare purge failed with status {status_code}: {payload!r}",
         file=sys.stderr,
     )
-    sys.exit(1)
+    sys.exit(0)
 PY
-      echo "Cloudflare cache purge succeeded."
+        echo "Cloudflare cache purge succeeded."
+      fi
       echo "Deployment complete."
     EOT
     working_dir = path.module

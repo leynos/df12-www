@@ -235,6 +235,7 @@ def build_env(
     endpoint = creds.s3_endpoint or backend_endpoint
     if endpoint:
         env.setdefault("AWS_S3_ENDPOINT", endpoint)
+        env.setdefault("AWS_ENDPOINT_URL_S3", endpoint)
     if creds.scw_access_key:
         env.setdefault("SCW_ACCESS_KEY", creds.scw_access_key)
     if creds.scw_secret_key:

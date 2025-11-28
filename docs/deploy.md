@@ -114,6 +114,37 @@ What it does:
 Configuration path can be overridden with `DF12_CONFIG_FILE` if you prefer an
 alternate location.
 
+#### Credential store format
+
+Credentials are persisted to `~/.config/df12-www/config.toml` (mode 0600) under a
+single `[auth]` table. Any key can be omitted; the CLI will merge values from
+CLI flags, environment variables, and this file, then write back the resolved
+set. Schema:
+
+- `aws_access_key_id`, `aws_secret_access_key` — used for the backend S3
+  authentication (Scaleway-compatible).
+- `scw_access_key`, `scw_secret_key` — optional overrides for provider
+  authentication; default to the AWS values if omitted.
+- `cloudflare_api_token` — forwarded to both `CLOUDFLARE_API_TOKEN` and
+  `TF_VAR_cloudflare_api_token`.
+- `github_token` — forwarded to `GITHUB_TOKEN`, `GH_TOKEN`, and
+  `TF_VAR_github_token`.
+- `region` — sets `AWS_DEFAULT_REGION` / `SCW_DEFAULT_REGION`.
+- `s3_endpoint` — sets `AWS_S3_ENDPOINT` (e.g. `https://s3.fr-par.scw.cloud`).
+
+Example:
+
+```toml
+# ~/.config/df12-www/config.toml
+[auth]
+aws_access_key_id = "SCW123EXAMPLE"
+aws_secret_access_key = "super-secret-key"
+cloudflare_api_token = "cfp_example"
+github_token = "ghp_example"
+region = "fr-par"
+s3_endpoint = "https://s3.fr-par.scw.cloud"
+```
+
 ## 3. Build the Site Assets
 
 Before planning or applying infrastructure, refresh the static assets so the

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -9,24 +10,54 @@ import pytest
 from df12_pages import deploy
 
 
+def _write_config(tmp_path: Path) -> Path:
+    path = tmp_path / "config.toml"
+    path.write_text(
+        """
+[auth]
+aws_access_key_id = "AKIA_CFG"
+aws_secret_access_key = "SECRET_CFG"
+cloudflare_api_token = "cf-token"
+github_token = "gh-token"
+region = "fr-par"
+s3_endpoint = "https://s3.fr-par.scw.cloud"
+
+[backend]
+bucket = "df12-test"
+region = "fr-par"
+endpoint = "https://s3.fr-par.scw.cloud"
+
+[site]
+domain_name = "example.com"
+root_domain = "example.com"
+environment = "dev"
+project_name = "df12-www"
+cloud_provider = "scaleway"
+cloudflare_zone_id = "0123456789abcdef0123456789abcdef"
+cloudflare_proxied = true
+scaleway_project_id = "11111111-2222-3333-4444-555555555555"
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def test_credentials_round_trip(tmp_path: Path) -> None:
-    config_path = tmp_path / "config.toml"
+    config_path = _write_config(tmp_path)
     creds = deploy.resolve_credentials(
         config_path=config_path,
         aws_access_key_id="AKIA_TEST",
         aws_secret_access_key="SECRET",
         scw_access_key="SCWKEY",
         scw_secret_key="SCWSECRET",
-        cloudflare_api_token="cf-token",
-        github_token="gh-token",
-        region="fr-par",
-        s3_endpoint="https://s3.fr-par.scw.cloud",
+        cloudflare_api_token="cf-token-new",
+        github_token="gh-token-new",
         save=True,
     )
-    assert config_path.exists()
     loaded = deploy.resolve_credentials(config_path=config_path, save=False)
-    assert loaded.aws_access_key_id == creds.aws_access_key_id
-    assert loaded.aws_secret_access_key == creds.aws_secret_access_key
+    assert loaded.aws_access_key_id == creds.aws_access_key_id == "AKIA_TEST"
+    assert loaded.aws_secret_access_key == "SECRET"
     assert loaded.region == "fr-par"
     assert loaded.s3_endpoint == "https://s3.fr-par.scw.cloud"
 
@@ -54,42 +85,51 @@ def test_build_env_sets_expected_keys() -> None:
     assert env["AWS_S3_ENDPOINT"] == "https://s3.fr-par.scw.cloud"
 
 
-def test_backend_config_parses_tfbackend(tmp_path: Path) -> None:
-    backend_path = tmp_path / "backend.tfbackend"
-    backend_path.write_text(
-        'bucket = "df12-test"\n'
-        'region = "fr-par"\n'
-        'endpoints = { s3 = "https://s3.fr-par.scw.cloud" }\n'
-        'access_key = "<SCW_ACCESS_KEY_ID>"\n'
-        'secret_key = "<SCW_SECRET_KEY>"\n',
-        encoding="utf-8",
+def test_materialize_backend_disables_encrypt_for_scaleway() -> None:
+    backend = deploy.BackendConfig(
+        bucket="df12-test", region="fr-par", endpoint="https://s3.fr-par.scw.cloud"
     )
-    backend = deploy.BackendConfig.from_file(backend_path)
-    assert backend.bucket == "df12-test"
-    assert backend.region == "fr-par"
-    assert backend.endpoint == "https://s3.fr-par.scw.cloud"
-    assert backend.access_key is None
-    assert backend.secret_key is None
+    creds = deploy.CredentialSet(aws_access_key_id="AKIA", aws_secret_access_key="SECRET")
+    path = deploy._materialize_backend_file(backend, creds)
+    try:
+        content = path.read_text(encoding="utf-8")
+        assert "encrypt = false" in content
+        assert "access_key = \"AKIA\"" in content
+        assert "secret_key = \"SECRET\"" in content
+        mode = os.stat(path).st_mode & 0o777
+        assert mode == 0o600
+    finally:
+        path.unlink(missing_ok=True)
 
 
-def test_resolve_credentials_reads_tfvars(tmp_path: Path) -> None:
-    tfvars = tmp_path / "terraform.tfvars"
-    tfvars.write_text(
-        'scaleway_access_key = "SCW_TFVARS"\n'
-        'scaleway_secret_key = "SCW_SECRET_TFVARS"\n'
-        'cloudflare_api_token = "cf_token_from_tfvars"\n'
-        'github_token = "gh_token_from_tfvars"\n'
-        'scaleway_region = "fr-par"\n'
-        'scaleway_s3_endpoint = "https://s3.fr-par.scw.cloud"\n',
-        encoding="utf-8",
+def test_materialize_tfvars_merges_creds() -> None:
+    site = {"domain_name": "example.com", "cloud_provider": "scaleway"}
+    creds = deploy.CredentialSet(
+        scw_access_key="SCW",
+        scw_secret_key="SCWSECRET",
+        cloudflare_api_token="cf-token",
+        github_token="gh-token",
+        region="fr-par",
+        s3_endpoint="https://s3.fr-par.scw.cloud",
     )
-    creds = deploy.resolve_credentials(config_path=tmp_path / "missing.toml", var_file=tfvars, save=False)
-    assert creds.scw_access_key == "SCW_TFVARS"
-    assert creds.aws_access_key_id == "SCW_TFVARS"
-    assert creds.cloudflare_api_token == "cf_token_from_tfvars"
-    assert creds.github_token == "gh_token_from_tfvars"
+    path = deploy._materialize_tfvars(site, creds)
+    try:
+        text = path.read_text(encoding="utf-8")
+        assert "cloudflare_api_token = \"cf-token\"" in text
+        assert "github_token = \"gh-token\"" in text
+        assert "scaleway_access_key = \"SCW\"" in text
+        assert "scaleway_secret_key = \"SCWSECRET\"" in text
+        assert "scaleway_region = \"fr-par\"" in text
+        mode = os.stat(path).st_mode & 0o777
+        assert mode == 0o600
+    finally:
+        path.unlink(missing_ok=True)
+
+
+def test_resolve_credentials_falls_back_to_backend_region(tmp_path: Path) -> None:
+    config_path = _write_config(tmp_path)
+    creds = deploy.resolve_credentials(config_path=config_path, save=False)
     assert creds.region == "fr-par"
-    assert creds.s3_endpoint == "https://s3.fr-par.scw.cloud"
 
 
 def test_ensure_backend_bucket_creates_when_missing(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -114,26 +154,27 @@ def test_ensure_backend_bucket_creates_when_missing(monkeypatch: pytest.MonkeyPa
     assert any("create-bucket" in call for call in calls)
 
 
-def _write_backend(tmp_path: Path) -> Path:
-    path = tmp_path / "backend.tfbackend"
-    path.write_text(
-        'bucket = "df12-test"\n'
-        'region = "fr-par"\n'
-        'endpoints = { s3 = "https://s3.fr-par.scw.cloud" }\n'
-        'access_key = "<SCW_ACCESS_KEY_ID>"\n'
-        'secret_key = "<SCW_SECRET_KEY>"\n'
-        'encrypt = true\n',
-        encoding="utf-8",
-    )
-    return path
+def test_ensure_backend_bucket_uses_env_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
+    backend = deploy.BackendConfig(bucket="df12-test", region="fr-par", endpoint=None)
+    calls: list[list[str]] = []
+
+    def fake_run(cmd: list[str], check: bool, env: dict[str, str], text: bool, capture_output: bool):
+        calls.append(cmd)
+        raise subprocess.CalledProcessError(returncode=1, cmd=cmd)
+
+    monkeypatch.setattr(deploy.subprocess, "run", fake_run)
+    with pytest.raises(subprocess.CalledProcessError):
+        deploy.ensure_backend_bucket(
+            backend,
+            env={"AWS_ACCESS_KEY_ID": "AKIA", "AWS_SECRET_ACCESS_KEY": "SECRET", "AWS_S3_ENDPOINT": "https://s3.fr-par.scw.cloud"},
+            aws_exe="/usr/bin/aws",
+        )
+    assert any("--endpoint-url" in call for call in calls)
 
 
 def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    backend_path = _write_backend(tmp_path)
-    var_file = tmp_path / "terraform.tfvars"
-    var_file.write_text('cloud_provider = "scaleway"\n', encoding="utf-8")
+    config_path = _write_config(tmp_path)
     calls: list[list[str]] = []
-    materialized: list[str] = []
 
     monkeypatch.setattr(deploy, "ensure_backend_bucket", lambda *args, **kwargs: calls.append(["ensure"]))
 
@@ -142,45 +183,22 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
-    original_materialize = deploy._materialize_backend_file
 
-    def capture_materialize(src, creds, backend):
-        path = original_materialize(src, creds, backend)
-        materialized.append(str(path))
-        return path
+    deploy.init_stack(config_path=config_path, save_credentials_flag=False)
 
-    monkeypatch.setattr(deploy, "_materialize_backend_file", capture_materialize)
-    creds = deploy.CredentialSet(
-        aws_access_key_id="AKIA",
-        aws_secret_access_key="SECRET",
-        cloudflare_api_token="cf",
-        github_token="gh",
-        scw_access_key="SCW",
-        scw_secret_key="SCWSECRET",
-        region="fr-par",
-        s3_endpoint="https://s3.fr-par.scw.cloud",
-    )
-    deploy.init_stack(
-        var_file=var_file,
-        backend_config=backend_path,
-        credentials=creds,
-        save_credentials_flag=False,
-    )
+    init_call = next(call for call in calls if call and call[0] == "init")
+    backend_path = Path(init_call[init_call.index("-backend-config") + 1])
+    tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
+
     assert calls[0] == ["ensure"]
-    assert materialized
-    assert ["init", "-backend-config", materialized[0], "-var-file", str(var_file)] in calls
-    # ensure encryption is disabled for scaleway endpoints
-    materialized_path = Path(materialized[0])
-    content = materialized_path.read_text(encoding="utf-8")
-    assert "encrypt = false" in content
+    assert not backend_path.exists()
+    assert not tfvars_path.exists()
 
 
-def test_plan_stack_runs_init_and_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    backend_path = _write_backend(tmp_path)
-    var_file = tmp_path / "terraform.tfvars"
-    var_file.write_text('cloud_provider = "scaleway"\n', encoding="utf-8")
+def test_plan_stack_runs_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    config_path = _write_config(tmp_path)
     calls: list[list[str]] = []
-    materialized: list[str] = []
+
     monkeypatch.setattr(deploy, "ensure_backend_bucket", lambda *args, **kwargs: calls.append(["ensure"]))
 
     def fake_run(args: list[str], env: dict[str, str]):
@@ -188,37 +206,29 @@ def test_plan_stack_runs_init_and_plan(monkeypatch: pytest.MonkeyPatch, tmp_path
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
-    monkeypatch.setattr(
-        deploy,
-        "_materialize_backend_file",
-        lambda src, creds, backend: materialized.append(str(src)) or src,
-    )
-    creds = deploy.CredentialSet(
-        aws_access_key_id="AKIA",
-        aws_secret_access_key="SECRET",
-        scw_access_key="SCW",
-        scw_secret_key="SCWSECRET",
-        region="fr-par",
-    )
+
+    plan_file = tmp_path / "plan.out"
     deploy.plan_stack(
-        var_file=var_file,
-        backend_config=backend_path,
-        plan_file=tmp_path / "plan.out",
-        credentials=creds,
+        config_path=config_path,
+        plan_file=plan_file,
         save_credentials_flag=False,
     )
+
+    init_call = next(call for call in calls if call and call[0] == "init")
+    plan_call = next(call for call in calls if call and call[0] == "plan")
+    backend_path = Path(init_call[init_call.index("-backend-config") + 1])
+    tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
+
     assert calls[0] == ["ensure"]
-    assert ["init", "-backend-config", str(backend_path), "-var-file", str(var_file)] in calls
-    assert ["plan", "-var-file", str(var_file), "-out", str(tmp_path / "plan.out")] in calls
-    assert materialized
+    assert plan_call[-1] == str(plan_file)
+    assert not backend_path.exists()
+    assert not tfvars_path.exists()
 
 
 def test_apply_stack_uses_plan_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    backend_path = _write_backend(tmp_path)
-    var_file = tmp_path / "terraform.tfvars"
-    var_file.write_text('cloud_provider = "scaleway"\n', encoding="utf-8")
+    config_path = _write_config(tmp_path)
     calls: list[list[str]] = []
-    materialized: list[str] = []
+
     monkeypatch.setattr(deploy, "ensure_backend_bucket", lambda *args, **kwargs: calls.append(["ensure"]))
 
     def fake_run(args: list[str], env: dict[str, str]):
@@ -226,25 +236,20 @@ def test_apply_stack_uses_plan_file(monkeypatch: pytest.MonkeyPatch, tmp_path: P
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
-    monkeypatch.setattr(
-        deploy,
-        "_materialize_backend_file",
-        lambda src, creds, backend: materialized.append(str(src)) or src,
-    )
-    creds = deploy.CredentialSet(
-        aws_access_key_id="AKIA",
-        aws_secret_access_key="SECRET",
-        region="fr-par",
-    )
+
     plan_file = tmp_path / "plan.out"
     deploy.apply_stack(
-        var_file=var_file,
-        backend_config=backend_path,
+        config_path=config_path,
         plan_file=plan_file,
-        credentials=creds,
         save_credentials_flag=False,
     )
+
+    init_call = next(call for call in calls if call and call[0] == "init")
+    apply_call = next(call for call in calls if call and call[0] == "apply")
+    backend_path = Path(init_call[init_call.index("-backend-config") + 1])
+    tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
+
     assert calls[0] == ["ensure"]
-    assert ["init", "-backend-config", str(backend_path), "-var-file", str(var_file)] in calls
-    assert ["apply", str(plan_file)] in calls
-    assert materialized
+    assert apply_call[1] == str(plan_file)
+    assert not backend_path.exists()
+    assert not tfvars_path.exists()

@@ -18,11 +18,10 @@ import os
 import shutil
 import subprocess
 import tempfile
-import tomllib
+import tomlkit
 import typing as typ
 from pathlib import Path
 
-import hcl2
 
 DEFAULT_CONFIG_PATH = Path(
     os.getenv(
@@ -30,8 +29,9 @@ DEFAULT_CONFIG_PATH = Path(
         Path.home() / ".config" / "df12-www" / "config.toml",
     )
 )
-DEFAULT_VAR_FILE = Path("terraform.tfvars.prod")
-DEFAULT_BACKEND_FILE = Path("backend.scaleway.tfbackend")
+
+# Temporary files should be created with restrictive permissions
+_TEMP_FILE_MODE = 0o600
 
 
 class CredentialError(RuntimeError):
@@ -69,91 +69,140 @@ class CredentialSet:
 
 @dc.dataclass(slots=True)
 class BackendConfig:
-    """Minimal backend configuration parsed from a ``.tfbackend`` file."""
+    """Backend configuration persisted under the ``[backend]`` table."""
 
     bucket: str
     region: str
     endpoint: str | None = None
-    access_key: str | None = None
-    secret_key: str | None = None
+    encrypt: bool | None = None
 
     @classmethod
-    def from_file(cls, path: Path) -> "BackendConfig":
-        with path.open("r", encoding="utf-8") as handle:
-            data = hcl2.load(handle)
+    def from_mapping(cls, data: dict[str, typ.Any], *, path: Path | None = None) -> "BackendConfig":
         try:
             bucket = typ.cast(str, data["bucket"])
             region = typ.cast(str, data["region"])
-        except KeyError as exc:  # pragma: no cover - defensive guard
-            msg = f"Missing {exc} in backend config {path}"
+        except KeyError as exc:
+            location = f" in {path}" if path else ""
+            msg = f"Missing {exc} in backend config{location}"
             raise ValueError(msg) from exc
-        endpoint = None
-        endpoints = typ.cast(dict[str, typ.Any], data.get("endpoints") or {})
-        if "s3" in endpoints:
-            endpoint = typ.cast(str, endpoints["s3"])
-        access_key = data.get("access_key")
-        secret_key = data.get("secret_key")
-        if isinstance(access_key, str) and access_key.startswith("<"):
-            access_key = None
-        if isinstance(secret_key, str) and secret_key.startswith("<"):
-            secret_key = None
-        return cls(
-            bucket=bucket,
-            region=region,
-            endpoint=endpoint,
-            access_key=typ.cast(str | None, access_key),
-            secret_key=typ.cast(str | None, secret_key),
-        )
+        endpoint = typ.cast(str | None, data.get("endpoint"))
+        encrypt = typ.cast(bool | None, data.get("encrypt"))
+        return cls(bucket=bucket, region=region, endpoint=endpoint, encrypt=encrypt)
 
 
-def _read_config(path: Path) -> CredentialSet:
-    if not path.exists():
-        return CredentialSet()
-    with path.open("rb") as handle:
-        data = tomllib.load(handle)
-    auth = typ.cast(dict[str, typ.Any], data.get("auth") or {})
-    return CredentialSet(
-        aws_access_key_id=auth.get("aws_access_key_id"),
-        aws_secret_access_key=auth.get("aws_secret_access_key"),
-        scw_access_key=auth.get("scw_access_key"),
-        scw_secret_key=auth.get("scw_secret_key"),
-        cloudflare_api_token=auth.get("cloudflare_api_token"),
-        github_token=auth.get("github_token"),
-        region=auth.get("region"),
-        s3_endpoint=auth.get("s3_endpoint"),
+@dc.dataclass(slots=True)
+class DeployConfig:
+    """Aggregate configuration loaded from ``config.toml``."""
+
+    auth: CredentialSet
+    backend: BackendConfig
+    site: dict[str, typ.Any]
+
+
+def _load_config(path: Path = DEFAULT_CONFIG_PATH) -> DeployConfig:
+    if not path.exists():  # pragma: no cover - defensive guard
+        msg = f"Config file not found: {path}"
+        raise FileNotFoundError(msg)
+    data = tomlkit.parse(path.read_text(encoding="utf-8"))
+
+    def _as_dict(table: typ.Any) -> dict[str, typ.Any]:
+        return {k: v for k, v in table.items()} if table else {}
+
+    auth_data = _as_dict(data.get("auth"))
+    backend_data = _as_dict(data.get("backend"))
+    site_data = _as_dict(data.get("site"))
+    auth = CredentialSet(
+        aws_access_key_id=auth_data.get("aws_access_key_id"),
+        aws_secret_access_key=auth_data.get("aws_secret_access_key"),
+        scw_access_key=auth_data.get("scw_access_key"),
+        scw_secret_key=auth_data.get("scw_secret_key"),
+        cloudflare_api_token=auth_data.get("cloudflare_api_token"),
+        github_token=auth_data.get("github_token"),
+        region=auth_data.get("region"),
+        s3_endpoint=auth_data.get("s3_endpoint"),
+    )
+    backend = BackendConfig.from_mapping(backend_data, path=path)
+    return DeployConfig(auth=auth, backend=backend, site=site_data)
+
+
+def _resolve_backend(backend: BackendConfig, creds: CredentialSet) -> BackendConfig:
+    """Fill backend endpoint defaults using resolved credentials."""
+
+    endpoint = backend.endpoint or creds.s3_endpoint
+    return BackendConfig(
+        bucket=backend.bucket,
+        region=backend.region,
+        endpoint=endpoint,
+        encrypt=backend.encrypt,
     )
 
 
-def _serialize_config(creds: CredentialSet) -> str:
-    lines = ["[auth]"]
-    for key, value in (
-        ("aws_access_key_id", creds.aws_access_key_id),
-        ("aws_secret_access_key", creds.aws_secret_access_key),
-        ("scw_access_key", creds.scw_access_key),
-        ("scw_secret_key", creds.scw_secret_key),
-        ("cloudflare_api_token", creds.cloudflare_api_token),
-        ("github_token", creds.github_token),
-        ("region", creds.region),
-        ("s3_endpoint", creds.s3_endpoint),
-    ):
-        if value:
-            escaped = value.replace('"', '\\"')
-            lines.append(f'{key} = "{escaped}"')
-    return "\n".join(lines) + "\n"
+def save_credentials(
+    creds: CredentialSet,
+    *,
+    path: Path = DEFAULT_CONFIG_PATH,
+    existing: DeployConfig | None = None,
+) -> None:
+    """Persist credentials back into ``config.toml`` preserving formatting."""
 
-
-def save_credentials(creds: CredentialSet, path: Path = DEFAULT_CONFIG_PATH) -> None:
-    """Persist credentials to a TOML file with restrictive permissions."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = _serialize_config(creds)
-    path.write_text(payload, encoding="utf-8")
-    os.chmod(path, 0o600)
+
+    try:
+        doc = tomlkit.parse(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        doc = tomlkit.document()
+    except tomlkit.exceptions.ParseError as exc:  # pragma: no cover - defensive guard
+        msg = f"Unable to parse config TOML at {path}"
+        raise ValueError(msg) from exc
+
+    auth_table = doc.get("auth")
+    if not isinstance(auth_table, tomlkit.items.Table):
+        auth_table = tomlkit.table()
+
+    def _set(key: str, value: str | None) -> None:
+        if value is None:
+            auth_table.pop(key, None)
+        else:
+            auth_table[key] = value
+
+    _set("aws_access_key_id", creds.aws_access_key_id)
+    _set("aws_secret_access_key", creds.aws_secret_access_key)
+    _set("scw_access_key", creds.scw_access_key)
+    _set("scw_secret_key", creds.scw_secret_key)
+    _set("cloudflare_api_token", creds.cloudflare_api_token)
+    _set("github_token", creds.github_token)
+    _set("region", creds.region)
+    _set("s3_endpoint", creds.s3_endpoint)
+
+    doc["auth"] = auth_table
+
+    if "backend" not in doc and existing:
+        backend_table = tomlkit.table()
+        backend_table.update(
+            {
+                "bucket": existing.backend.bucket,
+                "region": existing.backend.region,
+            }
+        )
+        if existing.backend.endpoint:
+            backend_table["endpoint"] = existing.backend.endpoint
+        if existing.backend.encrypt is not None:
+            backend_table["encrypt"] = existing.backend.encrypt
+        doc["backend"] = backend_table
+
+    if "site" not in doc and existing:
+        site_table = tomlkit.table()
+        site_table.update(existing.site)
+        doc["site"] = site_table
+
+    path.write_text(tomlkit.dumps(doc), encoding="utf-8")
+    os.chmod(path, _TEMP_FILE_MODE)
 
 
 def resolve_credentials(
     *,
     config_path: Path = DEFAULT_CONFIG_PATH,
-    var_file: Path | None = None,
+    config: DeployConfig | None = None,
     aws_access_key_id: str | None = None,
     aws_secret_access_key: str | None = None,
     scw_access_key: str | None = None,
@@ -164,51 +213,40 @@ def resolve_credentials(
     s3_endpoint: str | None = None,
     save: bool = True,
 ) -> CredentialSet:
-    """Merge CLI, environment, stored credentials, and optional tfvars content."""
-    stored = _read_config(config_path)
-    tfvars: dict[str, typ.Any] = {}
-    if var_file and var_file.exists():
-        with var_file.open("r", encoding="utf-8") as handle:
-            tfvars = hcl2.load(handle)
+    """Merge CLI, environment, stored credentials, and config.toml content."""
+
+    deploy_config = config or _load_config(config_path)
+    stored = deploy_config.auth
 
     resolved = CredentialSet(
         aws_access_key_id=aws_access_key_id
         or os.getenv("AWS_ACCESS_KEY_ID")
-        or stored.aws_access_key_id
-        or tfvars.get("scaleway_access_key")
-        or tfvars.get("aws_access_key_id"),
+        or stored.aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key
         or os.getenv("AWS_SECRET_ACCESS_KEY")
-        or stored.aws_secret_access_key
-        or tfvars.get("scaleway_secret_key")
-        or tfvars.get("aws_secret_access_key"),
+        or stored.aws_secret_access_key,
         scw_access_key=scw_access_key
         or os.getenv("SCW_ACCESS_KEY")
-        or stored.scw_access_key
-        or tfvars.get("scaleway_access_key"),
+        or stored.scw_access_key,
         scw_secret_key=scw_secret_key
         or os.getenv("SCW_SECRET_KEY")
-        or stored.scw_secret_key
-        or tfvars.get("scaleway_secret_key"),
+        or stored.scw_secret_key,
         cloudflare_api_token=cloudflare_api_token
         or os.getenv("CLOUDFLARE_API_TOKEN")
         or os.getenv("CF_API_TOKEN")
-        or stored.cloudflare_api_token
-        or tfvars.get("cloudflare_api_token"),
+        or stored.cloudflare_api_token,
         github_token=github_token
         or os.getenv("GITHUB_TOKEN")
         or os.getenv("GH_TOKEN")
-        or stored.github_token
-        or tfvars.get("github_token"),
+        or stored.github_token,
         region=region
         or os.getenv("AWS_DEFAULT_REGION")
         or stored.region
-        or tfvars.get("scaleway_region")
-        or tfvars.get("aws_region"),
+        or deploy_config.backend.region,
         s3_endpoint=s3_endpoint
         or os.getenv("AWS_S3_ENDPOINT")
         or stored.s3_endpoint
-        or tfvars.get("scaleway_s3_endpoint"),
+        or deploy_config.backend.endpoint,
     ).with_fallbacks()
     if not resolved.aws_access_key_id or not resolved.aws_secret_access_key:
         msg = (
@@ -217,7 +255,7 @@ def resolve_credentials(
         )
         raise CredentialError(msg)
     if save:
-        save_credentials(resolved, path=config_path)
+        save_credentials(resolved, path=config_path, existing=deploy_config)
     return resolved
 
 
@@ -254,49 +292,64 @@ def build_env(
     return env
 
 
-def _materialize_backend_file(
-    source: Path, creds: CredentialSet, backend: BackendConfig
-) -> Path:
-    """Return a temp backend file with concrete access/secret keys.
+def _materialize_backend_file(backend: BackendConfig, creds: CredentialSet) -> Path:
+    """Return a temp backend file built from config.toml and resolved creds."""
 
-    If the source already contains real keys, they are preserved; placeholder
-    values like "<SCW_ACCESS_KEY_ID>" are replaced with the resolved creds.
-    """
-    lines = source.read_text(encoding="utf-8").splitlines()
-    has_access = False
-    has_secret = False
-    has_encrypt = False
-    new_lines: list[str] = []
+    lines = [
+        f'bucket = "{backend.bucket}"',
+        f'region = "{backend.region}"',
+    ]
+    if backend.endpoint:
+        lines.append('endpoints = { s3 = "' + backend.endpoint + '" }')
+
+    has_encrypt = backend.encrypt is not None
     force_disable_encrypt = backend.endpoint and "scw.cloud" in backend.endpoint
-    for line in lines:
-        stripped = line.strip()
-        if stripped.startswith("access_key"):
-            has_access = True
-            new_lines.append(f'access_key = "{creds.aws_access_key_id}"')
-        elif stripped.startswith("secret_key"):
-            has_secret = True
-            new_lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
-        elif stripped.startswith("encrypt"):
-            has_encrypt = True
-            if force_disable_encrypt:
-                new_lines.append("encrypt = false")
-            else:
-                new_lines.append(line)
-        else:
-            new_lines.append(line)
-    if not has_access:
-        new_lines.append(f'access_key = "{creds.aws_access_key_id}"')
-    if not has_secret:
-        new_lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
-    if force_disable_encrypt and not has_encrypt:
-        new_lines.append("encrypt = false")
+    if force_disable_encrypt:
+        lines.append("encrypt = false")
+    elif has_encrypt:
+        lines.append(f'encrypt = {str(backend.encrypt).lower()}')
+
+    lines.append(f'access_key = "{creds.aws_access_key_id}"')
+    lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
 
     fd, tmp_path = tempfile.mkstemp(
         prefix="df12-backend-", suffix=".tfbackend", text=True
     )
     tmp = Path(tmp_path)
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
-        handle.write("\n".join(new_lines) + "\n")
+        handle.write("\n".join(lines) + "\n")
+    os.chmod(tmp, _TEMP_FILE_MODE)
+    return tmp
+
+
+def _format_hcl_value(value: typ.Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if value is None:
+        return "null"
+    escaped = str(value).replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def _materialize_tfvars(site: dict[str, typ.Any], creds: CredentialSet) -> Path:
+    """Build a temporary ``tfvars`` file from site config plus resolved creds."""
+
+    merged: dict[str, typ.Any] = dict(site)
+    merged.setdefault("cloudflare_api_token", creds.cloudflare_api_token)
+    merged.setdefault("github_token", creds.github_token)
+    merged.setdefault("scaleway_access_key", creds.scw_access_key)
+    merged.setdefault("scaleway_secret_key", creds.scw_secret_key)
+    merged.setdefault("scaleway_region", creds.region)
+
+    lines = [f"{key} = {_format_hcl_value(value)}" for key, value in merged.items() if value is not None]
+
+    fd, tmp_path = tempfile.mkstemp(prefix="df12-vars-", suffix=".tfvars", text=True)
+    tmp = Path(tmp_path)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        handle.write("\n".join(lines) + "\n")
+    os.chmod(tmp, _TEMP_FILE_MODE)
     return tmp
 
 
@@ -310,8 +363,9 @@ def ensure_backend_bucket(
         raise FileNotFoundError(msg)
 
     base = [cmd]
-    if backend.endpoint:
-        base += ["--endpoint-url", backend.endpoint]
+    endpoint = backend.endpoint or env.get("AWS_S3_ENDPOINT")
+    if endpoint:
+        base += ["--endpoint-url", endpoint]
     base += ["--region", backend.region, "s3api"]
 
     def _run(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -350,79 +404,89 @@ def run_tofu(args: list[str], env: dict[str, str]) -> subprocess.CompletedProces
 
 def init_stack(
     *,
-    var_file: Path = DEFAULT_VAR_FILE,
-    backend_config: Path = DEFAULT_BACKEND_FILE,
     config_path: Path = DEFAULT_CONFIG_PATH,
     credentials: CredentialSet | None = None,
     save_credentials_flag: bool = True,
     ensure_bucket: bool = True,
 ) -> None:
     """Initialize the backend and providers using managed credentials."""
+    deploy_config = _load_config(config_path)
     creds = credentials or resolve_credentials(
-        config_path=config_path, var_file=var_file, save=save_credentials_flag
+        config_path=config_path, config=deploy_config, save=save_credentials_flag
     )
-    backend = BackendConfig.from_file(backend_config)
-    env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
-    materialized_backend = _materialize_backend_file(backend_config, creds, backend)
-    if ensure_bucket:
-        ensure_backend_bucket(backend, env)
-    run_tofu(
-        [
-            "init",
-            "-backend-config",
-            str(materialized_backend),
-            "-var-file",
-            str(var_file),
-        ],
-        env=env,
+    backend = _resolve_backend(deploy_config.backend, creds)
+    env = build_env(
+        creds, backend_region=backend.region, backend_endpoint=backend.endpoint
     )
-
-
-def plan_stack(
-    *,
-    var_file: Path = DEFAULT_VAR_FILE,
-    backend_config: Path = DEFAULT_BACKEND_FILE,
-    plan_file: Path = Path("plan.out"),
-    config_path: Path = DEFAULT_CONFIG_PATH,
-    credentials: CredentialSet | None = None,
-    save_credentials_flag: bool = True,
-    run_init: bool = True,
-) -> None:
-    """Generate an OpenTofu plan using stored credentials."""
-    creds = credentials or resolve_credentials(
-        config_path=config_path, var_file=var_file, save=save_credentials_flag
-    )
-    backend = BackendConfig.from_file(backend_config)
-    materialized_backend = _materialize_backend_file(backend_config, creds, backend)
-    env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
-    ensure_backend_bucket(backend, env)
-    if run_init:
+    materialized_backend = _materialize_backend_file(backend, creds)
+    materialized_tfvars = _materialize_tfvars(deploy_config.site, creds)
+    try:
+        if ensure_bucket:
+            ensure_backend_bucket(backend, env)
         run_tofu(
             [
                 "init",
                 "-backend-config",
                 str(materialized_backend),
                 "-var-file",
-                str(var_file),
+                str(materialized_tfvars),
             ],
             env=env,
         )
-    run_tofu(
-        [
+    finally:
+        materialized_backend.unlink(missing_ok=True)
+        materialized_tfvars.unlink(missing_ok=True)
+
+
+def plan_stack(
+    *,
+    plan_file: Path = Path("plan.out"),
+    config_path: Path = DEFAULT_CONFIG_PATH,
+    credentials: CredentialSet | None = None,
+    save_credentials_flag: bool = True,
+    run_init: bool = True,
+    destroy: bool = False,
+) -> None:
+    """Generate an OpenTofu plan using stored credentials."""
+    deploy_config = _load_config(config_path)
+    creds = credentials or resolve_credentials(
+        config_path=config_path, config=deploy_config, save=save_credentials_flag
+    )
+    backend = _resolve_backend(deploy_config.backend, creds)
+    materialized_backend = _materialize_backend_file(backend, creds)
+    materialized_tfvars = _materialize_tfvars(deploy_config.site, creds)
+    env = build_env(
+        creds, backend_region=backend.region, backend_endpoint=backend.endpoint
+    )
+    try:
+        ensure_backend_bucket(backend, env)
+        if run_init:
+            run_tofu(
+                [
+                    "init",
+                    "-backend-config",
+                    str(materialized_backend),
+                    "-var-file",
+                    str(materialized_tfvars),
+                ],
+                env=env,
+            )
+        plan_args = [
             "plan",
+            "-destroy" if destroy else None,
             "-var-file",
-            str(var_file),
+            str(materialized_tfvars),
             "-out",
             str(plan_file),
-        ],
-        env=env,
-    )
+        ]
+        run_tofu([arg for arg in plan_args if arg is not None], env=env)
+    finally:
+        materialized_backend.unlink(missing_ok=True)
+        materialized_tfvars.unlink(missing_ok=True)
 
 
 def apply_stack(
     *,
-    var_file: Path = DEFAULT_VAR_FILE,
-    backend_config: Path = DEFAULT_BACKEND_FILE,
     plan_file: Path | None = None,
     config_path: Path = DEFAULT_CONFIG_PATH,
     credentials: CredentialSet | None = None,
@@ -430,26 +494,34 @@ def apply_stack(
     run_init: bool = True,
 ) -> None:
     """Apply infrastructure changes using managed credentials."""
+    deploy_config = _load_config(config_path)
     creds = credentials or resolve_credentials(
-        config_path=config_path, var_file=var_file, save=save_credentials_flag
+        config_path=config_path, config=deploy_config, save=save_credentials_flag
     )
-    backend = BackendConfig.from_file(backend_config)
-    materialized_backend = _materialize_backend_file(backend_config, creds, backend)
-    env = build_env(creds, backend_region=backend.region, backend_endpoint=backend.endpoint)
-    ensure_backend_bucket(backend, env)
-    if run_init:
-        run_tofu(
-            [
-                "init",
-                "-backend-config",
-                str(materialized_backend),
-                "-var-file",
-                str(var_file),
-            ],
-            env=env,
-        )
-    if plan_file:
-        args = ["apply", str(plan_file)]
-    else:
-        args = ["apply", "-var-file", str(var_file)]
-    run_tofu(args, env=env)
+    backend = _resolve_backend(deploy_config.backend, creds)
+    materialized_backend = _materialize_backend_file(backend, creds)
+    materialized_tfvars = _materialize_tfvars(deploy_config.site, creds)
+    env = build_env(
+        creds, backend_region=backend.region, backend_endpoint=backend.endpoint
+    )
+    try:
+        ensure_backend_bucket(backend, env)
+        if run_init:
+            run_tofu(
+                [
+                    "init",
+                    "-backend-config",
+                    str(materialized_backend),
+                    "-var-file",
+                    str(materialized_tfvars),
+                ],
+                env=env,
+            )
+        if plan_file:
+            args = ["apply", str(plan_file)]
+        else:
+            args = ["apply", "-var-file", str(materialized_tfvars)]
+        run_tofu(args, env=env)
+    finally:
+        materialized_backend.unlink(missing_ok=True)
+        materialized_tfvars.unlink(missing_ok=True)

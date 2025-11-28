@@ -15,6 +15,7 @@ dependencies = [
     "requests>=2.32",
     "ruamel.yaml>=0.18",
     "python-hcl2>=4.3",
+    "tomlkit>=0.13",
 ]
 
 [project.scripts]

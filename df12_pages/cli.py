@@ -35,9 +35,7 @@ from .bump import bump_latest_release_metadata
 from .config import load_site_config
 from .docs_index import DocsIndexBuilder
 from .deploy import (
-    DEFAULT_BACKEND_FILE,
     DEFAULT_CONFIG_PATH,
-    DEFAULT_VAR_FILE,
     apply_stack,
     init_stack,
     plan_stack,
@@ -194,12 +192,6 @@ def bump(
 @app.command(help="Initialize OpenTofu backend and providers with managed creds.")
 def init(
     *,
-    var_file: typ.Annotated[
-        Path, Parameter(help="Path to tfvars file")
-    ] = DEFAULT_VAR_FILE,
-    backend_config: typ.Annotated[
-        Path, Parameter(help="Path to backend .tfbackend file")
-    ] = DEFAULT_BACKEND_FILE,
     config_path: typ.Annotated[
         Path,
         Parameter(
@@ -231,8 +223,6 @@ def init(
         save=save,
     )
     init_stack(
-        var_file=var_file,
-        backend_config=backend_config,
         config_path=config_path,
         credentials=creds,
         save_credentials_flag=save,
@@ -243,12 +233,6 @@ def init(
 @app.command(help="Generate a plan using stored credentials.")
 def plan(
     *,
-    var_file: typ.Annotated[
-        Path, Parameter(help="Path to tfvars file")
-    ] = DEFAULT_VAR_FILE,
-    backend_config: typ.Annotated[
-        Path, Parameter(help="Path to backend .tfbackend file")
-    ] = DEFAULT_BACKEND_FILE,
     plan_file: typ.Annotated[
         Path, Parameter(help="Where to write the binary plan")
     ] = Path("plan.out"),
@@ -260,26 +244,20 @@ def plan(
         ),
     ] = DEFAULT_CONFIG_PATH,
     run_init: bool = True,
+    destroy: bool = False,
 ) -> None:
     """Wrapper around `tofu plan` that ensures the backend bucket exists."""
     plan_stack(
-        var_file=var_file,
-        backend_config=backend_config,
         plan_file=plan_file,
         config_path=config_path,
         run_init=run_init,
+        destroy=destroy,
     )
 
 
 @app.command(help="Apply changes using stored credentials.")
 def apply(
     *,
-    var_file: typ.Annotated[
-        Path, Parameter(help="Path to tfvars file")
-    ] = DEFAULT_VAR_FILE,
-    backend_config: typ.Annotated[
-        Path, Parameter(help="Path to backend .tfbackend file")
-    ] = DEFAULT_BACKEND_FILE,
     plan_file: typ.Annotated[
         Path | None, Parameter(help="Optional plan file to apply")
     ] = None,
@@ -294,8 +272,6 @@ def apply(
 ) -> None:
     """Wrapper around `tofu apply` that reuses managed credentials."""
     apply_stack(
-        var_file=var_file,
-        backend_config=backend_config,
         plan_file=plan_file,
         config_path=config_path,
         run_init=run_init,

@@ -31,8 +31,12 @@ automation, and rollback strategies.
 
 ## 2. Configuration Inputs
 
-Create a `terraform.tfvars` file per environment (e.g. `terraform.tfvars.dev`)
-and populate the required variables:
+All inputs now live in a single TOML file (default
+`~/.config/df12-www/config.toml`). The CLI reads this file, merges any CLI or
+environment overrides, then generates temporary `tfbackend` and `tfvars` files
+for OpenTofu. No checked-in `.tfvars` or `.tfbackend` files are needed.
+
+### `[site]` variables (forwarded to `tfvars`)
 
 | Variable                                       | Purpose                                                                                   |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -66,77 +70,75 @@ Additional variables for `cloud_provider = "scaleway"`:
 | `scaleway_region`           | Object Storage region (e.g. `fr-par`).                              |
 | `scaleway_zone`             | Service zone (e.g. `fr-par-1`).                                     |
 
+### `[backend]` variables (backend state bucket)
+
+| Variable   | Purpose                                                     |
+| ---------- | ----------------------------------------------------------- |
+| `bucket`   | Name of the S3-compatible bucket used for OpenTofu state.   |
+| `region`   | Region for the backend bucket (e.g. `fr-par`).              |
+| `endpoint` | Optional custom endpoint for S3-compatible backends.        |
+| `encrypt`  | Set `false` to disable SSE for providers that reject it.    |
+
+### `[auth]` variables (persisted credentials)
+
+| Variable                 | Purpose                                                            |
+| ------------------------ | ------------------------------------------------------------------ |
+| `aws_access_key_id`      | AWS-style access key used for backend auth (works with Scaleway).  |
+| `aws_secret_access_key`  | Secret key paired with the access key.                             |
+| `scw_access_key`         | Optional override for provider auth; falls back to AWS key.        |
+| `scw_secret_key`         | Optional override for provider auth; falls back to AWS secret.     |
+| `cloudflare_api_token`   | Forwarded to both env vars and `TF_VAR_cloudflare_api_token`.       |
+| `github_token`           | Forwarded to `GITHUB_TOKEN`, `GH_TOKEN`, and `TF_VAR_github_token`. |
+| `region`                 | Default region for providers when `site.scaleway_region` is unset. |
+| `s3_endpoint`            | Default endpoint for S3-compatible providers/backends.             |
+
 ### Secrets Management
 
-- Store secrets (GitHub token, optional GitHub SSH private key, Cloudflare token, provider credentials) outside
-  version control.
-  - Pass them as environment variables when running commands locally:
-    `tofu plan -var="github_token=$GITHUB_TOKEN"` or
-    `tofu plan -var="github_ssh_private_key=$(cat ~/.ssh/id_ed25519)"`.
-  - Keep encrypted `.tfvars` files using tools such as `sops` if you must
-    persist them.
-  - In CI, rely on the platform’s secrets store (e.g. GitHub Actions secrets)
-    and inject them at runtime.
-- `.gitignore` already excludes `*.tfvars` and `.terraform/`.
-- Rotate tokens regularly and scope them to the minimum required access.
+- Store the TOML file outside version control. The CLI writes it with mode
+  `0600` and only touches the `[auth]` section when persisting credentials.
+- CLI flags or environment variables override `[auth]`; resolved values are
+  written back so you only have to supply them once locally. In CI, skip
+  persistence by passing `--no-save`.
+- Temporary backend and tfvars files are generated on the fly (mode `0600`) and
+  removed immediately after each command.
 
 ### One-command wrappers (pages init/plan/apply)
 
-The `pages` CLI now wraps OpenTofu with credential management and backend
-bootstrapping:
+The `pages` CLI wraps OpenTofu with credential management and backend
+bootstrapping. Only the config path (default
+`~/.config/df12-www/config.toml`) and optional credential overrides are needed:
 
 ```bash
-# persists secrets to ~/.config/df12-www/config.toml (0600) and creates the
-# Scaleway S3 backend bucket if missing.
-pages init --var-file terraform.tfvars.prod --backend-config backend.scaleway.tfbackend \
+# Initialise backend/providers using config.toml
+pages init --config-path ~/.config/df12-www/config.toml \
   --aws-access-key-id "$SCW_ACCESS_KEY_ID" \
   --aws-secret-access-key "$SCW_SECRET_KEY" \
   --cloudflare-api-token "$CLOUDFLARE_API_TOKEN" \
   --github-token "$GITHUB_TOKEN"
 
-# produce a plan (runs init first by default)
-pages plan --var-file terraform.tfvars.prod --backend-config backend.scaleway.tfbackend --plan-file plan.out
+# Produce a plan (runs init automatically)
+pages plan --config-path ~/.config/df12-www/config.toml --plan-file plan.out
 
-# apply either from a plan file or directly from tfvars
-pages apply --plan-file plan.out
+# Apply either from a saved plan or directly from the generated tfvars
+pages apply --config-path ~/.config/df12-www/config.toml --plan-file plan.out
 ```
 
 What it does:
 
-- Reads/writes `~/.config/df12-www/config.toml` so credentials are supplied once
-  (optional overrides via CLI flags or env vars).
-- Sets `AWS_*` / `SCW_*` / `TF_VAR_*` / `CLOUDFLARE_API_TOKEN` / `GITHUB_TOKEN`
-  for both the backend and providers.
-- Parses the `.tfbackend` file to discover the Scaleway S3 endpoint/region,
-  creates the backend bucket if it does not exist (using AWS CLI against the
-  Scaleway endpoint), then runs the appropriate `tofu` subcommand.
-  - SSE is disabled automatically for Scaleway endpoints (`encrypt = false`).
-  - When `cloud_provider = scaleway`, the AWS state bucket module is skipped.
-  - Cloudflare purge is best-effort: if the token is missing or invalid the
-    deploy will log the error but continue.
+- Reads the `[auth]`, `[backend]`, and `[site]` tables from `config.toml`, then
+  merges CLI/env overrides into `[auth]`.
+- Generates temporary backend and tfvars files (mode `0600`), injects the
+  resolved credentials, and deletes the files immediately after each command.
+- Sets `AWS_*` / `SCW_*` / `TF_VAR_*` / `CLOUDFLARE_API_TOKEN` /
+  `GITHUB_TOKEN` for both the backend and providers.
+- Bootstraps the backend bucket if missing; SSE is disabled automatically for
+  Scaleway endpoints (`encrypt = false`).
+- When `cloud_provider = scaleway`, the AWS state bucket module is skipped.
 
 Configuration path can be overridden with `DF12_CONFIG_FILE` if you prefer an
 alternate location.
 
-#### Credential store format
-
-Credentials are persisted to `~/.config/df12-www/config.toml` (mode 0600) under a
-single `[auth]` table. Any key can be omitted; the CLI will merge values from
-CLI flags, environment variables, and this file, then write back the resolved
-set. Schema:
-
-- `aws_access_key_id`, `aws_secret_access_key` — used for the backend S3
-  authentication (Scaleway-compatible).
-- `scw_access_key`, `scw_secret_key` — optional overrides for provider
-  authentication; default to the AWS values if omitted.
-- `cloudflare_api_token` — forwarded to both `CLOUDFLARE_API_TOKEN` and
-  `TF_VAR_cloudflare_api_token`.
-- `github_token` — forwarded to `GITHUB_TOKEN`, `GH_TOKEN`, and
-  `TF_VAR_github_token`.
-- `region` — sets `AWS_DEFAULT_REGION` / `SCW_DEFAULT_REGION`.
-- `s3_endpoint` — sets `AWS_S3_ENDPOINT` (e.g. `https://s3.fr-par.scw.cloud`).
-
-Example:
+#### Config file example
 
 ```toml
 # ~/.config/df12-www/config.toml
@@ -147,6 +149,23 @@ cloudflare_api_token = "cfp_example"
 github_token = "ghp_example"
 region = "fr-par"
 s3_endpoint = "https://s3.fr-par.scw.cloud"
+
+[backend]
+bucket = "df12-www-state"
+region = "fr-par"
+endpoint = "https://s3.fr-par.scw.cloud"
+
+[site]
+domain_name = "www.example.com"
+root_domain = "example.com"
+environment = "dev"
+project_name = "df12-www"
+cloud_provider = "scaleway"
+cloudflare_zone_id = "0123456789abcdef0123456789abcdef"
+cloudflare_proxied = true
+scaleway_project_id = "31485361-39da-4ac0-bfcb-d5beb57c2c12"
+scaleway_region = "fr-par"
+scaleway_zone = "fr-par-1"
 ```
 
 #### Cloudflare token scopes
@@ -185,10 +204,10 @@ All commands below assume the repo root as the working directory.
 
 ### AWS flow
 
-1. **Initialize providers**
+1. **Initialize providers** (generates temporary backend/tfvars from config)
 
    ```bash
-   tofu init
+   pages init --config-path ~/.config/df12-www/config.toml
    ```
 
 2. **Validate configuration**
@@ -201,7 +220,7 @@ All commands below assume the repo root as the working directory.
 3. **Plan changes**
 
    ```bash
-   tofu plan -var-file="terraform.tfvars.prod"
+   pages plan --config-path ~/.config/df12-www/config.toml --plan-file plan.out
    ```
 
    Inspect the plan carefully. Expect S3 buckets, CloudFront distributions,
@@ -210,7 +229,7 @@ All commands below assume the repo root as the working directory.
 4. **Apply infrastructure**
 
    ```bash
-   tofu apply -var-file="terraform.tfvars.prod"
+   pages apply --config-path ~/.config/df12-www/config.toml --plan-file plan.out
    ```
 
    ACM validation completes automatically through the Cloudflare DNS records.
@@ -226,11 +245,12 @@ All commands below assume the repo root as the working directory.
 
 1. Set `cloud_provider = "scaleway"` and populate the Scaleway-specific
    variables.
-2. Run `tofu init` to fetch the Scaleway provider alongside the others.
-3. Run `tofu plan -var-file=...` and confirm the plan includes
+2. Run `pages init --config-path ~/.config/df12-www/config.toml` to fetch the
+   providers and bootstrap the backend.
+3. Run `pages plan --config-path ~/.config/df12-www/config.toml` and confirm the plan includes
    `scaleway_object_bucket` resources, Cloudflare CNAME records, and a
    `scaleway_cockpit` activation.
-4. Run `tofu apply -var-file=...` to provision the bucket, website
+4. Run `pages apply --config-path ~/.config/df12-www/config.toml` to provision the bucket, website
    configuration, Cloudflare DNS, and Cockpit.
 5. The `modules/deploy_scaleway` module clones the repo, installs
    dependencies, runs `bun run build`, syncs the `site_path` directory via
@@ -238,13 +258,9 @@ All commands below assume the repo root as the working directory.
    and purges the
    Cloudflare cache so changes propagate immediately.
 6. To force a fresh content upload (for example after changing ACL flags or
-   build tooling), re-run apply with the deploy resource replaced:
-   ```bash
-   tofu apply -var-file="terraform.tfvars.prod" \
-     -replace="module.deploy_scaleway[0].null_resource.deploy"
-   ```
-   This re-executes the clone/build/sync/purge steps without touching the
-   infrastructure resources.
+   build tooling), re-run `pages apply` after deleting the plan so it executes
+   the deploy `null_resource` again. This re-executes the clone/build/sync/purge
+   steps without touching the infrastructure resources.
 
 ## 5. CI Integration (GitHub Actions Example)
 
@@ -265,20 +281,22 @@ jobs:
         run: bun run build
       - name: OpenTofu init/plan/apply
         env:
+          DF12_CONFIG_FILE: ${{ secrets.DF12_CONFIG_FILE_PATH || '$HOME/.config/df12-www/config.toml' }}
           GITHUB_TOKEN: ${{ secrets.SITE_REPO_TOKEN }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          tofu init
-          tofu plan -var-file="terraform.tfvars.prod"
-          tofu apply -auto-approve -var-file="terraform.tfvars.prod"
+          pages init --config-path "$DF12_CONFIG_FILE" --no-save
+          pages plan --config-path "$DF12_CONFIG_FILE" --plan-file plan.out --no-save
+          pages apply --config-path "$DF12_CONFIG_FILE" --plan-file plan.out --no-save
 ```
 
 CI tips:
 
-- Store environment-scoped `terraform.tfvars.*` securely (encrypted secrets,
-  object storage with KMS, etc.).
+- Keep the config file encrypted in CI (e.g. GitHub Actions secrets or
+  workspace-scoped secrets). Provide `DF12_CONFIG_FILE` pointing to the
+  decrypted path at runtime.
 - Cache Bun’s package directory if builds become slow.
 - Set `BUN_TMPDIR` and `BUN_INSTALL` explicitly when runner ephemeral storage
   is read-only.
@@ -332,7 +350,8 @@ CI tips:
 To decommission all resources:
 
 ```bash
-tofu destroy -var-file="terraform.tfvars.prod"
+pages plan --config-path ~/.config/df12-www/config.toml --plan-file destroy.out --destroy
+pages apply --config-path ~/.config/df12-www/config.toml --plan-file destroy.out
 ```
 
 Confirm that S3 contents, CDN distributions, and DNS records are no longer

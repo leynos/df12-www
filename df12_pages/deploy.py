@@ -264,7 +264,9 @@ def _materialize_backend_file(
     lines = source.read_text(encoding="utf-8").splitlines()
     has_access = False
     has_secret = False
+    has_encrypt = False
     new_lines: list[str] = []
+    force_disable_encrypt = backend.endpoint and "scw.cloud" in backend.endpoint
     for line in lines:
         stripped = line.strip()
         if stripped.startswith("access_key"):
@@ -273,12 +275,20 @@ def _materialize_backend_file(
         elif stripped.startswith("secret_key"):
             has_secret = True
             new_lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
+        elif stripped.startswith("encrypt"):
+            has_encrypt = True
+            if force_disable_encrypt:
+                new_lines.append("encrypt = false")
+            else:
+                new_lines.append(line)
         else:
             new_lines.append(line)
     if not has_access:
         new_lines.append(f'access_key = "{creds.aws_access_key_id}"')
     if not has_secret:
         new_lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
+    if force_disable_encrypt and not has_encrypt:
+        new_lines.append("encrypt = false")
 
     fd, tmp_path = tempfile.mkstemp(
         prefix="df12-backend-", suffix=".tfbackend", text=True

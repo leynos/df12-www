@@ -121,7 +121,8 @@ def _write_backend(tmp_path: Path) -> Path:
         'region = "fr-par"\n'
         'endpoints = { s3 = "https://s3.fr-par.scw.cloud" }\n'
         'access_key = "<SCW_ACCESS_KEY_ID>"\n'
-        'secret_key = "<SCW_SECRET_KEY>"\n',
+        'secret_key = "<SCW_SECRET_KEY>"\n'
+        'encrypt = true\n',
         encoding="utf-8",
     )
     return path
@@ -141,11 +142,14 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
         return SimpleNamespace(returncode=0)
 
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
-    monkeypatch.setattr(
-        deploy,
-        "_materialize_backend_file",
-        lambda src, creds, backend: materialized.append(str(src)) or src,
-    )
+    original_materialize = deploy._materialize_backend_file
+
+    def capture_materialize(src, creds, backend):
+        path = original_materialize(src, creds, backend)
+        materialized.append(str(path))
+        return path
+
+    monkeypatch.setattr(deploy, "_materialize_backend_file", capture_materialize)
     creds = deploy.CredentialSet(
         aws_access_key_id="AKIA",
         aws_secret_access_key="SECRET",
@@ -163,8 +167,12 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
         save_credentials_flag=False,
     )
     assert calls[0] == ["ensure"]
-    assert ["init", "-backend-config", str(backend_path), "-var-file", str(var_file)] in calls
     assert materialized
+    assert ["init", "-backend-config", materialized[0], "-var-file", str(var_file)] in calls
+    # ensure encryption is disabled for scaleway endpoints
+    materialized_path = Path(materialized[0])
+    content = materialized_path.read_text(encoding="utf-8")
+    assert "encrypt = false" in content
 
 
 def test_plan_stack_runs_init_and_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

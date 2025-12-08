@@ -294,8 +294,8 @@ pages:
   rstest-bdd:
     label: "rstest-bdd"
     repo: leynos/rstest-bdd
-    latest_release: v0.1.0
-    latest_release_published_at: '2025-11-08T02:36:09Z'
+    latest_release: v0.2.0
+    latest_release_published_at: '2025-12-08T00:37:34Z'
     language: rust
     filename_prefix: docs-rstest-bdd-
     page_title_suffix: "rstest-bdd"

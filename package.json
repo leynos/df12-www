@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "bunx concurrently -k -n watch,serve -c blue,green \"bunx chokidar-cli 'src/**/*' 'df12_pages/**/*' 'config/**/*' 'scripts/**/*' 'pyproject.toml' --initial -i '**/*.pyc' -i '**/__pycache__/**' -c 'bun run build'\" \"bunx http-server public -p 8080 -c-1\"",
-    "build": "bun run build:css && bun run build:images && bun run build:pages",
+    "build": "bun run build:css && bun run build:images && bun run build:pages && bun run build:search",
+    "build:search": "node scripts/build-netsuke-search-index.mjs",
     "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
     "build:images": "bun run scripts/generate-image-variants.ts",
     "build:pages": "uv run pages generate",
@@ -21,5 +22,8 @@
     "http-server": "^14.1.1",
     "sharp": "^0.34.4",
     "tailwindcss": "^4.1.15"
+  },
+  "dependencies": {
+    "minisearch": "7.2.0"
   }
 }

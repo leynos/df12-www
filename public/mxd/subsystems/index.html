@@ -1,0 +1,569 @@
+<!DOCTYPE html><html lang="en"><head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subsystems — mxd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;family=DM+Serif+Display:ital,wght@0,400;1,400&amp;family=Source+Serif+4:ital,wght@200;300;400;600;700;900&amp;family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        "primary": ["JetBrains Mono", "monospace"],
+                        "secondary": ["DM Serif Display", "serif"],
+                        "tertiary": ["Source Serif 4", "serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="icon" href="../assets/logo-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="bg-[#fdf8f0]">
+<a class="mxd-skip-link" href="#main-content">Skip to content</a>
+<header class="mxd-site-header">
+  <div class="mxd-site-header__inner">
+    <a class="mxd-brand" href="../">
+      <img src="../assets/logo-mark.svg" alt="">
+      <span>
+        <span class="mxd-brand__eyebrow">df12 Productions</span>
+        <span class="mxd-brand__title">Marrakesh Express Daemon</span>
+      </span>
+    </a>
+    <nav class="mxd-site-nav" aria-label="Primary">
+      <a href="../">Home</a><a href="../quickstart/">Quickstart</a><a href="../installation/">Installation</a><a href="../deployment/">Deployment</a><a href="../architecture/">Architecture</a><a href="../protocol/">Protocol</a><a href="../configuration/">Configuration</a><a href="../database-backends/">Databases</a><a href="./" aria-current="page">Subsystems</a><a href="../compatibility/">Compatibility</a><a href="../verification/">Verification</a><a href="../roadmap/">Roadmap</a><a href="../changelog/">Changelog</a>
+    </nav>
+  </div>
+</header>
+<main id="main-content" tabindex="-1">
+
+<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
+
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
+        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
+            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Subsystems</div>
+        </div>
+
+        <h1 class="mb-6">
+            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Domain subsystem designs</span>
+        </h1>
+
+        <div class="text-[#e8d5b8] text-base font-normal font-tertiary leading-[27.20px] max-w-[700px] space-y-4">
+            <p>
+                The mxd reference set documents three major domain subsystems in
+                depth: file services, chat and presence, and threaded news. These
+                designs shape the database schema, the verification invariants,
+                and the transaction catalogue that the rest of the site references.
+            </p>
+            <p>
+                All three subsystems carry a
+                <span class="px-2.5 py-1 bg-[#e8eaf6] rounded-full border border-[#c5cae9]"><span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Planned</span></span>
+                badge. The models are designed and documented; their broader
+                runtime wiring is roadmap work.
+            </p>
+        </div>
+    </div>
+
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+</section>
+
+<section class="mxd-page-toc" aria-labelledby="mxd-toc-title">
+  <div class="mxd-page-toc__inner">
+    <div>
+      <div class="mxd-page-toc__label">Route map</div>
+      <div class="mxd-page-toc__title" id="mxd-toc-title">Domain subsystem designs</div>
+    </div>
+    <div class="mxd-page-toc__links">
+      <a href="#section-file-services">File Services</a><a href="#section-chat-presence">Chat &amp; Presence</a><a href="#section-news">News Hierarchy</a>
+    </div>
+  </div>
+</section>
+
+<section id="section-file-services" class="border-t border-[#e8d5b8] py-16 sm:py-20" aria-labelledby="section-file-services-title">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">01 — File Services</div>
+        <div class="flex items-center gap-3 mb-6">
+            <h2 id="section-file-services-title" class="text-[#12121f] text-[39.80px] font-normal font-secondary">File services</h2>
+            <span class="px-2.5 py-1 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Planned</span>
+            </span>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The file subsystem separates content storage from metadata
+            management. An object-store abstraction backed by the
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">object_store</code>
+            crate handles binary content on local disk, S3, or Azure, while
+            the database owns the hierarchical folder structure, permissions,
+            and file metadata through a unified
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">FileNode</code>
+            table.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+                <div class="px-6 py-6">
+                    <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center mb-4">
+                        <span class="text-white text-xl font-bold font-primary">Os</span>
+                    </div>
+                    <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-3">Object store</h3>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Flat key-value storage for file content. Local filesystem,
+                        S3, and Azure backends are supported through the
+                        <code class="text-[#12121f] text-xs font-normal font-primary">object_store</code>
+                        crate. Files are addressed by opaque keys; the
+                        hierarchical path lives only in the database.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+                <div class="px-6 py-6">
+                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center mb-4">
+                        <span class="text-white text-xl font-bold font-primary">Fn</span>
+                    </div>
+                    <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-3">FileNode metadata</h3>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        A unified
+                        <code class="text-[#12121f] text-xs font-normal font-primary">FileNode</code>
+                        table models files, folders, and aliases in a single
+                        hierarchy. Each node carries a type discriminator,
+                        optional
+                        <code class="text-[#12121f] text-xs font-normal font-primary">object_key</code>,
+                        parent reference, comment field, and creation metadata.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-[#e8d5b8]">
+                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Transaction catalogue</h3>
+            </div>
+            <div class="divide-y divide-[#e8d5b8]">
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">200</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">GetFileNameList</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        List files and folders in a directory path.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">202</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">DownloadFile</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Stream file content to the client. Supports resumable
+                        transfers using the file length as an offset.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">203</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">UploadFile</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Receive file content from the client. Partial uploads
+                        are kept with a database entry marked incomplete; resume
+                        uses the file length as an offset.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">204</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">DeleteFile</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Remove a file node and its object-store content.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">205</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">NewFolder</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Create a folder node in the hierarchy.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">206–207</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">GetFileInfo / SetFileInfo</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Read and update file metadata including comments.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">208</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">MoveFile</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Relocate a file or folder within the hierarchy.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">209</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">MakeFileAlias</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Create a
+                        <code class="text-[#12121f] text-xs font-normal font-primary">FileNode</code>
+                        of type alias pointing to a target node, with no own
+                        <code class="text-[#12121f] text-xs font-normal font-primary">object_key</code>.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">210 / 213</span>
+                        <span class="text-[#12121f] text-sm font-normal font-tertiary">DownloadFolder / UploadFolder</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Recursive folder transfer in both directions.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-6">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Drop boxes:</span>
+                Folders with
+                <code class="text-[#12121f] text-xs font-normal font-primary">is_dropbox=true</code>
+                are write-only for regular users. Uploads succeed, but list
+                requests return empty results for unprivileged sessions.
+                Privilege bits 28 and 29 control folder and file comment
+                visibility.
+            </p>
+        </div>
+
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#2d3a8c]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#2d3a8c] font-semibold">ACL model:</span>
+                Per-file and per-folder access control uses a
+                <code class="text-[#12121f] text-xs font-normal font-primary">Permission</code>
+                table linking principals to resources. The flat object-store
+                keys are invisible to the ACL layer; permissions apply to the
+                hierarchical
+                <code class="text-[#12121f] text-xs font-normal font-primary">FileNode</code>
+                tree.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="section-chat-presence" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden" aria-labelledby="section-chat-presence-title">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">02 — Chat &amp; Presence</div>
+        <div class="flex items-center gap-3 mb-6">
+            <h2 id="section-chat-presence-title" class="text-[#12121f] text-[39.80px] font-normal font-secondary">Chat and presence</h2>
+            <span class="px-2.5 py-1 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Planned</span>
+            </span>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The chat subsystem models public lobbies, private group chats,
+            and direct messages through a unified room-based schema. Presence
+            notifications are tied to authenticated sessions and broadcast on
+            login and logout.
+        </p>
+
+        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-[#e8d5b8]">
+                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Schema tables</h3>
+            </div>
+            <div class="divide-y divide-[#e8d5b8]">
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">chat_rooms</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        <code class="text-[#12121f] text-xs font-normal font-primary">id</code>,
+                        <code class="text-[#12121f] text-xs font-normal font-primary">creator_id</code>,
+                        <code class="text-[#12121f] text-xs font-normal font-primary">subject</code>,
+                        <code class="text-[#12121f] text-xs font-normal font-primary">is_private</code>,
+                        <code class="text-[#12121f] text-xs font-normal font-primary">created_at</code>.
+                        Public rooms use
+                        <code class="text-[#12121f] text-xs font-normal font-primary">is_private=false</code>
+                        and auto-join on login.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">chat_participants</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Join table linking users to rooms. Membership is added
+                        on room creation, invite acceptance, or public lobby
+                        auto-join.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">chat_messages</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Optional history persistence for chat rooms. Messages
+                        reference the room and sender with a timestamp.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">chat_invites</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Tracks pending, accepted, and declined invitations for
+                        private and group chats.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Invite and join flow</h3>
+
+        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
+            <div class="divide-y divide-[#e8d5b8]">
+                <div class="px-6 py-4 flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#c54b2a] rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-white text-sm font-bold font-primary">1</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[#12121f] text-sm font-semibold font-tertiary mb-1">Invite (transaction 112)</p>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Creator sends an invite to a user, creating a private or group room if one does not already exist.</p>
+                    </div>
+                </div>
+                <div class="px-6 py-4 flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#e8a838] rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-[#12121f] text-sm font-bold font-primary">2</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[#12121f] text-sm font-semibold font-tertiary mb-1">Accept (transaction 113)</p>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Accepting adds the user to the room's participant list and notifies existing members.</p>
+                    </div>
+                </div>
+                <div class="px-6 py-4 flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-white text-sm font-bold font-primary">3</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[#12121f] text-sm font-semibold font-tertiary mb-1">Decline (transaction 114)</p>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Declining removes the invite record and notifies the room creator.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Chat subjects are set via transaction 120 (Set Chat Subject), which
+            triggers a Notify Chat Subject (119) push to all room participants.
+            Direct messages are modelled as private chats between exactly two
+            participants — no separate DM table or transport path.
+        </p>
+
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Presence:</span>
+                Presence uses transactions 300 (request user list), 301 (notify
+                add user), and 302 (notify remove user). The server broadcasts
+                add and remove notifications on authenticated login and logout.
+                Presence state is transient — it is not persisted in the
+                database.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="section-news" class="border-t border-[#e8d5b8] py-16 sm:py-20" aria-labelledby="section-news-title">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">03 — News Hierarchy</div>
+        <div class="flex items-center gap-3 mb-6">
+            <h2 id="section-news-title" class="text-[#12121f] text-[39.80px] font-normal font-secondary">News hierarchy</h2>
+            <span class="px-2.5 py-1 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Planned</span>
+            </span>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The news subsystem implements a three-level hierarchy: bundles
+            contain categories, which contain threaded articles. Bundles
+            support recursive nesting via a
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">parent_bundle_id</code>
+            self-reference. Categories may live inside a bundle or at the top
+            level when
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">bundle_id IS NULL</code>.
+        </p>
+
+        <div class="bg-white rounded-lg border border-[#e8d5b8] p-8 mb-8">
+            <div class="text-center mb-6">
+                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em] mb-4">Hierarchy structure</h3>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-32 h-20 bg-[#e8eaf6] border-2 border-[#2d3a8c] rounded flex items-center justify-center">
+                        <span class="text-[#2d3a8c] text-sm font-bold font-primary">Bundles</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                            Top-level grouping. Recursive nesting via
+                            <code class="text-[#12121f] text-xs font-normal font-primary">parent_bundle_id</code>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 pl-8">
+                    <div class="w-32 h-20 bg-[#faf3ea] border-2 border-[#c54b2a] rounded flex items-center justify-center">
+                        <span class="text-[#c54b2a] text-sm font-bold font-primary">Categories</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                            Topic containers inside bundles. May also exist at
+                            the top level.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 pl-16">
+                    <div class="w-32 h-20 bg-[#fff4e0] border-2 border-[#e8a838] rounded flex items-center justify-center">
+                        <span class="text-[#c89430] text-sm font-bold font-primary">Articles</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                            Threaded content with linked-list navigation pointers.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-[#e8d5b8]">
+                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Article pointer fields</h3>
+            </div>
+            <div class="divide-y divide-[#e8d5b8]">
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">parent_article_id</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        The article this one replies to, establishing thread depth.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">prev_article_id</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Previous sibling in the linked list at the same depth.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">next_article_id</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Next sibling in the linked list at the same depth.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">first_child_article_id</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Head of the child linked list — the first reply to this article.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Each article carries metadata fields:
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">title</code>,
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">poster</code>,
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">posted_at</code>,
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">flags</code>,
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">data_flavor</code>,
+            and
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">data</code>.
+            News permissions use 38 privilege codes modelled as a lookup table
+            with many-to-many linking between principals and resources.
+        </p>
+
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Recursive CTE traversal:</span>
+                Navigating the bundle and article hierarchies requires
+                recursive common table expressions. This is the primary reason
+                the
+                <a href="../database-backends/" class="text-[#c54b2a] underline hover:text-[#9a3a1f]">database-backends page</a>
+                requires recursive CTE support from both SQLite and PostgreSQL.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white" aria-labelledby="footer-cta-title">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
+        <h2 id="footer-cta-title" class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">From design to implementation</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+            These subsystem designs feed the roadmap, the verification invariants, and the transaction catalogue. Explore the connected documentation.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-3">
+            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../roadmap/">
+                Roadmap
+            </a>
+            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../protocol/">
+                Protocol Reference
+            </a>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer id="footer" class="bg-[#12121f] relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 py-12 text-center">
+        <div class="mb-6 opacity-40">
+            <span class="text-[#e8d5b8] text-[23px] font-normal font-primary">◆</span>
+        </div>
+
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
+            Protocol Souk — Design System for <span class="text-[#e8a838]">mxd</span>
+        </p>
+
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px]">
+            A <span class="text-[#e8a838]">df12 Productions</span> artefact · Edinburgh · 2026
+        </p>
+    </div>
+    <div class="border-t border-[#2a2a42] py-6">
+        <div class="max-w-[900px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center text-[11.10px] font-primary">
+            <p class="text-[#9a9ab0] mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
+            <nav class="mxd-legal-nav flex space-x-6" aria-label="Legal">
+                <a href="../privacy-policy/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Privacy Policy</a>
+                <a href="../terms-of-use/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Terms of Use</a>
+                <a href="../code-of-conduct/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Code of Conduct</a>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+</body></html>

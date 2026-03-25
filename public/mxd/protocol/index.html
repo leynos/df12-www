@@ -1,0 +1,565 @@
+<!DOCTYPE html><html lang="en"><head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocol — mxd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;family=DM+Serif+Display:ital,wght@0,400;1,400&amp;family=Source+Serif+4:ital,wght@200;300;400;600;700;900&amp;family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        "primary": ["JetBrains Mono", "monospace"],
+                        "secondary": ["DM Serif Display", "serif"],
+                        "tertiary": ["Source Serif 4", "serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="icon" href="../assets/logo-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="bg-[#fdf8f0]">
+<a class="mxd-skip-link" href="#main-content">Skip to content</a>
+<header class="mxd-site-header">
+  <div class="mxd-site-header__inner">
+    <a class="mxd-brand" href="../">
+      <img src="../assets/logo-mark.svg" alt="">
+      <span>
+        <span class="mxd-brand__eyebrow">df12 Productions</span>
+        <span class="mxd-brand__title">Marrakesh Express Daemon</span>
+      </span>
+    </a>
+    <nav class="mxd-site-nav" aria-label="Primary">
+      <a href="../">Home</a><a href="../quickstart/">Quickstart</a><a href="../installation/">Installation</a><a href="../deployment/">Deployment</a><a href="../architecture/">Architecture</a><a href="./" aria-current="page">Protocol</a><a href="../configuration/">Configuration</a><a href="../database-backends/">Databases</a><a href="../subsystems/">Subsystems</a><a href="../compatibility/">Compatibility</a><a href="../verification/">Verification</a><a href="../roadmap/">Roadmap</a><a href="../changelog/">Changelog</a>
+    </nav>
+  </div>
+</header>
+<main id="main-content" tabindex="-1">
+
+<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
+    
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
+        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
+            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Protocol</div>
+        </div>
+        
+        <h1 class="mb-6">
+            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Hotline Server Protocol v1.8.5</span>
+        </h1>
+        
+        <div class="text-[#e8d5b8] text-base font-normal font-tertiary leading-[27.20px] max-w-[700px] space-y-4">
+            <p>
+                Hotline communicates over TCP using a binary frame protocol. All
+                multi-byte integers are big-endian. No padding or alignment
+                bytes appear in the wire format. This reference covers the
+                documented handshake, transaction frame structure, parameter
+                encoding, and the subset of routed transactions explicitly
+                described by the repository reference set.
+            </p>
+            <p>
+                mxd implements the protocol faithfully, not slavishly. Where the original specification is ambiguous, this reference records the interpretation adopted and the evidence supporting it. Where client behaviour diverges from the specification, the compatibility matrix documents the divergence and the adapter-level shim that handles it.
+            </p>
+        </div>
+    </div>
+    
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+</section>
+
+<section class="mxd-page-toc" aria-labelledby="mxd-toc-title">
+  <div class="mxd-page-toc__inner">
+    <div>
+      <div class="mxd-page-toc__label">Route map</div>
+      <div class="mxd-page-toc__title" id="mxd-toc-title">Hotline Server Protocol v1.8.5</div>
+    </div>
+    <div class="mxd-page-toc__links">
+      <a href="#section-handshake">Handshake</a><a href="#section-negotiation">Negotiation</a><a href="#section-frame">Frame Structure</a><a href="#section-parameters">Parameters</a><a href="#section-catalogue">Catalogue</a>
+    </div>
+  </div>
+</section>
+
+<div id="section-handshake" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">01 — Handshake</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Session handshake</h2>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-6">
+            The client initiates with a 12-byte preamble: the four-byte
+            protocol identifier, the protocol version, and the client
+            sub-version fields used by compatibility policy:
+        </p>
+        
+        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8 transition-all duration-300 hover:shadow-[0px_12px_32px_0px_rgba(18,18,31,0.24)]">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">handshake structure</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#3a3a55]">// 12-byte handshake preamble</span>
+<span class="text-[#e8a838]">protocol_id</span>: [<span class="text-[#d4714f]">0x54</span>, <span class="text-[#d4714f]">0x52</span>, <span class="text-[#d4714f]">0x54</span>, <span class="text-[#d4714f]">0x50</span>]  <span class="text-[#3a3a55]">// "TRTP"</span>
+<span class="text-[#e8a838]">version</span>: <span class="text-[#d4714f]">0x0001</span>                            <span class="text-[#3a3a55]">// protocol version</span>
+<span class="text-[#e8a838]">sub_version</span>: <span class="text-[#d4714f]">u32</span>                        <span class="text-[#3a3a55]">// compatibility marker</span>
+<span class="text-[#e8a838]">reserved</span>: <span class="text-[#d4714f]">u16</span>                           <span class="text-[#3a3a55]">// retained by the preamble layout</span></pre>
+            </div>
+        </div>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-6">
+            The server validates the identifier and version, then sends an
+            8-byte handshake reply with an error code: `0` for success, `1`
+            for invalid protocol, `2` for unsupported version, and `3` for
+            handshake timeout. Idle sockets are dropped after the five-second
+            handshake timeout. Only after that reply does the server begin
+            accepting transaction frames, and the negotiated sub-protocol and
+            sub-version remain recorded in connection state for the lifetime of
+            the session.
+        </p>
+        
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Interpretation:</span> The protocol identifier is ASCII <span class="text-[#12121f] text-xs font-normal font-primary">TRTP</span> (Transaction Request/Transaction Protocol). The original specification does not name the protocol; this identifier appears in packet captures and is universally recognised by clients.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="section-negotiation" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">02 — Negotiation</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Compatibility negotiation</h2>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The handshake is only the first half of compatibility detection.
+            mxd also records login metadata and text-encoding behaviour so the
+            reply path can stay client-specific without lying about broader
+            feature parity.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Login field gating</h3>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
+                    <span class="text-[#12121f] text-xs font-normal font-primary">sub_version == 2</span>
+                    identifies SynHX. Otherwise, login field
+                    <span class="text-[#12121f] text-xs font-normal font-primary">160</span>
+                    distinguishes Hotline 1.8.5
+                    (<span class="text-[#12121f] text-xs font-normal font-primary">151..=189</span>)
+                    from Hotline 1.9
+                    (<span class="text-[#12121f] text-xs font-normal font-primary">&gt;=190</span>).
+                </p>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    Replies always include the server version field, while
+                    Hotline 1.8.5 and 1.9 clients also receive fields
+                    <span class="text-[#12121f] text-xs font-normal font-primary">161</span>
+                    and <span class="text-[#12121f] text-xs font-normal font-primary">162</span>.
+                    SynHX and unknown or legacy versions omit those banner
+                    extras on purpose.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">XOR heuristics</h3>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
+                    XOR compatibility is heuristic and per-connection rather
+                    than negotiated by a clean capability bit. The adapter
+                    enables it when text-bearing payloads look invalid until
+                    XOR-decoded, then keeps that transform aligned on replies.
+                </p>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    The currently evidenced scope covers XOR login, XOR news
+                    payloads, and the guard that plaintext message payloads do
+                    not accidentally enable XOR mode. Broader parity still
+                    belongs to the compatibility matrix and roadmap.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-frame" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">03 — Frame Structure</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Transaction frame structure</h2>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Every transaction begins with a 20-byte header. Fields are fixed-width, big-endian, with no padding:
+        </p>
+        
+        <div class="rounded-lg overflow-hidden mb-6">
+            <div class="flex">
+                <div class="flex-1 px-2 py-3 bg-[#c54b2a] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Flags</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#9a3a1f] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Reply</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#e8a838] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#12121f] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#12121f] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Type</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#e8a838] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#12121f] text-xl font-bold font-primary leading-8">6B</div>
+                    <div class="text-center text-[#12121f] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Type</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">01</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+            </div>
+            <div class="flex">
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">24</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">24</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-[#e8d5b8]">
+                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Field definitions</h3>
+            </div>
+            <div class="divide-y divide-[#e8d5b8]">
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">flags</span>
+                        <span class="text-[#3a3a55] text-xs font-normal font-primary">u8</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Reserved. Must be zero in all current transactions.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">is_reply</span>
+                        <span class="text-[#3a3a55] text-xs font-normal font-primary">u8</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        <span class="text-[#12121f] text-xs font-normal font-primary">0x00</span> for client requests, <span class="text-[#12121f] text-xs font-normal font-primary">0x01</span> for server replies.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">transaction_type</span>
+                        <span class="text-[#3a3a55] text-xs font-normal font-primary">u16</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Identifies the transaction. <span class="text-[#12121f] text-xs font-normal font-primary">0x006B</span> is Login, <span class="text-[#12121f] text-xs font-normal font-primary">0x012C</span> is Get User Name List, etc.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">transaction_id</span>
+                        <span class="text-[#3a3a55] text-xs font-normal font-primary">u32</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Client-assigned identifier. Server replies echo this value to correlate request and response.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">error_code</span>
+                        <span class="text-[#3a3a55] text-xs font-normal font-primary">u32</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Zero on success. Non-zero indicates error; see error catalogue.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">total_size</span>
+                        <span class="text-[#3a3a55] text-xs font-normal font-primary">u32</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Total payload size in bytes, excluding the 20-byte header.
+                    </p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="flex items-baseline gap-3 mb-2">
+                        <span class="text-[#e8a838] text-sm font-bold font-primary">data_size</span>
+                        <span class="text-[#3a3a55] text-xs font-normal font-primary">u32</span>
+                    </div>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Payload size in this fragment. For single-frame transactions, equals <span class="text-[#12121f] text-xs font-normal font-primary">total_size</span>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-parameters" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">04 — Parameters</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Parameter encoding</h2>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Transaction payloads consist of typed parameters. Each parameter is a TLV (type-length-value) structure:
+        </p>
+        
+        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8 transition-all duration-300 hover:shadow-[0px_12px_32px_0px_rgba(18,18,31,0.24)]">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">parameter structure</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">type_code</span>: <span class="text-[#2d3a8c]">u16</span>      <span class="text-[#3a3a55]">// Parameter type identifier</span>
+<span class="text-[#e8a838]">length</span>: <span class="text-[#2d3a8c]">u16</span>         <span class="text-[#3a3a55]">// Value length in bytes</span>
+<span class="text-[#e8a838]">value</span>: [<span class="text-[#2d3a8c]">u8</span>; length]  <span class="text-[#3a3a55]">// Raw value data</span></pre>
+            </div>
+        </div>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-6">
+            Common parameter types include integers, strings, and binary data.
+            String parameters may be XOR-encoded; mxd detects and decodes these
+            transparently when the connection has entered that compatibility
+            mode.
+        </p>
+        
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">XOR encoding:</span>
+                Some clients XOR-encode text fields with
+                <span class="text-[#12121f] text-xs font-normal font-primary">0xFF</span>.
+                The wireframe layer detects this by examining early text-bearing
+                transactions, especially Login, and applies the same transform
+                only to text fields for the remainder of that connection.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="section-catalogue" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">05 — Catalogue</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Transaction catalogue</h2>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The reference set supports only a conservative catalogue here. The
+            pages and docs agree on login, authenticated-session continuity,
+            selected file routing, and selected news routing. Other transactions
+            are still design material or roadmap work and should not be read as
+            fully implemented.
+        </p>
+
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-8">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Design depth versus shipped scope:</span>
+                the reference set goes much further than this routed subset. It
+                documents file operations 200 through 213 with resumable
+                transfers, aliasing, folder upload and download, comments, and
+                ACLs; chat rooms with invites, subjects, and persisted history;
+                and news bundles, categories, and threaded article pointers.
+                Those designs matter, but they are not all implemented today.
+                The <a href="../subsystems/" class="text-[#c54b2a] underline hover:text-[#9a3a1f]">subsystems page</a> documents these designs in full.
+            </p>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden transition-all duration-300 hover:shadow-[0px_8px_24px_0px_rgba(18,18,31,0.12)]">
+                <div class="px-6 py-4 border-b border-[#e8d5b8] flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="text-[#12121f] text-[20.20px] font-bold font-primary">0x006B</span>
+                            <span class="text-[#12121f] text-[20.20px] font-normal font-secondary">Login</span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Authenticate with username and password</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="px-2.5 py-1 bg-[#e8f5ec] rounded-full border border-[#c4e5cc]">
+                            <span class="text-[#4a8c5c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Implemented</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden transition-all duration-300 hover:shadow-[0px_8px_24px_0px_rgba(18,18,31,0.12)]">
+                <div class="px-6 py-4 border-b border-[#e8d5b8] flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="text-[#12121f] text-[20.20px] font-bold font-primary">0x012C</span>
+                            <span class="text-[#12121f] text-[20.20px] font-normal font-secondary">Get User Name List</span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Retrieve list of connected users</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="px-2.5 py-1 bg-[#fff4e0] rounded-full border border-[#f2dca8]">
+                            <span class="text-[#c89430] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Routed / Partial</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden transition-all duration-300 hover:shadow-[0px_8px_24px_0px_rgba(18,18,31,0.12)]">
+                <div class="px-6 py-4 border-b border-[#e8d5b8] flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="text-[#12121f] text-[20.20px] font-bold font-primary">0x00CE</span>
+                            <span class="text-[#12121f] text-[20.20px] font-normal font-secondary">Get File Info</span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Retrieve file metadata by path</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="px-2.5 py-1 bg-[#fff4e0] rounded-full border border-[#f2dca8]">
+                            <span class="text-[#c89430] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Partial</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden transition-all duration-300 hover:shadow-[0px_8px_24px_0px_rgba(18,18,31,0.12)]">
+                <div class="px-6 py-4 border-b border-[#e8d5b8] flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="text-[#12121f] text-[20.20px] font-bold font-primary">0x0190</span>
+                            <span class="text-[#12121f] text-[20.20px] font-normal font-secondary">Instant Message</span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Send private message to user</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="px-2.5 py-1 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                            <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Planned</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Scope note:</span>
+                This page is intentionally narrower than a full protocol manual.
+                For current support claims, defer to the compatibility matrix
+                and roadmap rather than inferring completeness from this
+                catalogue.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Implementation details</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+            Explore the wireframe architecture, compatibility layer, and verification artefacts that implement this protocol.
+        </p>
+        
+        <div class="flex flex-wrap justify-center gap-3">
+            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../architecture/">
+                Architecture
+            </a>
+            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../compatibility/">
+                Compatibility Matrix
+            </a>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer id="footer" class="bg-[#12121f] relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 py-12 text-center">
+        <div class="mb-6 opacity-40">
+            <span class="text-[#e8d5b8] text-[23px] font-normal font-primary">◆</span>
+        </div>
+        
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
+            Protocol Souk — Design System for <span class="text-[#e8a838]">mxd</span>
+        </p>
+        
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px]">
+            A <span class="text-[#e8a838]">df12 Productions</span> artefact · Edinburgh · 2026
+        </p>
+    </div>
+    <div class="border-t border-[#2a2a42] py-6">
+        <div class="max-w-[900px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center text-[11.10px] font-primary">
+            <p class="text-[#9a9ab0] mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
+            <nav class="mxd-legal-nav flex space-x-6" aria-label="Legal">
+                <a href="../privacy-policy/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Privacy Policy</a>
+                <a href="../terms-of-use/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Terms of Use</a>
+                <a href="../code-of-conduct/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Code of Conduct</a>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+</body></html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety & Sandboxing - Weaver AI Codebase Tooling</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'weaver-cream': '#F3EFD9',
+                        'weaver-indigo': '#193C6E',
+                        'weaver-vermilion': '#E8502B',
+                        'weaver-dark': '#0F2440',
+                        'weaver-faded': '#4A6FA5',
+                    },
+                    fontFamily: {
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'sans': ['"IBM Plex Sans"', 'sans-serif'],
+                        'mono': ['"IBM Plex Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, rgba(25, 60, 110, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(25, 60, 110, 0.05) 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Syntax Highlighting */
+        .token-key { color: #8BE9FD; }
+        .token-string { color: #F1FA8C; }
+        .token-number { color: #BD93F9; }
+        .token-boolean { color: #FF79C6; }
+        .token-comment { color: #6272A4; font-style: italic; }
+        
+        /* Custom UI Elements */
+        .lock-animation { animation: lock-pulse 4s infinite; }
+        @keyframes lock-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+    </style>
+    <link rel="stylesheet" href="../assets/styles/weaver-site.css">
+</head>
+<body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
+    
+    <!-- Texture Overlay -->
+    <div class="texture-overlay"></div>
+
+    <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
+            <div>
+                <div class="p-8 border-b-2 border-weaver-indigo/20" data-mobile-nav-header>
+                    <h1 class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">WEAVER</h1>
+                    <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
+                </div>
+                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+                    <a href="../" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <span class="mr-2 font-mono text-xs opacity-60">00</span> Home
+                    </a>
+                    <a href="../why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <span class="mr-2 font-mono text-xs opacity-60">01</span> Philosophy
+                    </a>
+                    <a href="../how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <span class="mr-2 font-mono text-xs opacity-60">02</span> Architecture
+                    </a>
+                    <a href="../commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <span class="mr-2 font-mono text-xs opacity-60">03</span> Commands
+                    </a>
+                    
+                    <a href="./" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
+                        <span class="mr-2 font-mono text-xs">04</span> Safety
+                    </a>
+                    <!-- Sub-navigation for Safety -->
+                    <div class="ml-4 pl-4 border-l border-weaver-indigo/20 space-y-1 my-2">
+                        <a href="#double-lock" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Double-Lock Validation</a>
+                        <a href="#birdcage" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Birdcage Sandbox</a>
+                        <a href="#threat-model" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Threat Model</a>
+                    </div>
+
+                    <a href="../sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <span class="mr-2 font-mono text-xs opacity-60">05</span> Sempai Engine
+                    </a>
+                    <a href="../jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <span class="mr-2 font-mono text-xs opacity-60">06</span> Jacquard
+                    </a>
+                    <div class="pt-4 mt-4 border-t border-weaver-indigo/10">
+                        <a href="../install/" class="block px-4 py-2 text-sm font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono">
+                            > Install
+                        </a>
+                        <a href="../docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                            Docs
+                        </a>
+                        <a href="../roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                            Roadmap
+                        </a>
+                    </div>
+                </nav>
+            </div>
+            
+            <!-- Version/Status Footer in Sidebar -->
+            <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="font-mono text-xs text-weaver-indigo/60">System Operational</span>
+                </div>
+                <p class="font-mono text-[10px] text-weaver-indigo/40">v0.1.0</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-64 grid-bg min-h-screen relative">
+            
+            <!-- Hero Section -->
+            <section id="safety-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-weaver-indigo/20">
+                <div class="masthead-frame mx-auto relative z-10">
+                    <div class="masthead-eyebrow mb-6">
+                        <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Security Architecture</span>
+                    </div>
+                    
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
+                        Safety <span class="text-weaver-vermilion italic font-light">&amp;</span><br>
+                        Sandboxing
+                    </h1>
+
+                    <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
+                        Weaver assumes that AI agents are fundamentally untrusted actors. Two independent safety layers protect the codebase: the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Double-Lock</span> validation harness (syntactic + semantic checks on edits to supported files, with exemptions detailed below) and the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Birdcage</span> sandbox (kernel-level process isolation for all external tools). They operate independently — the Double-Lock guards code correctness; the sandbox guards system integrity.
+                    </p>
+                </div>
+                
+                <!-- Abstract Lock Illustration -->
+                <div class="absolute right-0 top-0 h-full hidden xl:flex opacity-25 pointer-events-none overflow-hidden items-start justify-end pr-8 pt-8">
+                    <img
+                        src="../assets/safety/safety-double-lock-architecture.png"
+                        alt="Blueprint-style illustration of Weaver's double-lock security architecture."
+                        class="block max-h-full w-auto max-w-none"
+                    >
+                </div>
+            </section>
+
+            <!-- Double-Lock Validation -->
+            <section id="double-lock" class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex items-center mb-10">
+                        <span class="h-px w-12 bg-weaver-indigo mr-4"></span>
+                        <h2 class="font-serif text-3xl text-weaver-indigo">The Double-Lock</h2>
+                    </div>
+
+                        <p class="text-weaver-indigo/80 mb-10 leading-relaxed max-w-3xl">
+                            Every <code class="font-mono text-sm bg-weaver-indigo/10 px-1 text-weaver-vermilion">act</code> command passes through a two-phase verification harness before any file is written to disk. For files with a recognised parser and language-server path, edits are applied to <strong>in-memory copies</strong>, checked syntactically, then checked semantically. Unsupported file types are preserved in the transaction, but they do not receive the full parser-plus-diagnostics lock sequence.
+                        </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+                        <!-- Syntactic Lock -->
+                        <div class="relative bg-white border-2 border-weaver-indigo p-8 shadow-[8px_8px_0px_0px_rgba(25,60,110,0.1)]">
+                            <div class="absolute -top-3 left-8 bg-white px-2 font-mono text-xs text-weaver-indigo font-bold border border-weaver-indigo">LOCK 1 &middot; SYNTACTIC</div>
+                            <h3 class="font-serif text-2xl text-weaver-indigo mb-4 mt-2">Syntactic Lock</h3>
+                            <p class="text-weaver-indigo/80 mb-6 leading-relaxed text-sm">
+                                Each modified file with a supported parser is checked with <strong>Tree-sitter</strong> to confirm a valid syntax tree. Structural errors — unbalanced braces, missing semicolons, malformed declarations — are caught here. Files that fail parsing are rejected immediately; the filesystem stays untouched.
+                            </p>
+                            <ul class="space-y-3 font-mono text-xs text-weaver-indigo">
+                                <li class="flex items-center gap-3">
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-code"></i></div>
+                                    <span>Tree-sitter parsers for Rust, Python, TypeScript</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-bolt"></i></div>
+                                    <span>Fast, local — no language server needed</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-forward"></i></div>
+                                    <span>Unknown file types pass through without parser or semantic checks</span>
+                                </li>
+                            </ul>
+                            <!-- Decorative padlock -->
+                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-indigo text-white flex items-center justify-center rounded-sm shadow-md z-10">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                        </div>
+
+                        <!-- Semantic Lock -->
+                        <div class="relative bg-white border-2 border-weaver-indigo p-8 shadow-[8px_8px_0px_0px_rgba(25,60,110,0.1)]">
+                            <div class="absolute -top-3 left-8 bg-white px-2 font-mono text-xs text-weaver-indigo font-bold border border-weaver-indigo">LOCK 2 &middot; SEMANTIC</div>
+                            <h3 class="font-serif text-2xl text-weaver-indigo mb-4 mt-2">Semantic Lock</h3>
+                            <p class="text-weaver-indigo/80 mb-6 leading-relaxed text-sm">
+                                If the syntactic lock passes, modified content is submitted to the configured <strong>language server</strong>. The daemon requests fresh diagnostics and compares them against the pre-edit baseline. Any new errors or high-severity warnings cause the semantic lock to fail.
+                            </p>
+                            <ul class="space-y-3 font-mono text-xs text-weaver-indigo">
+                                <li class="flex items-center gap-3">
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-microscope"></i></div>
+                                    <span>LSP diagnostics via didOpen / didChange / didClose</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-scale-balanced"></i></div>
+                                    <span>Compares against pre-edit baseline</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-shield-halved"></i></div>
+                                    <span>No disk writes until both locks pass</span>
+                                </li>
+                            </ul>
+                            <!-- Decorative padlock -->
+                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-vermilion text-white flex items-center justify-center rounded-sm shadow-md z-10">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error reporting callout -->
+                    <div class="mt-12 bg-weaver-indigo/5 border border-weaver-indigo/10 p-6 rounded-sm">
+                        <h4 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">When a lock fails</h4>
+                        <p class="text-sm text-weaver-indigo/80 leading-relaxed">
+                            The harness returns a structured error identifying the lock phase (syntactic or semantic), the affected files, optional line/column locations, and human-readable messages. Agents can use this to diagnose problems and regenerate corrected edits. The filesystem is never left in a partially written state.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sandbox Technical Details -->
+            <section id="birdcage" class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 relative">
+                <div class="absolute inset-0 z-0 opacity-5" style="background-image: radial-gradient(#193C6E 1px, transparent 1px); background-size: 20px 20px;"></div>
+                
+                <div class="max-w-6xl mx-auto relative z-10">
+                    <div class="flex items-center mb-10">
+                        <span class="h-px w-12 bg-weaver-indigo mr-4"></span>
+                        <h2 class="font-serif text-3xl text-weaver-indigo">Birdcage Boundaries</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Card 1: Filesystem -->
+                        <div class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-weaver-indigo">
+                                <svg viewBox="0 0 96 96" class="w-16 h-16 fill-current" aria-hidden="true">
+                                    <path d="M12 26a6 6 0 0 1 6-6h18l8 10h34a6 6 0 0 1 6 6v8H12V26z"></path>
+                                    <path d="M12 42h72v24a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V42z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Filesystem Jail</h3>
+                            <p class="text-sm font-mono text-weaver-indigo/50 mb-4">mount_policy</p>
+                            <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[96px]">
+                                The agent sees a virtualized filesystem. It can only write to the specific project directory explicitly mounted for the task.
+                            </p>
+                            <div class="bg-weaver-dark p-3 rounded-sm border border-weaver-indigo/20">
+                                <code class="font-mono text-xs text-green-400 block">/project (RW)</code>
+                                <code class="font-mono text-xs text-gray-300 block">/usr/lib (RO)</code>
+                                <code class="font-mono text-xs text-gray-500 block">/etc (Hidden)</code>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Network -->
+                        <div class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-weaver-indigo">
+                                <svg viewBox="0 0 96 96" class="w-16 h-16 fill-current" aria-hidden="true">
+                                    <circle cx="20" cy="48" r="10"></circle>
+                                    <circle cx="48" cy="24" r="10"></circle>
+                                    <circle cx="76" cy="48" r="10"></circle>
+                                    <circle cx="48" cy="72" r="10"></circle>
+                                    <rect x="20" y="45" width="56" height="6"></rect>
+                                    <rect x="45" y="24" width="6" height="48"></rect>
+                                </svg>
+                            </div>
+                            <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Network Gap</h3>
+                            <p class="text-sm font-mono text-weaver-indigo/50 mb-4">egress_policy</p>
+                            <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[96px]">
+                                By default, the network namespace is empty (loopback only). Access to package registries and APIs must be explicitly allowlisted via proxy.
+                            </p>
+                            <div class="bg-weaver-dark p-3 rounded-sm border border-weaver-indigo/20">
+                                <code class="font-mono text-xs text-green-400 block">ALLOW api.uxpilot.ai:443</code>
+                                <code class="font-mono text-xs text-green-400 block">ALLOW crates.io:443</code>
+                                <code class="font-mono text-xs text-red-400 block">DENY *</code>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Resources -->
+                        <div class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-weaver-indigo">
+                                <svg viewBox="0 0 96 96" class="w-16 h-16 fill-current" aria-hidden="true">
+                                    <rect x="22" y="22" width="52" height="52" rx="4"></rect>
+                                    <rect x="34" y="34" width="28" height="28"></rect>
+                                    <rect x="42" y="6" width="4" height="16"></rect>
+                                    <rect x="50" y="6" width="4" height="16"></rect>
+                                    <rect x="42" y="74" width="4" height="16"></rect>
+                                    <rect x="50" y="74" width="4" height="16"></rect>
+                                    <rect x="6" y="42" width="16" height="4"></rect>
+                                    <rect x="6" y="50" width="16" height="4"></rect>
+                                    <rect x="74" y="42" width="16" height="4"></rect>
+                                    <rect x="74" y="50" width="16" height="4"></rect>
+                                </svg>
+                            </div>
+                            <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Resource Quotas</h3>
+                            <p class="text-sm font-mono text-weaver-indigo/50 mb-4">quota_guard</p>
+                            <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[96px]">
+                                cgroups limit CPU cycles, memory usage, and process counts to prevent fork bombs, runaway builds, or mining attempts by rogue agents.
+                            </p>
+                            <div class="bg-weaver-dark p-3 rounded-sm border border-weaver-indigo/20">
+                                <code class="font-mono text-xs text-gray-300 block">CPU: 2 cores</code>
+                                <code class="font-mono text-xs text-gray-300 block">MEM: 4GB</code>
+                                <code class="font-mono text-xs text-gray-300 block">PIDS: 50 max</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Threat Model & Operational Guidance -->
+            <section id="threat-model" class="py-16 px-8 lg:px-16 bg-weaver-indigo text-weaver-cream border-b border-weaver-indigo/20">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-start gap-12">
+                        
+                        <!-- Threat Model List -->
+                        <div class="flex-1">
+                            <h2 class="font-serif text-3xl mb-6 text-white">Threat Model</h2>
+                            <p class="text-weaver-cream/70 mb-8 font-light">
+                                We assume the LLM provider may be compromised, hallucinating, or malicious. Weaver is designed to operate safely even if the agent is actively trying to escape.
+                            </p>
+                            
+                            <div class="space-y-6">
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-weaver-vermilion flex items-center justify-center shrink-0 text-white font-bold text-xs">01</div>
+                                    <div>
+                                        <h4 class="font-bold font-mono text-sm mb-1 text-white">Exfiltration Prevention</h4>
+                                        <p class="text-xs text-weaver-cream/60">Strict egress filtering prevents agents from sending your codebase to unauthorized external servers.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-weaver-vermilion flex items-center justify-center shrink-0 text-white font-bold text-xs">02</div>
+                                    <div>
+                                        <h4 class="font-bold font-mono text-sm mb-1 text-white">Destructive Action Mitigation</h4>
+                                        <p class="text-xs text-weaver-cream/60">Read-only system mounts prevent `rm -rf /` or modification of critical binaries.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-weaver-vermilion flex items-center justify-center shrink-0 text-white font-bold text-xs">03</div>
+                                    <div>
+                                        <h4 class="font-bold font-mono text-sm mb-1 text-white">Supply Chain Injection</h4>
+                                        <p class="text-xs text-weaver-cream/60">Dependency lockfiles are verified against policies to prevent adding malicious crates or packages.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Do's and Don'ts -->
+                        <div class="flex-1 bg-white/5 p-8 border border-white/10 rounded-sm w-full">
+                            <h3 class="font-serif text-xl mb-6 text-white">Operational Guidance</h3>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-mono text-xs text-green-400 font-bold mb-3 uppercase tracking-wider">Do</h4>
+                                    <ul class="space-y-2 text-xs text-weaver-cream/80">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Run verify often</li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Audit policy files</li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Use specific mounts</li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Review diffs manually</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-mono text-xs text-weaver-vermilion font-bold mb-3 uppercase tracking-wider">Don't</h4>
+                                    <ul class="space-y-2 text-xs text-weaver-cream/80">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Run as root</li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Disable sandbox in prod</li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Share API keys in env</li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Blindly auto-merge</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 pt-6 border-t border-white/10">
+                                <p class="font-mono text-[10px] text-weaver-cream/40 italic">
+                                    "Trust, but verify inside a chroot."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Example Config Section -->
+            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="font-serif text-3xl text-weaver-indigo mb-8">Configuration &amp; Protocol Reference</h2>
+
+                    <div class="reference-callout mb-8">
+                        <div class="reference-callout-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Canonical reference
+                        </div>
+                        <p class="text-sm text-weaver-indigo/80 mb-3">
+                            Keep the safety model here. Keep configuration defaults, daemon lifecycle, and the JSONL envelope in the docs hub. That page is now the maintained source of truth for operator-facing config and protocol details.
+                        </p>
+                        <div class="flex flex-wrap gap-3 text-xs font-mono">
+                            <a href="../docs/#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
+                            <a href="../docs/#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
+                            <a href="../docs/#daemon-lifecycle" class="text-weaver-vermilion hover:underline">Daemon lifecycle</a>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                            <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Defaults</h3>
+                            <p class="text-sm text-weaver-indigo/75 leading-relaxed">
+                                Built-in logging defaults remain <code>info</code> for <code>log_filter</code> and <code>json</code> for <code>log_format</code>. Use <code>log_format = "compact"</code> only when overriding that default.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                            <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Config keys</h3>
+                            <p class="text-sm text-weaver-indigo/75 leading-relaxed">
+                                The safety model depends on the same top-level config keys documented in the docs hub: <code>daemon_socket</code>, <code>log_filter</code>, <code>log_format</code>, and repeatable <code>[[capability_overrides]]</code>.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                            <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Wire format</h3>
+                            <p class="text-sm text-weaver-indigo/75 leading-relaxed">
+                                Sandbox-protected tools still report through the daemon's normal JSONL envelope: <code>stream</code> frames during execution, then a final <code>exit</code> frame.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom CTA -->
+            <section class="py-16 px-8 lg:px-16">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-sm">
+                        <div>
+                            <h3 class="font-serif text-xl text-weaver-indigo mb-2">Understand the Agent's Mind</h3>
+                            <p class="text-sm text-weaver-indigo/70">Explore how Sempai queries the codebase structure.</p>
+                        </div>
+                        <a href="../sempai/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
+                            Next: Sempai Engine
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
+                <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <div class="flex items-center gap-3 mb-2">
+                             <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
+                                <span class="font-serif font-bold text-lg">W</span>
+                             </div>
+                             <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
+                        </div>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
+                            <a href="../why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                            <a href="../roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
+                            <a href="../docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                            <a href="../install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Decorative Footer Stamp -->
+                <div class="absolute bottom-8 right-8 opacity-20 pointer-events-none hidden lg:block">
+                    <div class="w-24 h-24 border-4 border-weaver-indigo rounded-sm flex items-center justify-center stamp-rotate">
+                        <div class="text-center">
+                            <span class="text-weaver-indigo font-serif font-bold text-xl block">DESIGN</span>
+                            <span class="text-weaver-indigo font-serif font-bold text-xl block">SYSTEM</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+    <script src="../assets/js/mobile-nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himotoshi Design Language (Netsuke) - Design System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/tailwind-config.js"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Source+Sans+3:wght@300;400;500;600&amp;display=swap"
+      rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/himotoshi.css">
+    <script defer src="../assets/js/mobile-nav.js"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <style>
+.code-block
+      {
+        background-color: #2E2A25;
+        color: #E8D5B5;
+        font-family: 'JetBrains Mono', monospace;
+      }
+    </style>
+  </head>
+
+  <body
+    class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white">
+    <!-- Navigation -->
+    <nav id="navbar"
+      class="fixed top-0 w-full z-50 shell-backdrop border-b border-stone-light/50 transition-all duration-300" aria-label="Primary navigation">
+      <div class="site-container">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-white font-serif font-bold text-lg shadow-sm">
+              N</div><span
+              class="font-serif font-semibold text-xl tracking-tight text-charcoal">Himotoshi</span>
+          </div>
+          <div class="hidden md:flex space-x-8"><a href="#intro"
+              class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm">Introduction</a><a
+              href="#colors"
+              class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm">Visual
+              Design</a><a href="#typography"
+              class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm">Typography</a><a
+              href="#components"
+              class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm">Components</a><a
+              href="#tokens"
+              class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm">Tokens</a>
+          </div>
+          <div class="flex items-center space-x-4"><a href="https://github.com/leynos/netsuke"
+              class="hm-button hm-button--ghost hm-navbar-action--design hidden sm:inline-flex items-center px-4 py-1.5 text-sm"><span
+                class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span><span class="hm-navbar-action__label">GitHub</span></a>
+            <button id="navbar-mobile-toggle" type="button" class="hidden hm-hamburger md:hidden" aria-expanded="true" aria-controls="navbar-mobile-menu" aria-label="Close menu">
+              <span class="iconify hm-hamburger__open" data-icon="carbon:menu" aria-hidden="true"></span>
+              <span class="iconify hm-hamburger__close" data-icon="carbon:close" aria-hidden="true" style="display:none"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <nav id="navbar-mobile-menu" class="hm-mobile-menu is-open md:hidden" aria-label="Mobile navigation">
+      <ul class="list-none py-3 px-4 space-y-1">
+          <li><a href="#intro" class="hm-mobile-menu__link">Introduction</a></li>
+          <li><a href="#colors" class="hm-mobile-menu__link">Visual Design</a></li>
+          <li><a href="#typography" class="hm-mobile-menu__link">Typography</a></li>
+          <li><a href="#components" class="hm-mobile-menu__link">Components</a></li>
+          <li><a href="#tokens" class="hm-mobile-menu__link">Tokens</a></li>
+      </ul>
+      <ul class="list-none border-t border-stone-light/50 py-3 px-4 space-y-2">
+          <li><a href="https://github.com/leynos/netsuke" class="hm-mobile-menu__link hm-mobile-menu__link--secondary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:logo-github" aria-hidden="true"></span>GitHub</a></li>
+      </ul>
+    </nav><!-- Hero Section -->
+    <header id="intro"
+      class="pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative overflow-hidden">
+      <div
+        class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-boxwood/30 rounded-full blur-3xl -z-10">
+      </div>
+      <div
+        class="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-stone/30 rounded-full blur-3xl -z-10">
+      </div>
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="space-y-8">
+          <div
+            class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
+            v1.0.0 Release
+          </div>
+          <h1
+            class="font-serif text-5xl lg:text-7xl font-bold text-charcoal leading-[1.1] tracking-tight">
+            Warmth,<br>
+            Precision,<br><span class="text-vermillion italic">Structure.</span>
+          </h1>
+          <p
+            class="text-xl text-charcoal-mid max-w-lg leading-relaxed font-light">
+            The Himotoshi Design Language for Netsuke, the build system
+            compiler. Named for the
+            cord that threads through a carved netsuke, connecting it to the obi
+            sash —
+            Himotoshi connects every surface of Netsuke's identity into a
+            coherent whole.
+
+          </p>
+          <div class="flex flex-wrap gap-4 pt-4"><a href="#components"
+              class="hm-button hm-button--primary inline-flex items-center px-6 py-3">
+              Explore Components
+            </a><a href="#tokens"
+              class="hm-button hm-button--ghost inline-flex items-center px-6 py-3">
+              View Tokens
+            </a></div>
+        </div>
+        <div class="relative">
+          <div
+            class="relative rounded-xl overflow-hidden shadow-2xl border border-stone bg-boxwood-pale p-1">
+            <div class="absolute top-4 right-4 z-20">
+              <div
+                class="bg-white/90 backdrop-blur px-3 py-1 rounded text-xs font-mono text-charcoal shadow-sm border border-stone/50">
+                Netsuke UI
+              </div>
+            </div><img
+              src="../assets/himotoshi-dashboard.png"
+              alt="minimalist japanese aesthetic UI design dashboard, warm beige background, indigo and vermillion accents, clean typography, wooden texture details, soft lighting, detailed interface elements"
+              class="w-full h-auto object-cover rounded-lg aspect-[4/3]">
+          </div><!-- Floating Element -->
+          <div
+            class="absolute -bottom-10 -left-10 bg-white p-6 rounded-lg shadow-xl border border-stone max-w-xs z-20 hidden md:block">
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+              <div class="w-3 h-3 rounded-full bg-amber"></div>
+              <div class="w-3 h-3 rounded-full bg-matcha"></div>
+            </div>
+            <div class="font-mono text-xs text-charcoal-mid space-y-1">
+              <div class="flex justify-between"><span
+                  class="text-indigo">--bg-primary:</span> <span>#FAF6F0</span>
+              </div>
+              <div class="flex justify-between"><span
+                  class="text-indigo">--text-main:</span> <span>#2E2A25</span>
+              </div>
+              <div class="flex justify-between"><span
+                  class="text-indigo">--accent:</span> <span>#C23B22</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header><!-- Color System Section -->
+    <section id="colors" class="py-20 bg-white border-y border-stone-light">
+      <div class="site-container">
+        <div class="mb-16"><span
+            class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">01
+            — Visual Design</span>
+          <h2 class="font-serif text-4xl font-bold text-charcoal mb-6">Color
+            Palette</h2>
+          <p class="text-lg text-charcoal-mid max-w-2xl">
+            Our palette is grounded in natural materials—charcoal, indigo dye,
+            vermillion lacquer, and boxwood. These colors provide high contrast
+            while maintaining a warm, organic feel accessible under WCAG 2.1 AA
+            standards.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Charcoal -->
+          <div class="space-y-4">
+            <div
+              class="h-32 rounded-lg bg-charcoal shadow-md flex items-end p-4 group relative overflow-hidden">
+              <span class="text-white font-mono text-sm relative z-10">Charcoal
+                #2E2A25</span></div>
+            <div class="grid grid-cols-2 gap-4">
+              <div
+                class="h-20 rounded-lg bg-charcoal-mid flex items-end p-3 text-white font-mono text-xs">
+                Mid</div>
+              <div
+                class="h-20 rounded-lg bg-charcoal-light flex items-end p-3 text-white font-mono text-xs">
+                Light</div>
+            </div>
+          </div><!-- Indigo -->
+          <div class="space-y-4">
+            <div class="h-32 rounded-lg bg-indigo shadow-md flex items-end p-4">
+              <span class="text-white font-mono text-sm">Indigo #2B4162</span>
+            </div>
+            <div class="grid grid-cols-1 gap-4">
+              <div
+                class="h-20 rounded-lg bg-indigo-light flex items-end p-3 text-white font-mono text-xs">
+                Light #3A5A7C</div>
+            </div>
+          </div><!-- Vermillion -->
+          <div class="space-y-4">
+            <div
+              class="h-32 rounded-lg bg-vermillion shadow-md flex items-end p-4">
+              <span class="text-white font-mono text-sm">Vermillion
+                #C23B22</span></div>
+            <div class="grid grid-cols-1 gap-4">
+              <div
+                class="h-20 rounded-lg bg-vermillion-dim flex items-end p-3 text-white font-mono text-xs">
+                Dim #9E3020</div>
+            </div>
+          </div><!-- Boxwood & Stone -->
+          <div class="space-y-4">
+            <div
+              class="h-32 rounded-lg bg-boxwood shadow-md flex items-end p-4 border border-stone">
+              <span class="text-charcoal font-mono text-sm">Boxwood
+                #E8D5B5</span></div>
+            <div class="grid grid-cols-2 gap-4">
+              <div
+                class="h-20 rounded-lg bg-boxwood-pale border border-stone flex items-end p-3 text-charcoal font-mono text-xs">
+                Pale</div>
+              <div
+                class="h-20 rounded-lg bg-stone flex items-end p-3 text-charcoal font-mono text-xs">
+                Stone</div>
+            </div>
+          </div>
+        </div><!-- Semantic Colors -->
+        <div class="mt-16 pt-16 border-t border-stone-light">
+          <h3 class="font-serif text-2xl font-bold text-charcoal mb-8">Semantic
+            Application</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div
+              class="p-6 rounded-lg bg-boxwood-pale border border-stone flex items-start space-x-4">
+              <div
+                class="w-10 h-10 rounded-full bg-matcha flex items-center justify-center text-white shrink-0">
+                <span  class="iconify" data-icon="carbon:checkmark" aria-hidden="true"></span></div>
+              <div>
+                <h4 class="font-bold text-charcoal mb-1">Success</h4>
+                <p class="text-sm text-charcoal-mid">Use Matcha (#4A7C59) for
+                  success states, completions, and safe actions.</p>
+              </div>
+            </div>
+            <div
+              class="p-6 rounded-lg bg-boxwood-pale border border-stone flex items-start space-x-4">
+              <div
+                class="w-10 h-10 rounded-full bg-amber flex items-center justify-center text-white shrink-0">
+                <span  class="iconify" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span></div>
+              <div>
+                <h4 class="font-bold text-charcoal mb-1">Warning</h4>
+                <p class="text-sm text-charcoal-mid">Use Amber (#C48B2C) for
+                  non-blocking alerts and attention grabbers.</p>
+              </div>
+            </div>
+            <div
+              class="p-6 rounded-lg bg-boxwood-pale border border-stone flex items-start space-x-4">
+              <div
+                class="w-10 h-10 rounded-full bg-vermillion flex items-center justify-center text-white shrink-0">
+                <span  class="iconify" data-icon="carbon:close" aria-hidden="true"></span></div>
+              <div>
+                <h4 class="font-bold text-charcoal mb-1">Error</h4>
+                <p class="text-sm text-charcoal-mid">Use Vermillion (#C23B22)
+                  for destructive actions, errors, and failures.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- Typography Section -->
+    <section id="typography" class="py-20 relative overflow-hidden">
+      <div class="site-container relative z-10">
+        <div class="grid lg:grid-cols-12 gap-12">
+          <div class="lg:col-span-4"><span
+              class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">02
+              — Typography</span>
+            <h2 class="font-serif text-4xl font-bold text-charcoal mb-6">Type
+              &amp; Scale</h2>
+            <p class="text-charcoal-mid mb-8">
+              The typographic system uses a 1.25 major third scale starting from
+              a 16px baseline. We pair the humanistic Fraunces serif with the
+              clean utility of Source Sans 3 and JetBrains Mono.
+            </p>
+            <div class="p-6 bg-white border border-stone rounded-lg shadow-sm">
+              <h4 class="font-serif font-bold text-lg mb-4 text-indigo">Font
+                Stack</h4>
+              <div class="space-y-4">
+                <div><span
+                    class="text-xs font-mono text-charcoal-light uppercase tracking-wide">Display</span>
+                  <p class="font-serif text-2xl text-charcoal">Fraunces</p>
+                </div>
+                <div><span
+                    class="text-xs font-mono text-charcoal-light uppercase tracking-wide">Body</span>
+                  <p class="font-sans text-2xl text-charcoal">Source Sans 3</p>
+                </div>
+                <div><span
+                    class="text-xs font-mono text-charcoal-light uppercase tracking-wide">Code</span>
+                  <p class="font-mono text-xl text-charcoal">JetBrains Mono</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="lg:col-span-8 space-y-8">
+            <!-- Type Scale Preview -->
+            <div class="space-y-6 border-l-2 border-boxwood pl-8">
+              <div class="flex items-baseline"><span
+                  class="w-24 text-xs font-mono text-charcoal-light">Text
+                  5xl</span>
+                <h1 class="font-serif text-6xl text-charcoal">The quick brown
+                  fox</h1>
+              </div>
+              <div class="flex items-baseline"><span
+                  class="w-24 text-xs font-mono text-charcoal-light">Text
+                  4xl</span>
+                <h2 class="font-serif text-5xl text-charcoal">Jumps over the
+                  lazy dog</h2>
+              </div>
+              <div class="flex items-baseline"><span
+                  class="w-24 text-xs font-mono text-charcoal-light">Text
+                  3xl</span>
+                <h3 class="font-serif text-4xl text-charcoal">Tactile interfaces
+                </h3>
+              </div>
+              <div class="flex items-baseline"><span
+                  class="w-24 text-xs font-mono text-charcoal-light">Text
+                  2xl</span>
+                <h4 class="font-serif text-3xl text-charcoal">Precision and
+                  warmth</h4>
+              </div>
+              <div class="flex items-baseline"><span
+                  class="w-24 text-xs font-mono text-charcoal-light">Text
+                  xl</span>
+                <h5 class="font-serif text-2xl text-charcoal">Visible structure
+                </h5>
+              </div>
+              <div class="flex items-baseline"><span
+                  class="w-24 text-xs font-mono text-charcoal-light">Text
+                  Base</span>
+                <p class="font-sans text-base text-charcoal max-w-xl">
+                  Design philosophy emphasizes warmth over sterility, precision
+                  in small spaces, visible structure, and hands-on tactile
+                  interfaces. Dark contexts provide an inverted but warm
+                  variant.
+                </p>
+              </div>
+              <div class="flex items-baseline"><span
+                  class="w-24 text-xs font-mono text-charcoal-light">Text
+                  sm</span>
+                <p class="font-sans text-sm text-charcoal-mid">
+                  Branding notes focus on a warm, precise, and tactile
+                  personality; interfaces should feel natural and
+                  hand-influenced.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- Components Section -->
+    <section id="components"
+      class="py-20 bg-boxwood-pale border-y border-stone">
+      <div class="site-container">
+        <div class="text-center mb-16"><span
+            class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">03
+            — Components</span>
+          <h2 class="font-serif text-4xl font-bold text-charcoal">UI Elements
+            &amp; Patterns</h2>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-12">
+          <!-- Buttons Card -->
+          <div class="bg-white p-8 rounded-xl border border-stone shadow-sm">
+            <h3
+              class="font-serif text-xl font-bold text-charcoal mb-6 flex items-center">
+              <span  class="iconify text-indigo mr-3 text-sm" data-icon="carbon:cursor-1" aria-hidden="true"></span>
+              Buttons
+            </h3>
+            <div class="space-y-8">
+              <div>
+                <p class="text-sm text-charcoal-mid mb-4 font-mono">Default Size
+                </p>
+                <div class="flex flex-wrap gap-4 items-center"><button
+                    class="px-6 py-2.5 bg-indigo text-white rounded-md font-medium shadow-sm hover:bg-indigo-light transition-colors focus:ring-2 focus:ring-indigo focus:ring-offset-2">
+                    Primary Action
+                  </button><button
+                    class="px-6 py-2.5 bg-vermillion text-white rounded-md font-medium shadow-sm hover:bg-vermillion-dim transition-colors focus:ring-2 focus:ring-vermillion focus:ring-offset-2">
+                    Accent CTA
+                  </button><button
+                    class="px-6 py-2.5 bg-transparent border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors">
+                    Ghost Action
+                  </button></div>
+              </div>
+              <div>
+                <p class="text-sm text-charcoal-mid mb-4 font-mono">Small Size
+                  (--sm)</p>
+                <div class="flex flex-wrap gap-4 items-center"><button
+                    class="px-3 py-1.5 text-sm bg-indigo text-white rounded-md font-medium shadow-sm hover:bg-indigo-light transition-colors">
+                    Primary
+                  </button><button
+                    class="px-3 py-1.5 text-sm bg-vermillion text-white rounded-md font-medium shadow-sm hover:bg-vermillion-dim transition-colors">
+                    Accent
+                  </button><button
+                    class="px-3 py-1.5 text-sm bg-transparent border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors">
+                    Ghost
+                  </button></div>
+              </div>
+            </div>
+          </div><!-- Tags & Badges -->
+          <div class="bg-white p-8 rounded-xl border border-stone shadow-sm">
+            <h3
+              class="font-serif text-xl font-bold text-charcoal mb-6 flex items-center">
+              <span  class="iconify text-indigo mr-3 text-sm" data-icon="carbon:tag" aria-hidden="true"></span> Tags
+              &amp; Badges
+            </h3>
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm text-charcoal-mid mb-4">Pill-shaped, monospace
+                  metadata labels.</p>
+                <div class="flex flex-wrap gap-3"><span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-boxwood text-charcoal font-mono border border-stone">
+                    v2.0.1
+                  </span><span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo/10 text-indigo font-mono border border-indigo/20">
+                    docs
+                  </span><span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-matcha/10 text-matcha font-mono border border-matcha/20">
+                    stable
+                  </span><span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber/10 text-amber font-mono border border-amber/20">
+                    beta
+                  </span><span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-vermillion/10 text-vermillion font-mono border border-vermillion/20">
+                    deprecated
+                  </span></div>
+              </div><!-- Callouts -->
+              <div class="pt-6 border-t border-stone-light">
+                <p class="text-sm text-charcoal-mid mb-4 font-mono">Admonitions
+                </p>
+                <div
+                  class="border-l-4 border-indigo bg-indigo/5 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0"><span
+                         class="iconify text-indigo" data-icon="carbon:information-filled" aria-hidden="true"></span></div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-indigo">Information
+                      </h3>
+                      <div class="mt-1 text-sm text-indigo-light">
+                        <p>This is an informational callout used for
+                          non-critical guidance.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="mt-4 border-l-4 border-vermillion bg-vermillion/5 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0"><span
+                         class="iconify text-vermillion" data-icon="carbon:error-filled" aria-hidden="true"></span>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-vermillion">Critical
+                        Error</h3>
+                      <div class="mt-1 text-sm text-vermillion-dim">
+                        <p>Something went wrong with the compilation process.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- Terminal & Code -->
+          <div
+            class="lg:col-span-2 bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
+            <div
+              class="bg-charcoal-mid/30 px-4 py-2 flex items-center justify-between border-b border-white/10">
+              <div class="flex space-x-2">
+                <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                <div class="w-3 h-3 rounded-full bg-amber"></div>
+                <div class="w-3 h-3 rounded-full bg-matcha"></div>
+              </div>
+              <div class="text-xs font-mono text-charcoal-light">Terminal
+                Preview</div>
+              <div class="w-12"></div>
+            </div>
+            <div class="p-6 font-mono text-sm overflow-x-auto">
+              <div class="text-boxwood-pale"><span
+                  class="text-matcha">➜</span><span
+                  class="text-indigo-light">~/project</span> <span
+                  class="text-boxwood">netsuke build</span></div>
+              <div class="text-stone-light mt-2"><span
+                  class="text-charcoal-light">00:01:23</span> <span
+                  class="text-indigo font-bold">INFO</span> Compiling assets...
+              </div>
+              <div class="text-stone-light"><span
+                  class="text-charcoal-light">00:01:24</span> <span
+                  class="text-matcha font-bold">SUCCESS</span> Built 42 modules
+                in 1.2s
+              </div>
+              <div class="text-stone-light mt-4"><span
+                  class="text-charcoal-light">00:01:25</span> <span
+                  class="text-vermillion font-bold">ERROR</span> Failed to
+                resolve dependency
+              </div><!-- Miette Style Error -->
+              <div
+                class="mt-4 p-4 bg-black/30 rounded border-l-2 border-vermillion">
+                <div class="text-vermillion font-bold mb-2">× Config Error:
+                  Invalid Token</div>
+                <div class="pl-4 border-l border-charcoal-mid/50 ml-1">
+                  <div class="flex"><span
+                      class="text-charcoal-mid w-8 select-none">12</span><span
+                      class="text-stone"> color: </span><span
+                      class="text-amber">"invalid-hex"</span></div>
+                  <div class="flex"><span
+                      class="text-charcoal-mid w-8 select-none">13</span><span
+                      class="text-stone"> font: </span><span
+                      class="text-matcha">"Fraunces"</span></div>
+                  <div class="flex text-vermillion mt-1"><span
+                      class="w-8 select-none"></span><span> ^ expected hex color
+                      format like #RRGGBB</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- Tokens Table Section -->
+    <section id="tokens" class="py-20 bg-white">
+      <div class="site-container">
+        <div class="grid lg:grid-cols-3 gap-12">
+          <div class="lg:col-span-1"><span
+              class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">04
+              — Implementation</span>
+            <h2 class="font-serif text-3xl font-bold text-charcoal mb-4">Design
+              Tokens</h2>
+            <p class="text-charcoal-mid mb-6">
+              Core design decisions are stored as CSS custom properties. These
+              tokens ensure consistency across the platform and enable easy
+              theming.
+            </p>
+            <div class="bg-boxwood-pale p-6 rounded-lg border border-stone">
+              <h4 class="font-bold text-charcoal mb-2">Usage Note</h4>
+              <p class="text-sm text-charcoal-mid mb-4">
+                All tokens are prefixed with
+                <code class="bg-white px-1 py-0.5 rounded border border-stone text-vermillion">--netsuke-</code>
+                to avoid conflicts.
+              </p><button
+                class="text-indigo text-sm font-medium hover:text-indigo-light flex items-center">
+                Download JSON <span  class="iconify ml-2" data-icon="carbon:download" aria-hidden="true"></span></button>
+            </div>
+          </div>
+          <div class="lg:col-span-2">
+            <div
+              class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+              <table class="min-w-full divide-y divide-stone-light">
+                <thead class="bg-boxwood-pale">
+                  <tr>
+                    <th scope="col"
+                      class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-charcoal sm:pl-6">
+                      Token Name</th>
+                    <th scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-charcoal">
+                      Value</th>
+                    <th scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-charcoal">
+                      Example</th>
+                    <th scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-charcoal">
+                      Use Case</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-light bg-white">
+                  <tr>
+                    <td
+                      class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-mono text-indigo sm:pl-6">
+                      --color-primary</td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid font-mono">
+                      #2B4162</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                      <div
+                        class="w-6 h-6 rounded bg-indigo border border-stone-light">
+                      </div>
+                    </td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid">
+                      Primary actions, links</td>
+                  </tr>
+                  <tr>
+                    <td
+                      class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-mono text-indigo sm:pl-6">
+                      --color-surface</td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid font-mono">
+                      #FAF6F0</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                      <div
+                        class="w-6 h-6 rounded bg-boxwood-pale border border-stone-light">
+                      </div>
+                    </td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid">
+                      Page background</td>
+                  </tr>
+                  <tr>
+                    <td
+                      class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-mono text-indigo sm:pl-6">
+                      --font-display</td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid font-mono">
+                      "Fraunces", serif</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm font-serif">
+                      Aa</td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid">
+                      Headings, Hero</td>
+                  </tr>
+                  <tr>
+                    <td
+                      class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-mono text-indigo sm:pl-6">
+                      --radius-md</td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid font-mono">
+                      6px</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                      <div class="w-6 h-6 border border-charcoal rounded-md">
+                      </div>
+                    </td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid">
+                      Buttons, Inputs, Cards</td>
+                  </tr>
+                  <tr>
+                    <td
+                      class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-mono text-indigo sm:pl-6">
+                      --space-4</td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid font-mono">
+                      1rem (16px)</td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                      <div class="w-4 h-4 bg-vermillion/20"></div>
+                    </td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-charcoal-mid">
+                      Base padding unit</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- Chart Example Section -->
+    <section class="py-20 bg-boxwood-pale border-t border-stone">
+      <div class="site-container">
+        <h2
+          class="font-serif text-3xl font-bold text-charcoal mb-8 text-center">
+          Data Visualization Style</h2>
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-stone">
+            <h3 class="font-serif text-lg font-bold text-charcoal mb-4">System
+              Adoption</h3>
+            <div id="barChartContainer" class="h-[300px] w-full"></div>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-stone">
+            <h3 class="font-serif text-lg font-bold text-charcoal mb-4">
+              Component Usage</h3>
+            <div id="pieChartContainer" class="h-[300px] w-full"></div>
+          </div>
+        </div>
+      </div>
+    </section><!-- Footer -->
+    <footer id="footer"
+      class="bg-charcoal pt-16 pb-8 text-stone-light border-t border-charcoal-light">
+      <div class="site-container">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div class="col-span-1 md:col-span-1">
+            <div class="flex items-center space-x-3 mb-6">
+              <div
+                class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-white font-serif font-bold text-lg">
+                N</div><span
+                class="font-serif font-bold text-xl tracking-tight text-white">Himotoshi</span>
+            </div>
+            <p class="text-sm text-charcoal-light leading-relaxed">
+              A design language for building warm, precise, and tactile
+              interfaces. Inspired by traditional craftsmanship.
+            </p>
+          </div>
+          <div>
+            <h4
+              class="text-sm font-bold uppercase tracking-wider text-boxwood mb-4">
+              Resources</h4>
+            <ul class="space-y-3 text-sm text-stone">
+              <li><a href="./"
+                  class="hover:text-white transition-colors">Documentation</a>
+              </li>
+              <li><a href="./" class="hover:text-white transition-colors">Figma
+                  Kit</a></li>
+              <li><a href="./" class="hover:text-white transition-colors">NPM
+                  Package</a></li>
+              <li><a href="../blog/"
+                  class="hover:text-white transition-colors">Changelog</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4
+              class="text-sm font-bold uppercase tracking-wider text-boxwood mb-4">
+              Community</h4>
+            <ul class="space-y-3 text-sm text-stone">
+              <li><a href="./" class="hover:text-white transition-colors">GitHub
+                  Discussions</a></li>
+              <li><a href="./" class="hover:text-white transition-colors">Discord
+                  Server</a></li>
+              <li><a href="./" class="hover:text-white transition-colors">Twitter
+                  / X</a></li>
+              <li><a href="./"
+                  class="hover:text-white transition-colors">Showcase</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4
+              class="text-sm font-bold uppercase tracking-wider text-boxwood mb-4">
+              Legal</h4>
+            <ul class="space-y-3 text-sm text-stone">
+              <li><a href="./" class="hover:text-white transition-colors">License
+                  (MIT)</a></li>
+              <li><a href="../privacy-policy/" class="hover:text-white transition-colors">Privacy
+                  Policy</a></li>
+              <li><a href="../code-of-conduct/" class="hover:text-white transition-colors">Code of
+                  Conduct</a></li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-charcoal-mid pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p class="text-xs text-charcoal-light mb-4 md:mb-0">
+            &copy; 2026 df12 Productions. Serious tools, <span class="text-boxwood">playful worlds.</span>
+          </p>
+          <div class="flex space-x-6"><a href="https://github.com/leynos/netsuke"
+              class="hm-footer-icon" aria-label="Netsuke on GitHub"><span
+                 class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a><a href="https://bsky.app/profile/df12.studio"
+              class="hm-footer-icon" aria-label="df12 on Bluesky"><span
+                 class="iconify" data-icon="carbon:logo-bluesky" aria-hidden="true"></span></a></div>
+        </div>
+      </div>
+    </footer>
+    <script>
+      // Chart Generation
+      window.addEventListener('load', function()
+      {
+        try
+        {
+          // Bar Chart
+          const barData = [
+          {
+            x: ['Q1', 'Q2', 'Q3', 'Q4'],
+            y: [120, 180, 240, 310],
+            type: 'bar',
+            marker:
+            {
+              color: '#2B4162'
+            } // Indigo
+          }];
+          const barLayout = {
+            title:
+            {
+              text: '',
+              font:
+              {
+                family: 'Fraunces'
+              }
+            },
+            margin:
+            {
+              t: 20,
+              r: 20,
+              b: 40,
+              l: 40
+            },
+            plot_bgcolor: '#FFFFFF',
+            paper_bgcolor: '#FFFFFF',
+            font:
+            {
+              family: 'Source Sans 3',
+              color: '#5C554D'
+            },
+            xaxis:
+            {
+              gridcolor: '#F5EDE0'
+            },
+            yaxis:
+            {
+              gridcolor: '#F5EDE0'
+            }
+          };
+          Plotly.newPlot('barChartContainer', barData, barLayout,
+          {
+            responsive: true,
+            displayModeBar: false
+          });
+
+          // Pie Chart
+          const pieData = [
+          {
+            values: [45, 25, 20, 10],
+            labels: ['Buttons', 'Forms', 'Cards', 'Other'],
+            type: 'pie',
+            marker:
+            {
+              colors: ['#2B4162', '#C23B22', '#E8D5B5',
+                '#D1C7B8'
+              ] // Indigo, Vermillion, Boxwood, Stone
+            },
+            textinfo: 'none'
+          }];
+          const pieLayout = {
+            margin:
+            {
+              t: 20,
+              r: 20,
+              b: 20,
+              l: 20
+            },
+            paper_bgcolor: '#FFFFFF',
+            font:
+            {
+              family: 'Source Sans 3',
+              color: '#5C554D'
+            },
+            showlegend: true
+          };
+          Plotly.newPlot('pieChartContainer', pieData, pieLayout,
+          {
+            responsive: true,
+            displayModeBar: false
+          });
+
+        }
+        catch (e)
+        {
+          console.error("Chart generation failed:", e);
+        }
+      });
+    </script>
+  </body>
+
+</html>

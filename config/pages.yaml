@@ -390,3 +390,134 @@ pages:
       orchestration. Define msgspec payload schemas, spin up background
       workers, and broadcast updates to rooms—all without turning your ASGI
       app into spaghetti.
+
+shared_content:
+  terms-of-use:
+    label: "Terms of Use"
+    source: config/shared/terms-of-use.md
+    output_slug: terms-of-use
+  privacy-policy:
+    label: "Privacy Policy"
+    source: config/shared/privacy-policy.md
+    output_slug: privacy-policy
+  code-of-conduct:
+    label: "Code of Conduct"
+    source: config/shared/code-of-conduct.md
+    output_slug: code-of-conduct
+
+sites:
+  mxd:
+    output_dir: public/mxd
+    templates_dir: templates/mxd
+    stylesheet: assets/site.css
+    base_path: /mxd/
+    static_assets_dir: templates/mxd/static
+    theme:
+      site_name: mxd
+      hero_eyebrow: mxd Documentation
+      hero_tagline: Hotline-style daemon for joyful file-sharing
+    parent_link:
+      label: About df12
+      href: /about.html
+    nav_links:
+      - label: Home
+        href: ../
+      - label: Quickstart
+        href: ../quickstart/
+      - label: Installation
+        href: ../installation/
+      - label: Deployment
+        href: ../deployment/
+      - label: Architecture
+        href: ../architecture/
+      - label: Protocol
+        href: ../protocol/
+      - label: Configuration
+        href: ../configuration/
+      - label: Databases
+        href: ../database-backends/
+      - label: Subsystems
+        href: ../subsystems/
+      - label: Compatibility
+        href: ../compatibility/
+      - label: Verification
+        href: ../verification/
+      - label: Roadmap
+        href: ../roadmap/
+      - label: Changelog
+        href: ../changelog/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    pages: {}
+
+  netsuke:
+    output_dir: public/netsuke
+    templates_dir: templates/netsuke
+    stylesheet: assets/css/himotoshi.css
+    base_path: /netsuke/
+    static_assets_dir: templates/netsuke/static
+    theme:
+      site_name: Netsuke
+      hero_eyebrow: Netsuke Documentation
+      hero_tagline: Declarative build tooling for ambitious teams
+    parent_link:
+      label: About df12
+      href: /about.html
+    nav_links:
+      - label: Home
+        href: ../
+      - label: Docs
+        href: ../docs/
+      - label: Examples
+        href: ../examples/
+      - label: Guides
+        href: ../guides/
+      - label: Blog
+        href: ../blog/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    pages: {}
+
+  weaver:
+    output_dir: public/weaver
+    templates_dir: templates/weaver
+    stylesheet: assets/styles/weaver-site.css
+    base_path: /weaver/
+    static_assets_dir: templates/weaver/static
+    theme:
+      site_name: Weaver
+      hero_eyebrow: Weaver Documentation
+      hero_tagline: CLI tooling for code-aware agents
+    parent_link:
+      label: About df12
+      href: /about.html
+    nav_links:
+      - label: Home
+        href: ../
+      - label: Philosophy
+        href: ../why-weaver/
+      - label: Architecture
+        href: ../how-it-works/
+      - label: Commands
+        href: ../commands/
+      - label: Safety
+        href: ../safety/
+      - label: Sempai Engine
+        href: ../sempai/
+      - label: Jacquard
+        href: ../jacquard/
+      - label: Install
+        href: ../install/
+      - label: Docs
+        href: ../docs/
+      - label: Roadmap
+        href: ../roadmap/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    pages: {}

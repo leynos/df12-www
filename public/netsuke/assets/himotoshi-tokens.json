@@ -1,0 +1,29 @@
+{
+  "tokens": [
+    {
+      "name": "--netsuke-color-primary",
+      "value": "#2B4162",
+      "useCase": "Primary actions, links"
+    },
+    {
+      "name": "--netsuke-color-surface",
+      "value": "#FAF6F0",
+      "useCase": "Page background"
+    },
+    {
+      "name": "--netsuke-font-display",
+      "value": "\"Fraunces\", serif",
+      "useCase": "Headings, hero"
+    },
+    {
+      "name": "--netsuke-radius-md",
+      "value": "6px",
+      "useCase": "Buttons, inputs, cards"
+    },
+    {
+      "name": "--netsuke-space-4",
+      "value": "1rem",
+      "useCase": "Base padding unit"
+    }
+  ]
+}

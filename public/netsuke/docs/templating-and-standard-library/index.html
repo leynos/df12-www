@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templating & Standard Library - Netsuke Build System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../assets/js/tailwind-config.js"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/himotoshi.css">
+    <script defer src="../../assets/js/mobile-nav.js"></script>
+    <style>
+        /* Syntax Highlighting */
+        .token.comment { color: #8A8279; font-style: italic; }
+        .token.string { color: #4A7C59; }
+        .token.keyword { color: #C23B22; font-weight: bold; }
+        .token.function { color: #2B4162; }
+        .token.operator { color: #C48B2C; }
+        .token.number { color: #C48B2C; }
+        .token.property { color: #2E2A25; }
+        .token.type { color: #C48B2C; }
+
+        .code-container {
+            counter-reset: line;
+        }
+        .code-line::before {
+            counter-increment: line;
+            content: counter(line);
+            display: inline-block;
+            width: 1.5rem;
+            margin-right: 1rem;
+            text-align: right;
+            color: #5C554D;
+            opacity: 0.5;
+            user-select: none;
+        }
+
+        .function-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(46, 42, 37, 0.1), 0 4px 6px -2px rgba(46, 42, 37, 0.05);
+        }
+    </style>
+</head>
+<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
+        <div class="site-container">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-3 cursor-pointer">
+                    <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light shadow-sm" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="20.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                    <span class="font-serif font-bold text-xl tracking-tight text-charcoal">Netsuke</span>
+                </div>
+
+                <div class="hidden md:flex space-x-8">
+                    <a href="../../" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Home</a>
+                    <a href="../" class="text-charcoal font-semibold border-b-2 border-vermillion transition-colors text-sm py-1" aria-current="page">Docs</a>
+                    <a href="../../examples/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Examples</a>
+                    <a href="../../guides/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Guides</a>
+                    <a href="../../blog/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Blog</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/leynos/netsuke" class="hm-button hm-button--ghost hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
+                        <span class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span><span class="hm-navbar-action__label">GitHub</span>
+                    </a>
+                    <a href="../../install/" class="hm-button hm-button--primary hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
+                        <span class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span><span class="hm-navbar-action__label">Install</span>
+                    </a>
+                    <button id="navbar-mobile-toggle" type="button" class="hidden hm-hamburger md:hidden" aria-expanded="true" aria-controls="navbar-mobile-menu" aria-label="Close menu">
+                        <span class="iconify hm-hamburger__open" data-icon="carbon:menu" aria-hidden="true"></span>
+                        <span class="iconify hm-hamburger__close" data-icon="carbon:close" aria-hidden="true" style="display:none"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <nav id="navbar-mobile-menu" class="hm-mobile-menu is-open md:hidden" aria-label="Mobile navigation">
+        <ul class="list-none py-3 px-4 space-y-1">
+            <li><a href="../../" class="hm-mobile-menu__link">Home</a></li>
+            <li><a href="../" class="hm-mobile-menu__link hm-mobile-menu__link--active" aria-current="page">Docs</a></li>
+            <li><a href="../../examples/" class="hm-mobile-menu__link">Examples</a></li>
+            <li><a href="../../guides/" class="hm-mobile-menu__link">Guides</a></li>
+            <li><a href="../../blog/" class="hm-mobile-menu__link">Blog</a></li>
+        </ul>
+        <ul class="list-none border-t border-stone-light/50 py-3 px-4 space-y-2">
+            <li><a href="https://github.com/leynos/netsuke" class="hm-mobile-menu__link hm-mobile-menu__link--secondary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:logo-github" aria-hidden="true"></span>GitHub</a></li>
+            <li><a href="../../install/" class="hm-mobile-menu__link hm-mobile-menu__link--primary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:download" aria-hidden="true"></span>Install Netsuke</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="site-container pt-16 flex-grow flex">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            <!-- Search -->
+            <div
+                class="mb-8 relative"
+                data-doc-search-root
+                data-doc-search-index="../../assets/search/docs-search.json"
+            >
+                <span  class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                <input
+                    type="text"
+                    placeholder="Search docs..."
+                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
+                    data-doc-search-input
+                    aria-label="Search the documentation"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded="false"
+                >
+                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
+                <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
+                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
+                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                            Type at least 2 characters to search the docs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="space-y-8">
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Introduction</h3>
+                    <ul class="space-y-1">
+                        <li><a href="../" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
+                        <li><a href="../getting-started/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Getting Started</a></li>
+                        <li><a href="./" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Core Concepts</h3>
+                    <ul class="space-y-1">
+                        <li><a href="../manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
+                        <li><a href="../rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules & Targets</a></li>
+                        <li><a href="#starlark-intro" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Templating</a></li>
+                        <li><a href="#stdlib-reference" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Core Standard Library</a></li>
+                        <li><a href="#stdlib-extended" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Extended Library</a></li>
+                        <li><a href="#patterns" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Patterns</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
+                    <ul class="space-y-1">
+                        <li><a href="../cli-security-and-configuration/#cli" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
+                        <li><a href="../cli-security-and-configuration/#configuration" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
+                        <li><a href="../cli-security-and-configuration/#security" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
+                <a href="../" class="hover:text-vermillion transition-colors">Docs</a>
+                <span class="mx-2 text-stone">/</span>
+                <span class="text-charcoal font-medium">Templating & StdLib</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
+                        Core Concepts
+                    </div>
+                    <span class="text-charcoal-mid text-xs font-mono bg-white px-2 py-1 rounded border border-stone">Jinja helpers</span>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Templating & Standard Library</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    Netsuke uses MiniJinja inside YAML values. The structure stays as data; templating fills in strings, expands <code>foreach</code>, and gates entries with <code>when</code>.
+                </p>
+            </div>
+
+            <!-- Introduction to templating -->
+            <section id="starlark-intro" class="mb-16">
+                <div class="grid lg:grid-cols-2 gap-12 items-start">
+                    <div>
+                        <h2 class="font-serif text-2xl font-bold text-charcoal mb-4">Why Jinja inside YAML?</h2>
+                        <p class="text-charcoal-mid mb-6 leading-relaxed">
+                            Netsuke validates YAML before rendering templates. That keeps the manifest legible, keeps the structure explicit, and still leaves room for loops, macros, and conditional expansion.
+                        </p>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
+                                    <span  class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                </div>
+                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">YAML first:</strong> Structure is checked before templating is allowed to render commands.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
+                                    <span  class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                </div>
+                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">Controlled expansion:</strong> <code>foreach</code> and <code>when</code> handle structural repetition without turning the file into a programming language.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
+                                    <span  class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                </div>
+                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">Reusable helpers:</strong> Macros, filters, and built-in functions cover common path and environment tasks.</span>
+                            </li>
+                        </ul>
+                        <div class="bg-boxwood-pale p-5 rounded-lg border border-stone text-sm text-charcoal-mid">
+                            <p class="font-bold text-charcoal mb-2"><span  class="iconify mr-2 text-indigo" data-icon="carbon:book" aria-hidden="true"></span> Learn More</p>
+                            The goal is not to hide the build graph. The goal is to keep repeated YAML short enough to tolerate.
+                        </div>
+                    </div>
+
+                    <!-- Code Example Card -->
+                    <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
+                        <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber"></div>
+                                <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                            </div>
+                            <span class="text-xs font-mono text-stone-light">Netsukefile</span>
+                            <div class="w-12"></div>
+                        </div>
+                        <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light code-container">
+                            <div class="code-line"><span class="token property">macros</span>:</div>
+                            <div class="code-line">  - <span class="token property">signature</span>: <span class="token string">"obj_name(src)"</span></div>
+                            <div class="code-line">    <span class="token property">body</span>: <span class="token string">|</span></div>
+                            <div class="code-line">      <span class="token string">{{ src | basename | replace('.c', '.o') }}</span></div>
+                            <div class="code-line"></div>
+                            <div class="code-line"><span class="token property">targets</span>:</div>
+                            <div class="code-line">  - <span class="token property">foreach</span>: <span class="token string">glob('src/*.c')</span></div>
+                            <div class="code-line">    <span class="token property">name</span>: <span class="token string">"build/{{ obj_name(item) }}"</span></div>
+                            <div class="code-line">    <span class="token property">rule</span>: <span class="token string">"compile"</span></div>
+                            <div class="code-line">    <span class="token property">sources</span>: <span class="token string">"{{ item }}"</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Library Usage Stats Chart -->
+            <section id="stats" class="mb-20 pt-8 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Standard Library Usage</h2>
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div id="stdLibChart" class="h-[350px] w-full"></div>
+                    <p class="text-xs text-center text-charcoal-light mt-4 font-mono">Illustrative relative frequency across example manifests in the Netsuke repository</p>
+                </div>
+            </section>
+
+            <!-- Standard Library Reference -->
+            <section id="stdlib-reference" class="mb-16">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal">Standard Library Reference</h2>
+                    <div class="flex space-x-2">
+                        <span class="px-2 py-1 bg-white border border-stone rounded text-xs font-mono text-charcoal-mid cursor-pointer hover:border-indigo transition-colors">Core</span>
+                        <span class="px-2 py-1 bg-transparent border border-transparent rounded text-xs font-mono text-charcoal-light cursor-pointer hover:text-charcoal transition-colors">Shell</span>
+                        <span class="px-2 py-1 bg-transparent border border-transparent rounded text-xs font-mono text-charcoal-light cursor-pointer hover:text-charcoal transition-colors">Paths</span>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Function Card 1 -->
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">fetch()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Network</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            fetch("https://example.com/data", cache=true)
+                        </div>
+                    </div>
+
+                    <!-- Function Card 2 -->
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">shell_escape</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Security</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Safely quotes a string for use as a single shell argument. Use this whenever interpolating paths or variables into commands.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ path | shell_escape }}
+                        </div>
+                    </div>
+
+                    <!-- Function Card 3 -->
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">with_suffix</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Replaces the file extension of a path. Accepts an optional count to replace multiple trailing extensions.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ item | basename | with_suffix('.o') }}
+                        </div>
+                    </div>
+
+                    <!-- Function Card 4 -->
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">env()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Data</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Read environment variables into the templating context when the manifest needs host-specific values.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            env("CC")
+                        </div>
+                    </div>
+
+                    <!-- Function Card 5 -->
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">sorted</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Logic</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Sort a list deterministically before it becomes part of the final static graph.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            glob('build/*.html') | sorted
+                        </div>
+                    </div>
+
+                    <!-- Function Card 6 -->
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">glob</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Finds all files matching a pattern. Use sparingly to maintain explicit dependencies.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            glob(include=[], exclude=[])
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Extended Standard Library -->
+            <section id="stdlib-extended" class="mb-16 pt-8 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-3">Extended Standard Library</h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Beyond the core functions, Netsuke provides a rich set of filters and helpers covering time, file inspection, paths, collections, shell execution, and executable discovery.
+                </p>
+
+                <!-- Time Helpers -->
+                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                    <span class="iconify text-indigo mr-2" data-icon="carbon:time" aria-hidden="true"></span> Time helpers
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6 mb-10">
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">now()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Time</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns the current time as a timezone-aware object (defaults to UTC). Exposes <code>.iso8601</code>, <code>.unix_timestamp</code>, and <code>.offset</code>. Accepts an optional UTC offset string such as <code>'+02:00'</code> or <code>'Z'</code>.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ now().iso8601 }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">timedelta()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Time</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Creates a duration object for age comparisons and arithmetic. Accepts <code>weeks</code>, <code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>, <code>milliseconds</code>, <code>microseconds</code>, <code>nanoseconds</code>. Exposes <code>.iso8601</code>, <code>.seconds</code>, <code>.nanoseconds</code>.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            timedelta(days=7)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Content Filters -->
+                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                    <span class="iconify text-indigo mr-2" data-icon="carbon:document-view" aria-hidden="true"></span> File content filters
+                </h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">contents</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional <code>encoding</code> argument (default: <code>'utf-8'</code>).</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ "VERSION" | contents }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">size</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns the file size in bytes. Useful for gating large downloads or asserting build artefact bounds.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ path | size }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">linecount</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Counts the number of lines in a text file. Does not load the entire file into memory.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ "src/main.c" | linecount }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">hash</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns the full hex digest of a file. Supports <code>sha256</code> (default) and <code>sha512</code>.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ path | hash(alg='sha256') }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">digest</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns a truncated hex digest of a file. Accepts <code>len</code> (default: <code>8</code>) and <code>alg</code> arguments. Useful for short cache-busting hashes in output filenames.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ path | digest(len=8) }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Path Filters -->
+                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                    <span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span> Path filters
+                </h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">relative_to</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Makes an absolute path relative to a given base. <code>'/a/b/c' | relative_to('/a/b')</code> → <code>'c'</code>.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ path | relative_to(base_dir) }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">realpath</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Canonicalises a path, resolving all symlinks and relative components to an absolute path.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ item | realpath }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">expanduser</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Expands a leading <code>~</code> to the current user's home directory.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ "~/.config/app" | expanduser }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collection Filters -->
+                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                    <span class="iconify text-indigo mr-2" data-icon="carbon:list" aria-hidden="true"></span> Collection filters
+                </h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">uniq</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Collection</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Removes duplicate items from a list, preserving the original order of first occurrences.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            glob('**/*.h') | uniq
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">flatten</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Collection</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Flattens a nested list into a single flat list. <code>[[1], [2, 3]] | flatten</code> → <code>[1, 2, 3]</code>.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            source_groups | flatten
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">group_by</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Collection</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Groups a list of dicts or objects by the value of a named attribute, returning a dict of lists keyed by the grouped value.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            files | group_by('extension')
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Command Filters (Impure) -->
+                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                    <span class="iconify text-indigo mr-2" data-icon="carbon:terminal" aria-hidden="true"></span> Command filters
+                    <span class="ml-3 px-2 py-0.5 rounded text-xs font-mono bg-amber/10 text-amber border border-amber/20">Impure</span>
+                </h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
+                    These filters execute external processes at template evaluation time, making the template <em>impure</em> — its output depends on the environment, not just the manifest. Use judiciously.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-10">
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">shell()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Pipes the input value as stdin to a shell command string. Returns captured stdout (up to 1 MiB by default). Pass <code>{'mode': 'tempfile'}</code> to stream larger output to a temporary file instead.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ user_list | shell('grep admin') }}
+                        </div>
+                    </div>
+                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">grep()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4">Filters input lines matching a pattern. The <code>flags</code> argument accepts a string (e.g. <code>'-i'</code>) or list of strings. Implemented via <code>shell</code>.</p>
+                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                            {{ log_lines | grep('ERROR', flags='-i') }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Executable Discovery -->
+                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                    <span class="iconify text-indigo mr-2" data-icon="carbon:search-locate" aria-hidden="true"></span> Executable discovery
+                </h3>
+                <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden mb-10">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">which</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Discovery</span>
+                        </div>
+                        <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
+                            Resolves executables using the current <code>PATH</code> without marking the template impure.
+                            Available as both a filter (<code>{{ 'clang++' | which }}</code>) and a function (<code>{{ which('clang++') }}</code>).
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-charcoal text-xs uppercase tracking-wide mb-3">Keyword arguments</h4>
+                                <div class="space-y-2 text-xs font-mono">
+                                    <div class="flex items-start">
+                                        <span class="text-indigo w-24 shrink-0">all</span>
+                                        <span class="text-charcoal-mid">Return every match, ordered by <code>PATH</code> (default: <code>false</code>)</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="text-indigo w-24 shrink-0">canonical</span>
+                                        <span class="text-charcoal-mid">Resolve symlinks and deduplicate by canonical path (default: <code>false</code>)</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="text-indigo w-24 shrink-0">fresh</span>
+                                        <span class="text-charcoal-mid">Bypass the resolver cache for this lookup (default: <code>false</code>)</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="text-indigo w-24 shrink-0">cwd_mode</span>
+                                        <span class="text-charcoal-mid"><code>auto</code> | <code>always</code> | <code>never</code> — control whether empty <code>PATH</code> segments honour the working directory</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-charcoal text-xs uppercase tracking-wide mb-3">Diagnostic codes</h4>
+                                <div class="space-y-2 text-xs font-mono text-charcoal-mid">
+                                    <div><code class="text-vermillion">netsuke::jinja::which::not_found</code> — executable not on PATH; includes a preview of the scanned PATH</div>
+                                    <div class="mt-2"><code class="text-vermillion">netsuke::jinja::which::args</code> — unknown or invalid keyword argument</div>
+                                </div>
+                                <div class="mt-4 text-xs font-mono text-stone-light bg-charcoal p-3 rounded">
+                                    {{ 'clang++' | which(all=true, canonical=true) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filesystem Tests -->
+                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                    <span class="iconify text-indigo mr-2" data-icon="carbon:checkmark-outline" aria-hidden="true"></span> Filesystem tests
+                </h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
+                    Use Jinja's <code>is</code> keyword with these tests to gate targets conditionally.
+                    Type tests do not follow symbolic links; permission tests check for the current user.
+                </p>
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
+                        <div class="font-bold text-charcoal mb-2">Type tests</div>
+                        <div class="space-y-1 font-mono text-charcoal-mid">
+                            <div><code class="text-indigo">is file</code> — regular file</div>
+                            <div><code class="text-indigo">is dir</code> — directory</div>
+                            <div><code class="text-indigo">is symlink</code> — symbolic link</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
+                        <div class="font-bold text-charcoal mb-2">Permission tests</div>
+                        <div class="space-y-1 font-mono text-charcoal-mid">
+                            <div><code class="text-indigo">is readable</code></div>
+                            <div><code class="text-indigo">is writable</code></div>
+                            <div><code class="text-indigo">is executable</code></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
+                        <div class="font-bold text-charcoal mb-2">Path tests</div>
+                        <div class="space-y-1 font-mono text-charcoal-mid">
+                            <div><code class="text-indigo">is absolute</code></div>
+                            <div><code class="text-indigo">is relative</code></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-charcoal rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
+                    <pre><code><span class="token property">targets</span>:
+  - <span class="token property">when</span>: <span class="token string">env('CC') | which is executable</span>
+    <span class="token property">name</span>: <span class="token string">"build/main.o"</span>
+    <span class="token property">rule</span>: <span class="token string">"compile"</span></code></pre>
+                </div>
+            </section>
+
+            <!-- Advanced Patterns -->
+            <section id="patterns" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Common Patterns</h2>
+
+                <div class="bg-boxwood-pale border border-stone rounded-xl overflow-hidden">
+                    <div class="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-stone">
+                        <!-- Sidebar for patterns -->
+                        <div class="md:col-span-4 p-6 bg-white/50">
+                            <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Recipes</h3>
+                            <ul class="space-y-2">
+                                <li>
+                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-indigo bg-indigo/5 rounded-md border border-indigo/10">
+                                        Cross-Compilation
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-charcoal-mid hover:bg-white/60 rounded-md transition-colors">
+                                        Test Suites
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-charcoal-mid hover:bg-white/60 rounded-md transition-colors">
+                                        Code Generation
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Content for patterns -->
+                        <div class="md:col-span-8 p-8 bg-white">
+                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Platform-specific sources with `when`</h4>
+                            <p class="text-sm text-charcoal-mid mb-6">
+                                Use <code class="bg-stone-light/30 px-1 rounded text-xs">when</code> on repeated entries to include targets only when the current variables match the platform you want.
+                            </p>
+
+                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+<pre><code><span class="token property">targets</span>:
+  - <span class="token property">when</span>: <span class="token string">target_os == 'linux'</span>
+    <span class="token property">name</span>: <span class="token string">"sys/linux.o"</span>
+    <span class="token property">rule</span>: <span class="token string">"compile"</span>
+    <span class="token property">sources</span>: <span class="token string">"src/linux_utils.c"</span>
+
+  - <span class="token property">when</span>: <span class="token string">target_os == 'macos'</span>
+    <span class="token property">name</span>: <span class="token string">"sys/macos.o"</span>
+    <span class="token property">rule</span>: <span class="token string">"compile"</span>
+    <span class="token property">sources</span>: <span class="token string">"src/macos_utils.c"</span></code></pre>
+                            </div>
+
+                            <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
+                                <span  class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                                <p>Keep conditions coarse-grained. Avoid selecting on individual compiler versions unless absolutely necessary.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Help Footer -->
+            <div class="mt-10 pt-10 border-t border-stone-light">
+                <div class="flex justify-between items-center">
+                    <a href="../rules-and-targets/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span  class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
+                            <div class="font-medium text-sm">Rules & Targets</div>
+                        </div>
+                    </a>
+
+                    <a href="../cli-security-and-configuration/#cli" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="text-right">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
+                            <div class="font-medium text-sm">CLI Commands</div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span  class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-charcoal pt-16 pb-8 text-stone-light border-t border-charcoal-light mt-auto">
+        <div class="site-container">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Brand Column -->
+                <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="20.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                        <span class="font-serif font-bold text-xl tracking-tight text-white">Netsuke</span>
+                    </div>
+                    <p class="text-sm text-charcoal-light leading-relaxed mb-6">
+                        Netsuke is free, open-source, and written in Rust. It aims to bring the power of large-scale build systems to projects of any size.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/leynos/netsuke" class="hm-footer-icon" aria-label="Netsuke on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
+                        <a href="https://bsky.app/profile/df12.studio" class="hm-footer-icon" aria-label="df12 on Bluesky"><span  class="iconify" data-icon="carbon:logo-bluesky" aria-hidden="true"></span></a>
+                    </div>
+                </div>
+                <!-- Links -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Documentation</h4>
+                    <ul class="space-y-3 text-sm text-stone">
+                        <li><a href="../getting-started/" class="hover:text-white transition-colors">Getting Started</a></li>
+                        <li><a href="../manifest-reference/" class="hover:text-white transition-colors">Manifest Reference</a></li>
+                        <li><a href="../rules-and-targets/" class="hover:text-white transition-colors">Rules & Targets</a></li>
+                        <li><a href="../cli-security-and-configuration/#cli" class="hover:text-white transition-colors">CLI Commands</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Resources</h4>
+                    <ul class="space-y-3 text-sm text-stone">
+                        <li><a href="../../examples/" class="hover:text-white transition-colors">Examples Hub</a></li>
+                        <li><a href="../../design/" class="hover:text-white transition-colors">Design System</a></li>
+                        <li><a href="../../blog/" class="hover:text-white transition-colors">Blog & Releases</a></li>
+                        <li><a href="../../contributing/" class="hover:text-white transition-colors">Contributing</a></li>
+                    </ul>
+                </div>
+
+                <!-- CTA Column -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Ready to build?</h4>
+                    <div class="space-y-4">
+                        <a href="../../install/" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">
+                            Install Netsuke
+                        </a>
+                        <a href="../" class="block w-full py-2 px-4 bg-transparent border border-stone/30 text-stone text-center rounded text-sm font-bold hover:bg-white/5 transition-colors">
+                            Read the docs
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-charcoal-mid pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-charcoal-light">
+                <p class="mb-4 md:mb-0">
+                    &copy; 2026 df12 Productions. Serious tools, <span class="text-boxwood">playful worlds.</span>
+                </p>
+                <div class="flex space-x-6">
+                    <a href="../../privacy-policy/" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="../../terms-of-use/" class="hover:text-white transition-colors">Terms of Use</a>
+                    <a href="../../code-of-conduct/" class="hover:text-white transition-colors">Code of Conduct</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../../assets/vendor/minisearch.js"></script>
+    <script defer src="../../assets/js/doc-search.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            try {
+                // Bar Chart for StdLib Usage
+                const trace1 = {
+                    x: ['glob', 'env', 'basename', 'with_suffix', 'shell_escape', 'fetch', 'which', 'sorted', 'relative_to', 'contents', 'shell', 'now', 'hash', 'uniq', 'flatten'],
+                    y: [95, 82, 76, 65, 45, 30, 28, 25, 22, 18, 14, 12, 10, 9, 7],
+                    type: 'bar',
+                    marker: {
+                        color: ['#2B4162', '#3A5A7C', '#4A7C59', '#C48B2C', '#C23B22', '#8A8279',
+                                '#2B4162', '#3A5A7C', '#4A7C59', '#C48B2C', '#C23B22', '#8A8279',
+                                '#2B4162', '#3A5A7C', '#4A7C59']
+                    }
+                };
+
+                const layout = {
+                    title: { text: 'Most Used Standard Library Functions (%)', font: { family: 'Fraunces', size: 16, color: '#2E2A25' } },
+                    margin: { t: 50, r: 20, b: 60, l: 50 },
+                    plot_bgcolor: '#FFFFFF',
+                    paper_bgcolor: '#FFFFFF',
+                    font: { family: 'Source Sans 3', color: '#5C554D' },
+                    xaxis: { gridcolor: '#F5EDE0', tickangle: -45 },
+                    yaxis: { gridcolor: '#F5EDE0', range: [0, 100] },
+                    showlegend: false
+                };
+
+                Plotly.newPlot('stdLibChart', [trace1], layout, {responsive: true, displayModeBar: false});
+
+            } catch(e) {
+                console.error("Chart generation failed:", e);
+            }
+        });
+    </script>
+</body>
+</html>

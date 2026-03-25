@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Netsuke</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/tailwind-config.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../{{ stylesheet or 'assets/css/himotoshi.css' }}">
+</head>
+<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white min-h-screen">
+    <main class="max-w-4xl mx-auto px-6 py-20">
+        <div class="mb-8 text-sm font-mono text-charcoal-light">
+            <a href="../" class="hover:text-vermillion">Home</a>
+            <span class="mx-2">/</span>
+            <span>{{ title }}</span>
+        </div>
+        <div class="rounded-3xl border border-stone bg-white/80 p-10 shadow-sm">
+            <div class="inline-flex items-center rounded-full border border-stone bg-boxwood-light px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo">Legal</div>
+            <h1 class="mt-6 font-serif text-4xl font-bold tracking-tight">{{ title }}</h1>
+
+            <article class="mt-10 space-y-8 text-charcoal leading-8">
+                {{ body_html }}
+            </article>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html><html lang="en"><head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration — mxd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;family=DM+Serif+Display:ital,wght@0,400;1,400&amp;family=Source+Serif+4:ital,wght@200;300;400;600;700;900&amp;family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        "primary": ["JetBrains Mono", "monospace"],
+                        "secondary": ["DM Serif Display", "serif"],
+                        "tertiary": ["Source Serif 4", "serif"],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="icon" href="../assets/logo-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="bg-[#fdf8f0]">
+<a class="mxd-skip-link" href="#main-content">Skip to content</a>
+<header class="mxd-site-header">
+  <div class="mxd-site-header__inner">
+    <a class="mxd-brand" href="../">
+      <img src="../assets/logo-mark.svg" alt="">
+      <span>
+        <span class="mxd-brand__eyebrow">df12 Productions</span>
+        <span class="mxd-brand__title">Marrakesh Express Daemon</span>
+      </span>
+    </a>
+    <nav class="mxd-site-nav" aria-label="Primary">
+      <a href="../">Home</a><a href="../quickstart/">Quickstart</a><a href="../installation/">Installation</a><a href="../deployment/">Deployment</a><a href="../architecture/">Architecture</a><a href="../protocol/">Protocol</a><a href="./" aria-current="page">Configuration</a><a href="../database-backends/">Databases</a><a href="../subsystems/">Subsystems</a><a href="../compatibility/">Compatibility</a><a href="../verification/">Verification</a><a href="../roadmap/">Roadmap</a><a href="../changelog/">Changelog</a>
+    </nav>
+  </div>
+</header>
+<main id="main-content" tabindex="-1">
+
+<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
+    
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
+        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
+            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Configuration</div>
+        </div>
+        
+        <h1 class="mb-6">
+            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Configuration reference</span>
+        </h1>
+        
+        <div class="text-[#e8d5b8] text-base font-normal font-tertiary leading-[27.20px] max-w-[700px]">
+            <p>
+                mxd uses OrthoConfig to merge settings from four sources in ascending priority: compiled defaults, <span class="text-[#e8a838] text-base font-normal font-primary">.mxd.toml</span>, environment variables prefixed <span class="text-[#e8a838] text-base font-normal font-primary">MXD_</span>, and CLI flags.
+            </p>
+        </div>
+    </div>
+    
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+</section>
+
+<section class="mxd-page-toc" aria-labelledby="mxd-toc-title">
+  <div class="mxd-page-toc__inner">
+    <div>
+      <div class="mxd-page-toc__label">Route map</div>
+      <div class="mxd-page-toc__title" id="mxd-toc-title">Configuration reference</div>
+    </div>
+    <div class="mxd-page-toc__links">
+      <a href="#section-fields">Configuration fields</a><a href="#section-toml">TOML configuration file</a><a href="#section-precedence">Precedence order</a><a href="#section-examples">Usage examples</a>
+    </div>
+  </div>
+</section>
+
+<div id="section-fields" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Configuration fields</h2>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Each field can be set through any of the four configuration sources. The precedence order is fixed: CLI flags override environment variables, environment variables override the TOML file, the TOML file overrides compiled defaults.
+        </p>
+        
+        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-[#e8d5b8] bg-[#faf3ea]">
+                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Field</th>
+                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">CLI flag</th>
+                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Env var</th>
+                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Default</th>
+                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#e8d5b8]">
+                        <tr class="mxd-table-row">
+                            <td class="px-6 py-4">
+                                <code class="text-[#c54b2a] text-sm font-normal font-primary">bind</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--bind</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_BIND</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">0.0.0.0:5500</code>
+                            </td>
+                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                                Socket address to listen on
+                            </td>
+                        </tr>
+                        <tr class="mxd-table-row">
+                            <td class="px-6 py-4">
+                                <code class="text-[#c54b2a] text-sm font-normal font-primary">database</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--database</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_DATABASE</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">mxd.db</code>
+                            </td>
+                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                                SQLite path or PostgreSQL connection string
+                            </td>
+                        </tr>
+                        <tr class="mxd-table-row">
+                            <td class="px-6 py-4">
+                                <code class="text-[#c54b2a] text-sm font-normal font-primary">argon2_m_cost</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--argon2-m-cost</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_ARGON2_M_COST</code>
+                            </td>
+                            <td class="px-6 py-4 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                                Argon2 default
+                            </td>
+                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                                Memory cost for password hashing
+                            </td>
+                        </tr>
+                        <tr class="mxd-table-row">
+                            <td class="px-6 py-4">
+                                <code class="text-[#c54b2a] text-sm font-normal font-primary">argon2_t_cost</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--argon2-t-cost</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_ARGON2_T_COST</code>
+                            </td>
+                            <td class="px-6 py-4 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                                Argon2 default
+                            </td>
+                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                                Time cost for password hashing
+                            </td>
+                        </tr>
+                        <tr class="mxd-table-row">
+                            <td class="px-6 py-4">
+                                <code class="text-[#c54b2a] text-sm font-normal font-primary">argon2_p_cost</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--argon2-p-cost</code>
+                            </td>
+                            <td class="px-6 py-4">
+                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_ARGON2_P_COST</code>
+                            </td>
+                            <td class="px-6 py-4 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                                Argon2 default
+                            </td>
+                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                                Parallelism cost for password hashing
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-toml" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">TOML configuration file</h2>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The TOML file is named <span class="text-[#c54b2a] text-base font-normal font-primary">.mxd.toml</span> and searched in the current working directory. Keys match the field names above:
+        </p>
+        
+        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">.mxd.toml</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">bind</span> = <span class="text-[#4a8c5c]">"0.0.0.0:6600"</span>
+<span class="text-[#e8a838]">database</span> = <span class="text-[#4a8c5c]">"postgres://user:&lt;password&gt;@localhost/mxd"</span></pre>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-8">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">File location:</span> The TOML file must be in the current working directory. When mxd is launched from a different directory, place the file there or use environment variables or CLI flags instead.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="section-precedence" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Precedence order</h2>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            CLI flags override environment variables. Environment variables override the TOML file. The TOML file overrides compiled defaults. That sequence defines the precedence order.
+        </p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+                <div class="px-6 py-6">
+                    <div class="w-10 h-10 bg-[#2a2a42] rounded flex items-center justify-center mb-4">
+                        <span class="text-[#f5e6d0] text-xl font-bold font-primary">1</span>
+                    </div>
+                    <h3 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">Compiled defaults</h3>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Lowest priority. Embedded in the binary.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+                <div class="px-6 py-6">
+                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center mb-4">
+                        <span class="text-white text-xl font-bold font-primary">2</span>
+                    </div>
+                    <h3 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">.mxd.toml</h3>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        File-based configuration in current directory.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+                <div class="px-6 py-6">
+                    <div class="w-10 h-10 bg-[#e8a838] rounded flex items-center justify-center mb-4">
+                        <span class="text-[#12121f] text-xl font-bold font-primary">3</span>
+                    </div>
+                    <h3 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">Environment</h3>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Variables prefixed with <code class="text-[#c54b2a] text-xs font-normal font-primary">MXD_</code>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+                <div class="px-6 py-6">
+                    <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center mb-4">
+                        <span class="text-white text-xl font-bold font-primary">4</span>
+                    </div>
+                    <h3 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">CLI flags</h3>
+                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        Highest priority. Always wins.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-examples" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Usage examples</h2>
+        
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Using environment variables</h3>
+        
+        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">bash</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">export</span> MXD_BIND=<span class="text-[#4a8c5c]">"127.0.0.1:5501"</span>
+<span class="text-[#e8a838]">export</span> MXD_DATABASE=<span class="text-[#4a8c5c]">"postgres://mxd:${MXD_DB_PASSWORD}@db.example.com/mxd_prod"</span>
+mxd</pre>
+            </div>
+        </div>
+        
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Using CLI flags</h3>
+        
+        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">bash</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]">mxd --bind <span class="text-[#4a8c5c]">0.0.0.0:6600</span> --database <span class="text-[#4a8c5c]">mxd_production.db</span></pre>
+            </div>
+        </div>
+        
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Mixing sources</h3>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            TOML file sets database path, environment variable overrides bind address, CLI flag overrides both for Argon2 memory cost:
+        </p>
+        
+        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-4">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">.mxd.toml</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">database</span> = <span class="text-[#4a8c5c]">"mxd_local.db"</span></pre>
+            </div>
+        </div>
+        
+        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">bash</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">export</span> MXD_BIND=<span class="text-[#4a8c5c]">"0.0.0.0:7700"</span>
+mxd --argon2-m-cost <span class="text-[#d4714f]">65536</span></pre>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Result:</span> mxd binds to <code class="text-[#12121f] text-xs font-normal font-primary">0.0.0.0:7700</code> (from environment), uses <code class="text-[#12121f] text-xs font-normal font-primary">mxd_local.db</code> (from TOML), and sets Argon2 memory cost to 65536 (from CLI flag).
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Deployment guides</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+            See recommended configurations for production, development, and embedded deployment scenarios.
+        </p>
+        
+        <div class="flex flex-wrap justify-center gap-3">
+            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../deployment/">
+                Deployment
+            </a>
+            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../architecture/">
+                Architecture
+            </a>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer id="footer" class="bg-[#12121f] relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 py-12 text-center">
+        <div class="mb-6 opacity-40">
+            <span class="text-[#e8d5b8] text-[23px] font-normal font-primary">◆</span>
+        </div>
+        
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
+            Protocol Souk — Design System for <span class="text-[#e8a838]">mxd</span>
+        </p>
+        
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px]">
+            A <span class="text-[#e8a838]">df12 Productions</span> artefact · Edinburgh · 2026
+        </p>
+    </div>
+    <div class="border-t border-[#2a2a42] py-6">
+        <div class="max-w-[900px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center text-[11.10px] font-primary">
+            <p class="text-[#9a9ab0] mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
+            <nav class="mxd-legal-nav flex space-x-6" aria-label="Legal">
+                <a href="../privacy-policy/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Privacy Policy</a>
+                <a href="../terms-of-use/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Terms of Use</a>
+                <a href="../code-of-conduct/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Code of Conduct</a>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+</body></html>

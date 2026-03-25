@@ -87,6 +87,24 @@ homepage:
         icon: weaver
         meta_label: Learn more
         external: false
+      - label: Gauss
+        description: Accessible SVG illustration with scriptable precision. Illustrator for the open web.
+        href: "https://github.com/leynos/gauss"
+        icon: gauss
+        meta_label: View on GitHub
+        external: true
+      - label: Corbusier
+        description: AI agent orchestration. The best room, not the smartest agent.
+        href: "https://github.com/leynos/corbusier"
+        icon: corbusier
+        meta_label: View on GitHub
+        external: true
+      - label: Zamburak
+        description: Prompt-injection defence for tool-using agents. Security by architecture.
+        href: "https://github.com/leynos/zamburak"
+        icon: zamburak
+        meta_label: View on GitHub
+        external: true
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.

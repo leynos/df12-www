@@ -9,6 +9,7 @@ from pathlib import Path
 import requests
 from jinja2 import Environment, FileSystemLoader
 from markdown import markdown
+from markupsafe import Markup
 
 if typ.TYPE_CHECKING:
     from .config import NavLinkConfig, SharedContentConfig
@@ -82,7 +83,7 @@ class SharedContentGenerator:
 
         context = {
             "title": self.shared_config.label,
-            "body_html": body_html,
+            "body_html": Markup(body_html),  # noqa: S704 - trusted markdown output
             "generated_at": dt.datetime.now(dt.UTC),
             "nav_links": self.nav_links,
             "parent_link": self.parent_link,

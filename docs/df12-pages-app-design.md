@@ -1,15 +1,16 @@
 # df12 Pages Application Design
 
-This living document captures the architectural conventions for the df12
-Pages generator, with a focus on how the application interacts with upstream services and how those
-integrations are tested reliably.
+This living document captures the architectural conventions for the df12 Pages
+generator, with a focus on how the application interacts with upstream services
+and how those integrations are tested reliably.
 
 ## GitHub API Access
 
 ### Client Library
 
-- The application uses [`github3.py`](https://github3py.readthedocs.io/) for **all** GitHub
-  interactions. Direct `requests` calls to `api.github.com` are not permitted.
+- The application uses [`github3.py`](https://github3py.readthedocs.io/) for
+  **all** GitHub interactions. Direct `requests` calls to `api.github.com` are
+  not permitted.
 - Instantiate a single `github3.GitHub` client per generator instance and reuse
   it across calls. This keeps connection pooling efficient and simplifies
   mocking.
@@ -23,8 +24,8 @@ integrations are tested reliably.
 
 ### Commit Metadata Lookup
 
-When a documentation page does not have a release tag, the system falls back to the
-timestamp of the most recent commit touching the source Markdown path:
+When a documentation page does not have a release tag, the system falls back to
+the timestamp of the most recent commit touching the source Markdown path:
 
 1. Split `owner/repo` from the page config.
 2. Use `repository = github.repository(owner, name)`.
@@ -49,8 +50,7 @@ changed, eliminating churn caused by build timestamps.
 ### Behaviour Tests (pytest-bdd + Betamax)
 
 - For end-to-end coverage, continue to wrap `requests.Session` with Betamax
-  (see `tests/bdd/`), using recorded cassettes checked into
-  `tests/cassettes/`.
+  (see `tests/bdd/`), using recorded cassettes checked into `tests/cassettes/`.
 - Behaviour tests exercise the full CLI paths (e.g., rendering docs for a real
   repo + tag). Betamax ensures deterministic HTTP interactions without hitting
   GitHub during CI.
@@ -59,10 +59,10 @@ changed, eliminating churn caused by build timestamps.
 
 ### Test Matrix Summary
 
-| Layer                | Tooling                        | Purpose                                      |
-|----------------------|--------------------------------|----------------------------------------------|
-| Unit                 | `pytest`, `pytest-mock`        | Fast validation of commit-date logic         |
-| Behaviour / BDD      | `pytest-bdd`, `Betamax`        | Full pipeline with recorded HTTP responses   |
+| Layer           | Tooling                 | Purpose                                    |
+| --------------- | ----------------------- | ------------------------------------------ |
+| Unit            | `pytest`, `pytest-mock` | Fast validation of commit-date logic       |
+| Behaviour / BDD | `pytest-bdd`, `Betamax` | Full pipeline with recorded HTTP responses |
 
 Following these patterns keeps the GitHub integration robust while preventing
 flaky network-dependent tests.
@@ -130,18 +130,17 @@ readable, and reduces churn whenever Tailwind/DaisyUI upgrades land.
 ### Site Chrome Semantics
 
 - The shared header/footer macros now rely on dedicated utility classes
-  defined in `src/styles/site.css`—e.g., `.site-header`,
-  `.site-header__inner`, `.site-header__brand`, `.site-header__nav`, and the
-  corresponding `.site-footer*` helpers. This follows the Tailwind v4 and
-  DaisyUI guidance referenced in `docs/tailwind-v4-guide.md` and
-  `docs/daisyui-v5-guide.md`, keeping repeated utility stacks out of the
-  templates.
+  defined in `src/styles/site.css`—e.g., `.site-header`, `.site-header__inner`,
+  `.site-header__brand`, `.site-header__nav`, and the corresponding
+  `.site-footer*` helpers. This follows the Tailwind v4 and DaisyUI guidance
+  referenced in `docs/tailwind-v4-guide.md` and `docs/daisyui-v5-guide.md`,
+  keeping repeated utility stacks out of the templates.
 - Main-content shells across `index.html`, `docs.html`, and every `docs-*.html`
-  now use a shared `.site-main` base (padding, stacking context) with
-  modifiers like `.site-main--home`, `.site-main--docs-index`, and
-  `.site-main--doc` to encode their spacing/layout differences. When a new
-  page variant appears, extend the semantic helper set instead of sprinkling
-  raw `pt-*`/`flex` utilities so the macros keep these surfaces consistent.
+  now use a shared `.site-main` base (padding, stacking context) with modifiers
+  like `.site-main--home`, `.site-main--docs-index`, and `.site-main--doc` to
+  encode their spacing/layout differences. When a new page variant appears,
+  extend the semantic helper set instead of sprinkling raw `pt-*`/`flex`
+  utilities so the macros keep these surfaces consistent.
 - When extending the chrome, add new semantic helpers to the stylesheet once
   (instead of sprinkling raw utilities) and reference them via
   `partials/site_macros.jinja`. This ensures the landing page, docs index, and
@@ -149,8 +148,8 @@ readable, and reduces churn whenever Tailwind/DaisyUI upgrades land.
 
 ## OpenTofu Deployment Modules & Scripts
 
-The infrastructure portion of df12 Pages lives under `modules/` and `deploy.tofu`.
-The infrastructure follows three core ideas:
+The infrastructure portion of df12 Pages lives under `modules/` and
+`deploy.tofu`. The infrastructure follows three core ideas:
 
 1. **Split responsibilities by concern and provider.**
    - `modules/static_site` stands up the AWS primitives (S3 bucket, CloudFront,

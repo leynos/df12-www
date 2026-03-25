@@ -10,10 +10,14 @@ automation, and rollback strategies.
 ## 1. Prerequisites
 
 - **Tooling**
-  - [Bun](https://bun.sh) ≥ 1.1 for building the Tailwind bundle (the deploy modules now run `bun install`/`bun run build` during `apply`, so Bun must exist on the host executing OpenTofu).
+  - [Bun](https://bun.sh) ≥ 1.1 for building the Tailwind bundle (the deploy
+    modules now run `bun install`/`bun run build` during `apply`, so Bun must
+    exist on the host executing OpenTofu).
   - [OpenTofu CLI](https://opentofu.org) ≥ 1.6.0.
-  - AWS CLI (required: used both for AWS deploys *and* for Scaleway uploads via the S3-compatible endpoint).
-  - Optional: Scaleway CLI (`scw`) for ad-hoc diagnostics when targeting Scaleway.
+  - AWS CLI (required: used both for AWS deploys _and_ for Scaleway uploads via
+    the S3-compatible endpoint).
+  - Optional: Scaleway CLI (`scw`) for ad-hoc diagnostics when targeting
+    Scaleway.
 - **Accounts & credentials**
   - AWS account with permissions to manage S3, CloudFront, ACM, IAM, and Budgets
     (required when `cloud_provider = "aws"`).
@@ -61,36 +65,36 @@ for OpenTofu. No checked-in `.tfvars` or `.tfbackend` files are needed.
 
 Additional variables for `cloud_provider = "scaleway"`:
 
-| Variable                    | Purpose                                                             |
-| --------------------------- | ------------------------------------------------------------------- |
-| `scaleway_access_key`       | API access key with permissions for Object Storage and Cockpit.     |
-| `scaleway_secret_key`       | Secret key paired with the access key.                              |
-| `scaleway_project_id`       | Project UUID that owns the static assets.                           |
-| `scaleway_organization_id`  | Optional organization UUID (leave empty for project-scoped access). |
-| `scaleway_region`           | Object Storage region (e.g. `fr-par`).                              |
-| `scaleway_zone`             | Service zone (e.g. `fr-par-1`).                                     |
+| Variable                   | Purpose                                                             |
+| -------------------------- | ------------------------------------------------------------------- |
+| `scaleway_access_key`      | API access key with permissions for Object Storage and Cockpit.     |
+| `scaleway_secret_key`      | Secret key paired with the access key.                              |
+| `scaleway_project_id`      | Project UUID that owns the static assets.                           |
+| `scaleway_organization_id` | Optional organization UUID (leave empty for project-scoped access). |
+| `scaleway_region`          | Object Storage region (e.g. `fr-par`).                              |
+| `scaleway_zone`            | Service zone (e.g. `fr-par-1`).                                     |
 
 ### `[backend]` variables (backend state bucket)
 
-| Variable   | Purpose                                                     |
-| ---------- | ----------------------------------------------------------- |
-| `bucket`   | Name of the S3-compatible bucket used for OpenTofu state.   |
-| `region`   | Region for the backend bucket (e.g. `fr-par`).              |
-| `endpoint` | Optional custom endpoint for S3-compatible backends.        |
-| `encrypt`  | Set `false` to disable SSE for providers that reject it.    |
+| Variable   | Purpose                                                   |
+| ---------- | --------------------------------------------------------- |
+| `bucket`   | Name of the S3-compatible bucket used for OpenTofu state. |
+| `region`   | Region for the backend bucket (e.g. `fr-par`).            |
+| `endpoint` | Optional custom endpoint for S3-compatible backends.      |
+| `encrypt`  | Set `false` to disable SSE for providers that reject it.  |
 
 ### `[auth]` variables (persisted credentials)
 
-| Variable                 | Purpose                                                            |
-| ------------------------ | ------------------------------------------------------------------ |
-| `aws_access_key_id`      | AWS-style access key used for backend auth (works with Scaleway).  |
-| `aws_secret_access_key`  | Secret key paired with the access key.                             |
-| `scw_access_key`         | Optional override for provider auth; falls back to AWS key.        |
-| `scw_secret_key`         | Optional override for provider auth; falls back to AWS secret.     |
-| `cloudflare_api_token`   | Forwarded to both env vars and `TF_VAR_cloudflare_api_token`.       |
-| `github_token`           | Forwarded to `GITHUB_TOKEN`, `GH_TOKEN`, and `TF_VAR_github_token`. |
-| `region`                 | Default region for providers when `site.scaleway_region` is unset. |
-| `s3_endpoint`            | Default endpoint for S3-compatible providers/backends.             |
+| Variable                | Purpose                                                             |
+| ----------------------- | ------------------------------------------------------------------- |
+| `aws_access_key_id`     | AWS-style access key used for backend auth (works with Scaleway).   |
+| `aws_secret_access_key` | Secret key paired with the access key.                              |
+| `scw_access_key`        | Optional override for provider auth; falls back to AWS key.         |
+| `scw_secret_key`        | Optional override for provider auth; falls back to AWS secret.      |
+| `cloudflare_api_token`  | Forwarded to both env vars and `TF_VAR_cloudflare_api_token`.       |
+| `github_token`          | Forwarded to `GITHUB_TOKEN`, `GH_TOKEN`, and `TF_VAR_github_token`. |
+| `region`                | Default region for providers when `site.scaleway_region` is unset.  |
+| `s3_endpoint`           | Default endpoint for S3-compatible providers/backends.              |
 
 ### Secrets Management
 
@@ -105,8 +109,8 @@ Additional variables for `cloud_provider = "scaleway"`:
 ### One-command wrappers (pages init/plan/apply)
 
 The `pages` CLI wraps OpenTofu with credential management and backend
-bootstrapping. Only the config path (default
-`~/.config/df12-www/config.toml`) and optional credential overrides are needed:
+bootstrapping. Only the config path (default `~/.config/df12-www/config.toml`)
+and optional credential overrides are needed:
 
 ```bash
 # Initialise backend/providers using config.toml
@@ -194,9 +198,9 @@ This pipeline:
 - Generates `.webp` and `.avif` variants alongside every `.png` in
   `public/images/` using `scripts/generate-image-variants.ts`.
 
-These artifacts are intentionally `.gitignore`d; ensure they exist on disk
-when running a deployment (locally or in CI) so provisioners can upload them
-to the target bucket/CDN.
+These artifacts are intentionally `.gitignore`d; ensure they exist on disk when
+running a deployment (locally or in CI) so provisioners can upload them to the
+target bucket/CDN.
 
 ## 4. OpenTofu Workflow
 
@@ -223,8 +227,8 @@ All commands below assume the repo root as the working directory.
    pages plan --config-path ~/.config/df12-www/config.toml --plan-file plan.out
    ```
 
-   Inspect the plan carefully. Expect S3 buckets, CloudFront distributions,
-   ACM certificates, and Cloudflare DNS records.
+   Inspect the plan carefully. Expect S3 buckets, CloudFront distributions, ACM
+   certificates, and Cloudflare DNS records.
 
 4. **Apply infrastructure**
 
@@ -247,20 +251,19 @@ All commands below assume the repo root as the working directory.
    variables.
 2. Run `pages init --config-path ~/.config/df12-www/config.toml` to fetch the
    providers and bootstrap the backend.
-3. Run `pages plan --config-path ~/.config/df12-www/config.toml` and confirm the plan includes
-   `scaleway_object_bucket` resources, Cloudflare CNAME records, and a
-   `scaleway_cockpit` activation.
-4. Run `pages apply --config-path ~/.config/df12-www/config.toml` to provision the bucket, website
-   configuration, Cloudflare DNS, and Cockpit.
+3. Run `pages plan --config-path ~/.config/df12-www/config.toml` and confirm
+   the plan includes `scaleway_object_bucket` resources, Cloudflare CNAME
+   records, and a `scaleway_cockpit` activation.
+4. Run `pages apply --config-path ~/.config/df12-www/config.toml` to provision
+   the bucket, website configuration, Cloudflare DNS, and Cockpit.
 5. The `modules/deploy_scaleway` module clones the repo, installs
-   dependencies, runs `bun run build`, syncs the `site_path` directory via
-   the AWS CLI to the Scaleway S3-compatible endpoint with `--acl public-read`,
-   and purges the
-   Cloudflare cache so changes propagate immediately.
+   dependencies, runs `bun run build`, syncs the `site_path` directory via the
+   AWS CLI to the Scaleway S3-compatible endpoint with `--acl public-read`, and
+   purges the Cloudflare cache so changes propagate immediately.
 6. To force a fresh content upload (for example after changing ACL flags or
    build tooling), re-run `pages apply` after deleting the plan so it executes
-   the deploy `null_resource` again. This re-executes the clone/build/sync/purge
-   steps without touching the infrastructure resources.
+   the deploy `null_resource` again. This re-executes the
+   clone/build/sync/purge steps without touching the infrastructure resources.
 
 ## 5. CI Integration (GitHub Actions Example)
 
@@ -313,8 +316,8 @@ CI tips:
 ## 7. Environment Management Tips
 
 - Maintain separate state per environment (e.g. dedicated directories or
-  remote backends). The default backend is local; consider a remote backend
-  for team workflows.
+  remote backends). The default backend is local; consider a remote backend for
+  team workflows.
 - Use consistent tagging (`environment`, `project_name`) to simplify cost
   tracking.
 - Run `tofu test` before major changes to ensure module assertions still pass.

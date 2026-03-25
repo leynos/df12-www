@@ -3,8 +3,8 @@
 ## 1. Set Up the Cloudflare Provider
 
 The `provider "cloudflare"` block configures authentication and connects
-OpenTofu to Cloudflare. Environment variables should be used for credentials to avoid
-leaking secrets:
+OpenTofu to Cloudflare. Environment variables should be used for credentials to
+avoid leaking secrets:
 
 ```hcl
 provider "cloudflare" {
@@ -23,7 +23,8 @@ This ensures that sensitive data never lands in the repository.
 
 ## 2. Define and Manage DNS Zones
 
-Cloudflare DNS zones may be created or referenced with a `cloudflare_zone` resource:
+Cloudflare DNS zones may be created or referenced with a `cloudflare_zone`
+resource:
 
 ```hcl
 resource "cloudflare_zone" "example" {
@@ -92,7 +93,8 @@ This keeps the configuration DRY and maintainable.
 
 ## 5. Import Existing DNS Records
 
-When onboarding existing DNS infrastructure into OpenTofu, Cloudflare’s record ID (not just the name) is required to import:
+When onboarding existing DNS infrastructure into OpenTofu, Cloudflare’s record
+ID (not just the name) is required to import:
 
 1. Retrieve via API:
 
@@ -138,8 +140,10 @@ infra/
 2. **Preview**: `tofu plan`
 3. **Apply**: `tofu apply -auto-approve`
 4. **Observe**: State changes and Dashboard results should be reviewed.
-5. **Import** (if migrating): The API can be used to find record IDs before running `tofu import`.
-6. **Version Control**: Configurations should be stored in Git while secrets remain excluded.
+5. **Import** (if migrating): The API can be used to find record IDs before
+   running `tofu import`.
+6. **Version Control**: Configurations should be stored in Git while secrets
+   remain excluded.
 
 ## Additional Levers & Advanced Practices
 
@@ -147,7 +151,8 @@ infra/
   OpenTofu and Cloudflare, offering rich sample code for elevated use cases.
 
 - Cloudflare’s Terraform provider supports advanced modularisation. The
-  module registry and example repos should be employed for better modular design.
+  module registry and example repos should be employed for better modular
+  design.
 
 ### Summary Table
 

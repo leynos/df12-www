@@ -65,22 +65,28 @@ homepage:
         external: true
       - label: Netsuke
         description: YAML-first builds (Ninja × Jinja). Fast, reproducible, readable.
-        href: "https://github.com/leynos/netsuke"
+        href: "netsuke/"
         icon: netsuke
-        meta_label: View on GitHub
-        external: true
+        meta_label: Learn more
+        external: false
       - label: mxd
         description: Hotline-style daemon for joyful file-sharing and retro chat.
-        href: "https://github.com/leynos/mxd"
+        href: "mxd/"
         icon: mxd
-        meta_label: View on GitHub
-        external: true
+        meta_label: Learn more
+        external: false
       - label: Episodic
         description: Agentic podcast studio with human-in-the-loop polish.
         href: "https://github.com/leynos/episodic"
         icon: episodic
         meta_label: View on GitHub
         external: true
+      - label: Weaver
+        description: CLI tooling for code-aware AI agents. Observe, act, verify.
+        href: "weaver/"
+        icon: weaver
+        meta_label: Learn more
+        external: false
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.
@@ -417,8 +423,8 @@ sites:
       hero_eyebrow: mxd Documentation
       hero_tagline: Hotline-style daemon for joyful file-sharing
     parent_link:
-      label: About df12
-      href: /about.html
+      label: "← Back to df12 Productions"
+      href: /
     nav_links:
       - label: Home
         href: ../
@@ -463,8 +469,8 @@ sites:
       hero_eyebrow: Netsuke Documentation
       hero_tagline: Declarative build tooling for ambitious teams
     parent_link:
-      label: About df12
-      href: /about.html
+      label: "← Back to df12 Productions"
+      href: /
     nav_links:
       - label: Home
         href: ../
@@ -493,8 +499,8 @@ sites:
       hero_eyebrow: Weaver Documentation
       hero_tagline: CLI tooling for code-aware agents
     parent_link:
-      label: About df12
-      href: /about.html
+      label: "← Back to df12 Productions"
+      href: /
     nav_links:
       - label: Home
         href: ../

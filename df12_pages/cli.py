@@ -25,6 +25,7 @@ Regenerate a single page into a custom directory:
 from __future__ import annotations
 
 import os
+import shutil
 import typing as typ
 from pathlib import Path
 
@@ -33,7 +34,7 @@ from cyclopts import App, Parameter
 
 from .about_page import AboutPageBuilder
 from .bump import bump_latest_release_metadata
-from .config import load_site_config
+from .config import SiteConfig, SubSiteConfig, load_site_config
 from .deploy import (
     DEFAULT_CONFIG_PATH,
     apply_stack,
@@ -45,6 +46,8 @@ from .docs_index import DocsIndexBuilder
 from .generator import PageContentGenerator
 from .homepage import HomePageBuilder
 from .releases import GitHubReleaseClient
+from .shared_content import SharedContentGenerator
+from .subsite_homepage import SubSiteHomePageBuilder
 
 DEFAULT_CONFIG = Path("config/pages.yaml")
 
@@ -62,7 +65,7 @@ def _format_path(path: Path) -> str:
 
 
 @app.command(help="Generate static HTML documentation pages from Markdown.")
-def generate(
+def generate(  # noqa: PLR0913
     *,
     page: typ.Annotated[
         str | None, Parameter(help="Page identifier", env_var="INPUT_PAGE")
@@ -78,6 +81,14 @@ def generate(
         Path | None,
         Parameter(help="Override the output folder", env_var="INPUT_OUTPUT_DIR"),
     ] = None,
+    site: typ.Annotated[
+        str | None,
+        Parameter(help="Generate a specific sub-site only"),
+    ] = None,
+    all_sites: typ.Annotated[
+        bool,
+        Parameter(help="Generate main site and all sub-sites"),
+    ] = False,
 ) -> None:
     """Generate documentation pages for the requested site configuration.
 
@@ -95,6 +106,10 @@ def generate(
     output_dir : Path or None, optional
         Override output directory for single-page rendering (ignored when
         multiple pages are selected).
+    site : str or None, optional
+        Generate only the named sub-site (e.g. ``weaver``).
+    all_sites : bool
+        Generate the main site plus all configured sub-sites.
 
     Returns
     -------
@@ -105,10 +120,38 @@ def generate(
     ------
     ValueError
         If ``source_url`` or ``output_dir`` overrides are supplied when more
-        than one page is requested.
+        than one page is requested, or if ``--site`` names an unknown sub-site.
     """
     site_config = load_site_config(config)
 
+    if site:
+        if site not in site_config.sites:
+            available = ", ".join(sorted(site_config.sites))
+            msg = f"Unknown site '{site}'. Known sites: {available}"
+            raise ValueError(msg)
+        _generate_subsite(site_config, site_config.sites[site], page=page)
+        return
+
+    _generate_main_site(
+        site_config,
+        page=page,
+        source_url=source_url,
+        output_dir=output_dir,
+    )
+
+    if all_sites:
+        for subsite in site_config.sites.values():
+            _generate_subsite(site_config, subsite)
+
+
+def _generate_main_site(
+    site_config: SiteConfig,
+    *,
+    page: str | None = None,
+    source_url: str | None = None,
+    output_dir: Path | None = None,
+) -> None:
+    """Generate the main df12 site pages."""
     if page:
         target_pages = [site_config.get_page(page)]
     else:
@@ -133,6 +176,84 @@ def generate(
     if site_config.about:
         about_path = AboutPageBuilder(site_config.about).run()
         print(f"wrote {_format_path(about_path)}")
+
+    # Shared content for main site
+    for sc in site_config.shared_content.values():
+        sc_path = SharedContentGenerator(sc, site_config.docs_index_output.parent).run()
+        print(f"wrote {_format_path(sc_path)}")
+
+
+def _generate_subsite(
+    site_config: SiteConfig,
+    subsite: SubSiteConfig,
+    *,
+    page: str | None = None,
+) -> None:
+    """Generate all pages for a single sub-site."""
+    templates_dir = subsite.templates_dir
+
+    # Doc pages
+    if page:
+        if page not in subsite.pages:
+            available = ", ".join(sorted(subsite.pages))
+            msg = f"Unknown page '{page}' in site '{subsite.key}'. Known: {available}"
+            raise ValueError(msg)
+        target_pages = [subsite.pages[page]]
+    else:
+        target_pages = list(subsite.pages.values())
+
+    for page_config in target_pages:
+        generator = PageContentGenerator(page_config, templates_dir=templates_dir)
+        written = generator.run()
+        for path in written:
+            print(f"[{subsite.key}] wrote {_format_path(path)}")
+
+    # Docs index
+    if subsite.pages and subsite.docs_index_output:
+        scoped = SiteConfig(
+            pages=subsite.pages,
+            docs_index_output=subsite.docs_index_output,
+            theme=subsite.theme,
+        )
+        idx_path = DocsIndexBuilder(scoped, templates_dir=templates_dir).run()
+        print(f"[{subsite.key}] wrote {_format_path(idx_path)}")
+
+    # Homepage
+    if subsite.homepage:
+        hp_path = SubSiteHomePageBuilder(
+            subsite.homepage, templates_dir=templates_dir
+        ).run()
+        print(f"[{subsite.key}] wrote {_format_path(hp_path)}")
+
+    # About page
+    if subsite.about:
+        about_path = AboutPageBuilder(subsite.about, templates_dir=templates_dir).run()
+        print(f"[{subsite.key}] wrote {_format_path(about_path)}")
+
+    # Shared content
+    for ref_key in subsite.shared_content_refs:
+        sc = site_config.shared_content.get(ref_key)
+        if not sc:
+            msg = (
+                f"Sub-site '{subsite.key}' references "
+                f"unknown shared content '{ref_key}'."
+            )
+            raise ValueError(msg)
+        sc_path = SharedContentGenerator(
+            sc,
+            subsite.output_dir,
+            templates_dir=templates_dir,
+            nav_links=subsite.nav_links,
+            parent_link=subsite.parent_link,
+            stylesheet=subsite.stylesheet,
+        ).run()
+        print(f"[{subsite.key}] wrote {_format_path(sc_path)}")
+
+    # Static assets
+    if subsite.static_assets_dir and subsite.static_assets_dir.is_dir():
+        dest = subsite.output_dir / "assets"
+        shutil.copytree(subsite.static_assets_dir, dest, dirs_exist_ok=True)
+        print(f"[{subsite.key}] copied static assets to {_format_path(dest)}")
 
 
 @app.command(help="Record the latest GitHub release tag for each configured page.")

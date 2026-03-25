@@ -42,7 +42,7 @@ class SectionModel:
     layout: str
     intro_html: str
     default_html: str
-    numbered_steps: list[dict[str, str]]
+    numbered_steps: list[dict[str, str | int]]
     split_panel: dict[str, str]
     subsections: list[dict[str, str]]
     toc_items: list[dict[str, str]]

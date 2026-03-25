@@ -48,9 +48,7 @@ def _build_about_config(
     hero_intro = hero.get("intro")
     avatar = _build_avatar(hero.get("avatar"))
     if not (hero_name and hero_email and hero_intro and avatar):
-        msg = (
-            "About hero requires 'name', 'email', 'intro', and an 'avatar' block."
-        )
+        msg = "About hero requires 'name', 'email', 'intro', and an 'avatar' block."
         raise SiteConfigError(msg)
 
     about_block = payload.get("about") or {}
@@ -169,7 +167,7 @@ def _build_principles(
     if isinstance(payload, dict):
         entries = payload.get("items")
     elif isinstance(payload, list):
-        entries = payload
+        entries = payload  # type: ignore[assignment]
     if entries is None:
         return []
 

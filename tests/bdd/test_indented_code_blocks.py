@@ -29,7 +29,7 @@ from df12_pages.generator import PageContentGenerator
 FEATURE_FILE = (
     Path(__file__).resolve().parents[2] / "features" / "indented_code_blocks.feature"
 )
-scenarios(FEATURE_FILE)
+scenarios(str(FEATURE_FILE))
 
 
 @pytest.fixture

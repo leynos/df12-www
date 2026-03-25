@@ -30,7 +30,7 @@ from df12_pages.config import load_site_config
 from df12_pages.generator import PageContentGenerator
 
 FEATURE_FILE = Path(__file__).resolve().parents[2] / "features" / "docs_release.feature"
-scenarios(FEATURE_FILE)
+scenarios(str(FEATURE_FILE))
 
 
 @pytest.fixture

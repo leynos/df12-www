@@ -380,7 +380,7 @@ class PageContentGenerator:
         """Construct a SectionModel with rendered HTML and layout metadata."""
         intro_html = self.renderer.markdown(section.intro_markdown)
         default_html = self.renderer.markdown(section.markdown)
-        numbered_steps: list[dict[str, str]] = []
+        numbered_steps: list[dict[str, str | int]] = []
         split_panel = {"primary_html": "", "secondary_html": ""}
         subsections = self._build_subsection_blocks(section)
         toc_items = [
@@ -395,7 +395,7 @@ class PageContentGenerator:
                 resolved_layout = "default"
             else:
                 toc_items = [
-                    {"label": step["title"], "anchor": step["anchor"]}
+                    {"label": str(step["title"]), "anchor": str(step["anchor"])}
                     for step in numbered_steps
                 ]
         elif layout.device == "split_panel":
@@ -419,7 +419,7 @@ class PageContentGenerator:
 
     def _prepare_numbered_steps(
         self, section: Section, layout: SectionLayout
-    ) -> list[dict[str, str]]:
+    ) -> list[dict[str, str | int]]:
         """Return numbered step data for ``section`` based on the provided layout."""
         subsections = list(section.subsections)
         if not subsections:
@@ -437,7 +437,7 @@ class PageContentGenerator:
                     ordered.append(sub)
             subsections = ordered
 
-        steps: list[dict[str, str]] = []
+        steps: list[dict[str, str | int]] = []
         for idx, sub in enumerate(subsections, start=1):
             html = self.renderer.markdown(sub.markdown)
             steps.append(

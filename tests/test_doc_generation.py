@@ -290,7 +290,7 @@ def test_sidebar_groups_include_top_and_child_links(
     """Sidebar groups should render top-level sections plus subsections."""
     soup = generated_docs["docs-test-introduction.html"]
     groups = soup.select(".doc-sidebar__groups .doc-nav-group")
-    headings = [g.select_one("h3").get_text(strip=True) for g in groups]
+    headings = [h.get_text(strip=True) for g in groups if (h := g.select_one("h3"))]
     assert headings == [
         "Introduction",
         "Getting Started",

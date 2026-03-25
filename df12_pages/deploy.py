@@ -18,10 +18,12 @@ import os
 import shutil
 import subprocess
 import tempfile
-import tomlkit
 import typing as typ
 from pathlib import Path
 
+import tomlkit
+import tomlkit.exceptions
+import tomlkit.items
 
 DEFAULT_CONFIG_PATH = Path(
     os.getenv(
@@ -51,7 +53,7 @@ class CredentialSet:
     region: str | None = None
     s3_endpoint: str | None = None
 
-    def with_fallbacks(self) -> "CredentialSet":
+    def with_fallbacks(self) -> CredentialSet:
         """Return a copy where AWS/Scaleway keys fall back to one another."""
         access = self.aws_access_key_id or self.scw_access_key
         secret = self.aws_secret_access_key or self.scw_secret_key
@@ -77,16 +79,19 @@ class BackendConfig:
     encrypt: bool | None = None
 
     @classmethod
-    def from_mapping(cls, data: dict[str, typ.Any], *, path: Path | None = None) -> "BackendConfig":
+    def from_mapping(
+        cls, data: dict[str, typ.Any], *, path: Path | None = None
+    ) -> BackendConfig:
+        """Create a BackendConfig from a mapping dictionary."""
         try:
-            bucket = typ.cast(str, data["bucket"])
-            region = typ.cast(str, data["region"])
+            bucket = typ.cast("str", data["bucket"])
+            region = typ.cast("str", data["region"])
         except KeyError as exc:
             location = f" in {path}" if path else ""
             msg = f"Missing {exc} in backend config{location}"
             raise ValueError(msg) from exc
-        endpoint = typ.cast(str | None, data.get("endpoint"))
-        encrypt = typ.cast(bool | None, data.get("encrypt"))
+        endpoint = typ.cast("str | None", data.get("endpoint"))
+        encrypt = typ.cast("bool | None", data.get("encrypt"))
         return cls(bucket=bucket, region=region, endpoint=endpoint, encrypt=encrypt)
 
 
@@ -105,8 +110,8 @@ def _load_config(path: Path = DEFAULT_CONFIG_PATH) -> DeployConfig:
         raise FileNotFoundError(msg)
     data = tomlkit.parse(path.read_text(encoding="utf-8"))
 
-    def _as_dict(table: typ.Any) -> dict[str, typ.Any]:
-        return {k: v for k, v in table.items()} if table else {}
+    def _as_dict(table: typ.Any) -> dict[str, typ.Any]:  # noqa: ANN401
+        return dict(table.items()) if table else {}
 
     auth_data = _as_dict(data.get("auth"))
     backend_data = _as_dict(data.get("backend"))
@@ -127,7 +132,6 @@ def _load_config(path: Path = DEFAULT_CONFIG_PATH) -> DeployConfig:
 
 def _resolve_backend(backend: BackendConfig, creds: CredentialSet) -> BackendConfig:
     """Fill backend endpoint defaults using resolved credentials."""
-
     endpoint = backend.endpoint or creds.s3_endpoint
     return BackendConfig(
         bucket=backend.bucket,
@@ -144,7 +148,6 @@ def save_credentials(
     existing: DeployConfig | None = None,
 ) -> None:
     """Persist credentials back into ``config.toml`` preserving formatting."""
-
     path.parent.mkdir(parents=True, exist_ok=True)
 
     try:
@@ -196,10 +199,10 @@ def save_credentials(
         doc["site"] = site_table
 
     path.write_text(tomlkit.dumps(doc), encoding="utf-8")
-    os.chmod(path, _TEMP_FILE_MODE)
+    path.chmod(_TEMP_FILE_MODE)
 
 
-def resolve_credentials(
+def resolve_credentials(  # noqa: PLR0913
     *,
     config_path: Path = DEFAULT_CONFIG_PATH,
     config: DeployConfig | None = None,
@@ -214,7 +217,6 @@ def resolve_credentials(
     save: bool = True,
 ) -> CredentialSet:
     """Merge CLI, environment, stored credentials, and config.toml content."""
-
     deploy_config = config or _load_config(config_path)
     stored = deploy_config.auth
 
@@ -260,7 +262,10 @@ def resolve_credentials(
 
 
 def build_env(
-    creds: CredentialSet, *, backend_region: str | None = None, backend_endpoint: str | None = None
+    creds: CredentialSet,
+    *,
+    backend_region: str | None = None,
+    backend_endpoint: str | None = None,
 ) -> dict[str, str]:
     """Construct an environment dict for OpenTofu and provider commands."""
     env = os.environ.copy()
@@ -294,7 +299,6 @@ def build_env(
 
 def _materialize_backend_file(backend: BackendConfig, creds: CredentialSet) -> Path:
     """Return a temp backend file built from config.toml and resolved creds."""
-
     lines = [
         f'bucket = "{backend.bucket}"',
         f'region = "{backend.region}"',
@@ -307,7 +311,7 @@ def _materialize_backend_file(backend: BackendConfig, creds: CredentialSet) -> P
     if force_disable_encrypt:
         lines.append("encrypt = false")
     elif has_encrypt:
-        lines.append(f'encrypt = {str(backend.encrypt).lower()}')
+        lines.append(f"encrypt = {str(backend.encrypt).lower()}")
 
     lines.append(f'access_key = "{creds.aws_access_key_id}"')
     lines.append(f'secret_key = "{creds.aws_secret_access_key}"')
@@ -318,11 +322,11 @@ def _materialize_backend_file(backend: BackendConfig, creds: CredentialSet) -> P
     tmp = Path(tmp_path)
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write("\n".join(lines) + "\n")
-    os.chmod(tmp, _TEMP_FILE_MODE)
+    tmp.chmod(_TEMP_FILE_MODE)
     return tmp
 
 
-def _format_hcl_value(value: typ.Any) -> str:
+def _format_hcl_value(value: typ.Any) -> str:  # noqa: ANN401
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, (int, float)):
@@ -335,7 +339,6 @@ def _format_hcl_value(value: typ.Any) -> str:
 
 def _materialize_tfvars(site: dict[str, typ.Any], creds: CredentialSet) -> Path:
     """Build a temporary ``tfvars`` file from site config plus resolved creds."""
-
     merged: dict[str, typ.Any] = dict(site)
     merged.setdefault("cloudflare_api_token", creds.cloudflare_api_token)
     merged.setdefault("github_token", creds.github_token)
@@ -343,13 +346,17 @@ def _materialize_tfvars(site: dict[str, typ.Any], creds: CredentialSet) -> Path:
     merged.setdefault("scaleway_secret_key", creds.scw_secret_key)
     merged.setdefault("scaleway_region", creds.region)
 
-    lines = [f"{key} = {_format_hcl_value(value)}" for key, value in merged.items() if value is not None]
+    lines = [
+        f"{key} = {_format_hcl_value(value)}"
+        for key, value in merged.items()
+        if value is not None
+    ]
 
     fd, tmp_path = tempfile.mkstemp(prefix="df12-vars-", suffix=".tfvars", text=True)
     tmp = Path(tmp_path)
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write("\n".join(lines) + "\n")
-    os.chmod(tmp, _TEMP_FILE_MODE)
+    tmp.chmod(_TEMP_FILE_MODE)
     return tmp
 
 
@@ -379,7 +386,7 @@ def ensure_backend_bucket(
 
     try:
         _run(["head-bucket", "--bucket", backend.bucket])
-        return
+        return  # noqa: TRY300
     except subprocess.CalledProcessError:
         _run(
             [
@@ -395,7 +402,7 @@ def ensure_backend_bucket(
 def run_tofu(args: list[str], env: dict[str, str]) -> subprocess.CompletedProcess[str]:
     """Invoke OpenTofu with the provided arguments and environment."""
     return subprocess.run(  # noqa: S603
-        ["tofu"] + args,
+        ["tofu", *args],  # noqa: S607
         check=True,
         env=env,
         text=True,
@@ -438,7 +445,7 @@ def init_stack(
         materialized_tfvars.unlink(missing_ok=True)
 
 
-def plan_stack(
+def plan_stack(  # noqa: PLR0913
     *,
     plan_file: Path = Path("plan.out"),
     config_path: Path = DEFAULT_CONFIG_PATH,

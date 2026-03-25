@@ -31,9 +31,9 @@ from pathlib import Path
 import cyclopts
 from cyclopts import App, Parameter
 
+from .about_page import AboutPageBuilder
 from .bump import bump_latest_release_metadata
 from .config import load_site_config
-from .docs_index import DocsIndexBuilder
 from .deploy import (
     DEFAULT_CONFIG_PATH,
     apply_stack,
@@ -41,9 +41,9 @@ from .deploy import (
     plan_stack,
     resolve_credentials,
 )
+from .docs_index import DocsIndexBuilder
 from .generator import PageContentGenerator
 from .homepage import HomePageBuilder
-from .about_page import AboutPageBuilder
 from .releases import GitHubReleaseClient
 
 DEFAULT_CONFIG = Path("config/pages.yaml")
@@ -190,7 +190,7 @@ def bump(
 
 
 @app.command(help="Initialize OpenTofu backend and providers with managed creds.")
-def init(
+def init(  # noqa: PLR0913
     *,
     config_path: typ.Annotated[
         Path,
@@ -209,7 +209,7 @@ def init(
     s3_endpoint: str | None = None,
     save: bool = True,
 ) -> None:
-    """Wrapper around `tofu init` that also bootstraps the backend bucket."""
+    """Initialize OpenTofu backend and bootstrap the backend bucket."""
     creds = resolve_credentials(
         config_path=config_path,
         aws_access_key_id=aws_access_key_id,
@@ -246,7 +246,7 @@ def plan(
     run_init: bool = True,
     destroy: bool = False,
 ) -> None:
-    """Wrapper around `tofu plan` that ensures the backend bucket exists."""
+    """Generate an OpenTofu plan using stored credentials."""
     plan_stack(
         plan_file=plan_file,
         config_path=config_path,
@@ -270,7 +270,7 @@ def apply(
     ] = DEFAULT_CONFIG_PATH,
     run_init: bool = True,
 ) -> None:
-    """Wrapper around `tofu apply` that reuses managed credentials."""
+    """Apply infrastructure changes using stored credentials."""
     apply_stack(
         plan_file=plan_file,
         config_path=config_path,

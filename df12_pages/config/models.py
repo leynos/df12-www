@@ -168,10 +168,12 @@ class AvatarConfig:
 
     @property
     def src_webp(self) -> str:
+        """Return the WebP variant path for this image."""
         return self.src.rsplit(".", 1)[0] + ".webp"
 
     @property
     def src_avif(self) -> str:
+        """Return the AVIF variant path for this image."""
         return self.src.rsplit(".", 1)[0] + ".avif"
 
 
@@ -281,18 +283,18 @@ class SiteConfig:
 
 
 __all__ = [
+    "AboutLocationConfig",
+    "AboutPageConfig",
+    "AvatarConfig",
     "CTAButtonConfig",
+    "FocusCardConfig",
     "FooterConfig",
     "FooterLinkConfig",
     "HeroConfig",
     "HomepageConfig",
-    "AvatarConfig",
-    "AboutLocationConfig",
-    "FocusCardConfig",
-    "PrincipleConfig",
-    "AboutPageConfig",
     "NavLinkConfig",
     "PageConfig",
+    "PrincipleConfig",
     "SectionLayout",
     "SiteConfig",
     "SiteConfigError",

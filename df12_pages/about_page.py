@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import datetime as dt
+import typing as typ
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from .config import AboutPageConfig
+if typ.TYPE_CHECKING:
+    from .config import AboutPageConfig
 
 
 class AboutPageBuilder:

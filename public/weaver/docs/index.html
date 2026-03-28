@@ -549,10 +549,13 @@ string "yes", expected a boolean
                         <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 overflow-x-auto">
                             <div class="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">EXAMPLE ENVELOPE</div>
 <pre class="font-mono text-xs text-gray-300 leading-relaxed">
-{"kind":"stream","stream":"stdout","data":"definition: file:///src/main.rs:42:17\n"}
+{"kind":"stream","stream":"stdout","data":"[{\"uri\":\"file:///src/main.rs\",\"line\":42,\"column\":17}]\n"}
 {"kind":"exit","status":0}
 </pre>
                         </div>
+                        <p class="mt-4 text-sm text-weaver-indigo/70">
+                            This wrapper is daemon transport, not CLI display. The CLI parses each line, strips the envelope, and then either forwards <code class="font-mono text-xs bg-weaver-indigo/10 px-1">data</code> verbatim in JSON mode or renders recognised payloads for humans.
+                        </p>
                     </section>
 
                     <!-- Daemon Lifecycle -->

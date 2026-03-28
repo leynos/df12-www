@@ -380,17 +380,16 @@
                                 01
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Streaming JSONL Output</h3>
+                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">CLI Output Modes</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">
-                                    Like every Weaver domain command, <code class="text-xs bg-weaver-indigo/10 px-1">verify</code> emits a <code class="text-xs bg-weaver-indigo/10 px-1">kind</code>-based JSONL envelope on stdout — one <code class="text-xs bg-weaver-indigo/10 px-1">stream</code> line per payload, then an <code class="text-xs bg-weaver-indigo/10 px-1">exit</code> line with the status code.
+                                    The daemon uses a <code class="text-xs bg-weaver-indigo/10 px-1">kind</code>-based JSONL envelope on the wire, but the CLI strips that wrapper before printing. In JSON mode it forwards the inner payload verbatim; in human mode it renders recognised diagnostics with source context.
                                 </p>
                                 <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 font-mono text-xs overflow-x-auto">
 <pre class="text-gray-300">
-<span class="token-comment">// diagnostics payload</span>
-{<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,
- <span class="token-key">"data"</span>:<span class="token-string">"{\"diagnostics\":[{\"line\":12,\"column\":5,\"message\":\"unused variable `x`\"}]}\n"</span>}
-<span class="token-comment">// exit status</span>
-{<span class="token-key">"kind"</span>:<span class="token-string">"exit"</span>,<span class="token-key">"status"</span>:<span class="token-number">0</span>}
+<span class="token-cmd">$</span> <span class="token-arg">weaver verify diagnostics --output json --uri file:///src/lib.rs</span>
+
+<span class="token-comment">// CLI JSON output</span>
+{<span class="token-key">"diagnostics"</span>:[{<span class="token-key">"line"</span>:<span class="token-number">12</span>,<span class="token-key">"column"</span>:<span class="token-number">5</span>,<span class="token-key">"message"</span>:<span class="token-string">"unused variable `x`"</span>}]}
 </pre>
                                 </div>
                             </div>
@@ -402,9 +401,9 @@
                                 02
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Example Invocation</h3>
+                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Human Mode</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">
-                                    Point at a file URI to pull every diagnostic the language server reports. Human-readable output is the default when stdout is a TTY.
+                                    Point at a file URI to pull every diagnostic the language server reports. Human-readable output is the default when stdout is a TTY, so recognised diagnostics render with source context instead of raw JSON.
                                 </p>
                                 <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 font-mono text-xs overflow-x-auto">
 <pre class="text-gray-300">

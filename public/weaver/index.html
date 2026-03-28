@@ -180,7 +180,7 @@
                             </div>
                             <h3 class="font-serif text-2xl text-weaver-indigo mb-3 group-hover:text-weaver-vermilion transition-colors">Composable</h3>
                             <p class="font-sans text-weaver-indigo/70 leading-relaxed mb-6">
-                                Use one surface for structural queries, patch application, and diagnostics. The CLI, daemon, and language-server bridge share the same JSONL contract.
+                                Use one surface for structural queries, patch application, and diagnostics. The daemon streams JSONL to the CLI, which then forwards raw payloads or human-readable output as needed.
                             </p>
                             <a href="how-it-works/#fusion" class="inline-flex items-center font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider group-hover:underline decoration-weaver-vermilion underline-offset-4">
                                 Explore Fusion <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
@@ -265,11 +265,10 @@
                                 <div class="flex text-gray-400">
                                     <span class="text-weaver-vermilion mr-2">➜</span>
                                     <span class="mr-2">~</span>
-                                    <span class="text-white">weaver observe get-definition --uri file:///src/main.rs --position 10:5</span>
+                                    <span class="text-white">weaver observe get-definition --output json --uri file:///src/main.rs --position 10:5</span>
                                 </div>
                                 <div class="text-blue-300 mt-2 pl-4 border-l-2 border-blue-500/30">
-                                    {"kind":"stream","stream":"stdout","data":"[{\"uri\":\"file:///src/lib.rs\",\"line\":42,\"column\":17}]\n"}<br>
-                                    {"kind":"exit","status":0}
+                                    [{"uri":"file:///src/lib.rs","line":42,"column":17}]
                                 </div>
                             </div>
 
@@ -278,11 +277,10 @@
                                 <div class="flex text-gray-400">
                                     <span class="text-weaver-vermilion mr-2">➜</span>
                                     <span class="mr-2">~</span>
-                                    <span class="text-white">weaver act apply-patch &lt; fix.diff</span>
+                                    <span class="text-white">weaver act apply-patch --output json &lt; fix.diff</span>
                                 </div>
                                 <div class="text-yellow-300 mt-2 pl-4 border-l-2 border-yellow-500/30">
-                                    {"kind":"stream","stream":"stdout","data":"{\"applied\":true,\"files\":[\"src/lib.rs\"]}\n"}<br>
-                                    {"kind":"exit","status":0}
+                                    {"applied":true,"files":["src/lib.rs"]}
                                 </div>
                             </div>
 
@@ -290,7 +288,7 @@
                             <div class="flex text-gray-400">
                                 <span class="text-weaver-vermilion mr-2">➜</span>
                                 <span class="mr-2">~</span>
-                                <span class="text-white">weaver verify diagnostics --uri file:///src/lib.rs<span class="animate-pulse inline-block w-2.5 h-5 bg-gray-400 ml-1 align-middle"></span></span>
+                                <span class="text-white">weaver verify diagnostics --output json --uri file:///src/lib.rs<span class="animate-pulse inline-block w-2.5 h-5 bg-gray-400 ml-1 align-middle"></span></span>
                             </div>
                         </div>
                     </div>

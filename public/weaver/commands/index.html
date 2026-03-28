@@ -305,14 +305,14 @@
                                     <p class="text-sm text-weaver-indigo/70 mb-4">Agent jumps to the definition of <code class="text-xs bg-weaver-indigo/10 px-1">process_data</code> to understand it before editing.</p>
                                     <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
                                         <span class="text-weaver-vermilion">$</span> weaver observe get-definition \<br>
+                                        &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/main.rs --position 10:5
                                     </div>
                                 </div>
                                 <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
 <pre>
-<span class="text-gray-500">// JSONL output</span>
-{"kind":"stream","stream":"stdout","data":"[{\"uri\":\"file:///src/lib.rs\",\"line\":42,\"column\":17}]\n"}
-{"kind":"exit","status":0}
+<span class="text-gray-500">// CLI JSON output (--output json)</span>
+[{"uri":"file:///src/lib.rs","line":42,"column":17}]
 </pre>
                                 </div>
                             </div>
@@ -334,14 +334,13 @@
                                     </div>
                                     <p class="text-sm text-weaver-indigo/70 mb-4">Agent pipes a diff through Double-Lock validation and onto disk.</p>
                                     <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
-                                        <span class="text-weaver-vermilion">$</span> weaver act apply-patch &lt; refactor.diff
+                                        <span class="text-weaver-vermilion">$</span> weaver act apply-patch --output json &lt; refactor.diff
                                     </div>
                                 </div>
                                 <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
 <pre>
-<span class="text-gray-500">// JSONL output</span>
-{"kind":"stream","stream":"stdout","data":"{\"applied\":true,\"files\":[\"src/lib.rs\"]}\n"}
-{"kind":"exit","status":0}
+<span class="text-gray-500">// CLI JSON output (--output json)</span>
+{"applied":true,"files":["src/lib.rs"]}
 </pre>
                                 </div>
                             </div>
@@ -364,14 +363,14 @@
                                     <p class="text-sm text-weaver-indigo/70 mb-4">Agent confirms the edited file has no compiler warnings or errors.</p>
                                     <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
                                         <span class="text-weaver-vermilion">$</span> weaver verify diagnostics \<br>
+                                        &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/lib.rs
                                     </div>
                                 </div>
                                 <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
 <pre>
-<span class="text-gray-500">// JSONL output — no diagnostics, clean file</span>
-{"kind":"stream","stream":"stdout","data":"{\"diagnostics\":[]}\n"}
-{"kind":"exit","status":0}
+<span class="text-gray-500">// CLI JSON output (--output json; no diagnostics, clean file)</span>
+{"diagnostics":[]}
 </pre>
                                 </div>
                             </div>

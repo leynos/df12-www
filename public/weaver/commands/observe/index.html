@@ -157,7 +157,7 @@
                         <div class="lg:col-span-1">
                             <h2 class="font-serif text-2xl text-weaver-indigo mb-4">Synopsis</h2>
                             <p class="text-sm text-weaver-indigo/70 mb-6 leading-relaxed">
-                                Each <code class="font-mono text-xs bg-weaver-indigo/10 px-1">observe</code> operation queries code structure and relationships via the daemon. Output is streamed as JSONL (or human-readable when stdout is a TTY).
+                                Each <code class="font-mono text-xs bg-weaver-indigo/10 px-1">observe</code> operation queries code structure and relationships via the daemon. The daemon speaks JSONL internally; the CLI either forwards the inner payload in JSON mode or renders recognised responses for humans when stdout is a TTY.
                             </p>
 
                             <div class="bg-weaver-cream border border-weaver-indigo p-4 relative mb-6">
@@ -265,6 +265,7 @@
                                     </div>
                                     <code class="font-mono text-sm text-green-400">
                                         $ weaver observe get-definition \<br>
+                                        &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/main.rs \<br>
                                         &nbsp;&nbsp;--position 10:5
                                     </code>
@@ -272,13 +273,10 @@
 
                                 <!-- JSON Output -->
                                 <div class="bg-[#282A36] rounded-sm p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">JSONL Stream</div>
+                                    <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">CLI JSON Output</div>
 <pre class="text-gray-300">
-<span class="token-comment">// definition locations (JSON payload)</span>
-{<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,
- <span class="token-key">"data"</span>:<span class="token-string">"[{\"uri\":\"file:///src/auth.rs\",\"line\":42,\"column\":17}]\n"</span>}
-<span class="token-comment">// exit status</span>
-{<span class="token-key">"kind"</span>:<span class="token-string">"exit"</span>,<span class="token-key">"status"</span>:<span class="token-number">0</span>}
+<span class="token-comment">// raw payload forwarded by the CLI</span>
+[<span class="token-string">{"uri":"file:///src/auth.rs","line":42,"column":17}</span>]
 </pre>
                                 </div>
                             </div>
@@ -305,6 +303,7 @@
                                     </div>
                                     <code class="font-mono text-sm text-green-400">
                                         $ weaver observe find-references \<br>
+                                        &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/auth.rs \<br>
                                         &nbsp;&nbsp;--position 42:17
                                     </code>
@@ -312,13 +311,10 @@
 
                                 <!-- JSON Output -->
                                 <div class="bg-[#282A36] rounded-sm p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">JSONL Stream</div>
+                                    <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">CLI JSON Output</div>
 <pre class="text-gray-300">
-<span class="token-comment">// reference locations (JSON payload)</span>
-{<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,
- <span class="token-key">"data"</span>:<span class="token-string">"{\"references\":[{\"uri\":\"file:///src/main.rs\",\"line\":10,\"column\":5},{\"uri\":\"file:///tests/auth_test.rs\",\"line\":7,\"column\":12}]}\n"</span>}
-<span class="token-comment">// exit status</span>
-{<span class="token-key">"kind"</span>:<span class="token-string">"exit"</span>,<span class="token-key">"status"</span>:<span class="token-number">0</span>}
+<span class="token-comment">// raw payload forwarded by the CLI</span>
+{<span class="token-key">"references"</span>:[{<span class="token-key">"uri"</span>:<span class="token-string">"file:///src/main.rs"</span>,<span class="token-key">"line"</span>:<span class="token-number">10</span>,<span class="token-key">"column"</span>:<span class="token-number">5</span>},{<span class="token-key">"uri"</span>:<span class="token-string">"file:///tests/auth_test.rs"</span>,<span class="token-key">"line"</span>:<span class="token-number">7</span>,<span class="token-key">"column"</span>:<span class="token-number">12</span>}]}
 </pre>
                                 </div>
                             </div>

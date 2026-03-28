@@ -419,6 +419,7 @@
                                 <div class="bg-white border border-weaver-indigo/10 rounded-sm p-5 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">CLI Contract</p>
 <pre class="font-mono text-xs text-weaver-indigo/90 whitespace-pre-wrap leading-relaxed">weaver observe query \
+  --output json \
   --lang rust \
   --uri file:///repo/src/lib.rs \
   --q 'pattern("fn $F(...) { ... }")'</pre>
@@ -439,12 +440,11 @@
 }</pre>
                                 </div>
                                 <div class="bg-weaver-dark text-weaver-cream rounded-sm p-6 paper-panel">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">JSONL Response (match payload inside <code>stream.data</code>)</p>
-<pre class="font-mono text-xs text-weaver-cream/90 whitespace-pre-wrap leading-relaxed">{"kind":"stream","stream":"stdout","data":"{\"type\":\"observe.query.match\",\"engine\":\"sempai\",\"rule_id\":\"interactive\",\"uri\":\"file:///repo/app.py\",\"span\":{\"start_byte\":12,\"end_byte\":42,\"start\":{\"line\":2,\"column\":0},\"end\":{\"line\":4,\"column\":0}},\"focus\":null,\"captures\":{\"$C\":{\"kind\":\"node\",\"span\":{\"start_byte\":18,\"end_byte\":26,\"start\":{\"line\":3,\"column\":6},\"end\":{\"line\":3,\"column\":14}},\"kind_name\":\"identifier\",\"text\":\"MyClass\"}},\"message\":null,\"fix\":null}\n"}
-{"kind":"exit","status":0}</pre>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">CLI JSON Output (--output json)</p>
+<pre class="font-mono text-xs text-weaver-cream/90 whitespace-pre-wrap leading-relaxed">{"type":"observe.query.match","engine":"sempai","rule_id":"interactive","uri":"file:///repo/app.py","span":{"start_byte":12,"end_byte":42,"start":{"line":2,"column":0},"end":{"line":4,"column":0}},"focus":null,"captures":{"$C":{"kind":"node","span":{"start_byte":18,"end_byte":26,"start":{"line":3,"column":6},"end":{"line":3,"column":14}},"kind_name":"identifier","text":"MyClass"}},"message":null,"fix":null}</pre>
                                 </div>
                                 <div class="bg-white/70 border border-weaver-indigo/10 rounded-sm p-6">
-                                    <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Payload Fields (inside <code>stream.data</code>)</p>
+                                    <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Payload Fields</p>
                                     <div class="overflow-x-auto">
                                         <table class="w-full text-sm border border-weaver-indigo/20">
                                             <thead>

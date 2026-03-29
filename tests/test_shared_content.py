@@ -16,9 +16,9 @@ if typ.TYPE_CHECKING:
 def test_shared_content_uses_parent_relative_stylesheet_by_default(
     tmp_path: Path,
 ) -> None:
-    """Nested shared-content pages should link back to the root CSS bundle."""
+    """Root shared-content pages should use the absolute shared stylesheet."""
     source = tmp_path / "privacy-policy.md"
-    source.write_text("# Privacy Policy\n", encoding="utf-8")
+    source.write_text("# Privacy Policy\n\nBody copy.\n", encoding="utf-8")
 
     config = SharedContentConfig(
         key="privacy-policy",
@@ -30,6 +30,9 @@ def test_shared_content_uses_parent_relative_stylesheet_by_default(
     output_path = SharedContentGenerator(config, tmp_path).run()
     soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
 
-    stylesheet = soup.find("link", attrs={"href": "../assets/site.css"})
+    stylesheet = soup.find("link", attrs={"href": "/assets/site.css"})
     assert stylesheet is not None
-    assert stylesheet.get("href") == "../assets/site.css"
+    assert stylesheet.get("href") == "/assets/site.css"
+    assert [heading.get_text(strip=True) for heading in soup.find_all("h1")] == [
+        "Privacy Policy"
+    ]

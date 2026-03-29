@@ -51,7 +51,7 @@ rendered into every site through each site's own template wrapper.
 ### `df12_pages/`
 
 The Python package that powers the `pages` CLI. Contains the site generator,
-config loader, markdown parser, and all builder classes. Key subdirectories:
+config loader, Markdown parser, and all builder classes. Key subdirectories:
 
 - `config/` — Dataclass models, YAML loader, and config helpers.
 - `generator/` — Page rendering pipeline: section models, HTML renderer, link
@@ -121,7 +121,7 @@ Test suite for the Python package:
   `features/`.
 - `cassettes/` — Betamax HTTP recording cassettes for reproducible API tests.
 - Top-level test modules cover doc generation, docs index rendering, release
-  bumping, and the deploy subsystem.
+  bumping, and the deployment subsystem.
 
 ## Top-level configuration files
 

@@ -35,7 +35,9 @@
       </span>
     </a>
     <nav class="mxd-site-nav" aria-label="Primary">
-      <a href="/" class="text-[#e8a838]">&larr; Back to df12 Productions</a>
+      {% if parent_link %}
+      <a href="{{ parent_link.href }}" class="text-[#e8a838]">{{ parent_link.label }}</a>
+      {% endif %}
       {% for link in nav_links %}
       <a href="{{ link.href }}">{{ link.label }}</a>
       {% endfor %}
@@ -65,7 +67,7 @@
 <div class="border-t border-[#e8d5b8] py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
         <article class="mxd-prose space-y-8 text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
-            {{ body_html }}
+            {{ body_html | safe }}
         </article>
     </div>
 </div>

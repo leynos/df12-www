@@ -138,11 +138,13 @@ def load_site_config(path: Path) -> SiteConfig:
         fallback_footer=homepage_config.footer if homepage_config else None,
     )
 
-    shared_content = _build_shared_content_map(raw.get("shared_content"))
+    shared_content = _build_shared_content_map(
+        raw.get("shared_content"),
+        config_dir=path.parent,
+    )
     sites = _build_sites_map(
         raw.get("sites"),
         page_defaults=page_defaults,
-        shared_layouts=shared_layouts,
         default_theme=default_theme,
         fallback_footer=homepage_config.footer if homepage_config else None,
     )
@@ -243,6 +245,8 @@ def _build_page_config(
 
 def _build_shared_content_map(
     raw: typ.Mapping[str, typ.Any] | None,
+    *,
+    config_dir: Path,
 ) -> dict[str, SharedContentConfig]:
     """Parse the top-level ``shared_content`` YAML block."""
     if not raw or not isinstance(raw, dict):
@@ -259,10 +263,25 @@ def _build_shared_content_map(
                 f"Shared content '{key}' requires 'label', 'source', and 'output_slug'."
             )
             raise SiteConfigError(msg)
+        source_text = str(source)
+        if "://" in source_text:
+            resolved_source: str | Path = source_text
+        else:
+            source_path = Path(source_text)
+            if source_path.is_absolute():
+                resolved_source = source_path
+            else:
+                candidates = [config_dir / source_path]
+                if source_text.startswith(f"{config_dir.name}/"):
+                    candidates.append(config_dir.parent / source_path)
+                resolved_source = next(
+                    (candidate for candidate in candidates if candidate.exists()),
+                    candidates[0],
+                )
         result[key] = SharedContentConfig(
             key=key,
             label=str(label),
-            source=str(source),
+            source=str(resolved_source),
             output_slug=str(output_slug),
         )
     return result
@@ -272,7 +291,6 @@ def _build_sites_map(
     raw: typ.Mapping[str, typ.Any] | None,
     *,
     page_defaults: _PageDefaults,
-    shared_layouts: typ.Mapping[str, typ.Any],
     default_theme: ThemeConfig,
     fallback_footer: FooterConfig | None,
 ) -> dict[str, SubSiteConfig]:
@@ -287,19 +305,17 @@ def _build_sites_map(
             key=key,
             payload=payload,
             page_defaults=page_defaults,
-            shared_layouts=shared_layouts,
             default_theme=default_theme,
             fallback_footer=fallback_footer,
         )
     return result
 
 
-def _build_subsite_config(  # noqa: PLR0913
+def _build_subsite_config(
     *,
     key: str,
     payload: typ.Mapping[str, typ.Any],
     page_defaults: _PageDefaults,
-    shared_layouts: typ.Mapping[str, typ.Any],
     default_theme: ThemeConfig,
     fallback_footer: FooterConfig | None,
 ) -> SubSiteConfig:

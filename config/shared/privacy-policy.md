@@ -1,3 +1,5 @@
+# Privacy Policy
+
 ## Contact details
 
 For privacy questions, data requests, or complaints, contact us at
@@ -49,7 +51,7 @@ website:
   to the processing of your personal data.
   [Read more about the right to object to processing](https://ico.org.uk/for-organisations/advice-for-small-organisations/privacy-notices-and-cookies/create-your-own-privacy-notice/your-data-protection-rights/#rto).
 - **Your right to data portability** -- You have the right to ask that we
-  transfer the personal information you gave us to another organisation,
+  transfer the personal information you gave us to another organization,
   or to you.
   [Read more about the right to data portability](https://ico.org.uk/for-organisations/advice-for-small-organisations/privacy-notices-and-cookies/create-your-own-privacy-notice/your-data-protection-rights/#rtdp).
 - **Your right to withdraw consent** -- When we use consent as our lawful
@@ -97,20 +99,14 @@ privacy notice.
 If you remain unhappy with how we've used your data after raising a
 complaint with us, you can also complain to the ICO.
 
-<div class="not-prose my-8 rounded-lg border border-current/10 bg-current/[0.03] p-6">
-<p class="mb-3 text-sm font-semibold uppercase tracking-wider opacity-70">The ICO's address</p>
-<address class="not-italic leading-relaxed">
-Information Commissioner's Office<br>
-Wycliffe House<br>
-Water Lane<br>
-Wilmslow<br>
-Cheshire<br>
-SK9 5AF
-</address>
-<p class="mt-4">Helpline number: 0303 123 1113</p>
-<p class="mt-1">Website:
-<a href="https://ico.org.uk/make-a-complaint/" class="underline">https://ico.org.uk/make-a-complaint/</a></p>
-</div>
+### The ICO's address
+
+Information Commissioner's Office, Wycliffe House, Water Lane, Wilmslow,
+Cheshire, SK9 5AF
+
+Helpline number: 0303 123 1113
+
+Website: <https://ico.org.uk/make-a-complaint/>
 
 ## Last updated
 

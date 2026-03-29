@@ -116,8 +116,8 @@
         
         <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-6">
             The server validates the identifier and version, then sends an
-            8-byte handshake reply with an error code: `0` for success, `1`
-            for invalid protocol, `2` for unsupported version, and `3` for
+            8-byte handshake reply with an error code: <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">0</code> for success, <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">1</code>
+            for invalid protocol, <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">2</code> for unsupported version, and <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">3</code> for
             handshake timeout. Idle sockets are dropped after the five-second
             handshake timeout. Only after that reply does the server begin
             accepting transaction frames, and the negotiated sub-protocol and

@@ -165,9 +165,11 @@ def _build_principles(
     """Build the list of design principles."""
     entries: list[typ.Mapping[str, object]] | None = None
     if isinstance(payload, dict):
-        entries = payload.get("items")
+        items = payload.get("items")
+        if isinstance(items, list):
+            entries = [entry for entry in items if isinstance(entry, dict)]
     elif isinstance(payload, list):
-        entries = payload  # type: ignore[assignment]
+        entries = [entry for entry in payload if isinstance(entry, dict)]
     if entries is None:
         return []
 

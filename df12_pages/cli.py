@@ -34,7 +34,7 @@ from cyclopts import App, Parameter
 
 from .about_page import AboutPageBuilder
 from .bump import bump_latest_release_metadata
-from .config import SiteConfig, SubSiteConfig, load_site_config
+from .config import SharedContentPageChrome, SiteConfig, SubSiteConfig, load_site_config
 from .deploy import (
     DEFAULT_CONFIG_PATH,
     apply_stack,
@@ -152,6 +152,11 @@ def _generate_main_site(
     output_dir: Path | None = None,
 ) -> None:
     """Generate the main df12 site pages."""
+    shared_output_root = (
+        site_config.docs_index_output.parent
+        if site_config.docs_index_output is not None
+        else Path("public")
+    )
     if page:
         target_pages = [site_config.get_page(page)]
     else:
@@ -179,7 +184,7 @@ def _generate_main_site(
 
     # Shared content for main site
     for sc in site_config.shared_content.values():
-        sc_path = SharedContentGenerator(sc, site_config.docs_index_output.parent).run()
+        sc_path = SharedContentGenerator(sc, shared_output_root).run()
         print(f"wrote {_format_path(sc_path)}")
 
 
@@ -243,9 +248,13 @@ def _generate_subsite(
             sc,
             subsite.output_dir,
             templates_dir=templates_dir,
-            nav_links=subsite.nav_links,
-            parent_link=subsite.parent_link,
-            stylesheet=subsite.stylesheet,
+            page_chrome=SharedContentPageChrome(
+                nav_links=subsite.nav_links,
+                parent_link=subsite.parent_link,
+                stylesheet=subsite.stylesheet,
+                site_title_suffix=subsite.theme.site_name,
+                site_brand=subsite.theme.site_name,
+            ),
         ).run()
         print(f"[{subsite.key}] wrote {_format_path(sc_path)}")
 

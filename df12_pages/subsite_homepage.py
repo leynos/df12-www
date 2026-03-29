@@ -1,4 +1,11 @@
-"""Render sub-site homepages from freeform template context."""
+"""Build and render sub-site homepage documents.
+
+This module adapts the generic site-generation pipeline to sub-sites whose
+homepages are driven by freeform template context instead of the strongly typed
+main-site homepage dataclasses. The builder is intentionally narrow: it loads a
+sub-site-local Jinja template, injects the configured context plus generation
+metadata, and writes the final HTML document to the requested output path.
+"""
 
 from __future__ import annotations
 
@@ -42,12 +49,18 @@ class SubSiteHomePageBuilder:
         self.template = self.env.get_template("home_page.jinja")
 
     def run(self) -> Path:
-        """Render and write the sub-site homepage HTML."""
+        """Render and write the sub-site homepage HTML.
+
+        Returns
+        -------
+        Path
+            The filesystem path written for the rendered homepage.
+        """
         output_path = self.config.output
         output_path.parent.mkdir(parents=True, exist_ok=True)
         context = {
-            "title": self.config.title,
             **self.config.context,
+            "title": self.config.title,
             "generated_at": dt.datetime.now(dt.UTC),
         }
         html = self.template.render(**context)

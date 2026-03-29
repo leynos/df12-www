@@ -468,4 +468,4 @@ ______________________________________________________________________
    `/about.html`; main homepage links to `/weaver/` etc.
 6. Each sub-site's CSS compiles independently and is
    referenced correctly in generated HTML
-7. Existing tests pass without modification
+7. Existing tests pass without modification.

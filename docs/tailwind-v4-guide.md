@@ -46,7 +46,7 @@ Use the `@theme` directive in your CSS file:
 @import "tailwindcss";
 
 @theme {
-  /* Colors (use OKLCH for wider gamut) */
+  /* Colours (use OKLCH for wider gamut) */
   --color-brand-50: oklch(0.98 0.01 142.12);
   --color-brand-500: oklch(0.64 0.15 142.12);
   --color-brand-900: oklch(0.25 0.08 142.12);

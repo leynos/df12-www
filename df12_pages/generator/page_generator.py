@@ -191,7 +191,10 @@ class PageContentGenerator:
                         commits = None
 
                     if commits is not None:
-                        latest_commit = next(iter(commits), None)
+                        try:
+                            latest_commit = next(iter(commits), None)
+                        except gh_exc.GitHubException:
+                            latest_commit = None
                         if latest_commit:
                             result = self._extract_commit_timestamp(latest_commit)
 

@@ -12,9 +12,30 @@
     <link rel="stylesheet" href="../assets/css/himotoshi.css">
 </head>
 <body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white min-h-screen">
-    <main class="max-w-4xl mx-auto px-6 py-20">
+    <header class="fixed top-0 z-50 w-full border-b border-stone-light/50 shell-backdrop" aria-label="Primary navigation">
+        <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
+            <a href="../" class="group flex items-center space-x-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-vermillion text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+                    <span class="font-serif text-xl font-bold">根</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-serif text-xl font-semibold tracking-tight text-charcoal">Himotoshi</span>
+                    <span class="font-mono text-xs uppercase tracking-[0.3em] text-charcoal-light">Netsuke</span>
+                </div>
+            </a>
+            <nav class="hidden items-center space-x-8 md:flex">
+                <a href="../" class="text-sm font-medium text-charcoal-mid transition-colors hover:text-vermillion">Home</a>
+                <a href="../docs/" class="text-sm font-medium text-charcoal-mid transition-colors hover:text-vermillion">Docs</a>
+                <a href="../examples/" class="text-sm font-medium text-charcoal-mid transition-colors hover:text-vermillion">Examples</a>
+                <a href="../guides/" class="text-sm font-medium text-charcoal-mid transition-colors hover:text-vermillion">Guides</a>
+                <a href="../blog/" class="text-sm font-medium text-charcoal-mid transition-colors hover:text-vermillion">Blog</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 pb-20 pt-32 lg:px-8">
         <div class="mb-8 text-sm font-mono text-charcoal-light">
-            <a href="/" class="hover:text-vermillion">&larr; df12</a>
+            <a href="../" class="hover:text-vermillion">← Back to df12 Productions</a>
             <span class="mx-2">/</span>
             <a href="../" class="hover:text-vermillion">Home</a>
             <span class="mx-2">/</span>
@@ -23,7 +44,6 @@
         <div class="rounded-3xl border border-stone bg-white/80 p-10 shadow-sm">
             <div class="inline-flex items-center rounded-full border border-stone bg-boxwood-light px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo">Legal</div>
             <h1 class="mt-6 font-serif text-4xl font-bold tracking-tight">Terms of Use</h1>
-
             <article class="mt-10 space-y-8 text-charcoal leading-8">
                 <p>Welcome to our website. If you continue to browse and use this website,
 you are agreeing to comply with and be bound by the following terms and
@@ -70,5 +90,50 @@ website. The term 'you' refers to the user or viewer of our website.</p>
             </article>
         </div>
     </main>
+
+    <footer class="bg-charcoal text-stone-light">
+        <div class="mx-auto grid max-w-7xl gap-10 px-6 py-14 lg:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-vermillion text-white shadow-sm">
+                        <span class="font-serif text-xl font-bold">根</span>
+                    </div>
+                    <div>
+                        <p class="font-serif text-xl font-semibold text-white">Himotoshi</p>
+                        <p class="font-mono text-xs uppercase tracking-[0.3em] text-stone">Declarative build tooling</p>
+                    </div>
+                </div>
+                <p class="max-w-md text-sm leading-7 text-stone-light/80">
+                    Netsuke keeps the build graph explicit, reviewable, and
+                    scriptable without turning every project into a custom shell
+                    runtime.
+                </p>
+            </div>
+            <div>
+                <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone">Explore</h2>
+                <ul class="mt-4 space-y-3 text-sm">
+                    <li><a href="../" class="transition-colors hover:text-white">Home</a></li>
+                    <li><a href="../docs/" class="transition-colors hover:text-white">Docs</a></li>
+                    <li><a href="../examples/" class="transition-colors hover:text-white">Examples</a></li>
+                    <li><a href="../guides/" class="transition-colors hover:text-white">Guides</a></li>
+                    <li><a href="../blog/" class="transition-colors hover:text-white">Blog</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone">Legal</h2>
+                <ul class="mt-4 space-y-3 text-sm">
+                    <li><a href="../privacy-policy/" class="transition-colors hover:text-white">Privacy Policy</a></li>
+                    <li><a href="../terms-of-use/" class="transition-colors hover:text-white">Terms of Use</a></li>
+                    <li><a href="../code-of-conduct/" class="transition-colors hover:text-white">Code of Conduct</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-white/10">
+            <div class="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 text-xs text-stone-light/70 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+                <p>&copy; 2026 df12 Productions</p>
+                <p>Serious tools, playful worlds.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

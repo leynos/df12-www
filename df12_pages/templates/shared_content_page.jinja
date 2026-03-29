@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="en" data-theme="df12">
+<html lang="{{ lang or 'en' }}" data-theme="{{ theme_name or 'df12' }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link href="{{ stylesheet or '../assets/site.css' }}" rel="stylesheet" />
-  <title>{{ title }} — df12</title>
+  <link href="{{ stylesheet or '/assets/site.css' }}" rel="stylesheet" />
+  <title>{{ title }} — {{ site_title_suffix or site_brand or 'df12' }}</title>
 </head>
 <body class="min-h-screen bg-base-100 text-base-content">
   <header class="navbar bg-base-200/60 backdrop-blur sticky top-0 z-50">
     <div class="container mx-auto flex items-center justify-between px-4">
-      <a href="/" class="text-lg font-bold tracking-tight">df12</a>
+      <a href="{{ site_home_url or '/' }}" class="text-lg font-bold tracking-tight">{{ site_brand or 'df12' }}</a>
       <nav class="flex gap-4 text-sm">
         {% if parent_link %}
         <a href="{{ parent_link.href }}" class="link link-hover">{{ parent_link.label }}</a>
@@ -27,7 +27,7 @@
   <main class="container mx-auto max-w-3xl px-4 py-12">
     <h1 class="text-3xl font-bold mb-8">{{ title }}</h1>
     <article class="prose prose-neutral max-w-none">
-      {{ body_html }}
+      {{ body_html | safe }}
     </article>
   </main>
 

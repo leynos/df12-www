@@ -261,6 +261,20 @@ class SharedContentConfig:
 
 
 @dc.dataclass(slots=True)
+class SharedContentPageChrome:
+    """Template chrome metadata for shared-content pages."""
+
+    nav_links: list[NavLinkConfig] = dc.field(default_factory=list)
+    parent_link: NavLinkConfig | None = None
+    stylesheet: str | None = None
+    lang: str = "en"
+    theme_name: str = "df12"
+    site_brand: str = "df12"
+    site_home_url: str = "/"
+    site_title_suffix: str = "df12"
+
+
+@dc.dataclass(slots=True)
 class SubSiteHomepageConfig:
     """Homepage config with freeform template context."""
 
@@ -339,6 +353,7 @@ __all__ = [
     "PrincipleConfig",
     "SectionLayout",
     "SharedContentConfig",
+    "SharedContentPageChrome",
     "SiteConfig",
     "SiteConfigError",
     "SubSiteConfig",

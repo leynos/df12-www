@@ -248,6 +248,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-exception-schema-versioning"
+                           class="doc-nav__link "
+>
+                          <span>Exception schema versioning</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-managing-handlers-and-custom-sinks"
                            class="doc-nav__link "
 >
@@ -283,6 +290,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtotimedrotatingfilehandler"
+                           class="doc-nav__link "
+>
+                          <span>FemtoTimedRotatingFileHandler</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtosockethandler"
                            class="doc-nav__link "
 >
@@ -290,10 +304,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtohttphandler"
+                           class="doc-nav__link "
+>
+                          <span>FemtoHTTPHandler</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-custom-python-handlers"
                            class="doc-nav__link "
 >
                           <span>Custom Python handlers</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-using-standard-library-stdlib-logging-handler-subclasses"
+                           class="doc-nav__link "
+>
+                          <span>Using standard library (stdlib) `logging.Handler` subclasses</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-limitations"
+                           class="doc-nav__link "
+>
+                          <span>Limitations</span>
                         </a>
                       </li>
                   </ul>
@@ -348,6 +383,25 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-femtologging-operational-tips-and-caveats.html">Operational tips and caveats</a>
                 </h3>
               </div>
+              <div class="doc-nav-group" aria-label="Journald and OpenTelemetry roadmap notes">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-femtologging-journald-and-opentelemetry-roadmap-notes.html">Journald and OpenTelemetry roadmap notes</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Scoped structured context">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-femtologging-scoped-structured-context.html">Scoped structured context</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-femtologging-scoped-structured-context.html#scoped-structured-context-callback-enrichment-validation"
+                           class="doc-nav__link "
+>
+                          <span>Callback enrichment validation</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
@@ -393,6 +447,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-emitting-records" class="doc-nav__link">Emitting records</a>
                     </li>
                     <li>
+                      <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-exception-schema-versioning" class="doc-nav__link">Exception schema versioning</a>
+                    </li>
+                    <li>
                       <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-managing-handlers-and-custom-sinks" class="doc-nav__link">Managing handlers and custom sinks</a>
                     </li>
                 </ul>
@@ -413,10 +470,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtorotatingfilehandler" class="doc-nav__link">FemtoRotatingFileHandler</a>
                     </li>
                     <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtotimedrotatingfilehandler" class="doc-nav__link">FemtoTimedRotatingFileHandler</a>
+                    </li>
+                    <li>
                       <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtosockethandler" class="doc-nav__link">FemtoSocketHandler</a>
                     </li>
                     <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtohttphandler" class="doc-nav__link">FemtoHTTPHandler</a>
+                    </li>
+                    <li>
                       <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-custom-python-handlers" class="doc-nav__link">Custom Python handlers</a>
+                    </li>
+                    <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-using-standard-library-stdlib-logging-handler-subclasses" class="doc-nav__link">Using standard library (stdlib) `logging.Handler` subclasses</a>
+                    </li>
+                    <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-limitations" class="doc-nav__link">Limitations</a>
                     </li>
                 </ul>
               </li>
@@ -464,13 +533,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     </li>
                 </ul>
               </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Journald and OpenTelemetry roadmap notes</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-femtologging-journald-and-opentelemetry-roadmap-notes.html" class="doc-nav__link">Journald and OpenTelemetry roadmap notes</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Scoped structured context</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-femtologging-scoped-structured-context.html" class="doc-nav__link">Scoped structured context</a>
+                    </li>
+                    <li>
+                      <a href="docs-femtologging-scoped-structured-context.html#scoped-structured-context-callback-enrichment-validation" class="doc-nav__link">Callback enrichment validation</a>
+                    </li>
+                </ul>
+              </li>
           </ul>
         </nav>
 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Operational tips and caveats</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Nov 11, 2025</span>
+            <span class="doc-meta-list__item">Updated Apr 01, 2026</span>
           </div>
         </header>
 
@@ -492,11 +580,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   messages before logging.</li>
 <li><code>reset_manager()</code> is a destructive operation intended for tests. Do not call
   it while other threads might still hold references to existing loggers.</li>
-</ul>
-<p>Keep an eye on the roadmap in <code>docs/</code> for upcoming additions (formatter
-resolution, richer dictConfig support, timed rotation) and update your
-configuration once those features land. For now, the patterns above reflect the
-current, tested surface area of femtologging.</p></div>
+</ul></div>
               </section>
         </article>
       </section>
@@ -535,7 +619,7 @@ current, tested surface area of femtologging.</p></div>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

@@ -449,8 +449,8 @@ ______________________________________________________________________
 4. ~~**CLI orchestration** (Phase 5)~~ — **DONE**
 5. ~~**Main-site shared content template**~~ — **DONE**
 6. ~~**All three sub-sites** (mxd, netsuke, weaver)~~ —
-   **DONE**: shared content templates, YAML config, static
-   assets copied, `pages generate --all-sites` verified
+   **DONE**: shared content templates, YAML config, static assets copied,
+   `pages generate --all-sites` verified
 
 ______________________________________________________________________
 

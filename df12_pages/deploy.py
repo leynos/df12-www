@@ -82,16 +82,38 @@ class BackendConfig:
     def from_mapping(
         cls, data: dict[str, typ.Any], *, path: Path | None = None
     ) -> BackendConfig:
-        """Create a BackendConfig from a mapping dictionary."""
+        """Create a BackendConfig from a mapping dictionary.
+
+        Parameters
+        ----------
+        data
+            Raw key/value mapping (typically parsed from TOML).
+        path
+            Source file path, included in error messages when provided.
+
+        Raises
+        ------
+        ValueError
+            If *bucket* or *region* is missing from *data*.
+        """
         try:
-            bucket = typ.cast("str", data["bucket"])
-            region = typ.cast("str", data["region"])
+            bucket = data["bucket"]
+            region = data["region"]
         except KeyError as exc:
             location = f" in {path}" if path else ""
             msg = f"Missing {exc} in backend config{location}"
             raise ValueError(msg) from exc
-        endpoint = typ.cast("str | None", data.get("endpoint"))
-        encrypt = typ.cast("bool | None", data.get("encrypt"))
+        if not isinstance(bucket, str) or not isinstance(region, str):
+            msg = "bucket and region must be strings"
+            raise TypeError(msg)
+        endpoint = data.get("endpoint")
+        encrypt = data.get("encrypt")
+        if endpoint is not None and not isinstance(endpoint, str):
+            msg = "endpoint must be a string"
+            raise TypeError(msg)
+        if encrypt is not None and not isinstance(encrypt, bool):
+            msg = "encrypt must be a boolean"
+            raise TypeError(msg)
         return cls(bucket=bucket, region=region, endpoint=endpoint, encrypt=encrypt)
 
 
@@ -202,7 +224,7 @@ def save_credentials(
     path.chmod(_TEMP_FILE_MODE)
 
 
-def resolve_credentials(  # noqa: PLR0913
+def resolve_credentials(  # noqa: PLR0913 -- each credential maps to a distinct auth backend
     *,
     config_path: Path = DEFAULT_CONFIG_PATH,
     config: DeployConfig | None = None,
@@ -326,7 +348,8 @@ def _materialize_backend_file(backend: BackendConfig, creds: CredentialSet) -> P
     return tmp
 
 
-def _format_hcl_value(value: typ.Any) -> str:  # noqa: ANN401
+def _format_hcl_value(value: typ.Any) -> str:  # noqa: ANN401 -- HCL values are heterogeneous by nature
+    """Format a Python value as an HCL literal string."""
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, (int, float)):
@@ -386,8 +409,11 @@ def ensure_backend_bucket(
 
     try:
         _run(["head-bucket", "--bucket", backend.bucket])
-        return  # noqa: TRY300
-    except subprocess.CalledProcessError:
+        return  # noqa: TRY300 -- early return is clearer than else-after-try here
+    except subprocess.CalledProcessError as exc:
+        stderr = (exc.stderr or "").strip()
+        if stderr:
+            print(f"head-bucket check: {stderr}")
         _run(
             [
                 "create-bucket",
@@ -401,8 +427,12 @@ def ensure_backend_bucket(
 
 def run_tofu(args: list[str], env: dict[str, str]) -> subprocess.CompletedProcess[str]:
     """Invoke OpenTofu with the provided arguments and environment."""
+    tofu = shutil.which("tofu")
+    if not tofu:
+        msg = "tofu binary not found on PATH"
+        raise FileNotFoundError(msg)
     return subprocess.run(  # noqa: S603
-        ["tofu", *args],  # noqa: S607
+        [tofu, *args],
         check=True,
         env=env,
         text=True,
@@ -445,7 +475,7 @@ def init_stack(
         materialized_tfvars.unlink(missing_ok=True)
 
 
-def plan_stack(  # noqa: PLR0913
+def plan_stack(  # noqa: PLR0913 -- orchestration entry point needs explicit plan, config, creds, and flags
     *,
     plan_file: Path = Path("plan.out"),
     config_path: Path = DEFAULT_CONFIG_PATH,

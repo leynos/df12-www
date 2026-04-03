@@ -1,7 +1,7 @@
 # Repository layout
 
-This document describes the directory structure of the df12-www repository
-and the responsibilities of each major path. The tree below is simplified;
+This document describes the directory structure of the df12-www repository and
+the responsibilities of each major path. The tree below is simplified;
 generated artefacts and tool caches are omitted for clarity.
 
 ```plaintext

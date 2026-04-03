@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="assets/site.css" rel="stylesheet" />
-  <title>df12 Productions — Autodiscovering scenarios | rstest-bdd</title>
+  <title>df12 Productions — Benchmarking | Chutoro</title>
   <style>
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -213,216 +213,60 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             Back to docs
           </a>
           <div>
-            <p class="doc-sidebar__eyebrow">rstest-bdd</p>
-            <p class="doc-sidebar__body">Behavior-driven testing macros layered on top of `rstest`. Narrative clarity without the ceremony.
+            <p class="doc-sidebar__eyebrow">Chutoro</p>
+            <p class="doc-sidebar__body">Work-in-progress FISHDBC engine written in Rust that merges a rayon-driven CPU path, Rust-CUDA kernels, and a C-ABI plugin system. Built for safe, iterative clustering across heterogeneous hardware—sushi-grade data science.
 </p>
           </div>
           <div class="doc-sidebar__groups">
-              <div class="doc-nav-group" aria-label="Introduction">
+              <div class="doc-nav-group" aria-label="Audience and scope">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-introduction.html">Introduction</a>
+                  <a href="docs-chutoro-audience-and-scope.html">Audience and scope</a>
                 </h3>
               </div>
-              <div class="doc-nav-group" aria-label="Toolchain requirements">
+              <div class="doc-nav-group" aria-label="Adding the crate">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-toolchain-requirements.html">Toolchain requirements</a>
+                  <a href="docs-chutoro-adding-the-crate.html">Adding the crate</a>
                 </h3>
               </div>
-              <div class="doc-nav-group" aria-label="The three amigos">
+              <div class="doc-nav-group" aria-label="Running the clustering pipeline">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-the-three-amigos.html">The three amigos</a>
+                  <a href="docs-chutoro-running-the-clustering-pipeline.html">Running the clustering pipeline</a>
                 </h3>
               </div>
-              <div class="doc-nav-group" aria-label="Gherkin feature files">
+              <div class="doc-nav-group" aria-label="Implementing data sources">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-gherkin-feature-files.html">Gherkin feature files</a>
+                  <a href="docs-chutoro-implementing-data-sources.html">Implementing data sources</a>
                 </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-example-feature-file"
-                           class="doc-nav__link "
->
-                          <span>Example feature file</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-internationalised-scenarios"
-                           class="doc-nav__link "
->
-                          <span>Internationalised scenarios</span>
-                        </a>
-                      </li>
-                  </ul>
               </div>
-              <div class="doc-nav-group" aria-label="Step definitions">
+              <div class="doc-nav-group" aria-label="Results and assignments">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-step-definitions.html">Step definitions</a>
+                  <a href="docs-chutoro-results-and-assignments.html">Results and assignments</a>
                 </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection"
-                           class="doc-nav__link "
->
-                          <span>Fixtures and implicit injection</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures"
-                           class="doc-nav__link "
->
-                          <span>Mutable world fixtures</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture"
-                           class="doc-nav__link "
->
-                          <span>When to use `&mut Fixture`</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values"
-                           class="doc-nav__link "
->
-                          <span>Step return values</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-struct-based-step-arguments"
-                           class="doc-nav__link "
->
-                          <span>Struct-based step arguments</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-scenario-state-slots"
-                           class="doc-nav__link "
->
-                          <span>Scenario state slots</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-implicit-fixture-injection"
-                           class="doc-nav__link "
->
-                          <span>Implicit fixture injection</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-inferred-step-patterns"
-                           class="doc-nav__link "
->
-                          <span>Inferred step patterns</span>
-                        </a>
-                      </li>
-                  </ul>
               </div>
-              <div class="doc-nav-group" aria-label="Binding tests to scenarios">
+              <div class="doc-nav-group" aria-label="Error handling">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-binding-tests-to-scenarios.html">Binding tests to scenarios</a>
+                  <a href="docs-chutoro-error-handling.html">Error handling</a>
                 </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios"
-                           class="doc-nav__link "
->
-                          <span>Skipping scenarios</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes"
-                           class="doc-nav__link "
->
-                          <span>Asserting skipped outcomes</span>
-                        </a>
-                      </li>
-                  </ul>
               </div>
-              <div class="doc-nav-group" aria-label="Autodiscovering scenarios">
+              <div class="doc-nav-group" aria-label="Distance helpers">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-chutoro-distance-helpers.html">Distance helpers</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Feature flags and execution strategies">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-chutoro-feature-flags-and-execution-strategies.html">Feature flags and execution strategies</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Benchmarking">
                 <h3 class="doc-nav-group__title is-active" aria-current="page">
-                  <a href="docs-rstest-bdd-autodiscovering-scenarios.html">Autodiscovering scenarios</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Running and maintaining tests">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-running-and-maintaining-tests.html">Running and maintaining tests</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Data tables and Docstrings">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-data-tables-and-docstrings.html">Data tables and Docstrings</a>
-                </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching"
-                           class="doc-nav__link "
->
-                          <span>Performance and caching</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors"
-                           class="doc-nav__link "
->
-                          <span>Debugging data table errors</span>
-                        </a>
-                      </li>
-                  </ul>
-              </div>
-              <div class="doc-nav-group" aria-label="Limitations and roadmap">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-limitations-and-roadmap.html">Limitations and roadmap</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Assertion macros">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-assertion-macros.html">Assertion macros</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Internationalization and localization">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-internationalization-and-localization.html">Internationalization and localization</a>
-                </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-writing-feature-files-in-other-languages"
-                           class="doc-nav__link "
->
-                          <span>Writing feature files in other languages</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-localizing-runtime-diagnostics"
-                           class="doc-nav__link "
->
-                          <span>Localizing runtime diagnostics</span>
-                        </a>
-                      </li>
-                  </ul>
-              </div>
-              <div class="doc-nav-group" aria-label="Diagnostic tooling">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-diagnostic-tooling.html">Diagnostic tooling</a>
-                </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-diagnostic-tooling.html#diagnostic-tooling-scenario-report-writers"
-                           class="doc-nav__link "
->
-                          <span>Scenario report writers</span>
-                        </a>
-                      </li>
-                  </ul>
-              </div>
-              <div class="doc-nav-group" aria-label="Summary">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-summary.html">Summary</a>
+                  <a href="docs-chutoro-benchmarking.html">Benchmarking</a>
                 </h3>
               </div>
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.2.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/chutoro/refs/heads/main/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -431,170 +275,79 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         </div>
       </aside>
 
-      <section class="space-y-6" id="autodiscovering-scenarios">
+      <section class="space-y-6" id="benchmarking">
         <nav class="doc-mobile-nav" aria-labelledby="mobile-sections-label">
           <p id="mobile-sections-label" class="doc-sidebar__section-label">Contents</p>
           <ul class="doc-nav__list doc-nav__list--mobile" role="list">
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Introduction</h3>
+                <h3 class="doc-nav-group__title">Audience and scope</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-introduction.html" class="doc-nav__link">Introduction</a>
+                      <a href="docs-chutoro-audience-and-scope.html" class="doc-nav__link">Audience and scope</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Toolchain requirements</h3>
+                <h3 class="doc-nav-group__title">Adding the crate</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-toolchain-requirements.html" class="doc-nav__link">Toolchain requirements</a>
+                      <a href="docs-chutoro-adding-the-crate.html" class="doc-nav__link">Adding the crate</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">The three amigos</h3>
+                <h3 class="doc-nav-group__title">Running the clustering pipeline</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-the-three-amigos.html" class="doc-nav__link">The three amigos</a>
+                      <a href="docs-chutoro-running-the-clustering-pipeline.html" class="doc-nav__link">Running the clustering pipeline</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Gherkin feature files</h3>
+                <h3 class="doc-nav-group__title">Implementing data sources</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-gherkin-feature-files.html" class="doc-nav__link">Gherkin feature files</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-example-feature-file" class="doc-nav__link">Example feature file</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-internationalised-scenarios" class="doc-nav__link">Internationalised scenarios</a>
+                      <a href="docs-chutoro-implementing-data-sources.html" class="doc-nav__link">Implementing data sources</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Step definitions</h3>
+                <h3 class="doc-nav-group__title">Results and assignments</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-step-definitions.html" class="doc-nav__link">Step definitions</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection" class="doc-nav__link">Fixtures and implicit injection</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures" class="doc-nav__link">Mutable world fixtures</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture" class="doc-nav__link">When to use `&mut Fixture`</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values" class="doc-nav__link">Step return values</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-struct-based-step-arguments" class="doc-nav__link">Struct-based step arguments</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-scenario-state-slots" class="doc-nav__link">Scenario state slots</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-implicit-fixture-injection" class="doc-nav__link">Implicit fixture injection</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-inferred-step-patterns" class="doc-nav__link">Inferred step patterns</a>
+                      <a href="docs-chutoro-results-and-assignments.html" class="doc-nav__link">Results and assignments</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Binding tests to scenarios</h3>
+                <h3 class="doc-nav-group__title">Error handling</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html" class="doc-nav__link">Binding tests to scenarios</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios" class="doc-nav__link">Skipping scenarios</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-nav__link">Asserting skipped outcomes</a>
+                      <a href="docs-chutoro-error-handling.html" class="doc-nav__link">Error handling</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Autodiscovering scenarios</h3>
+                <h3 class="doc-nav-group__title">Distance helpers</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-autodiscovering-scenarios.html" class="doc-nav__link">Autodiscovering scenarios</a>
+                      <a href="docs-chutoro-distance-helpers.html" class="doc-nav__link">Distance helpers</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Running and maintaining tests</h3>
+                <h3 class="doc-nav-group__title">Feature flags and execution strategies</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-running-and-maintaining-tests.html" class="doc-nav__link">Running and maintaining tests</a>
+                      <a href="docs-chutoro-feature-flags-and-execution-strategies.html" class="doc-nav__link">Feature flags and execution strategies</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Data tables and Docstrings</h3>
+                <h3 class="doc-nav-group__title">Benchmarking</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html" class="doc-nav__link">Data tables and Docstrings</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching" class="doc-nav__link">Performance and caching</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors" class="doc-nav__link">Debugging data table errors</a>
-                    </li>
-                </ul>
-              </li>
-              <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Limitations and roadmap</h3>
-                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
-                    <li>
-                      <a href="docs-rstest-bdd-limitations-and-roadmap.html" class="doc-nav__link">Limitations and roadmap</a>
-                    </li>
-                </ul>
-              </li>
-              <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Assertion macros</h3>
-                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
-                    <li>
-                      <a href="docs-rstest-bdd-assertion-macros.html" class="doc-nav__link">Assertion macros</a>
-                    </li>
-                </ul>
-              </li>
-              <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Internationalization and localization</h3>
-                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
-                    <li>
-                      <a href="docs-rstest-bdd-internationalization-and-localization.html" class="doc-nav__link">Internationalization and localization</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-writing-feature-files-in-other-languages" class="doc-nav__link">Writing feature files in other languages</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-localizing-runtime-diagnostics" class="doc-nav__link">Localizing runtime diagnostics</a>
-                    </li>
-                </ul>
-              </li>
-              <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Diagnostic tooling</h3>
-                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
-                    <li>
-                      <a href="docs-rstest-bdd-diagnostic-tooling.html" class="doc-nav__link">Diagnostic tooling</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-diagnostic-tooling.html#diagnostic-tooling-scenario-report-writers" class="doc-nav__link">Scenario report writers</a>
-                    </li>
-                </ul>
-              </li>
-              <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Summary</h3>
-                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
-                    <li>
-                      <a href="docs-rstest-bdd-summary.html" class="doc-nav__link">Summary</a>
+                      <a href="docs-chutoro-benchmarking.html" class="doc-nav__link">Benchmarking</a>
                     </li>
                 </ul>
               </li>
@@ -602,39 +355,29 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         </nav>
 
         <header class="doc-hero" id="doc-title">
-          <h1 class="doc-hero__title">Autodiscovering scenarios</h1>
+          <h1 class="doc-hero__title">Benchmarking</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.2.0</span>
-            <span class="doc-meta-list__item">Updated Dec 08, 2025</span>
+            <span class="doc-meta-list__item">Updated Feb 16, 2026</span>
           </div>
         </header>
 
         <article class="doc-article">
               <section class="doc-section">
-                <div class="doc-prose"><p>For large suites, it is tedious to bind each scenario manually. The
-<code>scenarios!</code> macro scans a directory recursively for <code>.feature</code> files and
-generates a module with a test for every <code>Scenario</code> found. Each test is named
-after the feature file and scenario title. Identifiers are sanitized
-(ASCII-only) and deduplicated by appending a numeric suffix when collisions
-occur.</p>
-<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd_macros</span><span class="p">::{</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">then</span><span class="p">,</span><span class="w"> </span><span class="n">when</span><span class="p">,</span><span class="w"> </span><span class="n">scenarios</span><span class="p">};</span>
-
-<span class="cp">#[given(</span><span class="s">&quot;a precondition&quot;</span><span class="cp">)]</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">precondition</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
-<span class="cp">#[when(</span><span class="s">&quot;an action occurs&quot;</span><span class="cp">)]</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">action</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
-<span class="cp">#[then(</span><span class="s">&quot;events are recorded&quot;</span><span class="cp">)]</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">events</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
-
-<span class="n">scenarios</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;tests/features/auto&quot;</span><span class="p">);</span>
-
-<span class="c1">// Only expand scenarios tagged @smoke and not marked @wip</span>
-<span class="n">scenarios</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;tests/features/auto&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;@smoke and not @wip&quot;</span><span class="p">);</span>
+                <div class="doc-prose"><p>The companion <code>chutoro-benches</code> crate ships Criterion benchmarks for the four
+CPU pipeline stages: Hierarchical Navigable Small World (HNSW) index
+construction, edge harvest, minimum spanning tree (MST) computation, and
+hierarchy extraction. These benchmarks use a <code>SyntheticSource</code> — a <code>DataSource</code>
+implementation that generates random Euclidean vectors from a seeded random
+number generator (RNG) for reproducibility.</p>
+<p>Run all benchmarks with:</p>
+<div class="codehilite" data-language="sh"><pre><span></span><code>make<span class="w"> </span>bench
 </code></pre></div>
 
-<p>When <code>tags</code> is supplied the macro evaluates the expression against the same
-union of feature, scenario, and example tags described above. Scenarios that do
-not match simply do not generate a test, and outline examples drop unmatched
-rows.</p>
-<p>Generated tests cannot currently accept fixtures; use <code>#[scenario]</code> when
-fixture injection or custom assertions are required.</p></div>
+<p>Criterion writes HTML timing reports to <code>target/criterion/</code>. The benchmarks
+cover multiple dataset sizes and parameter combinations so that scaling
+behaviour is visible. Consumers integrating <code>chutoro-core</code> into their own
+projects can use <code>chutoro-benches</code> as a reference for structuring performance
+tests around the pipeline APIs.</p></div>
               </section>
         </article>
       </section>

@@ -123,6 +123,10 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         If ``source_url`` or ``output_dir`` overrides are supplied when more
         than one page is requested, or if ``--site`` names an unknown sub-site.
     """
+    if site and (source_url or output_dir):
+        msg = "--source-url and --output-dir are not supported with --site"
+        raise ValueError(msg)
+
     site_config = load_site_config(config)
 
     if site:
@@ -174,6 +178,10 @@ def _generate_main_site(
         written = generator.run()
         for path in written:
             print(f"wrote {_format_path(path)}")
+
+    if page:
+        return
+
     docs_index_path = DocsIndexBuilder(site_config).run()
     print(f"wrote {_format_path(docs_index_path)}")
     if site_config.homepage:

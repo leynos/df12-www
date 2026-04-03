@@ -267,6 +267,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures"
+                           class="doc-nav__link "
+>
+                          <span>Mutable world fixtures</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture"
+                           class="doc-nav__link "
+>
+                          <span>When to use `&mut Fixture`</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values"
                            class="doc-nav__link "
 >
@@ -315,6 +329,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                           <span>Skipping scenarios</span>
                         </a>
                       </li>
+                      <li>
+                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes"
+                           class="doc-nav__link "
+>
+                          <span>Asserting skipped outcomes</span>
+                        </a>
+                      </li>
                   </ul>
               </div>
               <div class="doc-nav-group" aria-label="Autodiscovering scenarios">
@@ -332,6 +353,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-rstest-bdd-data-tables-and-docstrings.html">Data tables and Docstrings</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching"
+                           class="doc-nav__link "
+>
+                          <span>Performance and caching</span>
+                        </a>
+                      </li>
                       <li>
                         <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors"
                            class="doc-nav__link "
@@ -394,7 +422,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.1.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.2.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -455,6 +483,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection" class="doc-nav__link">Fixtures and implicit injection</a>
                     </li>
                     <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures" class="doc-nav__link">Mutable world fixtures</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture" class="doc-nav__link">When to use `&mut Fixture`</a>
+                    </li>
+                    <li>
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values" class="doc-nav__link">Step return values</a>
                     </li>
                     <li>
@@ -480,6 +514,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <li>
                       <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios" class="doc-nav__link">Skipping scenarios</a>
                     </li>
+                    <li>
+                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-nav__link">Asserting skipped outcomes</a>
+                    </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
@@ -503,6 +540,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html" class="doc-nav__link">Data tables and Docstrings</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching" class="doc-nav__link">Performance and caching</a>
                     </li>
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors" class="doc-nav__link">Debugging data table errors</a>
@@ -564,8 +604,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Binding tests to scenarios</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Nov 08, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Dec 08, 2025</span>
           </div>
         </header>
 
@@ -668,6 +708,16 @@ message. Pass an optional string to describe the reason, and use the standard
 <code>rstest_bdd::config::set_fail_on_skipped(true)</code>, to escalate skipped scenarios
 into test failures unless the feature or scenario carries an <code>@allow_skipped</code>
 tag. (Example-level tags are not yet evaluated.)</p>
+<p>The macro captures the current execution scope internally, so helper functions
+may freely call <code>skip!</code> as long as they eventually run within a step or hook.
+When code outside that context—for example, a unit test or module
+initialization routine—invokes the macro, it panics with the message
+<code>rstest_bdd::skip! may only be used inside a step or hook generated by rstest-bdd</code>.
+ Each scope tracks the thread that entered it; issuing a skip from another
+thread panics with
+<code>rstest_bdd::skip! may only run on the thread executing the step ...</code>. Keep
+skip requests on the thread that executes steps, so the runner can intercept
+the panic payload.</p>
 <div class="codehilite" data-language="rust"><pre><span></span><code><span class="p">#</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">bdd</span><span class="p">;</span>
 <span class="p">#</span><span class="w"> </span><span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd_macros</span><span class="p">::{</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">scenario</span><span class="p">};</span>
 
@@ -696,6 +746,39 @@ scenario to document that the skip is expected:</p>
 <div class="codehilite" data-language="gherkin"><pre><span></span><code><span class="nt">@allow_skipped</span>
 <span class="k">Scenario:</span><span class="nf"> Behaviour pending external contract</span>
 <span class="k">  Given </span><span class="nf">a dependent service is unavailable</span>
+</code></pre></div></div>
+                </section>
+                <section id="binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>Asserting skipped outcomes</h2>
+                  </div>
+                  <div class="doc-prose"><p>Tests that exercise skip-heavy flows no longer need to match on enums to verify
+that a step or scenario stopped executing. Use
+<code>rstest_bdd::assert_step_skipped!</code> to unwrap a <code>StepExecution::Skipped</code>
+outcome, optionally constraining its message, and
+<code>rstest_bdd::assert_scenario_skipped!</code> to inspect
+<a href="crate::reporting::ScenarioStatus"><code>ScenarioStatus</code></a> records. Both macros
+accept <code>message_absent = true</code> to assert that no message was provided and
+substring matching to confirm that a message contains the expected reason.</p>
+<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd</span><span class="p">::{</span><span class="n">assert_scenario_skipped</span><span class="p">,</span><span class="w"> </span><span class="n">assert_step_skipped</span><span class="p">,</span><span class="w"> </span><span class="n">StepExecution</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd</span><span class="p">::</span><span class="n">reporting</span><span class="p">::{</span><span class="n">ScenarioRecord</span><span class="p">,</span><span class="w"> </span><span class="n">ScenarioStatus</span><span class="p">,</span><span class="w"> </span><span class="n">SkippedScenario</span><span class="p">};</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StepExecution</span><span class="p">::</span><span class="n">skipped</span><span class="p">(</span><span class="nb">Some</span><span class="p">(</span><span class="s">&quot;maintenance pending&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">()));</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">assert_step_skipped</span><span class="o">!</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;maintenance&quot;</span><span class="p">);</span>
+<span class="fm">assert_eq!</span><span class="p">(</span><span class="n">message</span><span class="p">,</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="s">&quot;maintenance pending&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">()));</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">record</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ScenarioRecord</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;features/unhappy.feature&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s">&quot;pending work&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ScenarioStatus</span><span class="p">::</span><span class="n">Skipped</span><span class="p">(</span><span class="n">SkippedScenario</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="nb">None</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)),</span>
+<span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">details</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">assert_scenario_skipped</span><span class="o">!</span><span class="p">(</span>
+<span class="w">    </span><span class="n">record</span><span class="p">.</span><span class="n">status</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">message_absent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="n">allow_skipped</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="n">forced_failure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="p">);</span>
+<span class="fm">assert!</span><span class="p">(</span><span class="n">details</span><span class="p">.</span><span class="n">allow_skipped</span><span class="p">());</span>
 </code></pre></div></div>
                 </section>
         </article>
@@ -735,7 +818,7 @@ scenario to document that the skip is expected:</p>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

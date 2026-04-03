@@ -267,6 +267,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures"
+                           class="doc-nav__link "
+>
+                          <span>Mutable world fixtures</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture"
+                           class="doc-nav__link "
+>
+                          <span>When to use `&mut Fixture`</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values"
                            class="doc-nav__link "
 >
@@ -315,6 +329,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                           <span>Skipping scenarios</span>
                         </a>
                       </li>
+                      <li>
+                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes"
+                           class="doc-nav__link "
+>
+                          <span>Asserting skipped outcomes</span>
+                        </a>
+                      </li>
                   </ul>
               </div>
               <div class="doc-nav-group" aria-label="Autodiscovering scenarios">
@@ -332,6 +353,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-rstest-bdd-data-tables-and-docstrings.html">Data tables and Docstrings</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching"
+                           class="doc-nav__link "
+>
+                          <span>Performance and caching</span>
+                        </a>
+                      </li>
                       <li>
                         <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors"
                            class="doc-nav__link "
@@ -394,7 +422,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.1.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.2.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -455,6 +483,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection" class="doc-nav__link">Fixtures and implicit injection</a>
                     </li>
                     <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures" class="doc-nav__link">Mutable world fixtures</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture" class="doc-nav__link">When to use `&mut Fixture`</a>
+                    </li>
+                    <li>
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values" class="doc-nav__link">Step return values</a>
                     </li>
                     <li>
@@ -480,6 +514,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <li>
                       <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios" class="doc-nav__link">Skipping scenarios</a>
                     </li>
+                    <li>
+                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-nav__link">Asserting skipped outcomes</a>
+                    </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
@@ -503,6 +540,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html" class="doc-nav__link">Data tables and Docstrings</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching" class="doc-nav__link">Performance and caching</a>
                     </li>
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors" class="doc-nav__link">Debugging data table errors</a>
@@ -564,8 +604,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Toolchain requirements</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Nov 08, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Dec 08, 2025</span>
           </div>
         </header>
 
@@ -574,15 +614,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <div class="doc-prose"><p><code>rstest-bdd</code> targets Rust 1.75 or newer across every crate in the workspace.
 Each <code>Cargo.toml</code> declares <code>rust-version = "1.75"</code>, so <code>cargo</code> will refuse to
 compile the project on older stable compilers. The workspace now settles on the
-Rust 2021 edition to keep the declared MSRV and edition compatible. The
-repository still pins a nightly toolchain for development because the runtime
-uses auto traits and negative impls. Those nightly-only features remain behind
-the existing <code>rust-toolchain.toml</code> pin and do not alter the public MSRV. Step
-definitions and writers remain synchronous functions; the framework no longer
-depends on the <code>async-trait</code> crate to express async methods in traits. Projects
-that previously relied on <code>#[async_trait]</code> in helper traits should replace
-those methods with ordinary functions—<code>StepFn</code> continues to execute
-synchronously and exposes results via <code>StepExecution</code>.</p></div>
+Rust 2021 edition to keep the declared Minimum Supported Rust Version (MSRV)
+and edition compatible. The repository still pins a nightly toolchain for
+development because the runtime uses auto traits and negative impls. Those
+nightly-only features remain behind the existing <code>rust-toolchain.toml</code> pin and
+do not alter the public MSRV. Step definitions and writers remain synchronous
+functions; the framework no longer depends on the <code>async-trait</code> crate to
+express async methods in traits. Projects that previously relied on
+<code>#[async_trait]</code> in helper traits should replace those methods with ordinary
+functions—<code>StepFn</code> continues to execute synchronously and exposes results via
+<code>StepExecution</code>.</p></div>
               </section>
         </article>
       </section>
@@ -621,7 +662,7 @@ synchronously and exposes results via <code>StepExecution</code>.</p></div>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

@@ -267,6 +267,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures"
+                           class="doc-nav__link "
+>
+                          <span>Mutable world fixtures</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture"
+                           class="doc-nav__link "
+>
+                          <span>When to use `&mut Fixture`</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values"
                            class="doc-nav__link "
 >
@@ -315,6 +329,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                           <span>Skipping scenarios</span>
                         </a>
                       </li>
+                      <li>
+                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes"
+                           class="doc-nav__link "
+>
+                          <span>Asserting skipped outcomes</span>
+                        </a>
+                      </li>
                   </ul>
               </div>
               <div class="doc-nav-group" aria-label="Autodiscovering scenarios">
@@ -332,6 +353,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-rstest-bdd-data-tables-and-docstrings.html">Data tables and Docstrings</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching"
+                           class="doc-nav__link "
+>
+                          <span>Performance and caching</span>
+                        </a>
+                      </li>
                       <li>
                         <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors"
                            class="doc-nav__link "
@@ -394,7 +422,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.1.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.2.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -455,6 +483,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection" class="doc-nav__link">Fixtures and implicit injection</a>
                     </li>
                     <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures" class="doc-nav__link">Mutable world fixtures</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture" class="doc-nav__link">When to use `&mut Fixture`</a>
+                    </li>
+                    <li>
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values" class="doc-nav__link">Step return values</a>
                     </li>
                     <li>
@@ -480,6 +514,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <li>
                       <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios" class="doc-nav__link">Skipping scenarios</a>
                     </li>
+                    <li>
+                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-nav__link">Asserting skipped outcomes</a>
+                    </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
@@ -503,6 +540,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html" class="doc-nav__link">Data tables and Docstrings</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching" class="doc-nav__link">Performance and caching</a>
                     </li>
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors" class="doc-nav__link">Debugging data table errors</a>
@@ -564,8 +604,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Data tables and Docstrings</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Nov 08, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Dec 08, 2025</span>
           </div>
         </header>
 
@@ -573,10 +613,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
               <section class="doc-section">
                 <div class="doc-prose"><p>Steps may supply structured or free-form data via a trailing argument. A data
 table is received by including a parameter annotated with <code>#[datatable]</code> or
-named <code>datatable</code>. The declared type must implement <code>TryFrom&lt;Vec&lt;Vec&lt;String&gt;&gt;&gt;</code>
-so the wrapper can convert the parsed cells. Existing code can continue to
-accept a raw <code>Vec&lt;Vec&lt;String&gt;&gt;</code>, while the <code>rstest_bdd::datatable</code> module
-offers strongly typed helpers.</p>
+named <code>datatable</code>. The declared type must implement
+<code>TryFrom&lt;Vec&lt;Vec&lt;String&gt;&gt;&gt;</code>, so the wrapper can convert the parsed cells.
+Existing code can continue to accept a raw <code>Vec&lt;Vec&lt;String&gt;&gt;</code>, while the
+<code>rstest_bdd::datatable</code> module offers strongly typed helpers.</p>
 <p><code>datatable::Rows&lt;T&gt;</code> wraps a vector of parsed rows and derives
 <code>Deref&lt;Target = [T]&gt;</code>, <code>From&lt;Vec&lt;T&gt;&gt;</code>, and <code>IntoIterator</code>, enabling direct
 consumption of the table. The <code>datatable::DataTableRow</code> trait describes how
@@ -619,9 +659,27 @@ each row should be interpreted for a given type. When <code>T::REQUIRES_HEADER</
 
 <p>Projects that prefer to work with raw rows can declare the argument as
 <code>Vec&lt;Vec&lt;String&gt;&gt;</code> and handle parsing manually. Both forms can co-exist within
-the same project, allowing incremental adoption of typed tables.</p>
+the same project, allowing incremental adoption of typed tables.</p></div>
+              </section>
+                <section id="data-tables-and-docstrings-performance-and-caching" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>Performance and caching</h2>
+                  </div>
+                  <div class="doc-prose"><p>Data tables are now converted once per distinct table literal and cached for
+reuse. The generated wrappers key the cache by the table content, so repeated
+executions of the same step with the same table reuse the stored
+<code>Vec&lt;Vec&lt;String&gt;&gt;</code> without re-parsing cell text. The cache is scoped to the
+step wrapper, preventing different steps or tables from sharing entries.</p>
+<p>For zero-allocation access on subsequent executions, prefer the
+<code>datatable::CachedTable</code> argument type. It borrows the cached rows via an
+<code>Arc</code>, avoiding fresh string allocations when the step runs multiple times.
+Existing <code>Vec&lt;Vec&lt;String&gt;&gt;</code> signatures remain supported; they clone the cached
+rows when binding the argument, which still avoids re-parsing but retains the
+ownership semantics of the older API. The cache lives for the lifetime of the
+test process, so large tables remain available to later scenarios without
+additional conversion overhead.</p>
 <p>A derive macro removes the boilerplate when mapping headers to fields. Annotate
-the struct with <code>#[derive(DataTableRow)]</code> and customise behaviour via field
+the struct with <code>#[derive(DataTableRow)]</code> and customize behaviour via field
 attributes:</p>
 <ul>
 <li><code>#[datatable(rename_all = "kebab-case")]</code> applies a casing rule to unnamed
@@ -702,7 +760,7 @@ rows before exposing them to the step function:</p>
 <span class="w">        </span><span class="p">.</span><span class="n">collect</span><span class="p">())</span>
 <span class="p">}</span>
 </code></pre></div></div>
-              </section>
+                </section>
                 <section id="data-tables-and-docstrings-debugging-data-table-errors" class="doc-section">
                   <div class="doc-section__heading">
                     <h2>Debugging data table errors</h2>
@@ -845,7 +903,7 @@ delimited by triple double-quotes or triple backticks.</p></div>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

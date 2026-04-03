@@ -388,10 +388,59 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-network-policy-options"
+                           class="doc-nav__link "
+>
+                          <span>Network Policy Options</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-commands"
                            class="doc-nav__link "
 >
                           <span>Commands</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-configuration-and-localization"
+                           class="doc-nav__link "
+>
+                          <span>Configuration and Localization</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-output-streams"
+                           class="doc-nav__link "
+>
+                          <span>Output streams</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-json-diagnostics-mode"
+                           class="doc-nav__link "
+>
+                          <span>JSON diagnostics mode</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-accessible-output-mode"
+                           class="doc-nav__link "
+>
+                          <span>Accessible output mode</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-theme-and-accessibility-preferences"
+                           class="doc-nav__link "
+>
+                          <span>Theme and accessibility preferences</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-default-targets-from-configuration"
+                           class="doc-nav__link "
+>
+                          <span>Default targets from configuration</span>
                         </a>
                       </li>
                       <li>
@@ -548,7 +597,28 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-global-options" class="doc-nav__link">Global Options</a>
                     </li>
                     <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-network-policy-options" class="doc-nav__link">Network Policy Options</a>
+                    </li>
+                    <li>
                       <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-commands" class="doc-nav__link">Commands</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-configuration-and-localization" class="doc-nav__link">Configuration and Localization</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-output-streams" class="doc-nav__link">Output streams</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-json-diagnostics-mode" class="doc-nav__link">JSON diagnostics mode</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-accessible-output-mode" class="doc-nav__link">Accessible output mode</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-theme-and-accessibility-preferences" class="doc-nav__link">Theme and accessibility preferences</a>
+                    </li>
+                    <li>
+                      <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-default-targets-from-configuration" class="doc-nav__link">Default targets from configuration</a>
                     </li>
                     <li>
                       <a href="docs-netsuke-command-line-interface-cli.html#command-line-interface-cli-exit-codes" class="doc-nav__link">Exit Codes</a>
@@ -585,7 +655,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Command-Line Interface (CLI)</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Nov 24, 2025</span>
+            <span class="doc-meta-list__item">Updated Apr 02, 2026</span>
           </div>
         </header>
 
@@ -611,7 +681,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   (default: Ninja's default).</p>
 </li>
 <li>
-<p><code>-v, --verbose</code>: Enable verbose logging output.</p>
+<p><code>-v, --verbose</code>: Enable verbose diagnostic logging and completion timing
+  summaries.</p>
+</li>
+<li>
+<p><code>--locale &lt;LOCALE&gt;</code>: Localize CLI help and error messages (for example
+  <code>en-US</code> or <code>es-ES</code>).</p>
 </li>
 </ul></div>
                 </li>
@@ -625,12 +700,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </li>
 <li>
 <p><code>--emit &lt;FILE&gt;</code>: Write the generated <code>build.ninja</code> file to <code>&lt;FILE&gt;</code> and
-    keep it, instead of using a temporary file.</p>
+    keep it, instead of using a temporary file. When <code>-C/--directory</code> is set,
+    relative <code>--emit</code> paths are resolved under <code>&lt;DIR&gt;</code>.</p>
 </li>
 <li>
 <p><code>manifest &lt;FILE&gt;</code>: Generates the <code>build.ninja</code> file and writes it to
-  <code>&lt;FILE&gt;</code> without executing Ninja. Useful for debugging or integration with
-  other tools.</p>
+  <code>&lt;FILE&gt;</code> without executing Ninja. Use <code>-</code> to stream the generated Ninja file
+  to stdout (for example <code>netsuke manifest - | sed ...</code>). When <code>-C/--directory</code>
+  is set, relative manifest output paths are resolved under <code>&lt;DIR&gt;</code>.</p>
 </li>
 <li>
 <p><code>clean</code>: Removes build artefacts by running <code>ninja -t clean</code>. Requires
@@ -638,9 +715,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   <code>phony</code> targets).</p>
 </li>
 <li>
-<p><code>graph</code>: Generates the build dependency graph and outputs it in DOT format
-  (suitable for Graphviz). Future versions may support other formats like
-  <code>--html</code>.</p>
+<p><code>graph</code>: Generates the build dependency graph by running <code>ninja -t graph</code> on
+  the generated <code>build.ninja</code>, outputting DOT to stdout (suitable for
+  Graphviz). Future versions may support other formats like <code>--html</code>.</p>
 </li>
 </ul></div>
                 </li>
@@ -656,6 +733,326 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   command failure).</p>
 </li>
 </ul></div>
+                </li>
+                <li id="command-line-interface-cli-step-4" class="doc-step">
+                  <p class="doc-step__index">Step 04</p>
+                  <p class="doc-step__title">Network Policy Options</p>
+                  <div class="mt-4 doc-prose"><p>Netsuke's <code>fetch</code> helper is guarded by a configurable network policy. The
+policy is configured by these global options:</p>
+<ul>
+<li>
+<p><code>--fetch-allow-scheme &lt;SCHEME&gt;</code>: Allow additional URL schemes beyond the
+  defaults.</p>
+</li>
+<li>
+<p><code>--fetch-allow-host &lt;HOST&gt;</code>: Allow the provided hostnames when default deny
+  is enabled (wildcards such as <code>*.example.com</code> are supported).</p>
+</li>
+<li>
+<p><code>--fetch-block-host &lt;HOST&gt;</code>: Always block the provided hostnames (wildcards
+  supported), even if they are allowlisted.</p>
+</li>
+<li>
+<p><code>--fetch-default-deny</code>: Deny all hosts by default and only permit the
+  allowlist.</p>
+</li>
+</ul></div>
+                </li>
+                <li id="command-line-interface-cli-step-5" class="doc-step">
+                  <p class="doc-step__index">Step 05</p>
+                  <p class="doc-step__title">Configuration and Localization</p>
+                  <div class="mt-4 doc-prose"><p>Netsuke layers configuration in this order, with later entries overriding
+earlier ones: defaults, configuration files, environment variables, and
+command-line flags.</p>
+<p>Configuration files are discovered using OrthoConfig. Netsuke honours
+<code>NETSUKE_CONFIG_PATH</code> first, then searches <code>$XDG_CONFIG_HOME/netsuke</code>, each
+entry in <code>$XDG_CONFIG_DIRS</code> (falling back to <code>/etc/xdg</code> on Unix-like targets),
+Windows application data directories, <code>$HOME/.config/netsuke</code>,
+<code>$HOME/.netsuke.toml</code>, and finally the project root.</p>
+<p>Environment variables use the <code>NETSUKE_</code> prefix (for example,
+<code>NETSUKE_JOBS=8</code>). Use <code>__</code> to separate nested keys when matching structured
+configuration.</p>
+<p>Use <code>--locale &lt;LOCALE&gt;</code>, <code>NETSUKE_LOCALE</code>, or a <code>locale = "..."</code> entry in a
+configuration file to select localized CLI copy and error messages. Locale
+precedence is: command-line flag, environment variable, configuration file,
+then the system default. The same locale applies to user-facing runtime
+diagnostics, including manifest parse failures, stdlib template errors, and
+runner failures. Spanish (<code>es-ES</code>) is included as a reference translation;
+unsupported locales fall back to English (<code>en-US</code>).</p>
+<p>For information on contributing translations, see the
+<a href="https://github.com/leynos/netsuke/blob/main/docs/translators-guide.md">Translator Guide</a>.</p>
+<p>JSON diagnostics follow the same OrthoConfig layering:</p>
+<ul>
+<li>CLI flag: <code>--diag-json</code></li>
+<li>Environment variable: <code>NETSUKE_DIAG_JSON=true|false</code></li>
+<li>Configuration file: <code>diag_json = true|false</code></li>
+</ul>
+<p>The newer typed preference aliases use the same precedence chain:</p>
+<ul>
+<li><code>--colour-policy auto|always|never</code></li>
+<li><code>NETSUKE_COLOUR_POLICY=auto|always|never</code></li>
+<li><code>colour_policy = "auto" | "always" | "never"</code></li>
+<li><code>--spinner-mode enabled|disabled</code></li>
+<li><code>NETSUKE_SPINNER_MODE=enabled|disabled</code></li>
+<li><code>spinner_mode = "enabled" | "disabled"</code></li>
+<li><code>--output-format human|json</code></li>
+<li><code>NETSUKE_OUTPUT_FORMAT=human|json</code></li>
+<li><code>output_format = "human" | "json"</code></li>
+<li><code>--default-target &lt;TARGET&gt;</code> (repeatable)</li>
+<li><code>NETSUKE_DEFAULT_TARGETS__0=&lt;TARGET&gt;</code> style environment entries</li>
+<li><code>default_targets = ["lint", "test"]</code></li>
+</ul>
+<p>For startup failures that happen before configuration files can be loaded,
+Netsuke honours the CLI flag and environment variable immediately. A
+configuration file cannot request JSON for errors raised while that same file
+is being discovered or parsed.</p></div>
+                </li>
+                <li id="command-line-interface-cli-step-6" class="doc-step">
+                  <p class="doc-step__index">Step 06</p>
+                  <p class="doc-step__title">Output streams</p>
+                  <div class="mt-4 doc-prose"><p>Netsuke separates its output into two streams for scriptability:</p>
+<ul>
+<li><strong>stderr</strong>: Status messages, progress indicators, stage summaries, and
+  diagnostics</li>
+<li><strong>stdout</strong>: Subprocess output (for example, <code>ninja -t graph</code> produces DOT
+  graphs on stdout)</li>
+</ul>
+<p>This separation allows reliable piping and redirection:</p>
+<div class="codehilite" data-language="bash"><pre><span></span><code><span class="c1"># Capture build graph without status noise</span>
+netsuke<span class="w"> </span>graph<span class="w"> </span>&gt;<span class="w"> </span>build.dot
+
+<span class="c1"># Capture progress log without build output</span>
+netsuke<span class="w"> </span>build<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>progress.log
+
+<span class="c1"># Suppress status messages entirely</span>
+netsuke<span class="w"> </span>--progress<span class="w"> </span><span class="nb">false</span><span class="w"> </span>build
+</code></pre></div>
+
+<p>When using the <code>manifest</code> subcommand with <code>-</code> as the output path, the generated
+Ninja file streams to stdout while status messages remain on stderr:</p>
+<div class="codehilite" data-language="bash"><pre><span></span><code><span class="c1"># Pipe generated Ninja file for inspection</span>
+netsuke<span class="w"> </span>manifest<span class="w"> </span>-<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;rule &#39;</span>
+</code></pre></div></div>
+                </li>
+                <li id="command-line-interface-cli-step-7" class="doc-step">
+                  <p class="doc-step__index">Step 07</p>
+                  <p class="doc-step__title">JSON diagnostics mode</p>
+                  <div class="mt-4 doc-prose"><p>Use <code>--diag-json</code> when a caller needs machine-readable diagnostics on <code>stderr</code>
+instead of the human-oriented text renderer.</p>
+<p>When JSON diagnostics are enabled:</p>
+<ul>
+<li>Failing commands write exactly one JSON document to <code>stderr</code>.</li>
+<li>Successful commands write nothing to <code>stderr</code>.</li>
+<li>Progress lines, timing summaries, emoji prefixes, and tracing logs are
+  suppressed so <code>stderr</code> remains machine-readable.</li>
+<li><code>stdout</code> behaviour is unchanged. For example, <code>netsuke --diag-json manifest -</code>
+  still streams the generated Ninja file to <code>stdout</code>.</li>
+</ul>
+<p>The current schema version is <code>1</code>. The document shape is:</p>
+<ul>
+<li><code>schema_version</code>: Integer schema version for compatibility checks.</li>
+<li><code>generator</code>: Object containing <code>name</code> and <code>version</code>.</li>
+<li><code>diagnostics</code>: Array of diagnostic objects.</li>
+</ul>
+<p>Each diagnostic object contains:</p>
+<ul>
+<li><code>message</code>: Localized summary line.</li>
+<li><code>code</code>: Stable diagnostic code, or <code>null</code> when unavailable.</li>
+<li><code>severity</code>: One of <code>error</code>, <code>warning</code>, or <code>advice</code>.</li>
+<li><code>help</code>: Localized remediation hint, or <code>null</code>.</li>
+<li><code>url</code>: Optional documentation URL.</li>
+<li><code>causes</code>: Ordered error-cause chain.</li>
+<li><code>source</code>: Optional source descriptor currently containing <code>name</code>.</li>
+<li><code>primary_span</code>: The first labelled span, or <code>null</code>.</li>
+<li><code>labels</code>: All labelled spans with <code>label</code>, <code>offset</code>, <code>length</code>, <code>line</code>,
+  <code>column</code>, <code>end_line</code>, <code>end_column</code>, and <code>snippet</code>.</li>
+<li><code>related</code>: Nested diagnostics rendered using the same schema.</li>
+</ul>
+<p>Example:</p>
+<div class="codehilite" data-language="json"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;schema_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;generator&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;netsuke&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;diagnostics&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Manifest parse failed.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;netsuke::manifest::parse&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;help&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;YAML does not permit tabs; use spaces for indentation.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;causes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;YAML parse error at line 2, column 2: tabs disallowed within this context&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;tabs disallowed within this context (block indentation) at line 2, column 2&quot;</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Netsukefile&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;primary_span&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;invalid YAML&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;line&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;end_line&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;end_column&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;snippet&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;labels&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;invalid YAML&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;length&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;line&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;end_line&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;end_column&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;snippet&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;related&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></div>
+                </li>
+                <li id="command-line-interface-cli-step-8" class="doc-step">
+                  <p class="doc-step__index">Step 08</p>
+                  <p class="doc-step__title">Accessible output mode</p>
+                  <div class="mt-4 doc-prose"><p>Netsuke supports an accessible output mode that uses static, labelled status
+lines suitable for screen readers and dumb terminals.</p>
+<p>Accessible mode is auto-enabled when:</p>
+<ul>
+<li><code>TERM</code> is set to <code>dumb</code></li>
+<li><code>NO_COLOR</code> is set (any value)</li>
+</ul>
+<p>Accessible mode can be forced on or off:</p>
+<ul>
+<li>CLI flag: <code>--accessible true</code> or <code>--accessible false</code></li>
+<li>Environment variable: <code>NETSUKE_ACCESSIBLE=true</code></li>
+<li>Configuration file: <code>accessible = true</code></li>
+</ul>
+<p>Explicit configuration always takes precedence over auto-detection, in either
+direction (<code>--accessible false</code> disables accessible mode even when <code>NO_COLOR</code>
+is set).</p>
+<p>When accessible mode is active, each pipeline stage produces a labelled status
+line on stderr:</p>
+<div class="codehilite" data-language="text"><pre><span></span><code>Stage 1/6: Reading manifest file
+Stage 2/6: Parsing YAML document
+Stage 3/6: Expanding template directives
+Stage 4/6: Deserializing and rendering manifest values
+Stage 5/6: Building and validating dependency graph
+Stage 6/6: Synthesizing Ninja plan and executing Build
+Task 1/2: cc -c src/a.c
+Task 2/2: cc -c src/b.c
+Build complete.
+</code></pre></div>
+
+<p>In standard mode, Netsuke uses <code>indicatif</code> stage summaries when progress is
+enabled. During Stage 6, Netsuke parses Ninja status lines (<code>[current/total]</code>)
+and emits task progress updates. When stdout is not a teletype terminal (TTY),
+task progress automatically falls back to textual updates, so continuous
+integration (CI) and redirected logs remain readable.</p>
+<p>When verbose mode is enabled, Netsuke appends a completion timing summary on
+stderr after a successful run:</p>
+<div class="codehilite" data-language="text"><pre><span></span><code>Build complete.
+Stage timing summary:
+- Stage 1/6: Reading manifest file: 12ms
+- Stage 2/6: Parsing YAML document: 4ms
+- Stage 3/6: Expanding template directives: 7ms
+- Stage 4/6: Deserializing and rendering manifest values: 6ms
+- Stage 5/6: Building and validating dependency graph: 3ms
+- Stage 6/6: Synthesizing Ninja plan and executing Build: 18ms
+Total pipeline time: 50ms
+</code></pre></div>
+
+<p>Without <code>--verbose</code>, timing lines are not emitted. Failed runs also suppress
+timing summary output, even when verbose mode is enabled.</p>
+<p>Progress output can be controlled via OrthoConfig layering:</p>
+<ul>
+<li>CLI flag: <code>--progress true</code> or <code>--progress false</code></li>
+<li>Environment variable: <code>NETSUKE_PROGRESS=true|false</code></li>
+<li>Configuration file: <code>progress = true|false</code></li>
+<li>Typed alias: <code>--spinner-mode enabled|disabled</code>,
+  <code>NETSUKE_SPINNER_MODE=enabled|disabled</code>, or
+  <code>spinner_mode = "enabled" | "disabled"</code></li>
+</ul>
+<p>When progress is disabled, Netsuke suppresses stage and task progress output in
+both standard and accessible modes. If verbose mode is enabled at the same
+time, only the completion timing summary remains visible on successful runs.
+When both the legacy and typed forms are present, <code>spinner_mode</code> takes
+precedence.</p></div>
+                </li>
+                <li id="command-line-interface-cli-step-9" class="doc-step">
+                  <p class="doc-step__index">Step 09</p>
+                  <p class="doc-step__title">Theme and accessibility preferences</p>
+                  <div class="mt-4 doc-prose"><p>Netsuke resolves a CLI theme through the same layered configuration model as
+its other user-facing preferences:</p>
+<ul>
+<li>CLI flag: <code>--theme auto|unicode|ascii</code></li>
+<li>Environment variable: <code>NETSUKE_THEME=auto|unicode|ascii</code></li>
+<li>Configuration file: <code>theme = "auto" | "unicode" | "ascii"</code></li>
+</ul>
+<p>Theme precedence is:</p>
+<ol>
+<li>Explicit <code>theme</code></li>
+<li>Legacy <code>no_emoji = true</code></li>
+<li><code>NETSUKE_NO_EMOJI</code> present</li>
+<li><code>NO_COLOR</code> present</li>
+<li>Output mode default (<code>unicode</code> for standard output, <code>ascii</code> for
+   accessible output)</li>
+</ol>
+<p><code>auto</code> keeps the mode-sensitive default. <code>unicode</code> forces Unicode symbols even
+in accessible mode, while <code>ascii</code> forces ASCII-safe symbols everywhere.</p>
+<p>Colour policy is configured separately from theme selection:</p>
+<ul>
+<li>CLI flag: <code>--colour-policy auto|always|never</code></li>
+<li>Environment variable: <code>NETSUKE_COLOUR_POLICY=auto|always|never</code></li>
+<li>Configuration file: <code>colour_policy = "auto" | "always" | "never"</code></li>
+</ul>
+<p><code>auto</code> preserves the current <code>NO_COLOR</code>-aware behaviour. <code>always</code> ignores
+<code>NO_COLOR</code> when deciding between standard and accessible presentation. <code>never</code>
+forces <code>NO_COLOR</code> behaviour internally, which also makes <code>auto</code> theme
+resolution choose ASCII-safe symbols.</p>
+<p>Netsuke still supports the legacy no-emoji compatibility flag for users who
+already rely on it:</p>
+<ul>
+<li>CLI flag: <code>--no-emoji true</code></li>
+<li>Environment variable: <code>NETSUKE_NO_EMOJI</code> (any value, including empty)</li>
+<li>Configuration file: <code>no_emoji = true</code></li>
+</ul>
+<p>Only <code>--no-emoji true</code> acts as a hard override; <code>--no-emoji false</code> and omitting
+the flag both defer to environment variable detection. <code>NETSUKE_NO_EMOJI</code> uses
+presence-based semantics, so setting it to any value (including <code>"false"</code> or
+<code>"0"</code>) still selects the ASCII theme unless an explicit <code>theme</code> overrides it.</p>
+<p>In all output modes, Netsuke uses semantic text prefixes, so meaning is never
+conveyed solely by colour. The active theme swaps only the glyph set:</p>
+<ul>
+<li>Unicode theme: <code>✖ Error:</code>, <code>⚠ Warning:</code>, <code>✔ Success:</code>, <code>ℹ Info:</code>,
+  <code>⏱ Timing:</code></li>
+<li>ASCII theme: <code>X Error:</code>, <code>! Warning:</code>, <code>+ Success:</code>, <code>i Info:</code>,
+  <code>T Timing:</code></li>
+</ul></div>
+                </li>
+                <li id="command-line-interface-cli-step-10" class="doc-step">
+                  <p class="doc-step__index">Step 10</p>
+                  <p class="doc-step__title">Default targets from configuration</p>
+                  <div class="mt-4 doc-prose"><p>The manifest's <code>defaults:</code> list remains the final fallback when a build command
+does not name targets explicitly. Netsuke now supports a higher-precedence CLI
+configuration layer for that same decision:</p>
+<ul>
+<li>CLI flag: <code>--default-target &lt;TARGET&gt;</code> (repeatable)</li>
+<li>Environment variable: indexed <code>NETSUKE_DEFAULT_TARGETS__N</code></li>
+<li>Configuration file: <code>default_targets = ["hello", "test"]</code></li>
+</ul>
+<p>Configured <code>default_targets</code> are appended across defaults, files, environment
+variables, and CLI flags. When <code>netsuke</code> or <code>netsuke build</code> is invoked without
+explicit positional targets, Netsuke uses <code>default_targets</code> first and falls
+back to the manifest's <code>defaults:</code> list only when the configured list is empty.</p>
+<p>These theme-specific stage, task, completion, and timing renderings are also
+guarded by snapshot regression tests so alignment and prefix stability stay
+pinned for both Unicode and ASCII output.</p></div>
                 </li>
             </ol>
         </article>
@@ -695,7 +1092,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

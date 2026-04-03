@@ -267,6 +267,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures"
+                           class="doc-nav__link "
+>
+                          <span>Mutable world fixtures</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture"
+                           class="doc-nav__link "
+>
+                          <span>When to use `&mut Fixture`</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values"
                            class="doc-nav__link "
 >
@@ -315,6 +329,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                           <span>Skipping scenarios</span>
                         </a>
                       </li>
+                      <li>
+                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes"
+                           class="doc-nav__link "
+>
+                          <span>Asserting skipped outcomes</span>
+                        </a>
+                      </li>
                   </ul>
               </div>
               <div class="doc-nav-group" aria-label="Autodiscovering scenarios">
@@ -332,6 +353,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-rstest-bdd-data-tables-and-docstrings.html">Data tables and Docstrings</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching"
+                           class="doc-nav__link "
+>
+                          <span>Performance and caching</span>
+                        </a>
+                      </li>
                       <li>
                         <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors"
                            class="doc-nav__link "
@@ -394,7 +422,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.1.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.2.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -455,6 +483,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection" class="doc-nav__link">Fixtures and implicit injection</a>
                     </li>
                     <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures" class="doc-nav__link">Mutable world fixtures</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture" class="doc-nav__link">When to use `&mut Fixture`</a>
+                    </li>
+                    <li>
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values" class="doc-nav__link">Step return values</a>
                     </li>
                     <li>
@@ -480,6 +514,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <li>
                       <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios" class="doc-nav__link">Skipping scenarios</a>
                     </li>
+                    <li>
+                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-nav__link">Asserting skipped outcomes</a>
+                    </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
@@ -503,6 +540,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html" class="doc-nav__link">Data tables and Docstrings</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching" class="doc-nav__link">Performance and caching</a>
                     </li>
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors" class="doc-nav__link">Debugging data table errors</a>
@@ -564,8 +604,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Step definitions</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Nov 08, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Dec 08, 2025</span>
           </div>
         </header>
 
@@ -605,6 +645,131 @@ that, at runtime, retrieves references from a <code>StepContext</code>. This con
 key–value map of fixture names to type‑erased references. When a scenario runs,
 the generated test inserts its arguments (the <code>rstest</code> fixtures) into the
 <code>StepContext</code> before invoking each registered step.</p></div>
+                </section>
+                <section id="step-definitions-mutable-world-fixtures" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>Mutable world fixtures</h2>
+                  </div>
+                  <div class="doc-prose"><p>Each scenario owns its fixtures, so value fixtures are stored with exclusive
+access. Step parameters declared as <code>&amp;mut FixtureType</code> receive mutable
+references, making “world” structs ergonomic without sprinkling <code>Cell</code> or
+<code>RefCell</code> wrappers through the fields. Immutable references continue to work
+exactly as before; mutability is an opt‑in convenience.</p></div>
+                </section>
+                <section id="step-definitions-when-to-use-mut-fixture" class="doc-section">
+                  <div class="doc-section__heading">
+                    <h2>When to use `&mut Fixture`</h2>
+                  </div>
+                  <div class="doc-prose"><ul>
+<li>Prefer <code>&amp;mut</code> when the world has straightforward owned fields and the steps
+  mutate them directly.</li>
+<li>Prefer <code>Slot&lt;T&gt;</code> (from <code>rstest_bdd::Slot</code>) when state is optional, when a
+  need to reset between steps, or when a step may override values conditionally
+  without holding a mutable borrow.</li>
+<li>Combine both: keep the primary world mutable and store optional or
+  late‑bound values in slots to avoid borrow checker churn inside complex
+  scenarios.</li>
+</ul>
+<h4>Simple mutable world</h4>
+<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">rstest</span><span class="p">::</span><span class="n">fixture</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd_macros</span><span class="p">::{</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">scenario</span><span class="p">,</span><span class="w"> </span><span class="n">then</span><span class="p">,</span><span class="w"> </span><span class="n">when</span><span class="p">};</span>
+
+<span class="cp">#[derive(Default)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">CounterWorld</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">count</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="cp">#[fixture]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">world</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">CounterWorld</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">CounterWorld</span><span class="p">::</span><span class="n">default</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="cp">#[given(</span><span class="s">&quot;the world starts at {value}&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">seed</span><span class="p">(</span><span class="n">world</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">CounterWorld</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">world</span><span class="p">.</span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cp">#[when(</span><span class="s">&quot;the world increments&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">increment</span><span class="p">(</span><span class="n">world</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">CounterWorld</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">world</span><span class="p">.</span><span class="n">count</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cp">#[then(</span><span class="s">&quot;the world equals {expected}&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="n">world</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">CounterWorld</span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cp">#[scenario(path = </span><span class="s">&quot;tests/features/mutable_world.feature&quot;</span><span class="cp">, name = </span><span class="s">&quot;Steps mutate shared state&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">mutable_world</span><span class="p">(</span><span class="n">world</span><span class="p">:</span><span class="w"> </span><span class="nc">CounterWorld</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h4>Slot‑based state (unchanged and still useful)</h4>
+<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">rstest</span><span class="p">::</span><span class="n">fixture</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd</span><span class="p">::{</span><span class="n">ScenarioState</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">Slot</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd_macros</span><span class="p">::{</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">scenario</span><span class="p">,</span><span class="w"> </span><span class="n">then</span><span class="p">,</span><span class="w"> </span><span class="n">when</span><span class="p">,</span><span class="w"> </span><span class="n">ScenarioState</span><span class="p">};</span>
+
+<span class="cp">#[derive(Default, ScenarioState)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">CartState</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">total</span><span class="p">:</span><span class="w"> </span><span class="nc">Slot</span><span class="o">&lt;</span><span class="kt">i32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="cp">#[fixture]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">cart_state</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">CartState</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CartState</span><span class="p">::</span><span class="n">default</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+
+<span class="cp">#[when(</span><span class="s">&quot;I record {value:i32}&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="n">cart_state</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">CartState</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">cart_state</span><span class="p">.</span><span class="n">total</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+
+<span class="cp">#[then(</span><span class="s">&quot;the recorded value is {expected:i32}&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="n">cart_state</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">CartState</span><span class="p">,</span><span class="w"> </span><span class="n">expected</span><span class="p">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">cart_state</span><span class="p">.</span><span class="n">total</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">expected</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="cp">#[scenario(path = </span><span class="s">&quot;tests/features/scenario_state.feature&quot;</span><span class="cp">, name = </span><span class="s">&quot;Recording a single value&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">keeps_value</span><span class="p">(</span><span class="n">cart_state</span><span class="p">:</span><span class="w"> </span><span class="nc">CartState</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cart_state</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<h4>Mixed approach</h4>
+<div class="codehilite" data-language="rust"><pre><span></span><code><span class="cp">#[derive(Default, ScenarioState)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">ReportWorld</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">total</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">    </span><span class="n">last_input</span><span class="p">:</span><span class="w"> </span><span class="nc">Slot</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="cp">#[when(</span><span class="s">&quot;the total increases by {value:usize}&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">bump</span><span class="p">(</span><span class="n">world</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">ReportWorld</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">world</span><span class="p">.</span><span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<span class="w">    </span><span class="n">world</span><span class="p">.</span><span class="n">last_input</span><span class="p">.</span><span class="n">set</span><span class="p">(</span><span class="fm">format!</span><span class="p">(</span><span class="s">&quot;+{value}&quot;</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="cp">#[then(</span><span class="s">&quot;the last input was recorded&quot;</span><span class="cp">)]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">last_input</span><span class="p">(</span><span class="n">world</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">ReportWorld</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">world</span><span class="p">.</span><span class="n">last_input</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="s">&quot;+1&quot;</span><span class="p">.</span><span class="n">to_string</span><span class="p">()));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h4>Best practices</h4>
+<ul>
+<li>Keep world structs small and focused; extract helper methods when mutation
+  requires validation or cross‑field consistency.</li>
+<li>Prefer immutable references in assertions to make read‑only intent obvious.</li>
+<li>Reserve <code>Slot&lt;T&gt;</code> for optional or resettable state; avoid mixing it in when a
+  plain field would do.</li>
+<li>Add comments where mutation order matters between steps.</li>
+</ul>
+<h4>Troubleshooting</h4>
+<ul>
+<li>A rustc internal compiler error (ICE) affected some nightly compilers when
+  expanding macro‑driven scenarios with <code>&amp;mut</code> fixtures. See
+  <code>crates/rstest-bdd/tests/mutable_world_macro.rs</code> for a guarded example and
+  <code>crates/rstest-bdd/tests/mutable_fixture.rs</code> for the context‑level regression
+  test used until the upstream fix lands. Tracking details live in
+  <code>docs/known-issues.md#rustc-ice-with-mutable-world-macro</code>.</li>
+<li>For advanced cases—custom fixture injection or manual borrowing—use
+  <code>StepContext::insert_owned</code> and <code>StepContext::borrow_mut</code> directly; the
+  examples above cover most scenarios.</li>
+</ul></div>
                 </section>
                 <section id="step-definitions-step-return-values" class="doc-section">
                   <div class="doc-section__heading">
@@ -743,10 +908,10 @@ slot starts empty and supports helpers such as <code>set</code>, <code>replace</
 The derive macro clears every slot by implementing <code>ScenarioState::reset</code> and
 it automatically adds a [<code>Default</code>] implementation that leaves all slots empty.
 <strong>Do not</strong> also derive or implement <code>Default</code>: Rust will report a
-duplicate-implementation error because the macro already provides it. When you
-need custom initialization, plan to use the future
-<code>#[scenario_state(no_default)]</code> flag (or equivalent) to opt out of the
-generated <code>Default</code> and supply your own logic.</p>
+duplicate-implementation error because the macro already provides it. For
+custom initialization, plan to use the future <code>#[scenario_state(no_default)]</code>
+flag (or equivalent) to opt out of the generated <code>Default</code> and supply bespoke
+logic.</p>
 <div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">rstest</span><span class="p">::</span><span class="n">fixture</span><span class="p">;</span>
 <span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd</span><span class="p">::{</span><span class="n">ScenarioState</span><span class="p">,</span><span class="w"> </span><span class="n">Slot</span><span class="p">};</span>
 <span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd_macros</span><span class="p">::{</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">scenario</span><span class="p">,</span><span class="w"> </span><span class="n">then</span><span class="p">,</span><span class="w"> </span><span class="n">when</span><span class="p">,</span><span class="w"> </span><span class="n">ScenarioState</span><span class="p">};</span>
@@ -867,7 +1032,7 @@ Inference preserves spaces derived from underscores:</p>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

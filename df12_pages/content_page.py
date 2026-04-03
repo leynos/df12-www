@@ -17,7 +17,7 @@ if typ.TYPE_CHECKING:
 class ContentPageGenerator:
     """Render a Jinja page template with shared chrome into a sub-site directory."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913 -- template rendering requires config, output, templates, nav, stylesheet, parent link
         self,
         config: ContentPageConfig,
         output_dir: Path,

@@ -133,15 +133,15 @@ different purposes, detect different types of bugs, and are applied at
 different stages of the CI/CD pipeline. The following table synthesizes the key
 differences in the context of OpenTofu.
 
-| Feature       | Unit Testing                                                                                     | Integration Testing                                                                       | Notes |
-| ------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | ----- |
-| Scope         | A single module or resource in isolation.[^5]                                                    | Multiple modules and their interactions.[^4]                                              |       |
-| Dependencies  | External dependencies are mocked or stubbed.[^5] Uses `mock_provider`, `override_resource`, etc. | Uses real or closely replicated services (e.g., real cloud APIs).[^15]                    |       |
-| Execution     | tofu plan or tofu test with mocks. Very fast.[^5]                                                | tofu apply or tofu test with command=apply. Slower due to real resource provisioning.[^4] |       |
-| Bugs Detected | Logic errors, incorrect variable interpolation, invalid inputs, broken conditional logic.[^13]   | Interface errors, permission issues, data flow problems, dependency conflicts.[^13]       |       |
-| Primary Tools | tofu test (with command=plan and mocks), Terratest (with plan-based checks).                     | tofu test (with command=apply), Terratest, Kitchen-Terraform (legacy).                    |       |
-| Cost          | Low to none. No real infrastructure deployed.                                                    | Higher, as it involves provisioning (and paying for) real cloud resources.                |       |
-| CI/CD Stage   | Pre-merge checks on pull requests.                                                               | Post-merge checks in a dedicated test environment.                                        |       |
+| Feature       | Unit Testing                                                                                     | Integration Testing                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| Scope         | A single module or resource in isolation.[^5]                                                    | Multiple modules and their interactions.[^4]                                              |
+| Dependencies  | External dependencies are mocked or stubbed.[^5] Uses `mock_provider`, `override_resource`, etc. | Uses real or closely replicated services (e.g., real cloud APIs).[^15]                    |
+| Execution     | tofu plan or tofu test with mocks. Very fast.[^5]                                                | tofu apply or tofu test with command=apply. Slower due to real resource provisioning.[^4] |
+| Bugs Detected | Logic errors, incorrect variable interpolation, invalid inputs, broken conditional logic.[^13]   | Interface errors, permission issues, data flow problems, dependency conflicts.[^13]       |
+| Primary Tools | tofu test (with command=plan and mocks), Terratest (with plan-based checks).                     | tofu test (with command=apply), Terratest, Kitchen-Terraform (legacy).                    |
+| Cost          | Low to none. No real infrastructure deployed.                                                    | Higher, as it involves provisioning (and paying for) real cloud resources.                |
+| CI/CD Stage   | Pre-merge checks on pull requests.                                                               | Post-merge checks in a dedicated test environment.                                        |
 
 ### 1. The Blurring Lines and the Importance of Intent
 

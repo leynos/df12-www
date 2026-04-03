@@ -7,7 +7,19 @@ import typing as typ
 
 
 class NumberedStep(typ.TypedDict):
-    """A single numbered step within a section layout."""
+    """A single numbered step within a section layout.
+
+    Attributes
+    ----------
+    title
+        Display heading for the step.
+    number
+        1-based ordinal shown in the step badge.
+    html
+        Pre-rendered HTML body of the step.
+    anchor
+        Fragment identifier used for deep-linking.
+    """
 
     title: str
     number: int

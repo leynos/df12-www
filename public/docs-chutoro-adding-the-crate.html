@@ -258,6 +258,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-chutoro-feature-flags-and-execution-strategies.html">Feature flags and execution strategies</a>
                 </h3>
               </div>
+              <div class="doc-nav-group" aria-label="Benchmarking">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-chutoro-benchmarking.html">Benchmarking</a>
+                </h3>
+              </div>
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
@@ -338,23 +343,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     </li>
                 </ul>
               </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Benchmarking</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-chutoro-benchmarking.html" class="doc-nav__link">Benchmarking</a>
+                    </li>
+                </ul>
+              </li>
           </ul>
         </nav>
 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Adding the crate</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Oct 20, 2025</span>
+            <span class="doc-meta-list__item">Updated Feb 16, 2026</span>
           </div>
         </header>
 
         <article class="doc-article">
               <section class="doc-section">
-                <div class="doc-prose"><p>The project's <code>Cargo.toml</code> must include <code>chutoro-core</code>. Enable the <code>skeleton</code>
-feature to use the CPU walking skeleton and, optionally, the <code>gpu</code> feature for
-future GPU support.</p>
+                <div class="doc-prose"><p>The project's <code>Cargo.toml</code> must include <code>chutoro-core</code>. The default feature set
+enables the CPU backend; the <code>gpu</code> feature prepares the orchestration surface
+for a future GPU backend.</p>
 <div class="codehilite" data-language="toml"><pre><span></span><code><span class="k">[dependencies]</span>
-<span class="n">chutoro-core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;skeleton&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">chutoro-core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span>
 </code></pre></div>
 
 <p>The crate exports all public entry points from the root module, so required
@@ -397,7 +410,7 @@ types can be imported directly from <code>chutoro_core</code>.</p></div>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

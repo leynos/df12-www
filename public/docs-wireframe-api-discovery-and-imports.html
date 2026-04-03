@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="assets/site.css" rel="stylesheet" />
-  <title>df12 Productions — Autodiscovering scenarios | rstest-bdd</title>
+  <title>df12 Productions — API discovery and imports | Wireframe</title>
   <style>
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -213,216 +213,304 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             Back to docs
           </a>
           <div>
-            <p class="doc-sidebar__eyebrow">rstest-bdd</p>
-            <p class="doc-sidebar__body">Behavior-driven testing macros layered on top of `rstest`. Narrative clarity without the ceremony.
+            <p class="doc-sidebar__eyebrow">Wireframe</p>
+            <p class="doc-sidebar__body">Framework for building binary protocol servers and clients in Rust—think Actix Web, but for everything not HTTP. Message routing, framing, and backpressure included; bring your own transport.
 </p>
           </div>
           <div class="doc-sidebar__groups">
-              <div class="doc-nav-group" aria-label="Introduction">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-introduction.html">Introduction</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Toolchain requirements">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-toolchain-requirements.html">Toolchain requirements</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="The three amigos">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-the-three-amigos.html">The three amigos</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Gherkin feature files">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-gherkin-feature-files.html">Gherkin feature files</a>
-                </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-example-feature-file"
-                           class="doc-nav__link "
->
-                          <span>Example feature file</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-internationalised-scenarios"
-                           class="doc-nav__link "
->
-                          <span>Internationalised scenarios</span>
-                        </a>
-                      </li>
-                  </ul>
-              </div>
-              <div class="doc-nav-group" aria-label="Step definitions">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-step-definitions.html">Step definitions</a>
-                </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection"
-                           class="doc-nav__link "
->
-                          <span>Fixtures and implicit injection</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures"
-                           class="doc-nav__link "
->
-                          <span>Mutable world fixtures</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture"
-                           class="doc-nav__link "
->
-                          <span>When to use `&mut Fixture`</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values"
-                           class="doc-nav__link "
->
-                          <span>Step return values</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-struct-based-step-arguments"
-                           class="doc-nav__link "
->
-                          <span>Struct-based step arguments</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-scenario-state-slots"
-                           class="doc-nav__link "
->
-                          <span>Scenario state slots</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-implicit-fixture-injection"
-                           class="doc-nav__link "
->
-                          <span>Implicit fixture injection</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-inferred-step-patterns"
-                           class="doc-nav__link "
->
-                          <span>Inferred step patterns</span>
-                        </a>
-                      </li>
-                  </ul>
-              </div>
-              <div class="doc-nav-group" aria-label="Binding tests to scenarios">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-binding-tests-to-scenarios.html">Binding tests to scenarios</a>
-                </h3>
-                  <ul class="doc-nav__list" role="list">
-                      <li>
-                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios"
-                           class="doc-nav__link "
->
-                          <span>Skipping scenarios</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes"
-                           class="doc-nav__link "
->
-                          <span>Asserting skipped outcomes</span>
-                        </a>
-                      </li>
-                  </ul>
-              </div>
-              <div class="doc-nav-group" aria-label="Autodiscovering scenarios">
+              <div class="doc-nav-group" aria-label="API discovery and imports">
                 <h3 class="doc-nav-group__title is-active" aria-current="page">
-                  <a href="docs-rstest-bdd-autodiscovering-scenarios.html">Autodiscovering scenarios</a>
+                  <a href="docs-wireframe-api-discovery-and-imports.html">API discovery and imports</a>
                 </h3>
               </div>
-              <div class="doc-nav-group" aria-label="Running and maintaining tests">
+              <div class="doc-nav-group" aria-label="Conceptual model and vocabulary">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-running-and-maintaining-tests.html">Running and maintaining tests</a>
+                  <a href="docs-wireframe-conceptual-model-and-vocabulary.html">Conceptual model and vocabulary</a>
                 </h3>
               </div>
-              <div class="doc-nav-group" aria-label="Data tables and Docstrings">
+              <div class="doc-nav-group" aria-label="Quick start: building an application">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-data-tables-and-docstrings.html">Data tables and Docstrings</a>
+                  <a href="docs-wireframe-quick-start-building-an-application.html">Quick start: building an application</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
                       <li>
-                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching"
+                        <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-custom-frame-codecs"
                            class="doc-nav__link "
 >
-                          <span>Performance and caching</span>
+                          <span>Custom frame codecs</span>
                         </a>
                       </li>
                       <li>
-                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors"
+                        <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-codec-error-handling"
                            class="doc-nav__link "
 >
-                          <span>Debugging data table errors</span>
+                          <span>Codec error handling</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-error-categories"
+                           class="doc-nav__link "
+>
+                          <span>Error categories</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-recovery-policies"
+                           class="doc-nav__link "
+>
+                          <span>Recovery policies</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-protocol-hooks-for-eof"
+                           class="doc-nav__link "
+>
+                          <span>Protocol hooks for EOF</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-metrics"
+                           class="doc-nav__link "
+>
+                          <span>Metrics</span>
                         </a>
                       </li>
                   </ul>
               </div>
-              <div class="doc-nav-group" aria-label="Limitations and roadmap">
+              <div class="doc-nav-group" aria-label="Packets, payloads, and serialization">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-limitations-and-roadmap.html">Limitations and roadmap</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Assertion macros">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-assertion-macros.html">Assertion macros</a>
-                </h3>
-              </div>
-              <div class="doc-nav-group" aria-label="Internationalization and localization">
-                <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-internationalization-and-localization.html">Internationalization and localization</a>
+                  <a href="docs-wireframe-packets-payloads-and-serialization.html">Packets, payloads, and serialization</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
                       <li>
-                        <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-writing-feature-files-in-other-languages"
+                        <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-migration-from-message-only-bounds"
                            class="doc-nav__link "
 >
-                          <span>Writing feature files in other languages</span>
+                          <span>Migration from `Message`-only bounds</span>
                         </a>
                       </li>
                       <li>
-                        <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-localizing-runtime-diagnostics"
+                        <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-fragmentation-metadata"
                            class="doc-nav__link "
 >
-                          <span>Localizing runtime diagnostics</span>
+                          <span>Fragmentation metadata</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-request-parts-and-streaming-bodies"
+                           class="doc-nav__link "
+>
+                          <span>Request parts and streaming bodies</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-message-assembler-hook"
+                           class="doc-nav__link "
+>
+                          <span>Message assembler hook</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-per-connection-memory-budgets"
+                           class="doc-nav__link "
+>
+                          <span>Per-connection memory budgets</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-streaming-request-body-consumption"
+                           class="doc-nav__link "
+>
+                          <span>Streaming request body consumption</span>
                         </a>
                       </li>
                   </ul>
               </div>
-              <div class="doc-nav-group" aria-label="Diagnostic tooling">
+              <div class="doc-nav-group" aria-label="Working with requests and middleware">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-diagnostic-tooling.html">Diagnostic tooling</a>
+                  <a href="docs-wireframe-working-with-requests-and-middleware.html">Working with requests and middleware</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Connection lifecycle">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-connection-lifecycle.html">Connection lifecycle</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Message fragmentation">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-message-fragmentation.html">Message fragmentation</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Protocol hooks">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-protocol-hooks.html">Protocol hooks</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Running servers">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-running-servers.html">Running servers</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Client runtime">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-client-runtime.html">Client runtime</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
                       <li>
-                        <a href="docs-rstest-bdd-diagnostic-tooling.html#diagnostic-tooling-scenario-report-writers"
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-configuration-reference"
                            class="doc-nav__link "
 >
-                          <span>Scenario report writers</span>
+                          <span>Client configuration reference</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-pools"
+                           class="doc-nav__link "
+>
+                          <span>Client pools</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-preamble-exchange"
+                           class="doc-nav__link "
+>
+                          <span>Client preamble exchange</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-lifecycle-hooks"
+                           class="doc-nav__link "
+>
+                          <span>Client lifecycle hooks</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-request-hooks"
+                           class="doc-nav__link "
+>
+                          <span>Client request hooks</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-outbound-streaming-sends"
+                           class="doc-nav__link "
+>
+                          <span>Outbound streaming sends</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-tracing"
+                           class="doc-nav__link "
+>
+                          <span>Client tracing</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-message-api-with-correlation-identifiers"
+                           class="doc-nav__link "
+>
+                          <span>Client message API with correlation identifiers</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-client-runtime.html#client-runtime-client-request-response-error-mapping"
+                           class="doc-nav__link "
+>
+                          <span>Client request/response error mapping</span>
                         </a>
                       </li>
                   </ul>
               </div>
-              <div class="doc-nav-group" aria-label="Summary">
+              <div class="doc-nav-group" aria-label="Push queues and connection actors">
                 <h3 class="doc-nav-group__title " >
-                  <a href="docs-rstest-bdd-summary.html">Summary</a>
+                  <a href="docs-wireframe-push-queues-and-connection-actors.html">Push queues and connection actors</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Session management">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-session-management.html">Session management</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Streaming responses">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-streaming-responses.html">Streaming responses</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Consuming streaming responses on the client">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html">Consuming streaming responses on the client</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-terminator-detection-with-is-stream-terminator"
+                           class="doc-nav__link "
+>
+                          <span>Terminator detection with `is_stream_terminator`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-high-level-api-call-streaming"
+                           class="doc-nav__link "
+>
+                          <span>High-level API: `call_streaming`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-helper-based-typed-consumption-with-typed-with"
+                           class="doc-nav__link "
+>
+                          <span>Helper-based typed consumption with `typed_with`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-low-level-api-receive-streaming"
+                           class="doc-nav__link "
+>
+                          <span>Low-level API: `receive_streaming`</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-back-pressure"
+                           class="doc-nav__link "
+>
+                          <span>Back-pressure</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-error-handling"
+                           class="doc-nav__link "
+>
+                          <span>Error handling</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-client-troubleshooting"
+                           class="doc-nav__link "
+>
+                          <span>Client troubleshooting</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="doc-nav-group" aria-label="Versioning and graceful deprecation">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-versioning-and-graceful-deprecation.html">Versioning and graceful deprecation</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Metrics and observability">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-metrics-and-observability.html">Metrics and observability</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Additional utilities">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-wireframe-additional-utilities.html">Additional utilities</a>
                 </h3>
               </div>
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.2.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/wireframe/refs/heads/main/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -431,170 +519,227 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         </div>
       </aside>
 
-      <section class="space-y-6" id="autodiscovering-scenarios">
+      <section class="space-y-6" id="api-discovery-and-imports">
         <nav class="doc-mobile-nav" aria-labelledby="mobile-sections-label">
           <p id="mobile-sections-label" class="doc-sidebar__section-label">Contents</p>
           <ul class="doc-nav__list doc-nav__list--mobile" role="list">
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Introduction</h3>
+                <h3 class="doc-nav-group__title">API discovery and imports</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-introduction.html" class="doc-nav__link">Introduction</a>
+                      <a href="docs-wireframe-api-discovery-and-imports.html" class="doc-nav__link">API discovery and imports</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Toolchain requirements</h3>
+                <h3 class="doc-nav-group__title">Conceptual model and vocabulary</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-toolchain-requirements.html" class="doc-nav__link">Toolchain requirements</a>
+                      <a href="docs-wireframe-conceptual-model-and-vocabulary.html" class="doc-nav__link">Conceptual model and vocabulary</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">The three amigos</h3>
+                <h3 class="doc-nav-group__title">Quick start: building an application</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-the-three-amigos.html" class="doc-nav__link">The three amigos</a>
+                      <a href="docs-wireframe-quick-start-building-an-application.html" class="doc-nav__link">Quick start: building an application</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-custom-frame-codecs" class="doc-nav__link">Custom frame codecs</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-codec-error-handling" class="doc-nav__link">Codec error handling</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-error-categories" class="doc-nav__link">Error categories</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-recovery-policies" class="doc-nav__link">Recovery policies</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-protocol-hooks-for-eof" class="doc-nav__link">Protocol hooks for EOF</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-quick-start-building-an-application.html#quick-start-building-an-application-metrics" class="doc-nav__link">Metrics</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Gherkin feature files</h3>
+                <h3 class="doc-nav-group__title">Packets, payloads, and serialization</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-gherkin-feature-files.html" class="doc-nav__link">Gherkin feature files</a>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html" class="doc-nav__link">Packets, payloads, and serialization</a>
                     </li>
                     <li>
-                      <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-example-feature-file" class="doc-nav__link">Example feature file</a>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-migration-from-message-only-bounds" class="doc-nav__link">Migration from `Message`-only bounds</a>
                     </li>
                     <li>
-                      <a href="docs-rstest-bdd-gherkin-feature-files.html#gherkin-feature-files-internationalised-scenarios" class="doc-nav__link">Internationalised scenarios</a>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-fragmentation-metadata" class="doc-nav__link">Fragmentation metadata</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-request-parts-and-streaming-bodies" class="doc-nav__link">Request parts and streaming bodies</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-message-assembler-hook" class="doc-nav__link">Message assembler hook</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-per-connection-memory-budgets" class="doc-nav__link">Per-connection memory budgets</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-packets-payloads-and-serialization.html#packets-payloads-and-serialization-streaming-request-body-consumption" class="doc-nav__link">Streaming request body consumption</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Step definitions</h3>
+                <h3 class="doc-nav-group__title">Working with requests and middleware</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-step-definitions.html" class="doc-nav__link">Step definitions</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection" class="doc-nav__link">Fixtures and implicit injection</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures" class="doc-nav__link">Mutable world fixtures</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture" class="doc-nav__link">When to use `&mut Fixture`</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values" class="doc-nav__link">Step return values</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-struct-based-step-arguments" class="doc-nav__link">Struct-based step arguments</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-scenario-state-slots" class="doc-nav__link">Scenario state slots</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-implicit-fixture-injection" class="doc-nav__link">Implicit fixture injection</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-inferred-step-patterns" class="doc-nav__link">Inferred step patterns</a>
+                      <a href="docs-wireframe-working-with-requests-and-middleware.html" class="doc-nav__link">Working with requests and middleware</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Binding tests to scenarios</h3>
+                <h3 class="doc-nav-group__title">Connection lifecycle</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html" class="doc-nav__link">Binding tests to scenarios</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios" class="doc-nav__link">Skipping scenarios</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-nav__link">Asserting skipped outcomes</a>
+                      <a href="docs-wireframe-connection-lifecycle.html" class="doc-nav__link">Connection lifecycle</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Autodiscovering scenarios</h3>
+                <h3 class="doc-nav-group__title">Message fragmentation</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-autodiscovering-scenarios.html" class="doc-nav__link">Autodiscovering scenarios</a>
+                      <a href="docs-wireframe-message-fragmentation.html" class="doc-nav__link">Message fragmentation</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Running and maintaining tests</h3>
+                <h3 class="doc-nav-group__title">Protocol hooks</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-running-and-maintaining-tests.html" class="doc-nav__link">Running and maintaining tests</a>
+                      <a href="docs-wireframe-protocol-hooks.html" class="doc-nav__link">Protocol hooks</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Data tables and Docstrings</h3>
+                <h3 class="doc-nav-group__title">Running servers</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html" class="doc-nav__link">Data tables and Docstrings</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching" class="doc-nav__link">Performance and caching</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors" class="doc-nav__link">Debugging data table errors</a>
+                      <a href="docs-wireframe-running-servers.html" class="doc-nav__link">Running servers</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Limitations and roadmap</h3>
+                <h3 class="doc-nav-group__title">Client runtime</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-limitations-and-roadmap.html" class="doc-nav__link">Limitations and roadmap</a>
+                      <a href="docs-wireframe-client-runtime.html" class="doc-nav__link">Client runtime</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-configuration-reference" class="doc-nav__link">Client configuration reference</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-pools" class="doc-nav__link">Client pools</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-preamble-exchange" class="doc-nav__link">Client preamble exchange</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-lifecycle-hooks" class="doc-nav__link">Client lifecycle hooks</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-request-hooks" class="doc-nav__link">Client request hooks</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-outbound-streaming-sends" class="doc-nav__link">Outbound streaming sends</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-tracing" class="doc-nav__link">Client tracing</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-message-api-with-correlation-identifiers" class="doc-nav__link">Client message API with correlation identifiers</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-client-runtime.html#client-runtime-client-request-response-error-mapping" class="doc-nav__link">Client request/response error mapping</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Assertion macros</h3>
+                <h3 class="doc-nav-group__title">Push queues and connection actors</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-assertion-macros.html" class="doc-nav__link">Assertion macros</a>
+                      <a href="docs-wireframe-push-queues-and-connection-actors.html" class="doc-nav__link">Push queues and connection actors</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Internationalization and localization</h3>
+                <h3 class="doc-nav-group__title">Session management</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-internationalization-and-localization.html" class="doc-nav__link">Internationalization and localization</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-writing-feature-files-in-other-languages" class="doc-nav__link">Writing feature files in other languages</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-internationalization-and-localization.html#internationalization-and-localization-localizing-runtime-diagnostics" class="doc-nav__link">Localizing runtime diagnostics</a>
+                      <a href="docs-wireframe-session-management.html" class="doc-nav__link">Session management</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Diagnostic tooling</h3>
+                <h3 class="doc-nav-group__title">Streaming responses</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-diagnostic-tooling.html" class="doc-nav__link">Diagnostic tooling</a>
-                    </li>
-                    <li>
-                      <a href="docs-rstest-bdd-diagnostic-tooling.html#diagnostic-tooling-scenario-report-writers" class="doc-nav__link">Scenario report writers</a>
+                      <a href="docs-wireframe-streaming-responses.html" class="doc-nav__link">Streaming responses</a>
                     </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
-                <h3 class="doc-nav-group__title">Summary</h3>
+                <h3 class="doc-nav-group__title">Consuming streaming responses on the client</h3>
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
-                      <a href="docs-rstest-bdd-summary.html" class="doc-nav__link">Summary</a>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html" class="doc-nav__link">Consuming streaming responses on the client</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-terminator-detection-with-is-stream-terminator" class="doc-nav__link">Terminator detection with `is_stream_terminator`</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-high-level-api-call-streaming" class="doc-nav__link">High-level API: `call_streaming`</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-helper-based-typed-consumption-with-typed-with" class="doc-nav__link">Helper-based typed consumption with `typed_with`</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-low-level-api-receive-streaming" class="doc-nav__link">Low-level API: `receive_streaming`</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-back-pressure" class="doc-nav__link">Back-pressure</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-error-handling" class="doc-nav__link">Error handling</a>
+                    </li>
+                    <li>
+                      <a href="docs-wireframe-consuming-streaming-responses-on-the-client.html#consuming-streaming-responses-on-the-client-client-troubleshooting" class="doc-nav__link">Client troubleshooting</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Versioning and graceful deprecation</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-wireframe-versioning-and-graceful-deprecation.html" class="doc-nav__link">Versioning and graceful deprecation</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Metrics and observability</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-wireframe-metrics-and-observability.html" class="doc-nav__link">Metrics and observability</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Additional utilities</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-wireframe-additional-utilities.html" class="doc-nav__link">Additional utilities</a>
                     </li>
                 </ul>
               </li>
@@ -602,39 +747,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         </nav>
 
         <header class="doc-hero" id="doc-title">
-          <h1 class="doc-hero__title">Autodiscovering scenarios</h1>
+          <h1 class="doc-hero__title">API discovery and imports</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.2.0</span>
-            <span class="doc-meta-list__item">Updated Dec 08, 2025</span>
+            <span class="doc-meta-list__item">Updated Mar 27, 2026</span>
           </div>
         </header>
 
         <article class="doc-article">
               <section class="doc-section">
-                <div class="doc-prose"><p>For large suites, it is tedious to bind each scenario manually. The
-<code>scenarios!</code> macro scans a directory recursively for <code>.feature</code> files and
-generates a module with a test for every <code>Scenario</code> found. Each test is named
-after the feature file and scenario title. Identifiers are sanitized
-(ASCII-only) and deduplicated by appending a numeric suffix when collisions
-occur.</p>
-<div class="codehilite" data-language="rust"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">rstest_bdd_macros</span><span class="p">::{</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">then</span><span class="p">,</span><span class="w"> </span><span class="n">when</span><span class="p">,</span><span class="w"> </span><span class="n">scenarios</span><span class="p">};</span>
-
-<span class="cp">#[given(</span><span class="s">&quot;a precondition&quot;</span><span class="cp">)]</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">precondition</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
-<span class="cp">#[when(</span><span class="s">&quot;an action occurs&quot;</span><span class="cp">)]</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">action</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
-<span class="cp">#[then(</span><span class="s">&quot;events are recorded&quot;</span><span class="cp">)]</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">events</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
-
-<span class="n">scenarios</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;tests/features/auto&quot;</span><span class="p">);</span>
-
-<span class="c1">// Only expand scenarios tagged @smoke and not marked @wip</span>
-<span class="n">scenarios</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;tests/features/auto&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;@smoke and not @wip&quot;</span><span class="p">);</span>
-</code></pre></div>
-
-<p>When <code>tags</code> is supplied the macro evaluates the expression against the same
-union of feature, scenario, and example tags described above. Scenarios that do
-not match simply do not generate a test, and outline examples drop unmatched
-rows.</p>
-<p>Generated tests cannot currently accept fixtures; use <code>#[scenario]</code> when
-fixture injection or custom assertions are required.</p></div>
+                <div class="doc-prose"><p>Wireframe uses progressive discovery for public APIs:</p>
+<ul>
+<li><code>wireframe::</code> root is intentionally small and stable, exposing canonical
+  <code>Result</code> and <code>WireframeError</code>.</li>
+<li><code>wireframe::&lt;module&gt;::...</code> is the default path for specialized APIs.</li>
+<li><code>wireframe::prelude::*</code> is an optional convenience import for common
+  workflows.</li>
+</ul></div>
               </section>
         </article>
       </section>

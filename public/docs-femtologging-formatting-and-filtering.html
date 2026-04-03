@@ -248,6 +248,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-exception-schema-versioning"
+                           class="doc-nav__link "
+>
+                          <span>Exception schema versioning</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-managing-handlers-and-custom-sinks"
                            class="doc-nav__link "
 >
@@ -283,6 +290,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtotimedrotatingfilehandler"
+                           class="doc-nav__link "
+>
+                          <span>FemtoTimedRotatingFileHandler</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtosockethandler"
                            class="doc-nav__link "
 >
@@ -290,10 +304,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtohttphandler"
+                           class="doc-nav__link "
+>
+                          <span>FemtoHTTPHandler</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-custom-python-handlers"
                            class="doc-nav__link "
 >
                           <span>Custom Python handlers</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-using-standard-library-stdlib-logging-handler-subclasses"
+                           class="doc-nav__link "
+>
+                          <span>Using standard library (stdlib) `logging.Handler` subclasses</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-limitations"
+                           class="doc-nav__link "
+>
+                          <span>Limitations</span>
                         </a>
                       </li>
                   </ul>
@@ -348,6 +383,25 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-femtologging-operational-tips-and-caveats.html">Operational tips and caveats</a>
                 </h3>
               </div>
+              <div class="doc-nav-group" aria-label="Journald and OpenTelemetry roadmap notes">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-femtologging-journald-and-opentelemetry-roadmap-notes.html">Journald and OpenTelemetry roadmap notes</a>
+                </h3>
+              </div>
+              <div class="doc-nav-group" aria-label="Scoped structured context">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-femtologging-scoped-structured-context.html">Scoped structured context</a>
+                </h3>
+                  <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-femtologging-scoped-structured-context.html#scoped-structured-context-callback-enrichment-validation"
+                           class="doc-nav__link "
+>
+                          <span>Callback enrichment validation</span>
+                        </a>
+                      </li>
+                  </ul>
+              </div>
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
@@ -393,6 +447,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-emitting-records" class="doc-nav__link">Emitting records</a>
                     </li>
                     <li>
+                      <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-exception-schema-versioning" class="doc-nav__link">Exception schema versioning</a>
+                    </li>
+                    <li>
                       <a href="docs-femtologging-working-with-loggers.html#working-with-loggers-managing-handlers-and-custom-sinks" class="doc-nav__link">Managing handlers and custom sinks</a>
                     </li>
                 </ul>
@@ -413,10 +470,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtorotatingfilehandler" class="doc-nav__link">FemtoRotatingFileHandler</a>
                     </li>
                     <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtotimedrotatingfilehandler" class="doc-nav__link">FemtoTimedRotatingFileHandler</a>
+                    </li>
+                    <li>
                       <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtosockethandler" class="doc-nav__link">FemtoSocketHandler</a>
                     </li>
                     <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-femtohttphandler" class="doc-nav__link">FemtoHTTPHandler</a>
+                    </li>
+                    <li>
                       <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-custom-python-handlers" class="doc-nav__link">Custom Python handlers</a>
+                    </li>
+                    <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-using-standard-library-stdlib-logging-handler-subclasses" class="doc-nav__link">Using standard library (stdlib) `logging.Handler` subclasses</a>
+                    </li>
+                    <li>
+                      <a href="docs-femtologging-built-in-handlers.html#built-in-handlers-limitations" class="doc-nav__link">Limitations</a>
                     </li>
                 </ul>
               </li>
@@ -464,13 +533,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     </li>
                 </ul>
               </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Journald and OpenTelemetry roadmap notes</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-femtologging-journald-and-opentelemetry-roadmap-notes.html" class="doc-nav__link">Journald and OpenTelemetry roadmap notes</a>
+                    </li>
+                </ul>
+              </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Scoped structured context</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-femtologging-scoped-structured-context.html" class="doc-nav__link">Scoped structured context</a>
+                    </li>
+                    <li>
+                      <a href="docs-femtologging-scoped-structured-context.html#scoped-structured-context-callback-enrichment-validation" class="doc-nav__link">Callback enrichment validation</a>
+                    </li>
+                </ul>
+              </li>
           </ul>
         </nav>
 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Formatting and filtering</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Nov 11, 2025</span>
+            <span class="doc-meta-list__item">Updated Apr 01, 2026</span>
           </div>
         </header>
 
@@ -482,6 +570,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </ul>
 <div class="codehilite" data-language="python"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">json_formatter</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
         <span class="p">{</span>
             <span class="s2">&quot;logger&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;logger&quot;</span><span class="p">],</span>
@@ -491,6 +580,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">),</span>
     <span class="p">)</span>
 
+
 <span class="n">stream</span> <span class="o">=</span> <span class="n">StreamHandlerBuilder</span><span class="o">.</span><span class="n">stdout</span><span class="p">()</span><span class="o">.</span><span class="n">with_formatter</span><span class="p">(</span><span class="n">json_formatter</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 </code></pre></div>
 
@@ -498,10 +588,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <li>Formatter identifiers are limited to <code>"default"</code> for now. Future releases
   will connect <code>FormatterBuilder</code> and handler formatter IDs, but this is not
   yet implemented.</li>
-<li>Filters are only available through <code>ConfigBuilder</code>. <code>dictConfig</code> and
-  <code>fileConfig</code> deliberately reject filter declarations so the limited,
-  guaranteed-safe subset remains obvious.</li>
-</ul></div>
+<li>Filters are available through both <code>ConfigBuilder</code> and <code>dictConfig</code>.
+  <code>fileConfig</code> does not yet support filter declarations. Handler-level
+  <code>filters</code> and <code>level</code> attributes remain unsupported, as these require Rust
+  infrastructure changes outside the current scope.</li>
+<li>Python callback filters receive a mutable <code>logging.LogRecord</code> view on the
+  producer thread. When they accept the record, any new supported attributes
+  they add are copied into <code>metadata.key_values</code> before the record enters the
+  async queue, making them visible to formatter callables and
+  <code>StdlibHandlerAdapter</code>.</li>
+</ul>
+<div class="codehilite" data-language="python"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">femtologging</span><span class="w"> </span><span class="kn">import</span> <span class="n">PythonCallbackFilterBuilder</span>
+
+<span class="n">request_id</span> <span class="o">=</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;request_id&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">enrich_request</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">LogRecord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">record</span><span class="o">.</span><span class="n">request_id</span> <span class="o">=</span> <span class="n">request_id</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">levelname</span> <span class="o">==</span> <span class="s2">&quot;INFO&quot;</span>
+
+
+<span class="n">callback_filter</span> <span class="o">=</span> <span class="n">PythonCallbackFilterBuilder</span><span class="p">(</span><span class="n">enrich_request</span><span class="p">)</span>
+</code></pre></div></div>
               </section>
         </article>
       </section>
@@ -540,7 +651,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

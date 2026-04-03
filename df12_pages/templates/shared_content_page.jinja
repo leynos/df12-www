@@ -13,6 +13,7 @@
   <header class="navbar bg-base-200/60 backdrop-blur sticky top-0 z-50">
     <div class="container mx-auto flex items-center justify-between px-4">
       <a href="{{ site_home_url or '/' }}" class="text-lg font-bold tracking-tight">{{ site_brand or 'df12' }}</a>
+      {% if parent_link or nav_links %}
       <nav class="flex gap-4 text-sm">
         {% if parent_link %}
         <a href="{{ parent_link.href }}" class="link link-hover">{{ parent_link.label }}</a>
@@ -21,6 +22,7 @@
         <a href="{{ link.href }}" class="link link-hover">{{ link.label }}</a>
         {% endfor %}
       </nav>
+      {% endif %}
     </div>
   </header>
 

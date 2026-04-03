@@ -361,19 +361,7 @@ def _build_subsite_config(
     docs_index_output = Path(docs_index_raw) if docs_index_raw else None
 
     # Homepage
-    homepage_raw = payload.get("homepage")
-    homepage: SubSiteHomepageConfig | None = None
-    if homepage_raw and isinstance(homepage_raw, dict):
-        hp_output = Path(homepage_raw.get("output", output_dir / "index.html"))
-        hp_title = homepage_raw.get("title", f"{key} — Home")
-        hp_context = {
-            k: v for k, v in homepage_raw.items() if k not in {"output", "title"}
-        }
-        homepage = SubSiteHomepageConfig(
-            output=hp_output,
-            title=str(hp_title),
-            context=hp_context,
-        )
+    homepage = _build_subsite_homepage(payload.get("homepage"), key, output_dir)
 
     # About page
     about_config = _build_about_config(
@@ -398,17 +386,7 @@ def _build_subsite_config(
     nav_links = _build_nav_links(payload.get("nav_links"))
 
     # Parent link
-    parent_link_raw = payload.get("parent_link")
-    parent_link: NavLinkConfig | None = None
-    if isinstance(parent_link_raw, dict):
-        pl_label = parent_link_raw.get("label")
-        pl_href = parent_link_raw.get("href")
-        if pl_label and pl_href:
-            parent_link = NavLinkConfig(
-                label=str(pl_label),
-                href=str(pl_href),
-                variant=_optional_str(parent_link_raw.get("variant")),
-            )
+    parent_link = _build_parent_link(payload.get("parent_link"))
 
     # Static assets
     static_raw = payload.get("static_assets_dir")
@@ -430,6 +408,41 @@ def _build_subsite_config(
         parent_link=parent_link,
         static_assets_dir=static_assets_dir,
         content_pages=content_pages,
+    )
+
+
+def _build_subsite_homepage(
+    raw: typ.Any,  # noqa: ANN401 -- YAML values are untyped
+    key: str,
+    output_dir: Path,
+) -> SubSiteHomepageConfig | None:
+    """Parse a sub-site homepage block into a typed config."""
+    if not raw or not isinstance(raw, dict):
+        return None
+    hp_output = Path(raw.get("output", output_dir / "index.html"))
+    hp_title = raw.get("title", f"{key} — Home")
+    hp_context = {k: v for k, v in raw.items() if k not in {"output", "title"}}
+    return SubSiteHomepageConfig(
+        output=hp_output,
+        title=str(hp_title),
+        context=hp_context,
+    )
+
+
+def _build_parent_link(
+    raw: typ.Any,  # noqa: ANN401 -- YAML values are untyped
+) -> NavLinkConfig | None:
+    """Parse an optional parent_link mapping into a NavLinkConfig."""
+    if not isinstance(raw, dict):
+        return None
+    label = raw.get("label")
+    href = raw.get("href")
+    if not label or not href:
+        return None
+    return NavLinkConfig(
+        label=str(label),
+        href=str(href),
+        variant=_optional_str(raw.get("variant")),
     )
 
 

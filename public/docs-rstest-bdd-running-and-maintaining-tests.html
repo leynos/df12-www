@@ -267,6 +267,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         </a>
                       </li>
                       <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures"
+                           class="doc-nav__link "
+>
+                          <span>Mutable world fixtures</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture"
+                           class="doc-nav__link "
+>
+                          <span>When to use `&mut Fixture`</span>
+                        </a>
+                      </li>
+                      <li>
                         <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values"
                            class="doc-nav__link "
 >
@@ -315,6 +329,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                           <span>Skipping scenarios</span>
                         </a>
                       </li>
+                      <li>
+                        <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes"
+                           class="doc-nav__link "
+>
+                          <span>Asserting skipped outcomes</span>
+                        </a>
+                      </li>
                   </ul>
               </div>
               <div class="doc-nav-group" aria-label="Autodiscovering scenarios">
@@ -332,6 +353,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-rstest-bdd-data-tables-and-docstrings.html">Data tables and Docstrings</a>
                 </h3>
                   <ul class="doc-nav__list" role="list">
+                      <li>
+                        <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching"
+                           class="doc-nav__link "
+>
+                          <span>Performance and caching</span>
+                        </a>
+                      </li>
                       <li>
                         <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors"
                            class="doc-nav__link "
@@ -394,7 +422,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
-            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.1.0/docs/users-guide.md" target="_blank" rel="noopener">
+            <a class="inline-flex items-center gap-2 font-semibold text-primary" href="https://raw.githubusercontent.com/leynos/rstest-bdd/refs/tags/v0.2.0/docs/users-guide.md" target="_blank" rel="noopener">
               View markdown
               <iconify-icon icon="carbon:arrow-up-right" aria-hidden="true"></iconify-icon>
             </a>
@@ -455,6 +483,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-fixtures-and-implicit-injection" class="doc-nav__link">Fixtures and implicit injection</a>
                     </li>
                     <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-mutable-world-fixtures" class="doc-nav__link">Mutable world fixtures</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-step-definitions.html#step-definitions-when-to-use-mut-fixture" class="doc-nav__link">When to use `&mut Fixture`</a>
+                    </li>
+                    <li>
                       <a href="docs-rstest-bdd-step-definitions.html#step-definitions-step-return-values" class="doc-nav__link">Step return values</a>
                     </li>
                     <li>
@@ -480,6 +514,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <li>
                       <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-skipping-scenarios" class="doc-nav__link">Skipping scenarios</a>
                     </li>
+                    <li>
+                      <a href="docs-rstest-bdd-binding-tests-to-scenarios.html#binding-tests-to-scenarios-asserting-skipped-outcomes" class="doc-nav__link">Asserting skipped outcomes</a>
+                    </li>
                 </ul>
               </li>
               <li class="doc-nav-group">
@@ -503,6 +540,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <ul class="doc-nav__list doc-nav__list--mobile" role="list">
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html" class="doc-nav__link">Data tables and Docstrings</a>
+                    </li>
+                    <li>
+                      <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-performance-and-caching" class="doc-nav__link">Performance and caching</a>
                     </li>
                     <li>
                       <a href="docs-rstest-bdd-data-tables-and-docstrings.html#data-tables-and-docstrings-debugging-data-table-errors" class="doc-nav__link">Debugging data table errors</a>
@@ -564,8 +604,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Running and maintaining tests</h1>
           <div class="doc-meta-list">
-              <span class="doc-meta-list__item">Version 0.1.0</span>
-            <span class="doc-meta-list__item">Updated Nov 08, 2025</span>
+              <span class="doc-meta-list__item">Version 0.2.0</span>
+            <span class="doc-meta-list__item">Updated Dec 08, 2025</span>
           </div>
         </header>
 
@@ -577,21 +617,21 @@ behave like other <code>rstest</code> tests; they honour <code>#[tokio::test]</c
 <code>#[async_std::test]</code> attributes if applied to the original function. Each
 scenario runs its steps sequentially in the order defined in the feature file.
 By default, missing steps emit a compile‑time warning and are checked again at
-runtime so steps can live in other crates. Enabling the
+runtime, so steps can live in other crates. Enabling the
 <code>compile-time-validation</code> feature on <code>rstest-bdd-macros</code> registers steps and
 performs compile‑time validation, emitting warnings for any that are missing.
 The <code>strict-compile-time-validation</code> feature builds on this and turns those
 warnings into <code>compile_error!</code>s when all step definitions are local. This
 prevents behaviour specifications from silently drifting from the code while
 still permitting cross‑crate step sharing.</p>
-<p>To enable validation pin a feature in your <code>dev-dependencies</code>:</p>
+<p>To enable validation, pin a feature in the project's <code>dev-dependencies</code>:</p>
 <div class="codehilite" data-language="toml"><pre><span></span><code><span class="k">[dev-dependencies]</span>
-<span class="n">rstest-bdd-macros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;compile-time-validation&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">rstest-bdd-macros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;compile-time-validation&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 
 <p>For strict checking use:</p>
 <div class="codehilite" data-language="toml"><pre><span></span><code><span class="k">[dev-dependencies]</span>
-<span class="n">rstest-bdd-macros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;strict-compile-time-validation&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="n">rstest-bdd-macros</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;strict-compile-time-validation&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 
 <p>Steps are only validated when one of these features is enabled.</p>
@@ -625,17 +665,25 @@ still permitting cross‑crate step sharing.</p>
   (for example, <code>1e3</code>, <code>-1E-9</code>), and the special values <code>NaN</code>, <code>inf</code>, and
   <code>Infinity</code> (matched case-insensitively). Matching is anchored: the entire
   step text must match the pattern; partial matches do not succeed. Escape
-  literal braces with <code>{{</code> and <code>}}</code>. Use <code>\</code> to match a single backslash. A
-  trailing <code>\</code> or any other backslash escape is treated literally, so <code>\d</code>
-  matches the two-character sequence <code>\d</code>. Nested braces inside placeholders
-  are not supported. Placeholders follow <code>{name[:type]}</code>; <code>name</code> must start
-  with a letter or underscore and may contain letters, digits, or underscores
-  (<code>[A-Za-z_][A-Za-z0-9_]*</code>). Whitespace within the type hint is ignored (for
-  example, <code>{count: u32}</code> and <code>{count:u32}</code> are both accepted), but whitespace
-  is not allowed between the name and the colon. Prefer the compact form
-  <code>{count:u32}</code> in new code. When a pattern contains no placeholders, the step
-  text must match exactly. Unknown type hints are treated as generic
-  placeholders and capture any non-newline text greedily.</p>
+  literal braces with <code>{{</code> and <code>}}</code>. Use
+  <code>\</code> to match a single backslash. A trailing <code>\</code> or any other backslash escape
+  is treated literally, so <code>\d</code> matches the two-character sequence <code>\d</code>. Nested
+  braces inside placeholders are not supported. Braces are not allowed inside
+  type hints. Placeholders use <code>{name}</code> or <code>{name:type}</code>; the type hint must
+  not contain braces (for example, <code>{n:{u32}}</code> and <code>{n:Vec&lt;{u32}&gt;}</code> are
+  rejected). To describe braces in the surrounding step text (for example,
+  referring to <code>{u32}</code>), escape them as <code>{{</code> and <code>}}</code> rather than placing them
+  inside <code>{name:type}</code>. The lexer closes the placeholder at the first <code>}</code> after
+  the optional type hint; any characters between the <code>:type</code> and that first <code>}</code>
+  are ignored (for example, <code>{n:u32 extra}</code> parses as <code>name = n</code>,
+  <code>type = u32</code>). <code>name</code> must start with a letter or underscore and may contain
+  letters, digits, or underscores (<code>[A-Za-z_][A-Za-z0-9_]*</code>). Whitespace within
+  the type hint is ignored (for example, <code>{count: u32}</code> and <code>{count:u32}</code> are
+  both accepted), but whitespace is not allowed between the name and the colon.
+  Prefer the compact form <code>{count:u32}</code> in new code. When a pattern contains no
+  placeholders, the step text must match exactly. Unknown type hints are
+  treated as generic placeholders and capture any non-newline text using a
+  non-greedy match.</p>
 </li>
 </ul></div>
               </section>
@@ -676,7 +724,7 @@ still permitting cross‑crate step sharing.</p>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

@@ -258,6 +258,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                   <a href="docs-chutoro-feature-flags-and-execution-strategies.html">Feature flags and execution strategies</a>
                 </h3>
               </div>
+              <div class="doc-nav-group" aria-label="Benchmarking">
+                <h3 class="doc-nav-group__title " >
+                  <a href="docs-chutoro-benchmarking.html">Benchmarking</a>
+                </h3>
+              </div>
           </div>
           <div>
             <p class="doc-sidebar__section-label">Source</p>
@@ -338,13 +343,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     </li>
                 </ul>
               </li>
+              <li class="doc-nav-group">
+                <h3 class="doc-nav-group__title">Benchmarking</h3>
+                <ul class="doc-nav__list doc-nav__list--mobile" role="list">
+                    <li>
+                      <a href="docs-chutoro-benchmarking.html" class="doc-nav__link">Benchmarking</a>
+                    </li>
+                </ul>
+              </li>
           </ul>
         </nav>
 
         <header class="doc-hero" id="doc-title">
           <h1 class="doc-hero__title">Implementing data sources</h1>
           <div class="doc-meta-list">
-            <span class="doc-meta-list__item">Updated Oct 20, 2025</span>
+            <span class="doc-meta-list__item">Updated Feb 16, 2026</span>
           </div>
         </header>
 
@@ -361,6 +374,8 @@ must provide three methods:</p>
 <p>The default <code>distance_batch</code> helper uses <code>distance</code> to fill an output buffer
 and keeps it unchanged if any pair fails. Override when the backend can compute
 batches more efficiently.</p>
+<p>The CPU backend performs parallel HNSW insertion, so <code>Chutoro::run</code> requires a
+<code>DataSource + Sync</code>.</p>
 <p>Empty inputs should be handled by returning <code>DataSourceError::EmptyData</code> or
 <code>ZeroDimension</code> during ingestion. Chutoro rejects a <code>DataSource</code> with zero
 items, or one with fewer than <code>min_cluster_size</code> items, before invoking the
@@ -403,7 +418,7 @@ backend.</p></div>
             </a>
           </li>
         </ul>
-        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2025&nbsp;df12&nbsp;Productions.</p>
+        <p class="site-footer__closing">Built for curious builders and storytellers everywhere. ©&nbsp;2026&nbsp;df12&nbsp;Productions.</p>
       </div>
     </div>
   </footer>

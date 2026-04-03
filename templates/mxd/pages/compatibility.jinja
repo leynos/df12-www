@@ -1,46 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compatibility — mxd</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;family=DM+Serif+Display:ital,wght@0,400;1,400&amp;family=Source+Serif+4:ital,wght@200;300;400;600;700;900&amp;family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        "primary": ["JetBrains Mono", "monospace"],
-                        "secondary": ["DM Serif Display", "serif"],
-                        "tertiary": ["Source Serif 4", "serif"]
-                    }
-                }
-            }
-        };
-    </script>
-    <link rel="icon" href="../assets/logo-mark.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="../assets/site.css">
-</head>
-<body class="bg-[#fdf8f0]">
-<a class="mxd-skip-link" href="#main-content">Skip to content</a>
-<header class="mxd-site-header">
-  <div class="mxd-site-header__inner">
-    <a class="mxd-brand" href="../">
-      <img src="../assets/logo-mark.svg" alt="">
-      <span>
-        <span class="mxd-brand__eyebrow">df12 Productions</span>
-        <span class="mxd-brand__title">Marrakesh Express Daemon</span>
-      </span>
-    </a>
-    <nav class="mxd-site-nav" aria-label="Primary">
-      <a href="/" class="text-[#e8a838]">← Back to df12 Productions</a>
-<a href="../">Home</a><a href="../getting-started/">Getting Started</a><a href="../architecture/">Architecture</a><a href="../protocol/">Protocol</a><a href="../configuration/">Configuration</a><a href="../subsystems/">Subsystems</a><a href="./" aria-current="page">Compatibility</a><a href="../verification/">Verification</a><a href="../roadmap/">Roadmap</a><a href="../changelog/">Changelog</a>    </nav>
-  </div>
-</header>
-<main id="main-content" tabindex="-1">
-
+{% extends "doc_page.jinja" %}
+{% block page_title %}Compatibility{% endblock %}
+{% block hero %}
 <section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
     <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
     
@@ -67,7 +27,8 @@
     
     <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
 </section>
-
+{% endblock %}
+{% block route_map %}
 <section class="mxd-page-toc" aria-labelledby="mxd-toc-title">
   <div class="mxd-page-toc__inner">
     <div>
@@ -79,7 +40,8 @@
     </div>
   </div>
 </section>
-
+{% endblock %}
+{% block content %}
 <div id="section-matrix" class="border-t border-[#e8d5b8] py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
@@ -368,7 +330,8 @@
         </div>
     </div>
 </div>
-
+{% endblock %}
+{% block footer_cta %}
 <div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
         <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Protocol documentation</h2>
@@ -386,32 +349,4 @@
         </div>
     </div>
 </div>
-
-</main>
-
-<footer id="footer" class="bg-[#12121f] relative">
-    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
-    <div class="max-w-[900px] mx-auto px-4 sm:px-8 py-12 text-center">
-        <div class="mb-6 opacity-40">
-            <span class="text-[#e8d5b8] text-[23px] font-normal font-primary">◆</span>
-        </div>
-        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
-            Protocol Souk — Design System for <span class="text-[#e8a838]">mxd</span>
-        </p>
-        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px]">
-            A <span class="text-[#e8a838]">df12 Productions</span> artefact · Edinburgh · 2026
-        </p>
-    </div>
-    <div class="border-t border-[#2a2a42] py-6">
-        <div class="max-w-[900px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center text-[11.10px] font-primary">
-            <p class="text-[#9a9ab0] mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
-            <nav class="mxd-legal-nav flex space-x-6" aria-label="Legal">
-                <a href="../privacy-policy/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Privacy Policy</a>
-                <a href="../terms-of-use/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Terms of Use</a>
-                <a href="../code-of-conduct/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Code of Conduct</a>
-            </nav>
-        </div>
-    </div>
-</footer>
-
-</body></html>
+{% endblock %}

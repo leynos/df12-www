@@ -21,6 +21,7 @@ from .helpers import (
 )
 from .homepage import _build_homepage_config, _build_nav_links
 from .models import (
+    ContentPageConfig,
     FooterConfig,
     NavLinkConfig,
     PageConfig,
@@ -390,6 +391,9 @@ def _build_subsite_config(
         raise SiteConfigError(msg)
     shared_content_refs = [str(ref) for ref in shared_refs_raw if ref]
 
+    # Content pages
+    content_pages = _build_content_pages(key, payload.get("content_pages"))
+
     # Navigation
     nav_links = _build_nav_links(payload.get("nav_links"))
 
@@ -425,7 +429,48 @@ def _build_subsite_config(
         nav_links=nav_links,
         parent_link=parent_link,
         static_assets_dir=static_assets_dir,
+        content_pages=content_pages,
     )
+
+
+def _build_content_pages(
+    site_key: str,
+    raw: list[typ.Any] | None,
+) -> list[ContentPageConfig]:
+    """Parse a ``content_pages`` YAML list into typed config objects."""
+    if not raw:
+        return []
+    if not isinstance(raw, list):
+        msg = (
+            f"Site '{site_key}' content_pages must be a list, got: {type(raw).__name__}"
+        )
+        raise SiteConfigError(msg)
+    result: list[ContentPageConfig] = []
+    for entry in raw:
+        if not isinstance(entry, dict):
+            msg = (
+                f"Site '{site_key}' content_pages entry must be a mapping,"
+                f" got: {type(entry).__name__}"
+            )
+            raise SiteConfigError(msg)
+        key = entry.get("key")
+        template = entry.get("template")
+        if not key or not template:
+            msg = (
+                f"Site '{site_key}' content_pages entry requires 'key' and 'template'."
+            )
+            raise SiteConfigError(msg)
+        label = entry.get("label") or str(key).replace("-", " ").title()
+        output_slug = entry.get("output_slug") or str(key)
+        result.append(
+            ContentPageConfig(
+                key=str(key),
+                label=str(label),
+                template=str(template),
+                output_slug=str(output_slug),
+            )
+        )
+    return result
 
 
 __all__ = ["load_site_config"]

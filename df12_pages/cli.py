@@ -35,6 +35,7 @@ from cyclopts import App, Parameter
 from .about_page import AboutPageBuilder
 from .bump import bump_latest_release_metadata
 from .config import SharedContentPageChrome, SiteConfig, SubSiteConfig, load_site_config
+from .content_page import ContentPageGenerator
 from .deploy import (
     DEFAULT_CONFIG_PATH,
     apply_stack,
@@ -257,6 +258,18 @@ def _generate_subsite(
             ),
         ).run()
         print(f"[{subsite.key}] wrote {_format_path(sc_path)}")
+
+    # Content pages
+    for cp_config in subsite.content_pages:
+        cp_path = ContentPageGenerator(
+            cp_config,
+            subsite.output_dir,
+            templates_dir=templates_dir,
+            nav_links=subsite.nav_links,
+            stylesheet=subsite.stylesheet,
+            parent_link=subsite.parent_link,
+        ).run()
+        print(f"[{subsite.key}] wrote {_format_path(cp_path)}")
 
     # Static assets
     if subsite.static_assets_dir and subsite.static_assets_dir.is_dir():

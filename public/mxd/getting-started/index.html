@@ -1,0 +1,697 @@
+<!DOCTYPE html><html lang="en"><head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started — mxd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;family=DM+Serif+Display:ital,wght@0,400;1,400&amp;family=Source+Serif+4:ital,wght@200;300;400;600;700;900&amp;family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        "primary": ["JetBrains Mono", "monospace"],
+                        "secondary": ["DM Serif Display", "serif"],
+                        "tertiary": ["Source Serif 4", "serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="icon" href="../assets/logo-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="bg-[#fdf8f0]">
+<a class="mxd-skip-link" href="#main-content">Skip to content</a>
+<header class="mxd-site-header">
+  <div class="mxd-site-header__inner">
+    <a class="mxd-brand" href="../">
+      <img src="../assets/logo-mark.svg" alt="">
+      <span>
+        <span class="mxd-brand__eyebrow">df12 Productions</span>
+        <span class="mxd-brand__title">Marrakesh Express Daemon</span>
+      </span>
+    </a>
+    <nav class="mxd-site-nav" aria-label="Primary">
+      <a href="/" class="text-[#e8a838]">← Back to df12 Productions</a>
+<a href="../">Home</a><a href="./" aria-current="page">Getting Started</a><a href="../architecture/">Architecture</a><a href="../protocol/">Protocol</a><a href="../configuration/">Configuration</a><a href="../subsystems/">Subsystems</a><a href="../compatibility/">Compatibility</a><a href="../verification/">Verification</a><a href="../roadmap/">Roadmap</a><a href="../changelog/">Changelog</a>    </nav>
+  </div>
+</header>
+<main id="main-content" tabindex="-1">
+
+<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
+
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
+        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
+            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Getting Started</div>
+        </div>
+
+        <h1 class="mb-6">
+            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Getting started</span>
+        </h1>
+
+        <p class="text-[#e8d5b8] text-lg sm:text-[23px] font-light font-tertiary leading-relaxed sm:leading-[39.17px] max-w-[700px]">
+            Build mxd from source, create a user account, choose between the legacy and Wireframe runtimes, and deploy to production — all in one place.
+        </p>
+    </div>
+
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+</section>
+
+<section class="mxd-page-toc" aria-labelledby="mxd-toc-title">
+  <div class="mxd-page-toc__inner">
+    <div>
+      <div class="mxd-page-toc__label">Route map</div>
+      <div class="mxd-page-toc__title" id="mxd-toc-title">Getting started</div>
+    </div>
+    <div class="mxd-page-toc__links">
+      <a href="#section-quickstart">Quickstart</a><a href="#section-installation">Installation</a><a href="#section-deployment">Deployment</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     QUICKSTART
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="section-quickstart" class="border-t-4 border-[#e8a838] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">Quickstart</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Five-minute quickstart</h2>
+    </div>
+</div>
+
+<div id="section-build" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">01 — Build</div>
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Build the SQLite variant</h3>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-6">
+            mxd requires the Rust toolchain pinned by <span class="text-[#12121f] text-base font-normal font-primary">rust-toolchain.toml</span>. Clone the repository and build the SQLite variant:
+        </p>
+
+        <div class="mxd-code-block bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#e8a838] text-sm font-normal font-primary leading-[21.32px]">git clone https://github.com/leynos/mxd.git
+cd mxd
+make sqlite</pre>
+            </div>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            The default build keeps <span class="text-[#12121f] text-base font-normal font-primary">legacy-networking</span> enabled, so the classic <span class="text-[#12121f] text-base font-normal font-primary">mxd</span> daemon remains part of the operator surface. Runtime selection is documented behaviour, not a packaging accident.
+        </p>
+    </div>
+</div>
+
+<div id="section-user" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">02 — User Account</div>
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Create a user account</h3>
+
+        <div class="mxd-code-block bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#e8a838] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#3a3a55]"># The CLI prompts for a password securely (non-echoed).</span>
+<span class="text-[#3a3a55]"># For scripted/CI use only: --password &lt;value&gt;</span>
+cargo run --bin mxd -- create-user --username alice</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-start" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">03 — Start</div>
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Start the daemon</h3>
+
+        <div class="mxd-code-block bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-6">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#e8a838] text-sm font-normal font-primary leading-[21.32px]">cargo run --bin mxd -- --bind 0.0.0.0:5500 --database mxd.db</pre>
+            </div>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            The server prints <span class="text-[#12121f] text-base font-normal font-primary">mxd listening on 0.0.0.0:5500</span> once the accept loop is running. Login compatibility is currently documented for Hotline 1.8.5, Hotline 1.9, and SynHX with partial status; use the compatibility matrix before assuming broader client parity.
+        </p>
+    </div>
+</div>
+
+<div id="section-wireframe" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">04 — Wireframe</div>
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Wireframe server</h3>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-6">
+            The <span class="text-[#12121f] text-base font-normal font-primary">mxd-wireframe-server</span> binary runs the new transport runtime. It honours the same configuration surface — flags, env, TOML — and exposes identical admin subcommands.
+        </p>
+
+        <div class="mxd-code-block bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#e8a838] text-sm font-normal font-primary leading-[21.32px]">make APP=mxd-wireframe-server sqlite
+cargo run --bin mxd-wireframe-server -- --bind 0.0.0.0:6600 --database mxd.db</pre>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Wireframe-only build:</span>
+                disable default features with <code class="text-xs font-primary">cargo build --no-default-features --features "sqlite toml"</code>
+                to omit the legacy <code class="text-xs font-primary">mxd</code>
+                binary entirely while keeping the same CLI flags,
+                <code class="text-xs font-primary">MXD_*</code> overrides,
+                <code class="text-xs font-primary">.mxd.toml</code> defaults,
+                and admin subcommands.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="section-postgresql" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">05 — PostgreSQL</div>
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">PostgreSQL</h3>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-6">
+            Install the unprivileged embedded helper and switch the database URL:
+        </p>
+
+        <div class="mxd-code-block bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#e8a838] text-sm font-normal font-primary leading-[21.32px]">cargo install --locked pg-embed-setup-unpriv --version 0.5.0
+pg_embedded_setup_unpriv
+export MXD_DATABASE='postgres://postgres:&lt;db-password&gt;@localhost/mxd'
+cargo run --bin mxd -- --database "$MXD_DATABASE"</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-tests" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">06 — Tests</div>
+        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Running the test suite</h3>
+
+        <div class="mxd-code-block bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-6">
+            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="flex-1 text-right">
+                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                </div>
+            </div>
+            <div class="px-6 py-6">
+                <pre class="text-[#e8a838] text-sm font-normal font-primary leading-[21.32px]">make fmt
+make lint
+make test</pre>
+            </div>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            <span class="text-[#12121f] text-base font-normal font-primary">make test</span> exercises SQLite, PostgreSQL (if the helper has been run), and wireframe-only suites. No manual database setup required.
+        </p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     INSTALLATION
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="section-installation" class="border-t-4 border-[#e8a838] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">Installation</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Installation</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            mxd builds from source. There is no binary distribution yet.
+        </p>
+    </div>
+</div>
+
+<div id="section-prerequisites" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <h3 class="text-[#12121f] text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">Prerequisites</h3>
+
+        <div class="space-y-6">
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                The Rust toolchain version is pinned by <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">rust-toolchain.toml</code> in the repository root. <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">cargo</code> and <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">make</code> must be on the <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">PATH</code>. Optionally, install <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">pg-embed-setup-unpriv</code> for PostgreSQL-backed tests without a system-level database install.
+            </p>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 sm:p-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-[#c54b2a] rounded flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fa-solid fa-box text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-[#12121f] text-base font-semibold font-tertiary mb-1">Rust toolchain</h4>
+                            <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Version pinned via <code class="text-xs font-primary">rust-toolchain.toml</code></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-[#e8a838] rounded flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fa-solid fa-terminal text-[#12121f] text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-[#12121f] text-base font-semibold font-tertiary mb-1">Build tools</h4>
+                            <p class="text-[#3a3a55] text-sm font-normal font-tertiary"><code class="text-xs font-primary">cargo</code> and <code class="text-xs font-primary">make</code> required</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 sm:col-span-2">
+                        <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fa-solid fa-database text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-[#12121f] text-base font-semibold font-tertiary mb-1">PostgreSQL (optional)</h4>
+                            <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Install <code class="text-xs font-primary">pg-embed-setup-unpriv</code> for PostgreSQL tests without system database</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-building" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <h3 class="text-[#12121f] text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">Building</h3>
+
+        <div class="space-y-8">
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
+                <div class="px-6 py-4 bg-[#faf3ea] border-b border-[#e8d5b8]">
+                    <h4 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">For SQLite (the default)</h4>
+                </div>
+                <div class="p-0">
+                    <div class="bg-[#12121f] overflow-hidden">
+                        <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                            <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                            <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                            <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                            <div class="flex-1 text-right">
+                                <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                            </div>
+                        </div>
+                        <div class="px-6 py-6">
+                            <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">make</span> sqlite</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
+                <div class="px-6 py-4 bg-[#faf3ea] border-b border-[#e8d5b8]">
+                    <h4 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">For PostgreSQL</h4>
+                </div>
+                <div class="p-0">
+                    <div class="bg-[#12121f] overflow-hidden">
+                        <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                            <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                            <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                            <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                            <div class="flex-1 text-right">
+                                <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                            </div>
+                        </div>
+                        <div class="px-6 py-6">
+                            <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">make</span> postgres</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
+                <div class="px-6 py-4 bg-[#faf3ea] border-b border-[#e8d5b8]">
+                    <h4 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">For the Wireframe server</h4>
+                </div>
+                <div class="p-0">
+                    <div class="bg-[#12121f] overflow-hidden">
+                        <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                            <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                            <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                            <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                            <div class="flex-1 text-right">
+                                <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                            </div>
+                        </div>
+                        <div class="px-6 py-6">
+                            <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">make</span> <span class="text-[#f5e6d0]">APP</span>=mxd-wireframe-server sqlite</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-[#9a3a1f] font-semibold">Shared operator surface:</span>
+                both <code class="text-xs font-primary">mxd</code> and
+                <code class="text-xs font-primary">mxd-wireframe-server</code>
+                reuse the same CLI flags, <code class="text-xs font-primary">MXD_*</code>
+                environment overrides, <code class="text-xs font-primary">.mxd.toml</code>
+                defaults, and admin subcommands such as
+                <code class="text-xs font-primary">create-user</code>.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="section-wireframe-only" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <h3 class="text-[#12121f] text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">Runtime selection</h3>
+
+        <div class="space-y-6">
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                The <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">legacy-networking</code> Cargo feature is enabled by default. That keeps the classic <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">mxd</code> binary available. Disabling default features changes the produced binaries and selects the Wireframe runtime as the active listener path:
+            </p>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+                <div class="bg-[#12121f] overflow-hidden">
+                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                        <div class="flex-1 text-right">
+                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                        </div>
+                    </div>
+                    <div class="px-6 py-6 overflow-x-auto">
+                        <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">cargo</span> build --no-default-features --features <span class="text-[#4a8c5c]">"sqlite toml"</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+                <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <span class="text-[#9a3a1f] font-semibold">Feature flags:</span>
+                    This command disables all default features and explicitly
+                    enables only <code class="text-xs font-primary">sqlite</code>
+                    and <code class="text-xs font-primary">toml</code>. The
+                    legacy <code class="text-xs font-primary">mxd</code>
+                    binary is skipped via <code class="text-xs font-primary">required-features</code>,
+                    and <code class="text-xs font-primary">server::run()</code>
+                    invokes the Wireframe runtime instead.
+                </p>
+            </div>
+
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                Treat that runtime choice as user-facing behaviour. The
+                repository documents and tests it explicitly with the
+                Wireframe-first suite, rather than leaving it as an incidental
+                build detail.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DEPLOYMENT
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="section-deployment" class="border-t-4 border-[#e8a838] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">Deployment</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Deployment</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            Production deployment strategies for systemd, containers, and socket activation.
+        </p>
+    </div>
+</div>
+
+<div id="section-systemd" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <h3 class="text-[#12121f] text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">systemd</h3>
+
+        <div class="space-y-6">
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                A recommended service unit:
+            </p>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
+                <div class="bg-[#12121f] overflow-hidden">
+                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                        <div class="flex-1 text-right">
+                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">mxd.service</span>
+                        </div>
+                    </div>
+                    <div class="px-6 py-6 overflow-x-auto">
+                        <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">[Unit]</span>
+<span class="text-[#f5e6d0]">Description</span>=Marrakesh Express Daemon
+<span class="text-[#f5e6d0]">After</span>=network.target
+
+<span class="text-[#e8a838]">[Service]</span>
+<span class="text-[#f5e6d0]">Type</span>=notify
+<span class="text-[#f5e6d0]">ExecStart</span>=/usr/local/bin/mxd --bind <span class="text-[#d4714f]">0.0.0.0:5500</span> --database /var/lib/mxd/mxd.db
+<span class="text-[#f5e6d0]">User</span>=mxd
+<span class="text-[#f5e6d0]">Group</span>=mxd
+<span class="text-[#f5e6d0]">Restart</span>=on-failure
+<span class="text-[#f5e6d0]">WatchdogSec</span>=<span class="text-[#d4714f]">60s</span>
+
+<span class="text-[#e8a838]">[Install]</span>
+<span class="text-[#f5e6d0]">WantedBy</span>=multi-user.target</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                    <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">Type=notify</code> means mxd signals readiness to systemd after binding the socket and running migrations. <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">WatchdogSec=60s</code> means mxd sends a heartbeat every 20 seconds; if systemd doesn't hear one for 60 seconds, it restarts the process.
+                </p>
+
+                <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                    Socket activation is supported. Create a companion <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">.socket</code> unit that listens on port 5500; systemd holds incoming connections in queue during restarts so clients experience a pause, not a refusal.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-containers" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <h3 class="text-[#12121f] text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">Containers</h3>
+
+        <div class="space-y-8">
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                The default bind address <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">0.0.0.0:5500</code> works inside a container without modification. Mount a volume at the database path for persistence:
+            </p>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
+                <div class="bg-[#12121f] overflow-hidden">
+                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                        <div class="flex-1 text-right">
+                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                        </div>
+                    </div>
+                    <div class="px-6 py-6 overflow-x-auto">
+                        <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">docker</span> run -v /data/mxd:/var/lib/mxd mxd:latest \
+  --bind <span class="text-[#d4714f]">0.0.0.0:5500</span> --database /var/lib/mxd/mxd.db</pre>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                For PostgreSQL, pass the connection string as an environment variable:
+            </p>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
+                <div class="bg-[#12121f] overflow-hidden">
+                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
+                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
+                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
+                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                        <div class="flex-1 text-right">
+                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                        </div>
+                    </div>
+                    <div class="px-6 py-6 overflow-x-auto">
+                        <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#3a3a55]"># Pass credentials via env file, not inline.</span>
+<span class="text-[#e8a838]">docker</span> run --env-file <span class="text-[#4a8c5c]">mxd.env</span> mxd:latest</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
+                <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <span class="text-[#9a3a1f] font-semibold">Development note:</span> The fuzz harness ships with its own Dockerfile (<code class="text-xs font-primary">fuzz/Dockerfile</code>) that includes AFL++ and sanitizers. It is not intended for production use.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-best-practices" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <h3 class="text-[#12121f] text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">Deployment considerations</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 mxd-card-hover">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-2">User isolation</h4>
+                    </div>
+                </div>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    Run mxd as a dedicated unprivileged user. Never run as root. The service unit example above creates an <code class="text-xs font-primary">mxd</code> user and group.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 mxd-card-hover">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 bg-[#e8a838] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-database text-[#12121f] text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-2">Database backups</h4>
+                    </div>
+                </div>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    For SQLite, back up the <code class="text-xs font-primary">.db</code> file while the daemon is stopped. For PostgreSQL, use <code class="text-xs font-primary">pg_dump</code> with appropriate scheduling.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 mxd-card-hover">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-network-wired text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-2">Network binding</h4>
+                    </div>
+                </div>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    Bind to <code class="text-xs font-primary">0.0.0.0:5500</code> for external access or <code class="text-xs font-primary">127.0.0.1:5500</code> for local-only. Use a reverse proxy for TLS termination if required.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 mxd-card-hover">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 bg-[#4a8c5c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-clock-rotate-left text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-2">Restart policy</h4>
+                    </div>
+                </div>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    Use <code class="text-xs font-primary">Restart=on-failure</code> in systemd or equivalent restart policies in container orchestrators to handle transient failures gracefully.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Next steps</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+            Explore the architecture documentation, protocol reference, and verification artefacts.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-3">
+            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../architecture/">
+                Architecture Guide
+            </a>
+            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="../protocol/">
+                Protocol Reference
+            </a>
+            <a class="mxd-btn--outline px-6 py-3 text-[#3a3a55] text-sm font-semibold font-primary rounded border-2 border-[#e8d5b8] mxd-site-button" href="../configuration/">
+                Configuration Guide
+            </a>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer id="footer" class="bg-[#12121f] relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 py-12 text-center">
+        <div class="mb-6 opacity-40">
+            <span class="text-[#e8d5b8] text-[23px] font-normal font-primary">◆</span>
+        </div>
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
+            Protocol Souk — Design System for <span class="text-[#e8a838]">mxd</span>
+        </p>
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px]">
+            A <span class="text-[#e8a838]">df12 Productions</span> artefact · Edinburgh · 2026
+        </p>
+    </div>
+    <div class="border-t border-[#2a2a42] py-6">
+        <div class="max-w-[900px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center text-[11.10px] font-primary">
+            <p class="text-[#9a9ab0] mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
+            <nav class="mxd-legal-nav flex space-x-6" aria-label="Legal">
+                <a href="../privacy-policy/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Privacy Policy</a>
+                <a href="../terms-of-use/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Terms of Use</a>
+                <a href="../code-of-conduct/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Code of Conduct</a>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+</body></html>

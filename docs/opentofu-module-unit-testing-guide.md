@@ -815,11 +815,10 @@ confirming the IaC logic is sound.
 
 For testing the *logic of the script itself* (e.g., the `echo` command or a
 more complex shell script), a separate, dedicated testing approach should be
-used. Frameworks like `bunit`[^29],
-`shunit2`, or the BDD-style `shellspec`[^30] are designed for unit testing
-shell scripts. This separation of concerns is a critical best practice: use
-OpenTofu testing tools to test OpenTofu code, and use shell script testing
-tools to test shell scripts.
+used. Frameworks like `bunit`[^29], `shunit2`, or the BDD-style
+`shellspec`[^30] are designed for unit testing shell scripts. This separation
+of concerns is a critical best practice: use OpenTofu testing tools to test
+OpenTofu code, and use shell script testing tools to test shell scripts.
 
 ## Part 4: A Comparative Analysis of Alternative Testing Frameworks
 

@@ -446,20 +446,14 @@ sites:
     nav_links:
       - label: Home
         href: ../
-      - label: Quickstart
-        href: ../quickstart/
-      - label: Installation
-        href: ../installation/
-      - label: Deployment
-        href: ../deployment/
+      - label: Getting Started
+        href: ../getting-started/
       - label: Architecture
         href: ../architecture/
       - label: Protocol
         href: ../protocol/
       - label: Configuration
         href: ../configuration/
-      - label: Databases
-        href: ../database-backends/
       - label: Subsystems
         href: ../subsystems/
       - label: Compatibility
@@ -474,6 +468,43 @@ sites:
       - terms-of-use
       - privacy-policy
       - code-of-conduct
+    content_pages:
+      - key: getting-started
+        label: Getting Started
+        template: pages/getting-started.jinja
+        output_slug: getting-started
+      - key: architecture
+        label: Architecture
+        template: pages/architecture.jinja
+        output_slug: architecture
+      - key: protocol
+        label: Protocol
+        template: pages/protocol.jinja
+        output_slug: protocol
+      - key: configuration
+        label: Configuration
+        template: pages/configuration.jinja
+        output_slug: configuration
+      - key: subsystems
+        label: Subsystems
+        template: pages/subsystems.jinja
+        output_slug: subsystems
+      - key: compatibility
+        label: Compatibility
+        template: pages/compatibility.jinja
+        output_slug: compatibility
+      - key: verification
+        label: Verification
+        template: pages/verification.jinja
+        output_slug: verification
+      - key: roadmap
+        label: Roadmap
+        template: pages/roadmap.jinja
+        output_slug: roadmap
+      - key: changelog
+        label: Changelog
+        template: pages/changelog.jinja
+        output_slug: changelog
     pages: {}
 
   netsuke:

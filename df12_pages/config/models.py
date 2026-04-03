@@ -261,6 +261,16 @@ class SharedContentConfig:
 
 
 @dc.dataclass(slots=True)
+class ContentPageConfig:
+    """A sub-site page rendered from a Jinja template with rich HTML content."""
+
+    key: str
+    label: str
+    template: str
+    output_slug: str
+
+
+@dc.dataclass(slots=True)
 class SharedContentPageChrome:
     """Template chrome metadata for shared-content pages."""
 
@@ -301,6 +311,7 @@ class SubSiteConfig:
     nav_links: list[NavLinkConfig]
     parent_link: NavLinkConfig | None
     static_assets_dir: Path | None
+    content_pages: list[ContentPageConfig] = dc.field(default_factory=list)
 
 
 @dc.dataclass(slots=True)
@@ -343,6 +354,7 @@ __all__ = [
     "AboutPageConfig",
     "AvatarConfig",
     "CTAButtonConfig",
+    "ContentPageConfig",
     "FocusCardConfig",
     "FooterConfig",
     "FooterLinkConfig",

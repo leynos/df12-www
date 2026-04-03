@@ -7,6 +7,7 @@ import re
 import typing as typ
 from pathlib import Path
 
+import nh3
 import requests
 from jinja2 import Environment, FileSystemLoader
 from markdown import markdown
@@ -62,7 +63,11 @@ class SharedContentGenerator:
         self._markdown_extensions = ["sane_lists", "tables", "fenced_code"]
 
     def run(self) -> Path:
-        """Fetch or read markdown, render HTML, wrap in template, and write."""
+        """Fetch or read markdown, render HTML, wrap in template, and write.
+
+        Remote HTTP sources are sanitised with ``nh3`` after markdown
+        rendering to prevent XSS from untrusted content.
+        """
         source = self.shared_config.source
         if "://" in source:
             raw_md = self._fetch_url(source)
@@ -75,6 +80,7 @@ class SharedContentGenerator:
             extensions=self._markdown_extensions,
             output_format="html5",
         )
+        body_html = nh3.clean(body_html)
 
         output_path = self.output_dir / self.shared_config.output_slug / "index.html"
         output_path.parent.mkdir(parents=True, exist_ok=True)

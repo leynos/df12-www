@@ -210,21 +210,30 @@
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">03 — Wireframe</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Wireframe capabilities that shape mxd</h2>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Wireframe capabilities that power mxd</h2>
 
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            Wireframe is the transport adapter that sits behind mxd's transport
+            port. The domain core defines what it needs — framed request
+            dispatch, streaming bodies, server-initiated push — and Wireframe
+            fulfils those contracts without leaking transport concerns back
+            across the boundary.
+        </p>
         <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
-            Wireframe is not an incidental dependency. The design documents lean
-            on its codec, middleware, lifecycle, streaming, and observability
-            surfaces, so the transport library directly shapes how mxd models
-            compatibility hooks, large transfers, and session handling.
+            Because the adapter owns connection lifecycle, codec selection, and
+            middleware layering, the domain remains testable in isolation: mock
+            the port, exercise the domain, and verify invariants without a
+            running TCP stack. What follows are the adapter-side capabilities
+            that make that contract work.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
                 <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Framing and streaming</h3>
                 <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
-                    Custom frame codecs and streaming primitives that mxd's
-                    transport layer relies on for large-payload handling.
+                    The adapter translates Hotline's binary wire format into
+                    the typed requests the domain port expects, and reassembles
+                    multi-fragment payloads before they cross the boundary.
                 </p>
                 <ul class="space-y-2 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
                     <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">FrameCodec</code> trait: <code class="text-[#12121f] text-xs font-normal font-primary">frame_payload()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">wrap_payload()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">correlation_id()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">max_frame_length()</code></li>
@@ -237,8 +246,9 @@
             <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
                 <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Middleware and lifecycle</h3>
                 <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
-                    Layered middleware and connection lifecycle hooks that keep
-                    handshake, compatibility, and routing logic explicit.
+                    Connection setup, teardown, and middleware layering are
+                    adapter responsibilities. The domain sees dispatched
+                    requests; the adapter handles everything before and after.
                 </p>
                 <ul class="space-y-2 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
                     <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">from_fn</code> async middleware with <code class="text-[#12121f] text-xs font-normal font-primary">frame()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">frame_mut()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">Next</code> continuation</li>
@@ -250,8 +260,9 @@
             <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
                 <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Push queues and observability</h3>
                 <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
-                    Server-initiated push delivery and metrics that form the
-                    design basis for presence, chat, and transfer work.
+                    Server-initiated push and metrics live in the adapter,
+                    fulfilling the domain's notification port without exposing
+                    transport-level queuing to the core.
                 </p>
                 <ul class="space-y-2 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
                     <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">PushQueues</code> with high/low-priority capacities, rate limits, dead-letter queue</li>

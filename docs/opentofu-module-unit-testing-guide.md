@@ -917,7 +917,7 @@ deploys a simple web server demonstrates Terratest's power.
 
 #### OpenTofu Compatibility
 
-Terratest is fully compatible with OpenTofu. Following HashiCorp's license
+Terratest is fully compatible with OpenTofu. Following HashiCorp's licence
 change, the Terratest maintainers updated the library to seamlessly support
 OpenTofu as a drop-in replacement for Terraform.[^32] By default, Terratest
 will look for a
@@ -996,7 +996,7 @@ A comprehensive module repository should be organized as follows:
     its inputs and outputs, and any important usage notes. Tools like
     `terraform-docs` can help automate the generation of input/output tables.[^36]
 
-  - `LICENSE`: A clear license file, which is critical for adoption, especially
+  - `LICENSE`: A clear licence file, which is critical for adoption, especially
     for public modules.[^38]
 
 - `examples/` **Directory**:
@@ -1464,7 +1464,7 @@ ever before.
        shell helper scripts.
 [^30]: `shellspec` is a BDD-style shell testing framework for exercising shell
        script behaviour.
-[^31]: Terratest follows a deploy → validate → destroy pattern implemented
+[^31]: Terratest follows a deployment → validate → destroy pattern implemented
        through Go helper libraries.
 [^32]: Terratest automatically falls back to the `tofu` binary when `terraform`
        is absent, easing migration.

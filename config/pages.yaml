@@ -442,7 +442,7 @@ sites:
       hero_tagline: Hotline-style daemon for joyful file-sharing
     parent_link:
       label: "← Back to df12 Productions"
-      href: ../
+      href: /
     nav_links:
       - label: Home
         href: ../
@@ -488,7 +488,7 @@ sites:
       hero_tagline: Declarative build tooling for ambitious teams
     parent_link:
       label: "← Back to df12 Productions"
-      href: ../
+      href: /
     nav_links:
       - label: Home
         href: ../
@@ -518,7 +518,7 @@ sites:
       hero_tagline: CLI tooling for code-aware agents
     parent_link:
       label: "← Back to df12 Productions"
-      href: ../
+      href: /
     nav_links:
       - label: Home
         href: ../

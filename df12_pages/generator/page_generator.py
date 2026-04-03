@@ -40,7 +40,7 @@ from df12_pages._constants import PAGE_META_TEMPLATE
 from df12_pages.config import PageConfig, SectionLayout
 from df12_pages.docs_index import ManifestDescriptionResolver
 from df12_pages.generator.link_rewriter import _build_link_rewriter
-from df12_pages.generator.models import SectionModel
+from df12_pages.generator.models import NumberedStep, SectionModel
 from df12_pages.generator.renderer import CODE_BLOCK_PATTERN, HtmlContentRenderer
 from df12_pages.markdown_parser import Section, Subsection, parse_sections
 
@@ -383,7 +383,7 @@ class PageContentGenerator:
         """Construct a SectionModel with rendered HTML and layout metadata."""
         intro_html = self.renderer.markdown(section.intro_markdown)
         default_html = self.renderer.markdown(section.markdown)
-        numbered_steps: list[dict[str, str | int]] = []
+        numbered_steps: list[NumberedStep] = []
         split_panel = {"primary_html": "", "secondary_html": ""}
         subsections = self._build_subsection_blocks(section)
         toc_items = [
@@ -398,7 +398,7 @@ class PageContentGenerator:
                 resolved_layout = "default"
             else:
                 toc_items = [
-                    {"label": str(step["title"]), "anchor": str(step["anchor"])}
+                    {"label": step["title"], "anchor": step["anchor"]}
                     for step in numbered_steps
                 ]
         elif layout.device == "split_panel":
@@ -422,7 +422,7 @@ class PageContentGenerator:
 
     def _prepare_numbered_steps(
         self, section: Section, layout: SectionLayout
-    ) -> list[dict[str, str | int]]:
+    ) -> list[NumberedStep]:
         """Return numbered step data for ``section`` based on the provided layout."""
         subsections = list(section.subsections)
         if not subsections:
@@ -440,16 +440,16 @@ class PageContentGenerator:
                     ordered.append(sub)
             subsections = ordered
 
-        steps: list[dict[str, str | int]] = []
+        steps: list[NumberedStep] = []
         for idx, sub in enumerate(subsections, start=1):
             html = self.renderer.markdown(sub.markdown)
             steps.append(
-                {
-                    "title": sub.title,
-                    "number": idx,
-                    "html": html,
-                    "anchor": f"{section.slug}-step-{idx}",
-                }
+                NumberedStep(
+                    title=sub.title,
+                    number=idx,
+                    html=html,
+                    anchor=f"{section.slug}-step-{idx}",
+                )
             )
         return steps
 

@@ -59,8 +59,10 @@ class SubSiteHomePageBuilder:
         output_path = self.config.output
         output_path.parent.mkdir(parents=True, exist_ok=True)
         context = {
-            **self.config.context,
-            "title": self.config.title,
+            "homepage": {
+                **self.config.context,
+                "title": self.config.title,
+            },
             "generated_at": dt.datetime.now(dt.UTC),
         }
         html = self.template.render(**context)

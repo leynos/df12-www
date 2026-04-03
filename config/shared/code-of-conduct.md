@@ -84,7 +84,7 @@ recordings, or interviewing witnesses and other participants. Community
 Moderators will keep investigation and enforcement actions as transparent
 as possible while prioritizing safety and confidentiality.
 
-In order to honor these values, enforcement actions are carried out in
+In order to honour these values, enforcement actions are carried out in
 private with the involved parties, but communicating to the whole
 community may be part of a mutually agreed upon resolution.
 

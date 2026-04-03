@@ -15,7 +15,7 @@ The use of this website is subject to the following terms of use:
 - The content of the pages of this website is for your general
   information and use only. It is subject to change without notice.
 - Neither we nor any third parties provide any warranty or guarantee as
-  to the accuracy, timeliness, performance, completeness or suitability
+  to the accuracy, timeliness, performance, completeness, or suitability
   of the information and materials found or offered on this website for
   any particular purpose. You acknowledge that such information and
   materials may contain inaccuracies or errors and we expressly exclude
@@ -33,7 +33,7 @@ The use of this website is subject to the following terms of use:
   terms and conditions.
 - All trademarks reproduced in this website, which are not the property
   of, or licensed to the operator, are acknowledged on the website.
-- Unauthorised use of this website may give rise to a claim for damages
+- Unauthorized use of this website may give rise to a claim for damages
   and/or be a criminal offence.
 - From time to time, this website may also include links to other
   websites. These links are provided for your convenience to provide

@@ -3,6 +3,16 @@
 from __future__ import annotations
 
 import dataclasses as dc
+import typing as typ
+
+
+class NumberedStep(typ.TypedDict):
+    """A single numbered step within a section layout."""
+
+    title: str
+    number: int
+    html: str
+    anchor: str
 
 
 @dc.dataclass(slots=True)
@@ -25,7 +35,7 @@ class SectionModel:
         Rendered HTML for the introduction block.
     default_html : str
         Rendered HTML for the main markdown body.
-    numbered_steps : list[dict[str, str]]
+    numbered_steps : list[NumberedStep]
         Collection of numbered step metadata (title, number, html, anchor).
     split_panel : dict[str, str]
         Mapping containing ``primary_html`` and ``secondary_html`` for split layouts.
@@ -42,10 +52,10 @@ class SectionModel:
     layout: str
     intro_html: str
     default_html: str
-    numbered_steps: list[dict[str, str | int]]
+    numbered_steps: list[NumberedStep]
     split_panel: dict[str, str]
     subsections: list[dict[str, str]]
     toc_items: list[dict[str, str]]
 
 
-__all__ = ["SectionModel"]
+__all__ = ["NumberedStep", "SectionModel"]

@@ -1,5 +1,6 @@
 /*!
  * MiniSearch v7.2.0
+ * Copyright (c) Luca Ongaro
  * @see https://github.com/lucaong/minisearch
  * @license MIT
  */

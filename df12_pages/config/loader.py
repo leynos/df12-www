@@ -249,12 +249,19 @@ def _build_shared_content_map(
     config_dir: Path,
 ) -> dict[str, SharedContentConfig]:
     """Parse the top-level ``shared_content`` YAML block."""
-    if not raw or not isinstance(raw, dict):
+    if not raw:
         return {}
+    if not isinstance(raw, dict):
+        msg = "shared_content must be a YAML mapping, got: " + type(raw).__name__
+        raise SiteConfigError(msg)
     result: dict[str, SharedContentConfig] = {}
     for key, payload in raw.items():
         if not isinstance(payload, dict):
-            continue
+            msg = (
+                f"Shared content entry '{key}' must be a mapping,"
+                f" got: {type(payload).__name__}"
+            )
+            raise SiteConfigError(msg)
         label = payload.get("label")
         source = payload.get("source")
         output_slug = payload.get("output_slug")
@@ -295,12 +302,16 @@ def _build_sites_map(
     fallback_footer: FooterConfig | None,
 ) -> dict[str, SubSiteConfig]:
     """Parse the ``sites`` YAML block into sub-site configurations."""
-    if not raw or not isinstance(raw, dict):
+    if not raw:
         return {}
+    if not isinstance(raw, dict):
+        msg = "sites must be a YAML mapping, got: " + type(raw).__name__
+        raise SiteConfigError(msg)
     result: dict[str, SubSiteConfig] = {}
     for key, payload in raw.items():
         if not isinstance(payload, dict):
-            continue
+            msg = f"Site entry '{key}' must be a mapping, got: {type(payload).__name__}"
+            raise SiteConfigError(msg)
         result[key] = _build_subsite_config(
             key=key,
             payload=payload,
@@ -371,6 +382,12 @@ def _build_subsite_config(
 
     # Shared content references
     shared_refs_raw = payload.get("shared_content") or []
+    if shared_refs_raw and not isinstance(shared_refs_raw, list):
+        msg = (
+            f"Site '{key}' shared_content must be a list,"
+            f" got: {type(shared_refs_raw).__name__}"
+        )
+        raise SiteConfigError(msg)
     shared_content_refs = [str(ref) for ref in shared_refs_raw if ref]
 
     # Navigation

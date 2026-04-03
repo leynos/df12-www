@@ -1,3 +1,12 @@
+/* ═══════════════════════════════════════════════════
+   RESET — shared across all pages
+   ═══════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   /* Core palette — Marrakesh */
   --mxd-accent: #c54b2a;
@@ -62,10 +71,6 @@ html {
   .mxd-express-line {
     animation: none;
   }
-}
-
-body {
-  margin: 0;
 }
 
 .mxd-skip-link {
@@ -554,13 +559,4 @@ body {
 
 .mxd-table-row:hover {
   background-color: var(--mxd-sandstone-light);
-}
-
-/* ═══════════════════════════════════════════════════
-   RESET — shared across all pages
-   ═══════════════════════════════════════════════════ */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }

@@ -44,7 +44,7 @@ df12-www/
 
 Site generation configuration. `pages.yaml` is the single source of truth for
 page definitions, sub-site declarations, shared content references, homepage
-layout, and theme settings. The `shared/` subdirectory holds markdown source
+layout, and theme settings. The `shared/` subdirectory holds Markdown source
 files for legal pages (terms of use, privacy policy, code of conduct) that are
 rendered into every site through each site's own template wrapper.
 

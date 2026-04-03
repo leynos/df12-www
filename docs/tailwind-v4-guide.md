@@ -296,7 +296,7 @@ v4 uses OKLCH colour space for wider gamut support:
 
 ```html
 <!-- Better contrast and vibrancy with OKLCH -->
-<div class="bg-blue-500 text-white">Vivid colors on modern displays</div>
+<div class="bg-blue-500 text-white">Vivid colours on modern displays</div>
 ```
 
 ### 3. Container Queries for True Responsive Design

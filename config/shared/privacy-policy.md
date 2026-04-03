@@ -13,7 +13,7 @@ marketing purposes**:
 - Names and contact details
 
 We collect or use the following personal information for **dealing with
-queries, complaints or claims**:
+queries, complaints, or claims**:
 
 - Names and contact details
 
@@ -69,7 +69,7 @@ contact details at the top of this privacy notice.
 Our lawful bases for collecting or using personal information for
 **service updates or marketing purposes** are:
 
-- Consent -- we have permission from you after we gave you all the
+- Consent — we have permission from you after we gave you all the
   relevant information. All of your data protection rights may apply,
   except the right to object. To be clear, you do have the right to
   withdraw your consent at any time.
@@ -77,7 +77,7 @@ Our lawful bases for collecting or using personal information for
 Our lawful bases for collecting or using personal information for
 **dealing with queries, complaints or claims** are:
 
-- Consent -- we have permission from you after we gave you all the
+- Consent — we have permission from you after we gave you all the
   relevant information. All of your data protection rights may apply,
   except the right to object. To be clear, you do have the right to
   withdraw your consent at any time.

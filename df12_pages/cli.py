@@ -65,7 +65,7 @@ def _format_path(path: Path) -> str:
 
 
 @app.command(help="Generate static HTML documentation pages from Markdown.")
-def generate(  # noqa: PLR0913
+def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     *,
     page: typ.Annotated[
         str | None, Parameter(help="Page identifier", env_var="INPUT_PAGE")
@@ -320,7 +320,7 @@ def bump(
 
 
 @app.command(help="Initialize OpenTofu backend and providers with managed creds.")
-def init(  # noqa: PLR0913
+def init(  # noqa: PLR0913  FIXME: bundle credentials into CredentialsInput dataclass
     *,
     config_path: typ.Annotated[
         Path,

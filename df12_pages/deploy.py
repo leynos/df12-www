@@ -110,7 +110,7 @@ def _load_config(path: Path = DEFAULT_CONFIG_PATH) -> DeployConfig:
         raise FileNotFoundError(msg)
     data = tomlkit.parse(path.read_text(encoding="utf-8"))
 
-    def _as_dict(table: typ.Any) -> dict[str, typ.Any]:  # noqa: ANN401
+    def _as_dict(table: typ.Any) -> dict[str, typ.Any]:  # noqa: ANN401  FIXME: narrow once tomlkit exposes typed table API
         return dict(table.items()) if table else {}
 
     auth_data = _as_dict(data.get("auth"))

@@ -16,7 +16,7 @@ def test_subsite_homepage_preserves_configured_title(tmp_path: Path) -> None:
     template_dir = tmp_path / "templates"
     template_dir.mkdir()
     (template_dir / "home_page.jinja").write_text(
-        "<title>{{ title }}</title><p>{{ generated_at.isoformat() }}</p>",
+        "<title>{{ homepage.title }}</title><p>{{ generated_at.isoformat() }}</p>",
         encoding="utf-8",
     )
 

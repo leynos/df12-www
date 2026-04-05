@@ -120,14 +120,27 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     Raises
     ------
     ValueError
-        If ``source_url`` or ``output_dir`` overrides are supplied when more
-        than one page is requested, or if ``--site`` names an unknown sub-site.
+        If ``--site`` and ``--all-sites`` are both supplied (mutually
+        exclusive).  If ``--source-url`` or ``--output-dir`` overrides are
+        combined with ``--site``.  If ``--all-sites`` is combined with any
+        partial-render override (``--page``, ``--source-url``,
+        ``--output-dir``).  If ``source_url`` or ``output_dir`` overrides are
+        supplied when more than one page is requested.  If ``--site`` names an
+        unknown sub-site.
     """
     if site and all_sites:
-        msg = "--site and --all-sites may not be used together"
+        msg = "--site and --all-sites are mutually exclusive"
         raise ValueError(msg)
-    if site and (source_url or output_dir):
+    if site and (source_url is not None or output_dir is not None):
         msg = "--source-url and --output-dir are not supported with --site"
+        raise ValueError(msg)
+    if all_sites and (
+        page is not None or source_url is not None or output_dir is not None
+    ):
+        msg = (
+            "--all-sites does not support partial render overrides"
+            " (--page, --source-url, --output-dir)"
+        )
         raise ValueError(msg)
 
     site_config = load_site_config(config)

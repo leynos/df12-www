@@ -530,9 +530,9 @@ conditional logic, and handling the imperative nature of provisioners.
 ### 3. Testing Iterative Resources (`count` and `for_each`)
 
 A common pattern in reusable modules is the creation of multiple resource
-instances based on a list or map, using the `count`[^24]. and
+instances based on a list or map, using the `count`[^24] and
 
-`for_each`[^25]. meta-arguments. Testing these constructs requires more than
+`for_each`[^25] meta-arguments. Testing these constructs requires more than
 just verifying that
 
 *a* resource is created; it requires validating that the *correct number* of

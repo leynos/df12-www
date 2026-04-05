@@ -786,7 +786,7 @@ bg-radial, bg-radial-at-t, bg-radial-at-tr, bg-radial-at-r, bg-radial-at-br, bg-
 bg-conic, bg-conic-at-t, bg-conic-at-tr, bg-conic-at-r, bg-conic-at-br, bg-conic-at-b, bg-conic-at-bl, bg-conic-at-l, bg-conic-at-tl, bg-conic-at-c
 ```
 
-#### Gradient Color Stops
+#### Gradient Colour Stops
 
 ```text
 from-inherit, from-current, from-transparent, from-black, from-white, from-{color}
@@ -838,7 +838,7 @@ border-solid, border-dashed, border-dotted, border-double, border-hidden, border
 divide-x-0, divide-x-2, divide-x-4, divide-x-8, divide-x, divide-y-0, divide-y-2, divide-y-4, divide-y-8, divide-y, divide-x-reverse, divide-y-reverse
 ```
 
-#### Divide Color
+#### Divide Colour
 
 All colour utilities work with `divide-` prefix
 
@@ -854,7 +854,7 @@ divide-solid, divide-dashed, divide-dotted, divide-double, divide-none
 outline-0, outline-1, outline-2, outline-4, outline-8
 ```
 
-#### Outline Color
+#### Outline Colour
 
 All colour utilities work with `outline-` prefix
 
@@ -876,7 +876,7 @@ outline-offset-0, outline-offset-1, outline-offset-2, outline-offset-4, outline-
 ring-0, ring-1, ring-2, ring, ring-4, ring-8, ring-inset
 ```
 
-#### Ring Color
+#### Ring Colour
 
 All colour utilities work with `ring-` prefix
 
@@ -886,7 +886,7 @@ All colour utilities work with `ring-` prefix
 ring-offset-0, ring-offset-1, ring-offset-2, ring-offset-4, ring-offset-8
 ```
 
-#### Ring Offset Color
+#### Ring Offset Colour
 
 All colour utilities work with `ring-offset-` prefix
 
@@ -898,11 +898,11 @@ All colour utilities work with `ring-offset-` prefix
 shadow-xs, shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl, shadow-2xl, shadow-inner, shadow-none
 ```
 
-#### Box Shadow Color
+#### Box Shadow Colour
 
 All colour utilities work with `shadow-` prefix
 
-#### Drop Shadow (NEW colored support in v4)
+#### Drop Shadow (NEW colour support in v4)
 
 ```text
 drop-shadow-sm, drop-shadow, drop-shadow-md, drop-shadow-lg, drop-shadow-xl, drop-shadow-2xl, drop-shadow-none
@@ -1182,7 +1182,7 @@ perspective-origin-center, perspective-origin-top, perspective-origin-top-right,
 
 ### Interactivity
 
-#### Accent Color
+#### Accent Colour
 
 ```text
 accent-auto, accent-inherit, accent-current, accent-transparent, accent-black, accent-white
@@ -1321,7 +1321,7 @@ stroke-0, stroke-1, stroke-2
 sr-only, not-sr-only
 ```
 
-#### Forced Color Adjust
+#### Forced Colour Adjust
 
 ```text
 forced-color-adjust-auto, forced-color-adjust-none

@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  --font-primary: "JetBrains Mono", monospace;
+  --font-secondary: "DM Serif Display", serif;
+  --font-tertiary: "Source Serif 4", serif;
+}

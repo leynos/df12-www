@@ -26,6 +26,7 @@ class ContentPageGenerator:
         nav_links: list[NavLinkConfig],
         stylesheet: str,
         parent_link: NavLinkConfig | None = None,
+        base_path: str | None = None,
     ) -> None:
         self.config = config
         self.output_dir = output_dir
@@ -33,6 +34,7 @@ class ContentPageGenerator:
         self.nav_links = nav_links
         self.stylesheet = stylesheet
         self.parent_link = parent_link
+        self.base_path = base_path
         self.env = Environment(
             loader=FileSystemLoader(str(templates_dir)),
             autoescape=True,
@@ -60,13 +62,17 @@ class ContentPageGenerator:
 
     def _mark_current_nav(self) -> list[dict[str, typ.Any]]:
         """Return nav_links dicts with ``current`` flag for the active page."""
-        target_href = f"../{self.config.output_slug}/"
+        if self.base_path is not None:
+            target_href = f"{self.base_path}{self.config.output_slug}/"
+        else:
+            target_href = f"../{self.config.output_slug}/"
         result: list[dict[str, typ.Any]] = []
         for link in self.nav_links:
             entry = dc.asdict(link)
             if link.href == target_href:
                 entry["current"] = True
-                entry["href"] = "./"
+                if self.base_path is None:
+                    entry["href"] = "./"
             result.append(entry)
         return result
 

@@ -444,25 +444,25 @@ sites:
       href: /
     nav_links:
       - label: Home
-        href: ../
+        href: /mxd/
       - label: Getting Started
-        href: ../getting-started/
+        href: /mxd/getting-started/
       - label: Architecture
-        href: ../architecture/
+        href: /mxd/architecture/
       - label: Protocol
-        href: ../protocol/
+        href: /mxd/protocol/
       - label: Configuration
-        href: ../configuration/
+        href: /mxd/configuration/
       - label: Subsystems
-        href: ../subsystems/
+        href: /mxd/subsystems/
       - label: Compatibility
-        href: ../compatibility/
+        href: /mxd/compatibility/
       - label: Verification
-        href: ../verification/
+        href: /mxd/verification/
       - label: Roadmap
-        href: ../roadmap/
+        href: /mxd/roadmap/
       - label: Changelog
-        href: ../changelog/
+        href: /mxd/changelog/
     shared_content:
       - terms-of-use
       - privacy-policy

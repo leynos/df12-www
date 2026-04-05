@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/netsuke/assets/css/himotoshi.css">
     <script defer src="/netsuke/assets/js/mobile-nav.js"></script>
+    <script defer src="/netsuke/assets/js/blog-filter.js"></script>
 </head>
 <body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white flex flex-col min-h-screen">
 
@@ -151,15 +152,15 @@
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-stone pb-4">
                     <h3 class="font-serif text-2xl font-bold text-charcoal">Recent Articles</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/netsuke/blog/" class="hm-chip hm-chip--filter">All</a>
-                        <a href="/netsuke/blog/?category=engineering" class="hm-chip hm-chip--filter">Engineering</a>
-                        <a href="/netsuke/blog/?category=releases" class="hm-chip hm-chip--filter">Releases</a>
-                        <a href="/netsuke/blog/?category=community" class="hm-chip hm-chip--filter">Community</a>
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="all" aria-pressed="true">All</button>
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="engineering" aria-pressed="false">Engineering</button>
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="releases" aria-pressed="false">Releases</button>
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="community" aria-pressed="false">Community</button>
                     </div>
                 </div>
 
                 <!-- Post 1 -->
-                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8">
+                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8" data-category="engineering">
                     <div class="flex-1">
                         <div class="flex items-center space-x-3 text-xs mb-3">
                             <span class="font-mono text-indigo font-semibold">Engineering</span>
@@ -183,7 +184,7 @@
                 </article>
 
                 <!-- Post 2 -->
-                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8">
+                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8" data-category="releases">
                     <div class="flex-1">
                         <div class="flex items-center space-x-3 text-xs mb-3">
                             <span class="px-2 py-0.5 rounded-full bg-boxwood/50 text-charcoal-mid font-mono border border-stone font-medium">Language note</span>
@@ -210,7 +211,7 @@
                 </article>
 
                 <!-- Post 3 -->
-                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8">
+                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8" data-category="community">
                     <div class="flex-1">
                         <div class="flex items-center space-x-3 text-xs mb-3">
                             <span class="font-mono text-matcha font-semibold">Community</span>
@@ -296,12 +297,12 @@
                 <div class="bg-boxwood-pale rounded-xl border border-stone p-6">
                     <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Topics</h3>
                     <div class="flex flex-wrap gap-2">
-                        <a href="/netsuke/blog/" class="hm-chip hm-chip--filter">Architecture</a>
-                        <a href="/netsuke/blog/" class="hm-chip hm-chip--filter">Tutorials</a>
-                        <a href="/netsuke/blog/" class="hm-chip hm-chip--filter">Case Studies</a>
-                        <a href="/netsuke/blog/" class="hm-chip hm-chip--filter">Rust</a>
-                        <a href="/netsuke/blog/" class="hm-chip hm-chip--filter">Performance</a>
-                        <a href="/netsuke/blog/" class="hm-chip hm-chip--filter">Ecosystem</a>
+                        <span class="hm-chip">Architecture</span>
+                        <span class="hm-chip">Tutorials</span>
+                        <span class="hm-chip">Case Studies</span>
+                        <span class="hm-chip">Rust</span>
+                        <span class="hm-chip">Performance</span>
+                        <span class="hm-chip">Ecosystem</span>
                     </div>
                 </div>
 

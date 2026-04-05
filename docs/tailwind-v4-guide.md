@@ -313,7 +313,7 @@ v4 uses OKLCH colour space for wider gamut support:
 <!-- Native cascade layers -->
 <div class="z-10">Standard utility layering</div>
 
-<!-- Color mixing -->
+<!-- Colour mixing -->
 <div class="bg-blue-500/50">Uses color-mix() under the hood</div>
 ```
 

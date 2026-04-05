@@ -123,6 +123,9 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         If ``source_url`` or ``output_dir`` overrides are supplied when more
         than one page is requested, or if ``--site`` names an unknown sub-site.
     """
+    if site and all_sites:
+        msg = "--site and --all-sites may not be used together"
+        raise ValueError(msg)
     if site and (source_url or output_dir):
         msg = "--source-url and --output-dir are not supported with --site"
         raise ValueError(msg)
@@ -195,6 +198,34 @@ def _generate_main_site(
     for sc in site_config.shared_content.values():
         sc_path = SharedContentGenerator(sc, shared_output_root).run()
         print(f"wrote {_format_path(sc_path)}")
+
+
+def _copy_static_assets(subsite: SubSiteConfig) -> None:
+    """Copy ``subsite`` static assets to its output directory.
+
+    Parameters
+    ----------
+    subsite : SubSiteConfig
+        Sub-site configuration whose ``static_assets_dir`` will be copied.
+
+    Raises
+    ------
+    ValueError
+        If ``static_assets_dir`` exists on disk but is not a directory.
+    """
+    if not subsite.static_assets_dir:
+        return
+    if not subsite.static_assets_dir.exists():
+        return
+    if not subsite.static_assets_dir.is_dir():
+        msg = (
+            f"[{subsite.key}] static_assets_dir "
+            f"{_format_path(subsite.static_assets_dir)} exists but is not a directory"
+        )
+        raise ValueError(msg)
+    dest = subsite.output_dir / "assets"
+    shutil.copytree(subsite.static_assets_dir, dest, dirs_exist_ok=True)
+    print(f"[{subsite.key}] copied static assets to {_format_path(dest)}")
 
 
 def _generate_subsite(
@@ -280,10 +311,7 @@ def _generate_subsite(
         print(f"[{subsite.key}] wrote {_format_path(cp_path)}")
 
     # Static assets
-    if subsite.static_assets_dir and subsite.static_assets_dir.is_dir():
-        dest = subsite.output_dir / "assets"
-        shutil.copytree(subsite.static_assets_dir, dest, dirs_exist_ok=True)
-        print(f"[{subsite.key}] copied static assets to {_format_path(dest)}")
+    _copy_static_assets(subsite)
 
 
 @app.command(help="Record the latest GitHub release tag for each configured page.")

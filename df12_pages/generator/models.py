@@ -18,13 +18,17 @@ class NumberedStep(typ.TypedDict):
     html
         Pre-rendered HTML body of the step.
     anchor
-        Fragment identifier used for deep-linking.
+        Step-number-based fragment identifier (``section-step-N``).
+    content_anchor
+        Content-based fragment identifier derived from the subsection title,
+        matching the anchor used in sidebar navigation links.
     """
 
     title: str
     number: int
     html: str
     anchor: str
+    content_anchor: str
 
 
 @dc.dataclass(slots=True)
@@ -48,7 +52,8 @@ class SectionModel:
     default_html : str
         Rendered HTML for the main markdown body.
     numbered_steps : list[NumberedStep]
-        Collection of numbered step metadata (title, number, html, anchor).
+        Collection of numbered step metadata (title, number, html, anchor,
+        content_anchor).
     split_panel : dict[str, str]
         Mapping containing ``primary_html`` and ``secondary_html`` for split layouts.
     subsections : list[dict[str, str]]

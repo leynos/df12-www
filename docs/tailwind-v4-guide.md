@@ -638,7 +638,7 @@ list-none, list-disc, list-decimal, list-inside, list-outside
 text-left, text-center, text-right, text-justify, text-start, text-end
 ```
 
-#### Text Color
+#### Text Colour
 
 ```text
 text-inherit, text-current, text-transparent, text-black, text-white
@@ -743,7 +743,7 @@ bg-fixed, bg-local, bg-scroll
 bg-clip-border, bg-clip-padding, bg-clip-content, bg-clip-text
 ```
 
-#### Background Color
+#### Background Colour
 
 All colour utilities work with `bg-` prefix (same as text colours above)
 
@@ -822,7 +822,7 @@ rounded-bl-none, rounded-bl-xs, rounded-bl-sm, rounded-bl, rounded-bl-md, rounde
 border-0, border-2, border-4, border-8, border, border-x, border-y, border-s, border-e, border-t, border-r, border-b, border-l
 ```
 
-#### Border Color
+#### Border Colour
 
 All colour utilities work with `border-` prefix (same as text/bg colours)
 

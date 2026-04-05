@@ -347,7 +347,7 @@ class PageContentGenerator:
         """Build sidebar navigation groups and entries for the rendered sections."""
         groups: list[dict[str, typ.Any]] = []
         for model in section_models:
-            page_url = f"{self.page.filename_prefix}{model.slug}.html"
+            page_url = f"/{self.page.filename_prefix}{model.slug}.html"
             group_label = self._clean_nav_label(model.short_title)
             entries: list[dict[str, typ.Any]] = [
                 {
@@ -393,7 +393,10 @@ class PageContentGenerator:
         resolved_layout = layout.device
 
         if layout.device == "numbered_steps":
-            numbered_steps = self._prepare_numbered_steps(section, layout)
+            subsection_anchors = {b["title"]: b["anchor"] for b in subsections}
+            numbered_steps = self._prepare_numbered_steps(
+                section, layout, subsection_anchors=subsection_anchors
+            )
             if not numbered_steps:
                 resolved_layout = "default"
             else:
@@ -421,9 +424,26 @@ class PageContentGenerator:
         )
 
     def _prepare_numbered_steps(
-        self, section: Section, layout: SectionLayout
+        self,
+        section: Section,
+        layout: SectionLayout,
+        *,
+        subsection_anchors: dict[str, str] | None = None,
     ) -> list[NumberedStep]:
-        """Return numbered step data for ``section`` based on the provided layout."""
+        """Return numbered step data for ``section`` based on the provided layout.
+
+        Parameters
+        ----------
+        section : Section
+            The parsed markdown section containing subsections.
+        layout : SectionLayout
+            Layout configuration that may specify a custom step ordering.
+        subsection_anchors : dict[str, str] or None, optional
+            Mapping of subsection title to content-based anchor string, as
+            produced by :meth:`_build_subsection_blocks`.  When provided, each
+            step's ``content_anchor`` is set to the corresponding value so that
+            nav links and in-page anchors remain consistent.
+        """
         subsections = list(section.subsections)
         if not subsections:
             return []
@@ -440,15 +460,19 @@ class PageContentGenerator:
                     ordered.append(sub)
             subsections = ordered
 
+        anchors = subsection_anchors or {}
         steps: list[NumberedStep] = []
         for idx, sub in enumerate(subsections, start=1):
             html = self.renderer.markdown(sub.markdown)
+            step_anchor = f"{section.slug}-step-{idx}"
+            content_anchor = anchors.get(sub.title, step_anchor)
             steps.append(
                 NumberedStep(
                     title=sub.title,
                     number=idx,
                     html=html,
-                    anchor=f"{section.slug}-step-{idx}",
+                    anchor=step_anchor,
+                    content_anchor=content_anchor,
                 )
             )
         return steps

@@ -181,7 +181,7 @@ leading to a more effective and efficient testing strategy.
 
 The most direct and accessible way to begin testing OpenTofu configurations is
 by using the native testing framework built directly into the OpenTofu
-command-line interface (CLI). Forked from Terraform version 1.[^4], this
+command-line interface (CLI). Forked from Terraform version 1[^4], this
 framework allows engineers to write tests in the same declarative HCL syntax
 they use for defining infrastructure, significantly lowering the barrier to
 entry for teams already proficient with OpenTofu.[^17]
@@ -202,7 +202,7 @@ infrastructure that was created during the test.[^16]
 #### Command-Line Interface
 
 The `tofu test` command is highly configurable through a set of command-line
-options that allow for precise control over test execution.[^21]:
+options that allow for precise control over test execution.[^18]:
 
 - `-test-directory=path`: Specifies an alternative directory to search for test
   files, defaulting to `tests`.[^16]
@@ -285,7 +285,7 @@ run "validate_instance_name_tag" {
 }
 ```
 
-The `run` block defines a single, named test case.[^18]
+The `run` block defines a single, named test case.[^19]
 
 #### Step 3: Configure the Test Run
 
@@ -307,7 +307,7 @@ run "validate_instance_name_tag" {
 ```
 
 Setting `command = plan` is the key to creating a unit test. It instructs the
-framework to generate an execution plan but not to apply it.[^19] The
+framework to generate an execution plan but not to apply it.[^20] The
 
 `variables` block supplies values for the input variables defined in the
 module.[^16]
@@ -338,7 +338,7 @@ run "validate_instance_name_tag" {
 
 This assertion checks that the `Name` tag on the `aws_instance.server` resource
 in the generated plan matches the value provided in the test's `variables`
-block.[^20]
+block.[^21]
 
 #### Step 5: Execute and Interpret
 
@@ -360,7 +360,7 @@ credentials (assuming no state backend is configured).
 A robust module not only works correctly with valid inputs but also correctly
 rejects invalid ones. This practice, known as negative testing, is crucial for
 validating custom conditions and input validation rules, ensuring the module is
-resilient to misconfiguration.[^20] The
+resilient to misconfiguration.[^21] The
 
 `expect_failures` attribute within a `run` block is designed specifically for
 this purpose.
@@ -417,7 +417,7 @@ isolation, free from external dependencies and side effects. In IaC, this means
 testing a module's logic without relying on network access, cloud credentials,
 or the state of real infrastructure. While `command = plan` goes a long way,
 true isolation is achieved through the powerful mocking and overriding features
-built into OpenTofu's testing framework.[^21] These capabilities, inherited and
+built into OpenTofu's testing framework.[^18] These capabilities, inherited and
 expanded from Terraform, fundamentally change the nature of IaC testing,
 allowing it to mirror the isolated, dependency-injected testing patterns common
 in application development.
@@ -464,7 +464,7 @@ run "test_with_mock_provider" {
 ```
 
 Provide specific default values for attributes on mocked resources to give the
-test precise control over the resulting data.[^21]
+test precise control over the resulting data.[^18]
 
 #### Overriding Specific Components
 
@@ -530,9 +530,9 @@ conditional logic, and handling the imperative nature of provisioners.
 ### 3. Testing Iterative Resources (`count` and `for_each`)
 
 A common pattern in reusable modules is the creation of multiple resource
-instances based on a list or map, using the `count`.[^24] and
+instances based on a list or map, using the `count`[^24]. and
 
-`for_each`.[^25] meta-arguments. Testing these constructs requires more than
+`for_each`[^25]. meta-arguments. Testing these constructs requires more than
 just verifying that
 
 *a* resource is created; it requires validating that the *correct number* of
@@ -740,7 +740,7 @@ input scenarios.[^28]
 
 Provisioners, and especially the `local-exec` provisioner, present a unique
 testing challenge. They are considered a "last resort" because they execute
-imperative scripts, stepping outside of OpenTofu's declarative model.[^18] This
+imperative scripts, stepping outside of OpenTofu's declarative model.[^19] This
 introduces side effects and dependencies on the local execution environment,
 which are antithetical to pure unit testing.
 
@@ -912,7 +912,7 @@ deploys a simple web server demonstrates Terratest's power.
   the OpenTofu output, and then repeatedly sends HTTP GET requests until it
   receives a `200 OK` response with the expected "Hello, World!" body,
   effectively validating that the server provisioned correctly and is
-  operational.[^19]
+  operational.[^20]
 
 #### OpenTofu Compatibility
 
@@ -937,13 +937,13 @@ direct comparison to aid in this decision-making process.
 
 | Dimension      | tofu test (Native Framework)                                                                                 | Terratest                                                                                                                               |
 | -------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Language       | HCL.[^19] Familiar to OpenTofu users, lowering the adoption barrier.                                         | Go (Golang).[^10] Requires learning a new programming language and its ecosystem.                                                       |
+| Language       | HCL.[^20] Familiar to OpenTofu users, lowering the adoption barrier.                                         | Go (Golang).[^10] Requires learning a new programming language and its ecosystem.                                                       |
 | Test Scope     | Excels at plan-based unit tests. Can perform integration tests with command=apply.[^16]                      | Excels at integration and E2E tests. Can perform plan-based unit tests, but it's less common and more verbose.[^33]                     |
-| Mocking        | Strong, built-in support for mocking providers and overriding resources, data, and modules.[^21]             | No built-in IaC mocking. Relies on deploying real resources or requires complex, custom Go-based mocking of cloud provider SDKs.        |
+| Mocking        | Strong, built-in support for mocking providers and overriding resources, data, and modules.[^18]             | No built-in IaC mocking. Relies on deploying real resources or requires complex, custom Go-based mocking of cloud provider SDKs.        |
 | Setup          | No extra dependencies beyond the OpenTofu binary itself.[^16]                                                | Requires a full Go development environment installation and dependency management via go mod.[^31]                                      |
 | Flexibility    | Limited by HCL's declarative nature. Complex logic or external API interactions require helper modules.[^16] | Highly flexible. Can perform any action possible in Go: complex logic, custom API calls, file manipulation, database queries, etc.[^34] |
 | Ecosystem      | Fully integrated into the OpenTofu CLI. Part of the core tool.                                               | Large library of helper functions for AWS, GCP, Azure, Kubernetes, Docker, SSH, and more, simplifying common validation tasks.[^10]     |
-| Learning Curve | Low for existing OpenTofu users; the syntax is the same.[^19]                                                | Steeper, requires proficiency in Go, its testing packages, and the Terratest library itself.[^34]                                       |
+| Learning Curve | Low for existing OpenTofu users; the syntax is the same.[^20]                                                | Steeper, requires proficiency in Go, its testing packages, and the Terratest library itself.[^34]                                       |
 
 ### 4. Legacy and Niche Tools: Kitchen-Terraform
 
@@ -1437,14 +1437,17 @@ ever before.
        workflows, covering unit and integration needs.
 [^17]: Terratest, while famous for integration testing, can also inspect plan
        outputs for unit-style assertions.
-[^18]: Each `run` block inside a `.tftest.hcl` or `.tofutest.hcl` file
-       represents a single named test case.
-[^19]: Setting `command = plan` keeps unit tests deterministic, fast, and free
-       of irreversible side effects.
-[^20]: Assertions evaluate values in the generated plan so tests can confirm
-       inputs flow into the expected attributes.
-[^21]: OpenTofu's test harness includes `mock_provider` and related constructs
+[^18]: OpenTofu's test harness includes `mock_provider` and related constructs
        to replace entire providers with mocks.
+
+[^19]: Each `run` block inside a `.tftest.hcl` or `.tofutest.hcl` file
+       represents a single named test case.
+
+[^20]: Setting `command = plan` keeps unit tests deterministic, fast, and free
+       of irreversible side effects.
+
+[^21]: Assertions evaluate values in the generated plan so tests can confirm
+       inputs flow into the expected attributes.
 [^22]: `override_data`, `override_resource`, and `override_module` blocks
        substitute specific dependencies with deterministic values.
 [^23]: Overriding data sources yields predictable responses, eliminating the

@@ -253,6 +253,9 @@ def _generate_subsite(
         for path in written:
             print(f"[{subsite.key}] wrote {_format_path(path)}")
 
+    if page is not None:
+        return
+
     # Docs index
     if subsite.pages and subsite.docs_index_output:
         scoped = SiteConfig(
@@ -388,7 +391,43 @@ def init(  # noqa: PLR0913  FIXME: bundle credentials into CredentialsInput data
     s3_endpoint: str | None = None,
     save: bool = True,
 ) -> None:
-    """Initialize OpenTofu backend and bootstrap the backend bucket."""
+    """Initialize OpenTofu backend and bootstrap the backend bucket.
+
+    Parameters
+    ----------
+    config_path : Path, optional
+        TOML file used to load and persist credentials; defaults to
+        ``~/.config/df12-www/config.toml`` (overridable via
+        ``DF12_CONFIG_FILE``).
+    aws_access_key_id : str or None, optional
+        AWS/Scaleway access key (highest priority over env and stored).
+    aws_secret_access_key : str or None, optional
+        AWS/Scaleway secret key (highest priority over env and stored).
+    scw_access_key : str or None, optional
+        Scaleway-specific access key (highest priority).
+    scw_secret_key : str or None, optional
+        Scaleway-specific secret key (highest priority).
+    cloudflare_api_token : str or None, optional
+        Cloudflare API token (highest priority).
+    github_token : str or None, optional
+        GitHub personal access token (highest priority).
+    region : str or None, optional
+        AWS/Scaleway region (highest priority).
+    s3_endpoint : str or None, optional
+        S3-compatible endpoint URL (highest priority).
+    save : bool, optional
+        Persist resolved credentials back to *config_path* when ``True``.
+
+    Raises
+    ------
+    CredentialError
+        If neither CLI arguments nor the environment nor the stored config
+        can supply an AWS access key and secret key.
+    FileNotFoundError
+        If the ``tofu`` or ``aws`` binary is not found on ``PATH``.
+    subprocess.CalledProcessError
+        If ``tofu init`` or the bucket bootstrap command exits non-zero.
+    """
     creds = resolve_credentials(
         config_path=config_path,
         aws_access_key_id=aws_access_key_id,
@@ -425,7 +464,31 @@ def plan(
     run_init: bool = True,
     destroy: bool = False,
 ) -> None:
-    """Generate an OpenTofu plan using stored credentials."""
+    """Generate an OpenTofu plan using stored credentials.
+
+    Parameters
+    ----------
+    plan_file : Path, optional
+        Output path for the binary plan file produced by ``tofu plan -out``.
+        Defaults to ``plan.out`` in the current working directory.
+    config_path : Path, optional
+        TOML file used to load and persist credentials; defaults to
+        ``~/.config/df12-www/config.toml`` (overridable via
+        ``DF12_CONFIG_FILE``).
+    run_init : bool, optional
+        Run ``tofu init`` before planning when ``True`` (default).
+    destroy : bool, optional
+        Pass ``-destroy`` to ``tofu plan`` to produce a destroy plan.
+
+    Raises
+    ------
+    CredentialError
+        If stored credentials are missing or incomplete.
+    FileNotFoundError
+        If the ``tofu`` or ``aws`` binary is not found on ``PATH``.
+    subprocess.CalledProcessError
+        If ``tofu plan`` or a prerequisite command exits non-zero.
+    """
     plan_stack(
         plan_file=plan_file,
         config_path=config_path,
@@ -449,7 +512,29 @@ def apply(
     ] = DEFAULT_CONFIG_PATH,
     run_init: bool = True,
 ) -> None:
-    """Apply infrastructure changes using stored credentials."""
+    """Apply infrastructure changes using stored credentials.
+
+    Parameters
+    ----------
+    plan_file : Path or None, optional
+        Pre-computed binary plan file to apply.  When ``None``, ``tofu
+        apply`` is invoked with a ``-var-file`` argument instead.
+    config_path : Path, optional
+        TOML file used to load and persist credentials; defaults to
+        ``~/.config/df12-www/config.toml`` (overridable via
+        ``DF12_CONFIG_FILE``).
+    run_init : bool, optional
+        Run ``tofu init`` before applying when ``True`` (default).
+
+    Raises
+    ------
+    CredentialError
+        If stored credentials are missing or incomplete.
+    FileNotFoundError
+        If the ``tofu`` or ``aws`` binary is not found on ``PATH``.
+    subprocess.CalledProcessError
+        If ``tofu apply`` or a prerequisite command exits non-zero.
+    """
     apply_stack(
         plan_file=plan_file,
         config_path=config_path,

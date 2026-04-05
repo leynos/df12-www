@@ -55,6 +55,19 @@ class SubSiteHomePageBuilder:
         -------
         Path
             The filesystem path written for the rendered homepage.
+
+        Raises
+        ------
+        OSError
+            Raised when creating parent directories or writing the output
+            file fails.
+
+        Notes
+        -----
+        Renders ``home_page.jinja`` with ``homepage`` and ``generated_at``
+        context keys.  The ``homepage`` dict merges ``config.context`` with
+        the configured ``title`` field.  A trailing newline is appended to
+        the rendered HTML when absent.
         """
         output_path = self.config.output
         output_path.parent.mkdir(parents=True, exist_ok=True)

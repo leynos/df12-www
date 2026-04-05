@@ -224,16 +224,15 @@ def _copy_static_assets(subsite: SubSiteConfig) -> None:
     Raises
     ------
     ValueError
-        If ``static_assets_dir`` exists on disk but is not a directory.
+        If ``static_assets_dir`` is configured but does not exist or is not
+        a directory.
     """
     if not subsite.static_assets_dir:
         return
-    if not subsite.static_assets_dir.exists():
-        return
     if not subsite.static_assets_dir.is_dir():
         msg = (
-            f"[{subsite.key}] static_assets_dir "
-            f"{_format_path(subsite.static_assets_dir)} exists but is not a directory"
+            f"Sub-site '{subsite.key}' static_assets_dir does not exist "
+            f"or is not a directory: {subsite.static_assets_dir}"
         )
         raise ValueError(msg)
     dest = subsite.output_dir / "assets"
@@ -247,7 +246,28 @@ def _generate_subsite(
     *,
     page: str | None = None,
 ) -> None:
-    """Generate all pages for a single sub-site."""
+    """Generate all pages for a single sub-site.
+
+    Parameters
+    ----------
+    site_config : SiteConfig
+        Top-level site configuration, used to resolve shared content.
+    subsite : SubSiteConfig
+        Configuration for the sub-site to generate.
+    page : str or None, optional
+        Specific page key to render; when ``None`` (default) all pages,
+        the docs index, homepage, about page, shared content, content
+        pages, and static assets are rendered.
+
+    Raises
+    ------
+    ValueError
+        If ``page`` is supplied but does not name a known page in
+        ``subsite.pages``.  If a ``shared_content_refs`` entry does not
+        resolve to a known shared-content block.  If
+        ``static_assets_dir`` is configured but does not exist or is not
+        a directory.
+    """
     templates_dir = subsite.templates_dir
 
     # Doc pages

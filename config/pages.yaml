@@ -435,7 +435,6 @@ sites:
     templates_dir: templates/mxd
     stylesheet: assets/site.css
     base_path: /mxd/
-    static_assets_dir: templates/mxd/static
     theme:
       site_name: mxd
       hero_eyebrow: mxd Documentation
@@ -512,7 +511,6 @@ sites:
     templates_dir: templates/netsuke
     stylesheet: assets/css/himotoshi.css
     base_path: /netsuke/
-    static_assets_dir: templates/netsuke/static
     theme:
       site_name: Netsuke
       hero_eyebrow: Netsuke Documentation
@@ -542,7 +540,6 @@ sites:
     templates_dir: templates/weaver
     stylesheet: assets/styles/weaver-site.css
     base_path: /weaver/
-    static_assets_dir: templates/weaver/static
     theme:
       site_name: Weaver
       hero_eyebrow: Weaver Documentation

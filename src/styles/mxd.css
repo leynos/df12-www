@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@source "../../templates/mxd/**/*.jinja";
+@source "../../public/mxd/index.html";
+
 @theme {
   --font-primary: "JetBrains Mono", monospace;
   --font-secondary: "DM Serif Display", serif;

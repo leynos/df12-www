@@ -663,7 +663,9 @@ exactly as before; mutability is an opt‑in convenience.</p></div>
                   <div class="doc-prose"><ul>
 <li>Prefer <code>&amp;mut</code> when the world has straightforward owned fields and the steps
   mutate them directly.</li>
-<li>Prefer <code>Slot&lt;T&gt;</code> (from <code>rstest_bdd::Slot</code>) when state is optional, when there is a need to reset between steps, or when a step may override values conditionally without holding a mutable borrow.</li>
+<li>Prefer <code>Slot&lt;T&gt;</code> (from <code>rstest_bdd::Slot</code>) when state is optional, when a
+  need to reset between steps, or when a step may override values conditionally
+  without holding a mutable borrow.</li>
 <li>Combine both: keep the primary world mutable and store optional or
   late‑bound values in slots to avoid borrow checker churn inside complex
   scenarios.</li>

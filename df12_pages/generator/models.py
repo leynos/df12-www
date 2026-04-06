@@ -11,15 +11,15 @@ class NumberedStep(typ.TypedDict):
 
     Attributes
     ----------
-    title
+    title : str
         Display heading for the step.
-    number
+    number : int
         1-based ordinal shown in the step badge.
-    html
+    html : str
         Pre-rendered HTML body of the step.
-    anchor
+    anchor : str
         Step-number-based fragment identifier (``section-step-N``).
-    content_anchor
+    content_anchor : str
         Content-based fragment identifier derived from the subsection title,
         matching the anchor used in sidebar navigation links.
     """

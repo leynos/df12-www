@@ -173,7 +173,7 @@ def _materialize_backend_file(backend: BackendConfig, creds: CredentialSet) -> P
         f'region = "{backend.region}"',
     ]
     if backend.endpoint:
-        lines.append('endpoints = { s3 = "' + backend.endpoint + '" }')
+        lines.append("endpoints = { s3 = " + _format_hcl_value(backend.endpoint) + " }")
 
     has_encrypt = backend.encrypt is not None
     force_disable_encrypt = backend.endpoint and "scw.cloud" in backend.endpoint

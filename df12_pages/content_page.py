@@ -43,7 +43,22 @@ class ContentPageGenerator:
         )
 
     def run(self) -> Path:
-        """Render the page template and write the output file."""
+        """Render the page template and write the output file.
+
+        Returns
+        -------
+        Path
+            Absolute path to the written ``index.html`` output file.
+
+        Raises
+        ------
+        jinja2.TemplateNotFound
+            If the template named in :attr:`config.template` does not exist in
+            the configured templates directory.
+        OSError
+            If the output directory cannot be created or the file cannot be
+            written.
+        """
         template = self.env.get_template(self.config.template)
         marked_nav = self._mark_current_nav()
         context = {

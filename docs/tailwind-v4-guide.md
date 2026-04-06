@@ -1542,7 +1542,7 @@ m-[12px], p-[24px], grid-cols-[200px_minmax(900px,_1fr)_100px]
 1. **Inspect CSS Variables**: Check `:root` in DevTools to see all theme
    variables
 2. **Check Cascade Layers**: Use the Layers panel to understand style precedence
-3. **Verify OKLCH Support**: Test colors in modern browsers vs fallbacks
+3. **Verify OKLCH Support**: Test colours in modern browsers vs fallbacks
 4. **Container Query Debugging**: Use the @container panel in DevTools
 
 ### Common Debug Commands

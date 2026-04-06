@@ -65,7 +65,7 @@ def save_credentials(
     creds: CredentialSet,
     *,
     path: Path = DEFAULT_CONFIG_PATH,
-    existing: typ.Any = None,  # noqa: ANN401 -- accepts DeployConfig, typed at call site
+    existing: typ.Any = None,  # noqa: ANN401  FIXME: https://github.com/leynos/df12-www/issues/34 — workaround for circular import until resolved
 ) -> None:
     """Persist credentials back into ``config.toml`` preserving formatting.
 
@@ -143,7 +143,7 @@ def save_credentials(
 def resolve_credentials(  # noqa: PLR0913 -- each credential maps to a distinct auth backend
     *,
     config_path: Path = DEFAULT_CONFIG_PATH,
-    config: typ.Any = None,  # noqa: ANN401 -- accepts DeployConfig, typed at call site
+    config: typ.Any = None,  # noqa: ANN401  FIXME: https://github.com/leynos/df12-www/issues/34 — workaround for circular import until resolved
     aws_access_key_id: str | None = None,
     aws_secret_access_key: str | None = None,
     scw_access_key: str | None = None,

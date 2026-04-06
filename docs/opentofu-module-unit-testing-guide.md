@@ -181,7 +181,7 @@ leading to a more effective and efficient testing strategy.
 
 The most direct and accessible way to begin testing OpenTofu configurations is
 by using the native testing framework built directly into the OpenTofu
-command-line interface (CLI). Forked from Terraform version 1[^4], this
+command-line interface (CLI). Forked from Terraform version 1[^2], this
 framework allows engineers to write tests in the same declarative HCL syntax
 they use for defining infrastructure, significantly lowering the barrier to
 entry for teams already proficient with OpenTofu.[^17]
@@ -832,7 +832,7 @@ and skill set.
 ### 4. Deep Dive into Terratest
 
 Terratest, an open-source library developed and maintained by Gruntwork, is a
-stalwart in the IaC testing community.[^10] It is written in the Go programming
+stalwart in the IaC testing community.[^17] It is written in the Go programming
 language and leverages Go's built-in testing packages to provide a rich
 framework for writing automated tests for OpenTofu, Terraform, Packer, Docker,
 and Kubernetes configurations.[^17]
@@ -937,12 +937,12 @@ direct comparison to aid in this decision-making process.
 
 | Dimension      | tofu test (Native Framework)                                                                                 | Terratest                                                                                                                               |
 | -------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Language       | HCL.[^20] Familiar to OpenTofu users, lowering the adoption barrier.                                         | Go (Golang).[^10] Requires learning a new programming language and its ecosystem.                                                       |
+| Language       | HCL.[^20] Familiar to OpenTofu users, lowering the adoption barrier.                                         | Go (Golang).[^17] Requires learning a new programming language and its ecosystem.                                                       |
 | Test Scope     | Excels at plan-based unit tests. Can perform integration tests with command=apply.[^16]                      | Excels at integration and E2E tests. Can perform plan-based unit tests, but it's less common and more verbose.[^33]                     |
 | Mocking        | Strong, built-in support for mocking providers and overriding resources, data, and modules.[^18]             | No built-in IaC mocking. Relies on deploying real resources or requires complex, custom Go-based mocking of cloud provider SDKs.        |
 | Setup          | No extra dependencies beyond the OpenTofu binary itself.[^16]                                                | Requires a full Go development environment installation and dependency management via go mod.[^31]                                      |
 | Flexibility    | Limited by HCL's declarative nature. Complex logic or external API interactions require helper modules.[^16] | Highly flexible. Can perform any action possible in Go: complex logic, custom API calls, file manipulation, database queries, etc.[^34] |
-| Ecosystem      | Fully integrated into the OpenTofu CLI. Part of the core tool.                                               | Large library of helper functions for AWS, GCP, Azure, Kubernetes, Docker, SSH, and more, simplifying common validation tasks.[^10]     |
+| Ecosystem      | Fully integrated into the OpenTofu CLI. Part of the core tool.                                               | Large library of helper functions for AWS, GCP, Azure, Kubernetes, Docker, SSH, and more, simplifying common validation tasks.[^17]     |
 | Learning Curve | Low for existing OpenTofu users; the syntax is the same.[^20]                                                | Steeper, requires proficiency in Go, its testing packages, and the Terratest library itself.[^34]                                       |
 
 ### 4. Legacy and Niche Tools: Kitchen-Terraform
@@ -1486,7 +1486,7 @@ ever before.
        reuse, and unit test.
 [^40]: Designing for testability creates more reliable IaC and reduces the cost
        of long-term maintenance.
-[^41]: Remote state backends preserve shared state and minimise the risk of
+[^41]: Remote state backends preserve shared state and minimize the risk of
        accidental data loss.
 [^42]: Pipelines typically progress through staged gates (formatting, unit,
        integration) to build confidence incrementally.

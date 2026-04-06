@@ -451,6 +451,13 @@ ______________________________________________________________________
 6. ~~**All three sub-sites** (mxd, netsuke, weaver)~~ —
    **DONE**: shared content templates, YAML config, static assets copied,
    `pages generate --all-sites` verified
+7. ~~**Additional session fixes**~~ — **DONE**:
+   - Netsuke blog filter controls wired up as JS buttons (`e372a2d`)
+   - Batch inline review fixes applied (`8e5571a`)
+   - Netsuke blog missing Tailwind CDN + config restored (`14d96e7`)
+   - mxd `src/styles/mxd.css` `@source` directives added so Tailwind v4
+     oxide engine scans `.jinja` templates for arbitrary-value classes
+     like `bg-[#12121f]` (`4cd73b5`)
 
 ______________________________________________________________________
 

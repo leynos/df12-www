@@ -502,15 +502,15 @@ features, often configured via nested blocks.
   identify what should be imported. After running
   `tofu plan -generate-config-out=generated.tofu`, OpenTofu inspects the
   existing resource and generates a corresponding HCL configuration file. The
-  generated code serves as a starting point that can be reviewed and
-  integrated into the main configuration.3
+  generated code serves as a starting point that can be reviewed and integrated
+  into the main configuration.3
 
 ### 2.2 variable: Parameterizing Configurations
 
-Input variables are the parameters of an OpenTofu module, allowing its behaviour
-to be customized without modifying its source code. They are analogous to
-function arguments in traditional programming.11 Each input variable is
-declared using a
+Input variables are the parameters of an OpenTofu module, allowing its
+behaviour to be customized without modifying its source code. They are
+analogous to function arguments in traditional programming.11 Each input
+variable is declared using a
 
 `variable` block.11
 
@@ -819,8 +819,8 @@ evaluates the `subnet_id` for each instance:
 The result is that OpenTofu plans to **change** the subnet for the instance at
 index 1 (from `subnet-def` to `subnet-ghi`) and **destroy** the instance at
 index 2. This is often not the desired behaviour; the user likely intended only
-to destroy the instance associated with `subnet-def`. This re-indexing behaviour
-makes `count` fragile for managing dynamic collections.2
+to destroy the instance associated with `subnet-def`. This re-indexing
+behaviour makes `count` fragile for managing dynamic collections.2
 
 #### The `for_each` Meta-Argument
 

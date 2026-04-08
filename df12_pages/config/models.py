@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses as dc
 import datetime as dt  # noqa: TC003 - used for runtime type metadata
+import typing as typ
 from pathlib import Path
 
 
@@ -168,10 +169,12 @@ class AvatarConfig:
 
     @property
     def src_webp(self) -> str:
+        """Return the WebP variant path for this image."""
         return self.src.rsplit(".", 1)[0] + ".webp"
 
     @property
     def src_avif(self) -> str:
+        """Return the AVIF variant path for this image."""
         return self.src.rsplit(".", 1)[0] + ".avif"
 
 
@@ -248,6 +251,70 @@ class PageConfig:
 
 
 @dc.dataclass(slots=True)
+class SharedContentConfig:
+    """Shared-copy page rendered into each sub-site."""
+
+    key: str
+    label: str
+    source: str
+    output_slug: str
+
+
+@dc.dataclass(slots=True)
+class ContentPageConfig:
+    """A sub-site page rendered from a Jinja template with rich HTML content."""
+
+    key: str
+    label: str
+    template: str
+    output_slug: str
+
+
+@dc.dataclass(slots=True)
+class SharedContentPageChrome:
+    """Template chrome metadata for shared-content pages."""
+
+    nav_links: list[NavLinkConfig] = dc.field(default_factory=list)
+    parent_link: NavLinkConfig | None = None
+    stylesheet: str | None = None
+    lang: str = "en"
+    theme_name: str = "df12"
+    site_brand: str = "df12"
+    site_home_url: str = "/"
+    site_title_suffix: str = "df12"
+
+
+@dc.dataclass(slots=True)
+class SubSiteHomepageConfig:
+    """Homepage config with freeform template context."""
+
+    output: Path
+    title: str
+    context: dict[str, typ.Any]
+
+
+@dc.dataclass(slots=True)
+class SubSiteConfig:
+    """Self-contained sub-site with own templates and CSS."""
+
+    key: str
+    output_dir: Path
+    templates_dir: Path
+    stylesheet: str
+    base_path: str
+    theme: ThemeConfig
+    pages: dict[str, PageConfig]
+    homepage: SubSiteHomepageConfig | None
+    about: AboutPageConfig | None
+    docs_index_output: Path | None
+    shared_content_refs: list[str]
+    nav_links: list[NavLinkConfig]
+    parent_link: NavLinkConfig | None
+    static_assets_dir: Path | None
+    content_pages: list[ContentPageConfig] = dc.field(default_factory=list)
+
+
+@dc.dataclass(slots=True)
 class SiteConfig:
     """Collection of page configs alongside shared defaults."""
 
@@ -257,6 +324,8 @@ class SiteConfig:
     theme: ThemeConfig | None = None
     homepage: HomepageConfig | None = None
     about: AboutPageConfig | None = None
+    sites: dict[str, SubSiteConfig] = dc.field(default_factory=dict)
+    shared_content: dict[str, SharedContentConfig] = dc.field(default_factory=dict)
 
     def get_page(self, page_id: str | None) -> PageConfig:
         """Return the requested page or fall back to the configured default."""
@@ -281,21 +350,26 @@ class SiteConfig:
 
 
 __all__ = [
+    "AboutLocationConfig",
+    "AboutPageConfig",
+    "AvatarConfig",
     "CTAButtonConfig",
+    "ContentPageConfig",
+    "FocusCardConfig",
     "FooterConfig",
     "FooterLinkConfig",
     "HeroConfig",
     "HomepageConfig",
-    "AvatarConfig",
-    "AboutLocationConfig",
-    "FocusCardConfig",
-    "PrincipleConfig",
-    "AboutPageConfig",
     "NavLinkConfig",
     "PageConfig",
+    "PrincipleConfig",
     "SectionLayout",
+    "SharedContentConfig",
+    "SharedContentPageChrome",
     "SiteConfig",
     "SiteConfigError",
+    "SubSiteConfig",
+    "SubSiteHomepageConfig",
     "SystemCardConfig",
     "SystemsSectionConfig",
     "ThemeConfig",

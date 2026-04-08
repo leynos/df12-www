@@ -3,11 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bunx chokidar-cli \"src/**/*\" \"df12_pages/**/*\" \"config/**/*\" \"scripts/**/*\" \"pyproject.toml\" --initial -i \"**/*.pyc\" -i \"**/__pycache__/**\" -c \"bun run build\"",
-    "build": "bun run build:css && bun run build:images && bun run build:pages",
-    "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify",
+    "dev": "bunx concurrently -k -n watch,serve -c blue,green \"bunx chokidar-cli 'src/**/*' 'df12_pages/**/*' 'config/**/*' 'scripts/**/*' 'pyproject.toml' --initial -i '**/*.pyc' -i '**/__pycache__/**' -c 'bun run build'\" \"bunx http-server public -p 8080 -c-1\"",
+    "build": "bun run build:css && bun run build:images && bun run build:pages && bun run build:search",
+    "build:search": "bun run scripts/build-netsuke-search-index.mjs",
+    "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify && bun run build:css:mxd",
+    "build:css:mxd": "bunx tailwindcss -i ./src/styles/mxd.css -o ./public/mxd/assets/tailwind.css --minify",
     "build:images": "bun run scripts/generate-image-variants.ts",
-    "build:pages": "uv run pages generate",
+    "build:pages": "uv run pages generate --all-sites",
     "serve": "bun run build && bunx http-server public -p 8080",
     "bump": "uv run pages bump"
   },
@@ -16,7 +18,10 @@
     "@tailwindcss/typography": "^0.5.19",
     "@types/bun": "latest",
     "chokidar-cli": "^3.0.0",
+    "concurrently": "^9.1.2",
     "daisyui": "^5.3.7",
+    "http-server": "^14.1.1",
+    "minisearch": "7.2.0",
     "sharp": "^0.34.4",
     "tailwindcss": "^4.1.15"
   }

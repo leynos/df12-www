@@ -8,6 +8,7 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
+from .about import _build_about_config
 from .helpers import (
     DEFAULT_DOC_PATH,
     _build_repo_url,
@@ -15,11 +16,22 @@ from .helpers import (
     _default_manifest_path,
     _merge_layouts,
     _merge_theme,
+    _optional_str,
     _parse_timestamp,
 )
-from .homepage import _build_homepage_config
-from .about import _build_about_config
-from .models import PageConfig, SiteConfig, SiteConfigError, ThemeConfig
+from .homepage import _build_homepage_config, _build_nav_links
+from .models import (
+    ContentPageConfig,
+    FooterConfig,
+    NavLinkConfig,
+    PageConfig,
+    SharedContentConfig,
+    SiteConfig,
+    SiteConfigError,
+    SubSiteConfig,
+    SubSiteHomepageConfig,
+    ThemeConfig,
+)
 
 
 def load_site_config(path: Path) -> SiteConfig:
@@ -123,7 +135,19 @@ def load_site_config(path: Path) -> SiteConfig:
 
     homepage_config = _build_homepage_config(homepage_raw) if homepage_raw else None
     about_config = _build_about_config(
-        raw.get("about"), fallback_footer=homepage_config.footer if homepage_config else None
+        raw.get("about"),
+        fallback_footer=homepage_config.footer if homepage_config else None,
+    )
+
+    shared_content = _build_shared_content_map(
+        raw.get("shared_content"),
+        config_dir=path.parent,
+    )
+    sites = _build_sites_map(
+        raw.get("sites"),
+        page_defaults=page_defaults,
+        default_theme=default_theme,
+        fallback_footer=homepage_config.footer if homepage_config else None,
     )
 
     return SiteConfig(
@@ -133,6 +157,8 @@ def load_site_config(path: Path) -> SiteConfig:
         theme=default_theme,
         homepage=homepage_config,
         about=about_config,
+        sites=sites,
+        shared_content=shared_content,
     )
 
 
@@ -216,6 +242,248 @@ def _build_page_config(
         latest_release=latest_release,
         latest_release_published_at=latest_release_published_at,
     )
+
+
+def _build_shared_content_map(
+    raw: typ.Mapping[str, typ.Any] | None,
+    *,
+    config_dir: Path,
+) -> dict[str, SharedContentConfig]:
+    """Parse the top-level ``shared_content`` YAML block."""
+    if not raw:
+        return {}
+    if not isinstance(raw, dict):
+        msg = "shared_content must be a YAML mapping, got: " + type(raw).__name__
+        raise SiteConfigError(msg)
+    result: dict[str, SharedContentConfig] = {}
+    for key, payload in raw.items():
+        if not isinstance(payload, dict):
+            msg = (
+                f"Shared content entry '{key}' must be a mapping,"
+                f" got: {type(payload).__name__}"
+            )
+            raise SiteConfigError(msg)
+        label = payload.get("label")
+        source = payload.get("source")
+        output_slug = payload.get("output_slug")
+        if not (label and source and output_slug):
+            msg = (
+                f"Shared content '{key}' requires 'label', 'source', and 'output_slug'."
+            )
+            raise SiteConfigError(msg)
+        source_text = str(source)
+        if "://" in source_text:
+            resolved_source: str | Path = source_text
+        else:
+            source_path = Path(source_text)
+            if source_path.is_absolute():
+                resolved_source = source_path
+            else:
+                candidates = [config_dir / source_path]
+                if source_text.startswith(f"{config_dir.name}/"):
+                    candidates.append(config_dir.parent / source_path)
+                resolved_source = next(
+                    (candidate for candidate in candidates if candidate.exists()),
+                    candidates[0],
+                )
+        result[key] = SharedContentConfig(
+            key=key,
+            label=str(label),
+            source=str(resolved_source),
+            output_slug=str(output_slug),
+        )
+    return result
+
+
+def _build_sites_map(
+    raw: typ.Mapping[str, typ.Any] | None,
+    *,
+    page_defaults: _PageDefaults,
+    default_theme: ThemeConfig,
+    fallback_footer: FooterConfig | None,
+) -> dict[str, SubSiteConfig]:
+    """Parse the ``sites`` YAML block into sub-site configurations."""
+    if not raw:
+        return {}
+    if not isinstance(raw, dict):
+        msg = "sites must be a YAML mapping, got: " + type(raw).__name__
+        raise SiteConfigError(msg)
+    result: dict[str, SubSiteConfig] = {}
+    for key, payload in raw.items():
+        if not isinstance(payload, dict):
+            msg = f"Site entry '{key}' must be a mapping, got: {type(payload).__name__}"
+            raise SiteConfigError(msg)
+        result[key] = _build_subsite_config(
+            key=key,
+            payload=payload,
+            page_defaults=page_defaults,
+            default_theme=default_theme,
+            fallback_footer=fallback_footer,
+        )
+    return result
+
+
+def _build_subsite_config(
+    *,
+    key: str,
+    payload: typ.Mapping[str, typ.Any],
+    page_defaults: _PageDefaults,
+    default_theme: ThemeConfig,
+    fallback_footer: FooterConfig | None,
+) -> SubSiteConfig:
+    """Build a single SubSiteConfig from its YAML mapping."""
+    output_dir = Path(payload.get("output_dir", f"public/{key}"))
+    templates_dir = Path(payload.get("templates_dir", f"templates/{key}"))
+    stylesheet = payload.get("stylesheet", f"assets/{key}.css")
+    base_path = payload.get("base_path", f"/{key}/")
+
+    theme = _merge_theme(default_theme, payload.get("theme"))
+
+    # Sub-site pages
+    sub_page_defaults = dc.replace(
+        page_defaults,
+        theme=theme,
+        output_dir=output_dir,
+        filename_prefix=payload.get("filename_prefix", page_defaults.filename_prefix),
+    )
+    pages_raw = payload.get("pages") or {}
+    pages: dict[str, PageConfig] = {}
+    for page_key, page_payload in pages_raw.items():
+        if isinstance(page_payload, dict):
+            pages[page_key] = _build_page_config(
+                key=page_key,
+                payload=page_payload,
+                defaults=sub_page_defaults,
+            )
+
+    # Docs index
+    docs_index_raw = payload.get("docs_index_output")
+    docs_index_output = Path(docs_index_raw) if docs_index_raw else None
+
+    # Homepage
+    homepage = _build_subsite_homepage(payload.get("homepage"), key, output_dir)
+
+    # About page
+    about_config = _build_about_config(
+        payload.get("about"),
+        fallback_footer=fallback_footer,
+    )
+
+    # Shared content references
+    shared_refs_raw = payload.get("shared_content") or []
+    if shared_refs_raw and not isinstance(shared_refs_raw, list):
+        msg = (
+            f"Site '{key}' shared_content must be a list,"
+            f" got: {type(shared_refs_raw).__name__}"
+        )
+        raise SiteConfigError(msg)
+    shared_content_refs = [str(ref) for ref in shared_refs_raw if ref]
+
+    # Content pages
+    content_pages = _build_content_pages(key, payload.get("content_pages"))
+
+    # Navigation
+    nav_links = _build_nav_links(payload.get("nav_links"))
+
+    # Parent link
+    parent_link = _build_parent_link(payload.get("parent_link"))
+
+    # Static assets
+    static_raw = payload.get("static_assets_dir")
+    static_assets_dir = Path(static_raw) if static_raw else None
+
+    return SubSiteConfig(
+        key=key,
+        output_dir=output_dir,
+        templates_dir=templates_dir,
+        stylesheet=str(stylesheet),
+        base_path=str(base_path),
+        theme=theme,
+        pages=pages,
+        homepage=homepage,
+        about=about_config,
+        docs_index_output=docs_index_output,
+        shared_content_refs=shared_content_refs,
+        nav_links=nav_links,
+        parent_link=parent_link,
+        static_assets_dir=static_assets_dir,
+        content_pages=content_pages,
+    )
+
+
+def _build_subsite_homepage(
+    raw: typ.Any,  # noqa: ANN401 -- YAML values are untyped
+    key: str,
+    output_dir: Path,
+) -> SubSiteHomepageConfig | None:
+    """Parse a sub-site homepage block into a typed config."""
+    if not raw or not isinstance(raw, dict):
+        return None
+    hp_output = Path(raw.get("output", output_dir / "index.html"))
+    hp_title = raw.get("title", f"{key} — Home")
+    hp_context = {k: v for k, v in raw.items() if k not in {"output", "title"}}
+    return SubSiteHomepageConfig(
+        output=hp_output,
+        title=str(hp_title),
+        context=hp_context,
+    )
+
+
+def _build_parent_link(
+    raw: typ.Any,  # noqa: ANN401 -- YAML values are untyped
+) -> NavLinkConfig | None:
+    """Parse an optional parent_link mapping into a NavLinkConfig."""
+    if not isinstance(raw, dict):
+        return None
+    label = raw.get("label")
+    href = raw.get("href")
+    if not label or not href:
+        return None
+    return NavLinkConfig(
+        label=str(label),
+        href=str(href),
+        variant=_optional_str(raw.get("variant")),
+    )
+
+
+def _build_content_pages(
+    site_key: str,
+    raw: list[typ.Any] | None,
+) -> list[ContentPageConfig]:
+    """Parse a ``content_pages`` YAML list into typed config objects."""
+    if not raw:
+        return []
+    if not isinstance(raw, list):
+        msg = (
+            f"Site '{site_key}' content_pages must be a list, got: {type(raw).__name__}"
+        )
+        raise SiteConfigError(msg)
+    result: list[ContentPageConfig] = []
+    for entry in raw:
+        if not isinstance(entry, dict):
+            msg = (
+                f"Site '{site_key}' content_pages entry must be a mapping,"
+                f" got: {type(entry).__name__}"
+            )
+            raise SiteConfigError(msg)
+        key = entry.get("key")
+        template = entry.get("template")
+        if not key or not template:
+            msg = (
+                f"Site '{site_key}' content_pages entry requires 'key' and 'template'."
+            )
+            raise SiteConfigError(msg)
+        label = entry.get("label") or str(key).replace("-", " ").title()
+        output_slug = entry.get("output_slug") or str(key)
+        result.append(
+            ContentPageConfig(
+                key=str(key),
+                label=str(label),
+                template=str(template),
+                output_slug=str(output_slug),
+            )
+        )
+    return result
 
 
 __all__ = ["load_site_config"]

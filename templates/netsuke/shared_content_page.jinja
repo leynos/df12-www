@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Netsuke</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/tailwind-config.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../{{ stylesheet or 'assets/css/himotoshi.css' }}">
+</head>
+<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white min-h-screen">
+    <header class="fixed top-0 z-50 w-full border-b border-stone-light/50 shell-backdrop" aria-label="Primary navigation">
+        <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
+            <a href="../" class="group flex items-center space-x-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-vermillion text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+                    <span class="font-serif text-xl font-bold">根</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-serif text-xl font-semibold tracking-tight text-charcoal">Himotoshi</span>
+                    <span class="font-mono text-xs uppercase tracking-[0.3em] text-charcoal-light">Netsuke</span>
+                </div>
+            </a>
+            <nav class="hidden items-center space-x-8 md:flex">
+                {% for link in nav_links %}
+                <a href="{{ link.href }}" class="text-sm font-medium text-charcoal-mid transition-colors hover:text-vermillion">{{ link.label }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 pb-20 pt-32 lg:px-8">
+        <div class="mb-8 text-sm font-mono text-charcoal-light">
+            {% if parent_link %}
+            <a href="{{ parent_link.href }}" class="hover:text-vermillion">{{ parent_link.label }}</a>
+            <span class="mx-2">/</span>
+            {% endif %}
+            <a href="../" class="hover:text-vermillion">Home</a>
+            <span class="mx-2">/</span>
+            <span>{{ title }}</span>
+        </div>
+        <div class="rounded-3xl border border-stone bg-white/80 p-10 shadow-sm">
+            <div class="inline-flex items-center rounded-full border border-stone bg-boxwood-light px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo">Legal</div>
+            <h1 class="mt-6 font-serif text-4xl font-bold tracking-tight">{{ title }}</h1>
+            <article class="mt-10 space-y-8 text-charcoal leading-8">
+                {{ body_html | safe }}
+            </article>
+        </div>
+    </main>
+
+    <footer class="bg-charcoal text-stone-light">
+        <div class="mx-auto grid max-w-7xl gap-10 px-6 py-14 lg:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-vermillion text-white shadow-sm">
+                        <span class="font-serif text-xl font-bold">根</span>
+                    </div>
+                    <div>
+                        <p class="font-serif text-xl font-semibold text-white">Himotoshi</p>
+                        <p class="font-mono text-xs uppercase tracking-[0.3em] text-stone">Declarative build tooling</p>
+                    </div>
+                </div>
+                <p class="max-w-md text-sm leading-7 text-stone-light/80">
+                    Netsuke keeps the build graph explicit, reviewable, and
+                    scriptable without turning every project into a custom shell
+                    runtime.
+                </p>
+            </div>
+            <div>
+                <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone">Explore</h2>
+                <ul class="mt-4 space-y-3 text-sm">
+                    {% for link in nav_links %}
+                    <li><a href="{{ link.href }}" class="transition-colors hover:text-white">{{ link.label }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone">Legal</h2>
+                <ul class="mt-4 space-y-3 text-sm">
+                    <li><a href="../privacy-policy/" class="transition-colors hover:text-white">Privacy Policy</a></li>
+                    <li><a href="../terms-of-use/" class="transition-colors hover:text-white">Terms of Use</a></li>
+                    <li><a href="../code-of-conduct/" class="transition-colors hover:text-white">Code of Conduct</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-white/10">
+            <div class="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 text-xs text-stone-light/70 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+                <p>&copy; 2026 df12 Productions</p>
+                <p>Serious tools, playful worlds.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

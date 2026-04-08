@@ -45,7 +45,7 @@ FEATURE_FILE = (
     / "features"
     / "docs_index_first_section.feature"
 )
-scenarios(FEATURE_FILE)
+scenarios(str(FEATURE_FILE))
 
 
 @pytest.fixture
@@ -185,6 +185,7 @@ def then_index_links_first_section(scenario_state: dict[str, object]) -> None:
     )
     href = entry.get("href")
     assert href is not None, "expected href attribute on product-card meta link"
+    assert isinstance(href, str)
     assert href.endswith("docs-zebra-start.html"), (
         f"expected href to end with 'docs-zebra-start.html', got {href!r}"
     )

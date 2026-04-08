@@ -75,11 +75,16 @@ from __future__ import annotations
 
 import dataclasses as dc
 import datetime as dt
+import functools
+import http.server
 import json
 import os
 import shutil
+import socketserver
 import subprocess
+import threading
 import typing as typ
+from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -107,6 +112,31 @@ def _require_executable(name: str) -> str:
         msg = f"Unable to locate '{name}' on PATH"
         raise FileNotFoundError(msg)
     return path
+
+
+@contextmanager
+def _http_serve(directory: Path) -> typ.Iterator[int]:
+    """Serve *directory* over HTTP on a free port, yielding the port number.
+
+    The server runs in a background daemon thread and is shut down on exit.
+    Root-relative stylesheet paths (e.g. ``/assets/site.css``) resolve
+    correctly when the page is fetched via ``http://127.0.0.1:<port>/``.
+    """
+
+    class _SilentHandler(http.server.SimpleHTTPRequestHandler):
+        def log_message(self, format: str, *args: object) -> None:  # noqa: A002
+            pass
+
+    handler = functools.partial(_SilentHandler, directory=str(directory))
+    with socketserver.TCPServer(("127.0.0.1", 0), handler) as httpd:
+        port = httpd.server_address[1]
+        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+        thread.start()
+        try:
+            yield port
+        finally:
+            httpd.shutdown()
+            thread.join(timeout=5)
 
 
 @pytest.fixture(scope="module")
@@ -290,7 +320,7 @@ def test_sidebar_groups_include_top_and_child_links(
     """Sidebar groups should render top-level sections plus subsections."""
     soup = generated_docs["docs-test-introduction.html"]
     groups = soup.select(".doc-sidebar__groups .doc-nav-group")
-    headings = [g.select_one("h3").get_text(strip=True) for g in groups]
+    headings = [h.get_text(strip=True) for g in groups if (h := g.select_one("h3"))]
     assert headings == [
         "Introduction",
         "Getting Started",
@@ -497,16 +527,18 @@ def test_doc_prose_code_spans_have_expected_computed_style(
         )
 
     bun_exe = _require_executable("bun")
-    try:
-        result = subprocess.run(  # noqa: S603 - FIXME: inputs are controlled fixture paths in tests; no user-provided arguments
-            [bun_exe, "x", "css-view", f"file://{doc_path.resolve()}"],
-            cwd=REPO_ROOT,
-            check=True,
-            capture_output=True,
-            timeout=90,
-        )
-    except subprocess.TimeoutExpired as exc:  # pragma: no cover - environment guard
-        pytest.skip(f"css-view timed out: {exc}")
+    with _http_serve(doc_path.parent) as port:
+        url = f"http://127.0.0.1:{port}/{doc_path.name}"
+        try:
+            result = subprocess.run(  # noqa: S603 - FIXME: inputs are controlled fixture paths in tests; no user-provided arguments
+                [bun_exe, "x", "css-view", url],
+                cwd=REPO_ROOT,
+                check=True,
+                capture_output=True,
+                timeout=90,
+            )
+        except subprocess.TimeoutExpired as exc:  # pragma: no cover - environment guard
+            pytest.skip(f"css-view timed out: {exc}")
     payload = msgspec_json.decode(result.stdout)
     tree = typ.cast("dict[str, typ.Any]", payload["payload"]["tree"])
     code_nodes = _extract_nodes_by_tag(tree, "code")

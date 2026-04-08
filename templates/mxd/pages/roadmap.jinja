@@ -1,0 +1,482 @@
+{% extends "doc_page.jinja" %}
+{% block page_title %}Roadmap{% endblock %}
+{% block hero %}
+<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
+    
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
+        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
+            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Roadmap</div>
+        </div>
+        
+        <h1 class="mb-6">
+            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Development roadmap</span>
+        </h1>
+        
+        <div class="text-[#e8d5b8] text-base sm:text-lg font-light font-tertiary leading-[27.20px] sm:leading-[39.17px] max-w-[700px]">
+            <p>The roadmap sequences work across four phases: Wireframe migration, Presence and chat, File services, and Administration. Items are organised into phases, steps, and measurable tasks with acceptance criteria and explicit dependencies. Timeframes are intentionally omitted — this is a hobby project with production-grade ambitions, not a sprint backlog with a burn-down chart.</p>
+        </div>
+    </div>
+    
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+</section>
+{% endblock %}
+{% block route_map %}
+<section class="mxd-page-toc" aria-labelledby="mxd-toc-title">
+  <div class="mxd-page-toc__inner">
+    <div>
+      <div class="mxd-page-toc__label">Route map</div>
+      <div class="mxd-page-toc__title" id="mxd-toc-title">Development roadmap</div>
+    </div>
+    <div class="mxd-page-toc__links">
+      <a href="#section-status">Status meaning</a><a href="#section-phase-1">Wireframe Migration</a><a href="#section-phase-2">Presence and Chat</a><a href="#section-phase-3">File Services</a><a href="#section-phase-4">Administration</a><a href="#section-closing">Closing</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block content %}
+<div id="section-status" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary mb-6">How to read roadmap status</h2>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The design set is broader than the currently shipped runtime. Some
+            subsystems already have detailed schemas, ADRs, and verification
+            notes even when the transport wiring still sits on the roadmap. The
+            status badges below are therefore part of the product story, not
+            decorative metadata.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-[#fdf8f0] rounded-lg border border-[#e8d5b8] p-6">
+                <span class="px-2 py-0.5 bg-[#e8f5ec] rounded-full border border-[#c4e5cc] text-[#4a8c5c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Supported</span>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mt-4">
+                    Shipped and evidenced. The capability is implemented for the
+                    scope named here and backed by tests or verification.
+                </p>
+            </div>
+
+            <div class="bg-[#fdf8f0] rounded-lg border border-[#e8d5b8] p-6">
+                <span class="px-2 py-0.5 bg-[#fff4e0] rounded-full border border-[#f2dca8] text-[#c89430] text-[10.40px] font-bold font-primary uppercase tracking-wide">Partial</span>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mt-4">
+                    Real code exists, but only for the narrower behaviour called
+                    out. Compatibility, routing, or subsystem parity remains
+                    incomplete.
+                </p>
+            </div>
+
+            <div class="bg-[#fdf8f0] rounded-lg border border-[#e8d5b8] p-6">
+                <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9] text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mt-4">
+                    The design may already be specific, but the runtime work is
+                    not yet complete. Detailed docs do not imply shipped feature
+                    coverage.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-phase-1" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+    
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-[#c54b2a] rounded flex items-center justify-center">
+                <span class="text-white text-xl font-bold font-primary">01</span>
+            </div>
+            <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary">Phase 1: Wireframe Migration</h2>
+        </div>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Establish the transport layer and protocol codec. Migrate core transaction handling from the legacy codebase to the hexagonal architecture. Verify correctness through property-based testing and formal models.
+        </p>
+        
+        <div class="space-y-4">
+            <div class="mxd-roadmap-item bg-white rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#4a8c5c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-check text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Transaction codec implementation</h3>
+                            <span class="px-2 py-0.5 bg-[#e8f5ec] rounded-full border border-[#c4e5cc]">
+                                <span class="text-[#4a8c5c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Supported</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Byte-level frame parsing and serialisation for the
+                            current routed subset, with shared big-endian
+                            header handling, XOR detection and decoding, and
+                            multi-fragment reassembly across the protocol
+                            surface.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#c54b2a] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Codec</span>
+                            </span>
+                            <span class="px-2.5 py-1 bg-[#12121f] rounded-full">
+                                <span class="text-[#f5e6d0] text-[10.40px] font-bold font-primary uppercase tracking-wide">Verified</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-white rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#4a8c5c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-check text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Handshake validation</h3>
+                            <span class="px-2 py-0.5 bg-[#e8f5ec] rounded-full border border-[#c4e5cc]">
+                                <span class="text-[#4a8c5c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Supported</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Protocol identifier verification. Version negotiation. Preamble structure validation. Rejection of malformed handshakes before domain logic executes.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#2d3a8c] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Protocol</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-white rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#c89430] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-wrench text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Login transaction routing</h3>
+                            <span class="px-2 py-0.5 bg-[#fff4e0] rounded-full border border-[#f2dca8]">
+                                <span class="text-[#c89430] text-[10.40px] font-bold font-primary uppercase tracking-wide">Partial</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Transaction ID 0x006B dispatch. Credential validation. Session establishment. Token generation. Reply frame construction. Authentication failure handling.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#e8a838] rounded-full">
+                                <span class="text-[#12121f] text-[10.40px] font-bold font-primary uppercase tracking-wide">Auth</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-phase-2" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-[#e8a838] rounded flex items-center justify-center">
+                <span class="text-[#12121f] text-xl font-bold font-primary">02</span>
+            </div>
+            <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary">Phase 2: Presence and Chat</h2>
+        </div>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            User presence tracking, public and private chat, and broadcast notifications. The schema work already covers lobby semantics, invite flows, membership tables, subjects, and persisted history, but most of that transport wiring still belongs to this phase rather than to current runtime support.
+        </p>
+        
+        <div class="space-y-4">
+            <div class="mxd-roadmap-item bg-[#fdf8f0] rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">User list synchronisation</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Transaction 0x012C (user list). Delta updates on join/leave. Icon and colour assignment. Idle detection. Away status propagation.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#2d3a8c] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Presence</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-[#fdf8f0] rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Public chat broadcast</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Transaction 0x0069 (chat send). Public lobby auto-join semantics. Join and leave notifications. XOR-aware outbound text. Message history persistence. Rate limiting.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#4a8c5c] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Chat</span>
+                            </span>
+                            <span class="px-2.5 py-1 bg-[#a855a0] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">XOR</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-[#fdf8f0] rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Private messaging</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Direct messages modelled as private chats. Invite, accept, and decline flows. Group-chat membership via persisted tables. Subject updates. Delivery confirmation and history retention.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#4a8c5c] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Chat</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-phase-3" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+    
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-[#2d3a8c] rounded flex items-center justify-center">
+                <span class="text-white text-xl font-bold font-primary">03</span>
+            </div>
+            <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary">Phase 3: File Services</h2>
+        </div>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            File transfer, news hierarchies, and folder navigation. The design already splits file bytes into object storage while keeping hierarchy, aliases, comments, drop-box flags, and ACLs in the database. This phase wires that richer model into the runtime and verifies the resulting permission and threading invariants.
+        </p>
+        
+        <div class="space-y-4">
+            <div class="mxd-roadmap-item bg-white rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">File listing and navigation</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Transaction 0x00C8 (get file list). FileNode tree traversal. Metadata and comment encoding. Alias visibility. Drop-box hiding and upload-only visibility rules. Folder and per-file ACL filtering.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#e8a838] rounded-full">
+                                <span class="text-[#12121f] text-[10.40px] font-bold font-primary uppercase tracking-wide">Files</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-white rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Download initiation</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Download and upload negotiation over transfer sockets. Resume support for partial transfers. Object-store streaming. Move, rename, delete, GetFileInfo, SetFileInfo, MakeFileAlias, DownloadFolder, and UploadFolder behaviour.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#e8a838] rounded-full">
+                                <span class="text-[#12121f] text-[10.40px] font-bold font-primary uppercase tracking-wide">Transfer</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-white rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">News hierarchy</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Bundles versus categories. Recursive path resolution. Article parent, previous, next, and first-child pointers. Read and unread assumptions. Category visibility and posting rights. Reply posting remains explicit implementation work.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#4a8c5c] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">News</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-phase-4" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-[#4a8c5c] rounded flex items-center justify-center">
+                <span class="text-white text-xl font-bold font-primary">04</span>
+            </div>
+            <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary">Phase 4: Administration</h2>
+        </div>
+        
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            User account management, permission administration, server configuration, and logging. Implement the privilege escalation model and audit trail. Verify access control invariants.
+        </p>
+        
+        <div class="space-y-4">
+            <div class="mxd-roadmap-item bg-[#fdf8f0] rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">User account creation</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Transaction 0x015E (create user). Password hashing. Permission assignment. Quota allocation. Account activation. Email verification (optional).
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#c54b2a] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Admin</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-[#fdf8f0] rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Permission management</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Transaction 0x0160 (modify user). Privilege bitmap editing. Role assignment. Capability delegation. Permission inheritance. Audit logging.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#c54b2a] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Admin</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mxd-roadmap-item bg-[#fdf8f0] rounded-lg border-2 border-[#e8d5b8] p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-8 h-8 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-calendar text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Server configuration interface</h3>
+                            <span class="px-2 py-0.5 bg-[#e8eaf6] rounded-full border border-[#c5cae9]">
+                                <span class="text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-wide">Planned</span>
+                            </span>
+                        </div>
+                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-3">
+                            Transaction 0x0168 (server settings). MOTD editing. Banner customisation. Port configuration. Rate limit tuning. Feature toggles.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 bg-[#c54b2a] rounded-full">
+                                <span class="text-white text-[10.40px] font-bold font-primary uppercase tracking-wide">Config</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-closing" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+    
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-8">
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                Completed items retain their acceptance criteria and evidence references so the roadmap doubles as a decision log. Each entry links to the relevant ADRs and verification artefacts.
+            </p>
+        </div>
+        
+        <div class="text-center">
+            <h3 class="text-[#12121f] text-2xl font-normal font-secondary mb-6">Contributing</h3>
+            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+                Proposals for new features follow the ADR process. Implementations require property-based tests and formal verification where applicable.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-3">
+                <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="https://github.com/leynos/mxd" target="_blank" rel="noreferrer">
+                    View Source
+                </a>
+                <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/architecture/">
+                    ADR Process
+                </a>
+                <a class="mxd-btn--outline px-6 py-3 text-[#3a3a55] text-sm font-semibold font-primary rounded border-2 border-[#e8d5b8] mxd-site-button" href="/mxd/verification/">
+                    Verification Guide
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

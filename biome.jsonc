@@ -10,7 +10,8 @@
       "!.cache",
       "!.artifacts",
       "!.act-stubs",
-      "!public/assets"
+      "!public/assets",
+      "!public/netsuke/assets/vendor"
     ],
     "ignoreUnknown": true
   },

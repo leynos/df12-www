@@ -86,9 +86,9 @@ class DocsIndexBuilder:
         output_path.write_text(html, encoding="utf-8")
         return output_path
 
-    def _gather_entries(self) -> list[dict[str, str]]:
+    def _gather_entries(self) -> list[dict[str, str | None]]:
         """Collect and return documentation entry dictionaries for the site."""
-        entries: list[dict[str, str]] = []
+        entries: list[dict[str, str | None]] = []
         docs_root = self.site_config.docs_index_output.parent
         for page in self.site_config.pages.values():
             link = _discover_entry_href(page, docs_root)

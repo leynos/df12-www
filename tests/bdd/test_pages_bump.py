@@ -34,7 +34,7 @@ from df12_pages.bump import bump_latest_release_metadata
 from df12_pages.releases import GitHubReleaseClient, ReleaseInfo
 
 FEATURE_FILE = Path(__file__).resolve().parents[2] / "features" / "pages_bump.feature"
-scenarios(FEATURE_FILE)
+scenarios(str(FEATURE_FILE))
 
 EXPECTED_TAGS: dict[str, str] = {
     "requests": "v2.32.5",

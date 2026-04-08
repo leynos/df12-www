@@ -1,5 +1,8 @@
+"""BDD tests for the deploy configuration workflow."""
+
 from __future__ import annotations
 
+import typing as typ
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,8 +14,9 @@ from df12_pages import deploy
 scenarios("../features/deploy_config.feature")
 
 
-@pytest.fixture()
+@pytest.fixture
 def context() -> dict[str, object]:
+    """Provide a shared mutable context dictionary for BDD steps."""
     return {}
 
 
@@ -48,18 +52,24 @@ scaleway_project_id = "11111111-2222-3333-4444-555555555555"
 
 
 @given("a deploy config file with backend and site values")
-def a_deploy_config_file_with_backend_and_site_values(tmp_path: Path, context: dict[str, object]) -> None:
+def a_deploy_config_file_with_backend_and_site_values(
+    tmp_path: Path, context: dict[str, object]
+) -> None:
+    """Write a valid deploy config file into a temporary directory."""
     context["config_path"] = _write_config(tmp_path)
 
 
 @when("I initialise the stack with the config")
-def i_initialise_the_stack_with_the_config(monkeypatch: pytest.MonkeyPatch, context: dict[str, object]) -> None:
+def i_initialise_the_stack_with_the_config(
+    monkeypatch: pytest.MonkeyPatch, context: dict[str, object]
+) -> None:
+    """Run init_stack with monkeypatched subprocess calls."""
     calls: list[list[str]] = []
 
-    def fake_ensure(*args, **kwargs):
+    def fake_ensure(*args: typ.Any, **kwargs: typ.Any) -> None:  # noqa: ANN401
         calls.append(["ensure"])
 
-    def fake_run(args: list[str], env: dict[str, str]):
+    def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:
         calls.append(args)
         context["backend_path"] = Path(args[args.index("-backend-config") + 1])
         context["tfvars_path"] = Path(args[args.index("-var-file") + 1])
@@ -68,13 +78,16 @@ def i_initialise_the_stack_with_the_config(monkeypatch: pytest.MonkeyPatch, cont
     monkeypatch.setattr(deploy, "ensure_backend_bucket", fake_ensure)
     monkeypatch.setattr(deploy, "run_tofu", fake_run)
 
-    deploy.init_stack(config_path=context["config_path"], save_credentials_flag=False)
+    config_path = context["config_path"]
+    assert isinstance(config_path, Path)
+    deploy.init_stack(config_path=config_path, save_credentials_flag=False)
 
     context["calls"] = calls
 
 
 @then("a temporary backend file is passed to tofu init")
 def a_temporary_backend_file_is_passed_to_tofu_init(context: dict[str, object]) -> None:
+    """Verify the backend file path passed to tofu init is a temp file."""
     backend_path = context["backend_path"]
     assert isinstance(backend_path, Path)
     assert backend_path.name.startswith("df12-backend-")
@@ -84,6 +97,7 @@ def a_temporary_backend_file_is_passed_to_tofu_init(context: dict[str, object]) 
 
 @then("a temporary tfvars file is passed to tofu init")
 def a_temporary_tfvars_file_is_passed_to_tofu_init(context: dict[str, object]) -> None:
+    """Verify the tfvars file path passed to tofu init is a temp file."""
     tfvars_path = context["tfvars_path"]
     assert isinstance(tfvars_path, Path)
     assert tfvars_path.name.startswith("df12-vars-")

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contributing - Netsuke Build System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../assets/js/tailwind-config.js"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/himotoshi.css">
+    <script defer src="../assets/js/mobile-nav.js"></script>
+</head>
+<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
+        <div class="site-container">
+            <div class="flex justify-between h-16 items-center">
+                <a href="../" aria-label="Netsuke home" class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light shadow-sm" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="20.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                    <span class="font-serif font-bold text-xl tracking-tight text-charcoal">Netsuke</span>
+                </a>
+
+                <div class="hidden md:flex space-x-8">
+                    <a href="/" class="text-vermillion font-medium transition-colors text-sm py-1">&larr; df12</a>
+                    <a href="../" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Home</a>
+                    <a href="../docs/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Docs</a>
+                    <a href="../examples/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Examples</a>
+                    <a href="../guides/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Guides</a>
+                    <a href="../blog/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Blog</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/leynos/netsuke" class="hm-button hm-button--ghost hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
+                        <span class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span><span class="hm-navbar-action__label">GitHub</span>
+                    </a>
+                    <a href="../install/" class="hm-button hm-button--primary hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
+                        <span class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span><span class="hm-navbar-action__label">Install</span>
+                    </a>
+                    <button id="navbar-mobile-toggle" type="button" class="hm-hamburger md:hidden" aria-expanded="false" aria-controls="navbar-mobile-menu" aria-label="Open menu">
+                        <span class="iconify hm-hamburger__open" data-icon="carbon:menu" aria-hidden="true"></span>
+                        <span class="iconify hm-hamburger__close" data-icon="carbon:close" aria-hidden="true" style="display:none"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <nav id="navbar-mobile-menu" class="hm-mobile-menu md:hidden" aria-label="Mobile navigation">
+        <ul class="list-none py-3 px-4 space-y-1">
+            <li><a href="/" class="hm-mobile-menu__link text-vermillion">&larr; Back to df12 Productions</a></li>
+            <li><a href="../" class="hm-mobile-menu__link">Home</a></li>
+            <li><a href="../docs/" class="hm-mobile-menu__link">Docs</a></li>
+            <li><a href="../examples/" class="hm-mobile-menu__link">Examples</a></li>
+            <li><a href="../guides/" class="hm-mobile-menu__link">Guides</a></li>
+            <li><a href="../blog/" class="hm-mobile-menu__link">Blog</a></li>
+        </ul>
+        <ul class="list-none border-t border-stone-light/50 py-3 px-4 space-y-2">
+            <li><a href="https://github.com/leynos/netsuke" class="hm-mobile-menu__link hm-mobile-menu__link--secondary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:logo-github" aria-hidden="true"></span>GitHub</a></li>
+            <li><a href="../install/" class="hm-mobile-menu__link hm-mobile-menu__link--primary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:download" aria-hidden="true"></span>Install Netsuke</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area with Sidebar -->
+    <div class="site-container pt-16 flex-grow flex">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            <nav class="space-y-8">
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#ways-to-contribute" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Ways to Contribute</a></li>
+                        <li><a href="#dev-workflow" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Development Workflow</a></li>
+                        <li><a href="#quality-gates" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Quality Gates</a></li>
+                        <li><a href="#translation" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Translating Netsuke</a></li>
+                        <li><a href="#commit-style" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Commit Style</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Helpful links</h3>
+                    <ul class="space-y-1">
+                        <li><a href="https://github.com/leynos/netsuke" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">GitHub Repository</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/issues" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Issue Tracker</a></li>
+                        <li><a href="../docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation</a></li>
+                        <li><a href="../code-of-conduct/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Code of Conduct</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono" aria-label="Breadcrumb">
+                <ol class="flex items-center">
+                    <li><a href="../" class="hover:text-vermillion transition-colors">Home</a></li>
+                    <li aria-hidden="true"><span class="mx-2 text-stone">/</span></li>
+                    <li><span class="text-charcoal font-medium" aria-current="page">Contributing</span></li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
+                        Community
+                    </div>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Contributing to Netsuke</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    Netsuke is open-source and welcoming to contributors of all backgrounds. Whether you fix a bug, write a test, improve documentation, or translate a message string, every contribution matters.
+                </p>
+            </div>
+
+            <!-- Ways to Contribute -->
+            <section id="ways-to-contribute" class="mb-20">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:collaborate" aria-hidden="true"></span> Ways to Contribute
+                </h2>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
+                            <span class="iconify" data-icon="carbon:code" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Code</h3>
+                        <p class="text-sm text-charcoal-mid">Fix bugs, add features, improve tests. Check the issue tracker for items tagged <code>good first issue</code> or <code>help wanted</code>.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
+                            <span class="iconify" data-icon="carbon:document" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Documentation</h3>
+                        <p class="text-sm text-charcoal-mid">Improve explanations, add examples, fix typos, or write guides. Documentation contributions are reviewed just like code.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
+                            <span class="iconify" data-icon="carbon:translate" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Translations</h3>
+                        <p class="text-sm text-charcoal-mid">Netsuke's CLI messages and error text are fully localisable. Help make Netsuke accessible to users in your language.</p>
+                    </div>
+                </div>
+
+                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <div>
+                        <h4 class="font-bold text-indigo text-sm mb-1">Before you start</h4>
+                        <p class="text-xs text-charcoal-mid">
+                            For significant changes, open a GitHub issue first to discuss the approach. This prevents duplicate effort and ensures your work fits the project's direction.
+                            All contributors must follow the <a href="../code-of-conduct/" class="text-indigo hover:underline">Code of Conduct</a>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Development Workflow -->
+            <section id="dev-workflow" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:development" aria-hidden="true"></span> Development Workflow
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Netsuke is written in Rust. You will need a recent stable Rust toolchain and <code>ninja</code> installed on your PATH.
+                </p>
+
+                <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Getting started</div>
+                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Clone the repository</span>
+git clone https://github.com/leynos/netsuke.git
+cd netsuke
+
+<span class="text-charcoal-light"># Build in release mode</span>
+cargo build --release
+
+<span class="text-charcoal-light"># Run the test suite</span>
+cargo test
+
+<span class="text-charcoal-light"># Run all quality gates (preferred)</span>
+make check-fmt lint test</code></pre>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Test suite structure</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span><strong>Unit tests</strong> live alongside source in <code>src/</code> using <code>#[cfg(test)]</code> modules.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span><strong>Integration tests</strong> live in <code>tests/</code> and exercise the full manifest-to-Ninja pipeline.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span><strong>Behavioural tests</strong> validate expected CLI output and error messages, ensuring diagnostics remain user-friendly across changes.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Compile-time validation</h3>
+                        <p class="text-xs text-charcoal-mid mb-3">
+                            Several checks happen at build time to catch regressions early:
+                        </p>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li class="flex items-start">
+                                <span class="iconify text-indigo mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
+                                Manifest schema types are fully derived — new fields must include <code>serde</code> attributes.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-indigo mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
+                                Standard-library function signatures are tested with property-based inputs to catch edge cases.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-indigo mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
+                                Fluent message keys are verified at startup — missing keys cause a panic in development builds.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quality Gates -->
+            <section id="quality-gates" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Quality Gates
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Every commit must pass all quality gates before being merged. Run <code>make check-fmt lint test</code> locally before opening a pull request.
+                </p>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white p-5 rounded-xl border border-stone text-center">
+                        <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mx-auto mb-3">
+                            <span class="iconify" data-icon="carbon:align-horizontal-left" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal text-sm mb-1">Format</h3>
+                        <code class="text-xs text-charcoal-mid font-mono">make check-fmt</code>
+                        <p class="text-xs text-charcoal-light mt-2">Enforces <code>rustfmt</code> style. Run <code>cargo fmt</code> to fix.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-stone text-center">
+                        <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mx-auto mb-3">
+                            <span class="iconify" data-icon="carbon:search" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal text-sm mb-1">Lint</h3>
+                        <code class="text-xs text-charcoal-mid font-mono">make lint</code>
+                        <p class="text-xs text-charcoal-light mt-2">Runs <code>clippy</code> with project-level lints. Zero warnings allowed.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-stone text-center">
+                        <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mx-auto mb-3">
+                            <span class="iconify" data-icon="carbon:test-tool" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal text-sm mb-1">Tests</h3>
+                        <code class="text-xs text-charcoal-mid font-mono">make test</code>
+                        <p class="text-xs text-charcoal-light mt-2">Runs all unit and integration tests. All must pass.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-stone text-center">
+                        <div class="w-10 h-10 rounded-full bg-vermillion/10 flex items-center justify-center text-vermillion mx-auto mb-3">
+                            <span class="iconify" data-icon="carbon:git-pull-request" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal text-sm mb-1">Whitespace</h3>
+                        <code class="text-xs text-charcoal-mid font-mono">git diff --check</code>
+                        <p class="text-xs text-charcoal-light mt-2">No trailing whitespace or stray blank lines at end of file.</p>
+                    </div>
+                </div>
+
+                <div class="bg-amber/5 border border-amber/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-amber mt-1 mr-3" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                    <div>
+                        <h4 class="font-bold text-amber text-sm mb-1">Documentation must be updated alongside behaviour</h4>
+                        <p class="text-xs text-charcoal-mid">
+                            If you change a command-line flag, a standard-library function, or a configuration key, update the corresponding documentation in the same pull request.
+                            Reviewers will check for documentation gaps as part of code review.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Translation -->
+            <section id="translation" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:translate" aria-hidden="true"></span> Translating Netsuke
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Netsuke uses <a href="https://projectfluent.org/" class="text-indigo hover:underline">Project Fluent</a> for all user-facing text.
+                    Every message is defined in a <code>.ftl</code> file — one per locale — rather than as hard-coded strings.
+                    Spanish (<code>es-ES</code>) ships as a reference translation; unsupported locales fall back to English (<code>en-US</code>).
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">File locations</h3>
+                        <div class="bg-white p-5 rounded-xl border border-stone text-xs font-mono space-y-1 text-charcoal-mid">
+                            <div>src/</div>
+                            <div class="pl-4">locale/</div>
+                            <div class="pl-8 text-indigo">en-US.ftl  <span class="text-charcoal-light font-sans">(primary)</span></div>
+                            <div class="pl-8 text-matcha">es-ES.ftl  <span class="text-charcoal-light font-sans">(reference translation)</span></div>
+                            <div class="pl-8 text-amber">fr-FR.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Translation workflow</h3>
+                        <ol class="space-y-3">
+                            <li class="flex items-start text-sm">
+                                <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">1</span>
+                                <span class="text-charcoal-mid">Copy <code class="font-mono">en-US.ftl</code> to a new file named after your locale identifier (e.g. <code class="font-mono">fr-FR.ftl</code>).</span>
+                            </li>
+                            <li class="flex items-start text-sm">
+                                <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">2</span>
+                                <span class="text-charcoal-mid">Translate the message values. Do not rename keys — key names are used by the Rust code and must stay identical.</span>
+                            </li>
+                            <li class="flex items-start text-sm">
+                                <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">3</span>
+                                <span class="text-charcoal-mid">Test with <code class="font-mono">NETSUKE_LOCALE=fr-FR netsuke --help</code> to verify your strings appear correctly.</span>
+                            </li>
+                            <li class="flex items-start text-sm">
+                                <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">4</span>
+                                <span class="text-charcoal-mid">Open a pull request. Include the locale file and a brief note about the translation's completeness.</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Fluent format essentials</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
+                    Fluent handles pluralisation and variable substitution natively. Here is an extract from <code>en-US.ftl</code> to orient you:
+                </p>
+                <div class="bg-charcoal rounded-xl overflow-hidden mb-6">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">en-US.ftl (excerpt)</div>
+                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Simple message</span>
+cli-help-description = A modern build system for intuitive, fast builds.
+
+<span class="text-charcoal-light"># Message with a variable</span>
+error-file-not-found = Error: File "{ $path }" was not found.
+    .hint = Check that the path exists and is readable.
+
+<span class="text-charcoal-light"># Message with pluralisation</span>
+progress-target-count = Building { $count -&gt;
+    [one] { $count } target...
+   *[other] { $count } targets...
+}</code></pre>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-matcha/5 border border-matcha/20 rounded-lg p-4 text-xs">
+                        <h4 class="font-bold text-matcha mb-2">Do</h4>
+                        <ul class="space-y-1 text-charcoal-mid">
+                            <li>Keep key names identical to <code>en-US.ftl</code></li>
+                            <li>Translate the <em>values</em> on the right of <code>=</code></li>
+                            <li>Keep all <code>{ $variable }</code> placeholders</li>
+                            <li>Adapt plural forms to your language's rules</li>
+                            <li>Translate <code>.hint</code> and <code>.label</code> attributes</li>
+                        </ul>
+                    </div>
+                    <div class="bg-vermillion/5 border border-vermillion/20 rounded-lg p-4 text-xs">
+                        <h4 class="font-bold text-vermillion mb-2">Do not</h4>
+                        <ul class="space-y-1 text-charcoal-mid">
+                            <li>Rename message keys</li>
+                            <li>Add keys that do not exist in <code>en-US.ftl</code></li>
+                            <li>Remove or rename <code>{ $variable }</code> placeholders</li>
+                            <li>Use machine translation without human review</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Commit Style -->
+            <section id="commit-style" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:commit" aria-hidden="true"></span> Commit Style
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Netsuke follows conventional commit style. Commit messages should be concise, use the imperative mood in the subject line, and reference the relevant issue where applicable.
+                </p>
+
+                <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Good commit message examples</div>
+                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-matcha">fix</span>: handle empty PATH in which() resolver
+
+<span class="text-matcha">feat</span>: add --fetch-default-deny network policy flag
+
+<span class="text-matcha">docs</span>: document accessible output mode on CLI page
+
+<span class="text-matcha">test</span>: add integration test for locale fallback to en-US
+
+<span class="text-matcha">chore</span>: update es-ES translation for progress messages</code></pre>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
+                        <div class="font-bold text-charcoal mb-2">Subject line</div>
+                        <ul class="space-y-1 text-charcoal-mid">
+                            <li>Imperative mood (<em>add</em>, <em>fix</em>, not <em>added</em>)</li>
+                            <li>No trailing period</li>
+                            <li>50 characters or fewer</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
+                        <div class="font-bold text-charcoal mb-2">Body (optional)</div>
+                        <ul class="space-y-1 text-charcoal-mid">
+                            <li>Blank line between subject and body</li>
+                            <li>Wrap at 72 characters</li>
+                            <li>Explain <em>why</em>, not just <em>what</em></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
+                        <div class="font-bold text-charcoal mb-2">Trailers</div>
+                        <ul class="space-y-1 text-charcoal-mid">
+                            <li><code>Fixes #123</code> closes the issue</li>
+                            <li><code>Co-authored-by:</code> for paired work</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer nav -->
+            <div class="mt-10 pt-10 border-t border-stone-light">
+                <div class="flex justify-between items-center">
+                    <a href="../guides/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Back</div>
+                            <div class="font-medium text-sm">Guides</div>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/leynos/netsuke/issues" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="text-right">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Open an</div>
+                            <div class="font-medium text-sm">Issue on GitHub</div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-charcoal pt-16 pb-8 text-stone-light border-t border-charcoal-light mt-auto">
+        <div class="site-container">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Brand Column -->
+                <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="20.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                        <span class="font-serif font-bold text-xl tracking-tight text-white">Netsuke</span>
+                    </div>
+                    <p class="text-sm text-charcoal-light leading-relaxed mb-6">
+                        Netsuke is free, open-source, and written in Rust. It aims to bring the power of large-scale build systems to projects of any size.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/leynos/netsuke" class="hm-footer-icon" aria-label="Netsuke on GitHub"><span class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
+                        <a href="https://bsky.app/profile/df12.studio" class="hm-footer-icon" aria-label="df12 on Bluesky"><span class="iconify" data-icon="carbon:logo-bluesky" aria-hidden="true"></span></a>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Documentation</h4>
+                    <ul class="space-y-3 text-sm text-stone">
+                        <li><a href="../docs/getting-started/" class="hover:text-white transition-colors">Getting Started</a></li>
+                        <li><a href="../docs/manifest-reference/" class="hover:text-white transition-colors">Manifest Reference</a></li>
+                        <li><a href="../docs/rules-and-targets/" class="hover:text-white transition-colors">Rules &amp; Targets</a></li>
+                        <li><a href="../docs/cli-security-and-configuration/#cli" class="hover:text-white transition-colors">CLI Commands</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Resources</h4>
+                    <ul class="space-y-3 text-sm text-stone">
+                        <li><a href="../examples/" class="hover:text-white transition-colors">Examples Hub</a></li>
+                        <li><a href="../design/" class="hover:text-white transition-colors">Design System</a></li>
+                        <li><a href="../blog/" class="hover:text-white transition-colors">Blog &amp; Releases</a></li>
+                        <li><a href="./" class="hover:text-white transition-colors">Contributing</a></li>
+                    </ul>
+                </div>
+
+                <!-- CTA Column -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Ready to build?</h4>
+                    <div class="space-y-4">
+                        <a href="../install/" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">
+                            Install Netsuke
+                        </a>
+                        <a href="../docs/" class="block w-full py-2 px-4 bg-transparent border border-stone/30 text-stone text-center rounded text-sm font-bold hover:bg-white/5 transition-colors">
+                            Read the docs
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-charcoal-mid pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-charcoal-light">
+                <p class="mb-4 md:mb-0">
+                    &copy; 2026 df12 Productions. Serious tools, <span class="text-boxwood">playful worlds.</span>
+                </p>
+                <div class="flex space-x-6">
+                    <a href="../privacy-policy/" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="../terms-of-use/" class="hover:text-white transition-colors">Terms of Use</a>
+                    <a href="../code-of-conduct/" class="hover:text-white transition-colors">Code of Conduct</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="../assets/vendor/minisearch.js"></script>
+    <script defer src="../assets/js/doc-search.js"></script>
+</body>
+</html>

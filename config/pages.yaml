@@ -65,20 +65,44 @@ homepage:
         external: true
       - label: Netsuke
         description: YAML-first builds (Ninja × Jinja). Fast, reproducible, readable.
-        href: "https://github.com/leynos/netsuke"
+        href: "netsuke/"
         icon: netsuke
-        meta_label: View on GitHub
-        external: true
+        meta_label: Learn more
+        external: false
       - label: mxd
         description: Hotline-style daemon for joyful file-sharing and retro chat.
-        href: "https://github.com/leynos/mxd"
+        href: "mxd/"
         icon: mxd
-        meta_label: View on GitHub
-        external: true
+        meta_label: Learn more
+        external: false
       - label: Episodic
         description: Agentic podcast studio with human-in-the-loop polish.
         href: "https://github.com/leynos/episodic"
         icon: episodic
+        meta_label: View on GitHub
+        external: true
+      - label: Weaver
+        description: CLI tooling for code-aware AI agents. Observe, act, verify.
+        href: "weaver/"
+        icon: weaver
+        meta_label: Learn more
+        external: false
+      - label: Gauss
+        description: Accessible SVG illustration with scriptable precision. Illustrator for the open web.
+        href: "https://github.com/leynos/gauss"
+        icon: gauss
+        meta_label: View on GitHub
+        external: true
+      - label: Corbusier
+        description: AI agent orchestration. The best room, not the smartest agent.
+        href: "https://github.com/leynos/corbusier"
+        icon: corbusier
+        meta_label: View on GitHub
+        external: true
+      - label: Zamburak
+        description: Prompt-injection defence for tool-using agents. Security by architecture.
+        href: "https://github.com/leynos/zamburak"
+        icon: zamburak
         meta_label: View on GitHub
         external: true
   worlds:
@@ -390,3 +414,162 @@ pages:
       orchestration. Define msgspec payload schemas, spin up background
       workers, and broadcast updates to rooms—all without turning your ASGI
       app into spaghetti.
+
+shared_content:
+  terms-of-use:
+    label: "Terms of Use"
+    source: config/shared/terms-of-use.md
+    output_slug: terms-of-use
+  privacy-policy:
+    label: "Privacy Policy"
+    source: config/shared/privacy-policy.md
+    output_slug: privacy-policy
+  code-of-conduct:
+    label: "Code of Conduct"
+    source: config/shared/code-of-conduct.md
+    output_slug: code-of-conduct
+
+sites:
+  mxd:
+    output_dir: public/mxd
+    templates_dir: templates/mxd
+    stylesheet: assets/site.css
+    base_path: /mxd/
+    theme:
+      site_name: mxd
+      hero_eyebrow: mxd Documentation
+      hero_tagline: Hotline-style daemon for joyful file-sharing
+    parent_link:
+      label: "← Back to df12 Productions"
+      href: /
+    nav_links:
+      - label: Home
+        href: /mxd/
+      - label: Getting Started
+        href: /mxd/getting-started/
+      - label: Architecture
+        href: /mxd/architecture/
+      - label: Protocol
+        href: /mxd/protocol/
+      - label: Configuration
+        href: /mxd/configuration/
+      - label: Subsystems
+        href: /mxd/subsystems/
+      - label: Compatibility
+        href: /mxd/compatibility/
+      - label: Verification
+        href: /mxd/verification/
+      - label: Roadmap
+        href: /mxd/roadmap/
+      - label: Changelog
+        href: /mxd/changelog/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    content_pages:
+      - key: getting-started
+        label: Getting Started
+        template: pages/getting-started.jinja
+        output_slug: getting-started
+      - key: architecture
+        label: Architecture
+        template: pages/architecture.jinja
+        output_slug: architecture
+      - key: protocol
+        label: Protocol
+        template: pages/protocol.jinja
+        output_slug: protocol
+      - key: configuration
+        label: Configuration
+        template: pages/configuration.jinja
+        output_slug: configuration
+      - key: subsystems
+        label: Subsystems
+        template: pages/subsystems.jinja
+        output_slug: subsystems
+      - key: compatibility
+        label: Compatibility
+        template: pages/compatibility.jinja
+        output_slug: compatibility
+      - key: verification
+        label: Verification
+        template: pages/verification.jinja
+        output_slug: verification
+      - key: roadmap
+        label: Roadmap
+        template: pages/roadmap.jinja
+        output_slug: roadmap
+      - key: changelog
+        label: Changelog
+        template: pages/changelog.jinja
+        output_slug: changelog
+    pages: {}
+
+  netsuke:
+    output_dir: public/netsuke
+    templates_dir: templates/netsuke
+    stylesheet: assets/css/himotoshi.css
+    base_path: /netsuke/
+    theme:
+      site_name: Netsuke
+      hero_eyebrow: Netsuke Documentation
+      hero_tagline: Declarative build tooling for ambitious teams
+    parent_link:
+      label: "← Back to df12 Productions"
+      href: /
+    nav_links:
+      - label: Home
+        href: ../
+      - label: Docs
+        href: ../docs/
+      - label: Examples
+        href: ../examples/
+      - label: Guides
+        href: ../guides/
+      - label: Blog
+        href: ../blog/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    pages: {}
+
+  weaver:
+    output_dir: public/weaver
+    templates_dir: templates/weaver
+    stylesheet: assets/styles/weaver-site.css
+    base_path: /weaver/
+    theme:
+      site_name: Weaver
+      hero_eyebrow: Weaver Documentation
+      hero_tagline: CLI tooling for code-aware agents
+    parent_link:
+      label: "← Back to df12 Productions"
+      href: /
+    nav_links:
+      - label: Home
+        href: ../
+      - label: Philosophy
+        href: ../why-weaver/
+      - label: Architecture
+        href: ../how-it-works/
+      - label: Commands
+        href: ../commands/
+      - label: Safety
+        href: ../safety/
+      - label: Sempai Engine
+        href: ../sempai/
+      - label: Jacquard
+        href: ../jacquard/
+      - label: Install
+        href: ../install/
+      - label: Docs
+        href: ../docs/
+      - label: Roadmap
+        href: ../roadmap/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    pages: {}

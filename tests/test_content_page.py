@@ -90,6 +90,35 @@ def test_nav_current_marking(tmp_path: Path) -> None:
     assert 'href="../"' in html
 
 
+def test_nested_page_marks_parent_nav_current(tmp_path: Path) -> None:
+    """Nested pages mark the nearest parent nav item current."""
+    templates_dir = tmp_path / "templates"
+    _write_templates(templates_dir)
+    output_dir = tmp_path / "out"
+    config = ContentPageConfig(
+        key="commands-act",
+        label="Act",
+        template="pages/demo.jinja",
+        output_slug="commands/act",
+    )
+    nav_links = [
+        NavLinkConfig(label="Home", href="/weaver/"),
+        NavLinkConfig(label="Commands", href="/weaver/commands/"),
+        NavLinkConfig(label="Safety", href="/weaver/safety/"),
+    ]
+    result = ContentPageGenerator(
+        config,
+        output_dir,
+        templates_dir=templates_dir,
+        nav_links=nav_links,
+        stylesheet="assets/site.css",
+        base_path="/weaver/",
+    ).run()
+    html = result.read_text(encoding="utf-8")
+    assert '<a href="/weaver/commands/" aria-current="page">Commands</a>' in html
+    assert '<a href="/weaver/" aria-current="page">Home</a>' not in html
+
+
 def test_stylesheet_passthrough(tmp_path: Path) -> None:
     """Stylesheet variable reaches the template's <link> tag."""
     templates_dir = tmp_path / "templates"

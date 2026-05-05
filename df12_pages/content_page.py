@@ -81,15 +81,30 @@ class ContentPageGenerator:
             target_href = f"{self.base_path}{self.config.output_slug}/"
         else:
             target_href = f"../{self.config.output_slug}/"
+        current_href = self._current_nav_href(target_href)
         result: list[dict[str, typ.Any]] = []
         for link in self.nav_links:
             entry = dc.asdict(link)
-            if link.href == target_href:
+            if link.href == current_href:
                 entry["current"] = True
-                if self.base_path is None:
+                if self.base_path is None and link.href == target_href:
                     entry["href"] = "./"
             result.append(entry)
         return result
+
+    def _current_nav_href(self, target_href: str) -> str | None:
+        """Return the exact or nearest parent nav href for ``target_href``."""
+        nav_hrefs = [link.href for link in self.nav_links]
+        if target_href in nav_hrefs:
+            return target_href
+        root_href = self.base_path if self.base_path is not None else "../"
+        current_href: str | None = None
+        for href in nav_hrefs:
+            if href == root_href or not target_href.startswith(href):
+                continue
+            if current_href is None or len(href) > len(current_href):
+                current_href = href
+        return current_href
 
 
 __all__ = ["ContentPageGenerator"]

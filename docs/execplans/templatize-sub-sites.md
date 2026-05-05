@@ -160,6 +160,20 @@ Playwright screenshots and structurally via
   - [x] (2026-05-05) Validate the focused type and content-page behaviour
         gates.
 
+- [x] (2026-05-05) Accessibility and generated-layout review follow-up
+  - [x] (2026-05-05) Verified `_mark_current_nav()` still left non-current
+        entries without an explicit `current` key after casting to
+        `_MarkedNavLink`.
+  - [x] (2026-05-05) Verified Netsuke install, Netsuke legal page, Weaver home,
+        Jacquard, and Sempai findings against current generated output and
+        mapped each still-valid issue back to a source template.
+  - [x] (2026-05-05) Patched source templates and `ContentPageGenerator`
+        minimally so regenerated output carries the accessibility, URL, and
+        layout fixes.
+  - [x] (2026-05-05) Regenerate affected Netsuke and Weaver pages.
+  - [x] (2026-05-05) Validate exact generated output, browser behaviour, and
+        project gates.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -293,6 +307,37 @@ Playwright screenshots and structurally via
   `uv run pytest -v tests/test_content_page.py`, `make test`,
   `make markdownlint`, and `make nixie`. Date/Author: 2026-05-05 (content nav
   TypedDict follow-up)
+
+- Observation: `SubSiteHomePageBuilder` already marks a homepage nav link as
+  current when its href matches the configured sub-site `base_path`, so the
+  Netsuke home template only needed to remove its hard-coded `"/netsuke/"`
+  fallback. Date/Author: 2026-05-05 (accessibility follow-up)
+
+- Observation: The Jacquard footer layout drift mapped to shared
+  `templates/weaver/doc_page.jinja`: Jacquard adds `xl:flex-row` through
+  `main_extra_class`, so any footer inside `<main>` becomes part of the row
+  layout. Moving the shared footer after the top-level flex wrapper keeps it
+  below all generated content pages. Date/Author: 2026-05-05 (accessibility
+  follow-up)
+
+- Observation: The Netsuke terms-of-use asset and brand URL findings mapped to
+  `templates/netsuke/shared_content_page.jinja`, which generates the shared
+  legal pages. Date/Author: 2026-05-05 (accessibility follow-up)
+
+- Observation: Playwright validation against a local static server on port
+  8100 confirmed the Netsuke install header and mobile install links have
+  `aria-current="page"`, the Netsuke terms page brand and asset URLs are
+  root-relative as requested, Weaver home marks the Home sidebar link current,
+  Jacquard's footer is a direct child of `<body>` and not inside `<main>`, and
+  Jacquard/Sempai hash links update `location.hash`. Date/Author: 2026-05-05
+  (accessibility follow-up)
+
+- Observation: Validation for the accessibility follow-up passed:
+  `make fmt`, `make check-fmt`, `make typecheck`, `make lint`,
+  `uv run pytest -v tests/test_content_page.py tests/test_subsite_homepage.py`,
+  `make test`, `make markdownlint`, and `make nixie`. Evidence logs are under
+  `/tmp/*-df12-www-templatize-sub-sites-accessibility*.out`. Date/Author:
+  2026-05-05 (accessibility follow-up)
 
 ## Decision log
 

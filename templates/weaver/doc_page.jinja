@@ -68,39 +68,39 @@
                             {%- endif -%}
                         {%- endif -%}
                     {%- endfor -%}
-                    <a href="/weaver/" class="block px-4 py-2 text-sm {% if ns.home_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                    <a href="/weaver/" class="block px-4 py-2 text-sm {% if ns.home_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.home_active %} aria-current="page"{% endif %}>
                         <span class="mr-2 font-mono text-xs {% if not ns.home_active %}opacity-60{% endif %}">00</span> Home
                     </a>
-                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm {% if ns.why_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm {% if ns.why_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.why_active %} aria-current="page"{% endif %}>
                         <span class="mr-2 font-mono text-xs {% if not ns.why_active %}opacity-60{% endif %}">01</span> Philosophy
                     </a>
-                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm {% if ns.how_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm {% if ns.how_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.how_active %} aria-current="page"{% endif %}>
                         <span class="mr-2 font-mono text-xs {% if not ns.how_active %}opacity-60{% endif %}">02</span> Architecture
                     </a>
                     {% block nav_subitems_how %}{% endblock %}
-                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm {% if ns.cmd_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm {% if ns.cmd_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.cmd_active %} aria-current="page"{% endif %}>
                         <span class="mr-2 font-mono text-xs {% if not ns.cmd_active %}opacity-60{% endif %}">03</span> Commands
                     </a>
                     {% block nav_subitems_commands %}{% endblock %}
-                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm {% if ns.safety_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm {% if ns.safety_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.safety_active %} aria-current="page"{% endif %}>
                         <span class="mr-2 font-mono text-xs {% if not ns.safety_active %}opacity-60{% endif %}">04</span> Safety
                     </a>
-                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm {% if ns.sempai_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm {% if ns.sempai_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.sempai_active %} aria-current="page"{% endif %}>
                         <span class="mr-2 font-mono text-xs {% if not ns.sempai_active %}opacity-60{% endif %}">05</span> Sempai Engine
                     </a>
                     {% block nav_subitems_sempai %}{% endblock %}
-                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm {% if ns.jacquard_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm {% if ns.jacquard_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.jacquard_active %} aria-current="page"{% endif %}>
                         <span class="mr-2 font-mono text-xs {% if not ns.jacquard_active %}opacity-60{% endif %}">06</span> Jacquard
                     </a>
                     {% block nav_subitems_jacquard %}{% endblock %}
                     <div class="pt-4 mt-4 border-t border-weaver-indigo/10">
-                        <a href="/weaver/install/" class="block px-4 py-2 text-sm {% if ns.install_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono{% endif %}">
+                        <a href="/weaver/install/" class="block px-4 py-2 text-sm {% if ns.install_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono{% endif %}"{% if ns.install_active %} aria-current="page"{% endif %}>
                             {% if not ns.install_active %}&gt; {% endif %}Install
                         </a>
-                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm {% if ns.docs_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm {% if ns.docs_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.docs_active %} aria-current="page"{% endif %}>
                             Docs
                         </a>
-                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm {% if ns.roadmap_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}">
+                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm {% if ns.roadmap_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.roadmap_active %} aria-current="page"{% endif %}>
                             Roadmap
                         </a>
                     </div>
@@ -123,47 +123,47 @@
 
 {% block content %}{% endblock %}
 
-            <!-- Footer -->
-            <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
-                <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
-                    <div class="mb-6 md:mb-0">
-                        <div class="flex items-center gap-3 mb-2">
-                             <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
-                                <span class="font-serif font-bold text-lg">W</span>
-                             </div>
-                             <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
-                        </div>
-                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
-                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
-                        <div class="flex flex-col space-y-2">
-                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
-                            <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
-                            <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
-                        </div>
-                        <div class="flex flex-col space-y-2">
-                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
-                            <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
-                            <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hanko Stamp (Decorative) -->
-                <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
-                    <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
-                        <div class="text-center leading-tight">
-                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
-                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-
         </main>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative lg:ml-64">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
+                        <span class="font-serif font-bold text-lg">W</span>
+                        </div>
+                        <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
+                </div>
+                <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
+                <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
+                <div class="flex flex-col space-y-2">
+                    <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
+                    <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                    <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
+                    <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                    <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hanko Stamp (Decorative) -->
+        <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+            <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
+                <div class="text-center leading-tight">
+                    <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
+                    <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Smooth scroll for anchor links
@@ -181,9 +181,12 @@
                 if (!target) return;
 
                 e.preventDefault();
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 target.scrollIntoView({
-                    behavior: 'smooth'
+                    behavior: reduceMotion ? 'auto' : 'smooth',
+                    block: 'start'
                 });
+                history.pushState(null, '', selector);
             });
         });
     </script>

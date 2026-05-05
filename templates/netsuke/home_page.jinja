@@ -32,7 +32,7 @@
                     <a href="{{ parent_link.href }}" class="text-vermillion font-medium transition-colors text-sm py-1">{{ parent_link.label }}</a>
                     {% endif %}
                     {% for link in nav_links %}
-                    {% set is_current = link.current or link.href == "/netsuke/" %}
+                    {% set is_current = link.current %}
                     <a href="{{ link.href }}" class="{% if is_current %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if is_current %} aria-current="page"{% endif %}>{{ link.label }}</a>
                     {% endfor %}
                 </div>
@@ -57,7 +57,7 @@
                 <li><a href="{{ parent_link.href }}" class="hm-mobile-menu__link text-vermillion">{{ parent_link.label }}</a></li>
                 {% endif %}
                 {% for link in nav_links %}
-                {% set is_current = link.current or link.href == "/netsuke/" %}
+                {% set is_current = link.current %}
                 <li><a href="{{ link.href }}" class="hm-mobile-menu__link{% if is_current %} hm-mobile-menu__link--active{% endif %}"{% if is_current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>
                 {% endfor %}
             </ul>

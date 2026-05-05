@@ -15,6 +15,13 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white flex flex-col min-h-screen {% block body_class %}{% endblock %}">
+    {% set nav_items = [
+        {'key': 'home', 'href': '/netsuke/', 'label': 'Home'},
+        {'key': 'docs', 'href': '/netsuke/docs/', 'label': 'Docs'},
+        {'key': 'examples', 'href': '/netsuke/examples/', 'label': 'Examples'},
+        {'key': 'guides', 'href': '/netsuke/guides/', 'label': 'Guides'},
+        {'key': 'blog', 'href': '/netsuke/blog/', 'label': 'Blog'},
+    ] %}
 
     <!-- Navigation -->
     <nav id="navbar" class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
@@ -30,11 +37,9 @@
                 <div class="hidden md:block">
                     <ul class="flex list-none space-x-8">
                         <li><a href="/" class="text-vermillion font-medium transition-colors text-sm py-1">&larr; df12</a></li>
-                        <li><a href="/netsuke/" class="{% if active_nav == 'home' %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if active_nav == 'home' %} aria-current="page"{% endif %}>Home</a></li>
-                        <li><a href="/netsuke/docs/" class="{% if active_nav == 'docs' %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if active_nav == 'docs' %} aria-current="page"{% endif %}>Docs</a></li>
-                        <li><a href="/netsuke/examples/" class="{% if active_nav == 'examples' %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if active_nav == 'examples' %} aria-current="page"{% endif %}>Examples</a></li>
-                        <li><a href="/netsuke/guides/" class="{% if active_nav == 'guides' %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if active_nav == 'guides' %} aria-current="page"{% endif %}>Guides</a></li>
-                        <li><a href="/netsuke/blog/" class="{% if active_nav == 'blog' %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if active_nav == 'blog' %} aria-current="page"{% endif %}>Blog</a></li>
+                        {% for item in nav_items %}
+                        <li><a href="{{ item.href }}" class="{% if item.key == active_nav %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if item.key == active_nav %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
 
@@ -42,7 +47,7 @@
                     <a href="https://github.com/leynos/netsuke" class="hm-button hm-button--ghost hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
                         <span class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span><span class="hm-navbar-action__label">GitHub</span>
                     </a>
-                    {% block navbar_action %}<a href="/netsuke/install/" class="hm-button hm-button--primary hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
+                    {% block navbar_action %}<a href="/netsuke/install/" class="hm-button hm-button--primary hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm"{% if active_nav == 'install' %} aria-current="page"{% endif %}>
                         <span class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span><span class="hm-navbar-action__label">Install</span>
                     </a>{% endblock %}
                     <button id="navbar-mobile-toggle" type="button" class="hm-hamburger md:hidden" aria-expanded="false" aria-controls="navbar-mobile-menu" aria-label="Open menu">
@@ -56,15 +61,13 @@
     <nav id="navbar-mobile-menu" class="hm-mobile-menu md:hidden" aria-label="Mobile navigation">
         <ul class="list-none py-3 px-4 space-y-1">
             <li><a href="/" class="hm-mobile-menu__link text-vermillion">&larr; Back to df12 Productions</a></li>
-            <li><a href="/netsuke/" class="hm-mobile-menu__link{% if active_nav == 'home' %} hm-mobile-menu__link--active{% endif %}"{% if active_nav == 'home' %} aria-current="page"{% endif %}>Home</a></li>
-            <li><a href="/netsuke/docs/" class="hm-mobile-menu__link{% if active_nav == 'docs' %} hm-mobile-menu__link--active{% endif %}"{% if active_nav == 'docs' %} aria-current="page"{% endif %}>Docs</a></li>
-            <li><a href="/netsuke/examples/" class="hm-mobile-menu__link{% if active_nav == 'examples' %} hm-mobile-menu__link--active{% endif %}"{% if active_nav == 'examples' %} aria-current="page"{% endif %}>Examples</a></li>
-            <li><a href="/netsuke/guides/" class="hm-mobile-menu__link{% if active_nav == 'guides' %} hm-mobile-menu__link--active{% endif %}"{% if active_nav == 'guides' %} aria-current="page"{% endif %}>Guides</a></li>
-            <li><a href="/netsuke/blog/" class="hm-mobile-menu__link{% if active_nav == 'blog' %} hm-mobile-menu__link--active{% endif %}"{% if active_nav == 'blog' %} aria-current="page"{% endif %}>Blog</a></li>
+            {% for item in nav_items %}
+            <li><a href="{{ item.href }}" class="hm-mobile-menu__link{% if item.key == active_nav %} hm-mobile-menu__link--active{% endif %}"{% if item.key == active_nav %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+            {% endfor %}
         </ul>
         <ul class="list-none border-t border-stone-light/50 py-3 px-4 space-y-2">
             <li><a href="https://github.com/leynos/netsuke" class="hm-mobile-menu__link hm-mobile-menu__link--secondary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:logo-github" aria-hidden="true"></span>GitHub</a></li>
-            {% block mobile_action %}<li><a href="/netsuke/install/" class="hm-mobile-menu__link hm-mobile-menu__link--primary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:download" aria-hidden="true"></span>Install Netsuke</a></li>{% endblock %}
+            {% block mobile_action %}<li><a href="/netsuke/install/" class="hm-mobile-menu__link hm-mobile-menu__link--primary"{% if active_nav == 'install' %} aria-current="page"{% endif %}><span class="iconify inline mr-2 align-middle" data-icon="carbon:download" aria-hidden="true"></span>Install Netsuke</a></li>{% endblock %}
         </ul>
     </nav>
 

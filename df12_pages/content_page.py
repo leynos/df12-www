@@ -95,6 +95,7 @@ class ContentPageGenerator:
         result: list[_MarkedNavLink] = []
         for link in self.nav_links:
             entry = typ.cast("_MarkedNavLink", dc.asdict(link))
+            entry["current"] = False
             if link.href == current_href:
                 entry["current"] = True
                 if self.base_path is None and link.href == target_href:

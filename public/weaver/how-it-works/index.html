@@ -63,7 +63,7 @@
                     <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">01</span> Philosophy
                     </a>
-                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
+                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]" aria-current="page">
                         <span class="mr-2 font-mono text-xs ">02</span> Architecture
                     </a>
                     <div class="ml-4 pl-4 border-l border-weaver-indigo/20 space-y-1 my-2">
@@ -430,47 +430,47 @@
             </section>
 
 
-            <!-- Footer -->
-            <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
-                <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
-                    <div class="mb-6 md:mb-0">
-                        <div class="flex items-center gap-3 mb-2">
-                             <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
-                                <span class="font-serif font-bold text-lg">W</span>
-                             </div>
-                             <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
-                        </div>
-                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
-                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
-                        <div class="flex flex-col space-y-2">
-                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
-                            <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
-                            <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
-                        </div>
-                        <div class="flex flex-col space-y-2">
-                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
-                            <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
-                            <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hanko Stamp (Decorative) -->
-                <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
-                    <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
-                        <div class="text-center leading-tight">
-                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
-                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-
         </main>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative lg:ml-64">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
+                        <span class="font-serif font-bold text-lg">W</span>
+                        </div>
+                        <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
+                </div>
+                <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
+                <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
+                <div class="flex flex-col space-y-2">
+                    <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
+                    <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                    <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
+                    <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                    <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hanko Stamp (Decorative) -->
+        <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+            <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
+                <div class="text-center leading-tight">
+                    <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
+                    <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Smooth scroll for anchor links
@@ -488,9 +488,12 @@
                 if (!target) return;
 
                 e.preventDefault();
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 target.scrollIntoView({
-                    behavior: 'smooth'
+                    behavior: reduceMotion ? 'auto' : 'smooth',
+                    block: 'start'
                 });
+                history.pushState(null, '', selector);
             });
         });
     </script>

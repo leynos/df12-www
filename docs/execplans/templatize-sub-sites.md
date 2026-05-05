@@ -144,6 +144,14 @@ Playwright screenshots and structurally via
   - [x] (2026-05-05) Regenerate Weaver pages and validate the generated
         sidebar footer output.
 
+- [x] (2026-05-05) Weaver homepage card accent follow-up
+  - [x] (2026-05-05) Verified the Weaver homepage value-prop card corner
+        accents still used `end-0` in both `templates/weaver/home_page.jinja`
+        and generated `public/weaver/index.html`.
+  - [x] (2026-05-05) Patched the three source template accents to use
+        `start-0`.
+  - [x] (2026-05-05) Regenerate Weaver and validate the generated homepage.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -252,6 +260,18 @@ Playwright screenshots and structurally via
   `/weaver/why-weaver/`, `/weaver/commands/act/`, and `/weaver/docs/` with
   `href="/"` and the same visual classes as the homepage. Date/Author:
   2026-05-05 (sidebar footer follow-up)
+
+- Observation: The Weaver homepage value-prop card corner accents still used
+  `bottom-0 end-0` in three places, which placed the accent on the wrong
+  logical side. The source template now uses `bottom-0 start-0` for all three
+  accents before regenerating `public/weaver/index.html`. Date/Author:
+  2026-05-05 (homepage card accent follow-up)
+
+- Observation: Exact checks and Playwright validation against a local static
+  server on port 8099 confirmed all three Weaver homepage value-prop card
+  accents now have `start-0`, none have `end-0`, and the affected cards are
+  `Composable`, `Safe`, and `Fast`. Date/Author: 2026-05-05 (homepage card
+  accent follow-up)
 
 ## Decision log
 

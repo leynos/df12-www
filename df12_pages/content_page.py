@@ -14,6 +14,16 @@ if typ.TYPE_CHECKING:
     from .config import ContentPageConfig, NavLinkConfig
 
 
+class _MarkedNavLink(typ.TypedDict):
+    """Template-facing navigation entry with current-page state."""
+
+    label: str
+    href: str
+    variant: str | None
+    nav_target: str | None
+    current: bool
+
+
 class ContentPageGenerator:
     """Render a Jinja page template with shared chrome into a sub-site directory."""
 
@@ -75,16 +85,16 @@ class ContentPageGenerator:
         output_path.write_text(html, encoding="utf-8")
         return output_path
 
-    def _mark_current_nav(self) -> list[dict[str, typ.Any]]:
+    def _mark_current_nav(self) -> list[_MarkedNavLink]:
         """Return nav_links dicts with ``current`` flag for the active page."""
         if self.base_path is not None:
             target_href = f"{self.base_path}{self.config.output_slug}/"
         else:
             target_href = f"../{self.config.output_slug}/"
         current_href = self._current_nav_href(target_href)
-        result: list[dict[str, typ.Any]] = []
+        result: list[_MarkedNavLink] = []
         for link in self.nav_links:
-            entry = dc.asdict(link)
+            entry = typ.cast("_MarkedNavLink", dc.asdict(link))
             if link.href == current_href:
                 entry["current"] = True
                 if self.base_path is None and link.href == target_href:

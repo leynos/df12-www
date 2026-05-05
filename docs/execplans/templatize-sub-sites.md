@@ -152,6 +152,14 @@ Playwright screenshots and structurally via
         `start-0`.
   - [x] (2026-05-05) Regenerate Weaver and validate the generated homepage.
 
+- [x] (2026-05-05) Content nav TypedDict follow-up
+  - [x] (2026-05-05) Verified `_mark_current_nav()` still returned
+        `list[dict[str, typ.Any]]` and assigned `dc.asdict(link)` directly.
+  - [x] (2026-05-05) Added `_MarkedNavLink` and cast the `dc.asdict(link)`
+        result before mutating the `current` and `href` fields.
+  - [x] (2026-05-05) Validate the focused type and content-page behaviour
+        gates.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -272,6 +280,19 @@ Playwright screenshots and structurally via
   accents now have `start-0`, none have `end-0`, and the affected cards are
   `Composable`, `Safe`, and `Fast`. Date/Author: 2026-05-05 (homepage card
   accent follow-up)
+
+- Observation: The nav-marking type finding was still valid in
+  `df12_pages/content_page.py`: `_mark_current_nav()` returned an unstructured
+  `list[dict[str, typ.Any]]`, and the `dc.asdict(link)` value was mutated
+  without a concrete shape. The new `_MarkedNavLink` mirrors `NavLinkConfig`
+  plus the `current` flag that templates consume. Date/Author: 2026-05-05
+  (content nav TypedDict follow-up)
+
+- Observation: Validation for the content nav TypedDict follow-up passed:
+  `make fmt`, `make check-fmt`, `make typecheck`, `make lint`,
+  `uv run pytest -v tests/test_content_page.py`, `make test`,
+  `make markdownlint`, and `make nixie`. Date/Author: 2026-05-05 (content nav
+  TypedDict follow-up)
 
 ## Decision log
 

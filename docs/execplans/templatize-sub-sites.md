@@ -135,6 +135,15 @@ Playwright screenshots and structurally via
   - [x] (2026-05-05) Validate generated HTML and browser behaviour with
         Playwright plus project gates.
 
+- [x] (2026-05-05) Weaver sidebar footer parity follow-up
+  - [x] (2026-05-05) Verified non-home Weaver content pages still lacked the
+        sidebar footer `Back to df12 Productions` link present on the Weaver
+        homepage.
+  - [x] (2026-05-05) Patched `templates/weaver/doc_page.jinja` so generated
+        content pages share the homepage sidebar footer back-link.
+  - [x] (2026-05-05) Regenerate Weaver pages and validate the generated
+        sidebar footer output.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -230,6 +239,19 @@ Playwright screenshots and structurally via
   `make markdownlint`, and `make nixie`. Evidence logs are under
   `/tmp/*-df12-www-templatize-sub-sites-review*.out`. Date/Author: 2026-05-05
   (review follow-up)
+
+- Observation: Non-home Weaver generated pages still missed the sidebar footer
+  `Back to df12 Productions` link because the link lived in
+  `templates/weaver/home_page.jinja` only. `templates/weaver/doc_page.jinja`
+  owns the sidebar for generated content pages, so the link belongs there too.
+  Date/Author: 2026-05-05 (sidebar footer follow-up)
+
+- Observation: `uv run pages generate --site weaver` regenerated all Weaver
+  pages after the sidebar footer change. Exact checks and Playwright validation
+  against a local static server on port 8098 confirmed the back-link appears on
+  `/weaver/why-weaver/`, `/weaver/commands/act/`, and `/weaver/docs/` with
+  `href="/"` and the same visual classes as the homepage. Date/Author:
+  2026-05-05 (sidebar footer follow-up)
 
 ## Decision log
 

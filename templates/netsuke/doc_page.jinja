@@ -36,7 +36,9 @@
                 <!-- Desktop Nav -->
                 <div class="hidden md:block">
                     <ul class="flex list-none space-x-8">
-                        <li><a href="/" class="text-vermillion font-medium transition-colors text-sm py-1">&larr; df12</a></li>
+                        {% if parent_link %}
+                        <li><a href="{{ parent_link.href }}" class="text-vermillion font-medium transition-colors text-sm py-1">{{ parent_link.label }}</a></li>
+                        {% endif %}
                         {% for item in nav_items %}
                         <li><a href="{{ item.href }}" class="{% if item.key == active_nav %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if item.key == active_nav %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
                         {% endfor %}
@@ -60,7 +62,9 @@
     </nav>
     <nav id="navbar-mobile-menu" class="hm-mobile-menu md:hidden" aria-label="Mobile navigation">
         <ul class="list-none py-3 px-4 space-y-1">
-            <li><a href="/" class="hm-mobile-menu__link text-vermillion">&larr; Back to df12 Productions</a></li>
+            {% if parent_link %}
+            <li><a href="{{ parent_link.href }}" class="hm-mobile-menu__link text-vermillion">{{ parent_link.label }}</a></li>
+            {% endif %}
             {% for item in nav_items %}
             <li><a href="{{ item.href }}" class="hm-mobile-menu__link{% if item.key == active_nav %} hm-mobile-menu__link--active{% endif %}"{% if item.key == active_nav %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
             {% endfor %}

@@ -182,6 +182,15 @@ Playwright screenshots and structurally via
         commands from capability probing.
   - [x] (2026-05-05) Regenerate Weaver and validate the generated install page.
 
+- [x] (2026-05-05) Netsuke top-nav parent-link wording follow-up
+  - [x] (2026-05-05) Verified Netsuke homepage navigation renders the
+        configured `parent_link.label`, while `templates/netsuke/doc_page.jinja`
+        hard-coded desktop content-page navigation as `&larr; df12`.
+  - [x] (2026-05-05) Patched `templates/netsuke/doc_page.jinja` so desktop and
+        mobile content-page parent links both render from `parent_link`.
+  - [x] (2026-05-05) Regenerate Netsuke and validate the generated top-nav
+        wording.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -360,6 +369,27 @@ Playwright screenshots and structurally via
   `make markdownlint`, and `make nixie`. Evidence logs are under
   `/tmp/*-df12-www-templatize-sub-sites-weaver-install-wording.out`.
   Date/Author: 2026-05-05 (install wording follow-up)
+
+- Observation: Netsuke's homepage template already uses the configured
+  `parent_link` for both desktop and mobile top navigation. The inconsistency
+  came from the content-page base template, which duplicated the parent link
+  rather than using the same context. Date/Author: 2026-05-05 (top-nav wording
+  follow-up)
+
+- Observation: The standalone Netsuke icon-replacements report also had a
+  hand-written df12 breadcrumb. It is not part of the shared Netsuke nav
+  chrome, but it receives `parent_link` from the generator, so it now renders
+  that same configured label. Date/Author: 2026-05-05 (top-nav wording
+  follow-up)
+
+- Observation: Netsuke top-nav wording validation passed: exact checks found
+  no generated `&larr; df12` or `← df12` top-nav labels, and Playwright
+  readback on local port 8102 confirmed `/netsuke/`, `/netsuke/docs/`, and
+  `/netsuke/icon-replacements/` render `← Back to df12 Productions`. Gates also
+  passed: `make fmt`, `make check-fmt`, `make typecheck`, `make lint`,
+  `make test`, `make markdownlint`, and `make nixie`. Evidence logs are under
+  `/tmp/*-df12-www-templatize-sub-sites-netsuke-topnav-wording.out`.
+  Date/Author: 2026-05-05 (top-nav wording follow-up)
 
 ## Decision log
 

@@ -4,7 +4,7 @@ This ExecPlan (execution plan) is a living document. The sections `Constraints`,
  `Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`, `Decision Log`,
 and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 ## Purpose / big picture
 
@@ -113,24 +113,87 @@ Playwright screenshots and structurally via
         screenshots confirm correct rendering), all 17 pages generated
   - [x] (2026-05-05) Gate commit (this commit)
 
-- [ ] Stage 3: netsuke (20 pages)
-  - [ ] Update netsuke `nav_links` to absolute paths in `config/pages.yaml`
-  - [ ] Create `templates/netsuke/doc_page.jinja`
-  - [ ] Create `templates/netsuke/home_page.jinja`
-  - [ ] Create 19 page templates in `templates/netsuke/pages/`
-  - [ ] Add `homepage:` and `content_pages:` to `sites.netsuke` in
+- [x] (2026-05-05) Stage 3: netsuke (20 pages)
+  - [x] (2026-05-05) Update netsuke `nav_links` to absolute paths in
         `config/pages.yaml`
-  - [ ] Run `pages generate --site netsuke`, validate, delete 20
+  - [x] (2026-05-05) Create `templates/netsuke/doc_page.jinja`
+  - [x] (2026-05-05) Create `templates/netsuke/home_page.jinja`
+  - [x] (2026-05-05) Create 19 page templates in
+        `templates/netsuke/pages/`
+  - [x] (2026-05-05) Add `homepage:` and `content_pages:` to `sites.netsuke`
+        in `config/pages.yaml`
+  - [x] (2026-05-05) Run `pages generate --site netsuke`, validate, delete 20
         hard-coded HTML files
-  - [ ] Gate commit
+  - [x] (2026-05-05) Gate commit (this commit)
 
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
   `{% extends "weaver/doc_page.jinja" %}` but the Jinja loader search path is
-  `templates/weaver`, so the correct path is just `{% extends "doc_page.jinja" %}`.
-  Evidence: Generator raised `TemplateNotFound: weaver/doc_page.jinja` on first run.
-  Impact: Fixed with sed; all page templates updated before committing.
+  `templates/weaver`, so the correct path is just
+  `{% extends "doc_page.jinja" %}`. Evidence: Generator raised
+  `TemplateNotFound: weaver/doc_page.jinja` on first run. Impact: Fixed with
+  sed; all page templates updated before committing.
+
+- Observation: On resume, Stage 3 was partially started but not wired into
+  `config/pages.yaml`. Existing untracked Netsuke templates were
+  `templates/netsuke/doc_page.jinja`, `templates/netsuke/home_page.jinja`, and
+  10 content templates under `templates/netsuke/pages/`. Missing templates were
+  the seven example-detail pages plus `guides`, `install`, and
+  `icon-replacements`. Impact: continue from this partial state without
+  reverting generated docs or template files.
+
+- Observation: GrepAI is installed, but the `Projects` workspace search backend
+  was unavailable during resume because Qdrant was not listening on
+  `127.0.0.1:6334`. Impact: code exploration fell back to scoped exact/file
+  inspection for this turn.
+
+- Observation: The first resumed `uv run pages generate --site netsuke` failed
+  after writing the first 12 Netsuke pages because migrated documentation
+  examples contained literal Jinja snippets such as
+  `{{ src | basename | replace('.c', '.o') }}`. The site generator tried to
+  evaluate those snippets and raised
+  `TemplateAssertionError: No filter named 'basename'`. Impact: wrap lifted
+  content bodies in `{% raw %}` / `{% endraw %}` blocks so examples render as
+  documentation text.
+
+- Observation: Several example-detail pages did not contain the
+  `<!-- Main Content -->` marker used by the initial extraction helper, so the
+  first generated templates for those pages had empty content blocks. Impact:
+  regenerate missing page templates by extracting the first `<main>...</main>`
+  block instead of depending on the optional comment marker.
+
+- Observation: `uv run pages generate --site netsuke` now exits 0 and writes
+  all 20 non-shared Netsuke pages plus the three shared pages. Evidence log:
+  `/tmp/pages-generate-df12-www-templatize-sub-sites-netsuke.out`.
+
+- Observation: Playwright spot checks at 1280x800 on
+  `http://127.0.0.1:8081/netsuke/`, `/netsuke/install/`,
+  `/netsuke/docs/getting-started/`, `/netsuke/examples/hello-world/`, and
+  `/netsuke/blog/` rendered the expected pages with correct top-level active
+  navigation. Screenshots were saved as `netsuke-home.png`,
+  `netsuke-install.png`, `netsuke-docs-getting-started.png`,
+  `netsuke-examples-hello-world.png`, and `netsuke-blog.png` by the Playwright
+  MCP.
+
+- Observation: The planned delete-and-regenerate pass completed successfully:
+  all 20 hard-coded Netsuke HTML files listed in the plan were removed, then
+  recreated by `uv run pages generate --site netsuke`. Evidence log:
+  `/tmp/pages-regenerate-after-delete-df12-www-templatize-sub-sites-netsuke.out`.
+
+- Observation: The first full `make test` gate failed with two unrelated
+  issues after 43 tests passed: `test_build_env_sets_expected_keys` exposed
+  that ambient `GITHUB_TOKEN` from the shell overrode the explicit
+  `CredentialSet.github_token`, and the Playwright/css-view style test failed
+  because css-view tried to launch a missing Firefox binary at
+  `~/.cache/ms-playwright/firefox-1495/firefox/firefox`. Impact: fix
+  `build_env` so explicit credentials override ambient provider-token
+  variables, then rerun tests after addressing the browser runtime.
+
+- Observation: After installing the exact Firefox build expected by css-view
+  (`~/.cache/ms-playwright/firefox-1495`) and fixing `build_env`, `make test`
+  passed: 45 tests passed with 2 deprecation warnings. Evidence log:
+  `/tmp/test-df12-www-templatize-sub-sites.out`.
 
 ## Decision log
 
@@ -155,9 +218,54 @@ Playwright screenshots and structurally via
   mixing migration and design changes introduces unnecessary risk and
   complicates validation. Date/Author: 2026-05-05 (plan phase)
 
+- Decision: Keep `templates/netsuke/pages/icon-replacements.jinja` as a
+  standalone full HTML template rather than forcing it to extend
+  `doc_page.jinja`. Rationale: the hard-coded
+  `public/netsuke/icon-replacements/index.html` is a migration report page with
+  no Netsuke nav, no mobile menu, no standard footer, and page-specific table
+  styling. Wrapping it in the content-page base template would be a visual
+  design change, violating the migration constraint. Date/Author: 2026-05-05
+  (implementation resume)
+
+- Decision: Preserve literal manifest/template snippets in Netsuke content
+  templates by wrapping lifted content blocks in Jinja raw blocks. Rationale:
+  snippets such as `{{ ins }}`, `{{ outs }}`, and `{{ path | shell_escape }}`
+  are source examples for readers, not render-time expressions for the website
+  generator. Date/Author: 2026-05-05 (implementation resume)
+
+- Decision: Treat explicit credentials passed to `build_env` as authoritative
+  for provider token environment variables, overriding ambient shell values.
+  Rationale: deploy commands pass a resolved `CredentialSet`; letting unrelated
+  process environment tokens win makes tests nondeterministic and can deploy
+  with credentials other than those selected by the caller. Date/Author:
+  2026-05-05 (gate fix)
+
 ## Outcomes & retrospective
 
-(to be completed)
+All three targeted sub-sites are now generated from Jinja templates rather than
+hand-authored HTML in `public/`. Stage 3 added the Netsuke homepage template,
+the shared Netsuke content-page base template, and all 19 Netsuke content-page
+templates, then wired those outputs through `config/pages.yaml`.
+
+The final gate replay passed:
+
+- `make fmt`
+- `make check-fmt`
+- `make typecheck`
+- `make lint`
+- `make test` (45 passed, 2 deprecation warnings)
+
+Validation notes:
+
+- `uv run pages generate --site netsuke` wrote all 20 non-shared Netsuke pages
+  and the three shared pages.
+- A delete-and-regenerate pass removed the old Netsuke HTML files and recreated
+  them from templates.
+- Playwright spot checks at 1280x800 covered `/netsuke/`, `/netsuke/install/`,
+  `/netsuke/docs/getting-started/`, `/netsuke/examples/hello-world/`, and
+  `/netsuke/blog/`.
+- The css-view Playwright gate required the exact Firefox build expected by
+  css-view (`firefox-1495`) to be present in the shared Playwright cache.
 
 ## Context and orientation
 

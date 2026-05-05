@@ -39,20 +39,20 @@
         .code-container { position: relative; overflow: hidden; }
         .code-container:hover .copy-btn { opacity: 1; }
         .copy-btn { opacity: 0; transition: opacity 0.2s; }
-        
+
         /* Step Connector */
         .step-line { position: absolute; left: 15px; top: 40px; bottom: -20px; width: 2px; background-color: rgba(25, 60, 110, 0.2); z-index: 0; }
         .last-step .step-line { display: none; }
     </style>
-    <link rel="stylesheet" href="../assets/styles/weaver-site.css">
+    <link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
-    
+
     <!-- Texture Overlay -->
     <div class="texture-overlay"></div>
 
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
-        
+
         <!-- Sidebar Navigation -->
         <aside id="sidebar" class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
             <div>
@@ -60,52 +60,41 @@
                     <h1 class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">WEAVER</h1>
                     <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
                 </div>
-                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    <a href="../" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]"><a href="/weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">00</span> Home
                     </a>
-                    <a href="../why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">01</span> Philosophy
                     </a>
-                    <a href="../how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">02</span> Architecture
                     </a>
-                    <a href="../commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">03</span> Commands
                     </a>
-                    
-                    <a href="../safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">04</span> Safety
                     </a>
-
-                    <a href="../sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">05</span> Sempai Engine
                     </a>
-                    <a href="../jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">06</span> Jacquard
                     </a>
                     <div class="pt-4 mt-4 border-t border-weaver-indigo/10">
-                        <!-- Active State for Installation -->
-                        <a href="./" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)] font-mono">
-                            > Install
+                        <a href="/weaver/install/" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
+Install
                         </a>
-                        <!-- Sub-navigation for Install -->
-                        <div class="ml-4 pl-4 border-l border-weaver-indigo/20 space-y-1 my-2">
-                            <a href="#prerequisites" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Prerequisites</a>
-                            <a href="#quick-start" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Quick Start</a>
-                            <a href="#troubleshooting" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Troubleshooting</a>
-                        </div>
-
-                        <a href="../docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                             Docs
                         </a>
-                        <a href="../roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                             Roadmap
                         </a>
                     </div>
                 </nav>
             </div>
-            
+
             <!-- Version/Status Footer in Sidebar -->
             <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
                 <div class="flex items-center gap-2 mb-2">
@@ -118,23 +107,24 @@
 
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 grid-bg min-h-screen relative">
-            
+
+
             <!-- Hero Section -->
             <section id="install-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-weaver-indigo/20">
                 <div class="masthead-frame mx-auto relative z-10">
                     <div class="masthead-eyebrow mb-6">
                         <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Setup Guide</span>
                     </div>
-                    
+
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
                         Initialize the <br><span class="text-weaver-vermilion italic font-light">Loom</span>
                     </h1>
-                    
+
                     <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
                         Weaver is distributed as a single binary via Cargo. It requires a local daemon to manage state and sandboxing. Follow this guide to weave your first project.
                     </p>
                 </div>
-                
+
                 <!-- Abstract Loom Illustration -->
                 <div class="absolute right-0 top-0 h-full w-1/3 hidden xl:block opacity-20 pointer-events-none overflow-hidden">
                     <svg viewBox="0 0 400 400" class="h-full w-full">
@@ -144,11 +134,11 @@
                         <line x1="0" y1="150" x2="400" y2="150" stroke="#193C6E" stroke-width="1" />
                         <line x1="0" y1="200" x2="400" y2="200" stroke="#193C6E" stroke-width="1" />
                         <line x1="0" y1="250" x2="400" y2="250" stroke="#193C6E" stroke-width="1" />
-                        
+
                         <!-- Shuttle -->
                         <path d="M50 0 C 100 0, 100 400, 150 400" stroke="#E8502B" stroke-width="4" fill="none" />
                         <path d="M150 0 C 200 0, 200 400, 250 400" stroke="#E8502B" stroke-width="4" fill="none" />
-                        
+
                         <!-- Grid Overlay -->
                         <rect x="300" y="50" width="80" height="300" fill="none" stroke="#193C6E" stroke-width="2" stroke-dasharray="4 4" />
                     </svg>
@@ -203,10 +193,10 @@
                     <div class="relative pl-12 pb-12">
                         <div class="step-line"></div>
                         <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-vermilion text-white font-mono font-bold flex items-center justify-center rounded-sm shadow-sm z-10">01</div>
-                        
+
                         <h3 class="font-serif text-xl font-bold text-weaver-indigo mb-2">Install from Crates.io</h3>
                         <p class="text-weaver-indigo/70 mb-4 max-w-2xl">Download and compile the weaver binary. This includes both the client CLI and the daemon.</p>
-                        
+
                         <div class="bg-weaver-dark rounded-sm p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-green-400">cargo install weaver</code>
@@ -223,7 +213,7 @@
                         <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-indigo text-white font-mono font-bold flex items-center justify-center rounded-sm shadow-sm z-10">02</div>
 
                         <h3 class="font-serif text-xl font-bold text-weaver-indigo mb-2">Verify Installation</h3>
-                        <p class="text-weaver-indigo/70 mb-4 max-w-2xl">No init ceremony required — Weaver discovers configuration through XDG paths, environment variables, and CLI flags, all with sensible defaults. Run the capability probe to confirm the binary is installed:</p>
+                        <p class="text-weaver-indigo/70 mb-4 max-w-2xl">No init ceremony required — Weaver discovers configuration through XDG paths, environment variables, and CLI flags, all with sensible defaults. Run the capability probe to confirm the binary is installed:</p>
 
                         <div class="bg-weaver-dark rounded-sm p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
@@ -234,7 +224,7 @@
                             </div>
                             <div class="mt-2 text-xs text-gray-500 font-mono border-t border-white/10 pt-2">
                                 Prints the negotiated capability matrix as JSON.<br>
-                                No daemon required — this runs entirely in the CLI process.
+                                No daemon required — this runs entirely in the CLI process.
                             </div>
                         </div>
 
@@ -247,9 +237,9 @@
                                 Need the real defaults, XDG discovery rules, or the daemon JSONL envelope? Use the docs hub instead of this quick-start page.
                             </p>
                             <div class="flex flex-wrap gap-3 text-xs font-mono">
-                                <a href="../docs/#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
-                                <a href="../docs/#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
-                                <a href="../docs/#daemon-lifecycle" class="text-weaver-vermilion hover:underline">Daemon lifecycle</a>
+                                <a href="/weaver/docs/#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
+                                <a href="/weaver/docs/#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
+                                <a href="/weaver/docs/#daemon-lifecycle" class="text-weaver-vermilion hover:underline">Daemon lifecycle</a>
                             </div>
                         </div>
                     </div>
@@ -257,9 +247,9 @@
                     <!-- Step 3 -->
                     <div class="relative pl-12 last-step">
                         <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-indigo text-white font-mono font-bold flex items-center justify-center rounded-sm shadow-sm z-10">03</div>
-                        
+
                         <h3 class="font-serif text-xl font-bold text-weaver-indigo mb-2">Try a Command</h3>
-                        <p class="text-weaver-indigo/70 mb-4 max-w-2xl">The daemon auto-starts when you issue a domain command — no manual launch needed. Just run:</p>
+                        <p class="text-weaver-indigo/70 mb-4 max-w-2xl">The daemon auto-starts when you issue a domain command — no manual launch needed. Just run:</p>
 
                         <div class="bg-weaver-dark rounded-sm p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
@@ -284,7 +274,7 @@
             <section id="quick-start" class="py-16 px-8 lg:px-16 bg-weaver-indigo text-weaver-cream border-t border-b border-weaver-indigo/20 relative overflow-hidden">
                 <!-- Background Pattern -->
                 <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 30px 30px;"></div>
-                
+
                 <div class="max-w-6xl mx-auto relative z-10">
                     <div class="flex flex-col md:flex-row justify-between items-end mb-12">
                         <div>
@@ -344,7 +334,7 @@
             <section id="troubleshooting" class="py-16 px-8 lg:px-16">
                 <div class="max-w-5xl mx-auto">
                     <h2 class="font-serif text-3xl text-weaver-indigo mb-8">Troubleshooting</h2>
-                    
+
                     <div class="space-y-6">
                         <!-- Issue 1 -->
                         <div class="border border-weaver-indigo/20 bg-white p-6 rounded-sm">
@@ -371,13 +361,14 @@
                                 Unix domain sockets are not supported on Windows. Switch to TCP mode in <code>weaver.toml</code>.
                             </p>
                             <div class="bg-weaver-dark p-4 rounded-sm text-xs font-mono text-gray-300">
-                                <span class="text-weaver-indigo/50"># weaver.toml — switch to TCP transport</span><br>
+                                <span class="text-weaver-indigo/50"># weaver.toml — switch to TCP transport</span><br>
                                 daemon_socket = { transport = <span class="text-green-400">"tcp"</span>, host = <span class="text-green-400">"127.0.0.1"</span>, port = <span class="text-yellow-400">9779</span> }
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
 
             <!-- Footer -->
             <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
@@ -392,26 +383,27 @@
                         <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
                         <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
                     </div>
-                    
+
                     <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
                         <div class="flex flex-col space-y-2">
                             <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
-                            <a href="../why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
-                            <a href="../roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                            <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                            <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
                         </div>
                         <div class="flex flex-col space-y-2">
                             <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
-                            <a href="../docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
-                            <a href="./" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
+                            <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                            <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
                         </div>
                     </div>
                 </div>
-                <!-- Decorative Footer Stamp -->
-                <div class="absolute bottom-8 right-8 opacity-20 pointer-events-none hidden lg:block">
-                    <div class="w-24 h-24 border-4 border-weaver-indigo rounded-sm flex items-center justify-center stamp-rotate">
-                        <div class="text-center">
-                            <span class="text-weaver-indigo font-serif font-bold text-xl block">DESIGN</span>
-                            <span class="text-weaver-indigo font-serif font-bold text-xl block">SYSTEM</span>
+
+                <!-- Hanko Stamp (Decorative) -->
+                <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+                    <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
+                        <div class="text-center leading-tight">
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
                         </div>
                     </div>
                 </div>
@@ -431,6 +423,6 @@
             });
         });
     </script>
-    <script src="../assets/js/mobile-nav.js"></script>
+    <script src="/weaver/assets/js/mobile-nav.js"></script>
 </body>
 </html>

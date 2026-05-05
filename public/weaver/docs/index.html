@@ -37,19 +37,19 @@
     <style>
         /* Search Input */
         .search-input:focus { outline: none; border-color: #E8502B; }
-        
+
         /* Sticky TOC */
         .sticky-toc { position: sticky; top: 2rem; max-height: calc(100vh - 4rem); overflow-y: auto; }
     </style>
-    <link rel="stylesheet" href="../assets/styles/weaver-site.css">
+    <link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
-    
+
     <!-- Texture Overlay -->
     <div class="texture-overlay"></div>
 
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
-        
+
         <!-- Sidebar Navigation -->
         <aside id="sidebar" class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
             <div>
@@ -57,47 +57,41 @@
                     <h1 class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">WEAVER</h1>
                     <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
                 </div>
-                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    <a href="../" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]"><a href="/weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">00</span> Home
                     </a>
-                    <a href="../why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">01</span> Philosophy
                     </a>
-                    <a href="../how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">02</span> Architecture
                     </a>
-                    <a href="../commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">03</span> Commands
                     </a>
-                    
-                    <a href="../safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">04</span> Safety
                     </a>
-
-                    <a href="../sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">05</span> Sempai Engine
                     </a>
-                    <a href="../jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">06</span> Jacquard
                     </a>
                     <div class="pt-4 mt-4 border-t border-weaver-indigo/10">
-                        <a href="../install/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
-                            Install
+                        <a href="/weaver/install/" class="block px-4 py-2 text-sm font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono">
+&gt; Install
                         </a>
-
-                        <!-- Active State for Docs -->
-                        <a href="./" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)] font-mono">
-                            > Docs Hub
+                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
+                            Docs
                         </a>
-                        
-                        <a href="../roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                             Roadmap
                         </a>
                     </div>
                 </nav>
             </div>
-            
+
             <!-- Version/Status Footer in Sidebar -->
             <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
                 <div class="flex items-center gap-2 mb-2">
@@ -110,7 +104,8 @@
 
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 grid-bg min-h-screen relative flex flex-col xl:flex-row">
-            
+
+
             <!-- Inner Sidebar / Table of Contents -->
             <aside class="w-full xl:w-72 bg-weaver-cream/80 backdrop-blur border-r border-weaver-indigo/10 p-8 hidden xl:block z-30 sticky top-0 h-screen overflow-y-auto">
                 <div class="mb-8">
@@ -123,7 +118,7 @@
 
                 <div class="space-y-8 sticky-toc">
                     <div>
-                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Design & Concept</h3>
+                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Design &amp; Concept</h3>
                         <ul class="space-y-2 border-l border-weaver-indigo/10 ml-1">
                             <li><a href="#design-docs" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Design Documents</a></li>
                             <li><a href="#architecture" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Architecture Deep Dive</a></li>
@@ -141,7 +136,7 @@
                     </div>
 
                     <div>
-                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Plugins & Extensibility</h3>
+                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Plugins &amp; Extensibility</h3>
                         <ul class="space-y-2 border-l border-weaver-indigo/10 ml-1">
                             <li><a href="#plugins" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Plugin System</a></li>
                             <li><a href="#capability-ids" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Capability IDs</a></li>
@@ -150,7 +145,7 @@
                     </div>
 
                     <div>
-                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Parsing & Analysis</h3>
+                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Parsing &amp; Analysis</h3>
                         <ul class="space-y-2 border-l border-weaver-indigo/10 ml-1">
                             <li><a href="#tree-sitter" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Tree-sitter Integration</a></li>
                             <li><a href="#semgrep-patterns" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Sempai Patterns</a></li>
@@ -159,7 +154,7 @@
                     </div>
                 </div>
             </aside>
-            
+
             <!-- Content Area -->
             <div class="flex-1 min-w-0">
                 <!-- Mobile Search & TOC Toggle (Visible only on small screens) -->
@@ -171,7 +166,7 @@
                 </div>
 
                 <div class="p-8 lg:p-16 masthead-frame mx-auto">
-                    
+
                     <!-- Header -->
                     <header class="mb-16 border-b border-weaver-indigo/20 pb-8">
                         <div class="masthead-eyebrow mb-6">
@@ -246,7 +241,7 @@
                                     <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </a>
-                            <a href="../roadmap/" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
+                            <a href="/weaver/roadmap/" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <i class="fa-solid fa-route text-4xl text-weaver-indigo"></i>
                                 </div>
@@ -352,7 +347,7 @@ directive = <span class="text-green-400">"force"</span>
                         <!-- Fail-fast behaviour -->
                         <h3 id="fail-fast" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Fail-Fast Validation</h3>
                         <p class="mb-4 text-sm text-weaver-indigo/80">
-                            <code class="font-mono text-xs bg-weaver-indigo/10 px-1">ortho-config</code> v0.6.0 treats invalid configuration files as fatal. Both the CLI and daemon abort with a <code class="font-mono text-xs bg-weaver-indigo/10 px-1">LoadConfiguration</code> error that lists every offending path. No silent fallback — fix or remove the reported files.
+                            <code class="font-mono text-xs bg-weaver-indigo/10 px-1">ortho-config</code> v0.6.0 treats invalid configuration files as fatal. Both the CLI and daemon abort with a <code class="font-mono text-xs bg-weaver-indigo/10 px-1">LoadConfiguration</code> error that lists every offending path. No silent fallback — fix or remove the reported files.
                         </p>
                         <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 overflow-x-auto mb-8 paper-panel">
                             <div class="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">EXAMPLE ERROR OUTPUT</div>
@@ -984,36 +979,48 @@ pattern:
                     </div>
 
                 </div>
+            </div>
 
-                <!-- Footer -->
-                <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative mt-12">
-                    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
-                        <div class="mb-6 md:mb-0">
-                            <div class="flex items-center gap-3 mb-2">
-                                 <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
-                                    <span class="font-serif font-bold text-lg">W</span>
-                                 </div>
-                                 <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
-                            </div>
-                            <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
-                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+
+            <!-- Footer -->
+            <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
+                <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <div class="flex items-center gap-3 mb-2">
+                             <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
+                                <span class="font-serif font-bold text-lg">W</span>
+                             </div>
+                             <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
-                            <div class="flex flex-col space-y-2">
-                                <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
-                                <a href="../why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
-                                <a href="../roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
-                                <a href="./" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
-                                <a href="../install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
-                            </div>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
+                            <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                            <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
+                            <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                            <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
                         </div>
                     </div>
-                </footer>
-            </div>
+                </div>
+
+                <!-- Hanko Stamp (Decorative) -->
+                <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+                    <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
+                        <div class="text-center leading-tight">
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
         </main>
     </div>
 
@@ -1022,18 +1029,12 @@ pattern:
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
     </script>
-    <script src="../assets/js/mobile-nav.js"></script>
+    <script src="/weaver/assets/js/mobile-nav.js"></script>
 </body>
 </html>

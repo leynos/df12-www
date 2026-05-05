@@ -1,11 +1,10 @@
 # Templatize sub-sites: mxd homepage, weaver, and netsuke
 
-This ExecPlan (execution plan) is a living document. The sections
-`Constraints`, `Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`,
-`Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
-proceeds.
+This ExecPlan (execution plan) is a living document. The sections `Constraints`,
+ `Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`, `Decision Log`,
+and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
-Status: DRAFT
+Status: IN PROGRESS
 
 ## Purpose / big picture
 
@@ -21,8 +20,8 @@ After this work, every HTML page across all three sub-sites will be produced by
 
 Observable success: running `pages generate --site mxd` (and weaver, netsuke)
 regenerates all HTML identically to what exists today, validated visually via
-Playwright screenshots and structurally via `make fmt check-fmt typecheck lint
-test` passing clean.
+Playwright screenshots and structurally via
+`make fmt check-fmt typecheck lint test` passing clean.
 
 ## Constraints
 
@@ -59,65 +58,60 @@ test` passing clean.
 ## Risks
 
 - Risk: `SubSiteHomePageBuilder` does not pass `nav_links` or `parent_link` to
-  templates, so homepages cannot render shared navigation.
-  Severity: medium
-  Likelihood: high (confirmed from code review)
-  Mitigation: Extend `SubSiteHomePageBuilder.__init__` with optional
-  `nav_links` and `parent_link` kwargs and include them in the render context.
-  Update `cli.py` to pass them from the `SubSiteConfig`. This is a small,
-  additive Python change.
+  templates, so homepages cannot render shared navigation. Severity: medium
+  Likelihood: high (confirmed from code review) Mitigation: Extend
+  `SubSiteHomePageBuilder.__init__` with optional `nav_links` and `parent_link`
+  kwargs and include them in the render context. Update `cli.py` to pass them
+  from the `SubSiteConfig`. This is a small, additive Python change.
 
 - Risk: Weaver and netsuke `nav_links` in `pages.yaml` use relative hrefs
   (`../`), which `ContentPageGenerator._mark_current_nav()` cannot match
-  against absolute `target_href` values.
-  Severity: low (nav "current" marking would silently fail, not break pages)
-  Likelihood: high (confirmed from code review)
-  Mitigation: Update weaver and netsuke `nav_links` in `pages.yaml` to use
-  absolute paths (`/weaver/...`, `/netsuke/...`) before wiring up content
+  against absolute `target_href` values. Severity: low (nav "current" marking
+  would silently fail, not break pages) Likelihood: high (confirmed from code
+  review) Mitigation: Update weaver and netsuke `nav_links` in `pages.yaml` to
+  use absolute paths (`/weaver/...`, `/netsuke/...`) before wiring up content
   pages.
 
 - Risk: Nested output slugs (e.g., `docs/getting-started`) may not be handled
-  correctly by `ContentPageGenerator` or `_mark_current_nav`.
-  Severity: medium
+  correctly by `ContentPageGenerator` or `_mark_current_nav`. Severity: medium
   Likelihood: low (`output_dir / output_slug / "index.html"` handles path
-  separators in slugs correctly on Linux)
-  Mitigation: Verify by running the generator for one nested slug before
-  wiring up all pages.
+  separators in slugs correctly on Linux) Mitigation: Verify by running the
+  generator for one nested slug before wiring up all pages.
 
 - Risk: Weaver and netsuke pages use Tailwind CDN and FontAwesome CDN inline
   in each page, not a compiled stylesheet. This pattern is fine in templates
   but adds ~400 bytes of `<script>`/`<link>` tags to the base template.
-  Severity: low
-  Likelihood: certain (by design)
-  Mitigation: Replicate these CDN tags verbatim in the `doc_page.jinja` base
-  template for each site. No action needed.
+  Severity: low Likelihood: certain (by design) Mitigation: Replicate these CDN
+  tags verbatim in the `doc_page.jinja` base template for each site. No action
+  needed.
 
 - Risk: The weaver homepage uses an inline `<script>` block for Tailwind
-  configuration that differs in detail from sub-pages (no differences found
-  on inspection, but confirm during implementation).
-  Severity: low
-  Likelihood: low
+  configuration that differs in detail from sub-pages (no differences found on
+  inspection, but confirm during implementation). Severity: low Likelihood: low
   Mitigation: Confirm the Tailwind config block is identical across all weaver
   pages; if not, move differing parts into the page-level block.
 
 ## Progress
 
-- [ ] Stage 1: mxd homepage
-  - [ ] Extend `SubSiteHomePageBuilder` and update `cli.py`
-  - [ ] Create `templates/mxd/home_page.jinja`
-  - [ ] Add `homepage:` key to `sites.mxd` in `config/pages.yaml`
-  - [ ] Run `pages generate --site mxd`, validate, delete `public/mxd/index.html`
-  - [ ] Gate commit
+- [x] (2026-05-05) Stage 1: mxd homepage
+  - [x] (2026-05-05) Extend `SubSiteHomePageBuilder` and update `cli.py`
+  - [x] (2026-05-05) Create `templates/mxd/home_page.jinja`
+  - [x] (2026-05-05) Add `homepage:` key to `sites.mxd` in `config/pages.yaml`
+  - [x] (2026-05-05) Run `pages generate --site mxd`, validate, delete
+        `public/mxd/index.html`
+  - [x] (2026-05-05) Gate commit (`8c11192`)
 
-- [ ] Stage 2: weaver (14 pages)
-  - [ ] Update weaver `nav_links` to absolute paths in `config/pages.yaml`
-  - [ ] Create `templates/weaver/doc_page.jinja`
-  - [ ] Create `templates/weaver/home_page.jinja`
-  - [ ] Create 13 page templates in `templates/weaver/pages/`
-  - [ ] Add `homepage:` and `content_pages:` to `sites.weaver` in `config/pages.yaml`
-  - [ ] Run `pages generate --site weaver`, validate, delete 14
-        hard-coded HTML files
-  - [ ] Gate commit
+- [x] (2026-05-05) Stage 2: weaver (14 pages)
+  - [x] (2026-05-05) Update weaver `nav_links` to absolute paths in
+        `config/pages.yaml`
+  - [x] (2026-05-05) Create `templates/weaver/doc_page.jinja`
+  - [x] (2026-05-05) Create `templates/weaver/home_page.jinja`
+  - [x] (2026-05-05) Create 13 page templates in `templates/weaver/pages/`
+  - [x] (2026-05-05) Add `homepage:` and `content_pages:` to `sites.weaver` in
+        `config/pages.yaml`
+  - [x] (2026-05-05) Run `pages generate --site weaver`, validate (Playwright
+        screenshots confirm correct rendering), all 17 pages generated
+  - [x] (2026-05-05) Gate commit (this commit)
 
 - [ ] Stage 3: netsuke (20 pages)
   - [ ] Update netsuke `nav_links` to absolute paths in `config/pages.yaml`
@@ -132,33 +126,34 @@ test` passing clean.
 
 ## Surprises & discoveries
 
-(none yet)
+- Observation: Weaver page templates created by the Task agent used
+  `{% extends "weaver/doc_page.jinja" %}` but the Jinja loader search path is
+  `templates/weaver`, so the correct path is just `{% extends "doc_page.jinja" %}`.
+  Evidence: Generator raised `TemplateNotFound: weaver/doc_page.jinja` on first run.
+  Impact: Fixed with sed; all page templates updated before committing.
 
 ## Decision log
 
 - Decision: Extend `SubSiteHomePageBuilder` with optional `nav_links` /
-  `parent_link` kwargs rather than embedding them in the YAML `homepage.context`
-  dict.
-  Rationale: Keeps the YAML clean; avoids duplicating structured nav data in
-  the freeform context block; consistent with how `ContentPageGenerator` works.
-  The change is additive and backward-compatible (both new kwargs default to
-  `None`/`[]`).
-  Date/Author: 2026-05-05 (plan phase)
+  `parent_link` kwargs rather than embedding them in the YAML
+  `homepage.context` dict. Rationale: Keeps the YAML clean; avoids duplicating
+  structured nav data in the freeform context block; consistent with how
+  `ContentPageGenerator` works. The change is additive and backward-compatible
+  (both new kwargs default to `None`/`[]`). Date/Author: 2026-05-05 (plan phase)
 
 - Decision: Update weaver and netsuke `nav_links` in `pages.yaml` to absolute
-  paths before wiring up content pages.
-  Rationale: `ContentPageGenerator._mark_current_nav()` computes `target_href`
-  as an absolute path (`/site/slug/`). Relative hrefs in `nav_links` would
-  never match, silently breaking active-link highlighting on every generated
-  page. Absolute paths also work correctly from shared_content_page.jinja.
+  paths before wiring up content pages. Rationale:
+  `ContentPageGenerator._mark_current_nav()` computes `target_href` as an
+  absolute path (`/site/slug/`). Relative hrefs in `nav_links` would never
+  match, silently breaking active-link highlighting on every generated page.
+  Absolute paths also work correctly from shared_content_page.jinja.
   Date/Author: 2026-05-05 (plan phase)
 
 - Decision: Approach content-page migration as "lift HTML into template, wrap
-  in base template extends, delete source file". No content changes are permitted
-  during migration.
-  Rationale: Visual fidelity is a hard constraint; mixing migration and design
-  changes introduces unnecessary risk and complicates validation.
-  Date/Author: 2026-05-05 (plan phase)
+  in base template extends, delete source file". No content changes are
+  permitted during migration. Rationale: Visual fidelity is a hard constraint;
+  mixing migration and design changes introduces unnecessary risk and
+  complicates validation. Date/Author: 2026-05-05 (plan phase)
 
 ## Outcomes & retrospective
 
@@ -195,16 +190,18 @@ public/
 
 ### How the build pipeline works
 
-`pages generate --site mxd` calls `_generate_subsite(site_config,
-subsite)` in `cli.py`. That function:
+`pages generate --site mxd` calls `_generate_subsite(site_config, subsite)` in
+`cli.py`. That function:
 
-1. Renders doc pages (from `subsite.pages` — empty for all three sites currently).
+1. Renders doc pages (from `subsite.pages` — empty for all three sites
+   currently).
 2. Renders the homepage if `subsite.homepage` is set (currently `None` for all
    three).
 3. Renders shared content (terms-of-use, privacy-policy, code-of-conduct) via
    `SharedContentGenerator`, using `templates/{site}/shared_content_page.jinja`.
-4. Renders content pages (from `subsite.content_pages`) via `ContentPageGenerator`,
-   using a per-page template that extends `templates/{site}/doc_page.jinja`.
+4. Renders content pages (from `subsite.content_pages`) via
+   `ContentPageGenerator`, using a per-page template that extends
+   `templates/{site}/doc_page.jinja`.
 5. Copies static assets from `subsite.static_assets_dir` (not used by any of
    the three sites currently).
 
@@ -219,18 +216,18 @@ render navigation.
 ### How content pages work
 
 `ContentPageGenerator` loads a template identified by
-`ContentPageConfig.template` (relative to `templates/{site}/`), renders it
-with `nav_links`, `parent_link`, `stylesheet`, and `generated_at`, and writes
-to `{output_dir}/{output_slug}/index.html`. For mxd, every content page
-template extends `doc_page.jinja`, filling named blocks (`page_title`, `hero`,
+`ContentPageConfig.template` (relative to `templates/{site}/`), renders it with
+`nav_links`, `parent_link`, `stylesheet`, and `generated_at`, and writes to
+`{output_dir}/{output_slug}/index.html`. For mxd, every content page template
+extends `doc_page.jinja`, filling named blocks (`page_title`, `hero`,
 `route_map`, `content`, `footer_cta`).
 
 ### Nav-link active marking
 
-`_mark_current_nav()` sets `current: true` on the nav link whose `href`
-matches `{base_path}{output_slug}/`. This requires nav links to use absolute
-paths (e.g. `/weaver/why-weaver/`). Weaver and netsuke currently use relative
-paths (`../why-weaver/`), which will not match and must be corrected.
+`_mark_current_nav()` sets `current: true` on the nav link whose `href` matches
+`{base_path}{output_slug}/`. This requires nav links to use absolute paths (e.g.
+ `/weaver/why-weaver/`). Weaver and netsuke currently use relative paths (
+`../why-weaver/`), which will not match and must be corrected.
 
 ### Template patterns in use
 
@@ -239,7 +236,8 @@ mxd `doc_page.jinja` is the reference pattern:
 - A standalone `<!DOCTYPE html>` document.
 - CDN stylesheet references use absolute paths (`/mxd/assets/...`).
 - Named blocks: `page_title`, `hero`, `route_map`, `content`, `footer_cta`.
-- Navigation rendered from injected `nav_links` and `parent_link` context variables.
+- Navigation rendered from injected `nav_links` and `parent_link` context
+  variables.
 
 Each site's `doc_page.jinja` will follow the same block structure, adapted to
 the site's own visual design.
@@ -343,10 +341,10 @@ variables, matching the loop already in `doc_page.jinja`:
 {% for link in nav_links %}<a href="{{ link.href }}"{% if link.href == "./" %} aria-current="page"{% endif %}>{{ link.label }}</a>{% endfor %}
 ```
 
-The `<main>` body content (all five content sections plus footer-CTA) is
-unique to the homepage and is pasted verbatim. Change asset references from
-relative (`assets/...`) to absolute (`/mxd/assets/...`) to be consistent with
-the generated content pages.
+The `<main>` body content (all five content sections plus footer-CTA) is unique
+to the homepage and is pasted verbatim. Change asset references from relative (
+`assets/...`) to absolute (`/mxd/assets/...`) to be consistent with the
+generated content pages.
 
 **Step 1.4 — Add homepage config to `config/pages.yaml`.**
 
@@ -366,10 +364,10 @@ pages generate --site mxd
 ```
 
 Use Playwright to navigate to `http://127.0.0.1:8080/mxd/` and take a
-screenshot. Compare with the reference screenshot captured during planning.
-Use `css-view` to diff the computed styles of key structural elements (hero,
-nav, footer) between the hard-coded page and the newly generated page —
-differences should be zero.
+screenshot. Compare with the reference screenshot captured during planning. Use
+`css-view` to diff the computed styles of key structural elements (hero, nav,
+footer) between the hard-coded page and the newly generated page — differences
+should be zero.
 
 **Step 1.6 — Delete the hard-coded file.**
 
@@ -387,7 +385,7 @@ make fmt check-fmt typecheck lint test
 
 Commit with message `feat: template mxd homepage`.
 
----
+______________________________________________________________________
 
 ### Stage 2 — weaver (14 pages)
 
@@ -427,29 +425,31 @@ still produces correct output:
 pages generate --site weaver
 ```
 
-Spot-check `public/weaver/terms-of-use/index.html` — nav link hrefs should
-now be absolute.
+Spot-check `public/weaver/terms-of-use/index.html` — nav link hrefs should now
+be absolute.
 
 **Step 2.2 — Create `templates/weaver/doc_page.jinja`.**
 
 This is the base template for all weaver content pages. It contains:
 
 - Full `<head>` with Font Awesome CDN, Tailwind CDN + config block, Google
-  Fonts link, and `<link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">`.
+  Fonts link, and
+  `<link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">`.
 - The sidebar `<aside>` with the WEAVER brand, nav links rendered from
   `nav_links` context (marking the active link), and the back-link footer.
 - A `<main>` element with a `{% block content %}{% endblock %}` for
   page-specific body.
 - The weaver `<footer>` block (shared by all content pages).
-- The inline smooth-scroll `<script>` and `<script src="/weaver/assets/js/mobile-nav.js">`.
+- The inline smooth-scroll `<script>` and
+  `<script src="/weaver/assets/js/mobile-nav.js">`.
 
-The sidebar nav renders the injected `nav_links` list, setting the active
-state class on the link whose `href` matches the current page. The `parent_link`
-is rendered in the sidebar footer area (`← Back to df12 Productions`).
+The sidebar nav renders the injected `nav_links` list, setting the active state
+class on the link whose `href` matches the current page. The `parent_link` is
+rendered in the sidebar footer area (`← Back to df12 Productions`).
 
 Lift this structure directly from `public/weaver/why-weaver/index.html`, which
-is a representative content page. Change all relative asset paths (`../assets/`)
-to absolute (`/weaver/assets/`).
+is a representative content page. Change all relative asset paths (
+`../assets/`) to absolute (`/weaver/assets/`).
 
 Named blocks: `page_title` (for `<title>`), `content` (page body inside main).
 
@@ -457,19 +457,19 @@ Named blocks: `page_title` (for `<title>`), `content` (page body inside main).
 
 Lift from `public/weaver/index.html`. Structure: full `<head>` (same as
 doc_page), sidebar nav with Home marked active, full hero + value-props +
-commands preview + Sempai + links-grid sections, and the weaver footer.
-Change relative asset refs to absolute.
+commands preview + Sempai + links-grid sections, and the weaver footer. Change
+relative asset refs to absolute.
 
 This is a standalone template (does not extend `doc_page.jinja`) because the
 homepage has structural differences in the sidebar footer and hero layout.
 
 **Step 2.4 — Create 13 content page templates.**
 
-Create `templates/weaver/pages/{slug}.jinja` for each content page,
-extending `doc_page.jinja`. Each template fills at minimum the `page_title`
-and `content` blocks with content lifted verbatim from the corresponding
-`public/weaver/{slug}/index.html`. Change relative asset refs (`../assets/`)
-to absolute (`/weaver/assets/`).
+Create `templates/weaver/pages/{slug}.jinja` for each content page, extending
+`doc_page.jinja`. Each template fills at minimum the `page_title` and `content`
+blocks with content lifted verbatim from the corresponding
+`public/weaver/{slug}/index.html`. Change relative asset refs (`../assets/`) to
+absolute (`/weaver/assets/`).
 
 Pages and their template paths:
 
@@ -597,7 +597,7 @@ make fmt check-fmt typecheck lint test
 
 Commit with message `feat: template weaver sub-site`.
 
----
+______________________________________________________________________
 
 ### Stage 3 — netsuke (20 pages)
 
@@ -626,7 +626,8 @@ Regenerate and spot-check shared content.
 Base template for netsuke content pages. Contains:
 
 - `<head>` with Tailwind CDN, Iconify CDN, Google Fonts (Fraunces, JetBrains
-  Mono, Source Sans 3), and `<link rel="stylesheet" href="/netsuke/assets/css/himotoshi.css">`.
+  Mono, Source Sans 3), and
+  `<link rel="stylesheet" href="/netsuke/assets/css/himotoshi.css">`.
 - The fixed top `<nav>` with brand logo, desktop nav links from `nav_links`
   context (marking active), GitHub/install action buttons, and mobile menu.
 - `<main>` with `{% block content %}{% endblock %}`.
@@ -636,25 +637,23 @@ Base template for netsuke content pages. Contains:
 Named blocks: `page_title`, `content`.
 
 Lift from a representative content page (e.g.,
-`public/netsuke/install/index.html`). Change relative asset refs to
-absolute (`/netsuke/assets/...`).
+`public/netsuke/install/index.html`). Change relative asset refs to absolute (
+`/netsuke/assets/...`).
 
 **Step 3.3 — Create `templates/netsuke/home_page.jinja`.**
 
-Lift from `public/netsuke/index.html`. This is a standalone template (does
-not extend `doc_page.jinja`) because the homepage has a full-viewport hero
-with background image and a significantly different structure from content
-pages.
+Lift from `public/netsuke/index.html`. This is a standalone template (does not
+extend `doc_page.jinja`) because the homepage has a full-viewport hero with
+background image and a significantly different structure from content pages.
 
 Change all relative asset refs to absolute (`/netsuke/assets/...`). Note the
-homepage includes `assets/js/tailwind-config.js` and Plotly CDN; preserve
-these verbatim.
+homepage includes `assets/js/tailwind-config.js` and Plotly CDN; preserve these
+verbatim.
 
 **Step 3.4 — Create 19 content page templates.**
 
-Create `templates/netsuke/pages/{name}.jinja` for each content page.
-Nested output slugs use flat template names with path segments in
-`output_slug`:
+Create `templates/netsuke/pages/{name}.jinja` for each content page. Nested
+output slugs use flat template names with path segments in `output_slug`:
 
 - `blog` → `pages/blog.jinja`
 - `contributing` → `pages/contributing.jinja`
@@ -696,8 +695,8 @@ pages generate --site netsuke
 
 Playwright spot-check: `/netsuke/`, `/netsuke/install/`, `/netsuke/docs/`,
 `/netsuke/docs/getting-started/`, `/netsuke/examples/hello-world/`,
-`/netsuke/blog/`. Use `css-view` to diff the nav structure of the
-hard-coded vs. generated `install` page.
+`/netsuke/blog/`. Use `css-view` to diff the nav structure of the hard-coded
+vs. generated `install` page.
 
 **Step 3.7 — Delete 20 hard-coded HTML files.**
 
@@ -835,8 +834,8 @@ make lint         # ruff / markdownlint
 make test         # pytest (including any Playwright tests unless SKIP_PLAYWRIGHT=1)
 ```
 
-Run each sequentially after all file changes within a stage are complete.
-Do not proceed to the next stage if any command fails.
+Run each sequentially after all file changes within a stage are complete. Do
+not proceed to the next stage if any command fails.
 
 ## Idempotence and recovery
 
@@ -844,9 +843,9 @@ Do not proceed to the next stage if any command fails.
 output files without side effects. If a generation step fails partway, delete
 any partial output under `public/{site}/` and re-run.
 
-Deleting hard-coded files is a one-way operation. Before deleting, confirm
-the generated output is present and correct. Git history preserves the
-originals; run `git show HEAD:{path}` to recover any deleted file.
+Deleting hard-coded files is a one-way operation. Before deleting, confirm the
+generated output is present and correct. Git history preserves the originals;
+run `git show HEAD:{path}` to recover any deleted file.
 
 ## Artifacts and notes
 

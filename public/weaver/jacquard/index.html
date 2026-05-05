@@ -34,56 +34,67 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/styles/weaver-site.css">
+    <link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
 
+    <!-- Texture Overlay -->
     <div class="texture-overlay"></div>
 
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
 
+        <!-- Sidebar Navigation -->
         <aside id="sidebar" class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
             <div>
                 <div class="p-8 border-b-2 border-weaver-indigo/20" data-mobile-nav-header>
                     <h1 class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">WEAVER</h1>
                     <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
                 </div>
-                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    <a href="../" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]"><a href="/weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">00</span> Home
                     </a>
-                    <a href="../why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">01</span> Philosophy
                     </a>
-                    <a href="../how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">02</span> Architecture
                     </a>
-                    <a href="../commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">03</span> Commands
                     </a>
-                    <a href="../safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">04</span> Safety
                     </a>
-                    <a href="../sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">05</span> Sempai Engine
                     </a>
-                    <a href="./" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)] font-mono">
-                        <span class="mr-2 font-mono text-xs">06</span> Jacquard
+                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
+                        <span class="mr-2 font-mono text-xs ">06</span> Jacquard
                     </a>
+<ul class="space-y-1 mt-1 ml-4">
+    <li><a href="#thesis" class="block px-4 py-1 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion transition-colors">Thesis</a></li>
+    <li><a href="#cards" class="block px-4 py-1 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion transition-colors">Card Contract</a></li>
+    <li><a href="#slices" class="block px-4 py-1 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion transition-colors">Bounded Slices</a></li>
+    <li><a href="#history" class="block px-4 py-1 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion transition-colors">History &amp; Matching</a></li>
+    <li><a href="#commands" class="block px-4 py-1 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion transition-colors">Command Surface</a></li>
+    <li><a href="#operations" class="block px-4 py-1 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion transition-colors">Operations</a></li>
+    <li><a href="#references" class="block px-4 py-1 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion transition-colors">References</a></li>
+</ul>
                     <div class="pt-4 mt-4 border-t border-weaver-indigo/10">
-                        <a href="../install/" class="block px-4 py-2 text-sm font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono">
-                            &gt; Install
+                        <a href="/weaver/install/" class="block px-4 py-2 text-sm font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono">
+&gt; Install
                         </a>
-                        <a href="../docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                             Docs
                         </a>
-                        <a href="../roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                             Roadmap
                         </a>
                     </div>
                 </nav>
             </div>
 
+            <!-- Version/Status Footer in Sidebar -->
             <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
                 <div class="flex items-center gap-2 mb-2">
                     <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
@@ -93,7 +104,9 @@
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="flex-1 lg:ml-64 grid-bg min-h-screen relative flex flex-col xl:flex-row">
+
 
             <aside class="w-full xl:w-72 bg-weaver-cream/80 backdrop-blur border-r border-weaver-indigo/10 p-8 hidden xl:block z-30 sticky top-0 h-screen overflow-y-auto">
                 <div class="mb-10">
@@ -108,7 +121,7 @@
                             <li><a href="#thesis" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">Thesis</a></li>
                             <li><a href="#cards" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">Card Contract</a></li>
                             <li><a href="#slices" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">Bounded Slices</a></li>
-                            <li><a href="#history" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">History & Matching</a></li>
+                            <li><a href="#history" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">History &amp; Matching</a></li>
                             <li><a href="#commands" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">Command Surface</a></li>
                             <li><a href="#operations" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">Operations</a></li>
                             <li><a href="#references" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">References</a></li>
@@ -174,7 +187,7 @@
                         <div class="flex items-center gap-3">
                             <span class="status-pill status-pill-planned">Planned</span>
                             <p class="text-sm text-weaver-indigo/80 leading-relaxed">
-                                Planned. Jacquard is in active design. The contract below reflects design intent, not current CLI behaviour. Implementation is tracked on the <a href="../roadmap/" class="text-weaver-vermilion hover:underline">roadmap</a>.
+                                Planned. Jacquard is in active design. The contract below reflects design intent, not current CLI behaviour. Implementation is tracked on the <a href="/weaver/roadmap/" class="text-weaver-vermilion hover:underline">roadmap</a>.
                             </p>
                         </div>
                     </div>
@@ -202,7 +215,7 @@
                             </div>
                             <div class="xl:col-span-8 space-y-8">
                                 <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-sm figure-frame figure-fullbleed">
-                                    <img src="../assets/jacquard/jacquard-whitepaper-entity-interstitial.png" alt="Illustrated diagram showing a source file split into entity regions and interstitial regions, with comments and decorators bundled into symbol cards and imports normalized into groups." class="w-full rounded-sm border border-weaver-indigo/10">
+                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-entity-interstitial.png" alt="Illustrated diagram showing a source file split into entity regions and interstitial regions, with comments and decorators bundled into symbol cards and imports normalized into groups." class="w-full rounded-sm border border-weaver-indigo/10">
                                     <figcaption class="mt-4 text-sm text-weaver-indigo/75 leading-relaxed">
                                         <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mr-2">Figure 1</span>
                                         Entity regions become cards. Interstitial regions carry import, decorator, header, and config data. The bundling rule is deterministic because history turns to soup fast when attachments float around.
@@ -292,7 +305,7 @@
                         <div class="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
                             <div class="xl:col-span-7">
                                 <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-sm figure-frame figure-fullbleed">
-                                    <img src="../assets/jacquard/jacquard-whitepaper-card-slice.png" alt="Illustrated diagram of a Jacquard symbol card at the center of a bounded slice with typed call, import, and config edges and explicit card, edge, and token budgets." class="w-full rounded-sm border border-weaver-indigo/10">
+                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-card-slice.png" alt="Illustrated diagram of a Jacquard symbol card at the center of a bounded slice with typed call, import, and config edges and explicit card, edge, and token budgets." class="w-full rounded-sm border border-weaver-indigo/10">
                                     <figcaption class="mt-4 text-sm text-weaver-indigo/75 leading-relaxed">
                                         <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mr-2">Figure 2</span>
                                         The slice builder is depth-limited, budget-aware, and confidence-weighted. Breadth-first search alone is too naive. Frontier scoring keeps the graph useful before it becomes a landfill.
@@ -334,7 +347,7 @@
                                 <div class="bg-white/70 border border-weaver-indigo/10 rounded-sm p-5 mt-5">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Frontier Scoring</p>
                                     <p class="text-sm text-weaver-indigo/80 leading-relaxed">
-                                        Not all frontier expansions deserve budget. The priority score weights confidence (how trustworthy is the edge?), fan-in (how many other symbols depend on this one?), and proximity to the entry symbol. Novelty matters because five cards from the same file often tell one story five times. The score is deterministic — given the same graph state, the same nodes win.
+                                        Not all frontier expansions deserve budget. The priority score weights confidence (how trustworthy is the edge?), fan-in (how many other symbols depend on this one?), and proximity to the entry symbol. Novelty matters because five cards from the same file often tell one story five times. The score is deterministic — given the same graph state, the same nodes win.
                                     </p>
                                 </div>
                             </div>
@@ -344,7 +357,7 @@
                     <section id="history" class="mb-20">
                         <div class="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
                             <div class="xl:col-span-4">
-                                <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-4 block">03. History & Matching</span>
+                                <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-4 block">03. History &amp; Matching</span>
                                 <h2 class="font-serif text-4xl text-weaver-indigo mb-5">Names drift. Code moves. The system still has to keep up.</h2>
                                 <p class="text-lg text-weaver-indigo/80 leading-relaxed mb-5">
                                     <code>graph-history</code> takes the current slice and walks it backward over recent commits. The initial mode is <code>snapshots_on_demand</code>: load only the blobs the slice needs, parse them directly from git, and stay within explicit blob, time, and file-count limits. Sensible. A ledger cache can wait until the system earns the complexity.
@@ -363,7 +376,7 @@
                             </div>
                             <div class="xl:col-span-8 space-y-8">
                                 <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-sm figure-frame figure-fullbleed">
-                                    <img src="../assets/jacquard/jacquard-whitepaper-history-matching.png" alt="Illustrated diagram of graph history across recent commits, showing exact matches, structural matches, alternates, confidence values, and a blast-radius view of downstream dependencies." class="w-full rounded-sm border border-weaver-indigo/10">
+                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-history-matching.png" alt="Illustrated diagram of graph history across recent commits, showing exact matches, structural matches, alternates, confidence values, and a blast-radius view of downstream dependencies." class="w-full rounded-sm border border-weaver-indigo/10">
                                     <figcaption class="mt-4 text-sm text-weaver-indigo/75 leading-relaxed">
                                         <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mr-2">Figure 3</span>
                                         The history model is honest about ambiguity. A rename that keeps structure and neighbourhood should score well. A collision among homonyms should not be waved through because the UI wants closure.
@@ -598,7 +611,7 @@
                                         Sempai is the discovery front door. Jacquard is what happens after discovery. One finds the interesting symbol. The other turns that symbol into a stable card, a bounded neighbourhood, and a recent change story. Search without context is brittle. Context without search is slow. The system needs both.
                                     </p>
                                     <p class="text-sm text-weaver-indigo/75 leading-relaxed">
-                                        The backend model follows Weaver’s existing three-way split: Tree-sitter for extraction, LSP for semantic enrichment, and a relational layer for slices, deltas, and fan metrics. The design is additive, not theatrical.
+                                        The backend model follows Weaver's existing three-way split: Tree-sitter for extraction, LSP for semantic enrichment, and a relational layer for slices, deltas, and fan metrics. The design is additive, not theatrical.
                                     </p>
                                 </div>
                             </div>
@@ -628,49 +641,62 @@
                         </div>
                     </section>
                 </div>
-
-                <!-- Footer -->
-                <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative mt-12">
-                    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
-                        <div class="mb-6 md:mb-0">
-                            <div class="flex items-center gap-3 mb-2">
-                                 <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
-                                    <span class="font-serif font-bold text-lg">W</span>
-                                 </div>
-                                 <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
-                            </div>
-                            <p class="font-mono text-xs text-weaver-indigo/60 mt-1">&copy; 2026 df12 Productions</p>
-                            <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
-                            <div class="flex flex-col space-y-2">
-                                <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
-                                <a href="../why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
-                                <a href="../roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
-                                <a href="../docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
-                                <a href="../install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hanko Stamp (Decorative) -->
-                    <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
-                        <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
-                            <div class="text-center leading-tight">
-                                <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
-                                <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
             </div>
+
+
+            <!-- Footer -->
+            <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
+                <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <div class="flex items-center gap-3 mb-2">
+                             <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
+                                <span class="font-serif font-bold text-lg">W</span>
+                             </div>
+                             <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
+                        </div>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
+                            <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                            <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
+                            <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                            <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hanko Stamp (Decorative) -->
+                <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+                    <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
+                        <div class="text-center leading-tight">
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
 
         </main>
     </div>
-    <script src="../assets/js/mobile-nav.js"></script>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+    <script src="/weaver/assets/js/mobile-nav.js"></script>
 </body>
 </html>

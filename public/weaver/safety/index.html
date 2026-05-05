@@ -41,7 +41,7 @@
         .token-number { color: #BD93F9; }
         .token-boolean { color: #FF79C6; }
         .token-comment { color: #6272A4; font-style: italic; }
-        
+
         /* Custom UI Elements */
         .lock-animation { animation: lock-pulse 4s infinite; }
         @keyframes lock-pulse {
@@ -49,15 +49,15 @@
             50% { transform: scale(1.05); opacity: 1; }
         }
     </style>
-    <link rel="stylesheet" href="../assets/styles/weaver-site.css">
+    <link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
-    
+
     <!-- Texture Overlay -->
     <div class="texture-overlay"></div>
 
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
-        
+
         <!-- Sidebar Navigation -->
         <aside id="sidebar" class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
             <div>
@@ -65,50 +65,41 @@
                     <h1 class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">WEAVER</h1>
                     <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
                 </div>
-                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    <a href="../" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]"><a href="/weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">00</span> Home
                     </a>
-                    <a href="../why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">01</span> Philosophy
                     </a>
-                    <a href="../how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">02</span> Architecture
                     </a>
-                    <a href="../commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">03</span> Commands
                     </a>
-                    
-                    <a href="./" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
-                        <span class="mr-2 font-mono text-xs">04</span> Safety
+                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
+                        <span class="mr-2 font-mono text-xs ">04</span> Safety
                     </a>
-                    <!-- Sub-navigation for Safety -->
-                    <div class="ml-4 pl-4 border-l border-weaver-indigo/20 space-y-1 my-2">
-                        <a href="#double-lock" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Double-Lock Validation</a>
-                        <a href="#birdcage" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Birdcage Sandbox</a>
-                        <a href="#threat-model" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Threat Model</a>
-                    </div>
-
-                    <a href="../sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">05</span> Sempai Engine
                     </a>
-                    <a href="../jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">06</span> Jacquard
                     </a>
                     <div class="pt-4 mt-4 border-t border-weaver-indigo/10">
-                        <a href="../install/" class="block px-4 py-2 text-sm font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono">
-                            > Install
+                        <a href="/weaver/install/" class="block px-4 py-2 text-sm font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono">
+&gt; Install
                         </a>
-                        <a href="../docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                             Docs
                         </a>
-                        <a href="../roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                             Roadmap
                         </a>
                     </div>
                 </nav>
             </div>
-            
+
             <!-- Version/Status Footer in Sidebar -->
             <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
                 <div class="flex items-center gap-2 mb-2">
@@ -121,28 +112,29 @@
 
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 grid-bg min-h-screen relative">
-            
+
+
             <!-- Hero Section -->
             <section id="safety-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-weaver-indigo/20">
                 <div class="masthead-frame mx-auto relative z-10">
                     <div class="masthead-eyebrow mb-6">
                         <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Security Architecture</span>
                     </div>
-                    
+
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
                         Safety <span class="text-weaver-vermilion italic font-light">&amp;</span><br>
                         Sandboxing
                     </h1>
 
                     <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
-                        Weaver assumes that AI agents are fundamentally untrusted actors. Two independent safety layers protect the codebase: the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Double-Lock</span> validation harness (syntactic + semantic checks on edits to supported files, with exemptions detailed below) and the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Birdcage</span> sandbox (kernel-level process isolation for all external tools). They operate independently — the Double-Lock guards code correctness; the sandbox guards system integrity.
+                        Weaver assumes that AI agents are fundamentally untrusted actors. Two independent safety layers protect the codebase: the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Double-Lock</span> validation harness (syntactic + semantic checks on edits to supported files, with exemptions detailed below) and the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Birdcage</span> sandbox (kernel-level process isolation for all external tools). They operate independently — the Double-Lock guards code correctness; the sandbox guards system integrity.
                     </p>
                 </div>
-                
+
                 <!-- Abstract Lock Illustration -->
                 <div class="absolute right-0 top-0 h-full hidden xl:flex opacity-25 pointer-events-none overflow-hidden items-start justify-end pr-8 pt-8">
                     <img
-                        src="../assets/safety/safety-double-lock-architecture.png"
+                        src="/weaver/assets/safety/safety-double-lock-architecture.png"
                         alt="Blueprint-style illustration of Weaver's double-lock security architecture."
                         class="block max-h-full w-auto max-w-none"
                     >
@@ -167,7 +159,7 @@
                             <div class="absolute -top-3 left-8 bg-white px-2 font-mono text-xs text-weaver-indigo font-bold border border-weaver-indigo">LOCK 1 &middot; SYNTACTIC</div>
                             <h3 class="font-serif text-2xl text-weaver-indigo mb-4 mt-2">Syntactic Lock</h3>
                             <p class="text-weaver-indigo/80 mb-6 leading-relaxed text-sm">
-                                Each modified file with a supported parser is checked with <strong>Tree-sitter</strong> to confirm a valid syntax tree. Structural errors — unbalanced braces, missing semicolons, malformed declarations — are caught here. Files that fail parsing are rejected immediately; the filesystem stays untouched.
+                                Each modified file with a supported parser is checked with <strong>Tree-sitter</strong> to confirm a valid syntax tree. Structural errors — unbalanced braces, missing semicolons, malformed declarations — are caught here. Files that fail parsing are rejected immediately; the filesystem stays untouched.
                             </p>
                             <ul class="space-y-3 font-mono text-xs text-weaver-indigo">
                                 <li class="flex items-center gap-3">
@@ -176,7 +168,7 @@
                                 </li>
                                 <li class="flex items-center gap-3">
                                     <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-bolt"></i></div>
-                                    <span>Fast, local — no language server needed</span>
+                                    <span>Fast, local — no language server needed</span>
                                 </li>
                                 <li class="flex items-center gap-3">
                                     <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-forward"></i></div>
@@ -230,7 +222,7 @@
             <!-- Sandbox Technical Details -->
             <section id="birdcage" class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 relative">
                 <div class="absolute inset-0 z-0 opacity-5" style="background-image: radial-gradient(#193C6E 1px, transparent 1px); background-size: 20px 20px;"></div>
-                
+
                 <div class="max-w-6xl mx-auto relative z-10">
                     <div class="flex items-center mb-10">
                         <span class="h-px w-12 bg-weaver-indigo mr-4"></span>
@@ -317,14 +309,14 @@
             <section id="threat-model" class="py-16 px-8 lg:px-16 bg-weaver-indigo text-weaver-cream border-b border-weaver-indigo/20">
                 <div class="max-w-6xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-start gap-12">
-                        
+
                         <!-- Threat Model List -->
                         <div class="flex-1">
                             <h2 class="font-serif text-3xl mb-6 text-white">Threat Model</h2>
                             <p class="text-weaver-cream/70 mb-8 font-light">
                                 We assume the LLM provider may be compromised, hallucinating, or malicious. Weaver is designed to operate safely even if the agent is actively trying to escape.
                             </p>
-                            
+
                             <div class="space-y-6">
                                 <div class="flex gap-4">
                                     <div class="w-8 h-8 rounded-full bg-weaver-vermilion flex items-center justify-center shrink-0 text-white font-bold text-xs">01</div>
@@ -353,7 +345,7 @@
                         <!-- Do's and Don'ts -->
                         <div class="flex-1 bg-white/5 p-8 border border-white/10 rounded-sm w-full">
                             <h3 class="font-serif text-xl mb-6 text-white">Operational Guidance</h3>
-                            
+
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
                                     <h4 class="font-mono text-xs text-green-400 font-bold mb-3 uppercase tracking-wider">Do</h4>
@@ -399,9 +391,9 @@
                             Keep the safety model here. Keep configuration defaults, daemon lifecycle, and the JSONL envelope in the docs hub. That page is now the maintained source of truth for operator-facing config and protocol details.
                         </p>
                         <div class="flex flex-wrap gap-3 text-xs font-mono">
-                            <a href="../docs/#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
-                            <a href="../docs/#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
-                            <a href="../docs/#daemon-lifecycle" class="text-weaver-vermilion hover:underline">Daemon lifecycle</a>
+                            <a href="/weaver/docs/#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
+                            <a href="/weaver/docs/#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
+                            <a href="/weaver/docs/#daemon-lifecycle" class="text-weaver-vermilion hover:underline">Daemon lifecycle</a>
                         </div>
                     </div>
 
@@ -436,13 +428,14 @@
                             <h3 class="font-serif text-xl text-weaver-indigo mb-2">Understand the Agent's Mind</h3>
                             <p class="text-sm text-weaver-indigo/70">Explore how Sempai queries the codebase structure.</p>
                         </div>
-                        <a href="../sempai/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
+                        <a href="/weaver/sempai/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
                             Next: Sempai Engine
                             <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                         </a>
                     </div>
                 </div>
             </section>
+
 
             <!-- Footer -->
             <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
@@ -457,26 +450,27 @@
                         <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
                         <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
                     </div>
-                    
+
                     <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
                         <div class="flex flex-col space-y-2">
                             <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
-                            <a href="../why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
-                            <a href="../roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                            <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                            <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
                         </div>
                         <div class="flex flex-col space-y-2">
                             <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
-                            <a href="../docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
-                            <a href="../install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
+                            <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                            <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
                         </div>
                     </div>
                 </div>
-                <!-- Decorative Footer Stamp -->
-                <div class="absolute bottom-8 right-8 opacity-20 pointer-events-none hidden lg:block">
-                    <div class="w-24 h-24 border-4 border-weaver-indigo rounded-sm flex items-center justify-center stamp-rotate">
-                        <div class="text-center">
-                            <span class="text-weaver-indigo font-serif font-bold text-xl block">DESIGN</span>
-                            <span class="text-weaver-indigo font-serif font-bold text-xl block">SYSTEM</span>
+
+                <!-- Hanko Stamp (Decorative) -->
+                <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+                    <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
+                        <div class="text-center leading-tight">
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
                         </div>
                     </div>
                 </div>
@@ -496,6 +490,6 @@
             });
         });
     </script>
-    <script src="../assets/js/mobile-nav.js"></script>
+    <script src="/weaver/assets/js/mobile-nav.js"></script>
 </body>
 </html>

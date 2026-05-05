@@ -51,15 +51,15 @@
         .roadmap-item { transition: all 0.3s ease; }
         .roadmap-item:hover { transform: translateX(5px); }
     </style>
-    <link rel="stylesheet" href="../assets/styles/weaver-site.css">
+    <link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
-    
+
     <!-- Texture Overlay -->
     <div class="texture-overlay"></div>
 
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
-        
+
         <!-- Sidebar Navigation -->
         <aside id="sidebar" class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
             <div>
@@ -67,47 +67,41 @@
                     <h1 class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">WEAVER</h1>
                     <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
                 </div>
-                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    <a href="../" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]"><a href="/weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">00</span> Home
                     </a>
-                    <a href="../why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">01</span> Philosophy
                     </a>
-                    <a href="../how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">02</span> Architecture
                     </a>
-                    <a href="../commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">03</span> Commands
                     </a>
-                    
-                    <a href="../safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">04</span> Safety
                     </a>
-
-                    <a href="../sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">05</span> Sempai Engine
                     </a>
-                    <a href="../jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
                         <span class="mr-2 font-mono text-xs opacity-60">06</span> Jacquard
                     </a>
                     <div class="pt-4 mt-4 border-t border-weaver-indigo/10">
-                        <a href="../install/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
-                            Install
+                        <a href="/weaver/install/" class="block px-4 py-2 text-sm font-medium text-weaver-vermilion hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono">
+&gt; Install
                         </a>
-                        
-                        <a href="../docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
-                            Docs Hub
+                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
+                            Docs
                         </a>
-                        
-                        <!-- Active State for Roadmap -->
-                        <a href="./" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)] font-mono">
-                            > Roadmap
+                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]">
+                            Roadmap
                         </a>
                     </div>
                 </nav>
             </div>
-            
+
             <!-- Version/Status Footer in Sidebar -->
             <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
                 <div class="flex items-center gap-2 mb-2">
@@ -120,11 +114,12 @@
 
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 grid-bg min-h-screen relative flex flex-col xl:flex-row">
-            
+
+
             <!-- Content Area -->
             <div class="flex-1 min-w-0">
                 <div class="p-8 lg:p-16 masthead-frame mx-auto">
-                    
+
                     <!-- Header -->
                     <header class="mb-16 border-b border-weaver-indigo/20 pb-8 relative">
                         <!-- Decorative Header Element -->
@@ -220,7 +215,7 @@
                         </div>
                     </section>
 
-                    <!-- Near Term — Phase 3: Syntactic & relational intelligence -->
+                    <!-- Near Term — Phase 3: Syntactic & relational intelligence -->
                     <section class="mb-24 relative timeline-line">
                         <div class="flex items-center mb-10 relative z-10">
                             <div class="w-10 h-10 bg-weaver-indigo text-weaver-cream flex items-center justify-center rounded-sm border-2 border-white shadow-md font-bold font-serif text-xl mr-6">
@@ -271,7 +266,7 @@
                         </div>
                     </section>
 
-                    <!-- Mid Term — Phases 4–6: Sempai, plugins, agent workflows -->
+                    <!-- Mid Term — Phases 4–6: Sempai, plugins, agent workflows -->
                     <section class="mb-24 relative timeline-line">
                         <div class="flex items-center mb-10 relative z-10">
                             <div class="w-10 h-10 bg-white text-weaver-indigo border-2 border-weaver-indigo flex items-center justify-center rounded-sm shadow-md font-bold font-serif text-xl mr-6">
@@ -298,7 +293,7 @@
                                     A Semgrep-compatible structural query language built on Tree-sitter. Delivers <code>observe query</code> for pattern-based code search, with YAML rule files and a one-liner DSL. The Tree-sitter backend handles metavariable unification, ellipsis matching, and bounded traversal.
                                 </p>
                                 <div class="flex gap-2">
-                                    <a href="../sempai/" class="text-xs text-weaver-vermilion hover:underline font-mono">Sempai Engine <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                                    <a href="/weaver/sempai/" class="text-xs text-weaver-vermilion hover:underline font-mono">Sempai Engine <i class="fa-solid fa-arrow-right ml-1"></i></a>
                                 </div>
                             </div>
 
@@ -337,13 +332,13 @@
                                     <span class="px-2 py-1 bg-white/10 text-xs font-mono rounded border border-white/10">JSONL</span>
                                 </div>
                                 <div class="mt-6 pt-4 border-t border-white/10 flex justify-end">
-                                    <a href="../jacquard/" class="text-xs text-weaver-vermilion hover:text-white transition-colors font-mono uppercase tracking-wider font-bold">Learn More <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                                    <a href="/weaver/jacquard/" class="text-xs text-weaver-vermilion hover:text-white transition-colors font-mono uppercase tracking-wider font-bold">Learn More <i class="fa-solid fa-arrow-right ml-1"></i></a>
                                 </div>
                             </div>
                         </div>
                     </section>
 
-                    <!-- Long Term — Directional -->
+                    <!-- Long Term — Directional -->
                     <section class="mb-24 relative timeline-line">
                         <div class="flex items-center mb-10 relative z-10">
                             <div class="w-10 h-10 bg-weaver-cream text-weaver-indigo border-2 border-dashed border-weaver-indigo flex items-center justify-center rounded-sm shadow-sm font-bold font-serif text-xl mr-6 opacity-60">
@@ -351,7 +346,7 @@
                             </div>
                             <div>
                                 <h2 class="font-serif text-3xl text-weaver-indigo">Long Term</h2>
-                                <p class="font-mono text-xs text-weaver-indigo/60 uppercase tracking-widest mt-1">Directional — scope and timing subject to change</p>
+                                <p class="font-mono text-xs text-weaver-indigo/60 uppercase tracking-widest mt-1">Directional — scope and timing subject to change</p>
                             </div>
                         </div>
 
@@ -392,7 +387,7 @@
                                     <i class="fa-solid fa-code text-2xl text-weaver-indigo/30 mb-4"></i>
                                     <h3 class="font-bold text-lg text-weaver-indigo font-serif mb-2">Editor Integration</h3>
                                     <p class="text-sm text-weaver-indigo/70 mb-4">
-                                        Native editor plugins (VS Code, IntelliJ) that surface Weaver's observe and verify operations in the editor UI. Currently a future goal — Weaver integrates with language servers but does not yet ship its own editor extensions.
+                                        Native editor plugins (VS Code, IntelliJ) that surface Weaver's observe and verify operations in the editor UI. Currently a future goal — Weaver integrates with language servers but does not yet ship its own editor extensions.
                                     </p>
                                     <span class="text-[10px] font-mono text-weaver-indigo/40 uppercase border border-dashed border-weaver-indigo/10 px-2 py-1 rounded">Directional</span>
                                 </div>
@@ -403,7 +398,7 @@
                     <!-- Contribution Call to Action -->
                     <section class="bg-weaver-indigo text-weaver-cream p-10 rounded-sm relative overflow-hidden panel-fullbleed">
                         <div class="absolute top-0 right-0 w-64 h-64 bg-weaver-vermilion rounded-full filter blur-[80px] opacity-20 -mr-20 -mt-20"></div>
-                        
+
                         <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                             <div class="max-w-xl">
                                 <h2 class="font-serif text-3xl mb-4 font-bold">Help Shape the Future</h2>
@@ -420,10 +415,10 @@
                                 </div>
                             </div>
                             <div class="flex flex-col gap-3 min-w-[200px]">
-                                <a href="../install/" class="px-6 py-3 bg-weaver-vermilion text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-weaver-vermilion transition-colors border border-weaver-vermilion text-center">
+                                <a href="/weaver/install/" class="px-6 py-3 bg-weaver-vermilion text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-weaver-vermilion transition-colors border border-weaver-vermilion text-center">
                                     Install Now
                                 </a>
-                                <a href="../docs/" class="px-6 py-3 bg-transparent text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/10 transition-colors border border-white/30 text-center">
+                                <a href="/weaver/docs/" class="px-6 py-3 bg-transparent text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/10 transition-colors border border-white/30 text-center">
                                     Read Docs
                                 </a>
                             </div>
@@ -431,36 +426,48 @@
                     </section>
 
                 </div>
+            </div>
 
-                <!-- Footer -->
-                <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative mt-12">
-                    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
-                        <div class="mb-6 md:mb-0">
-                            <div class="flex items-center gap-3 mb-2">
-                                 <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
-                                    <span class="font-serif font-bold text-lg">W</span>
-                                 </div>
-                                 <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
-                            </div>
-                            <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
-                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+
+            <!-- Footer -->
+            <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative">
+                <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0">
+                        <div class="flex items-center gap-3 mb-2">
+                             <div class="w-8 h-8 bg-weaver-indigo flex items-center justify-center text-weaver-cream">
+                                <span class="font-serif font-bold text-lg">W</span>
+                             </div>
+                             <h2 class="font-serif text-2xl font-bold text-weaver-indigo">WEAVER</h2>
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
-                            <div class="flex flex-col space-y-2">
-                                <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
-                                <a href="../why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
-                                <a href="./" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors font-bold text-weaver-indigo">Roadmap</a>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
-                                <a href="../docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
-                                <a href="../install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
-                            </div>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">© 2026 df12 Productions</p>
+                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Project</span>
+                            <a href="/weaver/why-weaver/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Philosophy</a>
+                            <a href="/weaver/roadmap/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Roadmap</a>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <span class="font-mono text-xs font-bold text-weaver-indigo uppercase mb-1">Resources</span>
+                            <a href="/weaver/docs/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Documentation</a>
+                            <a href="/weaver/install/" class="text-sm text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">Installation</a>
                         </div>
                     </div>
-                </footer>
-            </div>
+                </div>
+
+                <!-- Hanko Stamp (Decorative) -->
+                <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+                    <div class="w-24 h-24 border-4 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/5">
+                        <div class="text-center leading-tight">
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">CODE</span>
+                            <span class="text-weaver-vermilion font-serif font-bold text-xl block">SAFE</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
         </main>
     </div>
 
@@ -469,18 +476,12 @@
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
     </script>
-    <script src="../assets/js/mobile-nav.js"></script>
+    <script src="/weaver/assets/js/mobile-nav.js"></script>
 </body>
 </html>

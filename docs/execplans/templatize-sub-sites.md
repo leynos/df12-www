@@ -126,6 +126,15 @@ Playwright screenshots and structurally via
         hard-coded HTML files
   - [x] (2026-05-05) Gate commit (this commit)
 
+- [ ] (2026-05-05) Review follow-ups for generated sub-site output
+  - [x] (2026-05-05) Verified inline and outside-diff findings against current
+        source templates and generated `public/` output.
+  - [x] (2026-05-05) Patched still-valid findings in source templates instead
+        of editing generated HTML directly.
+  - [x] (2026-05-05) Regenerate affected Netsuke and Weaver pages.
+  - [x] (2026-05-05) Validate generated HTML and browser behaviour with
+        Playwright plus project gates.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -195,6 +204,33 @@ Playwright screenshots and structurally via
   passed: 45 tests passed with 2 deprecation warnings. Evidence log:
   `/tmp/test-df12-www-templatize-sub-sites.out`.
 
+- Observation: Review comments against generated `public/` files mapped back
+  to source templates in `templates/netsuke/` and `templates/weaver/`. Direct
+  edits under `public/` would be overwritten by the next generator run, so
+  still-valid generated-output findings are being fixed in templates and then
+  regenerated. Date/Author: 2026-05-05 (review follow-up)
+
+- Observation: The reported smooth-scroll issue in
+  `public/weaver/roadmap/index.html` mapped to shared source in
+  `templates/weaver/doc_page.jinja`, not the roadmap page template itself. The
+  same unguarded pattern also existed in the standalone
+  `templates/weaver/pages/design-language.jinja`, so both handlers now guard
+  empty, `#`, invalid, and missing selectors before preventing default.
+  Date/Author: 2026-05-05 (review follow-up)
+
+- Observation: Playwright validation against a local static server on port
+  8097 confirmed the Netsuke mobile menu starts closed and opens on click, the
+  requested Netsuke sidebar and footer links render with corrected hrefs,
+  duplicate head tags are absent from the Weaver design-language body, and the
+  Weaver smooth-scroll handlers use guarded selectors. Date/Author: 2026-05-05
+  (review follow-up)
+
+- Observation: Validation gates passed after the review follow-ups:
+  `make fmt`, `make check-fmt`, `make typecheck`, `make lint`, `make test`,
+  `make markdownlint`, and `make nixie`. Evidence logs are under
+  `/tmp/*-df12-www-templatize-sub-sites-review*.out`. Date/Author: 2026-05-05
+  (review follow-up)
+
 ## Decision log
 
 - Decision: Extend `SubSiteHomePageBuilder` with optional `nav_links` /
@@ -239,6 +275,13 @@ Playwright screenshots and structurally via
   process environment tokens win makes tests nondeterministic and can deploy
   with credentials other than those selected by the caller. Date/Author:
   2026-05-05 (gate fix)
+
+- Decision: Use sub-site-prefixed root-relative legal links in the shared
+  Netsuke and Weaver templates (`/netsuke/...` and `/weaver/...`) rather than
+  bare top-level `/privacy-policy/` paths. Rationale: some review examples
+  named bare root legal paths, but the surrounding findings asked for internal
+  sub-site links to stay root-relative under the sub-site prefix. Date/Author:
+  2026-05-05 (review follow-up)
 
 ## Outcomes & retrospective
 
@@ -596,7 +639,7 @@ Pages and their template paths:
 - `design-language` → `pages/design-language.jinja`
 
 Note: the nested sub-command pages (`commands/act` etc.) use flat template
-filenames (`commands-act.jinja`) to avoid creating sub-directories in the
+filenames (`commands-act.jinja`) to avoid creating subdirectories in the
 `pages/` template folder. The `output_slug` value in the YAML (`commands/act`)
 controls the output path; the template filename is independent.
 
@@ -995,7 +1038,7 @@ The render context in `run()` gains:
 All callers in `cli.py` pass `nav_links=subsite.nav_links` and
 `parent_link=subsite.parent_link`.
 
-### New template files (35 files total)
+### New template files (37 files total)
 
 ```plaintext
 templates/mxd/home_page.jinja                         (1)
@@ -1037,5 +1080,6 @@ templates/netsuke/pages/install.jinja                 (1)
 templates/netsuke/pages/icon-replacements.jinja       (1)
 ```
 
-(37 new template files in total; 35 listed above plus 2 netsuke — guides and
-icon-replacements are included in the count.)
+(37 new template files in total; the list above includes
+`templates/netsuke/pages/guides.jinja` and
+`templates/netsuke/pages/icon-replacements.jinja`.)

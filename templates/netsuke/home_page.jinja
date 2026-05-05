@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netsuke - Build systems, not build scripts</title>
+    <title>{{ homepage.title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/netsuke/assets/js/tailwind-config.js"></script>
     <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
@@ -28,12 +28,13 @@
 
                 <!-- Desktop Nav -->
                 <div class="hidden md:flex space-x-8">
-                    <a href="/" class="text-vermillion font-medium transition-colors text-sm py-1">&larr; df12</a>
-                    <a href="/netsuke/" class="text-charcoal font-semibold border-b-2 border-vermillion transition-colors text-sm py-1" aria-current="page">Home</a>
-                    <a href="/netsuke/docs/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Docs</a>
-                    <a href="/netsuke/examples/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Examples</a>
-                    <a href="/netsuke/guides/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Guides</a>
-                    <a href="/netsuke/blog/" class="text-charcoal-mid hover:text-vermillion font-medium transition-colors text-sm py-1">Blog</a>
+                    {% if parent_link %}
+                    <a href="{{ parent_link.href }}" class="text-vermillion font-medium transition-colors text-sm py-1">{{ parent_link.label }}</a>
+                    {% endif %}
+                    {% for link in nav_links %}
+                    {% set is_current = link.current or link.href == "/netsuke/" %}
+                    <a href="{{ link.href }}" class="{% if is_current %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if is_current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+                    {% endfor %}
                 </div>
 
                 <div class="flex items-center space-x-4">
@@ -43,21 +44,22 @@
                     <a href="/netsuke/install/" class="hm-button hm-button--primary hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
                         <span class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span><span class="hm-navbar-action__label">Install</span>
                     </a>
-                    <button id="navbar-mobile-toggle" type="button" class="hidden hm-hamburger md:hidden" aria-expanded="true" aria-controls="navbar-mobile-menu" aria-label="Close menu">
+                    <button id="navbar-mobile-toggle" type="button" class="hm-hamburger md:hidden" aria-expanded="false" aria-controls="navbar-mobile-menu" aria-label="Open menu">
                         <span class="iconify hm-hamburger__open" data-icon="carbon:menu" aria-hidden="true"></span>
                         <span class="iconify hm-hamburger__close" data-icon="carbon:close" aria-hidden="true" style="display:none"></span>
                     </button>
                 </div>
             </div>
         </div>
-        <nav id="navbar-mobile-menu" class="hm-mobile-menu is-open md:hidden" aria-label="Mobile navigation">
+        <nav id="navbar-mobile-menu" class="hm-mobile-menu hidden md:hidden" aria-label="Mobile navigation">
             <ul class="list-none py-3 px-4 space-y-1">
-                <li><a href="/" class="hm-mobile-menu__link text-vermillion">&larr; Back to df12 Productions</a></li>
-                <li><a href="/netsuke/" class="hm-mobile-menu__link hm-mobile-menu__link--active" aria-current="page">Home</a></li>
-                <li><a href="/netsuke/docs/" class="hm-mobile-menu__link">Docs</a></li>
-                <li><a href="/netsuke/examples/" class="hm-mobile-menu__link">Examples</a></li>
-                <li><a href="/netsuke/guides/" class="hm-mobile-menu__link">Guides</a></li>
-                <li><a href="/netsuke/blog/" class="hm-mobile-menu__link">Blog</a></li>
+                {% if parent_link %}
+                <li><a href="{{ parent_link.href }}" class="hm-mobile-menu__link text-vermillion">{{ parent_link.label }}</a></li>
+                {% endif %}
+                {% for link in nav_links %}
+                {% set is_current = link.current or link.href == "/netsuke/" %}
+                <li><a href="{{ link.href }}" class="hm-mobile-menu__link{% if is_current %} hm-mobile-menu__link--active{% endif %}"{% if is_current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>
+                {% endfor %}
             </ul>
             <ul class="list-none border-t border-stone-light/50 py-3 px-4 space-y-2">
                 <li><a href="https://github.com/leynos/netsuke" class="hm-mobile-menu__link hm-mobile-menu__link--secondary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:logo-github" aria-hidden="true"></span>GitHub</a></li>
@@ -450,7 +452,7 @@
                     <ul class="space-y-3 text-sm text-stone">
                         <li><a href="/netsuke/docs/getting-started/" class="hover:text-white transition-colors">Getting Started</a></li>
                         <li><a href="/netsuke/docs/manifest-reference/" class="hover:text-white transition-colors">Manifest Reference</a></li>
-                        <li><a href="/netsuke/docs/rules-and-targets/" class="hover:text-white transition-colors">Rules & Targets</a></li>
+                        <li><a href="/netsuke/docs/rules-and-targets/" class="hover:text-white transition-colors">Rules &amp; Targets</a></li>
                         <li><a href="/netsuke/docs/cli-security-and-configuration/#cli" class="hover:text-white transition-colors">CLI Commands</a></li>
                     </ul>
                 </div>
@@ -460,7 +462,7 @@
                     <ul class="space-y-3 text-sm text-stone">
                         <li><a href="/netsuke/examples/" class="hover:text-white transition-colors">Examples Hub</a></li>
                         <li><a href="/netsuke/design/" class="hover:text-white transition-colors">Design System</a></li>
-                        <li><a href="/netsuke/blog/" class="hover:text-white transition-colors">Blog & Releases</a></li>
+                        <li><a href="/netsuke/blog/" class="hover:text-white transition-colors">Blog &amp; Releases</a></li>
                         <li><a href="/netsuke/contributing/" class="hover:text-white transition-colors">Contributing</a></li>
                     </ul>
                 </div>

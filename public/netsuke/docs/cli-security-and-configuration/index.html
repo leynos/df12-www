@@ -150,7 +150,6 @@
                         <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
                         <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
                         <li><a href="/netsuke/docs/templating-and-standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="/netsuke/docs/templating-and-standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
                     </ul>
                 </div>
 
@@ -823,10 +822,11 @@ error-file-not-found = Error: File "{ $path }" was not found.
                                 <h4 class="font-bold text-sm text-charcoal mb-2">Need more help?</h4>
                                 <p class="text-sm text-charcoal-mid mb-4">Check the full troubleshooting guide or join our community.</p>
                                 <div class="flex space-x-3">
-                                    <button class="px-4 py-2 bg-white border border-stone text-charcoal rounded text-xs font-bold hover:border-indigo hover:text-indigo transition-colors shadow-sm">
+                                    <!-- TODO: Wire these support actions once the debug guide and community targets are published. -->
+                                    <button type="button" disabled aria-disabled="true" class="px-4 py-2 bg-white border border-stone text-charcoal rounded text-xs font-bold hover:border-indigo hover:text-indigo transition-colors shadow-sm">
                                         View Debug Guide
                                     </button>
-                                    <button class="px-4 py-2 bg-transparent text-charcoal-mid rounded text-xs font-bold hover:text-charcoal transition-colors">
+                                    <button type="button" disabled aria-disabled="true" class="px-4 py-2 bg-transparent text-charcoal-mid rounded text-xs font-bold hover:text-charcoal transition-colors">
                                         Join Discord
                                     </button>
                                 </div>

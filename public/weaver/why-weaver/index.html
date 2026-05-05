@@ -256,7 +256,7 @@
                                 AI shouldn't just run on your laptop. Weaver is designed to be the supervisory layer in your continuous integration pipeline.
                             </p>
                             <a href="/weaver/docs/" class="text-sm font-bold text-weaver-indigo border-b border-weaver-indigo pb-1 hover:text-weaver-vermilion hover:border-weaver-vermilion transition-colors">
-                                View CI Integration Docs ->
+                                View CI Integration Docs &gt;
                             </a>
                         </div>
 
@@ -357,8 +357,19 @@
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                const selector = this.getAttribute('href');
+                if (!selector || selector === '#') return;
+
+                let target;
+                try {
+                    target = document.querySelector(selector);
+                } catch {
+                    return;
+                }
+                if (!target) return;
+
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                target.scrollIntoView({
                     behavior: 'smooth'
                 });
             });

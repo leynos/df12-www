@@ -599,8 +599,19 @@
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                const selector = this.getAttribute('href');
+                if (!selector || selector === '#') return;
+
+                let target;
+                try {
+                    target = document.querySelector(selector);
+                } catch {
+                    return;
+                }
+                if (!target) return;
+
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                target.scrollIntoView({
                     behavior: 'smooth'
                 });
             });

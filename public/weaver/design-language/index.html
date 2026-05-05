@@ -124,30 +124,6 @@
 
   <body class="bg-weaver-cream relative overflow-x-hidden">
     <!-- Texture Overlay for Washi Paper feel -->
-    <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weaver Design Language</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@400;600;700;900&amp;display=swap"
-      rel="stylesheet">
-    <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weaver Design Language</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@400;600;700;900&amp;display=swap"
-      rel="stylesheet">
-    <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weaver Design Language</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@400;600;700;900&amp;display=swap"
-      rel="stylesheet">
     <div class="texture-overlay fixed w-full h-full"></div>
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
       <!-- Sidebar Navigation -->
@@ -733,12 +709,25 @@
       {
         anchor.addEventListener('click', function(e)
         {
+          const selector = this.getAttribute('href');
+          if (!selector || selector === '#') return;
+
+          let target;
+          try
+          {
+            target = document.querySelector(selector);
+          }
+          catch
+          {
+            return;
+          }
+          if (!target) return;
+
           e.preventDefault();
-          document.querySelector(this.getAttribute('href'))
-            .scrollIntoView(
-            {
-              behavior: 'smooth'
-            });
+          target.scrollIntoView(
+          {
+            behavior: 'smooth'
+          });
         });
       });
     </script>

@@ -174,6 +174,14 @@ Playwright screenshots and structurally via
   - [x] (2026-05-05) Validate exact generated output, browser behaviour, and
         project gates.
 
+- [x] (2026-05-05) Weaver install daemon wording follow-up
+  - [x] (2026-05-05) Verified the mixed daemon wording still existed in
+        generated `public/weaver/install/index.html` and source
+        `templates/weaver/pages/install.jinja`.
+  - [x] (2026-05-05) Patched the source template to distinguish domain
+        commands from capability probing.
+  - [x] (2026-05-05) Regenerate Weaver and validate the generated install page.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -338,6 +346,20 @@ Playwright screenshots and structurally via
   `make test`, `make markdownlint`, and `make nixie`. Evidence logs are under
   `/tmp/*-df12-www-templatize-sub-sites-accessibility*.out`. Date/Author:
   2026-05-05 (accessibility follow-up)
+
+- Observation: The Weaver install daemon wording finding mapped directly to
+  `templates/weaver/pages/install.jinja`, so the generated page should be
+  updated only by regenerating Weaver after the template edit. Date/Author:
+  2026-05-05 (install wording follow-up)
+
+- Observation: Weaver install wording validation passed: exact text checks and
+  Playwright readback on local port 8101 confirmed
+  `public/weaver/install/index.html` now says domain commands use a local
+  daemon while capability probing runs in the CLI process. Gates also passed:
+  `make fmt`, `make check-fmt`, `make typecheck`, `make lint`, `make test`,
+  `make markdownlint`, and `make nixie`. Evidence logs are under
+  `/tmp/*-df12-www-templatize-sub-sites-weaver-install-wording.out`.
+  Date/Author: 2026-05-05 (install wording follow-up)
 
 ## Decision log
 

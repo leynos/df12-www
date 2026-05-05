@@ -504,6 +504,8 @@ sites:
         label: Changelog
         template: pages/changelog.jinja
         output_slug: changelog
+    homepage:
+      title: Home
     pages: {}
 
   netsuke:

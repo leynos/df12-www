@@ -2,7 +2,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home — mxd</title>
+    <title>{{ homepage.title }} — mxd</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;family=DM+Serif+Display:ital,wght@0,400;1,400&amp;family=Source+Serif+4:ital,wght@200;300;400;600;700;900&amp;family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
@@ -22,8 +22,11 @@
       </span>
     </a>
     <nav class="mxd-site-nav" aria-label="Primary">
-      <a href="/" class="text-[#e8a838]">← Back to df12 Productions</a>
-<a href="/mxd/" aria-current="page">Home</a><a href="/mxd/getting-started/">Getting Started</a><a href="/mxd/architecture/">Architecture</a><a href="/mxd/protocol/">Protocol</a><a href="/mxd/configuration/">Configuration</a><a href="/mxd/subsystems/">Subsystems</a><a href="/mxd/compatibility/">Compatibility</a><a href="/mxd/verification/">Verification</a><a href="/mxd/roadmap/">Roadmap</a><a href="/mxd/changelog/">Changelog</a>    </nav>
+      {% if parent_link %}
+      <a href="{{ parent_link.href }}" class="text-[#e8a838]">{{ parent_link.label }}</a>
+      {% endif %}
+      {% for link in nav_links %}<a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>{% endfor %}
+    </nav>
   </div>
 </header>
 <main id="main-content" tabindex="-1">

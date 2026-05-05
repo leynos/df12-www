@@ -302,7 +302,11 @@ def _generate_subsite(
     # Homepage
     if subsite.homepage:
         hp_path = SubSiteHomePageBuilder(
-            subsite.homepage, templates_dir=templates_dir
+            subsite.homepage,
+            templates_dir=templates_dir,
+            nav_links=subsite.nav_links,
+            parent_link=subsite.parent_link,
+            base_path=subsite.base_path,
         ).run()
         print(f"[{subsite.key}] wrote {_format_path(hp_path)}")
 

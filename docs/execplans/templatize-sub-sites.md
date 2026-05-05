@@ -126,7 +126,7 @@ Playwright screenshots and structurally via
         hard-coded HTML files
   - [x] (2026-05-05) Gate commit (this commit)
 
-- [ ] (2026-05-05) Review follow-ups for generated sub-site output
+- [x] (2026-05-05) Review follow-ups for generated sub-site output
   - [x] (2026-05-05) Verified inline and outside-diff findings against current
         source templates and generated `public/` output.
   - [x] (2026-05-05) Patched still-valid findings in source templates instead
@@ -190,6 +190,19 @@ Playwright screenshots and structurally via
         mobile content-page parent links both render from `parent_link`.
   - [x] (2026-05-05) Regenerate Netsuke and validate the generated top-nav
         wording.
+
+- [x] (2026-05-05) Netsuke generated-output review follow-up
+  - [x] (2026-05-05) Verified the execplan review checklist and final gate
+        summary were stale against the validation evidence elsewhere in this
+        document.
+  - [x] (2026-05-05) Verified the Netsuke generated-output findings against
+        current templates and output: support controls, Plotly on the basic C
+        example, the examples clone snippet, docs hub self-links, relative
+        example links, hard-coded content nav links, and hard-coded content
+        footer year were still valid.
+  - [x] (2026-05-05) Patched the corresponding Netsuke source templates rather
+        than editing generated HTML directly.
+  - [x] (2026-05-05) Regenerate Netsuke and validate the generated pages.
 
 ## Surprises & discoveries
 
@@ -391,6 +404,33 @@ Playwright screenshots and structurally via
   `/tmp/*-df12-www-templatize-sub-sites-netsuke-topnav-wording.out`.
   Date/Author: 2026-05-05 (top-nav wording follow-up)
 
+- Observation: The docs hub self-link finding mapped to
+  `templates/netsuke/pages/docs.jinja`; the target pages for the named cards
+  already exist as generated pages or sections, so the fix can be static href
+  updates without changing generator routing. Date/Author: 2026-05-05
+  (generated-output review follow-up)
+
+- Observation: The disabled Netsuke support controls had no published Discord
+  target in the repository or config. The debug guide can point at the existing
+  `#troubleshooting` section, while the Discord control should become plain
+  "Discord coming soon" text to avoid presenting a fake action. Date/Author:
+  2026-05-05 (generated-output review follow-up)
+
+- Observation: Netsuke generated-output review validation passed. Exact checks
+  confirmed the stale execplan checkbox and final gate summary were corrected;
+  the Basic C example no longer loads Plotly; the examples hub clone snippet now
+  uses `https://github.com/leynos/netsuke.git` and `cd netsuke/examples`;
+  `templates/netsuke/doc_page.jinja` no longer defines `nav_items`; and the
+  cited Hello World and Visual Design Assets pages no longer contain relative
+  `../` or `../../` anchor hrefs. Playwright readback on local port 8103
+  confirmed the docs hub card targets, the support callout action/text, the
+  absence of Plotly on the Basic C example, and the absence of relative anchors
+  on the Hello World example. Gates also passed: `make fmt`, `make check-fmt`,
+  `make typecheck`, `make lint`, `make test`, `make markdownlint`, and
+  `make nixie`. Evidence logs are under
+  `/tmp/*-df12-www-templatize-sub-sites-netsuke-review-followup.out`.
+  Date/Author: 2026-05-05 (generated-output review follow-up)
+
 ## Decision log
 
 - Decision: Extend `SubSiteHomePageBuilder` with optional `nav_links` /
@@ -456,7 +496,9 @@ The final gate replay passed:
 - `make check-fmt`
 - `make typecheck`
 - `make lint`
-- `make test` (45 passed, 2 deprecation warnings)
+- `make test` (46 passed, 2 deprecation warnings)
+- `make markdownlint`
+- `make nixie`
 
 Validation notes:
 

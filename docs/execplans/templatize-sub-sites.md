@@ -615,9 +615,9 @@ templates/
     shared_content_page.jinja       — shared chrome for terms/privacy/CoC
     pages/                          — 9 existing content page templates
   netsuke/
-    shared_content_page.jinja       — shared chrome (no other templates yet)
+    shared_content_page.jinja       — shared chrome (full template set present)
   weaver/
-    shared_content_page.jinja       — shared chrome (no other templates yet)
+    shared_content_page.jinja       — shared chrome (full template set present)
 public/
   mxd/                              — output dir; content generated from templates
   netsuke/                          — output dir; content generated from templates
@@ -660,8 +660,8 @@ extends `doc_page.jinja`, filling named blocks (`page_title`, `hero`,
 
 `_mark_current_nav()` sets `current: true` on the nav link whose `href` matches
 `{base_path}{output_slug}/`. This requires nav links to use absolute paths (e.g.
- `/weaver/why-weaver/`). Weaver and netsuke currently use relative paths (
-`../why-weaver/`), which will not match and must be corrected.
+ `/weaver/why-weaver/`). Weaver and netsuke now use absolute paths such as
+`/weaver/why-weaver/`, so generated pages can mark the current nav item.
 
 ### Template patterns in use
 
@@ -1104,7 +1104,8 @@ ______________________________________________________________________
 #### Step 3.7 — Delete 20 hard-coded HTML files
 
 - [ ] **Task 3.7.1** Delete every `public/netsuke/*/index.html` and
-  `public/netsuke/index.html` listed under "Currently hard-coded pages" above.
+  `public/netsuke/index.html` listed under
+  "Historically hard-coded pages per site" above.
   Depends on: 3.6.1, 3.6.2, 3.6.3.
 - [ ] **Task 3.7.2** Regenerate Netsuke and re-verify the deleted files are
   recreated from templates.

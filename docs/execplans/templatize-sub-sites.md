@@ -268,6 +268,15 @@ Playwright screenshots and structurally via
         generated HTML still renders `2026` because the current generated year
         is 2026.
 
+- [x] (2026-05-06) Generated public artefact untracking follow-up
+  - [x] (2026-05-06) Verified modified tracked `public/` HTML, df12-pages
+        metadata JSON, the Netsuke search index, and `public/mxd/assets/tailwind.css`
+        are reproducible build output from `bun run build`, `pages generate`,
+        and the configured static-site build scripts.
+  - [x] (2026-05-06) Ignore and remove the verified generated artefacts from
+        the Git index while keeping source docs, templates, config, static
+        images, hand-maintained CSS, and JavaScript tracked.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used

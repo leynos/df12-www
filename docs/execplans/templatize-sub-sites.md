@@ -667,7 +667,10 @@ mxd `doc_page.jinja` is the reference pattern:
 Each site's `doc_page.jinja` will follow the same block structure, adapted to
 the site's own visual design.
 
-### Currently hard-coded pages per site
+### Historically hard-coded pages per site
+
+At the start of this ExecPlan, these public pages were hand-maintained and
+formed the migration inventory for the template conversion.
 
 **mxd** (1 page):
 

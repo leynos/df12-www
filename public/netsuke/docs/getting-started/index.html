@@ -207,7 +207,7 @@
 
                 <div class="relative group mb-6">
                     <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button class="bg-charcoal-light/20 hover:bg-charcoal-light/40 text-stone-light p-1.5 rounded transition-colors" title="Copy to clipboard">
+                        <button class="bg-charcoal-light/20 hover:bg-charcoal-light/40 text-stone-light p-1.5 rounded transition-colors" type="button" title="Copy to clipboard" aria-label="Copy install command" data-copy-code>
                             <span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span>
                         </button>
                     </div>
@@ -217,6 +217,7 @@
                             <span class="text-boxwood">cargo</span> install netsuke
                         </div>
                     </div>
+                    <span class="sr-only" aria-live="polite" data-copy-status></span>
                 </div>
 
                 <div class="flex items-center text-sm text-charcoal-mid">
@@ -342,7 +343,7 @@
                     <div class="ml-3 text-sm text-charcoal-mid">
                         <p class="font-bold text-charcoal mb-1">What just happened?</p>
                         <p>
-                            You asked to build <code class="bg-white px-1 rounded border border-stone/50">:shout</code>. Netsuke saw that <code class="bg-white px-1 rounded border border-stone/50">:shout</code> depends on <code class="bg-white px-1 rounded border border-stone/50">:hello</code>. It built <code class="bg-white px-1 rounded border border-stone/50">:hello</code> first, verified the output, and then fed that output into the <code class="bg-white px-1 rounded border border-stone/50">:shout</code> rule.
+                            You asked to build <code class="bg-white px-1 rounded border border-stone/50">shout.txt</code>. Netsuke saw that <code class="bg-white px-1 rounded border border-stone/50">shout.txt</code> depends on <code class="bg-white px-1 rounded border border-stone/50">hello.txt</code>. It built <code class="bg-white px-1 rounded border border-stone/50">hello.txt</code> first, verified the output, and then fed that output into the <code class="bg-white px-1 rounded border border-stone/50">shout.txt</code> rule.
                         </p>
                     </div>
                 </div>
@@ -410,6 +411,33 @@
     </div>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
+    <script>
+        document.querySelectorAll('[data-copy-code]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                const block = button.closest('.relative.group.mb-6');
+                const sample = block?.querySelector('.bg-charcoal');
+                const status = block?.querySelector('[data-copy-status]');
+                const text = sample?.textContent?.replace(/\s+/g, ' ').trim().replace(/^\$ /, '');
+
+                if (!text || !navigator.clipboard) {
+                    if (status) status.textContent = 'Copy unavailable';
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(text);
+                    button.setAttribute('aria-label', 'Copied install command');
+                    if (status) status.textContent = 'Copied install command';
+                    window.setTimeout(() => {
+                        button.setAttribute('aria-label', 'Copy install command');
+                        if (status) status.textContent = '';
+                    }, 1800);
+                } catch {
+                    if (status) status.textContent = 'Copy failed';
+                }
+            });
+        });
+    </script>
 
     <footer id="footer" class="bg-charcoal pt-20 pb-10 text-stone-light border-t border-charcoal-light">
         <div class="site-container">

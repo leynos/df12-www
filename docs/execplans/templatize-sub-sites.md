@@ -218,6 +218,16 @@ Playwright screenshots and structurally via
   - [x] (2026-05-06) Regenerate Netsuke and validate generated output plus
         project gates.
 
+- [x] (2026-05-06) Netsuke docs interaction and copy follow-up
+  - [x] (2026-05-06) Verified the Plan of work checkbox clarification,
+        handwritten spelling, install copy button, target-name copy, manifest
+        API CTA, qualitative security chart, and Basic C Manifest Reference
+        route findings against current source templates and generated output.
+  - [x] (2026-05-06) Patched the corresponding source templates and execplan
+        text rather than editing generated HTML directly.
+  - [x] (2026-05-06) Regenerate Netsuke and validate browser behaviour plus
+        project gates.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -243,9 +253,13 @@ Playwright screenshots and structurally via
 - Observation: The review suggestion for the Manifest Reference "Standard
   Library" sidebar link named `#standard-library`, but the current
   `templates/netsuke/pages/docs-templating-and-standard-library.jinja` page
-  exposes `#stdlib-reference` for that section. Impact: the generated
-  Manifest Reference link targets `#stdlib-reference` so the fragment resolves
-  to a real section.
+  exposes `#stdlib-reference` for that section. Impact: the generated Manifest
+  Reference link targets `#stdlib-reference` so the fragment resolves to a real
+  section.
+
+- Observation: The "View full API" CTA on the Manifest Reference page had no
+  deeper full-API section to target. Impact: the CTA was removed instead of
+  replacing one dead-end anchor with another.
 
 - Observation: The first resumed `uv run pages generate --site netsuke` failed
   after writing the first 12 Netsuke pages because migrated documentation
@@ -411,10 +425,9 @@ Playwright screenshots and structurally via
   follow-up)
 
 - Observation: The standalone Netsuke icon-replacements report also had a
-  hand-written df12 breadcrumb. It is not part of the shared Netsuke nav
-  chrome, but it receives `parent_link` from the generator, so it now renders
-  that same configured label. Date/Author: 2026-05-05 (top-nav wording
-  follow-up)
+  handwritten df12 breadcrumb. It is not part of the shared Netsuke nav chrome,
+  but it receives `parent_link` from the generator, so it now renders that same
+  configured label. Date/Author: 2026-05-05 (top-nav wording follow-up)
 
 - Observation: Netsuke top-nav wording validation passed: exact checks found
   no generated `&larr; df12` or `← df12` top-nav labels, and Playwright
@@ -664,6 +677,9 @@ the site's own visual design.
 
 ## Plan of work
 
+This section preserves the original roadmap; the `Progress` section above is
+the completed execution record.
+
 ### Phase 1 — mxd homepage
 
 #### Step 1.1 — Extend `SubSiteHomePageBuilder`
@@ -750,7 +766,7 @@ ______________________________________________________________________
 
 - [ ] **Task 2.1.1** In `config/pages.yaml`, under
   `sites.weaver.nav_links`, change all hrefs from relative (`../`) to absolute (
-  `/weaver/`):
+   `/weaver/`):
 
   ```yaml
   nav_links:

@@ -42,8 +42,8 @@ for common UI components
    This includes a component class name, part class names (if available for
    that component), and modifier class names (if available for that component).
 2. Components can be customized using Tailwind CSS utility classes if the
-   customization is not possible using the existing daisyUI classes. For example
-    `btn px-10` sets custom horizontal padding on a `btn`.
+   customization is not possible using the existing daisyUI classes. For example,
+   `btn px-10` sets custom horizontal padding on a `btn`.
 3. If customization of daisyUI styles using Tailwind CSS utility classes does
    not work because of CSS specificity issues, use the `!` at the end of the
    Tailwind CSS utility class to override the existing styles. For example

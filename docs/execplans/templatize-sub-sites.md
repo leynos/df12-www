@@ -1119,8 +1119,7 @@ ______________________________________________________________________
 
 ## Concrete steps
 
-All commands run from
-`/data/leynos/Projects/df12-www.worktrees/templatize-sub-sites`.
+All commands run from the repository root.
 
 ### Phase 1 commands
 

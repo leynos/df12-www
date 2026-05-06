@@ -247,6 +247,14 @@ Playwright screenshots and structurally via
   - [x] (2026-05-06) Regenerate Netsuke and validate browser behaviour plus
         project gates.
 
+- [x] (2026-05-06) Netsuke no-JS security chart fallback follow-up
+  - [x] (2026-05-06) Verified `securityChart` is seeded as an empty div in both
+        the source template and generated page, and that the later line range is
+        the runtime fallback for the same Plotly chart rather than a second
+        chart container.
+  - [x] (2026-05-06) Patch the source template, regenerate Netsuke, validate
+        browser behaviour, and replay project gates.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used

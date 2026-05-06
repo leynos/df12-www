@@ -791,7 +791,9 @@ error-file-not-found = Error: File "{ $path }" was not found.
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Vulnerability Mitigation</h3>
                     <p class="text-xs text-charcoal-mid mb-4">Qualitative comparison based on documented safety features; no numeric mitigation claim is implied.</p>
-                    <div id="securityChart" class="h-[300px] w-full"></div>
+                    <div id="securityChart" class="h-[300px] w-full">
+                        <p class="text-xs text-charcoal-mid">Sandboxing and capability checks provide stronger qualitative mitigation than direct execution. Interactive charting requires JavaScript.</p>
+                    </div>
                 </div>
             </section>
 
@@ -901,7 +903,12 @@ error-file-not-found = Error: File "{ $path }" was not found.
                     legend: { orientation: 'h', y: -0.2 }
                 };
 
-                Plotly.newPlot('securityChart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
+                const chart = document.getElementById('securityChart');
+                if (!chart) {
+                    return;
+                }
+                chart.innerHTML = '';
+                Plotly.newPlot(chart, [trace1, trace2], layout, {responsive: true, displayModeBar: false});
 
             } catch(e) {
                 console.error("Chart generation failed:", e);

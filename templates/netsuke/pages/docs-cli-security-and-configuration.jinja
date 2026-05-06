@@ -845,6 +845,10 @@ error-file-not-found = Error: File "{ $path }" was not found.
 
             } catch(e) {
                 console.error("Chart generation failed:", e);
+                const chart = document.getElementById('securityChart');
+                if (chart) {
+                    chart.innerHTML = '<p class="text-xs text-charcoal-mid">Security chart unavailable in this environment.</p>';
+                }
             }
         });
     </script>

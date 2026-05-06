@@ -238,6 +238,15 @@ Playwright screenshots and structurally via
   - [x] (2026-05-06) Regenerate Netsuke and validate browser behaviour plus
         project gates.
 
+- [x] (2026-05-06) Execplan runtime notes and chart fallback follow-up
+  - [x] (2026-05-06) Verified stale directory/runtime notes in the execplan and
+        the missing Netsuke security-chart fallback against current code.
+  - [x] (2026-05-06) Patched the execplan to describe the completed templated
+        output pipeline and patched the source template to render a visible
+        chart fallback.
+  - [x] (2026-05-06) Regenerate Netsuke and validate browser behaviour plus
+        project gates.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used
@@ -580,35 +589,33 @@ templates/
   weaver/
     shared_content_page.jinja       — shared chrome (no other templates yet)
 public/
-  mxd/                              — output dir; index.html still hard-coded
-  netsuke/                          — output dir; all content pages hard-coded
-  weaver/                           — output dir; all content pages hard-coded
+  mxd/                              — output dir; content generated from templates
+  netsuke/                          — output dir; content generated from templates
+  weaver/                           — output dir; content generated from templates
 ```
 
 ### How the build pipeline works
 
-`pages generate --site mxd` calls `_generate_subsite(site_config, subsite)` in
-`cli.py`. That function:
+`pages generate --site {site}` calls `_generate_subsite(site_config, subsite)`
+in `cli.py`. That function:
 
-1. Renders doc pages (from `subsite.pages` — empty for all three sites
-   currently).
-2. Renders the homepage if `subsite.homepage` is set (currently `None` for all
-   three).
+1. Renders doc pages from `subsite.pages`.
+2. Renders the homepage if `subsite.homepage` is set.
 3. Renders shared content (terms-of-use, privacy-policy, code-of-conduct) via
    `SharedContentGenerator`, using `templates/{site}/shared_content_page.jinja`.
 4. Renders content pages (from `subsite.content_pages`) via
    `ContentPageGenerator`, using a per-page template that extends
    `templates/{site}/doc_page.jinja`.
-5. Copies static assets from `subsite.static_assets_dir` (not used by any of
-   the three sites currently).
+5. Copies static assets from `subsite.static_assets_dir`.
 
 ### How homepages work
 
 `SubSiteHomePageBuilder` loads `templates/{site}/home_page.jinja` and renders
 it with a `homepage` dict (built from the YAML `homepage.context` block plus
-`title`) and a `generated_at` timestamp. It does **not** currently receive
-`nav_links` or `parent_link`. Both must be threaded through so templates can
-render navigation.
+`title`), `nav_links`, `parent_link`, and a `generated_at` timestamp. The
+generator passes `nav_links=subsite.nav_links`,
+`parent_link=subsite.parent_link`, and `base_path=subsite.base_path` so
+home-page templates can render shared navigation and mark the current page.
 
 ### How content pages work
 

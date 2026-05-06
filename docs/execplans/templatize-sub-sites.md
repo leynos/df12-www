@@ -228,6 +228,16 @@ Playwright screenshots and structurally via
   - [x] (2026-05-06) Regenerate Netsuke and validate browser behaviour plus
         project gates.
 
+- [x] (2026-05-06) Netsuke generated affordance follow-up
+  - [x] (2026-05-06) Verified the Plotly script loading, Manifest Reference
+        heading affordance, and Basic C breadcrumb findings against current
+        source templates and generated output.
+  - [x] (2026-05-06) Patched source templates so regenerated output defers
+        Plotly loading, removes false heading permalink affordances, and makes
+        the System Programming breadcrumb plain text.
+  - [x] (2026-05-06) Regenerate Netsuke and validate browser behaviour plus
+        project gates.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used

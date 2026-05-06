@@ -1,0 +1,440 @@
+<!DOCTYPE html><html lang="en"><head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ homepage.title }} — mxd</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800;900&amp;family=DM+Serif+Display:ital,wght@0,400;1,400&amp;family=Source+Serif+4:ital,wght@200;300;400;600;700;900&amp;family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/mxd/assets/tailwind.css">
+    <link rel="icon" href="/mxd/assets/logo-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/mxd/assets/site.css">
+</head>
+<body class="bg-[#fdf8f0]">
+<a class="mxd-skip-link" href="#main-content">Skip to content</a>
+<header class="mxd-site-header">
+  <div class="mxd-site-header__inner">
+    <a class="mxd-brand" href="/mxd/">
+      <img src="/mxd/assets/logo-mark.svg" alt="">
+      <span>
+        <span class="mxd-brand__eyebrow">df12 Productions</span>
+        <span class="mxd-brand__title">Marrakesh Express Daemon</span>
+      </span>
+    </a>
+    <nav class="mxd-site-nav" aria-label="Primary">
+      {% if parent_link %}
+      <a href="{{ parent_link.href }}" class="text-[#e8a838]">{{ parent_link.label }}</a>
+      {% endif %}
+      {% for link in nav_links %}<a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>{% endfor %}
+    </nav>
+  </div>
+</header>
+<main id="main-content" tabindex="-1">
+
+<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
+
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
+        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
+            <div class="text-[#e8a838] text-[11.10px] font-semibold font-primary uppercase tracking-[0.15em]">df12 Productions — Hotline server daemon</div>
+        </div>
+
+        <h1 class="mb-6">
+            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Marrakesh<br>Express </span>
+            <span class="text-[#d4714f] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary italic leading-tight sm:leading-[72.24px]">Daemon</span>
+        </h1>
+
+        <p class="text-[#e8d5b8] text-lg sm:text-[23px] font-light font-tertiary leading-relaxed sm:leading-[39.17px] mb-12 max-w-[600px]">
+            A Hotline protocol server in Rust. Hexagonal architecture, dual-database support, formally verified invariants. The protocol is the product.
+        </p>
+
+        <div class="inline-flex px-4 py-3 bg-[#1a1a2e] rounded border border-[#2a2a42] mb-12">
+            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">protocol_id: </span>
+            <span class="text-[#d4714f] text-[11.10px] font-normal font-primary">0x54 52 54 50</span>
+            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary"> · version: </span>
+            <span class="text-[#e8a838] text-[11.10px] font-normal font-primary">0x0001</span>
+            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary"> · status: </span>
+            <span class="text-[#e8a838] text-[11.10px] font-normal font-primary">PARTIAL</span>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/getting-started/">
+                Get Started
+            </a>
+            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="https://github.com/leynos/mxd" target="_blank" rel="noreferrer">
+                View Source
+            </a>
+            <a class="mxd-btn--ghost px-6 py-3 text-[#3a3a55] text-sm font-semibold font-primary rounded border-2 border-[#e8d5b8] mxd-site-button" href="/mxd/protocol/">
+                Read the Protocol
+            </a>
+        </div>
+    </div>
+
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+</section>
+
+<section class="mxd-page-toc" aria-labelledby="mxd-toc-title">
+  <div class="mxd-page-toc__inner">
+    <div>
+      <div class="mxd-page-toc__label">Route map</div>
+      <div class="mxd-page-toc__title" id="mxd-toc-title">Marrakesh Express Daemon</div>
+    </div>
+    <div class="mxd-page-toc__links">
+      <a href="#section-overview">Overview</a><a href="#section-architecture">Architecture</a><a href="#section-wire">The Wire</a><a href="#section-operational">Running it</a><a href="#section-testing">Confidence</a>
+    </div>
+  </div>
+</section>
+
+<div class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            Welcome to the mxd project site. These pages document the architecture,
+            protocol surface, deployment options, and verification strategy behind
+            the Marrakesh Express Daemon — a Hotline protocol server written in Rust.
+            Use the navigation above to explore the quickstart guide, installation
+            instructions, configuration reference, compatibility matrix, and roadmap.
+        </p>
+    </div>
+</div>
+
+<div id="section-overview" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">01 — Overview</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">The Hotline protocol, treated seriously</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            mxd is building toward Hotline server protocol v1.8.5 coverage. The
+            evidence-backed core today is narrower than the full design set:
+            the 12-byte handshake and 8-byte reply, compatibility-aware login
+            replies, authenticated-session continuity, and selected routed file
+            and news flows. The binary wire format still matters — 20-byte
+            frame headers, big-endian integers, multi-fragment reassembly —
+            but broad chat, presence, and full client parity remain roadmap
+            work.
+        </p>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Hotline 1.8.5, Hotline 1.9, and SynHX compatibility is partial
+            rather than complete. Runtime selection is part of that operator
+            surface too: the <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">legacy-networking</code>
+            feature remains enabled by default, so the classic <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">mxd</code>
+            binary stays available unless the build deliberately targets a
+            Wireframe-only runtime.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <div class="mb-3">
+                    <span class="px-2.5 py-1 bg-[#e8f5ec] rounded-full border border-[#c4e5cc] text-[#4a8c5c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Implemented now</span>
+                </div>
+                <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                    Handshake validation, timeout handling, login compatibility
+                    negotiation, selected file and news routes, and the
+                    verification workflow that backs those claims.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <div class="mb-3">
+                    <span class="px-2.5 py-1 bg-[#fff4e0] rounded-full border border-[#f2dca8] text-[#c89430] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Partial surface</span>
+                </div>
+                <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                    Compatibility rows are intentionally narrow. Hotline banner
+                    fields 161/162, SynHX omission semantics, XOR heuristics,
+                    and selected routed transactions are covered; user-list and
+                    messaging parity are not.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <div class="mb-3">
+                    <span class="px-2.5 py-1 bg-[#e8eaf6] rounded-full border border-[#c5cae9] text-[#2d3a8c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Designed in depth</span>
+                </div>
+                <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                    Chat invites, subjects, history, object-store-backed file
+                    services, aliases, drop boxes, bundles, categories, and
+                    threaded news pointers are documented models whose broader
+                    runtime wiring still sits on the roadmap.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-architecture" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">02 — Architecture</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-8">Built to be reasoned about</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center mb-6">
+                    <span class="text-white text-xl font-normal font-primary">Hx</span>
+                </div>
+                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary leading-[34.56px] mb-3"><a href="/mxd/architecture/" class="underline decoration-transparent hover:decoration-current">Hexagonal Architecture</a></h3>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    Domain logic sits behind ports. The Wireframe transport adapter handles framing and routing; Diesel handles persistence. Neither leaks into the other. Swap the database. Swap the transport. The domain doesn't notice.
+                </p>
+            </div>
+
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center mb-6">
+                    <span class="text-white text-xl font-normal font-primary">Db</span>
+                </div>
+                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary leading-[34.56px] mb-3"><a href="/mxd/configuration/" class="underline decoration-transparent hover:decoration-current">Dual Database</a></h3>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    SQLite for a single-file deployment that fits in a pocket. PostgreSQL when concurrent access matters at scale. One codebase, dual migration trees, compile-time backend selection. Recursive CTEs work on both.
+                </p>
+            </div>
+
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <div class="w-10 h-10 bg-[#e8a838] rounded flex items-center justify-center mb-6">
+                    <span class="text-[#12121f] text-xl font-normal font-primary">Cx</span>
+                </div>
+                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary leading-[34.56px] mb-3"><a href="/mxd/compatibility/" class="underline decoration-transparent hover:decoration-current">Client Compatibility</a></h3>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    Hotline 1.8.5, Hotline 1.9, and SynHX. Banner field augmentation, XOR text obfuscation detection, sub-version gating — all handled at the adapter boundary. A compatibility matrix tracks what works, what's partial, and what remains roadmap work. No over-claiming.
+                </p>
+            </div>
+
+            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] p-6">
+                <div class="w-10 h-10 bg-[#4a8c5c] rounded flex items-center justify-center mb-6">
+                    <span class="text-white text-xl font-normal font-primary">Kn</span>
+                </div>
+                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary leading-[34.56px] mb-3"><a href="/mxd/verification/" class="underline decoration-transparent hover:decoration-current">Verified Correct</a></h3>
+                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                    TLA+ specifications model the handshake state machine. Stateright explores concurrent session interleavings. Kani proves bounded invariants for XOR round-trips and frame validation. Protocol correctness is not left to hope.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="section-wire" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">03 — The Wire</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Every byte accounted for</h2>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            The Hotline transaction frame is 20 bytes: flags, reply bit, transaction type, ID, error code, total size, data size. When data_size &lt; total_size, continuation frames follow until the payload is fully assembled. Each continuation must echo the original header's flags, type, ID, error, and total size.
+        </p>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            mxd's codec validates all of this in a single decoding pass. Payloads exceeding 1 MiB are rejected. Fragment sizes are clamped to 32 KiB. Outbound encoding produces byte-for-byte parity with the legacy runtime.
+        </p>
+
+        <div class="mb-8 rounded-lg overflow-hidden">
+            <div class="flex">
+                <div class="flex-1 px-2 py-3 bg-[#c54b2a] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Flags</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#9a3a1f] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Reply</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#e8a838] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#12121f] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#12121f] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Type</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#e8a838] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#12121f] text-xl font-bold font-primary leading-8">6B</div>
+                    <div class="text-center text-[#12121f] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Type</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#c89430] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">01</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">ID</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+            </div>
+            <div class="flex">
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2d3a8c] flex flex-col items-center gap-1">
+                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Error</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#1e2760] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">24</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Total</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+                <div class="flex-1 px-2 py-3 bg-[#2a2a42] flex flex-col items-center gap-1">
+                    <div class="text-center text-[#f5e6d0] text-xl font-bold font-primary leading-8">24</div>
+                    <div class="text-center text-[#f5e6d0] text-[9.60px] font-normal font-primary uppercase opacity-70 tracking-[0.05em]">Data</div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            Property tests confirm it. Kani proves it. AFL++ fuzzes it nightly.
+        </p>
+    </div>
+</div>
+
+<div id="section-operational" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">04 — Running it</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Configuration without ceremony</h2>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            mxd ships two documented runtime binaries. With
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">legacy-networking</code>
+            enabled by default, the classic <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">mxd</code>
+            daemon remains available alongside
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">mxd-wireframe-server</code>.
+            Both binaries share the same CLI module, environment overrides,
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">.mxd.toml</code>
+            defaults, and admin subcommands such as
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">create-user</code>.
+        </p>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            OrthoConfig merges configuration layers in the documented order:
+            defaults &lt; file &lt; env &lt; CLI. Set
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">MXD_DATABASE</code>
+            to a Postgres connection string. Set
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">MXD_BIND</code>
+            to a socket address. Drop a
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">.mxd.toml</code>
+            for persistent defaults. Migrations apply automatically before
+            administrative commands insert users or before the daemon starts.
+        </p>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            Wireframe-only builds are deliberate, not implicit. Disable default
+            features to omit the legacy binary and force
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">server::run()</code>
+            onto the Wireframe runtime. That selection is part of documented
+            behaviour coverage and is tested as such.
+        </p>
+    </div>
+</div>
+
+<div id="section-testing" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+    <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
+
+    <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
+        <div class="mxd-section-label">05 — Confidence</div>
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Tested at every layer</h2>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            TLA+/TLC handles abstract state machines and policy invariants.
+            Stateright explores authenticated-session continuity, privilege
+            gating, and ordering across multiple clients. Kani proves sharp
+            local invariants such as XOR round-trips, header validation, and
+            login compatibility boundary checks. Adapters are exercised through
+            targeted integration tests rather than treated as the semantic
+            source of truth.
+        </p>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+            The pull-request suite runs bounded Stateright models, the
+            highest-value Kani harnesses, and the critical TLC specs. Nightly
+            jobs deepen the bounds and publish counterexample artefacts for
+            triage. Counterexamples become regression tests under
+            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">tests/regression/</code>.
+        </p>
+
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            The explicit invariants called out in the reference set include
+            handshake gating, privilege enforcement, drop-box visibility, and
+            threaded news consistency. Release notes are expected to describe
+            any compatibility deviation with the matrix, not leave it buried in
+            CI output.
+        </p>
+    </div>
+</div>
+
+<div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
+        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Get the daemon running</h2>
+        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            mxd is open source. The protocol documentation, architecture decisions, and verification artefacts ship with the code.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-3">
+            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/getting-started/">
+                Getting Started
+            </a>
+            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="https://github.com/leynos/mxd" target="_blank" rel="noreferrer">
+                GitHub
+            </a>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer id="footer" class="bg-[#12121f] relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="max-w-[900px] mx-auto px-4 sm:px-8 py-12 text-center">
+        <div class="mb-6 opacity-40">
+            <span class="text-[#e8d5b8] text-[23px] font-normal font-primary">◆</span>
+        </div>
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
+            Protocol Souk — Design System for <span class="text-[#e8a838]">mxd</span>
+        </p>
+        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px]">
+            A <span class="text-[#e8a838]">df12 Productions</span> artefact · Edinburgh · 2026
+        </p>
+    </div>
+    <div class="border-t border-[#2a2a42] py-6">
+        <div class="max-w-[900px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center text-[11.10px] font-primary">
+            <p class="text-[#9a9ab0] mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
+            <nav class="mxd-legal-nav flex space-x-6" aria-label="Legal">
+                <a href="/mxd/privacy-policy/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Privacy Policy</a>
+                <a href="/mxd/terms-of-use/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Terms of Use</a>
+                <a href="/mxd/code-of-conduct/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Code of Conduct</a>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+</body></html>

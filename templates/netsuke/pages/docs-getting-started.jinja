@@ -1,0 +1,382 @@
+{% extends "doc_page.jinja" %}
+{% set active_nav = 'docs' %}
+{% block page_title %}Getting Started - Netsuke Build System{% endblock %}
+{% block extra_head %}
+    <style>
+        /* Syntax Highlighting Base */
+        .token.comment { color: #8A8279; }
+        .token.string { color: #4A7C59; }
+        .token.keyword { color: #C23B22; font-weight: bold; }
+        .token.function { color: #2B4162; }
+    </style>
+{% endblock %}
+{% block content %}
+{% raw %}
+    <!-- Main Content Area with Sidebar -->
+    <div class="site-container pt-16 flex-grow flex">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            <!-- Search -->
+            <div
+                class="mb-8 relative"
+                data-doc-search-root
+                data-doc-search-index="/netsuke/assets/search/docs-search.json"
+            >
+                <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                <input
+                    type="text"
+                    placeholder="Search docs..."
+                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
+                    data-doc-search-input
+                    aria-label="Search the documentation"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded="false"
+                >
+                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
+                <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
+                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
+                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                            Type at least 2 characters to search the docs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="space-y-8">
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Introduction</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
+                        <li><a href="/netsuke/docs/getting-started/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Getting Started</a></li>
+                        <li><a href="/netsuke/docs/getting-started/#installation" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Core Concepts</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
+                        <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
+                        <li><a href="/netsuke/docs/templating-and-standard-library/#starlark-intro" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
+                        <li><a href="/netsuke/docs/templating-and-standard-library/#stdlib-reference" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/docs/cli-security-and-configuration/#cli" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
+                        <li><a href="/netsuke/docs/cli-security-and-configuration/#configuration" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
+                        <li><a href="/netsuke/docs/cli-security-and-configuration/#security" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
+                <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
+                <span class="mx-2 text-stone">/</span>
+                <span class="text-charcoal font-medium">Getting Started</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
+                        Tutorial
+                    </div>
+                    <div class="text-sm text-charcoal-mid font-mono">
+                        <span class="iconify mr-1" data-icon="carbon:time" aria-hidden="true"></span> 5 min read
+                    </div>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Getting Started with Netsuke</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    This guide will walk you through installing Netsuke, creating your first build manifest, and running your first successful build.
+                </p>
+            </div>
+
+            <!-- Prerequisites Section -->
+            <section id="prerequisites" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-4 group cursor-pointer">
+                    <span class="text-stone-light mr-2 font-light">01.</span> Prerequisites
+                    <span class="iconify text-sm text-stone opacity-0 group-hover:opacity-100 ml-2 transition-opacity" data-icon="carbon:link" aria-hidden="true"></span>
+                </h2>
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <p class="text-charcoal-mid mb-4">Before we begin, ensure you have the following installed on your system:</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="iconify text-matcha mt-1 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span class="text-charcoal">A Unix-like environment (macOS, Linux, or WSL2)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="iconify text-matcha mt-1 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span class="text-charcoal">Rust toolchain (optional, for building from source)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="iconify text-matcha mt-1 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span class="text-charcoal">Basic familiarity with terminal commands</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6 pt-6 border-t border-stone-light">
+                        <div class="flex items-start p-4 bg-indigo/5 rounded-lg border border-indigo/10">
+                            <span class="iconify text-indigo mt-0.5 mr-3" data-icon="carbon:information-filled" aria-hidden="true"></span>
+                            <div class="text-sm text-indigo">
+                                <span class="font-bold">Note:</span> Netsuke relies on <code class="bg-white px-1 py-0.5 rounded text-xs font-mono border border-indigo/20">ninja</code> for the execution phase. Make sure it is installed and available on your <code>PATH</code>.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Installation Section -->
+            <section id="installation" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-4 group cursor-pointer">
+                    <span class="text-stone-light mr-2 font-light">02.</span> Install Netsuke
+                    <span class="iconify text-sm text-stone opacity-0 group-hover:opacity-100 ml-2 transition-opacity" data-icon="carbon:link" aria-hidden="true"></span>
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Install Netsuke in the way that fits the machine. The reviewed docs only require the CLI binary and a working Ninja installation.
+                </p>
+
+                <div class="relative group mb-6">
+                    <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="bg-charcoal-light/20 hover:bg-charcoal-light/40 text-stone-light p-1.5 rounded transition-colors" type="button" title="Copy to clipboard" aria-label="Copy install command" data-copy-code>
+                            <span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="bg-charcoal rounded-lg p-5 font-mono text-sm overflow-x-auto border border-charcoal-mid shadow-lg">
+                        <div class="flex text-stone-light">
+                            <span class="text-vermillion mr-2">$</span>
+                            <span class="text-boxwood">cargo</span> install netsuke
+                        </div>
+                    </div>
+                    <span class="sr-only" aria-live="polite" data-copy-status></span>
+                </div>
+
+                <div class="flex items-center text-sm text-charcoal-mid">
+                    <span class="mr-2">Alternatively, install via Cargo:</span>
+                    <code class="bg-stone-light/30 px-2 py-1 rounded font-mono text-charcoal">cargo install netsuke</code>
+                </div>
+            </section>
+
+            <!-- First Project Section -->
+            <section id="first-project" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-4 group cursor-pointer">
+                    <span class="text-stone-light mr-2 font-light">03.</span> Create a Manifest
+                    <span class="iconify text-sm text-stone opacity-0 group-hover:opacity-100 ml-2 transition-opacity" data-icon="carbon:link" aria-hidden="true"></span>
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Netsuke uses a file named <code class="text-vermillion bg-vermillion/5 px-1 rounded font-mono text-sm">Netsukefile</code> to define build targets. Let's create a minimal project structure.
+                </p>
+
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Step 1: File Structure -->
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">1. Create Project Directory</h3>
+                        <div class="bg-charcoal rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
+                            <div class="text-stone-light mb-2">
+                                <span class="text-vermillion mr-2">$</span>
+                                mkdir my-first-build &amp;&amp; cd my-first-build
+                            </div>
+                            <div class="text-stone-light">
+                                <span class="text-vermillion mr-2">$</span>
+                                touch Netsukefile
+                            </div>
+                        </div>
+                        <p class="text-sm text-charcoal-mid">
+                            This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared.
+                        </p>
+                    </div>
+
+                    <!-- Step 2: Content -->
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">2. Define a Simple Rule</h3>
+                        <div class="hm-faux-window bg-charcoal rounded-lg border border-charcoal-mid shadow-lg overflow-hidden">
+                            <div class="hm-faux-window__titlebar flex items-center justify-between px-4 py-3 bg-charcoal-mid/20 border-b border-white/10">
+                                <div class="flex space-x-2">
+                                    <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                                    <div class="w-3 h-3 rounded-full bg-amber"></div>
+                                    <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                                </div>
+                                <span class="text-xs font-mono text-stone-light">Netsukefile</span>
+                                <div class="w-12"></div>
+                            </div>
+                            <div class="hm-faux-window__body p-5 font-mono text-sm text-stone-light overflow-x-auto">
+<pre><code><span class="text-indigo-light">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span>
+
+<span class="text-indigo-light">targets</span>:
+  - <span class="text-amber">name</span>: <span class="text-matcha">"hello.txt"</span>
+    <span class="text-amber">command</span>: <span class="text-matcha">"printf 'Hello, Netsuke!\n' &gt; {{ outs }}"</span>
+
+  - <span class="text-amber">name</span>: <span class="text-matcha">"shout.txt"</span>
+    <span class="text-amber">command</span>: <span class="text-matcha">"tr 'a-z' 'A-Z' &lt; {{ ins }} &gt; {{ outs }}"</span>
+    <span class="text-amber">sources</span>: <span class="text-matcha">"hello.txt"</span>
+
+<span class="text-indigo-light">defaults</span>: [<span class="text-matcha">"shout.txt"</span>]</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Build Execution Section -->
+            <section id="build" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-4 group cursor-pointer">
+                    <span class="text-stone-light mr-2 font-light">04.</span> Run the Build
+                    <span class="iconify text-sm text-stone opacity-0 group-hover:opacity-100 ml-2 transition-opacity" data-icon="carbon:link" aria-hidden="true"></span>
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Now invoke the CLI to build your target. Netsuke parses YAML first, resolves any templating, generates a Ninja plan, and then executes the required commands.
+                </p>
+
+                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-8">
+                    <div class="hm-faux-window__titlebar bg-charcoal-mid/30 px-4 py-3 flex items-center justify-between border-b border-white/10">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber"></div>
+                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                        </div>
+                        <div class="text-xs font-mono text-charcoal-light">Terminal</div>
+                        <div class="w-12"></div>
+                    </div>
+                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
+                        <div class="text-boxwood-pale mb-4">
+                            <span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~/my-first-build</span> <span class="text-boxwood">netsuke build shout.txt</span>
+                        </div>
+
+                        <div class="text-stone-light">
+                            <span class="text-charcoal-light">0.02s</span> <span class="text-indigo font-bold">INFO</span>  <span class="text-stone">Parsing Netsukefile...</span>
+                        </div>
+                        <div class="text-stone-light">
+                            <span class="text-charcoal-light">0.05s</span> <span class="text-indigo font-bold">INFO</span>  <span class="text-stone">Generated build.ninja for 2 targets.</span>
+                        </div>
+                        <div class="text-stone-light mt-2">
+                            <span class="text-charcoal-light">[1/2]</span> <span class="text-amber">Running</span> hello.txt
+                        </div>
+                        <div class="text-stone-light">
+                            <span class="text-charcoal-light">[2/2]</span> <span class="text-amber">Running</span> shout.txt
+                        </div>
+
+                        <div class="text-stone-light mt-4">
+                            <span class="text-matcha font-bold">SUCCESS</span> Build completed in 0.12s
+                        </div>
+                        <div class="text-stone-light mt-4">
+                             <span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~/my-first-build</span> <span class="text-boxwood">cat shout.txt</span>
+                        </div>
+                         <div class="text-stone-light">
+                            HELLO, NETSUKE!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex p-4 bg-boxwood-pale border border-stone rounded-lg">
+                    <div class="flex-shrink-0">
+                        <span class="iconify text-amber mt-0.5" data-icon="carbon:idea" aria-hidden="true"></span>
+                    </div>
+                    <div class="ml-3 text-sm text-charcoal-mid">
+                        <p class="font-bold text-charcoal mb-1">What just happened?</p>
+                        <p>
+                            You asked to build <code class="bg-white px-1 rounded border border-stone/50">shout.txt</code>. Netsuke saw that <code class="bg-white px-1 rounded border border-stone/50">shout.txt</code> depends on <code class="bg-white px-1 rounded border border-stone/50">hello.txt</code>. It built <code class="bg-white px-1 rounded border border-stone/50">hello.txt</code> first, verified the output, and then fed that output into the <code class="bg-white px-1 rounded border border-stone/50">shout.txt</code> rule.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Next Steps -->
+            <section id="next-steps" class="mb-20">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Next Steps</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <a href="/netsuke/docs/manifest-reference/" class="block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-indigo/10 text-indigo flex items-center justify-center text-lg mb-4 group-hover:scale-110 transition-transform">
+                            <span class="iconify" data-icon="carbon:book" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Manifest Reference</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">Dive deeper into the syntax and available functions in Netsukefiles.</p>
+                        <span class="text-indigo text-sm font-medium">Read docs &rarr;</span>
+                    </a>
+
+                    <a href="/netsuke/docs/rules-and-targets/" class="block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-vermillion transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-vermillion/10 text-vermillion flex items-center justify-center text-lg mb-4 group-hover:scale-110 transition-transform">
+                            <span class="iconify" data-icon="carbon:center-circle" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Rules &amp; Targets</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">Learn how to define custom rules and manage visibility across packages.</p>
+                        <span class="text-vermillion text-sm font-medium">Explore rules &rarr;</span>
+                    </a>
+
+                    <a href="/netsuke/examples/" class="block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-matcha transition-all group">
+                        <div class="w-10 h-10 rounded-lg bg-matcha/10 text-matcha flex items-center justify-center text-lg mb-4 group-hover:scale-110 transition-transform">
+                            <span class="iconify" data-icon="carbon:code" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Examples Hub</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">See real-world examples including C++ projects, website builds, and more.</p>
+                        <span class="text-matcha text-sm font-medium">View examples &rarr;</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Help Footer -->
+            <div class="mt-10 pt-10 border-t border-stone-light">
+                <div class="flex justify-between items-center">
+                    <a href="/netsuke/docs/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
+                            <div class="font-medium text-sm">Documentation Hub</div>
+                        </div>
+                    </a>
+
+                    <a href="/netsuke/docs/manifest-reference/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="text-right">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
+                            <div class="font-medium text-sm">Manifest Reference</div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+    <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
+    <script defer src="/netsuke/assets/js/doc-search.js"></script>
+    <script>
+        document.querySelectorAll('[data-copy-code]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                const block = button.closest('.relative.group.mb-6');
+                const sample = block?.querySelector('.bg-charcoal');
+                const status = block?.querySelector('[data-copy-status]');
+                const text = sample?.textContent?.replace(/\s+/g, ' ').trim().replace(/^\$ /, '');
+
+                if (!text || !navigator.clipboard) {
+                    if (status) status.textContent = 'Copy unavailable';
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(text);
+                    button.setAttribute('aria-label', 'Copied install command');
+                    if (status) status.textContent = 'Copied install command';
+                    window.setTimeout(() => {
+                        button.setAttribute('aria-label', 'Copy install command');
+                        if (status) status.textContent = '';
+                    }, 1800);
+                } catch {
+                    if (status) status.textContent = 'Copy failed';
+                }
+            });
+        });
+    </script>
+{% endraw %}
+{% endblock %}

@@ -133,8 +133,8 @@ constructs like resources and variables. The rules for identifiers are 6:
 - OpenTofu implements the Unicode identifier syntax, allowing for non-ASCII
   characters, though ASCII is most common.
 
-For naming conventions, a widely adopted best practice is to use underscores
-(`_`) to separate words (e.g., `web_server_firewall`) and to use singular nouns
+For naming conventions, a widely adopted best practice is to use underscores (
+`_`) to separate words (e.g., `web_server_firewall`) and to use singular nouns
 for resource names (e.g., `resource "aws_vpc" "main"`).8
 
 #### Comments and Character Encoding
@@ -915,9 +915,9 @@ and implementing complex logic within OpenTofu configurations.
   (`condition? true_val : false_val`) is a cornerstone of dynamic
   configuration. It is frequently used with `count` to conditionally create a
   resource (`count = var.create_resource? 1 : 0`) or to select between two
-  different values for an argument
-  (`instance_type = var.is_prod? "m5.large" : "t2.micro"`).2 A common pitfall
-  is when
+  different values for an argument (
+  `instance_type = var.is_prod? "m5.large" : "t2.micro"`).2 A common pitfall is
+  when
 
   `true_val` and `false_val` have incompatible types, which results in an
   "Inconsistent conditional result types" error.34

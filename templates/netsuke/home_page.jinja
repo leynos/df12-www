@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ homepage.title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/netsuke/assets/js/tailwind-config.js"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/netsuke/assets/css/himotoshi.css">
+    <script defer src="/netsuke/assets/js/mobile-nav.js"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+</head>
+<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
+        <div class="site-container">
+            <div class="flex justify-between h-16 items-center">
+                <a href="/netsuke/" class="flex items-center space-x-3" aria-label="Home">
+                    <!-- Logo mark inspired by Netsuke craftsmanship -->
+                    <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light shadow-sm" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="20.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                    <span class="font-serif font-bold text-xl tracking-tight text-charcoal">Netsuke</span>
+                </a>
+
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex space-x-8">
+                    {% if parent_link %}
+                    <a href="{{ parent_link.href }}" class="text-vermillion font-medium transition-colors text-sm py-1">{{ parent_link.label }}</a>
+                    {% endif %}
+                    {% for link in nav_links %}
+                    {% set is_current = link.current %}
+                    <a href="{{ link.href }}" class="{% if is_current %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if is_current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+                    {% endfor %}
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/leynos/netsuke" class="hm-button hm-button--ghost hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
+                        <span class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span><span class="hm-navbar-action__label">GitHub</span>
+                    </a>
+                    <a href="/netsuke/install/" class="hm-button hm-button--primary hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm">
+                        <span class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span><span class="hm-navbar-action__label">Install</span>
+                    </a>
+                    <button id="navbar-mobile-toggle" type="button" class="hm-hamburger md:hidden" aria-expanded="false" aria-controls="navbar-mobile-menu" aria-label="Open menu">
+                        <span class="iconify hm-hamburger__open" data-icon="carbon:menu" aria-hidden="true"></span>
+                        <span class="iconify hm-hamburger__close" data-icon="carbon:close" aria-hidden="true" style="display:none"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <nav id="navbar-mobile-menu" class="hm-mobile-menu hidden md:hidden" aria-label="Mobile navigation">
+            <ul class="list-none py-3 px-4 space-y-1">
+                {% if parent_link %}
+                <li><a href="{{ parent_link.href }}" class="hm-mobile-menu__link text-vermillion">{{ parent_link.label }}</a></li>
+                {% endif %}
+                {% for link in nav_links %}
+                {% set is_current = link.current %}
+                <li><a href="{{ link.href }}" class="hm-mobile-menu__link{% if is_current %} hm-mobile-menu__link--active{% endif %}"{% if is_current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>
+                {% endfor %}
+            </ul>
+            <ul class="list-none border-t border-stone-light/50 py-3 px-4 space-y-2">
+                <li><a href="https://github.com/leynos/netsuke" class="hm-mobile-menu__link hm-mobile-menu__link--secondary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:logo-github" aria-hidden="true"></span>GitHub</a></li>
+                <li><a href="/netsuke/install/" class="hm-mobile-menu__link hm-mobile-menu__link--primary"><span class="iconify inline mr-2 align-middle" data-icon="carbon:download" aria-hidden="true"></span>Install Netsuke</a></li>
+            </ul>
+        </nav>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="hero" class="relative w-full min-h-[800px] flex items-center overflow-hidden py-16">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0 hm-hero-overlay">
+             <img class="w-full h-full object-cover" src="/netsuke/assets/hero-carved-cat.png" alt="wooden carved cat figurine netsuke style, vibrant red floral japanese fabric background, warm lighting, macro photography, extremely detailed wood texture" />
+             <!-- Gradient Overlay for readability -->
+             <div class="absolute inset-0 bg-[linear-gradient(115deg,rgba(46,42,37,0.9)_0%,rgba(46,42,37,0.7)_36%,rgba(46,42,37,0.28)_64%,rgba(245,237,224,0.08)_100%)]"></div>
+        </div>
+
+        <div class="site-container relative z-10 w-full">
+            <div class="hm-hero-panel max-w-2xl space-y-8">
+                <div class="hm-kicker hm-kicker--hero">
+                    <span class="w-2 h-2 rounded-full bg-matcha mr-2 animate-pulse"></span> Open Source Build System
+                </div>
+
+                <h1 class="font-serif text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight drop-shadow-lg">
+                    Build systems,<br>
+                    not <span class="text-vermillion italic bg-white/12 px-2 rounded-lg">build scripts</span>.
+                </h1>
+
+                <p class="text-xl text-stone-light max-w-lg leading-relaxed font-light drop-shadow-md">
+                    Netsuke turns a YAML-plus-Jinja <code class="bg-white/10 px-1.5 py-0.5 rounded border border-white/10">Netsukefile</code> into a static Ninja plan. Describe the graph once; let Ninja do the running.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <a href="/netsuke/docs/getting-started/" class="hm-button hm-button--primary inline-flex justify-center items-center px-8 py-4 text-lg shadow-lg">
+                        Get started
+                        <span  class="iconify ml-2 text-sm" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                    </a>
+                    <a href="https://github.com/leynos/netsuke" class="hm-button hm-button--hero-ghost inline-flex justify-center items-center px-8 py-4 text-lg">
+                        <span  class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span> View on GitHub
+                    </a>
+                </div>
+
+                <div class="hm-proof-list pt-2">
+                    <span class="hm-proof-pill"><span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span> Rust-powered</span>
+                    <span class="hm-proof-pill"><span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span> Ninja backend</span>
+                    <span class="hm-proof-pill"><span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span> Zero-config C/C++</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Value Propositions -->
+    <section id="features" class="py-24 bg-white border-y border-stone-light">
+        <div class="site-container">
+            <div class="text-center mb-16">
+                <span class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">Why Netsuke?</span>
+                <h2 class="font-serif text-4xl font-bold text-charcoal">Crafted for reliability</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Card 1 -->
+                <div class="hm-feature-card p-8">
+                    <div class="w-12 h-12 rounded-lg bg-indigo text-white flex items-center justify-center mb-6 text-xl">
+                        <span  class="iconify" data-icon="carbon:rule" aria-hidden="true"></span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Declare</h3>
+                    <p class="text-charcoal-mid text-sm leading-relaxed">
+                        Describe <em>what</em> you want to build, not <em>how</em>. Netsuke figures out the steps, ensuring reproducibility across machines.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="hm-feature-card p-8">
+                    <div class="w-12 h-12 rounded-lg bg-vermillion text-white flex items-center justify-center mb-6 text-xl">
+                        <span  class="iconify" data-icon="carbon:flash" aria-hidden="true"></span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Fast by delegation</h3>
+                    <p class="text-charcoal-mid text-sm leading-relaxed">
+                        Netsuke compiles your graph to Ninja, leveraging its blazing fast incremental builds and parallelism.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="hm-feature-card p-8">
+                    <div class="w-12 h-12 rounded-lg bg-matcha text-white flex items-center justify-center mb-6 text-xl">
+                        <span  class="iconify" data-icon="carbon:security" aria-hidden="true"></span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Safe by default</h3>
+                    <p class="text-charcoal-mid text-sm leading-relaxed">
+                        Structured builds with explicit dependencies are safer by default. Shell escaping and YAML-first validation reduce common error classes.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="hm-feature-card p-8">
+                    <div class="w-12 h-12 rounded-lg bg-amber text-white flex items-center justify-center mb-6 text-xl">
+                        <span  class="iconify" data-icon="carbon:network-4" aria-hidden="true"></span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Polyglot</h3>
+                    <p class="text-charcoal-mid text-sm leading-relaxed">
+                        One tool, many workflows. Build C++, Rust, Python, documentation, and assets in a single unified graph.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Example Section -->
+    <section id="example" class="py-24 bg-boxwood-pale relative overflow-hidden">
+        <div class="site-container">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="text-indigo font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">The Netsukefile</span>
+                    <h2 class="font-serif text-4xl font-bold text-charcoal mb-6">Readable configuration</h2>
+                    <p class="text-lg text-charcoal-mid mb-8 leading-relaxed">
+                        The <code class="bg-white px-2 py-1 rounded border border-stone text-sm font-mono text-vermillion">Netsukefile</code> is plain YAML with controlled Jinja expansion. Structure stays declarative; the dynamic parts stay visible.
+                    </p>
+
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span  class="iconify text-matcha mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span class="text-charcoal-mid"><strong><code>foreach</code> and <code>when</code></strong> for explicit expansion and filtering</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span  class="iconify text-matcha mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span class="text-charcoal-mid"><strong>Rules, actions, and defaults</strong> that map cleanly onto the build graph</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span  class="iconify text-matcha mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span class="text-charcoal-mid"><strong>String-only rendering</strong> so structure is validated before commands are produced</span>
+                        </li>
+                    </ul>
+
+                    <div class="mt-10">
+                        <a href="/netsuke/docs/manifest-reference/" class="text-indigo font-medium hover:text-vermillion transition-colors flex items-center group">
+                            Read the syntax documentation <span  class="iconify ml-2 transform group-hover:translate-x-1 transition-transform" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Code Window -->
+                <div class="relative">
+                    <div class="hm-faux-window__shadow absolute -top-6 -right-6 w-full h-full bg-stone/30 rounded-lg transform rotate-2"></div>
+                    <div class="hm-faux-window code-window relative z-10 text-sm">
+                        <div class="hm-faux-window__titlebar flex items-center justify-between px-4 py-3 bg-charcoal-mid/20 border-b border-white/10">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber"></div>
+                                <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                            </div>
+                            <div class="text-stone-light font-mono text-xs">Netsukefile</div>
+                            <div class="w-12"></div>
+                        </div>
+                        <div class="hm-faux-window__body p-6 overflow-x-auto text-stone-light leading-relaxed">
+<pre><code><span class="text-charcoal-light"># Reusable commands live in rules</span>
+<span class="text-indigo-light">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span>
+
+<span class="text-indigo-light">vars</span>:
+  <span class="text-amber">cc</span>: <span class="text-matcha">"clang"</span>
+
+<span class="text-indigo-light">rules</span>:
+  - <span class="text-amber">name</span>: <span class="text-matcha">"compile"</span>
+    <span class="text-amber">command</span>: <span class="text-matcha">"&#123;&#123; cc &#125;&#125; -c &#123;&#123; ins &#125;&#125; -o &#123;&#123; outs &#125;&#125;"</span>
+
+<span class="text-indigo-light">targets</span>:
+  - <span class="text-amber">name</span>: <span class="text-matcha">"build/main.o"</span>
+    <span class="text-amber">rule</span>: <span class="text-matcha">"compile"</span>
+    <span class="text-amber">sources</span>: <span class="text-matcha">"src/main.c"</span>
+
+  - <span class="text-amber">name</span>: <span class="text-matcha">"docs/manual.html"</span>
+    <span class="text-amber">command</span>: <span class="text-matcha">"pandoc &#123;&#123; ins &#125;&#125; -o &#123;&#123; outs &#125;&#125;"</span>
+    <span class="text-amber">sources</span>: <span class="text-matcha">"README.md"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Process -->
+    <section id="pipeline" class="py-24 bg-white border-y border-stone-light">
+        <div class="site-container">
+            <div class="text-center mb-16">
+                <span class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">How it works</span>
+                <h2 class="font-serif text-4xl font-bold text-charcoal">The Six-Stage Pipeline</h2>
+            </div>
+
+            <div class="relative">
+                <!-- Mobile: Vertical Stack / Desktop: Horizontal Flow -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+
+                    <!-- Stage 1 -->
+                    <div class="relative group">
+                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">1</div>
+                            <h4 class="font-bold text-charcoal text-sm mb-2">Read</h4>
+                            <p class="text-xs text-charcoal-mid">Load manifest files from disk</p>
+                        </div>
+                        <div class="pipeline-connector hidden lg:block"></div>
+                    </div>
+
+                    <!-- Stage 2 -->
+                    <div class="relative group">
+                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">2</div>
+                            <h4 class="font-bold text-charcoal text-sm mb-2">Parse</h4>
+                            <p class="text-xs text-charcoal-mid">Validate the manifest as YAML</p>
+                        </div>
+                        <div class="pipeline-connector hidden lg:block"></div>
+                    </div>
+
+                    <!-- Stage 3 -->
+                    <div class="relative group">
+                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">3</div>
+                            <h4 class="font-bold text-charcoal text-sm mb-2">Expand</h4>
+                            <p class="text-xs text-charcoal-mid">Process templates & variables</p>
+                        </div>
+                        <div class="pipeline-connector hidden lg:block"></div>
+                    </div>
+
+                    <!-- Stage 4 -->
+                    <div class="relative group">
+                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">4</div>
+                            <h4 class="font-bold text-charcoal text-sm mb-2">Render</h4>
+                            <p class="text-xs text-charcoal-mid">Deserialize and render string fields</p>
+                        </div>
+                        <div class="pipeline-connector hidden lg:block"></div>
+                    </div>
+
+                    <!-- Stage 5 -->
+                    <div class="relative group">
+                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">5</div>
+                            <h4 class="font-bold text-charcoal text-sm mb-2">Validate</h4>
+                            <p class="text-xs text-charcoal-mid">Check cycles & missing deps</p>
+                        </div>
+                        <div class="pipeline-connector hidden lg:block"></div>
+                    </div>
+
+                    <!-- Stage 6 -->
+                    <div class="relative group">
+                        <div class="h-full bg-indigo text-white p-6 rounded-lg border border-indigo-light shadow-md flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center mb-4 text-white font-bold font-serif shadow-sm">6</div>
+                            <h4 class="font-bold text-white text-sm mb-2">Build</h4>
+                            <p class="text-xs text-indigo-100">Execute via Ninja backend</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Terminal Preview -->
+    <section id="terminal" class="py-20 bg-charcoal text-stone-light">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-3xl font-bold text-white mb-4">Clear feedback, human errors</h2>
+                <p class="text-charcoal-light max-w-2xl mx-auto">
+                    Netsuke respects your time. Output is minimal when things go right, and helpful when they go wrong.
+                </p>
+            </div>
+
+            <div class="hm-faux-window bg-charcoal-mid/30 rounded-xl border border-white/10 shadow-2xl overflow-hidden font-mono text-sm">
+                <div class="hm-faux-window__titlebar bg-charcoal-mid/50 px-4 py-3 border-b border-white/10 flex items-center">
+                    <div class="flex space-x-2 mr-4">
+                        <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                        <div class="w-3 h-3 rounded-full bg-amber"></div>
+                        <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                    </div>
+                    <span class="text-xs text-charcoal-light">user@devbox:~/netsuke-demo</span>
+                </div>
+                <div class="hm-faux-window__body p-6 space-y-4">
+                    <!-- Command 1 -->
+                    <div>
+                        <div class="flex items-center text-stone-light">
+                            <span class="text-matcha mr-2">➜</span>
+                            <span class="text-indigo-light mr-2">~/netsuke-demo</span>
+                            <span class="text-white">netsuke build app</span>
+                        </div>
+                        <div class="pl-4 mt-2 border-l-2 border-charcoal-mid/50 text-charcoal-light">
+                            <div class="hm-terminal-status flex justify-between w-64"><span>Parsing manifests...</span> <span class="text-matcha">Done (12ms)</span></div>
+                            <div class="hm-terminal-status flex justify-between w-64"><span>Constructing graph...</span> <span class="text-matcha">Done (4ms)</span></div>
+                            <div class="mt-1 text-stone-light"><span class="text-matcha font-bold">[1/3]</span> Compiling utils.c</div>
+                            <div class="text-stone-light"><span class="text-matcha font-bold">[2/3]</span> Compiling main.c</div>
+                            <div class="text-stone-light"><span class="text-matcha font-bold">[3/3]</span> Linking app</div>
+                            <div class="mt-2 text-matcha font-bold">Build successful in 0.45s</div>
+                        </div>
+                    </div>
+
+                    <!-- Command 2 (Error) -->
+                    <div class="pt-4">
+                        <div class="flex items-center text-stone-light">
+                            <span class="text-matcha mr-2">➜</span>
+                            <span class="text-indigo-light mr-2">~/netsuke-demo</span>
+                            <span class="text-white">netsuke build broken</span>
+                        </div>
+                        <div class="mt-4 p-4 bg-black/20 rounded border-l-2 border-vermillion">
+                            <div class="text-vermillion font-bold mb-2">× Cycle Detected</div>
+                            <div class="text-stone-light mb-1">The dependency graph contains a cycle:</div>
+                            <div class="pl-4 text-charcoal-light">
+                                <div>broken</div>
+                                <div>  └─ lib_a</div>
+                                <div>      └─ lib_b</div>
+                                <div>          └─ broken <span class="text-vermillion text-xs ml-2">&lt;-- Cycle here</span></div>
+                            </div>
+                            <div class="mt-3 text-xs text-charcoal-light">
+                                Check <span class="text-stone underline">src/Netsukefile:14</span> for dependency definitions.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section id="compare" class="py-24 bg-white">
+        <div class="site-container">
+            <div class="text-center mb-16">
+                <h2 class="font-serif text-3xl font-bold text-charcoal mb-4">What you give up vs. what you gain</h2>
+                <p class="text-charcoal-mid">Comparing Netsuke to traditional Makefiles.</p>
+            </div>
+
+            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg border border-stone-light">
+                <table class="min-w-full divide-y divide-stone-light">
+                    <thead class="bg-boxwood-pale">
+                        <tr>
+                            <th scope="col" class="py-4 pl-6 pr-3 text-left text-sm font-bold text-charcoal font-serif">Feature</th>
+                            <th scope="col" class="px-3 py-4 text-left text-sm font-bold text-charcoal font-serif">Make / Shell Scripts</th>
+                            <th scope="col" class="px-3 py-4 text-left text-sm font-bold text-charcoal font-serif text-indigo">Netsuke</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-light bg-white">
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Configuration</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid">Imperative, shell-dependent</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Declarative, structured</td>
+                        </tr>
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Parallelism</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid">Manual flags (-j), flaky</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Automatic, max core usage</td>
+                        </tr>
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Clean Builds</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid">Often required manually</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Correct by default</td>
+                        </tr>
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Learning Curve</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid">Steep (obscure syntax)</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Gentle (Python-like)</td>
+                        </tr>
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Cross-platform</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid">Difficult (Unix vs Windows)</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">First-class citizen</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-charcoal pt-20 pb-10 text-stone-light border-t border-charcoal-light">
+        <div class="site-container">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <!-- Brand Column -->
+                <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="20.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                        <span class="font-serif font-bold text-xl tracking-tight text-white">Netsuke</span>
+                    </div>
+                    <p class="text-sm text-charcoal-light leading-relaxed mb-6">
+                        Netsuke is free, open-source, and written in Rust. It aims to bring the power of large-scale build systems to projects of any size.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/leynos/netsuke" class="hm-footer-icon" aria-label="Netsuke on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
+                        <a href="https://bsky.app/profile/df12.studio" class="hm-footer-icon" aria-label="df12 on Bluesky"><span  class="iconify" data-icon="carbon:logo-bluesky" aria-hidden="true"></span></a>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Documentation</h4>
+                    <ul class="space-y-3 text-sm text-stone">
+                        <li><a href="/netsuke/docs/getting-started/" class="hover:text-white transition-colors">Getting Started</a></li>
+                        <li><a href="/netsuke/docs/manifest-reference/" class="hover:text-white transition-colors">Manifest Reference</a></li>
+                        <li><a href="/netsuke/docs/rules-and-targets/" class="hover:text-white transition-colors">Rules &amp; Targets</a></li>
+                        <li><a href="/netsuke/docs/cli-security-and-configuration/#cli" class="hover:text-white transition-colors">CLI Commands</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Resources</h4>
+                    <ul class="space-y-3 text-sm text-stone">
+                        <li><a href="/netsuke/examples/" class="hover:text-white transition-colors">Examples Hub</a></li>
+                        <li><a href="/netsuke/design/" class="hover:text-white transition-colors">Design System</a></li>
+                        <li><a href="/netsuke/blog/" class="hover:text-white transition-colors">Blog &amp; Releases</a></li>
+                        <li><a href="/netsuke/contributing/" class="hover:text-white transition-colors">Contributing</a></li>
+                    </ul>
+                </div>
+
+                <!-- CTA Column -->
+                <div>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Ready to build?</h4>
+                    <div class="space-y-4">
+                        <a href="/netsuke/install/" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">
+                            Install Netsuke
+                        </a>
+                        <a href="/netsuke/docs/" class="block w-full py-2 px-4 bg-transparent border border-stone/30 text-stone text-center rounded text-sm font-bold hover:bg-white/5 transition-colors">
+                            Read the docs
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-charcoal-mid pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-charcoal-light">
+                <p class="mb-4 md:mb-0">
+                    &copy; {{ generated_at.year }} df12 Productions. Serious tools, <span class="text-boxwood">playful worlds.</span>
+                </p>
+                <div class="flex space-x-6">
+                    <a href="/netsuke/privacy-policy/" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="/netsuke/terms-of-use/" class="hover:text-white transition-colors">Terms of Use</a>
+                    <a href="/netsuke/code-of-conduct/" class="hover:text-white transition-colors">Code of Conduct</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -9,6 +9,7 @@ metadata, and writes the final HTML document to the requested output path.
 
 from __future__ import annotations
 
+import dataclasses as dc
 import datetime as dt
 import typing as typ
 from pathlib import Path
@@ -16,7 +17,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 if typ.TYPE_CHECKING:
-    from .config import SubSiteHomepageConfig
+    from .config import NavLinkConfig, SubSiteHomepageConfig
 
 
 class SubSiteHomePageBuilder:
@@ -27,6 +28,9 @@ class SubSiteHomePageBuilder:
         config: SubSiteHomepageConfig,
         *,
         templates_dir: Path | None = None,
+        nav_links: list[NavLinkConfig] | None = None,
+        parent_link: NavLinkConfig | None = None,
+        base_path: str | None = None,
     ) -> None:
         """Initialize the sub-site homepage builder.
 
@@ -37,9 +41,20 @@ class SubSiteHomePageBuilder:
             context dict consumed by the sub-site's ``home_page.jinja``.
         templates_dir : Path, optional
             Directory containing Jinja templates for this sub-site.
+        nav_links : list[NavLinkConfig], optional
+            Navigation links to expose in the template context.
+        parent_link : NavLinkConfig, optional
+            Parent site link to expose in the template context.
+        base_path : str, optional
+            Absolute path prefix for the sub-site (e.g. ``/mxd/``).  When
+            provided, the nav link whose href equals *base_path* is marked
+            as current.
         """
         self.config = config
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
+        self.nav_links = nav_links or []
+        self.parent_link = parent_link
+        self.base_path = base_path
         self.env = Environment(
             loader=FileSystemLoader(str(self.templates_dir)),
             autoescape=True,
@@ -71,11 +86,19 @@ class SubSiteHomePageBuilder:
         """
         output_path = self.config.output
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        nav_dicts = [dc.asdict(link) for link in self.nav_links]
+        if self.base_path is not None:
+            for entry in nav_dicts:
+                if entry.get("href") == self.base_path:
+                    entry["current"] = True
+                    break
         context = {
             "homepage": {
                 **self.config.context,
                 "title": self.config.title,
             },
+            "nav_links": nav_dicts,
+            "parent_link": dc.asdict(self.parent_link) if self.parent_link else None,
             "generated_at": dt.datetime.now(dt.UTC),
         }
         html = self.template.render(**context)

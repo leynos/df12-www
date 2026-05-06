@@ -1,0 +1,142 @@
+{% extends "doc_page.jinja" %}
+{% set active_nav = 'examples' %}
+{% block page_title %}Hello World - Netsuke Examples{% endblock %}
+{% block content %}
+{% raw %}
+<main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
+        <nav class="flex mb-8 text-sm text-charcoal-mid" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center"><a href="/netsuke/examples/" class="inline-flex items-center hover:text-indigo">Examples</a></li>
+                <li><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium hover:text-indigo">Foundations</span></div></li>
+                <li aria-current="page"><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium text-charcoal">Hello World</span></div></li>
+            </ol>
+        </nav>
+
+        <header id="example-header" class="mb-12 border-b border-stone pb-12">
+            <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
+                <div class="max-w-3xl">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <span class="hm-chip hm-chip--warning">Basics</span>
+                        <span class="hm-chip hm-chip--muted">Beginner</span>
+                        <span class="hm-chip hm-chip--success"><span class="iconify" data-icon="carbon:checkmark" aria-hidden="true"></span> Reviewed syntax</span>
+                    </div>
+                    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Hello World</h1>
+                    <p class="text-xl text-charcoal-mid font-light leading-relaxed">
+                        The smallest useful Netsuke manifest in this repository. One target transforms `input.txt`, another writes a greeting from a variable, and `defaults` tell the CLI what to build when you just run `netsuke`.
+                    </p>
+                </div>
+                <div class="flex flex-col gap-3 w-full lg:w-auto shrink-0">
+                    <a href="/netsuke/examples/" class="hm-button hm-button--primary inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:arrow-left" aria-hidden="true"></span> Back to Examples</a>
+                    <a href="/netsuke/docs/getting-started/" class="hm-button hm-button--ghost inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:book" aria-hidden="true"></span> Getting Started</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid lg:grid-cols-12 gap-12">
+            <div class="lg:col-span-8 space-y-12 min-w-0">
+                <section id="structure" class="bg-white rounded-xl border border-stone shadow-sm p-6 lg:p-8">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:folder-open" aria-hidden="true"></span> Directory Structure</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="font-mono text-sm text-charcoal-mid bg-boxwood-pale p-6 rounded-lg border border-stone">
+                            <div class="flex items-center mb-2"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span class="font-bold">hello-world/</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:document" aria-hidden="true"></span><span>input.txt</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:document" aria-hidden="true"></span><span>README.md</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-vermillion mr-2" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></div>
+                        </div>
+                        <div class="flex flex-col justify-center space-y-4">
+                            <p class="text-charcoal-mid">This example is deliberately small. It keeps the whole language visible at once: top-level `vars`, inline target commands, and two default outputs.</p>
+                            <div class="text-sm border-l-2 border-indigo pl-4 py-1">
+                                <p class="text-indigo font-medium mb-1">Why it matters</p>
+                                <p class="text-charcoal-light">If a new user understands this file, they can read the rest of the examples without guessing what the manifest is doing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="manifest">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest</h2>
+                        <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">docs/examples/hello-world/Netsukefile</span>
+                    </div>
+                    <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
+<pre><code class="language-yaml">netsuke_version: "1.0.0"
+
+vars:
+  greeting: "Hello from Netsuke"
+
+targets:
+  - name: output.txt
+    command: "cat input.txt | tr 'a-z' 'A-Z' &gt; output.txt"
+    sources: input.txt
+
+  - name: greeting.txt
+    command: "printf '%s\n' '{{ greeting }}!' &gt; greeting.txt"
+
+defaults:
+  - output.txt
+  - greeting.txt</code></pre>
+                    </div>
+                    <div class="grid gap-4 mt-6">
+                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">Variables are templated directly</h4><p class="text-sm text-charcoal-mid">The `greeting` variable is expanded inside the command string with standard Jinja syntax.</p></div></div>
+                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">Targets can be fully inline</h4><p class="text-sm text-charcoal-mid">There is no rule block here because the commands are short and specific enough to sit on each target.</p></div></div>
+                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">3</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">Defaults describe the zero-argument build</h4><p class="text-sm text-charcoal-mid">Running `netsuke` builds both output files without requiring a named target on the command line.</p></div></div>
+                    </div>
+                </section>
+
+                <section id="terminal-preview">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build</h2>
+                    <div class="hm-example-terminal bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
+                        <div class="hm-example-terminal__titlebar bg-charcoal-mid/30 px-4 py-2 flex items-center justify-between border-b border-white/10"><div class="flex space-x-2"><div class="w-3 h-3 rounded-full bg-vermillion"></div><div class="w-3 h-3 rounded-full bg-amber"></div><div class="w-3 h-3 rounded-full bg-matcha"></div></div><div class="text-xs font-mono text-charcoal-light">Terminal</div><div class="w-12"></div></div>
+                        <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
+                            <div class="text-boxwood-pale mb-2"><span class="text-matcha">➜</span> <span class="text-indigo-light">~/hello-world</span> <span class="text-boxwood">netsuke</span></div>
+                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">0.0s</span> <span class="text-indigo font-bold">INFO</span> Loaded defaults `output.txt` and `greeting.txt`.</div>
+                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">0.0s</span> <span class="text-indigo font-bold">INFO</span> [1/2] Transforming `input.txt` to uppercase</div>
+                            <div class="text-stone-light/80 mb-3"><span class="text-charcoal-light">0.0s</span> <span class="text-indigo font-bold">INFO</span> [2/2] Writing greeting from manifest variable</div>
+                            <div class="text-matcha">Build complete: output.txt, greeting.txt</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="build-flow" class="bg-white rounded-xl border border-stone shadow-sm p-6 lg:p-8">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:flow-stream" aria-hidden="true"></span> Build Flow</h2>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">1. Read</p><p class="text-charcoal-mid">Load `input.txt` as a source file and `greeting` as a manifest variable.</p></div>
+                        <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">2. Build</p><p class="text-charcoal-mid">Run one inline transform and one inline file-write command.</p></div>
+                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">3. Default</p><p class="text-charcoal-mid">Emit both outputs when the CLI is invoked with no explicit target.</p></div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="lg:col-span-4 space-y-8">
+                <div class="bg-white rounded-lg shadow-sm border border-stone p-6 sticky top-24">
+                    <h3 class="font-serif text-lg font-bold text-charcoal mb-4">On this page</h3>
+                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1">
+                        <li><a href="#structure" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Directory Structure</a></li>
+                        <li><a href="#manifest" class="block pl-4 text-charcoal font-medium border-l-2 border-vermillion -ml-[1px]">Annotated Manifest</a></li>
+                        <li><a href="#terminal-preview" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Running the Build</a></li>
+                        <li><a href="#build-flow" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Build Flow</a></li>
+                    </ul>
+                    <div class="mt-8 pt-6 border-t border-stone-light">
+                        <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Related Documentation</h3>
+                        <ul class="space-y-3">
+                            <li><a href="/netsuke/docs/getting-started/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Getting Started</span><span class="text-xs text-charcoal-light">The minimal path from manifest to build</span></div></a></li>
+                            <li><a href="/netsuke/docs/manifest-reference/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:data-structured" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Manifest Reference</span><span class="text-xs text-charcoal-light">Top-level keys such as `vars`, `targets`, and `defaults`</span></div></a></li>
+                            <li><a href="/netsuke/docs/templating-and-standard-library/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Basic Jinja expansion inside commands</span></div></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
+                    <p class="text-indigo-100 text-sm mb-4 relative z-10">Once the minimal example makes sense, move to a manifest that fans one rule over a whole directory of inputs.</p>
+                    <a href="/netsuke/examples/static-site-pipeline/" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
+                        <div class="flex justify-between items-center mb-1"><span class="text-xs font-mono text-amber">Web</span><span class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span></div>
+                        <div class="font-bold text-sm">Static Site Pipeline</div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </main>
+{% endraw %}
+{% endblock %}

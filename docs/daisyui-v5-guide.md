@@ -42,8 +42,8 @@ for common UI components
    This includes a component class name, part class names (if available for
    that component), and modifier class names (if available for that component).
 2. Components can be customized using Tailwind CSS utility classes if the
-   customization is not possible using the existing daisyUI classes. For
-   example `btn px-10` sets custom horizontal padding on a `btn`.
+   customization is not possible using the existing daisyUI classes. For example,
+   `btn px-10` sets custom horizontal padding on a `btn`.
 3. If customization of daisyUI styles using Tailwind CSS utility classes does
    not work because of CSS specificity issues, use the `!` at the end of the
    Tailwind CSS utility class to override the existing styles. For example
@@ -1414,9 +1414,9 @@ Mask crops the content of the element to common shapes
 
 - component: `mask`
 - style: `mask-squircle`, `mask-heart`, `mask-hexagon`, `mask-hexagon-2`,
-  `mask-decagon`, `mask-pentagon`, `mask-diamond`, `mask-square`,
-  `mask-circle`, `mask-star`, `mask-star-2`, `mask-triangle`,
-  `mask-triangle-2`, `mask-triangle-3`, `mask-triangle-4`
+  `mask-decagon`, `mask-pentagon`, `mask-diamond`, `mask-square`, `mask-circle`,
+  `mask-star`, `mask-star-2`, `mask-triangle`, `mask-triangle-2`,
+  `mask-triangle-3`, `mask-triangle-4`
 - modifier: `mask-half-1`, `mask-half-2`
 
 #### Syntax

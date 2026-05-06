@@ -1,0 +1,466 @@
+{% extends "doc_page.jinja" %}
+
+{% block page_title %}Command Reference - Weaver AI Codebase Tooling{% endblock %}
+
+{% block extra_head %}
+    <style>
+        .code-block-shadow { box-shadow: 4px 4px 0px 0px rgba(25,60,110,0.1); }
+    </style>
+{% endblock %}
+
+{% block nav_subitems_commands %}
+                    <div class="ml-4 pl-4 border-l border-weaver-indigo/20 space-y-1 my-2">
+                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">/observe</a>
+                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">/act</a>
+                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">/verify</a>
+                    </div>
+{% endblock %}
+
+{% block content %}
+
+            <!-- Header Section -->
+            <section id="commands-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-weaver-indigo/20">
+                <div class="masthead-frame mx-auto">
+                    <div class="masthead-eyebrow mb-6">
+                        <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">CLI Reference</span>
+                    </div>
+
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-8">
+                        The Vocabulary of <br>
+                        <span class="text-weaver-vermilion italic font-light">Action</span>.
+                    </h1>
+
+                    <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
+                        Every command follows the same shape: <code class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded">weaver &lt;domain&gt; &lt;operation&gt; [ARG ...]</code>. Three domains — Observe, Act, and Verify — cover perception, mutation, and validation respectively.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Capabilities Table Section -->
+            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="font-serif text-3xl text-weaver-indigo mb-8">Core Capabilities</h2>
+
+                    <div class="overflow-hidden border border-weaver-indigo/20 rounded-sm shadow-sm bg-weaver-cream">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-weaver-indigo text-weaver-cream font-mono text-xs uppercase tracking-wider">
+                                    <th class="p-4 border-r border-weaver-cream/20 w-32">Domain</th>
+                                    <th class="p-4 border-r border-weaver-cream/20">Purpose</th>
+                                    <th class="p-4 border-r border-weaver-cream/20 w-56">Key Operations</th>
+                                    <th class="p-4 w-40">Output</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-weaver-indigo/10">
+                                <tr class="group hover:bg-weaver-indigo/5 transition-colors">
+                                    <td class="p-4 font-mono text-sm font-bold text-weaver-indigo border-r border-weaver-indigo/10">
+                                        <a href="/weaver/commands/observe/" class="flex items-center gap-2 hover:text-weaver-vermilion">
+                                            observe <i class="fa-solid fa-arrow-right -rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        </a>
+                                    </td>
+                                    <td class="p-4 text-sm text-weaver-indigo/80 border-r border-weaver-indigo/10">
+                                        Query code structure and relationships via LSP and Tree-sitter.
+                                    </td>
+                                    <td class="p-4 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">
+                                        get-definition, find-references, call-hierarchy, grep
+                                    </td>
+                                    <td class="p-4 font-mono text-xs text-weaver-indigo/60">
+                                        JSONL (<code class="text-[10px]">kind</code> envelope)
+                                    </td>
+                                </tr>
+                                <tr class="group hover:bg-weaver-indigo/5 transition-colors">
+                                    <td class="p-4 font-mono text-sm font-bold text-weaver-indigo border-r border-weaver-indigo/10">
+                                        <a href="/weaver/commands/act/" class="flex items-center gap-2 hover:text-weaver-vermilion">
+                                            act <i class="fa-solid fa-arrow-right -rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        </a>
+                                    </td>
+                                    <td class="p-4 text-sm text-weaver-indigo/80 border-r border-weaver-indigo/10">
+                                        Lock-guarded, transactional code mutation via patches or rewrites.
+                                    </td>
+                                    <td class="p-4 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">
+                                        apply-patch, apply-rewrite, refactor
+                                    </td>
+                                    <td class="p-4 font-mono text-xs text-weaver-indigo/60">
+                                        JSONL (<code class="text-[10px]">kind</code> envelope)
+                                    </td>
+                                </tr>
+                                <tr class="group hover:bg-weaver-indigo/5 transition-colors">
+                                    <td class="p-4 font-mono text-sm font-bold text-weaver-indigo border-r border-weaver-indigo/10">
+                                        <a href="/weaver/commands/verify/" class="flex items-center gap-2 hover:text-weaver-vermilion">
+                                            verify <i class="fa-solid fa-arrow-right -rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        </a>
+                                    </td>
+                                    <td class="p-4 text-sm text-weaver-indigo/80 border-r border-weaver-indigo/10">
+                                        Pull diagnostics from language servers to confirm code health.
+                                    </td>
+                                    <td class="p-4 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">
+                                        diagnostics
+                                    </td>
+                                    <td class="p-4 font-mono text-xs text-weaver-indigo/60">
+                                        JSONL (<code class="text-[10px]">kind</code> envelope)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Command Breakdown Cards -->
+            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <!-- Observe Card -->
+                    <div id="observe-card" class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fa-solid fa-eye text-6xl text-weaver-indigo"></i>
+                        </div>
+                        <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Observe</h3>
+                        <p class="text-sm font-mono text-weaver-indigo/50 mb-4">perception</p>
+                        <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[80px]">
+                            The agent's eyes. Queries code structure via LSP and Tree-sitter — definitions, references, call hierarchies, structural grep.
+                        </p>
+                        <div class="bg-weaver-dark p-3 rounded-sm mb-4 border border-weaver-indigo/20">
+                            <code class="font-mono text-xs text-green-400 block">$ weaver observe get-definition \<br>&nbsp;&nbsp;--uri file:///src/main.rs --position 10:5</code>
+                        </div>
+                        <a href="/weaver/commands/observe/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
+                            Full Documentation <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+
+                    <!-- Act Card -->
+                    <div id="act-card" class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fa-solid fa-hand-holding-hand text-6xl text-weaver-indigo"></i>
+                        </div>
+                        <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Act</h3>
+                        <p class="text-sm font-mono text-weaver-indigo/50 mb-4">mutation</p>
+                        <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[80px]">
+                            The agent's hands. Applies patches and rewrites through Double-Lock validation — every edit passes syntactic and semantic checks before it touches disk.
+                        </p>
+                        <div class="bg-weaver-dark p-3 rounded-sm mb-4 border border-weaver-indigo/20">
+                            <code class="font-mono text-xs text-green-400 block">$ weaver act apply-patch &lt; fix.diff</code>
+                        </div>
+                        <a href="/weaver/commands/act/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
+                            Full Documentation <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+
+                    <!-- Verify Card -->
+                    <div id="verify-card" class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fa-solid fa-scale-balanced text-6xl text-weaver-indigo"></i>
+                        </div>
+                        <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Verify</h3>
+                        <p class="text-sm font-mono text-weaver-indigo/50 mb-4">validation</p>
+                        <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[80px]">
+                            The agent's conscience. Currently pulls LSP diagnostics for any file with a supported language server. Policy and test orchestration are planned, not implemented yet.
+                        </p>
+                        <div class="bg-weaver-dark p-3 rounded-sm mb-4 border border-weaver-indigo/20">
+                            <code class="font-mono text-xs text-green-400 block">$ weaver verify diagnostics \<br>&nbsp;&nbsp;--uri file:///src/lib.rs</code>
+                        </div>
+                        <a href="/weaver/commands/verify/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
+                            Full Documentation <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Example Pipeline Section (Interactive-like) -->
+            <section class="py-20 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-weaver-cream relative">
+                <!-- Seigaiha Pattern Background -->
+                <div class="absolute left-0 bottom-0 w-full h-64 opacity-5 pointer-events-none"
+                     style="background-image: url('https://www.transparenttextures.com/patterns/seigaiha.png'); mask-image: linear-gradient(to top, black, transparent);">
+                </div>
+
+                <div class="max-w-6xl mx-auto relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between md:items-end mb-10">
+                        <div>
+                            <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-2 block">WORKFLOW</span>
+                            <h2 class="font-serif text-3xl text-weaver-indigo">End-to-End Pipeline</h2>
+                            <p class="text-weaver-indigo/70 mt-2 max-w-xl">How an agent typically chains commands to safely refactor code.</p>
+                        </div>
+                        <div class="hidden md:block">
+                             <div class="flex items-center gap-2 text-xs font-mono text-weaver-indigo/60">
+                                <span class="w-3 h-3 bg-weaver-dark rounded-full"></span> Input
+                                <span class="w-3 h-3 bg-weaver-vermilion rounded-full ml-2"></span> Process
+                                <span class="w-3 h-3 bg-weaver-indigo rounded-full ml-2"></span> Output
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border-2 border-weaver-indigo p-4 rounded-sm shadow-[8px_8px_0px_0px_rgba(25,60,110,0.08)] mb-8 figure-fullbleed">
+                        <img
+                            src="/weaver/assets/commands/commands-end-to-end-pipeline.png"
+                            alt="Illustration of the Observe, Act, and Verify command pipeline for an AI-assisted coding workflow."
+                            class="block w-full h-auto rounded-[2px] border border-weaver-indigo/10 bg-weaver-cream"
+                        >
+                    </div>
+
+                    <!-- Pipeline Steps -->
+                    <div class="space-y-4">
+
+                        <!-- Step 1: Observe -->
+                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-weaver-indigo"></div>
+                            <div class="flex flex-col lg:flex-row gap-6">
+                                <div class="lg:w-1/3 flex flex-col justify-center">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="font-mono text-xs font-bold bg-weaver-indigo text-weaver-cream px-2 py-0.5 rounded-sm">01</span>
+                                        <h3 class="font-serif text-xl text-weaver-indigo">Observe Context</h3>
+                                    </div>
+                                    <p class="text-sm text-weaver-indigo/70 mb-4">Agent jumps to the definition of <code class="text-xs bg-weaver-indigo/10 px-1">process_data</code> to understand it before editing.</p>
+                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
+                                        <span class="text-weaver-vermilion">$</span> weaver observe get-definition \<br>
+                                        &nbsp;&nbsp;--output json \<br>
+                                        &nbsp;&nbsp;--uri file:///src/main.rs --position 10:5
+                                    </div>
+                                </div>
+                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
+<pre>
+<span class="text-gray-500">// CLI JSON output (--output json)</span>
+[{"uri":"file:///src/lib.rs","line":42,"column":17}]
+</pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector -->
+                        <div class="flex justify-center h-6">
+                            <div class="w-px bg-weaver-indigo/30 border-l border-dashed border-weaver-indigo"></div>
+                        </div>
+
+                        <!-- Step 2: Act -->
+                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-weaver-vermilion"></div>
+                            <div class="flex flex-col lg:flex-row gap-6">
+                                <div class="lg:w-1/3 flex flex-col justify-center">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="font-mono text-xs font-bold bg-weaver-vermilion text-white px-2 py-0.5 rounded-sm">02</span>
+                                        <h3 class="font-serif text-xl text-weaver-indigo">Apply Patch</h3>
+                                    </div>
+                                    <p class="text-sm text-weaver-indigo/70 mb-4">Agent pipes a diff through Double-Lock validation and onto disk.</p>
+                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
+                                        <span class="text-weaver-vermilion">$</span> weaver act apply-patch --output json &lt; refactor.diff
+                                    </div>
+                                </div>
+                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
+<pre>
+<span class="text-gray-500">// CLI JSON output (--output json)</span>
+{"applied":true,"files":["src/lib.rs"]}
+</pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector -->
+                        <div class="flex justify-center h-6">
+                            <div class="w-px bg-weaver-indigo/30 border-l border-dashed border-weaver-indigo"></div>
+                        </div>
+
+                        <!-- Step 3: Verify -->
+                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-600"></div>
+                            <div class="flex flex-col lg:flex-row gap-6">
+                                <div class="lg:w-1/3 flex flex-col justify-center">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="font-mono text-xs font-bold bg-green-600 text-white px-2 py-0.5 rounded-sm">03</span>
+                                        <h3 class="font-serif text-xl text-weaver-indigo">Verify Diagnostics</h3>
+                                    </div>
+                                    <p class="text-sm text-weaver-indigo/70 mb-4">Agent confirms the edited file has no compiler warnings or errors.</p>
+                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
+                                        <span class="text-weaver-vermilion">$</span> weaver verify diagnostics \<br>
+                                        &nbsp;&nbsp;--output json \<br>
+                                        &nbsp;&nbsp;--uri file:///src/lib.rs
+                                    </div>
+                                </div>
+                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
+<pre>
+<span class="text-gray-500">// CLI JSON output (--output json; no diagnostics, clean file)</span>
+{"diagnostics":[]}
+</pre>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Common Flags & Exit Codes -->
+            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+                    <!-- Common Flags -->
+                    <div>
+                        <h3 class="font-serif text-2xl text-weaver-indigo mb-6">Global Flags</h3>
+                        <div class="reference-callout mb-6">
+                            <div class="reference-callout-title">
+                                <i class="fa-solid fa-book-open"></i>
+                                Canonical reference
+                            </div>
+                            <p class="text-sm text-weaver-indigo/80 mb-3">
+                                Keep command semantics on this page. Keep config defaults, override precedence, and the JSONL envelope in the docs hub.
+                            </p>
+                            <div class="flex flex-wrap gap-3 text-xs font-mono">
+                                <a href="/weaver/docs/#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
+                                <a href="/weaver/docs/#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
+                                <a href="/weaver/docs/#capability-overrides" class="text-weaver-vermilion hover:underline">Capability overrides</a>
+                            </div>
+                        </div>
+                        <div class="bg-weaver-cream border border-weaver-indigo/20 rounded-sm overflow-hidden">
+                            <table class="w-full text-left">
+                                <tbody class="divide-y divide-weaver-indigo/10">
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs text-weaver-vermilion bg-weaver-indigo/5 w-44">--output</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Output mode: <code class="text-xs bg-weaver-indigo/10 px-1">auto</code> (default), <code class="text-xs bg-weaver-indigo/10 px-1">human</code>, or <code class="text-xs bg-weaver-indigo/10 px-1">json</code>. <code class="text-xs bg-weaver-indigo/10 px-1">auto</code> selects <code class="text-xs bg-weaver-indigo/10 px-1">human</code> on a TTY, <code class="text-xs bg-weaver-indigo/10 px-1">json</code> when redirected. Must appear <em>before</em> the domain/operation.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs text-weaver-vermilion bg-weaver-indigo/5">--config-path</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Path to an explicit <code class="text-xs bg-weaver-indigo/10 px-1">weaver.toml</code> configuration file.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs text-weaver-vermilion bg-weaver-indigo/5">--daemon-socket</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Override daemon transport (e.g. <code class="text-xs bg-weaver-indigo/10 px-1">unix:///run/user/1000/weaver.sock</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs text-weaver-vermilion bg-weaver-indigo/5">--log-filter</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Tracing filter (default <code class="text-xs bg-weaver-indigo/10 px-1">info</code>).</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs text-weaver-vermilion bg-weaver-indigo/5">--log-format</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Log output format: <code class="text-xs bg-weaver-indigo/10 px-1">json</code> (default) or <code class="text-xs bg-weaver-indigo/10 px-1">compact</code>.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs text-weaver-vermilion bg-weaver-indigo/5">--capability-overrides</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Capability overrides. See the override syntax in the docs hub before repeating directives on the CLI.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Exit Codes -->
+                    <div>
+                        <h3 class="font-serif text-2xl text-weaver-indigo mb-6">Exit Codes</h3>
+                        <div class="bg-weaver-cream border border-weaver-indigo/20 rounded-sm overflow-hidden">
+                            <table class="w-full text-left">
+                                <tbody class="divide-y divide-weaver-indigo/10">
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs font-bold text-weaver-indigo bg-weaver-indigo/5 w-16 text-center">0</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Success. Command completed without error.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs font-bold text-weaver-indigo bg-weaver-indigo/5 text-center">1</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">General error (file not found, permission denied).</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs font-bold text-weaver-indigo bg-weaver-indigo/5 text-center">126</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Command invoked cannot execute (sandbox restriction).</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-mono text-xs font-bold text-weaver-indigo bg-weaver-indigo/5 text-center">130</td>
+                                        <td class="p-3 text-sm text-weaver-indigo/80">Terminated by signal (Ctrl-C).</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Capability Discovery & Output Contract -->
+            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="font-serif text-3xl text-weaver-indigo mb-8">Capability Discovery &amp; Output</h2>
+                    <div class="reference-callout mb-8">
+                        <div class="reference-callout-title">
+                            <i class="fa-solid fa-book-open"></i>
+                            Canonical reference
+                        </div>
+                        <p class="text-sm text-weaver-indigo/80 mb-3">
+                            This page keeps the command map. The authoritative defaults, override syntax, and JSONL envelope live in the docs hub so those details only drift in one place.
+                        </p>
+                        <div class="flex flex-wrap gap-3 text-xs font-mono">
+                            <a href="/weaver/docs/#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
+                            <a href="/weaver/docs/#capability-overrides" class="text-weaver-vermilion hover:underline">Capability overrides</a>
+                            <a href="/weaver/docs/#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                            <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Capability probe</h3>
+                            <p class="text-sm text-weaver-indigo/75 leading-relaxed">
+                                Run <code>weaver --capabilities</code> to inspect the negotiated capability surface. The full output shape and override syntax are documented in the docs hub.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                            <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Output modes</h3>
+                            <p class="text-sm text-weaver-indigo/75 leading-relaxed">
+                                <code>--output auto</code> stays the default. Use <code>human</code> for operator context and <code>json</code> for piping. The exact JSONL envelope is maintained in the docs hub.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                            <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Failure shape</h3>
+                            <p class="text-sm text-weaver-indigo/75 leading-relaxed">
+                                Capability mismatches still return structured failures with actionable hints. Keep the exact wire contract centralized so command docs can focus on operator intent.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CLI Help Discoverability (PLANNED) -->
+            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
+                <div class="max-w-6xl mx-auto">
+                    <div class="border-2 border-dashed border-weaver-indigo/40 rounded-sm p-8 opacity-80">
+                        <div class="flex items-center gap-3 mb-6">
+                            <h2 class="font-serif text-3xl text-weaver-indigo">CLI Help &amp; Discoverability</h2>
+                            <span class="status-pill status-pill-planned">Planned</span>
+                        </div>
+
+                        <p class="mb-6 text-sm text-weaver-indigo/80">
+                            Upcoming help surfaces will make the CLI self-documenting without requiring external runbooks or source inspection.
+                        </p>
+
+                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-6">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-weaver-indigo/80 text-white font-mono text-xs uppercase">
+                                    <tr>
+                                        <th class="p-4 font-medium">Command</th>
+                                        <th class="p-4 font-medium">Behaviour</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-weaver-indigo/10">
+                                    <tr class="hover:bg-weaver-cream/30">
+                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">weaver --help</td>
+                                        <td class="p-4 text-weaver-indigo/80">Lists all three domains and every operation for each, plus global options and a quick-start example. Does not require a running daemon.</td>
+                                    </tr>
+                                    <tr class="hover:bg-weaver-cream/30">
+                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">weaver &lt;domain&gt;</td>
+                                        <td class="p-4 text-weaver-indigo/80">Without an operation, prints available operations for that domain and a follow-up <code class="text-xs bg-weaver-indigo/10 px-1">--help</code> hint.</td>
+                                    </tr>
+                                    <tr class="hover:bg-weaver-cream/30">
+                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">weaver &lt;domain&gt; &lt;op&gt; --help</td>
+                                        <td class="p-4 text-weaver-indigo/80">Operation-level help with required arguments, examples, and exit codes.</td>
+                                    </tr>
+                                    <tr class="hover:bg-weaver-cream/30">
+                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">weaver --version</td>
+                                        <td class="p-4 text-weaver-indigo/80">Prints the version string and exits.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3 class="font-serif text-lg text-weaver-indigo mb-3">Actionable Errors</h3>
+                        <p class="text-sm text-weaver-indigo/80">
+                            Invalid domains will list all valid alternatives. Unknown operations will suggest the nearest match by edit distance. All error paths will follow a three-part template: problem statement, valid alternatives, and an explicit next command.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+{% endblock %}

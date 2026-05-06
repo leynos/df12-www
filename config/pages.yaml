@@ -504,6 +504,8 @@ sites:
         label: Changelog
         template: pages/changelog.jinja
         output_slug: changelog
+    homepage:
+      title: Home
     pages: {}
 
   netsuke:
@@ -520,19 +522,98 @@ sites:
       href: /
     nav_links:
       - label: Home
-        href: ../
+        href: /netsuke/
       - label: Docs
-        href: ../docs/
+        href: /netsuke/docs/
       - label: Examples
-        href: ../examples/
+        href: /netsuke/examples/
       - label: Guides
-        href: ../guides/
+        href: /netsuke/guides/
       - label: Blog
-        href: ../blog/
+        href: /netsuke/blog/
     shared_content:
       - terms-of-use
       - privacy-policy
       - code-of-conduct
+    homepage:
+      title: "Netsuke - Build systems, not build scripts"
+    content_pages:
+      - key: blog
+        label: Blog
+        template: pages/blog.jinja
+        output_slug: blog
+      - key: contributing
+        label: Contributing
+        template: pages/contributing.jinja
+        output_slug: contributing
+      - key: design
+        label: Design
+        template: pages/design.jinja
+        output_slug: design
+      - key: docs
+        label: Docs
+        template: pages/docs.jinja
+        output_slug: docs
+      - key: docs-cli-security-and-configuration
+        label: "CLI, Security, and Configuration"
+        template: pages/docs-cli-security-and-configuration.jinja
+        output_slug: docs/cli-security-and-configuration
+      - key: docs-getting-started
+        label: Getting Started
+        template: pages/docs-getting-started.jinja
+        output_slug: docs/getting-started
+      - key: docs-manifest-reference
+        label: Manifest Reference
+        template: pages/docs-manifest-reference.jinja
+        output_slug: docs/manifest-reference
+      - key: docs-rules-and-targets
+        label: Rules and Targets
+        template: pages/docs-rules-and-targets.jinja
+        output_slug: docs/rules-and-targets
+      - key: docs-templating-and-standard-library
+        label: Templating and Standard Library
+        template: pages/docs-templating-and-standard-library.jinja
+        output_slug: docs/templating-and-standard-library
+      - key: examples
+        label: Examples
+        template: pages/examples.jinja
+        output_slug: examples
+      - key: examples-basic-c-application
+        label: Basic C Application
+        template: pages/examples-basic-c-application.jinja
+        output_slug: examples/basic-c-application
+      - key: examples-batch-photo-processing
+        label: Batch Photo Processing
+        template: pages/examples-batch-photo-processing.jinja
+        output_slug: examples/batch-photo-processing
+      - key: examples-hello-world
+        label: Hello World
+        template: pages/examples-hello-world.jinja
+        output_slug: examples/hello-world
+      - key: examples-multi-format-documentation
+        label: Multi-Format Documentation
+        template: pages/examples-multi-format-documentation.jinja
+        output_slug: examples/multi-format-documentation
+      - key: examples-static-site-pipeline
+        label: Static Site Pipeline
+        template: pages/examples-static-site-pipeline.jinja
+        output_slug: examples/static-site-pipeline
+      - key: examples-visual-design-assets
+        label: Visual Design Assets
+        template: pages/examples-visual-design-assets.jinja
+        output_slug: examples/visual-design-assets
+      - key: guides
+        label: Guides
+        template: pages/guides.jinja
+        output_slug: guides
+      - key: install
+        label: Install
+        template: pages/install.jinja
+        output_slug: install
+      - key: icon-replacements
+        label: Icon Replacements
+        template: pages/icon-replacements.jinja
+        output_slug: icon-replacements
     pages: {}
 
   weaver:
@@ -549,27 +630,82 @@ sites:
       href: /
     nav_links:
       - label: Home
-        href: ../
+        href: /weaver/
       - label: Philosophy
-        href: ../why-weaver/
+        href: /weaver/why-weaver/
       - label: Architecture
-        href: ../how-it-works/
+        href: /weaver/how-it-works/
       - label: Commands
-        href: ../commands/
+        href: /weaver/commands/
       - label: Safety
-        href: ../safety/
+        href: /weaver/safety/
       - label: Sempai Engine
-        href: ../sempai/
+        href: /weaver/sempai/
       - label: Jacquard
-        href: ../jacquard/
+        href: /weaver/jacquard/
       - label: Install
-        href: ../install/
+        href: /weaver/install/
       - label: Docs
-        href: ../docs/
+        href: /weaver/docs/
       - label: Roadmap
-        href: ../roadmap/
+        href: /weaver/roadmap/
     shared_content:
       - terms-of-use
       - privacy-policy
       - code-of-conduct
+    homepage:
+      title: "Weaver — AI Codebase Tooling"
+    content_pages:
+      - key: why-weaver
+        label: Philosophy
+        template: pages/why-weaver.jinja
+        output_slug: why-weaver
+      - key: how-it-works
+        label: Architecture
+        template: pages/how-it-works.jinja
+        output_slug: how-it-works
+      - key: commands
+        label: Commands
+        template: pages/commands.jinja
+        output_slug: commands
+      - key: commands-act
+        label: "Commands: Act"
+        template: pages/commands-act.jinja
+        output_slug: commands/act
+      - key: commands-observe
+        label: "Commands: Observe"
+        template: pages/commands-observe.jinja
+        output_slug: commands/observe
+      - key: commands-verify
+        label: "Commands: Verify"
+        template: pages/commands-verify.jinja
+        output_slug: commands/verify
+      - key: safety
+        label: Safety
+        template: pages/safety.jinja
+        output_slug: safety
+      - key: sempai
+        label: Sempai Engine
+        template: pages/sempai.jinja
+        output_slug: sempai
+      - key: jacquard
+        label: Jacquard
+        template: pages/jacquard.jinja
+        output_slug: jacquard
+      - key: install
+        label: Install
+        template: pages/install.jinja
+        output_slug: install
+      - key: docs
+        label: Docs
+        template: pages/docs.jinja
+        output_slug: docs
+      - key: roadmap
+        label: Roadmap
+        template: pages/roadmap.jinja
+        output_slug: roadmap
+      - key: design-language
+        label: Design Language
+        template: pages/design-language.jinja
+        output_slug: design-language
     pages: {}

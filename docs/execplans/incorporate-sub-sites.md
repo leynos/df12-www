@@ -48,8 +48,8 @@ layout with CLI install commands; netsuke has benchmark charts. Creating
 per-site dataclasses would mean dozens of types consumed by only one template
 each.
 
-**Solution**: A new `SubSiteHomepageConfig` carries typed structural fields
-(`output`, `title`) plus a freeform `context: dict[str, Any]` holding the raw
+**Solution**: A new `SubSiteHomepageConfig` carries typed structural fields (
+`output`, `title`) plus a freeform `context: dict[str, Any]` holding the raw
 YAML payload. Each sub-site's `home_page.jinja` accesses what it needs from the
 context dict. Jinja handles dict attribute access transparently.
 

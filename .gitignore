@@ -8,6 +8,13 @@ public/images/*.webp
 public/images/*.avif
 reference/
 
+# Generated site output
+public/*.html
+public/**/*.html
+public/.df12-pages-*-meta.json
+public/netsuke/assets/search/docs-search.json
+public/mxd/assets/tailwind.css
+
 # Project build outputs
 out
 coverage

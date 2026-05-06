@@ -1,0 +1,256 @@
+{% extends "doc_page.jinja" %}
+{% set active_nav = 'blog' %}
+{% block page_title %}Blog - Netsuke Build System{% endblock %}
+{% block extra_head %}<script defer src="/netsuke/assets/js/blog-filter.js"></script>{% endblock %}
+{% block content %}
+{% raw %}
+    <!-- Main Content -->
+    <main id="main-content" class="flex-grow pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+
+        <!-- Hero Section -->
+        <header id="blog-hero" class="mb-16 text-center max-w-3xl mx-auto">
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone mb-6">
+                <span class="iconify mr-2 text-vermillion" data-icon="carbon:pen-fountain" aria-hidden="true"></span> Devlog & Releases
+            </div>
+            <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Latest Updates</h1>
+            <p class="text-xl text-charcoal-mid font-light leading-relaxed mb-8">
+                News from the Netsuke team, deep dives into build system architecture, and release notes for the latest versions.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <a href="https://github.com/leynos/netsuke" class="hm-button hm-button--ghost inline-flex items-center px-4 py-2 text-sm">
+                    <span class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span> Project Repository
+                </a>
+            </div>
+        </header>
+
+        <!-- Featured Post (Latest Release) -->
+        <section id="featured-post" class="mb-20">
+            <div class="hm-card hm-card--interactive hm-card--accent overflow-hidden relative group">
+                <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none hidden lg:block">
+                     <span class="iconify text-9xl text-indigo" data-icon="carbon:cube" aria-hidden="true"></span>
+                </div>
+
+                <div class="p-8 lg:p-12 relative z-10">
+                    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                        <div class="max-w-2xl">
+                            <div class="flex items-center space-x-3 text-sm mb-4">
+                                <span class="px-2.5 py-0.5 rounded-full bg-matcha/10 text-matcha font-mono border border-matcha/20 font-medium">Design note</span>
+                                <span class="text-charcoal-light">Reviewed against current docs</span>
+                            </div>
+
+                            <h2 class="font-serif text-3xl lg:text-4xl font-bold text-charcoal mb-4 group-hover:text-indigo transition-colors">
+                                <a href="/netsuke/docs/manifest-reference/">Why YAML First Matters in Netsuke</a>
+                            </h2>
+
+                            <p class="text-charcoal-mid text-lg mb-6 leading-relaxed">
+                                Netsuke validates the manifest as YAML before it renders templates. That sounds conservative because it is. The reward is a build graph that can still be read by a human.
+                            </p>
+
+                            <div class="flex flex-wrap gap-2 mb-8">
+                                <span class="hm-chip">Design</span>
+                                <span class="hm-chip">YAML</span>
+                                <span class="hm-chip">Jinja</span>
+                            </div>
+
+                            <div class="flex flex-wrap gap-4">
+                                <a href="/netsuke/docs/manifest-reference/" class="hm-button hm-button--primary inline-flex items-center px-5 py-2.5">
+                                    Read Announcement
+                                </a>
+                                <a href="/netsuke/install/" class="hm-button hm-button--ghost inline-flex items-center px-5 py-2.5">
+                                    <span class="iconify mr-2 text-charcoal-mid" data-icon="carbon:download" aria-hidden="true"></span> Read Install Notes
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Visual/Snippet for featured post -->
+                        <div class="w-full lg:w-96 flex-shrink-0">
+                            <div class="bg-charcoal rounded-lg p-4 font-mono text-xs text-stone-light shadow-inner border border-charcoal-mid">
+                                <div class="flex justify-between border-b border-white/10 pb-2 mb-2">
+                                    <span class="text-vermillion">cargo install netsuke</span>
+                                    <span class="text-charcoal-light">bash</span>
+                                </div>
+                                <div class="space-y-1">
+                                    <p><span class="text-matcha">➜</span> <span class="text-indigo-light">~</span> netsuke --version</p>
+                                    <p class="text-boxwood">netsuke 0.x.y</p>
+                                    <p class="text-charcoal-light mt-2"># First steps:</p>
+                                    <p><span class="text-vermillion">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span></p>
+                                    <p><span class="text-vermillion">targets</span>:</p>
+                                    <p class="pl-4">- <span class="text-amber">name</span>: <span class="text-matcha">"app"</span></p>
+                                    <p class="pl-4">  <span class="text-amber">command</span>: <span class="text-matcha">"gcc {{ ins }} -o {{ outs }}"</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid lg:grid-cols-12 gap-12">
+
+            <!-- Left Column: Blog Feed -->
+            <div class="lg:col-span-8 space-y-12 min-w-0">
+
+                <!-- Section Header -->
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-stone pb-4">
+                    <h3 class="font-serif text-2xl font-bold text-charcoal">Recent Articles</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="all" aria-pressed="true">All</button>
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="engineering" aria-pressed="false">Engineering</button>
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="releases" aria-pressed="false">Releases</button>
+                        <button type="button" class="hm-chip hm-chip--filter" data-category="community" aria-pressed="false">Community</button>
+                    </div>
+                </div>
+
+                <!-- Post 1 -->
+                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8" data-category="engineering">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 text-xs mb-3">
+                            <span class="font-mono text-indigo font-semibold">Engineering</span>
+                            <span class="text-stone-light">•</span>
+                            <span class="text-charcoal-mid">Feb 28, 2024</span>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-3 group-hover:text-indigo transition-colors">
+                            <a href="/netsuke/guides/#featured-guide" class="hover:text-indigo transition-colors">Reading the Six-Stage Pipeline Backwards</a>
+                        </h3>
+                        <p class="text-charcoal-mid text-sm mb-4 leading-relaxed">
+                            Start at the generated Ninja file, then work back to the manifest. It is the fastest way to understand what Netsuke is really doing on a non-trivial project.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex items-center space-x-2">
+                                <img src="/netsuke/assets/blog-author-avatar-2.jpg" alt="Author" class="w-6 h-6 rounded-full border border-stone">
+                                <span class="text-xs text-charcoal-mid font-medium">Alex Chen</span>
+                            </div>
+                            <a href="/netsuke/guides/#featured-guide" class="text-indigo text-xs font-bold hover:underline">Read Article &rarr;</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 2 -->
+                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8" data-category="releases">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 text-xs mb-3">
+                            <span class="px-2 py-0.5 rounded-full bg-boxwood/50 text-charcoal-mid font-mono border border-stone font-medium">Language note</span>
+                            <span class="text-stone-light">•</span>
+                            <span class="text-charcoal-mid">Jan 15, 2024</span>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-3">
+                            <a href="/netsuke/docs/templating-and-standard-library/" class="hover:text-indigo transition-colors">Macros, `foreach`, and the Smallest Useful Abstractions</a>
+                        </h3>
+                        <p class="text-charcoal-mid text-sm mb-4 leading-relaxed">
+                            The manifest language is not trying to be a general-purpose runtime. This note covers the pieces that keep repetition down without turning the file into a script.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex items-center space-x-2">
+                                <img src="/netsuke/assets/blog-author-avatar-5.jpg" alt="Author" class="w-6 h-6 rounded-full border border-stone">
+                                <span class="text-xs text-charcoal-mid font-medium">Sarah Jenkins</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <a href="https://github.com/leynos/netsuke/releases" class="text-charcoal-mid text-xs font-medium hover:text-vermillion"><span class="iconify mr-1" data-icon="carbon:list-checked" aria-hidden="true"></span> Changelog</a>
+                                <a href="/netsuke/docs/templating-and-standard-library/" class="text-indigo text-xs font-bold hover:underline">Read Article &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 3 -->
+                <article class="hm-card hm-card--interactive p-8 flex flex-col md:flex-row gap-8" data-category="community">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 text-xs mb-3">
+                            <span class="font-mono text-matcha font-semibold">Community</span>
+                            <span class="text-stone-light">•</span>
+                            <span class="text-charcoal-mid">Dec 10, 2023</span>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-3">
+                            <a href="/netsuke/docs/" class="hover:text-indigo transition-colors">Browse the Documentation</a>
+                        </h3>
+                        <p class="text-charcoal-mid text-sm mb-4 leading-relaxed">
+                            Documentation index and guides for the design docs, CLI guidance, and example manifests that currently define Netsuke more accurately than any marketing page should.
+                        </p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-vermillion text-white flex items-center justify-center text-xs font-bold">N</div>
+                                <span class="text-xs text-charcoal-mid font-medium">The Netsuke Team</span>
+                            </div>
+                            <a href="/netsuke/docs/" class="text-indigo text-xs font-bold hover:underline">Open Docs Hub &rarr;</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Pagination -->
+                <div class="flex justify-center pt-8">
+                    <a href="https://github.com/leynos/netsuke/releases" class="hm-button hm-button--ghost inline-flex items-center px-5 py-2.5 text-sm">
+                        <span class="iconify mr-2" data-icon="carbon:launch" aria-hidden="true"></span> Browse Releases
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <aside class="lg:col-span-4 space-y-8">
+
+                <!-- Release History -->
+                <div class="bg-white rounded-xl border border-stone shadow-sm p-6">
+                    <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
+                        <span class="iconify text-indigo mr-2 text-sm" data-icon="carbon:commit" aria-hidden="true"></span> Version History
+                    </h3>
+                    <div class="relative pl-4 border-l-2 border-stone-light space-y-6">
+                        <!-- Item -->
+                        <div class="relative group">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-indigo border-2 border-white ring-1 ring-white"></div>
+                            <div class="flex justify-between items-baseline">
+                                <a href="/netsuke/docs/manifest-reference/" class="text-sm font-bold text-charcoal hover:text-indigo transition-colors">YAML-first design</a>
+                                <span class="text-xs text-charcoal-light">Mar 15</span>
+                            </div>
+                            <p class="text-xs text-charcoal-mid mt-0.5">Why manifest validation happens before templating</p>
+                        </div>
+                        <!-- Item -->
+                        <div class="relative group">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-stone border-2 border-white ring-1 ring-white group-hover:bg-charcoal-mid transition-colors"></div>
+                            <div class="flex justify-between items-baseline">
+                                <a href="https://github.com/leynos/netsuke/releases" class="text-sm font-bold text-charcoal hover:text-indigo transition-colors">Releases</a>
+                                <span class="text-xs text-charcoal-light">Feb 02</span>
+                            </div>
+                            <p class="text-xs text-charcoal-mid mt-0.5">See all releases on GitHub</p>
+                        </div>
+                        <!-- Item -->
+                        <div class="relative group">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-stone border-2 border-white ring-1 ring-white group-hover:bg-charcoal-mid transition-colors"></div>
+                            <div class="flex justify-between items-baseline">
+                                <a href="/netsuke/docs/templating-and-standard-library/" class="text-sm font-bold text-charcoal hover:text-indigo transition-colors">Jinja usage</a>
+                                <span class="text-xs text-charcoal-light">Jan 15</span>
+                            </div>
+                            <p class="text-xs text-charcoal-mid mt-0.5">Macros, filters, and explicit expansion</p>
+                        </div>
+                        <!-- Item -->
+                        <div class="relative group">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-stone border-2 border-white ring-1 ring-white group-hover:bg-charcoal-mid transition-colors"></div>
+                            <div class="flex justify-between items-baseline">
+                                <a href="/netsuke/examples/" class="text-sm font-bold text-charcoal hover:text-indigo transition-colors">Example set</a>
+                                <span class="text-xs text-charcoal-light">Nov 20</span>
+                            </div>
+                            <p class="text-xs text-charcoal-mid mt-0.5">Small manifests for C, docs, sites, and images</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-stone-light text-center">
+                        <a href="https://github.com/leynos/netsuke/releases" class="text-xs font-bold text-indigo hover:text-vermillion transition-colors">View Full Changelog &rarr;</a>
+                    </div>
+                </div>
+
+                <!-- Categories/Tags -->
+                <div class="bg-boxwood-pale rounded-xl border border-stone p-6">
+                    <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Topics</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="hm-chip">Architecture</span>
+                        <span class="hm-chip">Tutorials</span>
+                        <span class="hm-chip">Case Studies</span>
+                        <span class="hm-chip">Rust</span>
+                        <span class="hm-chip">Performance</span>
+                        <span class="hm-chip">Ecosystem</span>
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+
+    </main>
+{% endraw %}
+{% endblock %}

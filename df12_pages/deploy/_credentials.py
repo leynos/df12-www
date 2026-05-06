@@ -274,20 +274,20 @@ def build_env(
         env.setdefault("AWS_S3_ENDPOINT", endpoint)
         env.setdefault("AWS_ENDPOINT_URL_S3", endpoint)
     if creds.scw_access_key:
-        env.setdefault("SCW_ACCESS_KEY", creds.scw_access_key)
+        env["SCW_ACCESS_KEY"] = creds.scw_access_key
     if creds.scw_secret_key:
-        env.setdefault("SCW_SECRET_KEY", creds.scw_secret_key)
+        env["SCW_SECRET_KEY"] = creds.scw_secret_key
     if creds.cloudflare_api_token:
-        env.setdefault("CLOUDFLARE_API_TOKEN", creds.cloudflare_api_token)
-        env.setdefault("TF_VAR_cloudflare_api_token", creds.cloudflare_api_token)
+        env["CLOUDFLARE_API_TOKEN"] = creds.cloudflare_api_token
+        env["TF_VAR_cloudflare_api_token"] = creds.cloudflare_api_token
     if creds.github_token:
-        env.setdefault("GITHUB_TOKEN", creds.github_token)
-        env.setdefault("GH_TOKEN", creds.github_token)
-        env.setdefault("TF_VAR_github_token", creds.github_token)
+        env["GITHUB_TOKEN"] = creds.github_token
+        env["GH_TOKEN"] = creds.github_token
+        env["TF_VAR_github_token"] = creds.github_token
     if creds.scw_access_key:
-        env.setdefault("TF_VAR_scaleway_access_key", creds.scw_access_key)
+        env["TF_VAR_scaleway_access_key"] = creds.scw_access_key
     if creds.scw_secret_key:
-        env.setdefault("TF_VAR_scaleway_secret_key", creds.scw_secret_key)
+        env["TF_VAR_scaleway_secret_key"] = creds.scw_secret_key
     return env
 
 

@@ -255,6 +255,19 @@ Playwright screenshots and structurally via
   - [x] (2026-05-06) Patch the source template, regenerate Netsuke, validate
         browser behaviour, and replay project gates.
 
+- [x] (2026-05-06) Netsuke generated copyright year refresh
+  - [x] (2026-05-06) Verified the multi-format generated page contains
+        `&copy; 2026`, while `templates/netsuke/doc_page.jinja` uses
+        `generated_at.year` and the page template extends it without overriding
+        the footer.
+  - [x] (2026-05-06) Found the same fixed-year source pattern in the Netsuke
+        home-page and shared-content templates, which would keep regenerating
+        fixed-year footer output for those page families.
+  - [x] (2026-05-06) Regenerate Netsuke, search for stale `&copy; 2026`
+        literals under `public/netsuke/`, validate, and commit the source fix;
+        generated HTML still renders `2026` because the current generated year
+        is 2026.
+
 ## Surprises & discoveries
 
 - Observation: Weaver page templates created by the Task agent used

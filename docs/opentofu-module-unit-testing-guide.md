@@ -87,9 +87,9 @@ Unit testing focuses on verifying the functionality of individual modules or
 components in isolation from the rest of the system.[^5] In the context of
 OpenTofu, a unit test validates the module's internal logic, its handling of
 input variables, and its expected outputs. The primary goal is to perform these
-checks without the cost, time, and complexity of deploying real
-infrastructure.[^10] To achieve this isolation, external dependencies, such as
-cloud provider APIs or other modules, are replaced with mocks or stubs.[^5]
+checks without the cost, time, and complexity of deploying real infrastructure.
+[ ^10] To achieve this isolation, external dependencies, such as cloud provider
+APIs or other modules, are replaced with mocks or stubs.[^5]
 
 Unit tests are characterized by their speed and focus. They provide immediate
 feedback to developers, making it easier and cheaper to fix errors.[^5] They
@@ -108,11 +108,11 @@ an integration test could verify that a web server module can correctly connect
 to a database module using the connection string provided as an output.
 
 Integration tests are inherently slower and more complex than unit tests
-because they involve provisioning and interacting with actual cloud
-resources.[^5] However, they are essential for detecting a class of bugs that
-unit tests cannot, such as incorrect IAM permissions, network connectivity
-issues, API incompatibilities between services, or misconfigured data flow
-between modules.[^13]
+because they involve provisioning and interacting with actual cloud resources.[
+^5] However, they are essential for detecting a class of bugs that unit tests
+cannot, such as incorrect IAM permissions, network connectivity issues, API
+incompatibilities between services, or misconfigured data flow between modules.
+[ ^13]
 
 #### Layer 4: End-to-End (E2E) Testing (The User Experience)
 
@@ -122,8 +122,8 @@ from the perspective of an end-user.[^5] For example, an E2E test for a web
 application would not just check if the servers are running, but would simulate
 a user logging in, performing an action, and verifying the expected outcome.
 While critical for overall system validation, these tests are the slowest, most
-brittle, and most expensive to run, which is why they are used most
-sparingly.[^14]
+brittle, and most expensive to run, which is why they are used most sparingly.[
+^14]
 
 ### 1. Table: Unit Testing vs. Integration Testing for OpenTofu
 
@@ -310,7 +310,7 @@ Setting `command = plan` is the key to creating a unit test. It instructs the
 framework to generate an execution plan but not to apply it.[^20] The
 
 `variables` block supplies values for the input variables defined in the
-module.[^16]
+module. [^16]
 
 #### Step 4: Write the Assertion
 
@@ -469,9 +469,8 @@ test precise control over the resulting data.[^18]
 #### Overriding Specific Components
 
 For more granular control, the framework provides `override` blocks to replace
-specific resources, data sources, or modules, rather than the entire
-provider.[^22] This is extremely useful for isolating a module from a specific
-dependency.
+specific resources, data sources, or modules, rather than the entire provider.[
+^22] This is extremely useful for isolating a module from a specific dependency.
 
 - `override_data`: This is one of the most common and powerful use cases. Many
   modules use data sources to fetch information, such as the latest AMI ID or
@@ -644,8 +643,8 @@ deploying any infrastructure.[^26]
 
 ### 3. Validating Complex Conditional Logic
 
-Modules frequently employ conditional expressions
-(`condition? true_val : false_val`) to create optional resources or modify
+Modules frequently employ conditional expressions (
+`condition? true_val : false_val`) to create optional resources or modify
 configurations based on input variables.[^27] Thoroughly testing this logic is
 essential to prevent unexpected behavior. The key strategy is to create a
 dedicated
@@ -815,10 +814,10 @@ confirming the IaC logic is sound.
 
 For testing the *logic of the script itself* (e.g., the `echo` command or a
 more complex shell script), a separate, dedicated testing approach should be
-used. Frameworks like `bunit`[^29], `shunit2`, or the BDD-style
-`shellspec`[^30] are designed for unit testing shell scripts. This separation
-of concerns is a critical best practice: use OpenTofu testing tools to test
-OpenTofu code, and use shell script testing tools to test shell scripts.
+used. Frameworks like `bunit`[^29], `shunit2`, or the BDD-style `shellspec`[
+^30] are designed for unit testing shell scripts. This separation of concerns
+is a critical best practice: use OpenTofu testing tools to test OpenTofu code,
+and use shell script testing tools to test shell scripts.
 
 ## Part 4: A Comparative Analysis of Alternative Testing Frameworks
 
@@ -864,8 +863,8 @@ A step-by-step guide to writing an integration test for an OpenTofu module that
 deploys a simple web server demonstrates Terratest's power.
 
 - **Project Setup**: A Terratest project requires a Go environment. Tests are
-  placed in a `test/` directory, and dependencies are managed using Go modules
-  (`go mod init` and `go mod tidy`).[^31]
+  placed in a `test/` directory, and dependencies are managed using Go modules (
+   `go mod init` and `go mod tidy`).[^31]
 
 - **Test Code (**`webserver_test.go`**)**: A typical test file imports the
   `testing` package, Terratest's `terraform` and `http_helper` modules, and an
@@ -925,7 +924,7 @@ will look for a
 automatically look for a `tofu` binary. This behavior ensures that existing
 test suites can be migrated to OpenTofu with minimal to no changes. For
 explicit control, the binary can be specified in the `terraform.Options`
-struct.[^32]
+struct. [^32]
 
 ### 4. Table: `tofu test` vs. Terratest
 
@@ -974,8 +973,8 @@ inherently easier to validate, maintain, and reuse.
 A standardized repository structure is the foundation of a clean and navigable
 codebase, making modules easier for both humans and automation tools to
 understand. The OpenTofu community and official documentation recommend a
-standard structure that logically separates module code, examples, and
-tests.[^36]
+standard structure that logically separates module code, examples, and tests.[
+^36]
 
 A comprehensive module repository should be organized as follows:
 
@@ -1169,8 +1168,8 @@ progression of stages, each building confidence in the proposed changes.[^42]
   keyless authentication mechanism like OpenID Connect (OIDC). This allows the
   CI/CD platform (like GitHub or GitLab) to securely request temporary,
   short-lived credentials from the cloud provider (like AWS, Azure, or GCP) for
-  the duration of the job, eliminating the need to store long-lived
-  secrets.[^44]
+  the duration of the job, eliminating the need to store long-lived secrets.[
+  ^44]
 
 ### 6. Implementation with GitHub Actions
 
@@ -1329,8 +1328,8 @@ tofu-unit-test:
 
 4. **Credential Management**: Similar to GitHub Actions, GitLab CI can be
    configured with OIDC to securely authenticate with cloud providers,
-   providing temporary credentials to the jobs without storing static
-   secrets.[^50]
+   providing temporary credentials to the jobs without storing static secrets.[
+   ^50]
 
 By integrating these automated testing workflows, teams can ensure that every
 change to their infrastructure code is validated against a suite of unit tests,

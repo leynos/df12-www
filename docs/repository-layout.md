@@ -101,8 +101,8 @@ Build-time scripts outside the Python package:
 
 ### `src/`
 
-Frontend source files. `styles/` contains the Tailwind CSS entry point
-(`site.css`) and any plugins. The compiled output is written to
+Frontend source files. `styles/` contains the Tailwind CSS entry point (
+`site.css`) and any plugins. The compiled output is written to
 `public/assets/site.css`.
 
 ### `templates/`

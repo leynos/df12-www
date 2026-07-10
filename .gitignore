@@ -150,6 +150,8 @@ ipython_config.py
 #uv.lock
 .uv-cache/
 .uv-tools/
+.typos-oxendict-base.json
+.typos-oxendict-base.toml
 
 # poetry
 #poetry.lock

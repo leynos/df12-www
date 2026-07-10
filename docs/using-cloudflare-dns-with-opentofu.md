@@ -150,7 +150,7 @@ infra/
 - The Filador blog documents how to integrate DNS, WAF, mTLS, and Pages with
   OpenTofu and Cloudflare, offering rich sample code for elevated use cases.
 
-- Cloudflare’s Terraform provider supports advanced modularisation. The
+- Cloudflare’s Terraform provider supports advanced modularization. The
   module registry and example repos should be employed for better modular
   design.
 
@@ -162,7 +162,7 @@ infra/
 | Zone      | Define or reference Cloudflare DNS zone     |
 | Record    | Create DNS entries, dynamic via `for_each`  |
 | Import    | Migrate existing records using API + import |
-| Structure | Organise by tf files, use version control   |
+| Structure | Organize by tf files, use version control   |
 | Advanced  | Extend with WAF, mTLS, modules as needed    |
 
 For end-to-end module scaffolding or CI/CD integration examples, refer to the

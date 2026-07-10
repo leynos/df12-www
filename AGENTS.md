@@ -26,6 +26,12 @@ tofu test
 These commands ensure consistent style, validate syntax, and execute unit
 tests. See the unit testing guide for details on setting up and running tests.
 
+For Markdown changes, run `make markdownlint` and `make nixie`. The Markdown
+gate refreshes the shared en-GB-oxendict base, regenerates `typos.toml`, and
+checks maintained prose with the pinned `typos` release. Put narrow
+repository-only exceptions in `typos.local.toml`; never edit the generated
+configuration by hand.
+
 ### Variable Declarations
 
 All input variables must include at least a `description` and `type` argument.

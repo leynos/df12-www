@@ -112,7 +112,7 @@ Use the `@theme` directive in your CSS file:
 - `blur-sm` → `blur-xs`
 - `bg-gradient-*` → `bg-linear-*`
 
-### Default Behavior Changes
+### Default Behaviour Changes
 
 - **Border**: No longer defaults to gray-200, uses `currentColor`
 - **Ring**: Changed from 3px blue to 1px `currentColor`
@@ -378,7 +378,7 @@ src/
 
 1. **Use browser dev tools** to inspect CSS variables
 2. **Check cascade layers** in dev tools
-3. **Verify modern browser support** for OKLCH colors
+3. **Verify modern browser support** for OKLCH colours
 4. **Use @reference** for CSS modules/component styles
 5. **Restart dev server** after major theme changes
 
@@ -1217,7 +1217,7 @@ pointer-events-none, pointer-events-auto
 resize-none, resize, resize-y, resize-x
 ```
 
-#### Scroll Behavior
+#### Scroll Behaviour
 
 ```text
 scroll-auto, scroll-smooth
@@ -1461,7 +1461,7 @@ m-[12px], p-[24px], grid-cols-[200px_minmax(900px,_1fr)_100px]
 - ❌ `@tailwind base; @tailwind components; @tailwind utilities;`
 - ❌ `text-opacity-50` → Use `text-white/50` instead
 - ❌ `bg-opacity-25` → Use `bg-blue-500/25` instead
-- ❌ `border` without color (now uses currentColor, not gray-200)
+- ❌ `border` without colour (now uses currentColour, not gray-200)
 - ❌ `ring` without explicit width (now 1px, was 3px)
 - ❌ `@layer utilities` → Use `@utility` instead
 - ❌ JavaScript config for new projects → Use CSS `@theme`
@@ -1471,7 +1471,7 @@ m-[12px], p-[24px], grid-cols-[200px_minmax(900px,_1fr)_100px]
 - ✅ `@import "tailwindcss";`
 - ✅ `text-white/50` for semi-transparent text
 - ✅ `bg-blue-500/25` for semi-transparent backgrounds
-- ✅ `border border-gray-200` for explicit border color
+- ✅ `border border-gray-200` for explicit border colour
 - ✅ `ring-3` for 3px ring width
 - ✅ `@utility` for custom utilities
 - ✅ `@theme` for configuration

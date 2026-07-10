@@ -288,17 +288,15 @@ def _build_world_image(
 ) -> WorldImageConfig:
     """Build world image configuration for a specific world card."""
     match payload:
-        case (
-            {
-                "avif": avif,
-                "webp": webp,
-                "fallback": fallback,
-                "alt": alt,
-                "width": width_value,
-                "height": height_value,
-                "sizes": sizes,
-            } as data
-        ):
+        case {
+            "avif": avif,
+            "webp": webp,
+            "fallback": fallback,
+            "alt": alt,
+            "width": width_value,
+            "height": height_value,
+            "sizes": sizes,
+        } as data:
             required = ["avif", "webp", "fallback", "alt", "width", "height", "sizes"]
         case _:
             msg = f"World card '{label}' requires an image mapping."

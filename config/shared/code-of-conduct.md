@@ -22,7 +22,7 @@ words and actions may be interpreted differently than we intend based on
 culture, background, or native language.
 
 With these considerations in mind, we agree to behave mindfully toward each
-other and act in ways that center our shared values, including:
+other and act in ways that centre our shared values, including:
 
 1. Respecting the purpose of our community, our activities, and our ways
    of gathering.

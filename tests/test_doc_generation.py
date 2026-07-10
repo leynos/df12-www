@@ -248,7 +248,7 @@ def markdown_response(
 
     state["set_last_modified"] = set_last_modified
     monkeypatch.setattr(
-        "df12_pages.generator.page_generator.requests.Session", lambda: _Session()
+        "df12_pages.generator.page_generator.requests.Session", _Session
     )
     return state
 
@@ -420,7 +420,8 @@ def test_indented_fenced_block_renders_codehilite(
         "expected at least one code block to contain 'use figment'"
     )
     assert any(
-        block.find_parent("div", class_="codehilite").get("data-language") == "rust"
+        (parent := block.find_parent("div", class_="codehilite")) is not None
+        and parent.get("data-language") == "rust"
         for block in code_blocks
     ), "expected at least one code block parent div to have data-language='rust'"
 

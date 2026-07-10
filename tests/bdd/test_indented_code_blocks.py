@@ -105,6 +105,7 @@ def then_html_has_code_block(scenario_state: dict[str, object]) -> None:
         "expected a highlighted code block containing 'fn main' in the rendered HTML"
     )
     assert any(
-        block.find_parent("div", class_="codehilite").get("data-language") == "rust"
+        (parent := block.find_parent("div", class_="codehilite")) is not None
+        and parent.get("data-language") == "rust"
         for block in code_blocks
     ), "expected a codehilite block with data-language='rust'"

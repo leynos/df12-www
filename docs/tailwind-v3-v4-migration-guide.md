@@ -152,7 +152,7 @@
 
 1. **Preprocessors (Sass/Less/Stylus):**
     * Not designed for use with Tailwind v4. Tailwind itself, with its
-        CSS-native features and internal processing via Lightning CSS, fulfills
+        CSS-native features and internal processing via Lightning CSS, fulfils
         most preprocessor roles.
 2. **`theme()` Function in CSS:**
     * Deprecated. Use `var(--css-variable-name)` instead. For media queries

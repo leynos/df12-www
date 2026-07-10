@@ -20,7 +20,7 @@ infrastructure. OpenTofu, as an Infrastructure as Code (IaC) tool, reads this
 declarative configuration and takes on the responsibility of figuring out how
 to achieve that state.
 
-This approach is centered on the concept of state reconciliation. OpenTofu
+This approach is centred on the concept of state reconciliation. OpenTofu
 maintains a state file (by default, `terraform.tfstate`) that records the
 real-world resources it manages. When a configuration is applied, OpenTofu
 compares the desired state defined in the HCL files with the current state
@@ -1014,7 +1014,7 @@ of operations for creating, updating, and destroying resources.
   dependencies is implicitly. When one resource's argument references an
   attribute of another resource (e.g., `subnet_id = aws_vpc.main.id`), OpenTofu
   automatically infers that the VPC must be created before the subnet. It
-  analyzes all such references to build the dependency graph.19
+  analyses all such references to build the dependency graph.19
 
 - **Explicit Dependencies with** `depends_on`: In some rare cases, a dependency
   exists that cannot be inferred from expression references. This typically

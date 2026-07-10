@@ -117,7 +117,7 @@ checked-in configuration record that guarantees reproducible builds.
   header/footer markup so DaisyUI classes stay consistent across the marketing
   landing page, docs index, and individual doc pages.
 - When authoring new components:
-  1. Favor existing DaisyUI variants (`btn-primary`, `badge-outline`) before
+  1. Favour existing DaisyUI variants (`btn-primary`, `badge-outline`) before
      introducing bespoke classes.
   2. If a new semantic helper is required, define it once in CSS and reuse it
      throughout the templates.

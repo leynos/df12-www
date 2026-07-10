@@ -64,3 +64,9 @@ name and implementation language.
 
 This project is released under the
 [GNU Affero General Public License v3.0](LICENSE).
+
+## Spelling policy
+
+Run `make spelling` to refresh the shared en-GB-oxendict dictionary when newer,
+regenerate `typos.toml`, and check maintained Markdown with a pinned `typos`
+release. A valid committed config remains usable without network access.

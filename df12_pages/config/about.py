@@ -167,9 +167,17 @@ def _build_principles(
     if isinstance(payload, dict):
         items = payload.get("items")
         if isinstance(items, list):
-            entries = [entry for entry in items if isinstance(entry, dict)]
+            entries = [
+                typ.cast("typ.Mapping[str, object]", entry)
+                for entry in items
+                if isinstance(entry, dict)
+            ]
     elif isinstance(payload, list):
-        entries = [entry for entry in payload if isinstance(entry, dict)]
+        entries = [
+            typ.cast("typ.Mapping[str, object]", entry)
+            for entry in payload
+            if isinstance(entry, dict)
+        ]
     if entries is None:
         return []
 

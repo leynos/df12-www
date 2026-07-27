@@ -22,7 +22,7 @@ queries, complaints, or claims**:
 Under UK data protection law, we must have a "lawful basis" for collecting and
 using your personal information. There is a list of possible
 [lawful bases](https://ico.org.uk/for-organisations/advice-for-small-organisations/getting-started-with-gdpr/data-protection-principles-definitions-and-key-terms/#lawfulbasis)
- in the UK GDPR. You can find out more about lawful bases on the ICO's website.
+in the UK GDPR. You can find out more about lawful bases on the ICO's website.
 
 Which lawful basis we rely on may affect your data protection rights which are
 set out in brief below. You can find out more about your data protection rights

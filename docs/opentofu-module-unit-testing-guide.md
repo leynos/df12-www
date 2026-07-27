@@ -108,11 +108,11 @@ an integration test could verify that a web server module can correctly connect
 to a database module using the connection string provided as an output.
 
 Integration tests are inherently slower and more complex than unit tests
-because they involve provisioning and interacting with actual cloud resources.[^5]
-However, they are essential for detecting a class of bugs that unit tests
-cannot, such as incorrect IAM permissions, network connectivity issues, API
-incompatibilities between services, or misconfigured data flow between
-modules.[^13]
+because they involve provisioning and interacting with actual cloud
+resources.[^5] However, they are essential for detecting a class of bugs that
+unit tests cannot, such as incorrect IAM permissions, network connectivity
+issues, API incompatibilities between services, or misconfigured data flow
+between modules.[^13]
 
 #### Layer 4: End-to-End (E2E) Testing (The User Experience)
 
@@ -122,7 +122,8 @@ from the perspective of an end-user.[^5] For example, an E2E test for a web
 application would not just check if the servers are running, but would simulate
 a user logging in, performing an action, and verifying the expected outcome.
 While critical for overall system validation, these tests are the slowest, most
-brittle, and most expensive to run, which is why they are used most sparingly[^14].
+brittle, and most expensive to run, which is why they are used most sparingly
+[^14].
 
 ### 1. Table: Unit Testing vs. Integration Testing for OpenTofu
 
@@ -468,8 +469,9 @@ test precise control over the resulting data.[^18]
 #### Overriding Specific Components
 
 For more granular control, the framework provides `override` blocks to replace
-specific resources, data sources, or modules, rather than the entire provider[^22].
-This is extremely useful for isolating a module from a specific dependency.
+specific resources, data sources, or modules, rather than the entire provider
+[^22]. This is extremely useful for isolating a module from a specific
+dependency.
 
 - `override_data`: This is one of the most common and powerful use cases. Many
   modules use data sources to fetch information, such as the latest AMI ID or
@@ -501,8 +503,8 @@ This is extremely useful for isolating a module from a specific dependency.
   ```
 
   This test verifies that the `aws_instance` resource correctly uses the ID
-  from the data source, without ever needing to contact AWS to resolve that
-  data source.[^23]
+  from the data source, without ever needing to contact AWS to resolve that data
+  source.[^23]
 
 - `override_resource`: This block can override a resource, which is useful for
   testing how other parts of the configuration react to its attributes without
@@ -972,7 +974,8 @@ inherently easier to validate, maintain, and reuse.
 A standardized repository structure is the foundation of a clean and navigable
 codebase, making modules easier for both humans and automation tools to
 understand. The OpenTofu community and official documentation recommend a
-standard structure that logically separates module code, examples, and tests.[^36]
+standard structure that logically separates module code, examples, and
+tests.[^36]
 
 A comprehensive module repository should be organized as follows:
 
@@ -1166,7 +1169,8 @@ progression of stages, each building confidence in the proposed changes.[^42]
   keyless authentication mechanism like OpenID Connect (OIDC). This allows the
   CI/CD platform (like GitHub or GitLab) to securely request temporary,
   short-lived credentials from the cloud provider (like AWS, Azure, or GCP) for
-  the duration of the job, eliminating the need to store long-lived secrets.[^44]
+  the duration of the job, eliminating the need to store long-lived
+  secrets.[^44]
 
 ### 6. Implementation with GitHub Actions
 
@@ -1325,7 +1329,8 @@ tofu-unit-test:
 
 4. **Credential Management**: Similar to GitHub Actions, GitLab CI can be
    configured with OIDC to securely authenticate with cloud providers,
-   providing temporary credentials to the jobs without storing static secrets.[^50]
+   providing temporary credentials to the jobs without storing static
+   secrets.[^50]
 
 By integrating these automated testing workflows, teams can ensure that every
 change to their infrastructure code is validated against a suite of unit tests,
@@ -1372,8 +1377,8 @@ infrastructure changes while optimizing for developer productivity.[^5]
 The emergence of powerful, native testing frameworks like `tofu test` and
 sophisticated third-party libraries like Terratest marks a significant
 maturation point for Infrastructure as Code. IaC is no longer just a scripting
-practice; it is a formal engineering discipline that demands the same rigour and
-quality assurance as application development.
+practice; it is a formal engineering discipline that demands the same rigour
+and quality assurance as application development.
 
 The future of IaC testing will likely see this trend continue and accelerate.
 We can anticipate even tighter integration of testing tools within IDEs,

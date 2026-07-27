@@ -1,7 +1,7 @@
 # Templatize sub-sites: mxd homepage, weaver, and netsuke
 
 This ExecPlan (execution plan) is a living document. The sections `Constraints`,
- `Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`, `Decision Log`,
+`Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`, `Decision Log`,
 and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
 Status: COMPLETE
@@ -37,8 +37,8 @@ Playwright screenshots and structurally via
 - No changes to the deployment pipeline (`deploy/`, `*.tofu`) are permitted.
 - The `templates/{site}/shared_content_page.jinja` templates already exist and
   work correctly; do not alter them.
-- Commit after each stage. Gate each commit with `make fmt check-fmt typecheck
-  lint test` (run sequentially, not in parallel).
+- Commit after each stage. Gate each commit with
+  `make fmt check-fmt typecheck lint test` (run sequentially, not in parallel).
 
 ## Tolerances (exception triggers)
 
@@ -660,7 +660,7 @@ extends `doc_page.jinja`, filling named blocks (`page_title`, `hero`,
 
 `_mark_current_nav()` sets `current: true` on the nav link whose `href` matches
 `{base_path}{output_slug}/`. This requires nav links to use absolute paths (e.g.
- `/weaver/why-weaver/`). Weaver and netsuke now use absolute paths such as
+`/weaver/why-weaver/`). Weaver and netsuke now use absolute paths such as
 `/weaver/why-weaver/`, so generated pages can mark the current nav item.
 
 ### Template patterns in use
@@ -816,7 +816,7 @@ ______________________________________________________________________
 
 - [ ] **Task 2.1.1** In `config/pages.yaml`, under
   `sites.weaver.nav_links`, change all hrefs from relative (`../`) to absolute (
-   `/weaver/`):
+  `/weaver/`):
 
   ```yaml
   nav_links:
@@ -991,7 +991,7 @@ ______________________________________________________________________
   `public/weaver/commands/act/index.html`,
   `public/weaver/commands/observe/index.html`,
   `public/weaver/commands/verify/index.html`, `public/weaver/safety/index.html`,
-   `public/weaver/sempai/index.html`, `public/weaver/jacquard/index.html`,
+  `public/weaver/sempai/index.html`, `public/weaver/jacquard/index.html`,
   `public/weaver/install/index.html`, `public/weaver/roadmap/index.html`,
   `public/weaver/docs/index.html`, and
   `public/weaver/design-language/index.html`. Depends on: 2.6.1, 2.6.2, 2.6.3.
@@ -1104,9 +1104,8 @@ ______________________________________________________________________
 #### Step 3.7 — Delete 20 hard-coded HTML files
 
 - [ ] **Task 3.7.1** Delete every `public/netsuke/*/index.html` and
-  `public/netsuke/index.html` listed under
-  "Historically hard-coded pages per site" above.
-  Depends on: 3.6.1, 3.6.2, 3.6.3.
+  `public/netsuke/index.html` listed under "Historically hard-coded pages per
+  site" above. Depends on: 3.6.1, 3.6.2, 3.6.3.
 - [ ] **Task 3.7.2** Regenerate Netsuke and re-verify the deleted files are
   recreated from templates.
 

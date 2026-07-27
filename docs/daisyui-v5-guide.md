@@ -42,8 +42,8 @@ for common UI components
    This includes a component class name, part class names (if available for
    that component), and modifier class names (if available for that component).
 2. Components can be customized using Tailwind CSS utility classes if the
-   customization is not possible using the existing daisyUI classes. For example,
-   `btn px-10` sets custom horizontal padding on a `btn`.
+   customization is not possible using the existing daisyUI classes. For
+   example, `btn px-10` sets custom horizontal padding on a `btn`.
 3. If customization of daisyUI styles using Tailwind CSS utility classes does
    not work because of CSS specificity issues, use the `!` at the end of the
    Tailwind CSS utility class to override the existing styles. For example
@@ -132,7 +132,8 @@ disabled
 
 - `primary`: Primary brand colour, The main colour of the brand
 - `primary-content`: Foreground content colour to use on primary colour
-- `secondary`: Secondary brand colour, The optional, secondary colour of the brand
+- `secondary`: Secondary brand colour, The optional, secondary colour of the
+  brand
 - `secondary-content`: Foreground content colour to use on secondary colour
 - `accent`: Accent brand colour, The optional, accent colour of the brand
 - `accent-content`: Foreground content colour to use on accent colour
@@ -160,15 +161,17 @@ disabled
 3. daisyUI colour names include variables as value so they can change based the
    theme
 4. There's no need to use `dark:` for daisyUI colour names
-5. Ideally only daisyUI colour names should be used for colours so the colours can
+5. Ideally only daisyUI colour names should be used for colours so the colours
+   can
    change automatically based on the theme
 6. If a Tailwind CSS colour name (like `red-500`) is used, it will be same red
    colour on all themes
-7. If a daisyUI colour name (like `primary`) is used, it will change colour based
+7. If a daisyUI colour name (like `primary`) is used, it will change colour
+   based
    on the theme
 8. Using Tailwind CSS colour names for text colours should be avoided because
-   Tailwind CSS colour `text-gray-800` on `bg-base-100` would be unreadable on a
-   dark theme - because on dark theme, `bg-base-100` is a dark colour
+   Tailwind CSS colour `text-gray-800` on `bg-base-100` would be unreadable on
+   a dark theme - because on dark theme, `bg-base-100` is a dark colour
 9. `*-content` colours should have a good contrast compared to their associated
    colours
 10. suggestion - when designing a page use `base-*` colours for majority of the
@@ -2203,8 +2206,8 @@ Toggle is a checkbox that is styled to look like a switch button
 
 ### validator
 
-Validator class changes the colour of form elements to error or success based on
-input's validation rules
+Validator class changes the colour of form elements to error or success based
+on input's validation rules
 
 [validator docs](https://daisyui.com/components/validator/)
 

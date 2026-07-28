@@ -1249,7 +1249,7 @@ Deleting hard-coded files is a one-way operation. Before deleting, confirm the
 generated output is present and correct. Git history preserves the originals;
 run `git show HEAD:{path}` to recover any deleted file.
 
-## Artefacts and notes
+## Artifacts and notes
 
 Reference Playwright screenshots captured during planning are stored at:
 

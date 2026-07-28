@@ -198,7 +198,7 @@ This pipeline:
 - Generates `.webp` and `.avif` variants alongside every `.png` in
   `public/images/` using `scripts/generate-image-variants.ts`.
 
-These artifacts are intentionally `.gitignore`d; ensure they exist on disk when
+These artefacts are intentionally `.gitignore`d; ensure they exist on disk when
 running a deployment (locally or in CI) so provisioners can upload them to the
 target bucket/CDN.
 

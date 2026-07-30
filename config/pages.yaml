@@ -572,10 +572,18 @@ sites:
         label: Docs
         template: pages/docs.jinja
         output_slug: docs
-      - key: docs-cli-security-and-configuration
-        label: "CLI, Security, and Configuration"
-        template: pages/docs-cli-security-and-configuration.jinja
-        output_slug: docs/cli-security-and-configuration
+      - key: docs-cli
+        label: CLI Commands
+        template: pages/docs-cli.jinja
+        output_slug: docs/cli
+      - key: docs-configuration
+        label: Configuration
+        template: pages/docs-configuration.jinja
+        output_slug: docs/configuration
+      - key: docs-security
+        label: Security Model
+        template: pages/docs-security.jinja
+        output_slug: docs/security
       - key: docs-getting-started
         label: Getting Started
         template: pages/docs-getting-started.jinja

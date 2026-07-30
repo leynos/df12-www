@@ -1,0 +1,279 @@
+{% extends "doc_page.jinja" %}
+{% set active_nav = 'docs' %}
+{% block page_title %}Security Model - Netsuke Build System{% endblock %}
+{% block extra_head %}
+    <script defer src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+{% endblock %}
+{% block content %}
+{% raw %}
+    <!-- Main Content Area with Sidebar -->
+    <div class="site-container pt-16 flex-grow flex">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            <!-- Search -->
+            <div
+                class="mb-8 relative"
+                data-doc-search-root
+                data-doc-search-index="/netsuke/assets/search/docs-search.json"
+            >
+                <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                <input
+                    type="text"
+                    placeholder="Search docs..."
+                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
+                    data-doc-search-input
+                    aria-label="Search the documentation"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded="false"
+                >
+                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
+                <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
+                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
+                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                            Type at least 2 characters to search the docs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="space-y-8">
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Introduction</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
+                        <li><a href="/netsuke/docs/getting-started/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Getting Started</a></li>
+                        <li><a href="/netsuke/install/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Core Concepts</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
+                        <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
+                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
+                        <li><a href="/netsuke/docs/standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/docs/cli/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
+                        <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
+                        <li><a href="/netsuke/docs/security/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Security Model</a></li>
+                        <li><a href="#network-policy" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Network policy</a></li>
+                        <li><a href="#security" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security model</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
+                <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
+                <span class="mx-2 text-stone">/</span>
+                <span class="text-charcoal font-medium">Security Model</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
+                        Reference
+                    </div>
+                    <span class="text-charcoal-mid text-xs font-mono bg-white px-2 py-1 rounded border border-stone">Safe by default</span>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Security Model</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    Validated structure, quoted path substitutions, and an auditable network policy for the <code>fetch()</code> helper. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>.
+                </p>
+            </div>
+
+            <section id="network-policy" class="mb-20">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:network-4" aria-hidden="true"></span> Network Policy
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    The <code>fetch()</code> standard-library function downloads content from URLs at template evaluation time.
+                    Because this happens before a build runs, Netsuke provides configurable network-policy controls
+                    so that teams can audit and restrict what remote resources a manifest is allowed to contact.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="space-y-4">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                            <code class="text-indigo font-bold font-mono text-sm">--fetch-allow-scheme &lt;SCHEME&gt;</code>
+                            <p class="text-xs text-charcoal-mid mt-2">Allow additional URL schemes beyond the defaults. Repeat the flag to allow multiple schemes.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                            <code class="text-indigo font-bold font-mono text-sm">--fetch-allow-host &lt;HOST&gt;</code>
+                            <p class="text-xs text-charcoal-mid mt-2">Allow the provided hostname when default-deny mode is active. Wildcards such as <code>*.example.com</code> are supported.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                            <code class="text-vermillion font-bold font-mono text-sm">--fetch-block-host &lt;HOST&gt;</code>
+                            <p class="text-xs text-charcoal-mid mt-2">Always block the provided hostname, even if it appears on the allowlist. Wildcards are supported.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                            <code class="text-vermillion font-bold font-mono text-sm">--fetch-default-deny</code>
+                            <p class="text-xs text-charcoal-mid mt-2">Deny all hosts by default. Only hosts explicitly allowed by <code>--fetch-allow-host</code> may be contacted.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-charcoal rounded-xl overflow-hidden">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Restricting fetch to a single host</div>
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke \
+  --fetch-default-deny \
+  --fetch-allow-host releases.example.com \
+  --fetch-block-host internal.example.com \
+  build
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+            </section>
+
+            <section id="security" class="mb-16 pt-10 border-t border-stone-light">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center">
+                        <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:security" aria-hidden="true"></span> Security Model
+                    </h2>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-matcha/10 text-matcha border border-matcha/20">
+                        Safe by Default
+                    </span>
+                </div>
+
+                <p class="text-charcoal-mid mb-10 max-w-3xl">
+                    The reviewed docs emphasize safer command construction, clear diagnostics, and explicit manifest structure. This page therefore sticks to the validation boundaries Netsuke actually documents.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-boxwood flex items-center justify-center text-charcoal mb-4">
+                            <span class="iconify" data-icon="carbon:box" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">YAML first</h3>
+                        <p class="text-sm text-charcoal-mid">The manifest must be valid YAML before any template expansion happens. Structural mistakes fail early, before commands are generated.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-boxwood flex items-center justify-center text-charcoal mb-4">
+                            <span class="iconify" data-icon="carbon:fingerprint-recognition" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Shell escaping</h3>
+                        <p class="text-sm text-charcoal-mid">Interpolated values in commands and scripts are escaped by default, with explicit opt-outs for raw usage where the author really means it.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-boxwood flex items-center justify-center text-charcoal mb-4">
+                            <span class="iconify" data-icon="carbon:network-4" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-2">Typed diagnostics</h3>
+                        <p class="text-sm text-charcoal-mid">CLI errors are designed to carry context, hints, and localized output rather than dropping raw parser failures on the floor.</p>
+                    </div>
+                </div>
+
+                <!-- Security Chart -->
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <h3 class="font-bold text-charcoal mb-4 text-sm">Vulnerability Mitigation</h3>
+                    <p class="text-xs text-charcoal-mid mb-4">Qualitative comparison based on documented safety features; no numeric mitigation claim is implied.</p>
+                    <div id="securityChart" class="h-[300px] w-full">
+                        <p class="text-xs text-charcoal-mid">Sandboxing and capability checks provide stronger qualitative mitigation than direct execution. Interactive charting requires JavaScript.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Help Footer -->
+            <div class="mt-10 pt-10 border-t border-stone-light">
+                <div class="flex justify-between items-center">
+                    <a href="/netsuke/docs/configuration/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
+                            <div class="font-medium text-sm">Configuration</div>
+                        </div>
+                    </a>
+
+                    <a href="/netsuke/examples/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="text-right">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
+                            <div class="font-medium text-sm">Examples Hub</div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            try {
+                // Security Chart
+                const categories = ['Low', 'Moderate', 'High'];
+                const ordinal = { Low: 1, Moderate: 2, High: 3 };
+                const trace1 = {
+                    x: ['Dependency Confusion', 'Build Injection', 'Environment Leakage', 'Unpinned Deps', 'Cache Poisoning'],
+                    y: ['High', 'High', 'High', 'Moderate', 'Moderate'].map((label) => ordinal[label]),
+                    text: ['High mitigation', 'High mitigation', 'High mitigation', 'Moderate mitigation', 'Moderate mitigation'],
+                    hovertemplate: '%{x}<br>%{text}<extra></extra>',
+                    name: 'Netsuke mitigation',
+                    type: 'bar',
+                    marker: { color: '#4A7C59' } // Matcha (Safe/Success)
+                };
+
+                const trace2 = {
+                    x: ['Dependency Confusion', 'Build Injection', 'Environment Leakage', 'Unpinned Deps', 'Cache Poisoning'],
+                    y: ['Low', 'Low', 'Moderate', 'Moderate', 'Moderate'].map((label) => ordinal[label]),
+                    text: ['Low mitigation', 'Low mitigation', 'Moderate mitigation', 'Moderate mitigation', 'Moderate mitigation'],
+                    hovertemplate: '%{x}<br>%{text}<extra></extra>',
+                    name: 'Ad hoc script mitigation',
+                    type: 'bar',
+                    marker: { color: '#C23B22' } // Vermillion (Danger)
+                };
+
+                const layout = {
+                    title: { text: 'Relative mitigation posture', font: { family: 'Fraunces', size: 16, color: '#2E2A25' } },
+                    barmode: 'group',
+                    margin: { t: 50, r: 20, b: 60, l: 50 },
+                    plot_bgcolor: '#FFFFFF',
+                    paper_bgcolor: '#FFFFFF',
+                    font: { family: 'Source Sans 3', color: '#5C554D' },
+                    xaxis: { gridcolor: '#F5EDE0', tickangle: -15 },
+                    yaxis: { gridcolor: '#F5EDE0', range: [0, 3.5], tickmode: 'array', tickvals: [1, 2, 3], ticktext: categories, title: 'Mitigation level' },
+                    legend: { orientation: 'h', y: -0.2 }
+                };
+
+                const chart = document.getElementById('securityChart');
+                if (!chart) {
+                    return;
+                }
+                chart.innerHTML = '';
+                Plotly.newPlot(chart, [trace1, trace2], layout, {responsive: true, displayModeBar: false});
+
+            } catch(e) {
+                console.error("Chart generation failed:", e);
+                const chart = document.getElementById('securityChart');
+                if (chart) {
+                    chart.innerHTML = '<p class="text-xs text-charcoal-mid">Security chart unavailable in this environment.</p>';
+                }
+            }
+        });
+    </script>
+    <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
+    <script defer src="/netsuke/assets/js/doc-search.js"></script>
+{% endraw %}
+{% endblock %}

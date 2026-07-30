@@ -227,7 +227,7 @@ about:
         variant: neutral
   hero:
     name: Payton McIntosh
-    email: pmcintosh@df12.net
+    email: hello@df12.studio
     intro: >-
       The software gremlin behind df12, building small sharp tools, humane infra and retro-tinted experiments in code,
       maps, audio and story.
@@ -238,9 +238,9 @@ about:
       height: 480
   about:
     blurb: >-
-      Payton cares about humane infra, observability and making AI workflows safer, calmer and less brittle. They've
-      spent years leading teams in big organisations; df12 is their way of turning that experience into a coherent
-      boutique studio instead of a junkyard of side projects.
+      Payton has spent years leading teams in large organisations—long enough to know where the sharp edges hide.
+      df12 is their way of turning that scar tissue into a coherent boutique studio instead of a junkyard of side
+      projects.
     location:
       title: Based in Edinburgh, Scotland
       description: Mediaeval skyline, liminal closes, and a surprisingly feral little tech scene.
@@ -248,15 +248,18 @@ about:
   focus:
     cards:
       - title: Humane Infrastructure
-        description: Building systems that respect developer time and cognitive load.
+        description: Building for the people who maintain systems, not just those who use them. Good infra stays out
+          of your way until you need it.
         icon: carbon:person-favorite
         tone: primary
-      - title: Observability
-        description: Making complex systems transparent and understandable.
+      - title: Legible Systems
+        description: If you can't reason about a system, you can't trust it. Observability isn't an add-on—it's
+          the foundation everything else rests on.
         icon: carbon:cloud-monitoring
         tone: accent
-      - title: Safer AI Workflows
-        description: Reducing brittleness in AI-powered systems and tooling.
+      - title: Calmer AI Tooling
+        description: AI workflows fail in novel ways. The answer isn't more guardrails—it's designing for
+          graceful degradation and predictable recovery.
         icon: carbon:ai-governance-lifecycle
         tone: neutral
   principles:
@@ -267,10 +270,10 @@ about:
         description: From installation to first successful run in under five minutes. Every tool includes quickstart 
           documentation.
       - title: Repeatability Over Magic
-        description: Predictable behavior across environments. Green-path repeatability means fewer surprises in 
+        description: Predictable behaviour across environments. Green-path repeatability means fewer surprises in
           production.
       - title: Respect Cognitive Load
-        description: Systems should be transparent and understandable. Complexity exists in the implementation, not the 
+        description: Systems should be legible and unsurprising. Complexity exists in the implementation, not the
           interface.
   footer: *site_footer
 

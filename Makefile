@@ -14,7 +14,8 @@ PYTEST_FILTER += -m 'not playwright'
 endif
 
 .PHONY: help all clean build build-release lint fmt check-fmt \
-        markdownlint nixie spelling test typecheck $(TOOLS) $(VENV_TOOLS)
+        markdownlint nixie spelling test typecheck $(TOOLS) $(VENV_TOOLS) \
+	dev
 
 .DEFAULT_GOAL := all
 
@@ -35,6 +36,10 @@ clean: ## Remove build artifacts
 	  lcov.info htmlcov .venv
 	rm -f .typos-oxendict-base.json .typos-oxendict-base.toml
 	find . -type d -name '__pycache__' -print0 | xargs -0 -r rm -rf
+
+dev: ## Run the dev server
+	$(MAKE) build
+	bun run dev
 
 define ensure_tool
 	@command -v $(1) >/dev/null 2>&1 || { \

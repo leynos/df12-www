@@ -91,7 +91,8 @@
                         <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/website.yml</span>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-paper-lg">
-<pre><code class="language-yaml">netsuke_version: "1.0.0"
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
 
 vars:
   pages_dir: pages
@@ -127,7 +128,8 @@ targets:
 defaults:
   - site/index.html
   - site/about.html
-  - site/contact.html</code></pre>
+  - site/contact.html
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
@@ -169,12 +171,13 @@ defaults:
                             <div class="w-12"></div>
                         </div>
                         <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
-                            <div class="text-boxwood-pale mb-2"><span class="text-matcha">➜</span> <span class="text-indigo-light">~/site-example</span> <span class="text-boxwood">netsuke build</span></div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">[1/4]</span> mkdir -p site</div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">[2/4]</span> pandoc pages/about.md -o site/about.html</div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">[3/4]</span> pandoc pages/contact.md -o site/contact.html</div>
-                            <div class="text-stone-light/80 mb-3"><span class="text-charcoal-light">[4/4]</span> pandoc --standalone pages/about.md pages/contact.md -o site/index.html</div>
-                            <div class="text-matcha">Build complete: site/index.html</div>
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke build
+[1/4] mkdir -p site
+[2/4] pandoc pages/about.md -o site/about.html
+[3/4] pandoc pages/contact.md -o site/contact.html
+[4/4] pandoc --standalone pages/about.md pages/contact.md -o site/index.html
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
                 </section>

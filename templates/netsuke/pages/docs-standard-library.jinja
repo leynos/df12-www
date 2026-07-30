@@ -1,33 +1,8 @@
 {% extends "doc_page.jinja" %}
 {% set active_nav = 'docs' %}
-{% block page_title %}Templating &amp; Standard Library - Netsuke Build System{% endblock %}
+{% block page_title %}Standard Library - Netsuke Build System{% endblock %}
 {% block extra_head %}
-    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
     <style>
-
-        .code-container {
-            counter-reset: line;
-        }
-        .code-line::before {
-            counter-increment: line;
-            content: counter(line);
-            display: inline-block;
-            width: 1.5rem;
-            margin-right: 1rem;
-            text-align: right;
-            color: #5C554D;
-            opacity: 0.5;
-            user-select: none;
-        }
-
-        .recipe-btn { color: #5C554D; }
-        .recipe-btn:hover { background: rgba(255, 255, 255, 0.6); }
-        .recipe-btn--active {
-            color: #2B4162;
-            background: rgba(43, 65, 98, 0.05);
-            border: 1px solid rgba(43, 65, 98, 0.1);
-        }
-
         .function-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(46, 42, 37, 0.1), 0 4px 6px -2px rgba(46, 42, 37, 0.05);
@@ -84,10 +59,11 @@
                     <ul class="space-y-1">
                         <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
                         <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
-                        <li><a href="#starlark-intro" class="sidebar-link sidebar-link--sub active block px-2 py-1.5 font-medium rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="#stdlib-reference" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Core Standard Library</a></li>
-                        <li><a href="#stdlib-extended" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Extended Library</a></li>
-                        <li><a href="#patterns" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Patterns</a></li>
+                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
+                        <li><a href="/netsuke/docs/standard-library/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Standard Library</a></li>
+                        <li><a href="#stdlib-reference" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Core reference</a></li>
+                        <li><a href="#stdlib-extended" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Extended library</a></li>
+                        <li><a href="#purity" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Pure vs host-observing</a></li>
                     </ul>
                 </div>
 
@@ -109,94 +85,24 @@
             <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
                 <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
                 <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">Templating &amp; StdLib</span>
+                <span class="text-charcoal font-medium">Standard Library</span>
             </nav>
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
-                        Core Concepts
+                        Reference
                     </div>
                     <span class="text-charcoal-mid text-xs font-mono bg-white px-2 py-1 rounded border border-stone">Jinja helpers</span>
                 </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Templating &amp; Standard Library</h1>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Standard Library</h1>
                 <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Netsuke uses MiniJinja inside YAML values. The structure stays as data; templating fills in strings, expands <code>foreach</code>, and gates entries with <code>when</code>.
+                    The functions, filters, and tests available inside a <code>Netsukefile</code>: paths, file contents,
+                    collections, time, command execution, executable discovery, and network access &mdash; each labelled
+                    pure or host-observing.
                 </p>
             </div>
-
-            <!-- Introduction to templating -->
-            <section id="starlark-intro" class="mb-16">
-                <div class="grid lg:grid-cols-2 gap-12 items-start">
-                    <div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal mb-4">Why Jinja inside YAML?</h2>
-                        <p class="text-charcoal-mid mb-6 leading-relaxed">
-                            Netsuke validates YAML before rendering templates. That keeps the manifest legible, keeps the structure explicit, and still leaves room for loops, macros, and conditional expansion.
-                        </p>
-                        <ul class="space-y-4 mb-8">
-                            <li class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
-                                    <span class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
-                                </div>
-                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">YAML first:</strong> Structure is checked before templating is allowed to render commands.</span>
-                            </li>
-                            <li class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
-                                    <span class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
-                                </div>
-                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">Controlled expansion:</strong> <code>foreach</code> and <code>when</code> handle structural repetition without turning the file into a programming language.</span>
-                            </li>
-                            <li class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
-                                    <span class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
-                                </div>
-                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">Reusable helpers:</strong> Macros, filters, and built-in functions cover common path and environment tasks.</span>
-                            </li>
-                        </ul>
-                        <div class="bg-boxwood-pale p-5 rounded-lg border border-stone text-sm text-charcoal-mid">
-                            <p class="font-bold text-charcoal mb-2"><span class="iconify mr-2 text-indigo" data-icon="carbon:book" aria-hidden="true"></span> Learn More</p>
-                            The goal is not to hide the build graph. The goal is to keep repeated YAML short enough to tolerate.
-                        </div>
-                    </div>
-
-                    <!-- Code Example Card -->
-                    <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                        <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                            <div class="flex space-x-2">
-                                <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                                <div class="w-3 h-3 rounded-full bg-amber"></div>
-                                <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                            </div>
-                            <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                            <div class="w-12"></div>
-                        </div>
-                        <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light code-container">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
-macros:
-  - signature: "obj_name(src)"
-    body: |
-      {{ src | basename | replace('.c', '.o') }}
-
-targets:
-  - foreach: glob('src/*.c')
-    name: "build/{{ obj_name(item) }}"
-    rule: "compile"
-    sources: "{{ item }}"
-{% endraw %}{% endhighlight %}{% raw %}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Library Usage Stats Chart -->
-            <section id="stats" class="mb-20 pt-8 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Standard Library Usage</h2>
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                    <div id="stdLibChart" class="h-[350px] w-full"></div>
-                    <p class="text-xs text-center text-charcoal-light mt-4 font-mono">Illustrative relative frequency across example manifests in the Netsuke repository</p>
-                </div>
-            </section>
 
             <!-- Standard Library Reference -->
             <section id="stdlib-reference" class="mb-16">
@@ -566,130 +472,38 @@ targets:
                 </div>
             </section>
 
-            <!-- Advanced Patterns -->
-            <section id="patterns" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Common Patterns</h2>
-
-                <div class="bg-boxwood-pale border border-stone rounded-xl overflow-hidden">
-                    <div class="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-stone">
-                        <!-- Sidebar for patterns -->
-                        <div class="md:col-span-4 p-6 bg-white/50">
-                            <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Recipes</h3>
-                            <ul class="space-y-2">
-                                <li>
-                                    <button type="button" class="recipe-btn recipe-btn--active w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="cross-compilation" aria-selected="true">
-                                        Cross-Compilation
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="test-suites" aria-selected="false">
-                                        Test Suites
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="code-generation" aria-selected="false">
-                                        Code Generation
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Content for patterns -->
-                        <div class="md:col-span-8 p-8 bg-white" data-recipe-panel="cross-compilation">
-                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Platform-specific sources with `when`</h4>
-                            <p class="text-sm text-charcoal-mid mb-6">
-                                Use <code class="bg-stone-light/30 px-1 rounded text-xs">when</code> on repeated entries to include targets only when the current variables match the platform you want.
-                            </p>
-
-                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
-targets:
-  - when: target_os == 'linux'
-    name: "sys/linux.o"
-    rule: "compile"
-    sources: "src/linux_utils.c"
-
-  - when: target_os == 'macos'
-    name: "sys/macos.o"
-    rule: "compile"
-    sources: "src/macos_utils.c"
-{% endraw %}{% endhighlight %}{% raw %}
-                            </div>
-
-                            <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
-                                <p>Keep conditions coarse-grained. Avoid selecting on individual compiler versions unless absolutely necessary.</p>
-                            </div>
-                        </div>
-
-                        <div class="md:col-span-8 p-8 bg-white hidden" data-recipe-panel="test-suites">
-                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Test runs with `actions` and `always`</h4>
-                            <p class="text-sm text-charcoal-mid mb-6">
-                                Put operator-run test suites in <code class="bg-stone-light/30 px-1 rounded text-xs">actions</code> so they stay outside the default graph, and mark report targets <code class="bg-stone-light/30 px-1 rounded text-xs">always</code> when they should rerun on every invocation.
-                            </p>
-
-                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
-targets:
-  - name: test-report.txt
-    command: "./run-tests > {{ outs }}"
-    sources: "app"
-    always: true
-
-actions:
-  - name: test
-    command: "./app --self-test"
-{% endraw %}{% endhighlight %}{% raw %}
-                            </div>
-
-                            <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
-                                <p>Keep the build product and the test run distinct: the report target depends on the binary, so tests always run against the current build.</p>
-                            </div>
-                        </div>
-
-                        <div class="md:col-span-8 p-8 bg-white hidden" data-recipe-panel="code-generation">
-                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Generated sources as first-class targets</h4>
-                            <p class="text-sm text-charcoal-mid mb-6">
-                                Model generated code as its own target and let downstream targets name it in <code class="bg-stone-light/30 px-1 rounded text-xs">sources</code>: the implicit dependency keeps generation ordered before compilation.
-                            </p>
-
-                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
-rules:
-  - name: protoc
-    command: "protoc --c_out=gen {{ ins }}"
-
-targets:
-  - name: gen/messages.c
-    rule: protoc
-    sources: proto/messages.proto
-
-  - name: messages.o
-    rule: compile
-    sources: gen/messages.c
-{% endraw %}{% endhighlight %}{% raw %}
-                            </div>
-
-                            <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
-                                <p>List generated inputs explicitly rather than globbing them: templates expand before anything is built, so a glob over generated files sees an empty directory.</p>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Purity -->
+            <section id="purity" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:certificate" aria-hidden="true"></span> Pure vs host-observing
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    &ldquo;Pure&rdquo; means the result depends only on the supplied value and arguments. Host-observing helpers
+                    read the clock, environment, filesystem, network, or subprocess state; <code>fetch</code> with a cache may
+                    also write beneath <code>.netsuke/</code>. Pure helpers make generated build graphs reproducible;
+                    host-observing helpers are useful for discovery and conditional planning, but their results can vary
+                    between machines or invocations.
+                </p>
+                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:idea" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        Prefer explicit manifest inputs when a value is part of the build's reproducibility contract, and keep
+                        network or command execution out of untrusted <code>Netsukefile</code> content &mdash; Netsuke bounds
+                        helper output, but it does not sandbox template evaluation.
+                    </p>
                 </div>
             </section>
 
             <!-- Help Footer -->
             <div class="mt-10 pt-10 border-t border-stone-light">
                 <div class="flex justify-between items-center">
-                    <a href="/netsuke/docs/rules-and-targets/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                    <a href="/netsuke/docs/templating/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
                         <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
                             <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
                         </div>
                         <div class="text-left">
                             <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
-                            <div class="font-medium text-sm">Rules &amp; Targets</div>
+                            <div class="font-medium text-sm">Templating</div>
                         </div>
                     </a>
 
@@ -708,60 +522,7 @@ targets:
         </main>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('[data-recipe-tab]');
-            const panels = document.querySelectorAll('[data-recipe-panel]');
-
-            tabs.forEach((tab) => {
-                tab.addEventListener('click', () => {
-                    const key = tab.getAttribute('data-recipe-tab');
-                    tabs.forEach((other) => {
-                        const active = other === tab;
-                        other.classList.toggle('recipe-btn--active', active);
-                        other.setAttribute('aria-selected', String(active));
-                    });
-                    panels.forEach((panel) => {
-                        panel.classList.toggle('hidden', panel.getAttribute('data-recipe-panel') !== key);
-                    });
-                });
-            });
-        });
-    </script>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-    <script>
-        window.addEventListener('load', function() {
-            try {
-                // Bar Chart for StdLib Usage
-                const trace1 = {
-                    x: ['glob', 'env', 'basename', 'with_suffix', 'dirname', 'fetch', 'which', 'command_available', 'relative_to', 'contents', 'shell', 'now', 'hash', 'uniq', 'flatten'],
-                    y: [95, 82, 76, 65, 45, 30, 28, 25, 22, 18, 14, 12, 10, 9, 7],
-                    type: 'bar',
-                    marker: {
-                        color: ['#2B4162', '#3A5A7C', '#4A7C59', '#C48B2C', '#C23B22', '#8A8279',
-                                '#2B4162', '#3A5A7C', '#4A7C59', '#C48B2C', '#C23B22', '#8A8279',
-                                '#2B4162', '#3A5A7C', '#4A7C59']
-                    }
-                };
-
-                const layout = {
-                    title: { text: 'Most Used Standard Library Functions (%)', font: { family: 'Fraunces', size: 16, color: '#2E2A25' } },
-                    margin: { t: 50, r: 20, b: 60, l: 50 },
-                    plot_bgcolor: '#FFFFFF',
-                    paper_bgcolor: '#FFFFFF',
-                    font: { family: 'Source Sans 3', color: '#5C554D' },
-                    xaxis: { gridcolor: '#F5EDE0', tickangle: -45 },
-                    yaxis: { gridcolor: '#F5EDE0', range: [0, 100] },
-                    showlegend: false
-                };
-
-                Plotly.newPlot('stdLibChart', [trace1], layout, {responsive: true, displayModeBar: false});
-
-            } catch(e) {
-                console.error("Chart generation failed:", e);
-            }
-        });
-    </script>
 {% endraw %}
 {% endblock %}

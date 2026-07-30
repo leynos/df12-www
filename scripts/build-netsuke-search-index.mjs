@@ -51,7 +51,8 @@ async function main() {
     path.join(DOCS_DIR, "getting-started", "index.html"),
     path.join(DOCS_DIR, "manifest-reference", "index.html"),
     path.join(DOCS_DIR, "rules-and-targets", "index.html"),
-    path.join(DOCS_DIR, "templating-and-standard-library", "index.html"),
+    path.join(DOCS_DIR, "templating", "index.html"),
+    path.join(DOCS_DIR, "standard-library", "index.html"),
     path.join(DOCS_DIR, "cli-security-and-configuration", "index.html"),
   ];
   const exampleFiles = [

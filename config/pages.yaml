@@ -588,10 +588,14 @@ sites:
         label: Rules and Targets
         template: pages/docs-rules-and-targets.jinja
         output_slug: docs/rules-and-targets
-      - key: docs-templating-and-standard-library
-        label: Templating and Standard Library
-        template: pages/docs-templating-and-standard-library.jinja
-        output_slug: docs/templating-and-standard-library
+      - key: docs-templating
+        label: Templating
+        template: pages/docs-templating.jinja
+        output_slug: docs/templating
+      - key: docs-standard-library
+        label: Standard Library
+        template: pages/docs-standard-library.jinja
+        output_slug: docs/standard-library
       - key: examples
         label: Examples
         template: pages/examples.jinja

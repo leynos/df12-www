@@ -71,9 +71,9 @@
                         <p class="text-charcoal-mid text-sm">Netsuke is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Source builds require Rust 1.89 or later, and <code>ninja</code> must be installed separately.</p>
                     </div>
                     <div class="bg-charcoal rounded-lg p-6 code-block-wrapper">
-                        <code class="font-mono text-sm text-stone-light break-all">
-                            <span class="text-vermillion">cargo</span> install netsuke-build
-                        </code>
+                        {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ cargo install netsuke-build
+                        {% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="mt-8 grid md:grid-cols-2 gap-6">
                         <div class="bg-boxwood-pale p-4 rounded-lg border border-stone">
@@ -103,25 +103,13 @@
                         <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
                     </div>
                     <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light space-y-3">
-                        <div><span class="text-charcoal-light"># Debian or Ubuntu</span></div>
-                        <div><span class="text-vermillion">sudo</span> apt install ./PACKAGE.deb</div>
-                        <div class="pt-2"><span class="text-charcoal-light"># Fedora, Rocky Linux, or another RPM-based distribution</span></div>
-                        <div><span class="text-vermillion">sudo</span> dnf install ./PACKAGE.rpm</div>
-                    </div>
-                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture. Standalone binaries with SHA-256 checksum sidecars are also published; the installer packages themselves do not have checksum sidecars in v0.1.0.</p>
-                </div>
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+# Install the downloaded package
+$ sudo installer -pkg ./PACKAGE.pkg -target /
 
-                <!-- macOS panel -->
-                <div class="p-8 lg:p-10 hidden" id="install-panel-macos" data-install-panel="macos" role="tabpanel">
-                    <div class="mb-8">
-                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">macOS installer package</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
-                    </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light space-y-3">
-                        <div><span class="text-charcoal-light"># Install the downloaded package</span></div>
-                        <div><span class="text-vermillion">sudo</span> installer -pkg ./PACKAGE.pkg -target /</div>
-                        <div class="pt-2"><span class="text-charcoal-light"># Ninja is a separate install</span></div>
-                        <div><span class="text-vermillion">brew</span> install ninja</div>
+# Ninja is a separate install
+$ brew install ninja
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture (for example <code>netsuke-0.1.0-macos-arm64.pkg</code>).</p>
                 </div>
@@ -166,11 +154,10 @@
                         <h3 class="text-xl font-bold text-charcoal mb-4">Verify Installation</h3>
                         <p class="text-charcoal-mid mb-4">Run the version command to ensure Netsuke is correctly installed and accessible in your path.</p>
                         <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
-                            <div class="flex">
-                                <span class="text-matcha mr-3">➜</span>
-                                <span>netsuke --version</span>
-                            </div>
-                            <div class="text-boxwood mt-1">netsuke 0.1.0</div>
+                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke --version
+netsuke 0.1.0
+                            {% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
 
@@ -180,13 +167,15 @@
                         <h3 class="text-xl font-bold text-charcoal mb-4">Create a Manifest</h3>
                         <p class="text-charcoal-mid mb-4">Create a <code>Netsukefile</code> in the project root. Start with one rule, one target, and one default.</p>
                         <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
-                            <div><span class="text-indigo">netsuke_version</span>: <span class="text-boxwood">"1.0.0"</span></div>
-                            <div><span class="text-indigo">targets</span>:</div>
-                            <div class="pl-4">- <span class="text-indigo">name</span>: <span class="text-boxwood">"hello.txt"</span></div>
-                            <div class="pl-4">  <span class="text-indigo">command</span>: <span class="text-boxwood">"printf 'hello\\n' &gt; {{ outs }}"</span></div>
-                            <div class="pl-4">  <span class="text-indigo">sources</span>: <span class="text-boxwood">[]</span></div>
-                            <div><span class="text-indigo">defaults</span>: [<span class="text-boxwood">"hello.txt"</span>]</div>
-                        </div>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
+targets:
+  - name: "hello.txt"
+    command: "printf 'hello\n' > {{ outs }}"
+    sources: []
+defaults: ["hello.txt"]
+{% endraw %}{% endhighlight %}{% raw %}
+                    
                     </div>
 
                     <!-- Step 3 -->
@@ -195,11 +184,10 @@
                         <h3 class="text-xl font-bold text-charcoal mb-4">Run Your First Build</h3>
                         <p class="text-charcoal-mid mb-4">Execute the default target defined in your manifest. Netsuke validates the manifest, expands templates, writes a Ninja plan, and hands execution over.</p>
                         <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
-                            <div class="flex">
-                                <span class="text-matcha mr-3">➜</span>
-                                <span>netsuke build</span>
-                            </div>
-                            <pre class="mt-2 text-stone-light"><samp>[1/1] printf 'hello\n' &gt; hello.txt</samp></pre>
+                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke build
+[1/1] printf 'hello\n' > hello.txt
+                            {% endraw %}{% endhighlight %}{% raw %}
                         </div>
 
                         <div class="mt-6 flex gap-4">

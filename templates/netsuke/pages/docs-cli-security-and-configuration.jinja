@@ -249,47 +249,19 @@
                                 <div class="ml-4 text-xs text-stone-light opacity-50">user@dev:~/netsuke-project</div>
                             </div>
                             <div class="terminal-body">
-                                <div>
-                                    <span class="prompt">&#10145;</span> <span class="cmd">netsuke --verbose build app</span>
-                                </div>
-                                <div class="mt-2 text-stone-light">
-                                    Parsed Netsukefile and expanded 3 targets
-                                </div>
-                                <div class="mt-1 text-stone-light">
-                                    Wrote build.ninja
-                                </div>
-                                <div class="mt-2 text-amber">
-                                    Running Ninja for requested target:
-                                </div>
-                                <div class="ml-4 text-stone-light">
-                                    - app
-                                </div>
-                                <div class="mt-2 text-stone-light">
-                                    <span class="text-matcha">[1 / 3]</span> Compiling utils.c...
-                                </div>
-                                <div class="text-stone-light">
-                                    <span class="text-matcha">[2 / 3]</span> Compiling main.c...
-                                </div>
-                                <div class="text-stone-light">
-                                    <span class="text-matcha">[3 / 3]</span> Linking app...
-                                </div>
-                                <div class="mt-2 success font-bold">
-                                    Build completed successfully in 0.8s
-                                </div>
-                                <br>
-                                <div>
-                                    <span class="prompt">&#10145;</span> <span class="cmd">netsuke graph</span>
-                                </div>
-                                <div class="mt-1 output">
-                                    digraph netsuke {<br>
-                                    &nbsp;&nbsp;"main.o" -&gt; "app"<br>
-                                    &nbsp;&nbsp;"utils.o" -&gt; "app"<br>
-                                    }
-                                </div>
-                                <br>
-                                <div>
-                                    <span class="prompt">&#10145;</span> <span class="cmd cursor-blink">_</span>
-                                </div>
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke --verbose build app
+Parsed Netsukefile and expanded 3 targets
+Wrote build.ninja
+[1/3] Compiling utils.c
+[2/3] Compiling main.c
+[3/3] Linking app
+$ netsuke graph
+digraph netsuke {
+  "main.o" -> "app"
+  "utils.o" -> "app"
+}
+{% endraw %}{% endhighlight %}{% raw %}
                             </div>
                         </div>
 
@@ -448,17 +420,19 @@ fetch_block_host = [<span class="text-matcha">"metadata.internal"</span>]</code>
 
                 <div class="bg-charcoal rounded-xl overflow-hidden mb-6">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Shell examples</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Capture build graph without status noise</span>
-netsuke graph <span class="text-matcha">&gt;</span> build.dot
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+# Capture build graph without status noise
+$ netsuke graph > build.dot
 
-<span class="text-charcoal-light"># Capture progress log without build output</span>
-netsuke build <span class="text-matcha">2&gt;</span> progress.log
+# Capture progress log without build output
+$ netsuke build 2> progress.log
 
-<span class="text-charcoal-light"># Suppress all progress rendering</span>
-netsuke --progress <span class="text-amber">never</span> build
+# Suppress all progress rendering
+$ netsuke --progress never build
 
-<span class="text-charcoal-light"># Inspect generated Ninja file inline</span>
-netsuke generate <span class="text-matcha">|</span> grep <span class="text-amber">'rule '</span></code></pre>
+# Inspect generated Ninja file inline
+$ netsuke generate | grep 'rule '
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
 
                 <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
@@ -529,7 +503,8 @@ netsuke generate <span class="text-matcha">|</span> grep <span class="text-amber
                 </p>
                 <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">stderr with accessible mode enabled</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light"><code>Stage 1/6: Reading manifest file
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+Stage 1/6: Reading manifest file
 Stage 2/6: Parsing YAML document
 Stage 3/6: Expanding template directives
 Stage 4/6: Deserializing and rendering manifest values
@@ -537,7 +512,8 @@ Stage 5/6: Building and validating dependency graph
 Stage 6/6: Synthesizing Ninja plan and executing Build
 Task 1/2: cc -c src/a.c
 Task 2/2: cc -c src/b.c
-Success: Build complete.</code></pre>
+Success: Build complete.
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
 
                 <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
@@ -684,11 +660,13 @@ error-file-not-found = Error: File "{ $path }" was not found.
 
                 <div class="bg-charcoal rounded-xl overflow-hidden">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Restricting fetch to a single host</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code>netsuke \
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke \
   --fetch-default-deny \
   --fetch-allow-host releases.example.com \
   --fetch-block-host internal.example.com \
-  build</code></pre>
+  build
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
             </section>
 

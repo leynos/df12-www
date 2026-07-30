@@ -305,15 +305,17 @@ example.files_processed = { $count -&gt;
 
                 <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Steps 1&ndash;3: create, copy, translate</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># 1. Create the locale directory</span>
-mkdir -p locales/fr-FR
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+# 1. Create the locale directory
+$ mkdir -p locales/fr-FR
 
-<span class="text-charcoal-light"># 2. Copy the English source file</span>
-cp locales/en-US/messages.ftl locales/fr-FR/messages.ftl
+# 2. Copy the English source file
+$ cp locales/en-US/messages.ftl locales/fr-FR/messages.ftl
 
-<span class="text-charcoal-light"># 3. Translate values, keep keys. For example:</span>
-<span class="text-charcoal-light">#   cli.about = Netsuke compile les manifestes YAML + Jinja</span>
-<span class="text-charcoal-light">#               en plans Ninja.</span></code></pre>
+# 3. Translate values, keep keys. For example:
+#   cli.about = Netsuke compile les manifestes YAML + Jinja
+#               en plans Ninja.
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
@@ -329,8 +331,10 @@ cp locales/en-US/messages.ftl locales/fr-FR/messages.ftl
                     <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Steps 5&ndash;6: build and test</h3>
                         <div class="bg-charcoal rounded-lg p-4 overflow-x-auto mb-3">
-                            <pre class="font-mono text-xs text-stone-light"><code>cargo build
-cargo run -- --locale fr-FR --help</code></pre>
+                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ cargo build
+$ cargo run -- --locale fr-FR --help
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                         <p class="text-xs text-charcoal-mid">
                             The compile-time audit verifies every key is present; missing or orphaned keys fail the build with a detailed error.

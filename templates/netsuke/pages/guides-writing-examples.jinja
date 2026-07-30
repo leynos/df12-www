@@ -109,10 +109,11 @@
 
                 <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">examples/visual_design.yml</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Schema version comes first, always quoted.</span>
+                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+# Schema version comes first, always quoted.
 netsuke_version: "1.0.0"
 
-<span class="text-charcoal-light"># Declare the file set and tool choices once.</span>
+# Declare the file set and tool choices once.
 vars:
   src_dir: design/svg
   out_dir: build/raster
@@ -121,7 +122,7 @@ vars:
     - hero
     - logo
 
-<span class="text-charcoal-light"># Rules carry the shared command templates.</span>
+# Rules carry the shared command templates.
 rules:
   - name: rasterise
     command: "{{ inkscape }} --export-type=png --export-filename={{ outs }} {{ ins }}"
@@ -129,7 +130,7 @@ rules:
   - name: clean
     command: "rm -rf {{ out_dir }}"
 
-<span class="text-charcoal-light"># The output directory is a first-class target.</span>
+# The output directory is a first-class target.
 targets:
   - name: "{{ out_dir }}"
     command: "mkdir -p {{ outs }}"
@@ -140,14 +141,15 @@ targets:
     sources: "{{ src_dir }}/{{ item }}.svg"
     order_only_deps: "{{ out_dir }}"
 
-<span class="text-charcoal-light"># Operator tasks live in actions, outside the default graph.</span>
+# Operator tasks live in actions, outside the default graph.
 actions:
   - name: clean
     rule: clean
 
-<span class="text-charcoal-light"># Defaults name the deliverable, not an abstract label.</span>
+# Defaults name the deliverable, not an abstract label.
 defaults:
-  - build/raster/hero.png</code></pre>
+  - build/raster/hero.png
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
             </section>
 

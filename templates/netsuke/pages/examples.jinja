@@ -54,20 +54,22 @@
                             <span>basic-c/</span>
                         </div>
                         <div class="code-preview p-4 text-sm border border-white/10 shadow-2xl rounded-lg">
-<pre><code><span class="text-indigo">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
 
-<span class="text-indigo">rules</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"compile"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"gcc -c {{ ins }} -o {{ outs }}"</span>
+rules:
+  - name: "compile"
+    command: "gcc -c {{ ins }} -o {{ outs }}"
 
-<span class="text-indigo">targets</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"main.o"</span>
-    <span class="text-amber">rule</span>: <span class="text-matcha">"compile"</span>
-    <span class="text-amber">sources</span>: <span class="text-matcha">"src/main.c"</span>
+targets:
+  - name: "main.o"
+    rule: "compile"
+    sources: "src/main.c"
 
-  - <span class="text-amber">name</span>: <span class="text-matcha">"app"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"gcc {{ ins }} -o {{ outs }}"</span>
-    <span class="text-amber">sources</span>: [<span class="text-matcha">"main.o"</span>, <span class="text-matcha">"utils.o"</span>]</code></pre>
+  - name: "app"
+    command: "gcc {{ ins }} -o {{ outs }}"
+    sources: ["main.o", "utils.o"]
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
                 </div>

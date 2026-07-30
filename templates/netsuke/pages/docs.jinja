@@ -189,17 +189,19 @@
                             <span>examples/basic/Netsukefile</span>
                             <span>RO</span>
                         </div>
-<pre class="font-mono text-sm leading-relaxed text-stone-light"><code><span class="text-charcoal-light"># Compile a simple C program</span>
-<span class="text-indigo-light">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+# Compile a simple C program
+netsuke_version: "1.0.0"
 
-<span class="text-indigo-light">rules</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"compile"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"gcc -c {{ ins }} -o {{ outs }}"</span>
+rules:
+  - name: "compile"
+    command: "gcc -c {{ ins }} -o {{ outs }}"
 
-<span class="text-indigo-light">targets</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"hello_world"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"gcc {{ ins }} -o {{ outs }}"</span>
-    <span class="text-amber">sources</span>: [<span class="text-matcha">"main.o"</span>, <span class="text-matcha">"print.o"</span>]</code></pre>
+targets:
+  - name: "hello_world"
+    command: "gcc {{ ins }} -o {{ outs }}"
+    sources: ["main.o", "print.o"]
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                 </div>
             </section>

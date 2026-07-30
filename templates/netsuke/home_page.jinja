@@ -214,24 +214,26 @@
                             <div class="w-12"></div>
                         </div>
                         <div class="hm-faux-window__body p-6 overflow-x-auto text-stone-light leading-relaxed">
-<pre><code><span class="text-charcoal-light"># Reusable commands live in rules</span>
-<span class="text-indigo-light">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span>
+{% highlight 'netsuke' %}{% raw %}
+# Reusable commands live in rules
+netsuke_version: "1.0.0"
 
-<span class="text-indigo-light">vars</span>:
-  <span class="text-amber">cc</span>: <span class="text-matcha">"clang"</span>
+vars:
+  cc: "clang"
 
-<span class="text-indigo-light">rules</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"compile"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"&#123;&#123; cc &#125;&#125; -c &#123;&#123; ins &#125;&#125; -o &#123;&#123; outs &#125;&#125;"</span>
+rules:
+  - name: "compile"
+    command: "{{ cc }} -c {{ ins }} -o {{ outs }}"
 
-<span class="text-indigo-light">targets</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"build/main.o"</span>
-    <span class="text-amber">rule</span>: <span class="text-matcha">"compile"</span>
-    <span class="text-amber">sources</span>: <span class="text-matcha">"src/main.c"</span>
+targets:
+  - name: "build/main.o"
+    rule: "compile"
+    sources: "src/main.c"
 
-  - <span class="text-amber">name</span>: <span class="text-matcha">"docs/manual.html"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"pandoc &#123;&#123; ins &#125;&#125; -o &#123;&#123; outs &#125;&#125;"</span>
-    <span class="text-amber">sources</span>: <span class="text-matcha">"README.md"</span></code></pre>
+  - name: "docs/manual.html"
+    command: "pandoc {{ ins }} -o {{ outs }}"
+    sources: "README.md"
+{% endraw %}{% endhighlight %}
                         </div>
                     </div>
                 </div>

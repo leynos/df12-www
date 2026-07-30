@@ -4,15 +4,6 @@
 {% block extra_head %}
     <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
     <style>
-        /* Syntax Highlighting */
-        .token.comment { color: #8A8279; font-style: italic; }
-        .token.string { color: #4A7C59; }
-        .token.keyword { color: #C23B22; font-weight: bold; }
-        .token.function { color: #2B4162; }
-        .token.operator { color: #C48B2C; }
-        .token.number { color: #C48B2C; }
-        .token.property { color: #2E2A25; }
-        .token.type { color: #C48B2C; }
 
         .code-container {
             counter-reset: line;
@@ -173,16 +164,18 @@
                             <div class="w-12"></div>
                         </div>
                         <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light code-container">
-                            <div class="code-line"><span class="token property">macros</span>:</div>
-                            <div class="code-line">  - <span class="token property">signature</span>: <span class="token string">"obj_name(src)"</span></div>
-                            <div class="code-line">    <span class="token property">body</span>: <span class="token string">|</span></div>
-                            <div class="code-line">      <span class="token string">{{ src | basename | replace('.c', '.o') }}</span></div>
-                            <div class="code-line"></div>
-                            <div class="code-line"><span class="token property">targets</span>:</div>
-                            <div class="code-line">  - <span class="token property">foreach</span>: <span class="token string">glob('src/*.c')</span></div>
-                            <div class="code-line">    <span class="token property">name</span>: <span class="token string">"build/{{ obj_name(item) }}"</span></div>
-                            <div class="code-line">    <span class="token property">rule</span>: <span class="token string">"compile"</span></div>
-                            <div class="code-line">    <span class="token property">sources</span>: <span class="token string">"{{ item }}"</span></div>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+macros:
+  - signature: "obj_name(src)"
+    body: |
+      {{ src | basename | replace('.c', '.o') }}
+
+targets:
+  - foreach: glob('src/*.c')
+    name: "build/{{ obj_name(item) }}"
+    rule: "compile"
+    sources: "{{ item }}"
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
                 </div>
@@ -556,10 +549,12 @@
                     </div>
                 </div>
                 <div class="bg-charcoal rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
-                    <pre><code><span class="token property">targets</span>:
-  - <span class="token property">when</span>: <span class="token string">'src/main.c' is file and command_available('clang')</span>
-    <span class="token property">name</span>: <span class="token string">"build/main.o"</span>
-    <span class="token property">rule</span>: <span class="token string">"compile"</span></code></pre>
+                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  - when: 'src/main.c' is file and command_available('clang')
+    name: "build/main.o"
+    rule: "compile"
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
             </section>
 
@@ -599,16 +594,18 @@
                             </p>
 
                             <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-<pre><code><span class="token property">targets</span>:
-  - <span class="token property">when</span>: <span class="token string">target_os == 'linux'</span>
-    <span class="token property">name</span>: <span class="token string">"sys/linux.o"</span>
-    <span class="token property">rule</span>: <span class="token string">"compile"</span>
-    <span class="token property">sources</span>: <span class="token string">"src/linux_utils.c"</span>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  - when: target_os == 'linux'
+    name: "sys/linux.o"
+    rule: "compile"
+    sources: "src/linux_utils.c"
 
-  - <span class="token property">when</span>: <span class="token string">target_os == 'macos'</span>
-    <span class="token property">name</span>: <span class="token string">"sys/macos.o"</span>
-    <span class="token property">rule</span>: <span class="token string">"compile"</span>
-    <span class="token property">sources</span>: <span class="token string">"src/macos_utils.c"</span></code></pre>
+  - when: target_os == 'macos'
+    name: "sys/macos.o"
+    rule: "compile"
+    sources: "src/macos_utils.c"
+{% endraw %}{% endhighlight %}{% raw %}
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">

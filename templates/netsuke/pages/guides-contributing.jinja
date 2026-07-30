@@ -112,18 +112,20 @@
 
                 <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Getting started</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Clone the repository</span>
-git clone https://github.com/leynos/netsuke.git
-cd netsuke
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+# Clone the repository
+$ git clone https://github.com/leynos/netsuke.git
+$ cd netsuke
 
-<span class="text-charcoal-light"># Build in release mode</span>
-cargo build --release
+# Build in release mode
+$ cargo build --release
 
-<span class="text-charcoal-light"># Run the test suite</span>
-cargo test
+# Run the test suite
+$ cargo test
 
-<span class="text-charcoal-light"># Run all quality gates (preferred)</span>
-make check-fmt lint test</code></pre>
+# Run all quality gates (preferred)
+$ make check-fmt lint test
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">

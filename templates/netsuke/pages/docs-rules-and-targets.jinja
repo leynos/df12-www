@@ -4,15 +4,6 @@
 {% block extra_head %}
     <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
     <style>
-        /* Syntax Highlighting Base */
-        .token.comment { color: #8A8279; font-style: italic; }
-        .token.string { color: #4A7C59; }
-        .token.keyword { color: #C23B22; font-weight: bold; }
-        .token.function { color: #2B4162; }
-        .token.operator { color: #C48B2C; }
-        .token.number { color: #C48B2C; }
-        .token.property { color: #2E2A25; }
-        .token.type { color: #C48B2C; }
 
         /* Custom Table Styling */
         .prop-table tr:last-child td { border-bottom: none; }
@@ -208,18 +199,20 @@
                         <div class="w-12"></div>
                     </div>
                     <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light">
-<pre><code><span class="token property">rules</span>:
-  - <span class="token property">name</span>: <span class="token string">"compile"</span>
-    <span class="token property">command</span>: <span class="token string">"gcc -c {{ ins }} -o {{ outs }}"</span>
-    <span class="token property">description</span>: <span class="token string">"Compiling {{ outs }}"</span>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+rules:
+  - name: "compile"
+    command: "gcc -c {{ ins }} -o {{ outs }}"
+    description: "Compiling {{ outs }}"
 
-  - <span class="token property">name</span>: <span class="token string">"link"</span>
-    <span class="token property">command</span>: <span class="token string">"gcc {{ ins }} -o {{ outs }}"</span>
+  - name: "link"
+    command: "gcc {{ ins }} -o {{ outs }}"
 
-<span class="token property">targets</span>:
-  - <span class="token property">name</span>: <span class="token string">"app"</span>
-    <span class="token property">rule</span>: <span class="token string">"link"</span>
-    <span class="token property">sources</span>: [<span class="token string">"main.o"</span>, <span class="token string">"utils.o"</span>]</code></pre>
+targets:
+  - name: "app"
+    rule: "link"
+    sources: ["main.o", "utils.o"]
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                 </div>
 

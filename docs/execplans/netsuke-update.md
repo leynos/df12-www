@@ -5,7 +5,7 @@ This ExecPlan (execution plan) is a living document. The sections
 `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
 proceeds.
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 ## Purpose / big picture
 
@@ -117,8 +117,12 @@ extension existed.
   environment wiring, and generated `.hm-syntax` CSS; tests green; contrast
   validated (all tokens at 5.0:1 or better; comment tint lifted to
   `#a39a8e`).
-- [ ] Stage D: template migration, page by page.
-- [ ] Stage E: refactor, screenshots, retrospective.
+- [x] (2026-07-30 19:10Z) Stage D: all fourteen templates migrated; manifest
+  block text verified identical to baseline; terminal transcripts
+  re-authored as `netsuke-console` sessions.
+- [x] (2026-07-30 19:30Z) Stage E: dead per-page `.token`/`.code-line` CSS
+  removed; cross-page colour identity verified via computed styles; all
+  sites regenerated with no tracked diffs outside the Netsuke work.
 
 ## Surprises & discoveries
 
@@ -185,7 +189,26 @@ extension existed.
 
 ## Outcomes & retrospective
 
-To be completed at delivery.
+Delivered as planned. The `netsuke` and `netsuke-console` syntaxes render
+every manifest and shell-session block on the sub-site through one
+`himotoshi` style; computed key/string colours are byte-identical across
+pages and resolve from `--netsuke-syntax-*` variables, all at 5.0:1
+contrast or better. Copy-paste fidelity held: rendered manifest text equals
+the shipped `examples/*.yml` content. The mxd, Weaver, and root outputs are
+unchanged.
+
+Deviations from the letter of the plan, both logged: template migration was
+committed per family rather than per file (structurally identical changes;
+recoverability preserved by the fidelity checks), and three block kinds
+were deliberately left bespoke as design elements — the home-page marketing
+terminal with its diagnostic panel, the install page's Windows
+PowerShell/MSI panel, and non-target languages (TOML, Fluent, Rust). The
+optional bash-in-string delegation prototype was not pursued; the string
+colouring reads well and the risk log stands.
+
+Lesson: Jinja's lexer runs before extensions, so any tag carrying literal
+Jinja syntax needs a `{% raw %}` inner wrapper — worth remembering for any
+future content-bearing tag.
 
 ## Context and orientation
 
@@ -411,3 +434,10 @@ netsuke-console = "df12_pages.highlighting:NetsukeConsoleLexer"
 [project.entry-points."pygments.styles"]
 himotoshi = "df12_pages.highlighting:HimotoshiStyle"
 ```
+
+## Revision note
+
+2026-07-30: Stages B-E implemented and validated. Progress, Surprises,
+Decision Log, and Outcomes updated; status moved to COMPLETE. Remaining
+follow-up ideas (bash-in-string delegation, light-background variant) are
+recorded as out of scope rather than open work.

@@ -238,7 +238,7 @@ about:
       height: 480
   about:
     blurb: >-
-      Payton has spent years leading teams in large organisations—long enough to know where the sharp edges hide.
+      Payton has spent years leading teams in large organisations — long enough to know where the sharp edges hide.
       df12 is their way of turning that scar tissue into a coherent boutique studio instead of a junkyard of side
       projects.
     location:
@@ -253,12 +253,12 @@ about:
         icon: carbon:person-favorite
         tone: primary
       - title: Legible Systems
-        description: If you can't reason about a system, you can't trust it. Observability isn't an add-on—it's
+        description: If you can't reason about a system, you can't trust it. Observability isn't an add-on — it's
           the foundation everything else rests on.
         icon: carbon:cloud-monitoring
         tone: accent
       - title: Calmer AI Tooling
-        description: AI workflows fail in novel ways. The answer isn't more guardrails—it's designing for
+        description: AI workflows fail in novel ways. The answer isn't more guardrails — it's designing for
           graceful degradation and predictable recovery.
         icon: carbon:ai-governance-lifecycle
         tone: neutral

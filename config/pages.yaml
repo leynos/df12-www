@@ -547,8 +547,8 @@ sites:
         href: /netsuke/examples/
       - label: Guides
         href: /netsuke/guides/
-      - label: Blog
-        href: /netsuke/blog/
+      - label: Roadmap
+        href: /netsuke/roadmap/
     shared_content:
       - terms-of-use
       - privacy-policy
@@ -556,10 +556,10 @@ sites:
     homepage:
       title: "Netsuke - Build systems, not build scripts"
     content_pages:
-      - key: blog
-        label: Blog
-        template: pages/blog.jinja
-        output_slug: blog
+      - key: roadmap
+        label: Roadmap
+        template: pages/roadmap.jinja
+        output_slug: roadmap
       - key: guides-contributing
         label: Contributing
         template: pages/guides-contributing.jinja

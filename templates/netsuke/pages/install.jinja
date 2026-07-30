@@ -102,7 +102,25 @@ $ cargo install netsuke-build
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Linux packages</h3>
                         <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
                     </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light space-y-3">
+                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+# Debian or Ubuntu
+$ sudo apt install ./PACKAGE.deb
+
+# Fedora, Rocky Linux, or another RPM-based distribution
+$ sudo dnf install ./PACKAGE.rpm
+{% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture. Standalone binaries with SHA-256 checksum sidecars are also published; the installer packages themselves do not have checksum sidecars in v0.1.0.</p>
+                </div>
+
+                <!-- macOS panel -->
+                <div class="p-8 lg:p-10 hidden" id="install-panel-macos" data-install-panel="macos" role="tabpanel">
+                    <div class="mb-8">
+                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">macOS installer package</h3>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
+                    </div>
+                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
 {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 # Install the downloaded package
 $ sudo installer -pkg ./PACKAGE.pkg -target /

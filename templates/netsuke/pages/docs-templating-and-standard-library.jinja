@@ -20,6 +20,14 @@
             user-select: none;
         }
 
+        .recipe-btn { color: #5C554D; }
+        .recipe-btn:hover { background: rgba(255, 255, 255, 0.6); }
+        .recipe-btn--active {
+            color: #2B4162;
+            background: rgba(43, 65, 98, 0.05);
+            border: 1px solid rgba(43, 65, 98, 0.1);
+        }
+
         .function-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(46, 42, 37, 0.1), 0 4px 6px -2px rgba(46, 42, 37, 0.05);
@@ -569,17 +577,17 @@ targets:
                             <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Recipes</h3>
                             <ul class="space-y-2">
                                 <li>
-                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-indigo bg-indigo/5 rounded-md border border-indigo/10">
+                                    <button type="button" class="recipe-btn recipe-btn--active w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="cross-compilation" aria-selected="true">
                                         Cross-Compilation
                                     </button>
                                 </li>
                                 <li>
-                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-charcoal-mid hover:bg-white/60 rounded-md transition-colors">
+                                    <button type="button" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="test-suites" aria-selected="false">
                                         Test Suites
                                     </button>
                                 </li>
                                 <li>
-                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-charcoal-mid hover:bg-white/60 rounded-md transition-colors">
+                                    <button type="button" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="code-generation" aria-selected="false">
                                         Code Generation
                                     </button>
                                 </li>
@@ -587,7 +595,7 @@ targets:
                         </div>
 
                         <!-- Content for patterns -->
-                        <div class="md:col-span-8 p-8 bg-white">
+                        <div class="md:col-span-8 p-8 bg-white" data-recipe-panel="cross-compilation">
                             <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Platform-specific sources with `when`</h4>
                             <p class="text-sm text-charcoal-mid mb-6">
                                 Use <code class="bg-stone-light/30 px-1 rounded text-xs">when</code> on repeated entries to include targets only when the current variables match the platform you want.
@@ -611,6 +619,61 @@ targets:
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
                                 <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                                 <p>Keep conditions coarse-grained. Avoid selecting on individual compiler versions unless absolutely necessary.</p>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-8 p-8 bg-white hidden" data-recipe-panel="test-suites">
+                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Test runs with `actions` and `always`</h4>
+                            <p class="text-sm text-charcoal-mid mb-6">
+                                Put operator-run test suites in <code class="bg-stone-light/30 px-1 rounded text-xs">actions</code> so they stay outside the default graph, and mark report targets <code class="bg-stone-light/30 px-1 rounded text-xs">always</code> when they should rerun on every invocation.
+                            </p>
+
+                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  - name: test-report.txt
+    command: "./run-tests > {{ outs }}"
+    sources: "app"
+    always: true
+
+actions:
+  - name: test
+    command: "./app --self-test"
+{% endraw %}{% endhighlight %}{% raw %}
+                            </div>
+
+                            <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
+                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                                <p>Keep the build product and the test run distinct: the report target depends on the binary, so tests always run against the current build.</p>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-8 p-8 bg-white hidden" data-recipe-panel="code-generation">
+                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Generated sources as first-class targets</h4>
+                            <p class="text-sm text-charcoal-mid mb-6">
+                                Model generated code as its own target and let downstream targets name it in <code class="bg-stone-light/30 px-1 rounded text-xs">sources</code>: the implicit dependency keeps generation ordered before compilation.
+                            </p>
+
+                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+rules:
+  - name: protoc
+    command: "protoc --c_out=gen {{ ins }}"
+
+targets:
+  - name: gen/messages.c
+    rule: protoc
+    sources: proto/messages.proto
+
+  - name: messages.o
+    rule: compile
+    sources: gen/messages.c
+{% endraw %}{% endhighlight %}{% raw %}
+                            </div>
+
+                            <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
+                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                                <p>List generated inputs explicitly rather than globbing them: templates expand before anything is built, so a glob over generated files sees an empty directory.</p>
                             </div>
                         </div>
                     </div>
@@ -645,6 +708,26 @@ targets:
         </main>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('[data-recipe-tab]');
+            const panels = document.querySelectorAll('[data-recipe-panel]');
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const key = tab.getAttribute('data-recipe-tab');
+                    tabs.forEach((other) => {
+                        const active = other === tab;
+                        other.classList.toggle('recipe-btn--active', active);
+                        other.setAttribute('aria-selected', String(active));
+                    });
+                    panels.forEach((panel) => {
+                        panel.classList.toggle('hidden', panel.getAttribute('data-recipe-panel') !== key);
+                    });
+                });
+            });
+        });
+    </script>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
     <script>

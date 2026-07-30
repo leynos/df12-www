@@ -49,63 +49,107 @@
         <section id="install-widget" class="max-w-4xl mx-auto mb-20">
             <div class="hm-card overflow-hidden">
                 <!-- OS Tabs -->
-                <div class="flex border-b border-stone bg-boxwood-pale/50 overflow-x-auto">
-                    <button class="tab-btn active px-6 py-4 text-sm font-bold text-charcoal border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap">
-                        <span  class="iconify mr-2" data-icon="carbon:apple" aria-hidden="true"></span> macOS / Linux
-                    </button>
-                    <button class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap">
-                        <span  class="iconify mr-2" data-icon="carbon:window-base" aria-hidden="true"></span> Windows
-                    </button>
-                    <button class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap">
+                <div class="flex border-b border-stone bg-boxwood-pale/50 overflow-x-auto" role="tablist" aria-label="Installation methods">
+                    <button type="button" class="tab-btn active px-6 py-4 text-sm font-bold text-charcoal border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="cargo" role="tab" aria-selected="true" aria-controls="install-panel-cargo">
                         <span  class="iconify mr-2" data-icon="carbon:development" aria-hidden="true"></span> Cargo
                     </button>
-                    <button class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap">
-                        <span  class="iconify mr-2" data-icon="carbon:box" aria-hidden="true"></span> Manual
+                    <button type="button" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="linux" role="tab" aria-selected="false" aria-controls="install-panel-linux">
+                        <span  class="iconify mr-2" data-icon="carbon:linux" aria-hidden="true"></span> Linux
+                    </button>
+                    <button type="button" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="macos" role="tab" aria-selected="false" aria-controls="install-panel-macos">
+                        <span  class="iconify mr-2" data-icon="carbon:apple" aria-hidden="true"></span> macOS
+                    </button>
+                    <button type="button" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="windows" role="tab" aria-selected="false" aria-controls="install-panel-windows">
+                        <span  class="iconify mr-2" data-icon="carbon:windows" aria-hidden="true"></span> Windows
                     </button>
                 </div>
 
-                <div class="p-8 lg:p-10">
+                <!-- Cargo panel -->
+                <div class="p-8 lg:p-10" id="install-panel-cargo" data-install-panel="cargo" role="tabpanel">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Install with Cargo</h3>
-                        <p class="text-charcoal-mid text-sm">Netsuke is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Install with Cargo, then verify that <code>ninja</code> is installed separately.</p>
+                        <p class="text-charcoal-mid text-sm">Netsuke is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Source builds require Rust 1.89 or later, and <code>ninja</code> must be installed separately.</p>
                     </div>
-
-                    <div class="bg-charcoal rounded-lg p-6 relative group code-block-wrapper">
-                        <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button class="text-xs text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded border border-white/20 transition-colors">
-                                <span  class="iconify mr-1" data-icon="carbon:copy" aria-hidden="true"></span> Copy
-                            </button>
-                        </div>
+                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper">
                         <code class="font-mono text-sm text-stone-light break-all">
                             <span class="text-vermillion">cargo</span> install netsuke-build
                         </code>
                     </div>
-
                     <div class="mt-8 grid md:grid-cols-2 gap-6">
                         <div class="bg-boxwood-pale p-4 rounded-lg border border-stone">
                             <h4 class="font-bold text-sm text-charcoal mb-2 flex items-center">
-                                <span  class="iconify mr-2 text-amber" data-icon="carbon:chemistry" aria-hidden="true"></span> Build from source
+                                <span  class="iconify mr-2 text-amber" data-icon="carbon:chemistry" aria-hidden="true"></span> Build from a source checkout
                             </h4>
                             <div class="bg-white p-3 rounded border border-stone font-mono text-xs text-charcoal-mid">
-                                cargo build --release
+                                git clone https://github.com/leynos/netsuke.git<br>
+                                cd netsuke &amp;&amp; cargo install --path .
                             </div>
                         </div>
                         <div class="bg-boxwood-pale p-4 rounded-lg border border-stone">
                             <h4 class="font-bold text-sm text-charcoal mb-2 flex items-center">
-                                <span  class="iconify mr-2 text-indigo" data-icon="carbon:cube" aria-hidden="true"></span> Manual verification
+                                <span  class="iconify mr-2 text-indigo" data-icon="carbon:cube" aria-hidden="true"></span> Verify
                             </h4>
                             <div class="bg-white p-3 rounded border border-stone font-mono text-xs text-charcoal-mid">
                                 netsuke --version
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-8 pt-6 border-t border-stone-light flex items-start gap-3">
-                        <span  class="iconify text-indigo mt-0.5" data-icon="carbon:information-filled" aria-hidden="true"></span>
-                        <p class="text-xs text-charcoal-mid">
-                            <strong>Note:</strong> You may need to restart your terminal after installation for the <code>netsuke</code> command to be recognized.
-                        </p>
+                <!-- Linux panel -->
+                <div class="p-8 lg:p-10 hidden" id="install-panel-linux" data-install-panel="linux" role="tabpanel">
+                    <div class="mb-8">
+                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Linux packages</h3>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
                     </div>
+                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light space-y-3">
+                        <div><span class="text-charcoal-light"># Debian or Ubuntu</span></div>
+                        <div><span class="text-vermillion">sudo</span> apt install ./PACKAGE.deb</div>
+                        <div class="pt-2"><span class="text-charcoal-light"># Fedora, Rocky Linux, or another RPM-based distribution</span></div>
+                        <div><span class="text-vermillion">sudo</span> dnf install ./PACKAGE.rpm</div>
+                    </div>
+                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture. Standalone binaries with SHA-256 checksum sidecars are also published; the installer packages themselves do not have checksum sidecars in v0.1.0.</p>
+                </div>
+
+                <!-- macOS panel -->
+                <div class="p-8 lg:p-10 hidden" id="install-panel-macos" data-install-panel="macos" role="tabpanel">
+                    <div class="mb-8">
+                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">macOS installer package</h3>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
+                    </div>
+                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light space-y-3">
+                        <div><span class="text-charcoal-light"># Install the downloaded package</span></div>
+                        <div><span class="text-vermillion">sudo</span> installer -pkg ./PACKAGE.pkg -target /</div>
+                        <div class="pt-2"><span class="text-charcoal-light"># Ninja is a separate install</span></div>
+                        <div><span class="text-vermillion">brew</span> install ninja</div>
+                    </div>
+                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture (for example <code>netsuke-0.1.0-macos-arm64.pkg</code>).</p>
+                </div>
+
+                <!-- Windows panel -->
+                <div class="p-8 lg:p-10 hidden" id="install-panel-windows" data-install-panel="windows" role="tabpanel">
+                    <div class="mb-8">
+                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Windows installer</h3>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts.</p>
+                    </div>
+                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light space-y-3 overflow-x-auto">
+                        <div><span class="text-charcoal-light"># Install the downloaded package</span></div>
+                        <div>msiexec.exe /i PACKAGE.msi</div>
+                        <div class="pt-2"><span class="text-charcoal-light"># Add the install directory to the current user's PATH</span></div>
+                        <div>$dir = Join-Path $env:ProgramFiles 'netsuke'</div>
+                        <div>[Environment]::SetEnvironmentVariable('Path',</div>
+                        <div>&nbsp;&nbsp;"$([Environment]::GetEnvironmentVariable('Path', 'User'));$dir", 'User')</div>
+                        <div>$env:Path = "$env:Path;$dir"</div>
+                        <div class="pt-2">netsuke --version</div>
+                    </div>
+                    <p class="mt-6 text-xs text-charcoal-mid">See the <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#complete-windows-setup" class="text-indigo hover:underline">complete Windows setup</a> for the idempotent PATH script and the PowerShell help module install.</p>
+                </div>
+
+                <div class="px-8 lg:px-10 pb-8 pt-2 border-t border-stone-light flex items-start gap-3">
+                    <span  class="iconify text-indigo mt-3" data-icon="carbon:information-filled" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid pt-2.5">
+                        <strong>Note:</strong> Netsuke delegates execution to <code>ninja</code>; make sure it is on your <code>PATH</code>. You may need to restart your terminal after installation for the <code>netsuke</code> command to be recognized.
+                    </p>
                 </div>
             </div>
         </section>
@@ -256,20 +300,30 @@
 {% endblock %}
 {% block extra_body %}
     <script>
-        // Interactive Tabs Logic
+        // Installation tab switcher
         document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('.tab-btn');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active', 'font-bold', 'text-charcoal', 'bg-white'));
-                    tabs.forEach(t => t.classList.add('font-medium', 'text-charcoal-mid'));
+            const tabs = document.querySelectorAll('[data-install-tab]');
+            const panels = document.querySelectorAll('[data-install-panel]');
 
-                    tab.classList.remove('font-medium', 'text-charcoal-mid');
-                    tab.classList.add('active', 'font-bold', 'text-charcoal');
-                    // In a real app, this would switch content. For this UI demo, we just toggle styles.
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const key = tab.getAttribute('data-install-tab');
+
+                    tabs.forEach((other) => {
+                        const active = other === tab;
+                        other.classList.toggle('active', active);
+                        other.classList.toggle('font-bold', active);
+                        other.classList.toggle('text-charcoal', active);
+                        other.classList.toggle('font-medium', !active);
+                        other.classList.toggle('text-charcoal-mid', !active);
+                        other.setAttribute('aria-selected', String(active));
+                    });
+
+                    panels.forEach((panel) => {
+                        panel.classList.toggle('hidden', panel.getAttribute('data-install-panel') !== key);
+                    });
                 });
             });
-
         });
     </script>
 {% endblock %}

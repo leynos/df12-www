@@ -995,3 +995,75 @@ body {
   color: var(--netsuke-charcoal);
   font-weight: 500;
 }
+
+/* BEGIN generated himotoshi-pygments (scripts/generate_himotoshi_pygments_css.py) */
+
+:root {
+  --netsuke-syntax-text: #e5ddd0;
+  --netsuke-syntax-comment: #a39a8e;
+  --netsuke-syntax-comment-preproc: #e0b45c;
+  --netsuke-syntax-keyword: #dba396;
+  --netsuke-syntax-operator: #d1c7b8;
+  --netsuke-syntax-punctuation: #d1c7b8;
+  --netsuke-syntax-punctuation-indicator: #d1c7b8;
+  --netsuke-syntax-name-tag: #a8c3e0;
+  --netsuke-syntax-name-variable: #e0b45c;
+  --netsuke-syntax-name-function: #e0b45c;
+  --netsuke-syntax-name-builtin: #e8d5b5;
+  --netsuke-syntax-literal-string: #8fbf9f;
+  --netsuke-syntax-literal-string-escape: #e0b45c;
+  --netsuke-syntax-literal-number: #d9b36a;
+  --netsuke-syntax-generic-prompt: #8fbf9f;
+  --netsuke-syntax-generic-output: #b8b0a5;
+  --netsuke-syntax-generic-error: #dba396;
+  --netsuke-syntax-error: #dba396;
+}
+
+.hm-syntax {
+  background: var(--netsuke-charcoal);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.hm-syntax pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* Inside faux-window chrome the container already pads and colours. */
+.hm-faux-window__body .hm-syntax,
+.hm-example-code-block .hm-syntax,
+.hm-example-terminal__body .hm-syntax {
+  background: transparent;
+  border-radius: 0;
+}
+
+.hm-faux-window__body .hm-syntax pre,
+.hm-example-code-block .hm-syntax pre,
+.hm-example-terminal__body .hm-syntax pre {
+  padding: 0;
+}
+
+.hm-syntax { color: var(--netsuke-syntax-text); }
+.hm-syntax .c { color: var(--netsuke-syntax-comment); font-style: italic; }
+.hm-syntax .cp { color: var(--netsuke-syntax-comment-preproc); }
+.hm-syntax .k { color: var(--netsuke-syntax-keyword); }
+.hm-syntax .o { color: var(--netsuke-syntax-operator); }
+.hm-syntax .p { color: var(--netsuke-syntax-punctuation); }
+.hm-syntax .p p-Indicator { color: var(--netsuke-syntax-punctuation-indicator); }
+.hm-syntax .nt { color: var(--netsuke-syntax-name-tag); }
+.hm-syntax .nv { color: var(--netsuke-syntax-name-variable); }
+.hm-syntax .nf { color: var(--netsuke-syntax-name-function); }
+.hm-syntax .nb { color: var(--netsuke-syntax-name-builtin); }
+.hm-syntax .s { color: var(--netsuke-syntax-literal-string); }
+.hm-syntax .se { color: var(--netsuke-syntax-literal-string-escape); }
+.hm-syntax .m { color: var(--netsuke-syntax-literal-number); }
+.hm-syntax .gp { color: var(--netsuke-syntax-generic-prompt); font-weight: 600; }
+.hm-syntax .go { color: var(--netsuke-syntax-generic-output); }
+.hm-syntax .gr { color: var(--netsuke-syntax-generic-error); }
+.hm-syntax .err { color: var(--netsuke-syntax-error); }
+
+/* END generated himotoshi-pygments */

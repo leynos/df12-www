@@ -5,7 +5,7 @@ This ExecPlan (execution plan) is a living document. The sections
 `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
 proceeds.
 
-Status: DRAFT
+Status: IN PROGRESS
 
 ## Purpose / big picture
 
@@ -109,9 +109,14 @@ extension existed.
 
 ## Progress
 
-- [ ] Stage A: approval of this plan.
-- [ ] Stage B: red tests for lexers, style, and extension.
-- [ ] Stage C: pipeline implementation (lexers, style, CSS, extension).
+- [x] (2026-07-30 18:05Z) Stage A: plan approved by the requester,
+  including the in-house extension and accessibility affordances.
+- [x] (2026-07-30 18:15Z) Stage B: red tests added; all four failed for
+  the expected reasons (`ClassNotFound`, `TemplateSyntaxError`).
+- [x] (2026-07-30 18:35Z) Stage C: lexers, style, entry points, extension,
+  environment wiring, and generated `.hm-syntax` CSS; tests green; contrast
+  validated (all tokens at 5.0:1 or better; comment tint lifted to
+  `#a39a8e`).
 - [ ] Stage D: template migration, page by page.
 - [ ] Stage E: refactor, screenshots, retrospective.
 
@@ -135,6 +140,14 @@ extension existed.
   style, CSS, and migration.
 
 ## Decision log
+
+- Decision: the `{% highlight %}` body must wrap Jinja-bearing source in
+  `{% raw %}` (documented in `df12_pages/jinja_highlight.py`).
+  Rationale: Jinja lexes the tag body before any extension runs, so
+  `{{ ins }}` placeholders would be interpolated away; a lexer-level tag
+  like `raw` is the only way to protect them, and the sub-site templates
+  already use `raw` blocks pervasively.
+  Date/Author: 2026-07-30, Claude (implementation).
 
 - Decision: implement the template tag as a small in-house Jinja extension
   (`df12_pages/jinja_highlight.py`) modelled on `jinja2-highlight`'s

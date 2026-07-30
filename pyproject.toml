@@ -22,6 +22,13 @@ dependencies = [
 [project.scripts]
 pages = "df12_pages:main"
 
+[project.entry-points."pygments.lexers"]
+netsuke = "df12_pages.highlighting:NetsukeLexer"
+netsuke-console = "df12_pages.highlighting:NetsukeConsoleLexer"
+
+[project.entry-points."pygments.styles"]
+himotoshi = "df12_pages.highlighting:HimotoshiStyle"
+
 [dependency-groups]
 dev = [
     "pytest",

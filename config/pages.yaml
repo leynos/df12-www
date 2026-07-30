@@ -560,10 +560,10 @@ sites:
         label: Blog
         template: pages/blog.jinja
         output_slug: blog
-      - key: contributing
+      - key: guides-contributing
         label: Contributing
-        template: pages/contributing.jinja
-        output_slug: contributing
+        template: pages/guides-contributing.jinja
+        output_slug: guides/contributing
       - key: design
         label: Design
         template: pages/design.jinja

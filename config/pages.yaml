@@ -418,14 +418,24 @@ pages:
 shared_content:
   terms-of-use:
     label: "Terms of Use"
+    eyebrow: "Website Terms"
+    summary: "Website usage terms and conditions."
     source: config/shared/terms-of-use.md
     output_slug: terms-of-use
   privacy-policy:
     label: "Privacy Policy"
+    eyebrow: "Customer Privacy Notice"
+    summary: >-
+      This privacy notice tells you what to expect us to do with your personal
+      information.
     source: config/shared/privacy-policy.md
     output_slug: privacy-policy
   code-of-conduct:
     label: "Code of Conduct"
+    eyebrow: "Contributor Covenant 3.0"
+    summary: >-
+      This project follows the Contributor Covenant Code of Conduct,
+      version 3.0.
     source: config/shared/code-of-conduct.md
     output_slug: code-of-conduct
 

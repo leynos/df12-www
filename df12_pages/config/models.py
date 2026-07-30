@@ -258,6 +258,8 @@ class SharedContentConfig:
     label: str
     source: str
     output_slug: str
+    eyebrow: str | None = None
+    summary: str | None = None
 
 
 @dc.dataclass(slots=True)

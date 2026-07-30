@@ -286,11 +286,15 @@ def _build_shared_content_map(
                     (candidate for candidate in candidates if candidate.exists()),
                     candidates[0],
                 )
+        eyebrow = payload.get("eyebrow")
+        summary = payload.get("summary")
         result[key] = SharedContentConfig(
             key=key,
             label=str(label),
             source=str(resolved_source),
             output_slug=str(output_slug),
+            eyebrow=str(eyebrow) if eyebrow else None,
+            summary=str(summary) if summary else None,
         )
     return result
 

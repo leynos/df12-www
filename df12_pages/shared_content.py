@@ -60,7 +60,7 @@ class SharedContentGenerator:
             lstrip_blocks=True,
         )
         self.template = self.env.get_template(self.template_name)
-        self._markdown_extensions = ["sane_lists", "tables", "fenced_code"]
+        self._markdown_extensions = ["sane_lists", "tables", "fenced_code", "smarty"]
 
     def run(self) -> Path:
         """Fetch or read markdown, render HTML, wrap in template, and write.
@@ -88,6 +88,8 @@ class SharedContentGenerator:
 
         context = {
             "title": self.shared_config.label,
+            "eyebrow": self.shared_config.eyebrow,
+            "summary": self.shared_config.summary,
             "body_html": body_html,
             "generated_at": dt.datetime.now(dt.UTC),
             "nav_links": page_chrome.nav_links if page_chrome else [],

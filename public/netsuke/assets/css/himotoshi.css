@@ -237,6 +237,10 @@ body {
   box-shadow: var(--netsuke-paper-shadow);
 }
 
+.hm-filter-shell__row {
+  padding-inline: 1rem;
+}
+
 .hm-sidebar-card {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(209, 199, 184, 0.85);
@@ -304,7 +308,12 @@ body {
   padding: 0;
 }
 
+/* Iconify swaps each icon span for an <svg>, and Tailwind's preflight sets
+   svg { display: block }, which would break the file name onto its own line. */
 .hm-file-tree-item {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
   padding-left: 1.5rem;
   position: relative;
 }
@@ -507,6 +516,142 @@ body {
   top: 50%;
   transform: translateY(-50%);
   width: 6px;
+}
+
+/* Long-form prose rendered from shared Markdown sources, where the generated
+   markup carries no utility classes of its own. */
+.hm-prose {
+  line-height: 2;
+}
+
+.hm-prose > * + * {
+  margin-top: 1.5rem;
+}
+
+.hm-prose h2 {
+  font-family: "Fraunces", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 2rem;
+  margin-top: 2.5rem;
+}
+
+.hm-prose h3 {
+  font-family: "Fraunces", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.75rem;
+  margin-top: 2rem;
+}
+
+.hm-prose h4 {
+  font-family: "Fraunces", serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.6rem;
+  margin-top: 1.75rem;
+}
+
+.hm-prose > :first-child {
+  margin-top: 0;
+}
+
+.hm-prose ul,
+.hm-prose ol {
+  padding-left: 1.5rem;
+}
+
+.hm-prose ul {
+  list-style: disc;
+}
+
+.hm-prose ol {
+  list-style: decimal;
+}
+
+.hm-prose li + li {
+  margin-top: 0.5rem;
+}
+
+.hm-prose li > ul,
+.hm-prose li > ol {
+  margin-top: 0.5rem;
+}
+
+.hm-prose a {
+  color: var(--netsuke-indigo);
+  text-decoration-color: var(--netsuke-stone);
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+  transition: color 180ms ease;
+}
+
+.hm-prose a:hover {
+  color: var(--netsuke-vermillion);
+}
+
+.hm-prose strong {
+  color: var(--netsuke-charcoal);
+  font-weight: 600;
+}
+
+.hm-prose code {
+  background: var(--netsuke-boxwood-pale);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 0.25rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875em;
+  padding: 0.1rem 0.35rem;
+}
+
+.hm-prose pre {
+  background: var(--netsuke-charcoal);
+  border-radius: 0.75rem;
+  color: var(--netsuke-stone-light);
+  line-height: 1.6;
+  overflow-x: auto;
+  padding: 1.25rem;
+}
+
+.hm-prose pre code {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 0.875rem;
+  padding: 0;
+}
+
+.hm-prose blockquote {
+  border-left: 3px solid var(--netsuke-stone);
+  color: var(--netsuke-charcoal-mid);
+  padding-left: 1.25rem;
+}
+
+.hm-prose hr {
+  border: 0;
+  border-top: 1px solid var(--netsuke-stone);
+  margin-block: 2.5rem;
+}
+
+.hm-prose table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.hm-prose th,
+.hm-prose td {
+  border: 1px solid var(--netsuke-stone);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.hm-prose th {
+  background: var(--netsuke-boxwood-light);
+  font-weight: 600;
 }
 
 @media (max-width: 1023.98px) {

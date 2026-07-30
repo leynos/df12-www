@@ -1,33 +1,6 @@
 {% extends "doc_page.jinja" %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Multi-Format Documentation - Netsuke Examples{% endblock %}
-{% block extra_head %}
-    <style>
-        .file-tree-item {
-            position: relative;
-            padding-left: 1.5rem;
-        }
-        .file-tree-item::before {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background-color: #D1C7B8;
-        }
-        .file-tree-item:last-child::before { height: 14px; }
-        .file-tree-item::after {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 14px;
-            width: 12px;
-            height: 1px;
-            background-color: #D1C7B8;
-        }
-    </style>
-{% endblock %}
 {% block content %}
 {% raw %}
 <main id="main-content" class="flex-grow pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -66,11 +39,11 @@
                     <div class="grid md:grid-cols-2 gap-8">
                         <div class="font-mono text-sm text-charcoal-mid bg-boxwood-pale p-6 rounded-lg border border-stone">
                             <div class="flex items-center mb-2"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span class="font-bold">book-project/</span></div>
-                            <div class="file-tree-item"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span>chapters/</span></div>
-                            <div class="file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:document" aria-hidden="true"></span><span>01-intro.md</span></div>
-                            <div class="file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:document" aria-hidden="true"></span><span>02-build-graph.md</span></div>
-                            <div class="file-tree-item"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span>build/</span></div>
-                            <div class="file-tree-item"><span class="iconify text-vermillion mr-2" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>chapters/</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>01-intro.md</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>02-build-graph.md</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>build/</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-vermillion" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></div>
                         </div>
                         <div class="flex flex-col justify-center space-y-4">
                             <p class="text-charcoal-mid">This manifest walks chapter files, writes `.tex` output into `build/`, then drives `latexmk` to produce a final `build/book.pdf`.</p>

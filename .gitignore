@@ -233,5 +233,8 @@ target/
 
 # Misc tooling
 .crush/
+.grepai/
+.memdb/
+.claude/
 
 terraform.tfvars.*

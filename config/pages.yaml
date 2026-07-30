@@ -624,6 +624,14 @@ sites:
         label: Guides
         template: pages/guides.jinja
         output_slug: guides
+      - key: guides-translating
+        label: Translating Netsuke
+        template: pages/guides-translating.jinja
+        output_slug: guides/translating
+      - key: guides-writing-examples
+        label: "Writing Examples and Showcases"
+        template: pages/guides-writing-examples.jinja
+        output_slug: guides/writing-examples
       - key: install
         label: Install
         template: pages/install.jinja

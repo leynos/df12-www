@@ -238,11 +238,10 @@ make check-fmt lint test</code></pre>
                     <div>
                         <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">File locations</h3>
                         <div class="bg-white p-5 rounded-xl border border-stone text-xs font-mono space-y-1 text-charcoal-mid">
-                            <div>src/</div>
-                            <div class="pl-4">locales/</div>
-                            <div class="pl-8 text-indigo">en-US/messages.ftl  <span class="text-charcoal-light font-sans">(primary)</span></div>
-                            <div class="pl-8 text-matcha">es-ES/messages.ftl  <span class="text-charcoal-light font-sans">(reference translation)</span></div>
-                            <div class="pl-8 text-amber">fr-FR/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
+                            <div>locales/</div>
+                            <div class="pl-4 text-indigo">en-US/messages.ftl  <span class="text-charcoal-light font-sans">(primary)</span></div>
+                            <div class="pl-4 text-matcha">es-ES/messages.ftl  <span class="text-charcoal-light font-sans">(reference translation)</span></div>
+                            <div class="pl-4 text-amber">fr-FR/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
                         </div>
                     </div>
                     <div>
@@ -307,6 +306,20 @@ progress-target-count = Building { $count -&gt;
                             <li>Remove or rename <code>{ $variable }</code> placeholders</li>
                             <li>Use machine translation without human review</li>
                         </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:book" aria-hidden="true"></span>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-indigo text-sm mb-1">Want the full picture?</h4>
+                        <p class="text-xs text-charcoal-mid mb-3">
+                            This section is the short version. The full localization guide covers message-key domains, variable catalogues,
+                            CLDR plural categories, locale registration in Rust, and the compile-time audit.
+                        </p>
+                        <a href="/netsuke/guides/translating/" class="hm-button hm-button--primary inline-flex items-center px-4 py-2 text-sm">
+                            Read the Translating Netsuke guide <span class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </a>
                     </div>
                 </div>
             </section>

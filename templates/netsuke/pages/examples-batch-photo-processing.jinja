@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Batch Photo Processing - Netsuke Examples{% endblock %}
 {% block content %}
@@ -156,15 +157,9 @@ defaults:
                     </div>
                 </div>
 
-                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                    <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
-                    <p class="text-indigo-100 text-sm mb-4 relative z-10">Switch from media output to interface assets. The same `foreach` pattern can rasterise every SVG in a design directory.</p>
-                    <a href="/netsuke/examples/visual-design-assets/" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
-                        <div class="flex justify-between items-center mb-1"><span class="text-xs font-mono text-amber">Design</span><span class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span></div>
-                        <div class="font-bold text-sm">Visual Design Assets</div>
-                    </a>
-                </div>
+                {% endraw %}
+{{ exdata.up_next('batch-photo-processing') }}
+{% raw %}
                 </div>
             </aside>
         </div>

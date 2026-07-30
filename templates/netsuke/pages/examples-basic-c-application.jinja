@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Basic C Application - Netsuke Examples{% endblock %}
 {% block extra_head %}
@@ -328,20 +329,9 @@
                 </div>
 
                 <!-- Next Example Card -->
-                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                    <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
-                    <p class="text-indigo-100 text-sm mb-4 relative z-10">
-                        Ready for something more complex? Try building a static website pipeline.
-                    </p>
-                    <a href="/netsuke/examples/static-site-pipeline/" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-mono text-amber">Web</span>
-                            <span  class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                        <div class="font-bold text-sm">Static Site Pipeline</div>
-                    </a>
-                </div>
+                {% endraw %}
+{{ exdata.up_next('basic-c-application') }}
+{% raw %}
 
                 </div>
             </aside>

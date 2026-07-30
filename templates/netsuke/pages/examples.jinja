@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Examples Hub - Netsuke Build System{% endblock %}
 {% block content %}
@@ -77,11 +78,9 @@
         <section id="filters" class="hm-filter-shell mb-10 sticky top-20 z-40 py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
             <div class="hm-filter-shell__row flex flex-col sm:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
                 <div class="flex items-center space-x-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 no-scrollbar">
-                    <button type="button" class="hm-chip hm-chip--filter hm-chip--active">All</button>
-                    <button type="button" class="hm-chip hm-chip--filter">Web</button>
-                    <button type="button" class="hm-chip hm-chip--filter">Systems</button>
-                    <button type="button" class="hm-chip hm-chip--filter">Data</button>
-                    <button type="button" class="hm-chip hm-chip--filter">Design</button>
+{% endraw %}
+{{ exdata.filter_buttons() }}
+{% raw %}
                 </div>
 
                 <div
@@ -116,209 +115,11 @@
 
         <!-- Examples Grid -->
         <section id="examples-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-
-            <!-- Example Card: Hello World -->
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1551288049.jpg')] bg-cover bg-center opacity-95"></div>
-                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
-                        <span  class="iconify mr-1 text-amber inline" data-icon="carbon:play-filled" aria-hidden="true"></span> Basics
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Hello World</h3>
-                        <p class="text-sm text-charcoal-mid line-clamp-3">
-                            The smallest useful Netsuke manifest in this repository. Demonstrates `vars`, inline target commands, source files, and default outputs without any reusable rule machinery.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="hm-chip">vars</span>
-                        <span class="hm-chip">defaults</span>
-                        <span class="hm-chip">inline commands</span>
-                    </div>
-
-                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="/netsuke/examples/hello-world/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
-                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </a>
-                        <div class="flex space-x-3">
-                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="https://github.com/leynos/netsuke/tree/main/examples/hello-world" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Example Card: Website Pipeline -->
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1507238691740.jpg')] bg-cover bg-center opacity-95"></div>
-                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
-                        <span  class="iconify mr-1 text-amber inline" data-icon="carbon:application-web" aria-hidden="true"></span> Web
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Static Site Pipeline</h3>
-                        <p class="text-sm text-charcoal-mid line-clamp-3">
-                            Compile Markdown pages with Pandoc, then assemble a shared index page from the generated HTML. Shows `glob`, `foreach`, and a short script rule in one small manifest.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="hm-chip">pandoc</span>
-                        <span class="hm-chip">glob</span>
-                        <span class="hm-chip">script</span>
-                    </div>
-
-                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="/netsuke/examples/static-site-pipeline/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
-                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </a>
-                        <div class="flex space-x-3">
-                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="https://github.com/leynos/netsuke/blob/main/examples/website.yml" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Example Card: Photo Edit -->
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1633525287515.jpg')] bg-cover bg-center opacity-95"></div>
-                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
-                        <span  class="iconify mr-1 text-matcha inline" data-icon="carbon:image" aria-hidden="true"></span> Media
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Batch Photo Processing</h3>
-                        <p class="text-sm text-charcoal-mid line-clamp-3">
-                            Convert a RAW photo directory into JPEG output, then regenerate a gallery page from the generated files. Shows `glob`, `foreach`, `always`, and a preview action.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="hm-chip">darktable-cli</span>
-                        <span class="hm-chip">glob</span>
-                        <span class="hm-chip">actions</span>
-                    </div>
-
-                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="/netsuke/examples/batch-photo-processing/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
-                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </a>
-                        <div class="flex space-x-3">
-                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="https://github.com/leynos/netsuke/blob/main/examples/photo_edit.yml" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Example Card: Design Assets -->
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1618005182384.jpg')] bg-cover bg-center opacity-95"></div>
-                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
-                        <span  class="iconify mr-1 text-vermillion inline" data-icon="carbon:pen-fountain" aria-hidden="true"></span> Design
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Visual Design Assets</h3>
-                        <p class="text-sm text-charcoal-mid line-clamp-3">
-                            Rasterise every SVG in `design/svg/` into PNG output with Inkscape. Shows environment-backed vars, filename transforms, and a clean action without hiding the graph in helper scripts.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="hm-chip">inkscape</span>
-                        <span class="hm-chip">foreach</span>
-                        <span class="hm-chip">env()</span>
-                    </div>
-
-                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="/netsuke/examples/visual-design-assets/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
-                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </a>
-                        <div class="flex space-x-3">
-                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="https://github.com/leynos/netsuke/blob/main/examples/visual_design.yml" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Example Card: Basic C -->
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1518770660439.jpg')] bg-cover bg-center opacity-95"></div>
-                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
-                        <span  class="iconify mr-1 text-amber inline" data-icon="carbon:terminal" aria-hidden="true"></span> C / C++
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Basic C Application</h3>
-                        <p class="text-sm text-charcoal-mid line-clamp-3">
-                            A small C build expressed in plain YAML. Reuse one compile rule, link two object files, and let Netsuke translate the graph for Ninja.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="hm-chip">gcc</span>
-                        <span class="hm-chip">ninja</span>
-                    </div>
-
-                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="/netsuke/examples/basic-c-application/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
-                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </a>
-                        <div class="flex space-x-3">
-                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="https://github.com/leynos/netsuke/blob/main/examples/basic_c.yml" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Example Card: Writing -->
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1455390582262.jpg')] bg-cover bg-center opacity-95"></div>
-                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
-                        <span  class="iconify mr-1 text-boxwood inline" data-icon="carbon:book" aria-hidden="true"></span> Docs
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Multi-Format Documentation</h3>
-                        <p class="text-sm text-charcoal-mid line-clamp-3">
-                            Convert chapter Markdown into TeX, then assemble a PDF with `latexmk`. Shows directory targets, explicit dependencies, and ordered document assembly in one manifest.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="hm-chip">pandoc</span>
-                        <span class="hm-chip">latexmk</span>
-                    </div>
-
-                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="/netsuke/examples/multi-format-documentation/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
-                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </a>
-                        <div class="flex space-x-3">
-                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="https://github.com/leynos/netsuke/blob/main/examples/writing.yml" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
+{% endraw %}
+{% for ex in exdata.examples %}
+{{ exdata.card(ex) }}
+{% endfor %}
+{% raw %}
         </section>
 
         <!-- Contributing Callout -->
@@ -333,10 +134,10 @@
                         The best way to learn Netsuke is by seeing it in action. If you've built something interesting, contribute it to our examples repository.
                     </p>
                     <div class="flex flex-wrap gap-4">
-                        <a href="/netsuke/guides/contributing/" class="inline-flex items-center px-6 py-3 bg-white text-indigo rounded-md font-bold shadow-sm hover:bg-stone-light transition-colors">
+                        <a href="mailto:netsuke@df12.studio" class="inline-flex items-center px-6 py-3 bg-white text-indigo rounded-md font-bold shadow-sm hover:bg-stone-light transition-colors">
                             Submit Example
                         </a>
-                        <a href="/netsuke/guides/contributing/" class="inline-flex items-center px-6 py-3 bg-indigo-light border border-white/20 text-white rounded-md font-bold hover:bg-indigo-light/80 transition-colors">
+                        <a href="/netsuke/guides/writing-examples/" class="inline-flex items-center px-6 py-3 bg-indigo-light border border-white/20 text-white rounded-md font-bold hover:bg-indigo-light/80 transition-colors">
                             Read Contribution Guide
                         </a>
                     </div>
@@ -364,5 +165,6 @@
     </main>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
+    <script defer src="/netsuke/assets/js/examples-hub.js"></script>
 {% endraw %}
 {% endblock %}

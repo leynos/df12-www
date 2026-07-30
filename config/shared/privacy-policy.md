@@ -1,11 +1,14 @@
 # Privacy Policy
 
-## Contact details
+## Contact details { #contact }
 
-For privacy questions, data requests, or complaints, contact us at
-[privacy@df12.studio](mailto:privacy@df12.studio).
+!!! card "@"
+    ### Email
 
-## What information we collect, use, and why
+    For privacy questions, data requests, or complaints, contact us at
+    [privacy@df12.studio](mailto:privacy@df12.studio).
+
+## What information we collect, use, and why { #collect }
 
 We collect or use the following information for **service updates or marketing
 purposes**:
@@ -17,7 +20,7 @@ queries, complaints, or claims**:
 
 - Names and contact details
 
-## Lawful bases and data protection rights
+## Lawful bases and data protection rights { #lawful }
 
 Under UK data protection law, we must have a "lawful basis" for collecting and
 using your personal information. There is a list of possible
@@ -78,15 +81,15 @@ with queries, complaints, or claims** are:
   the right to object. To be clear, you do have the right to withdraw your
   consent at any time.
 
-## Where we get personal information from
+## Where we get personal information from { #infofrom }
 
 - Directly from you
 
-## How long we keep information
+## How long we keep information { #retention }
 
 We keep personal information for 12 months since last contact.
 
-## How to complain
+## How to complain { #complain }
 
 If you have any concerns about our use of your personal data, you can make a
 complaint to us using the contact details at the top of this privacy notice.
@@ -94,10 +97,15 @@ complaint to us using the contact details at the top of this privacy notice.
 If you remain unhappy with how we've used your data after raising a complaint
 with us, you can also complain to the ICO.
 
-### The ICO's address
+!!! card accent "ICO"
+    ### The ICO's address
 
-Information Commissioner's Office, Wycliffe House, Water Lane, Wilmslow,
-Cheshire, SK9 5AF
+    Information Commissioner's Office<br>
+    Wycliffe House<br>
+    Water Lane<br>
+    Wilmslow<br>
+    Cheshire<br>
+    SK9 5AF
 
 Helpline number: 0303 123 1113
 

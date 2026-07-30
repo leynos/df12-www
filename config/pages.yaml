@@ -430,6 +430,10 @@ shared_content:
       information.
     source: config/shared/privacy-policy.md
     output_slug: privacy-policy
+    sections: true
+    toc: true
+    toc_exclude: ["Last updated"]
+    divider_sections: ["Last updated"]
   code-of-conduct:
     label: "Code of Conduct"
     eyebrow: "Contributor Covenant 3.0"
@@ -438,6 +442,10 @@ shared_content:
       version 3.0.
     source: config/shared/code-of-conduct.md
     output_slug: code-of-conduct
+    sections: true
+    toc: true
+    toc_exclude: ["Attribution"]
+    divider_sections: ["Attribution"]
 
 sites:
   mxd:

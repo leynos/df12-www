@@ -908,3 +908,90 @@ body {
     padding: 1rem;
   }
 }
+
+/* Structured shared-content pages (TOC, sections, badge cards) */
+.hm-prose .content-toc {
+  background: var(--netsuke-boxwood-pale);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.hm-prose .content-toc ul {
+  display: grid;
+  gap: 0.75rem;
+  line-height: 1.75;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hm-prose .content-toc li + li {
+  margin-top: 0;
+}
+
+.hm-prose .content-section {
+  margin-top: 2.5rem;
+}
+
+.hm-prose .content-section > * + * {
+  margin-top: 1rem;
+}
+
+.hm-prose .content-section--divider {
+  border-top: 1px solid var(--netsuke-stone);
+  padding-top: 2rem;
+}
+
+.hm-prose .content-card {
+  background: rgb(var(--netsuke-warm-surface-rgb) / 0.88);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 1rem;
+  box-shadow: var(--netsuke-paper-shadow);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.hm-prose .content-card__badge {
+  align-items: center;
+  background: rgb(43 65 98 / 0.1);
+  border-radius: 9999px;
+  color: var(--netsuke-indigo);
+  display: flex;
+  flex: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: 2.5rem;
+  justify-content: center;
+  letter-spacing: 0.1em;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  width: 2.5rem;
+}
+
+.hm-prose .content-card--accent .content-card__badge {
+  background: rgb(194 59 34 / 0.1);
+  color: var(--netsuke-vermillion);
+}
+
+.hm-prose .content-card__body {
+  min-width: 0;
+}
+
+.hm-prose .content-card__body > * + * {
+  margin-top: 0.5rem;
+}
+
+.hm-prose .content-card__body h3 {
+  margin-top: 0;
+}
+
+/* Scroll-spy state for the example-page "On this page" list */
+[data-page-toc] a.is-active {
+  border-color: var(--netsuke-vermillion);
+  color: var(--netsuke-charcoal);
+  font-weight: 500;
+}

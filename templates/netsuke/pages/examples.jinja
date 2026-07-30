@@ -84,16 +84,72 @@
                     <button type="button" class="hm-chip hm-chip--filter">Design</button>
                 </div>
 
-                <div class="relative w-full sm:w-64">
+                <div
+                    class="relative w-full sm:w-64"
+                    data-doc-search-root
+                    data-doc-search-index="/netsuke/assets/search/examples-search.json"
+                >
                     <label for="example-search" class="visually-hidden">Search examples</label>
                     <span  class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
-                    <input id="example-search" type="text" placeholder="Search examples..." class="search-input w-full pl-9 pr-4 py-1.5 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo focus:ring-1 focus:ring-indigo transition-colors">
+                    <input
+                        id="example-search"
+                        type="text"
+                        placeholder="Search examples..."
+                        class="search-input w-full pl-9 pr-4 py-1.5 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo focus:ring-1 focus:ring-indigo transition-colors"
+                        data-doc-search-input
+                        aria-label="Search the examples"
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded="false"
+                    >
+                    <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
+                        <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
+                            <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                            <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                                Type at least 2 characters to search the examples.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Examples Grid -->
         <section id="examples-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+
+            <!-- Example Card: Hello World -->
+            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col">
+                <div class="h-48 bg-charcoal relative overflow-hidden group">
+                     <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1551288049.jpg')] bg-cover bg-center opacity-95"></div>
+                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
+                        <span  class="iconify mr-1 text-amber inline" data-icon="carbon:play-filled" aria-hidden="true"></span> Basics
+                    </div>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="mb-4">
+                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Hello World</h3>
+                        <p class="text-sm text-charcoal-mid line-clamp-3">
+                            The smallest useful Netsuke manifest in this repository. Demonstrates `vars`, inline target commands, source files, and default outputs without any reusable rule machinery.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="hm-chip">vars</span>
+                        <span class="hm-chip">defaults</span>
+                        <span class="hm-chip">inline commands</span>
+                    </div>
+
+                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
+                        <a href="/netsuke/examples/hello-world/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
+                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </a>
+                        <div class="flex space-x-3">
+                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+                            <a href="https://github.com/leynos/netsuke/tree/main/examples/hello-world" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
+                        </div>
+                    </div>
+                </div>
+            </article>
 
             <!-- Example Card: Website Pipeline -->
             <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full">
@@ -263,40 +319,6 @@
                 </div>
             </article>
 
-            <!-- Example Card: Hello World -->
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('/netsuke/assets/example-card-photo-1551288049.jpg')] bg-cover bg-center opacity-95"></div>
-                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
-                        <span  class="iconify mr-1 text-amber inline" data-icon="carbon:play-filled" aria-hidden="true"></span> Basics
-                    </div>
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">Hello World</h3>
-                        <p class="text-sm text-charcoal-mid line-clamp-3">
-                            The smallest useful Netsuke manifest in this repository. Demonstrates `vars`, inline target commands, source files, and default outputs without any reusable rule machinery.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="hm-chip">vars</span>
-                        <span class="hm-chip">defaults</span>
-                        <span class="hm-chip">inline commands</span>
-                    </div>
-
-                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="/netsuke/examples/hello-world/" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
-                            Read Guide <span  class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </a>
-                        <div class="flex space-x-3">
-                            <button class="text-stone hover:text-charcoal transition-colors" title="Copy Snippet"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="https://github.com/leynos/netsuke/tree/main/examples/hello-world" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span  class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
         </section>
 
         <!-- Contributing Callout -->
@@ -340,5 +362,7 @@
         </section>
 
     </main>
+    <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
+    <script defer src="/netsuke/assets/js/doc-search.js"></script>
 {% endraw %}
 {% endblock %}

@@ -295,8 +295,27 @@ def _build_shared_content_map(
             output_slug=str(output_slug),
             eyebrow=str(eyebrow) if eyebrow else None,
             summary=str(summary) if summary else None,
+            sections=bool(payload.get("sections", False)),
+            toc=bool(payload.get("toc", False)),
+            toc_exclude=_string_tuple(payload, "toc_exclude", key),
+            divider_sections=_string_tuple(payload, "divider_sections", key),
         )
     return result
+
+
+def _string_tuple(
+    payload: typ.Mapping[str, typ.Any],
+    field: str,
+    entry_key: str,
+) -> tuple[str, ...]:
+    """Read an optional list of strings from a shared-content entry."""
+    value = payload.get(field)
+    if value is None:
+        return ()
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        msg = f"Shared content '{entry_key}' field '{field}' must be a list of strings."
+        raise SiteConfigError(msg)
+    return tuple(value)
 
 
 def _build_sites_map(

@@ -13,6 +13,7 @@ public/*.html
 public/**/*.html
 public/.df12-pages-*-meta.json
 public/netsuke/assets/search/docs-search.json
+public/netsuke/assets/search/examples-search.json
 public/mxd/assets/tailwind.css
 
 # Project build outputs

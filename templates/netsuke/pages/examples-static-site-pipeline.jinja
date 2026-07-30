@@ -191,12 +191,13 @@ defaults:
                 </section>
             </div>
 
-            <aside class="lg:col-span-4 space-y-8">
-                <div class="bg-white rounded-lg shadow-sm border border-stone p-6 sticky top-24">
+            <aside class="lg:col-span-4">
+                <div class="sticky top-24 space-y-8">
+                <div class="bg-white rounded-lg shadow-sm border border-stone p-6">
                     <h3 class="font-serif text-lg font-bold text-charcoal mb-4">On this page</h3>
-                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1">
+                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1" data-page-toc>
                         <li><a href="#structure" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Directory Structure</a></li>
-                        <li><a href="#manifest" class="block pl-4 text-charcoal font-medium border-l-2 border-vermillion -ml-[1px]">Annotated Manifest</a></li>
+                        <li><a href="#manifest" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Annotated Manifest</a></li>
                         <li><a href="#terminal-preview" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Running the Build</a></li>
                         <li><a href="#build-flow" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Build Flow</a></li>
                     </ul>
@@ -222,8 +223,10 @@ defaults:
                         <div class="font-bold text-sm">Batch Photo Processing</div>
                     </a>
                 </div>
+                </div>
             </aside>
         </div>
     </main>
+    <script defer src="/netsuke/assets/js/example-toc.js"></script>
 {% endraw %}
 {% endblock %}

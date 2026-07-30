@@ -154,15 +154,15 @@
                     <div class="bg-charcoal rounded-lg p-5 font-mono text-sm overflow-x-auto border border-charcoal-mid shadow-lg">
                         <div class="flex text-stone-light">
                             <span class="text-vermillion mr-2">$</span>
-                            <span class="text-boxwood">cargo</span> install netsuke
+                            <span class="text-boxwood">cargo</span> install netsuke-build
                         </div>
                     </div>
                     <span class="sr-only" aria-live="polite" data-copy-status></span>
                 </div>
 
                 <div class="flex items-center text-sm text-charcoal-mid">
-                    <span class="mr-2">Alternatively, install via Cargo:</span>
-                    <code class="bg-stone-light/30 px-2 py-1 rounded font-mono text-charcoal">cargo install netsuke</code>
+                    <span class="mr-2">The crate is published as <code class="bg-stone-light/30 px-1 rounded font-mono text-charcoal">netsuke-build</code>; the installed binary is named</span>
+                    <code class="bg-stone-light/30 px-2 py-1 rounded font-mono text-charcoal">netsuke</code>
                 </div>
             </section>
 
@@ -252,20 +252,10 @@
                         </div>
 
                         <div class="text-stone-light">
-                            <span class="text-charcoal-light">0.02s</span> <span class="text-indigo font-bold">INFO</span>  <span class="text-stone">Parsing Netsukefile...</span>
+                            <span class="text-charcoal-light">[1/2]</span> printf 'Hello, Netsuke!\n' &gt; hello.txt
                         </div>
                         <div class="text-stone-light">
-                            <span class="text-charcoal-light">0.05s</span> <span class="text-indigo font-bold">INFO</span>  <span class="text-stone">Generated build.ninja for 2 targets.</span>
-                        </div>
-                        <div class="text-stone-light mt-2">
-                            <span class="text-charcoal-light">[1/2]</span> <span class="text-amber">Running</span> hello.txt
-                        </div>
-                        <div class="text-stone-light">
-                            <span class="text-charcoal-light">[2/2]</span> <span class="text-amber">Running</span> shout.txt
-                        </div>
-
-                        <div class="text-stone-light mt-4">
-                            <span class="text-matcha font-bold">SUCCESS</span> Build completed in 0.12s
+                            <span class="text-charcoal-light">[2/2]</span> tr 'a-z' 'A-Z' &lt; hello.txt &gt; shout.txt
                         </div>
                         <div class="text-stone-light mt-4">
                              <span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~/my-first-build</span> <span class="text-boxwood">cat shout.txt</span>

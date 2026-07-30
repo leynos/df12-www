@@ -298,9 +298,9 @@
                         <div class="ml-4">
                             <h3 class="text-sm font-bold text-charcoal">CLI Tip: Querying Targets</h3>
                             <div class="mt-2 text-sm text-charcoal-mid">
-                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke manifest</code> to inspect the plan without running a full build.</p>
+                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke generate</code> to inspect the plan without running a full build.</p>
                                 <div class="bg-charcoal text-stone-light p-3 rounded font-mono text-xs">
-                                    $ netsuke graph app
+                                    $ netsuke graph --output build.dot
                                 </div>
                             </div>
                         </div>
@@ -344,7 +344,7 @@
             <section id="performance" class="mb-20 pt-8 border-t border-stone-light">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Performance Impact</h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Using granular targets and proper rule definitions significantly improves build times. Here's a comparison of clean vs. incremental builds with optimized rules.
+                    Using granular targets and proper rule definitions significantly improves build times. The chart below is an illustrative comparison of clean vs. incremental builds with optimized rules, not a measured benchmark.
                 </p>
 
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">

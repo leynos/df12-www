@@ -215,7 +215,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">fetch()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Network</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. HTTPS is the only allowed scheme by default; the <code>--fetch-*</code> CLI options widen or narrow the policy. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             fetch("https://example.com/data", cache=true)
                         </div>
@@ -224,12 +224,12 @@
                     <!-- Function Card 2 -->
                     <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">shell_escape</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Security</span>
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">command_available()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Discovery</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Safely quotes a string for use as a single shell argument. Use this whenever interpolating paths or variables into commands.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns <code>true</code> when an executable can be found on <code>PATH</code>, <code>false</code> otherwise. Accepts the same keyword arguments as <code>which</code>. Ideal in <code>when</code> conditions.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | shell_escape }}
+                            when: command_available('pandoc')
                         </div>
                     </div>
 
@@ -239,7 +239,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">with_suffix</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Replaces the file extension of a path. Accepts an optional count to replace multiple trailing extensions.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Replaces the file extension of a path. Accepts an optional count to replace multiple trailing extensions, and an optional separator (default <code>.</code>).</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ item | basename | with_suffix('.o') }}
                         </div>
@@ -251,7 +251,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">env()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Data</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Read environment variables into the templating context when the manifest needs host-specific values.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Reads one required environment variable. There is no default-value argument; a missing or non-Unicode value is an error.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             env("CC")
                         </div>
@@ -260,12 +260,12 @@
                     <!-- Function Card 5 -->
                     <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">sorted</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Logic</span>
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">basename / dirname</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Sort a list deterministically before it becomes part of the final static graph.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Pure path filters: <code>basename</code> returns the final path component; <code>dirname</code> returns the parent (or <code>.</code> when there is none).</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            glob('build/*.html') | sorted
+                            {{ 'reports/daily.csv' | basename }}
                         </div>
                     </div>
 
@@ -275,9 +275,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">glob</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Finds all files matching a pattern. Use sparingly to maintain explicit dependencies.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Finds workspace paths matching a pattern. Host-observing: results depend on workspace contents and platform. Use sparingly to maintain explicit dependencies.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            glob(include=[], exclude=[])
+                            glob('src/*.c')
                         </div>
                     </div>
                 </div>
@@ -327,7 +327,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">contents</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional <code>encoding</code> argument (default: <code>'utf-8'</code>).</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional encoding argument; <code>'utf-8'</code> (alias <code>'utf8'</code>) is currently the only supported encoding.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ "VERSION" | contents }}
                         </div>
@@ -357,9 +357,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">hash</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Returns the full hex digest of a file. Supports <code>sha256</code> (default) and <code>sha512</code>.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns the full hex digest of a file. Supports <code>sha256</code> (default) and <code>sha512</code>; MD5 and SHA-1 need the <code>legacy-digests</code> build feature.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | hash(alg='sha256') }}
+                            {{ path | hash('sha512') }}
                         </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
@@ -367,9 +367,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">digest</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Returns a truncated hex digest of a file. Accepts <code>len</code> (default: <code>8</code>) and <code>alg</code> arguments. Useful for short cache-busting hashes in output filenames.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns a truncated hex digest of a file. Accepts a length (default: <code>8</code>) and an algorithm (default: <code>sha256</code>). Useful for short cache-busting hashes in output filenames.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | digest(len=8) }}
+                            {{ path | digest(12, 'sha512') }}
                         </div>
                     </div>
                 </div>
@@ -462,7 +462,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">shell()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Pipes the input value as stdin to a shell command string. Returns captured stdout (up to 1 MiB by default). Pass <code>{'mode': 'tempfile'}</code> to stream larger output to a temporary file instead.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Pipes the input value as stdin to a shell command string. Capture mode (the default) returns the command's stdout. Pass <code>{'mode': 'tempfile'}</code> (also spelled <code>stream</code> or <code>streaming</code>) to write bounded output to a persisted temporary file; those modes return the file's path, not its contents.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ user_list | shell('grep admin') }}
                         </div>
@@ -472,9 +472,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">grep()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Filters input lines matching a pattern. The <code>flags</code> argument accepts a string (e.g. <code>'-i'</code>) or list of strings. Implemented via <code>shell</code>.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Runs the host <code>grep</code> executable over the input value. The <code>flags</code> argument is a sequence such as <code>['-i']</code>; availability and flag spelling are platform-dependent. Options share the same modes as <code>shell</code>.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ log_lines | grep('ERROR', flags='-i') }}
+                            {{ log_lines | grep('ERROR', ['-i']) }}
                         </div>
                     </div>
                 </div>
@@ -535,9 +535,9 @@
                 </h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                     Use Jinja's <code>is</code> keyword with these tests to gate targets conditionally.
-                    Type tests do not follow symbolic links; permission tests check for the current user.
+                    Tests are host-observing; a missing path or non-string value yields <code>false</code>, and the symlink test does not follow links.
                 </p>
-                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
                     <div class="bg-white p-4 rounded-lg border border-stone text-xs">
                         <div class="font-bold text-charcoal mb-2">Type tests</div>
                         <div class="space-y-1 font-mono text-charcoal-mid">
@@ -547,24 +547,17 @@
                         </div>
                     </div>
                     <div class="bg-white p-4 rounded-lg border border-stone text-xs">
-                        <div class="font-bold text-charcoal mb-2">Permission tests</div>
+                        <div class="font-bold text-charcoal mb-2">Special-file tests <span class="text-charcoal-light font-normal">(always <code>false</code> off Unix)</span></div>
                         <div class="space-y-1 font-mono text-charcoal-mid">
-                            <div><code class="text-indigo">is readable</code></div>
-                            <div><code class="text-indigo">is writable</code></div>
-                            <div><code class="text-indigo">is executable</code></div>
-                        </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
-                        <div class="font-bold text-charcoal mb-2">Path tests</div>
-                        <div class="space-y-1 font-mono text-charcoal-mid">
-                            <div><code class="text-indigo">is absolute</code></div>
-                            <div><code class="text-indigo">is relative</code></div>
+                            <div><code class="text-indigo">is pipe</code> &mdash; named pipe</div>
+                            <div><code class="text-indigo">is block_device</code> / <code class="text-indigo">is char_device</code></div>
+                            <div><code class="text-indigo">is device</code> &mdash; either device kind</div>
                         </div>
                     </div>
                 </div>
                 <div class="bg-charcoal rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
                     <pre><code><span class="token property">targets</span>:
-  - <span class="token property">when</span>: <span class="token string">env('CC') | which is executable</span>
+  - <span class="token property">when</span>: <span class="token string">'src/main.c' is file and command_available('clang')</span>
     <span class="token property">name</span>: <span class="token string">"build/main.o"</span>
     <span class="token property">rule</span>: <span class="token string">"compile"</span></code></pre>
                 </div>
@@ -662,7 +655,7 @@
             try {
                 // Bar Chart for StdLib Usage
                 const trace1 = {
-                    x: ['glob', 'env', 'basename', 'with_suffix', 'shell_escape', 'fetch', 'which', 'sorted', 'relative_to', 'contents', 'shell', 'now', 'hash', 'uniq', 'flatten'],
+                    x: ['glob', 'env', 'basename', 'with_suffix', 'dirname', 'fetch', 'which', 'command_available', 'relative_to', 'contents', 'shell', 'now', 'hash', 'uniq', 'flatten'],
                     y: [95, 82, 76, 65, 45, 30, 28, 25, 22, 18, 14, 12, 10, 9, 7],
                     type: 'bar',
                     marker: {

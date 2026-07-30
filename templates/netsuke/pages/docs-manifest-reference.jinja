@@ -285,7 +285,7 @@
                                     <code class="font-mono font-bold text-indigo">script</code>
                                     <span class="text-xs text-charcoal-light font-mono">String (multiline)</span>
                                 </div>
-                                <p class="text-sm text-charcoal-mid mt-1">A multi-line script. If it starts with <code>#!</code> it is executed directly; otherwise it runs via <code>/bin/sh -e</code> (or PowerShell on Windows). Mutually exclusive with <code>command</code> and <code>rule</code>.</p>
+                                <p class="text-sm text-charcoal-mid mt-1">A multi-line script executed via <code>/bin/sh -e</code>, so any line failing aborts the step. Mutually exclusive with <code>command</code> and <code>rule</code>.</p>
                             </div>
                         </div>
                     </div>

@@ -239,10 +239,10 @@ make check-fmt lint test</code></pre>
                         <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">File locations</h3>
                         <div class="bg-white p-5 rounded-xl border border-stone text-xs font-mono space-y-1 text-charcoal-mid">
                             <div>src/</div>
-                            <div class="pl-4">locale/</div>
-                            <div class="pl-8 text-indigo">en-US.ftl  <span class="text-charcoal-light font-sans">(primary)</span></div>
-                            <div class="pl-8 text-matcha">es-ES.ftl  <span class="text-charcoal-light font-sans">(reference translation)</span></div>
-                            <div class="pl-8 text-amber">fr-FR.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
+                            <div class="pl-4">locales/</div>
+                            <div class="pl-8 text-indigo">en-US/messages.ftl  <span class="text-charcoal-light font-sans">(primary)</span></div>
+                            <div class="pl-8 text-matcha">es-ES/messages.ftl  <span class="text-charcoal-light font-sans">(reference translation)</span></div>
+                            <div class="pl-8 text-amber">fr-FR/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
                         </div>
                     </div>
                     <div>
@@ -250,7 +250,7 @@ make check-fmt lint test</code></pre>
                         <ol class="space-y-3">
                             <li class="flex items-start text-sm">
                                 <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">1</span>
-                                <span class="text-charcoal-mid">Copy <code class="font-mono">en-US.ftl</code> to a new file named after your locale identifier (e.g. <code class="font-mono">fr-FR.ftl</code>).</span>
+                                <span class="text-charcoal-mid">Copy <code class="font-mono">locales/en-US/messages.ftl</code> to a new directory named after your locale identifier (e.g. <code class="font-mono">locales/fr-FR/messages.ftl</code>).</span>
                             </li>
                             <li class="flex items-start text-sm">
                                 <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">2</span>
@@ -270,10 +270,10 @@ make check-fmt lint test</code></pre>
 
                 <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Fluent format essentials</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
-                    Fluent handles pluralisation and variable substitution natively. Here is an extract from <code>en-US.ftl</code> to orient you:
+                    Fluent handles pluralisation and variable substitution natively. Here is an extract from <code>en-US/messages.ftl</code> to orient you:
                 </p>
                 <div class="bg-charcoal rounded-xl overflow-hidden mb-6">
-                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">en-US.ftl (excerpt)</div>
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">en-US/messages.ftl (excerpt)</div>
                     <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Simple message</span>
 cli-help-description = A modern build system for intuitive, fast builds.
 
@@ -292,7 +292,7 @@ progress-target-count = Building { $count -&gt;
                     <div class="bg-matcha/5 border border-matcha/20 rounded-lg p-4 text-xs">
                         <h4 class="font-bold text-matcha mb-2">Do</h4>
                         <ul class="space-y-1 text-charcoal-mid">
-                            <li>Keep key names identical to <code>en-US.ftl</code></li>
+                            <li>Keep key names identical to <code>en-US/messages.ftl</code></li>
                             <li>Translate the <em>values</em> on the right of <code>=</code></li>
                             <li>Keep all <code>{ $variable }</code> placeholders</li>
                             <li>Adapt plural forms to your language's rules</li>
@@ -303,7 +303,7 @@ progress-target-count = Building { $count -&gt;
                         <h4 class="font-bold text-vermillion mb-2">Do not</h4>
                         <ul class="space-y-1 text-charcoal-mid">
                             <li>Rename message keys</li>
-                            <li>Add keys that do not exist in <code>en-US.ftl</code></li>
+                            <li>Add keys that do not exist in <code>en-US/messages.ftl</code></li>
                             <li>Remove or rename <code>{ $variable }</code> placeholders</li>
                             <li>Use machine translation without human review</li>
                         </ul>

@@ -67,7 +67,7 @@
                 <div class="p-8 lg:p-10">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Install with Cargo</h3>
-                        <p class="text-charcoal-mid text-sm">The reviewed docs describe Cargo builds and release artefacts. Use Cargo when in doubt, then verify that <code>ninja</code> is installed separately.</p>
+                        <p class="text-charcoal-mid text-sm">Netsuke is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Install with Cargo, then verify that <code>ninja</code> is installed separately.</p>
                     </div>
 
                     <div class="bg-charcoal rounded-lg p-6 relative group code-block-wrapper">
@@ -77,7 +77,7 @@
                             </button>
                         </div>
                         <code class="font-mono text-sm text-stone-light break-all">
-                            <span class="text-vermillion">cargo</span> install netsuke
+                            <span class="text-vermillion">cargo</span> install netsuke-build
                         </code>
                     </div>
 
@@ -126,7 +126,7 @@
                                 <span class="text-matcha mr-3">➜</span>
                                 <span>netsuke --version</span>
                             </div>
-                            <div class="text-boxwood mt-1">netsuke 0.x.y</div>
+                            <div class="text-boxwood mt-1">netsuke 0.1.0</div>
                         </div>
                     </div>
 
@@ -196,7 +196,7 @@
                          <h3 class="font-serif text-lg font-bold text-charcoal mb-4">
                             Manual Download
                         </h3>
-                        <p class="text-xs text-charcoal-mid mb-4">Prefer not to use a script? Download the binary directly.</p>
+                        <p class="text-xs text-charcoal-mid mb-4">Prebuilt binaries are not yet published; watch the releases page for future artefacts, or build from source with Cargo.</p>
 
                         <div class="mt-4 text-center">
                              <a href="https://github.com/leynos/netsuke/releases" class="hm-button hm-button--ghost inline-flex items-center px-5 py-2.5 text-sm">
@@ -231,21 +231,21 @@
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal text-lg mb-2">Can I install a specific version?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Use Cargo with a semantic version number: <code>cargo install netsuke --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>0.4.0</code>, not <code>v0.4.0</code>). Check the <a href="https://github.com/leynos/netsuke/releases" class="text-indigo hover:underline">GitHub releases page</a> for available versions.
+                        Yes. Use Cargo with a semantic version number: <code>cargo install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>0.1.0</code>, not <code>v0.1.0</code>). Check <a href="https://crates.io/crates/netsuke-build" class="text-indigo hover:underline">crates.io</a> for available versions.
                     </p>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal text-lg mb-2">How do I update Netsuke?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Simply run the install script again. It will detect the existing installation and replace the binary with the latest version.
+                        Run <code>cargo install netsuke-build --force</code>. Cargo replaces the existing <code>netsuke</code> binary with the latest published version.
                     </p>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal text-lg mb-2">Does it work with CI/CD?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Install Netsuke on your continuous integration (CI) agent via Cargo or a pre-built binary and run <code>netsuke build</code> as a build step. When standard output (stdout) is not a teletype/terminal (TTY), progress falls back to plain text automatically. Dedicated CI integrations are planned but not yet available.
+                        Yes. Install Netsuke on your continuous integration (CI) agent via <code>cargo install netsuke-build</code> and run <code>netsuke build</code> as a build step. When standard error (stderr) is not a teletype/terminal (TTY), progress falls back to plain text automatically, and <code>--json</code> emits a machine-readable result document. Dedicated CI integrations are planned but not yet available.
                     </p>
                 </div>
             </div>

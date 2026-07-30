@@ -185,7 +185,7 @@ $ netsuke \
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Vulnerability Mitigation</h3>
                     <p class="text-xs text-charcoal-mid mb-4">Qualitative comparison based on documented safety features; no numeric mitigation claim is implied.</p>
-                    <div id="securityChart" class="h-[300px] w-full">
+                    <div id="securityChart" class="h-[400px] w-full">
                         <p class="text-xs text-charcoal-mid">Sandboxing and capability checks provide stronger qualitative mitigation than direct execution. Interactive charting requires JavaScript.</p>
                     </div>
                 </div>
@@ -222,39 +222,58 @@ $ netsuke \
     <script>
         window.addEventListener('load', function() {
             try {
-                // Security Chart
-                const categories = ['Low', 'Moderate', 'High'];
-                const ordinal = { Low: 1, Moderate: 2, High: 3 };
-                const trace1 = {
-                    x: ['Dependency Confusion', 'Build Injection', 'Environment Leakage', 'Unpinned Deps', 'Cache Poisoning'],
-                    y: ['High', 'High', 'High', 'Moderate', 'Moderate'].map((label) => ordinal[label]),
-                    text: ['High mitigation', 'High mitigation', 'High mitigation', 'Moderate mitigation', 'Moderate mitigation'],
-                    hovertemplate: '%{x}<br>%{text}<extra></extra>',
-                    name: 'Netsuke mitigation',
-                    type: 'bar',
-                    marker: { color: '#4A7C59' } // Matcha (Safe/Success)
-                };
+                const categories = [
+                    'Cache Poisoning',
+                    'Unpinned Deps',
+                    'Environment Leakage',
+                    'Build Injection',
+                    'Dependency Confusion',
+                ];
+                const levels = { Low: 1, Moderate: 2, High: 3 };
+                const netsuke = ['Moderate', 'Moderate', 'High', 'High', 'High'];
+                const adHoc = ['Moderate', 'Moderate', 'Moderate', 'Low', 'Low'];
 
-                const trace2 = {
-                    x: ['Dependency Confusion', 'Build Injection', 'Environment Leakage', 'Unpinned Deps', 'Cache Poisoning'],
-                    y: ['Low', 'Low', 'Moderate', 'Moderate', 'Moderate'].map((label) => ordinal[label]),
-                    text: ['Low mitigation', 'Low mitigation', 'Moderate mitigation', 'Moderate mitigation', 'Moderate mitigation'],
-                    hovertemplate: '%{x}<br>%{text}<extra></extra>',
-                    name: 'Ad hoc script mitigation',
+                const bar = (name, values, colour) => ({
+                    y: categories,
+                    x: values.map((label) => levels[label]),
+                    customdata: values,
+                    name: name,
                     type: 'bar',
-                    marker: { color: '#C23B22' } // Vermillion (Danger)
-                };
+                    orientation: 'h',
+                    marker: { color: colour },
+                    hovertemplate: '%{y}<br>' + name + ': %{customdata} mitigation<extra></extra>',
+                });
+
+                const data = [
+                    bar('Ad hoc scripts', adHoc, '#C48B2C'),
+                    bar('Netsuke', netsuke, '#3A5A7C'),
+                ];
 
                 const layout = {
-                    title: { text: 'Relative mitigation posture', font: { family: 'Fraunces', size: 16, color: '#2E2A25' } },
                     barmode: 'group',
-                    margin: { t: 50, r: 20, b: 60, l: 50 },
+                    bargap: 0.35,
+                    bargroupgap: 0.12,
+                    margin: { t: 8, r: 16, b: 48, l: 160 },
                     plot_bgcolor: '#FFFFFF',
                     paper_bgcolor: '#FFFFFF',
-                    font: { family: 'Source Sans 3', color: '#5C554D' },
-                    xaxis: { gridcolor: '#F5EDE0', tickangle: -15 },
-                    yaxis: { gridcolor: '#F5EDE0', range: [0, 3.5], tickmode: 'array', tickvals: [1, 2, 3], ticktext: categories, title: 'Mitigation level' },
-                    legend: { orientation: 'h', y: -0.2 }
+                    font: { family: 'Source Sans 3', size: 13, color: '#5C554D' },
+                    xaxis: {
+                        gridcolor: '#F5EDE0',
+                        range: [0, 3.2],
+                        tickmode: 'array',
+                        tickvals: [1, 2, 3],
+                        ticktext: ['Low', 'Moderate', 'High'],
+                        title: { text: 'Mitigation level', standoff: 12 },
+                    },
+                    yaxis: { automargin: true },
+                    legend: {
+                        orientation: 'h',
+                        x: 0,
+                        xanchor: 'left',
+                        y: 1.12,
+                        yanchor: 'top',
+                        traceorder: 'reversed',
+                    },
                 };
 
                 const chart = document.getElementById('securityChart');
@@ -262,7 +281,7 @@ $ netsuke \
                     return;
                 }
                 chart.innerHTML = '';
-                Plotly.newPlot(chart, [trace1, trace2], layout, {responsive: true, displayModeBar: false});
+                Plotly.newPlot(chart, data, layout, {responsive: true, displayModeBar: false});
 
             } catch(e) {
                 console.error("Chart generation failed:", e);

@@ -8,6 +8,8 @@ import typing as typ
 
 from jinja2 import Environment, FileSystemLoader
 
+from .jinja_highlight import HighlightExtension
+
 if typ.TYPE_CHECKING:
     from pathlib import Path
 
@@ -50,6 +52,7 @@ class ContentPageGenerator:
             autoescape=True,
             trim_blocks=True,
             lstrip_blocks=True,
+            extensions=[HighlightExtension],
         )
 
     def run(self) -> Path:

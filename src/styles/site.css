@@ -785,3 +785,68 @@
     transform: none;
   }
 }
+
+/* Structured shared-content pages (legal pages: TOC, sections, badge cards) */
+.content-toc {
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  padding: 1.25rem 1.5rem;
+}
+
+.content-toc ul {
+  display: grid;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.content-section {
+  margin-top: 2rem;
+}
+
+.content-section--divider {
+  border-top: 1px solid #d1d5db;
+  padding-top: 1.5rem;
+}
+
+.content-card {
+  align-items: flex-start;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1.25rem 1.5rem;
+}
+
+.content-card__badge {
+  align-items: center;
+  background: rgb(37 99 235 / 0.1);
+  border-radius: 9999px;
+  color: #2563eb;
+  display: flex;
+  flex: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: 2.5rem;
+  justify-content: center;
+  margin-top: 0.25rem;
+  width: 2.5rem;
+}
+
+.content-card--accent .content-card__badge {
+  background: rgb(220 38 38 / 0.1);
+  color: #dc2626;
+}
+
+.content-card__body {
+  min-width: 0;
+}
+
+.content-card__body > :first-child {
+  margin-top: 0;
+}

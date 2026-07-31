@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Basic C Application - Netsuke Examples{% endblock %}
 {% block extra_head %}
@@ -9,32 +10,6 @@
         }
         .annotation-marker:hover {
             transform: scale(1.1);
-        }
-
-        .file-tree-item {
-            position: relative;
-            padding-left: 1.5rem;
-        }
-        .file-tree-item::before {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background-color: #D1C7B8;
-        }
-        .file-tree-item:last-child::before {
-            height: 14px;
-        }
-        .file-tree-item::after {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 14px;
-            width: 12px;
-            height: 1px;
-            background-color: #D1C7B8;
         }
     </style>
 {% endblock %}
@@ -89,7 +64,7 @@
                     <a href="https://github.com/leynos/netsuke/archive/refs/heads/main.zip" class="hm-button hm-button--primary inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto">
                         <span  class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span> Download Repository Source
                     </a>
-                    <a href="https://github.com/leynos/netsuke/tree/main/docs/examples/basic-c-application" class="hm-button hm-button--ghost inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto">
+                    <a href="https://github.com/leynos/netsuke/blob/main/examples/basic_c.yml" class="hm-button hm-button--ghost inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto">
                         <span  class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span> View on GitHub
                     </a>
                 </div>
@@ -112,20 +87,20 @@
                                 <span  class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span>
                                 <span class="font-bold">basic-c/</span>
                             </div>
-                            <div class="file-tree-item">
-                                <span  class="iconify text-stone mr-2" data-icon="carbon:code-reference" aria-hidden="true"></span>
+                            <div class="hm-file-tree-item">
+                                <span  class="iconify text-stone" data-icon="carbon:code-reference" aria-hidden="true"></span>
                                 <span>main.c</span>
                             </div>
-                            <div class="file-tree-item">
-                                <span  class="iconify text-stone mr-2" data-icon="carbon:code-reference" aria-hidden="true"></span>
+                            <div class="hm-file-tree-item">
+                                <span  class="iconify text-stone" data-icon="carbon:code-reference" aria-hidden="true"></span>
                                 <span>utils.c</span>
                             </div>
-                            <div class="file-tree-item">
-                                <span  class="iconify text-stone mr-2" data-icon="carbon:code-reference" aria-hidden="true"></span>
+                            <div class="hm-file-tree-item">
+                                <span  class="iconify text-stone" data-icon="carbon:code-reference" aria-hidden="true"></span>
                                 <span>utils.h</span>
                             </div>
-                            <div class="file-tree-item">
-                                <span  class="iconify text-vermillion mr-2" data-icon="carbon:cube" aria-hidden="true"></span>
+                            <div class="hm-file-tree-item">
+                                <span  class="iconify text-vermillion" data-icon="carbon:cube" aria-hidden="true"></span>
                                 <span class="font-bold text-charcoal">Netsukefile</span>
                             </div>
                         </div>
@@ -157,25 +132,27 @@
                             <div class="absolute top-4 right-4 flex space-x-2">
                                 <button class="text-stone-light hover:text-white transition-colors" title="Copy"><span  class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
                             </div>
-                            <pre><code class="language-yaml"><span class="text-stone-light/50 italic"># Global manifest version</span>
-<span class="text-indigo">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span> <span class="relative inline-block ml-2"><span class="annotation-marker w-5 h-5 rounded-full bg-vermillion text-white text-xs font-bold flex items-center justify-center absolute -top-1 -left-1 shadow-sm">1</span></span>
+                            {% endraw %}{% highlight 'netsuke' %}{% raw %}
+# Global manifest version
+netsuke_version: "1.0.0"
 
-<span class="text-stone-light/50 italic mt-4 block"># Reusable compile step</span>
-<span class="text-indigo">rules</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"compile"</span> <span class="relative inline-block ml-2"><span class="annotation-marker w-5 h-5 rounded-full bg-vermillion text-white text-xs font-bold flex items-center justify-center absolute -top-1 -left-1 shadow-sm">2</span></span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"gcc -c {{ ins }} -o {{ outs }}"</span>
+# Reusable compile step
+rules:
+  - name: "compile"
+    command: "gcc -c {{ ins }} -o {{ outs }}"
 
-<span class="text-stone-light/50 italic mt-4 block"># Targets either reuse a rule or define an inline command</span>
-<span class="text-indigo">targets</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"main.o"</span>
-    <span class="text-amber">rule</span>: <span class="text-matcha">"compile"</span>
-    <span class="text-amber">sources</span>: <span class="text-matcha">"main.c"</span>
+# Targets either reuse a rule or define an inline command
+targets:
+  - name: "main.o"
+    rule: "compile"
+    sources: "main.c"
 
-  - <span class="text-amber">name</span>: <span class="text-matcha">"app"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"gcc {{ ins }} -o {{ outs }}"</span>
-    <span class="text-amber">sources</span>: [<span class="text-matcha">"main.o"</span>, <span class="text-matcha">"utils.o"</span>] <span class="relative inline-block ml-2"><span class="annotation-marker w-5 h-5 rounded-full bg-vermillion text-white text-xs font-bold flex items-center justify-center absolute -top-1 -left-1 shadow-sm">3</span></span>
+  - name: "app"
+    command: "gcc {{ ins }} -o {{ outs }}"
+    sources: ["main.o", "utils.o"]
 
-<span class="text-indigo">defaults</span>: [<span class="text-matcha">"app"</span>]</code></pre>
+defaults: ["app"]
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
 
@@ -222,46 +199,14 @@
                             <div class="w-12"></div>
                         </div>
                         <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
-                            <div class="text-boxwood-pale mb-2">
-                                <span class="text-matcha">➜</span> <span class="text-indigo-light">~/basic-c</span> <span class="text-boxwood">netsuke build app</span>
-                            </div>
-                            <div class="text-stone-light/80 mb-1">
-                                <span class="text-charcoal-light">0.0s</span> <span class="text-indigo font-bold">INFO</span>  Parsed Netsukefile and expanded target graph.
-                            </div>
-                            <div class="text-stone-light/80 mb-1">
-                                <span class="text-charcoal-light">0.1s</span> <span class="text-indigo font-bold">INFO</span>  [1/3] Compiling utils.c
-                            </div>
-                            <div class="text-stone-light/80 mb-1">
-                                <span class="text-charcoal-light">0.2s</span> <span class="text-indigo font-bold">INFO</span>  [2/3] Compiling main.c
-                            </div>
-                            <div class="text-stone-light/80 mb-4">
-                                <span class="text-charcoal-light">0.3s</span> <span class="text-indigo font-bold">INFO</span>  [3/3] Linking app
-                            </div>
-                            <div class="text-stone-light font-bold mb-6">
-                                <span class="text-matcha font-bold">SUCCESS</span> Built target app in 0.35s
-                            </div>
-
-                            <div class="text-boxwood-pale mb-2">
-                                <span class="text-matcha">➜</span> <span class="text-indigo-light">~/basic-c</span> <span class="text-boxwood">./app</span>
-                            </div>
-                            <div class="text-stone-light">
-                                Hello from Netsuke C Example!
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex flex-col md:flex-row gap-4">
-                        <div class="flex-1 p-4 bg-white border border-stone rounded-lg shadow-sm">
-                            <h4 class="font-bold text-charcoal mb-2 text-sm">Build Artifacts</h4>
-                            <p class="text-sm text-charcoal-mid">
-                                This example writes the executable to <code class="bg-boxwood-pale px-1 rounded border border-stone text-xs">./app</code>. The important part is that the output path is explicit in the manifest.
-                            </p>
-                        </div>
-                        <div class="flex-1 p-4 bg-white border border-stone rounded-lg shadow-sm">
-                            <h4 class="font-bold text-charcoal mb-2 text-sm">Caching</h4>
-                            <p class="text-sm text-charcoal-mid">
-                                Try running the command again. It will complete instantly as Netsuke detects no input changes.
-                            </p>
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke build app
+[1/3] Compiling an object file
+[2/3] Compiling an object file
+[3/3] gcc -Wall -O2 main.o utils.o -o app
+$ ./app
+Hello from C!
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
                 </section>
@@ -306,14 +251,15 @@
             </div>
 
             <!-- Right Column: Sidebar -->
-            <aside class="lg:col-span-4 space-y-8">
+            <aside class="lg:col-span-4">
+                <div class="sticky top-24 space-y-8">
 
                 <!-- Quick Navigation -->
-                <div class="bg-white rounded-lg shadow-sm border border-stone p-6 sticky top-24">
+                <div class="bg-white rounded-lg shadow-sm border border-stone p-6">
                     <h3 class="font-serif text-lg font-bold text-charcoal mb-4">On this page</h3>
-                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1">
+                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1" data-page-toc>
                         <li><a href="#structure" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Directory Structure</a></li>
-                        <li><a href="#manifest" class="block pl-4 text-charcoal font-medium border-l-2 border-vermillion -ml-[1px]">Annotated Manifest</a></li>
+                        <li><a href="#manifest" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Annotated Manifest</a></li>
                         <li><a href="#terminal-preview" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Running the Build</a></li>
                         <li><a href="#dependency-graph" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Dependency Graph</a></li>
                     </ul>
@@ -340,7 +286,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/netsuke/docs/cli-security-and-configuration/#cli" class="flex items-start group">
+                                <a href="/netsuke/docs/cli/" class="flex items-start group">
                                     <span  class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:terminal" aria-hidden="true"></span>
                                     <div>
                                         <span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">CLI Reference</span>
@@ -353,24 +299,15 @@
                 </div>
 
                 <!-- Next Example Card -->
-                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                    <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
-                    <p class="text-indigo-100 text-sm mb-4 relative z-10">
-                        Ready for something more complex? Try building a static website pipeline.
-                    </p>
-                    <a href="/netsuke/examples/static-site-pipeline/" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-mono text-amber">Web</span>
-                            <span  class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                        <div class="font-bold text-sm">Static Site Pipeline</div>
-                    </a>
-                </div>
+                {% endraw %}
+{{ exdata.up_next('basic-c-application') }}
+{% raw %}
 
+                </div>
             </aside>
         </div>
 
     </main>
+    <script defer src="/netsuke/assets/js/example-toc.js"></script>
 {% endraw %}
 {% endblock %}

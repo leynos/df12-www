@@ -1,0 +1,371 @@
+{#
+  Single source of truth for the example set.
+
+  The examples hub grid, the filter buttons, and the "Up Next" boxes on the
+  example detail pages all render from the ordered `examples` list below.
+  Snippets mirror the shipped manifests in the netsuke repository's
+  `examples/` directory.
+#}
+
+{% set snippet_hello_world %}{% raw %}netsuke_version: "1.0.0"
+
+vars:
+  greeting: "Hello from Netsuke"
+
+targets:
+  - name: output.txt
+    command: "cat input.txt | tr 'a-z' 'A-Z' > output.txt"
+    sources: input.txt
+
+  - name: greeting.txt
+    command: "printf '%s\n' '{{ greeting }}!' > greeting.txt"
+
+defaults:
+  - output.txt
+  - greeting.txt
+{% endraw %}{% endset %}
+
+{% set snippet_static_site %}{% raw %}netsuke_version: "1.0.0"
+
+vars:
+  pages_dir: pages
+  site_dir: site
+  pages:
+    - about
+    - contact
+
+rules:
+  - name: page
+    command: "pandoc {{ ins }} -o {{ outs }}"
+
+  - name: index
+    command: "pandoc --standalone {{ ins }} -o {{ outs }}"
+
+targets:
+  - name: "{{ site_dir }}"
+    command: "mkdir -p {{ outs }}"
+
+  - foreach: pages
+    name: "{{ site_dir }}/{{ item }}.html"
+    rule: page
+    sources: "{{ pages_dir }}/{{ item }}.md"
+    order_only_deps: "{{ site_dir }}"
+
+  - name: "{{ site_dir }}/index.html"
+    rule: index
+    sources:
+      - "{{ pages_dir }}/about.md"
+      - "{{ pages_dir }}/contact.md"
+    order_only_deps: "{{ site_dir }}"
+
+defaults:
+  - site/index.html
+  - site/about.html
+  - site/contact.html
+{% endraw %}{% endset %}
+
+{% set snippet_batch_photo %}{% raw %}netsuke_version: "1.0.0"
+
+vars:
+  out_dir: processed
+  photos:
+    - portrait
+    - landscape
+
+rules:
+  - name: convert_raw
+    command: "darktable-cli {{ ins }} {{ outs }} --core --width 100% --height 100% --quality 92"
+    description: "Converting RAW photo"
+
+  - name: make_gallery
+    command: "make-gallery {{ out_dir }} > {{ outs }}"
+
+targets:
+  - name: "{{ out_dir }}"
+    command: "mkdir -p {{ outs }}"
+
+  - foreach: photos
+    name: "{{ out_dir }}/{{ item }}.jpg"
+    rule: convert_raw
+    sources: "raw_photos/{{ item }}.CR2"
+    order_only_deps: "{{ out_dir }}"
+
+  - name: "{{ out_dir }}/gallery.html"
+    rule: make_gallery
+    sources:
+      - "{{ out_dir }}/portrait.jpg"
+      - "{{ out_dir }}/landscape.jpg"
+    order_only_deps: "{{ out_dir }}"
+    always: true
+
+actions:
+  - name: preview
+    script: |
+      feh {{ out_dir }} &
+
+defaults:
+  - processed/gallery.html
+{% endraw %}{% endset %}
+
+{% set snippet_visual_design %}{% raw %}netsuke_version: "1.0.0"
+
+vars:
+  src_dir: design/svg
+  out_dir: build/raster
+  inkscape: inkscape
+  designs:
+    - hero
+    - logo
+
+rules:
+  - name: rasterise
+    command: "{{ inkscape }} --export-type=png --export-filename={{ outs }} {{ ins }}"
+    description: "Rasterising an SVG file"
+  - name: clean
+    command: "rm -rf {{ out_dir }}"
+
+targets:
+  - name: "{{ out_dir }}"
+    command: "mkdir -p {{ outs }}"
+
+  - foreach: designs
+    name: "{{ out_dir }}/{{ item }}.png"
+    rule: rasterise
+    sources: "{{ src_dir }}/{{ item }}.svg"
+    order_only_deps: "{{ out_dir }}"
+
+actions:
+  - name: clean
+    rule: clean
+
+defaults:
+  - build/raster/hero.png
+{% endraw %}{% endset %}
+
+{% set snippet_basic_c %}{% raw %}netsuke_version: "1.0.0"
+
+vars:
+  cc: gcc
+  cflags: "-Wall -O2"
+
+rules:
+  - name: compile
+    command: "{{ cc }} {{ cflags }} -c {{ ins }} -o {{ outs }}"
+    description: "Compiling an object file"
+
+  - name: link
+    command: "{{ cc }} {{ cflags }} {{ ins }} -o {{ outs }}"
+
+targets:
+  - name: main.o
+    rule: compile
+    sources: src/main.c
+
+  - name: utils.o
+    rule: compile
+    sources: src/utils.c
+
+  - name: app
+    rule: link
+    sources:
+      - main.o
+      - utils.o
+
+actions:
+  - name: run
+    command: "./app"
+
+  - name: clean
+    command: "rm -f *.o app"
+
+defaults:
+  - app
+{% endraw %}{% endset %}
+
+{% set snippet_writing %}{% raw %}netsuke_version: "1.0.0"
+
+vars:
+  chapters_dir: chapters
+  build_dir: build
+  pandoc_flags: "-N --pdf-engine=xelatex"
+  chapters:
+    - introduction
+    - architecture
+
+rules:
+  - name: tex
+    command: "pandoc {{ pandoc_flags }} {{ ins }} -o {{ outs }}"
+
+  - name: combine
+    command: >-
+      pandoc --standalone {{ ins }} -o {{ build_dir }}/book.tex &&
+      latexmk -pdf -outdir={{ build_dir }} {{ build_dir }}/book.tex
+
+  - name: mkdir
+    command: "mkdir -p {{ outs }}"
+
+targets:
+  - foreach: chapters
+    name: "{{ build_dir }}/{{ item }}.tex"
+    rule: tex
+    sources: "{{ chapters_dir }}/{{ item }}.md"
+    deps:
+      - "{{ build_dir }}"
+
+  - name: "{{ build_dir }}/book.pdf"
+    rule: combine
+    sources:
+      - "{{ build_dir }}/introduction.tex"
+      - "{{ build_dir }}/architecture.tex"
+
+  - name: "{{ build_dir }}"
+    rule: mkdir
+
+defaults:
+  - build/book.pdf
+{% endraw %}{% endset %}
+
+{% set examples = [
+  {
+    'key': 'hello-world',
+    'title': 'Hello World',
+    'href': '/netsuke/examples/hello-world/',
+    'github': 'https://github.com/leynos/netsuke/tree/main/examples/hello-world',
+    'category': 'Basics',
+    'cat_icon': 'carbon:play-filled',
+    'cat_colour': 'text-amber',
+    'image': '/netsuke/assets/example-card-photo-1551288049.jpg',
+    'description': 'The smallest useful Netsuke manifest in this repository. Demonstrates `vars`, inline target commands, source files, and default outputs without any reusable rule machinery.',
+    'chips': ['vars', 'defaults', 'inline commands'],
+    'snippet': snippet_hello_world,
+  },
+  {
+    'key': 'static-site-pipeline',
+    'title': 'Static Site Pipeline',
+    'href': '/netsuke/examples/static-site-pipeline/',
+    'github': 'https://github.com/leynos/netsuke/blob/main/examples/website.yml',
+    'category': 'Web',
+    'cat_icon': 'carbon:application-web',
+    'cat_colour': 'text-amber',
+    'image': '/netsuke/assets/example-card-photo-1507238691740.jpg',
+    'description': 'Compile Markdown pages with Pandoc, then assemble a shared index page from the same sources. Shows `foreach`, `order_only_deps`, and reusable rules in one small manifest.',
+    'chips': ['pandoc', 'foreach', 'order_only_deps'],
+    'snippet': snippet_static_site,
+  },
+  {
+    'key': 'batch-photo-processing',
+    'title': 'Batch Photo Processing',
+    'href': '/netsuke/examples/batch-photo-processing/',
+    'github': 'https://github.com/leynos/netsuke/blob/main/examples/photo_edit.yml',
+    'category': 'Media',
+    'cat_icon': 'carbon:image',
+    'cat_colour': 'text-matcha',
+    'image': '/netsuke/assets/example-card-photo-1633525287515.jpg',
+    'description': 'Convert RAW photos into JPEG output, then regenerate a gallery page from the converted files. Shows `foreach`, `always`, and a preview action.',
+    'chips': ['darktable-cli', 'always', 'actions'],
+    'snippet': snippet_batch_photo,
+  },
+  {
+    'key': 'visual-design-assets',
+    'title': 'Visual Design Assets',
+    'href': '/netsuke/examples/visual-design-assets/',
+    'github': 'https://github.com/leynos/netsuke/blob/main/examples/visual_design.yml',
+    'category': 'Design',
+    'cat_icon': 'carbon:pen-fountain',
+    'cat_colour': 'text-vermillion',
+    'image': '/netsuke/assets/example-card-photo-1618005182384.jpg',
+    'description': 'Rasterise every SVG in `design/svg/` into PNG output with Inkscape. Shows variable-driven tooling, filename transforms, and a clean action without hiding the graph in helper scripts.',
+    'chips': ['inkscape', 'foreach', 'with_suffix'],
+    'snippet': snippet_visual_design,
+  },
+  {
+    'key': 'basic-c-application',
+    'title': 'Basic C Application',
+    'href': '/netsuke/examples/basic-c-application/',
+    'github': 'https://github.com/leynos/netsuke/blob/main/examples/basic_c.yml',
+    'category': 'C / C++',
+    'cat_icon': 'carbon:terminal',
+    'cat_colour': 'text-amber',
+    'image': '/netsuke/assets/example-card-photo-1518770660439.jpg',
+    'description': 'A small C build expressed in plain YAML. Reuse one compile rule, link two object files, and let Netsuke translate the graph for Ninja.',
+    'chips': ['gcc', 'rules', 'actions'],
+    'snippet': snippet_basic_c,
+  },
+  {
+    'key': 'multi-format-documentation',
+    'title': 'Multi-Format Documentation',
+    'href': '/netsuke/examples/multi-format-documentation/',
+    'github': 'https://github.com/leynos/netsuke/blob/main/examples/writing.yml',
+    'category': 'Docs',
+    'cat_icon': 'carbon:book',
+    'cat_colour': 'text-boxwood',
+    'image': '/netsuke/assets/example-card-photo-1455390582262.jpg',
+    'description': 'Convert chapter Markdown into TeX, then assemble a PDF with `latexmk`. Shows directory targets, explicit dependencies, and ordered document assembly in one manifest.',
+    'chips': ['pandoc', 'latexmk', 'deps'],
+    'snippet': snippet_writing,
+  },
+] %}
+
+{% macro card(ex) %}
+            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full" data-example-card data-category="{{ ex.category }}" data-snippet="{{ ex.snippet | forceescape }}">
+                <div class="h-48 bg-charcoal relative overflow-hidden group">
+                     <div class="absolute inset-0 bg-[url('{{ ex.image }}')] bg-cover bg-center opacity-95"></div>
+                    <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
+                        <span class="iconify mr-1 {{ ex.cat_colour }} inline" data-icon="{{ ex.cat_icon }}" aria-hidden="true"></span> {{ ex.category }}
+                    </div>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="mb-4">
+                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">{{ ex.title }}</h3>
+                        <p class="text-sm text-charcoal-mid line-clamp-3">
+                            {{ ex.description }}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        {% for chip in ex.chips %}
+                        <span class="hm-chip">{{ chip }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
+                        <a href="{{ ex.href }}" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
+                            Read Guide <span class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </a>
+                        <div class="flex space-x-3">
+                            <button type="button" class="text-stone hover:text-charcoal transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-snippet><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+                            <a href="{{ ex.github }}" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+{% endmacro %}
+
+{% macro filter_buttons() %}
+                    <button type="button" class="hm-chip hm-chip--filter hm-chip--active" data-example-filter="all" aria-pressed="true">All</button>
+                    {% for ex in examples %}
+                    {% if ex.category not in (examples[:loop.index0] | map(attribute='category') | list) %}
+                    <button type="button" class="hm-chip hm-chip--filter" data-example-filter="{{ ex.category }}" aria-pressed="false">{{ ex.category }}</button>
+                    {% endif %}
+                    {% endfor %}
+{% endmacro %}
+
+{% macro up_next(current_key) %}
+{% set ns = namespace(next=none) %}
+{% for ex in examples %}
+{% if ex.key == current_key %}
+{% set ns.next = examples[loop.index % (examples | length)] %}
+{% endif %}
+{% endfor %}
+{% if ns.next %}
+                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
+                    <p class="text-indigo-100 text-sm mb-4 relative z-10">{{ ns.next.description }}</p>
+                    <a href="{{ ns.next.href }}" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
+                        <div class="flex justify-between items-center mb-1"><span class="text-xs font-mono text-amber">{{ ns.next.category }}</span><span class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span></div>
+                        <div class="font-bold text-sm">{{ ns.next.title }}</div>
+                    </a>
+                </div>
+{% endif %}
+{% endmacro %}

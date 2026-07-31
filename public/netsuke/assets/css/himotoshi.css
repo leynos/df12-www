@@ -98,6 +98,29 @@ body {
   color: var(--netsuke-vermillion);
 }
 
+/* In-page sub-headings in the docs sidebar, as opposed to links that
+   navigate to other pages: indented under a rule, smaller and quieter. */
+a.sidebar-link--sub {
+  margin-left: 0.75rem;
+  border-left: 2px solid var(--netsuke-stone-light);
+  padding-left: 0.875rem;
+  font-size: 0.8125rem;
+  color: var(--netsuke-charcoal-light);
+}
+
+a.sidebar-link--sub:hover {
+  border-left-color: var(--netsuke-vermillion);
+  color: var(--netsuke-vermillion);
+}
+
+a.sidebar-link--sub.active {
+  border-left-color: var(--netsuke-vermillion);
+  border-right: none;
+  background-color: transparent;
+  color: var(--netsuke-vermillion);
+  font-weight: 500;
+}
+
 .search-input:focus {
   border-color: var(--netsuke-indigo);
   box-shadow: 0 0 0 2px var(--netsuke-focus-ring);
@@ -237,6 +260,10 @@ body {
   box-shadow: var(--netsuke-paper-shadow);
 }
 
+.hm-filter-shell__row {
+  padding-inline: 1rem;
+}
+
 .hm-sidebar-card {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(209, 199, 184, 0.85);
@@ -304,7 +331,12 @@ body {
   padding: 0;
 }
 
+/* Iconify swaps each icon span for an <svg>, and Tailwind's preflight sets
+   svg { display: block }, which would break the file name onto its own line. */
 .hm-file-tree-item {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
   padding-left: 1.5rem;
   position: relative;
 }
@@ -507,6 +539,142 @@ body {
   top: 50%;
   transform: translateY(-50%);
   width: 6px;
+}
+
+/* Long-form prose rendered from shared Markdown sources, where the generated
+   markup carries no utility classes of its own. */
+.hm-prose {
+  line-height: 2;
+}
+
+.hm-prose > * + * {
+  margin-top: 1.5rem;
+}
+
+.hm-prose h2 {
+  font-family: "Fraunces", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 2rem;
+  margin-top: 2.5rem;
+}
+
+.hm-prose h3 {
+  font-family: "Fraunces", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.75rem;
+  margin-top: 2rem;
+}
+
+.hm-prose h4 {
+  font-family: "Fraunces", serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.6rem;
+  margin-top: 1.75rem;
+}
+
+.hm-prose > :first-child {
+  margin-top: 0;
+}
+
+.hm-prose ul,
+.hm-prose ol {
+  padding-left: 1.5rem;
+}
+
+.hm-prose ul {
+  list-style: disc;
+}
+
+.hm-prose ol {
+  list-style: decimal;
+}
+
+.hm-prose li + li {
+  margin-top: 0.5rem;
+}
+
+.hm-prose li > ul,
+.hm-prose li > ol {
+  margin-top: 0.5rem;
+}
+
+.hm-prose a {
+  color: var(--netsuke-indigo);
+  text-decoration-color: var(--netsuke-stone);
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+  transition: color 180ms ease;
+}
+
+.hm-prose a:hover {
+  color: var(--netsuke-vermillion);
+}
+
+.hm-prose strong {
+  color: var(--netsuke-charcoal);
+  font-weight: 600;
+}
+
+.hm-prose code {
+  background: var(--netsuke-boxwood-pale);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 0.25rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875em;
+  padding: 0.1rem 0.35rem;
+}
+
+.hm-prose pre {
+  background: var(--netsuke-charcoal);
+  border-radius: 0.75rem;
+  color: var(--netsuke-stone-light);
+  line-height: 1.6;
+  overflow-x: auto;
+  padding: 1.25rem;
+}
+
+.hm-prose pre code {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 0.875rem;
+  padding: 0;
+}
+
+.hm-prose blockquote {
+  border-left: 3px solid var(--netsuke-stone);
+  color: var(--netsuke-charcoal-mid);
+  padding-left: 1.25rem;
+}
+
+.hm-prose hr {
+  border: 0;
+  border-top: 1px solid var(--netsuke-stone);
+  margin-block: 2.5rem;
+}
+
+.hm-prose table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.hm-prose th,
+.hm-prose td {
+  border: 1px solid var(--netsuke-stone);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.hm-prose th {
+  background: var(--netsuke-boxwood-light);
+  font-weight: 600;
 }
 
 @media (max-width: 1023.98px) {
@@ -763,3 +931,162 @@ body {
     padding: 1rem;
   }
 }
+
+/* Structured shared-content pages (TOC, sections, badge cards) */
+.hm-prose .content-toc {
+  background: var(--netsuke-boxwood-pale);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.hm-prose .content-toc ul {
+  display: grid;
+  gap: 0.75rem;
+  line-height: 1.75;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hm-prose .content-toc li + li {
+  margin-top: 0;
+}
+
+.hm-prose .content-section {
+  margin-top: 2.5rem;
+}
+
+.hm-prose .content-section > * + * {
+  margin-top: 1rem;
+}
+
+.hm-prose .content-section--divider {
+  border-top: 1px solid var(--netsuke-stone);
+  padding-top: 2rem;
+}
+
+.hm-prose .content-card {
+  background: rgb(var(--netsuke-warm-surface-rgb) / 0.88);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 1rem;
+  box-shadow: var(--netsuke-paper-shadow);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.hm-prose .content-card__badge {
+  align-items: center;
+  background: rgb(43 65 98 / 0.1);
+  border-radius: 9999px;
+  color: var(--netsuke-indigo);
+  display: flex;
+  flex: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: 2.5rem;
+  justify-content: center;
+  letter-spacing: 0.1em;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  width: 2.5rem;
+}
+
+.hm-prose .content-card--accent .content-card__badge {
+  background: rgb(194 59 34 / 0.1);
+  color: var(--netsuke-vermillion);
+}
+
+.hm-prose .content-card__body {
+  min-width: 0;
+}
+
+.hm-prose .content-card__body > * + * {
+  margin-top: 0.5rem;
+}
+
+.hm-prose .content-card__body h3 {
+  margin-top: 0;
+}
+
+/* Scroll-spy state for the example-page "On this page" list */
+[data-page-toc] a.is-active {
+  border-color: var(--netsuke-vermillion);
+  color: var(--netsuke-charcoal);
+  font-weight: 500;
+}
+
+/* BEGIN generated himotoshi-pygments (scripts/generate_himotoshi_pygments_css.py) */
+
+:root {
+  --netsuke-syntax-text: #e5ddd0;
+  --netsuke-syntax-comment: #a39a8e;
+  --netsuke-syntax-comment-preproc: #e0b45c;
+  --netsuke-syntax-keyword: #dba396;
+  --netsuke-syntax-operator: #d1c7b8;
+  --netsuke-syntax-punctuation: #d1c7b8;
+  --netsuke-syntax-punctuation-indicator: #d1c7b8;
+  --netsuke-syntax-name-tag: #a8c3e0;
+  --netsuke-syntax-name-variable: #e0b45c;
+  --netsuke-syntax-name-function: #e0b45c;
+  --netsuke-syntax-name-builtin: #e8d5b5;
+  --netsuke-syntax-literal-string: #8fbf9f;
+  --netsuke-syntax-literal-string-escape: #e0b45c;
+  --netsuke-syntax-literal-number: #d9b36a;
+  --netsuke-syntax-generic-prompt: #8fbf9f;
+  --netsuke-syntax-generic-output: #b8b0a5;
+  --netsuke-syntax-generic-error: #dba396;
+  --netsuke-syntax-error: #dba396;
+}
+
+.hm-syntax {
+  background: var(--netsuke-charcoal);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.hm-syntax pre {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* Inside faux-window chrome the container already pads and colours. */
+.hm-faux-window__body .hm-syntax,
+.hm-example-code-block .hm-syntax,
+.hm-example-terminal__body .hm-syntax {
+  background: transparent;
+  border-radius: 0;
+}
+
+.hm-faux-window__body .hm-syntax pre,
+.hm-example-code-block .hm-syntax pre,
+.hm-example-terminal__body .hm-syntax pre {
+  padding: 0;
+}
+
+.hm-syntax { color: var(--netsuke-syntax-text); }
+.hm-syntax .c { color: var(--netsuke-syntax-comment); font-style: italic; }
+.hm-syntax .cp { color: var(--netsuke-syntax-comment-preproc); }
+.hm-syntax .k { color: var(--netsuke-syntax-keyword); }
+.hm-syntax .o { color: var(--netsuke-syntax-operator); }
+.hm-syntax .p { color: var(--netsuke-syntax-punctuation); }
+.hm-syntax .p p-Indicator { color: var(--netsuke-syntax-punctuation-indicator); }
+.hm-syntax .nt { color: var(--netsuke-syntax-name-tag); }
+.hm-syntax .nv { color: var(--netsuke-syntax-name-variable); }
+.hm-syntax .nf { color: var(--netsuke-syntax-name-function); }
+.hm-syntax .nb { color: var(--netsuke-syntax-name-builtin); }
+.hm-syntax .s { color: var(--netsuke-syntax-literal-string); }
+.hm-syntax .se { color: var(--netsuke-syntax-literal-string-escape); }
+.hm-syntax .m { color: var(--netsuke-syntax-literal-number); }
+.hm-syntax .gp { color: var(--netsuke-syntax-generic-prompt); font-weight: 600; }
+.hm-syntax .go { color: var(--netsuke-syntax-generic-output); }
+.hm-syntax .gr { color: var(--netsuke-syntax-generic-error); }
+.hm-syntax .err { color: var(--netsuke-syntax-error); }
+
+/* END generated himotoshi-pygments */

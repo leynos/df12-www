@@ -16,6 +16,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from .jinja_highlight import HighlightExtension
+
 if typ.TYPE_CHECKING:
     from .config import NavLinkConfig, SubSiteHomepageConfig
 
@@ -60,6 +62,7 @@ class SubSiteHomePageBuilder:
             autoescape=True,
             trim_blocks=True,
             lstrip_blocks=True,
+            extensions=[HighlightExtension],
         )
         self.template = self.env.get_template("home_page.jinja")
 

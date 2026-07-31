@@ -36,3 +36,91 @@ def test_shared_content_uses_parent_relative_stylesheet_by_default(
     assert [heading.get_text(strip=True) for heading in soup.find_all("h1")] == [
         "Privacy Policy"
     ]
+
+
+def test_structured_shared_content_renders_toc_sections_and_cards(
+    tmp_path: Path,
+) -> None:
+    """Structured pages gain a TOC, section wrappers, and badge cards."""
+    source = tmp_path / "privacy-policy.md"
+    source.write_text(
+        "# Privacy Policy\n"
+        "\n"
+        "## Contact details { #contact }\n"
+        "\n"
+        '!!! card "@"\n'
+        "    ### Email\n"
+        "\n"
+        "    Write to us.\n"
+        "\n"
+        "## How to complain { #complain }\n"
+        "\n"
+        '!!! card accent "ICO"\n'
+        "    ### The ICO's address\n"
+        "\n"
+        "    Wilmslow.\n"
+        "\n"
+        "## Last updated\n"
+        "\n"
+        "9 March 2026\n",
+        encoding="utf-8",
+    )
+
+    config = SharedContentConfig(
+        key="privacy-policy",
+        label="Privacy Policy",
+        source=str(source),
+        output_slug="privacy-policy",
+        sections=True,
+        toc=True,
+        toc_exclude=("Last updated",),
+        divider_sections=("Last updated",),
+    )
+
+    output_path = SharedContentGenerator(config, tmp_path).run()
+    soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
+
+    toc = soup.find("nav", class_="content-toc")
+    assert toc is not None
+    toc_targets = [link.get("href") for link in toc.find_all("a")]
+    assert toc_targets == ["#contact", "#complain"]
+
+    section_ids = [section.get("id") for section in soup.find_all("section")]
+    assert section_ids == ["contact", "complain", "last-updated"]
+    divider = soup.find("section", class_="content-section--divider")
+    assert divider is not None
+    assert divider.get("id") == "last-updated"
+
+    badges = [
+        badge.get_text(strip=True)
+        for badge in soup.find_all("div", class_="content-card__badge")
+    ]
+    assert badges == ["@", "ICO"]
+    accent_card = soup.find("div", class_="content-card--accent")
+    assert accent_card is not None
+    assert "admonition" not in output_path.read_text(encoding="utf-8")
+
+
+def test_unstructured_shared_content_body_is_unchanged(tmp_path: Path) -> None:
+    """Pages without structure flags or card markers render as before."""
+    source = tmp_path / "terms.md"
+    source.write_text(
+        "# Terms\n\n## Scope\n\nPlain body copy.\n",
+        encoding="utf-8",
+    )
+
+    config = SharedContentConfig(
+        key="terms-of-use",
+        label="Terms of Use",
+        source=str(source),
+        output_slug="terms-of-use",
+    )
+
+    output_path = SharedContentGenerator(config, tmp_path).run()
+    soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
+
+    assert soup.find("nav", class_="content-toc") is None
+    assert soup.find("section") is None
+    heading = soup.find("h2")
+    assert heading is not None
+    assert heading.get_text(strip=True) == "Scope"

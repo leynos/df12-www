@@ -4,15 +4,6 @@
 {% block extra_head %}
     <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
     <style>
-        /* Syntax Highlighting Base */
-        .token.comment { color: #8A8279; font-style: italic; }
-        .token.string { color: #4A7C59; }
-        .token.keyword { color: #C23B22; font-weight: bold; }
-        .token.function { color: #2B4162; }
-        .token.operator { color: #C48B2C; }
-        .token.number { color: #C48B2C; }
-        .token.property { color: #2E2A25; }
-        .token.type { color: #C48B2C; }
 
         /* Custom Table Styling */
         .prop-table tr:last-child td { border-bottom: none; }
@@ -75,7 +66,6 @@
                     <ul class="space-y-1">
                         <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
                         <li><a href="/netsuke/docs/getting-started/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Getting Started</a></li>
-                        <li><a href="/netsuke/install/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
                     </ul>
                 </div>
 
@@ -84,17 +74,17 @@
                     <ul class="space-y-1">
                         <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
                         <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Rules &amp; Targets</a></li>
-                        <li><a href="/netsuke/docs/templating-and-standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="/netsuke/docs/templating-and-standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
+                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
+                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
                     <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#cli" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#configuration" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#security" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
+                        <li><a href="/netsuke/docs/cli/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
+                        <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
+                        <li><a href="/netsuke/docs/security/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
                     </ul>
                 </div>
             </nav>
@@ -208,18 +198,20 @@
                         <div class="w-12"></div>
                     </div>
                     <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light">
-<pre><code><span class="token property">rules</span>:
-  - <span class="token property">name</span>: <span class="token string">"compile"</span>
-    <span class="token property">command</span>: <span class="token string">"gcc -c {{ ins }} -o {{ outs }}"</span>
-    <span class="token property">description</span>: <span class="token string">"Compiling {{ outs }}"</span>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+rules:
+  - name: "compile"
+    command: "gcc -c {{ ins }} -o {{ outs }}"
+    description: "Compiling {{ outs }}"
 
-  - <span class="token property">name</span>: <span class="token string">"link"</span>
-    <span class="token property">command</span>: <span class="token string">"gcc {{ ins }} -o {{ outs }}"</span>
+  - name: "link"
+    command: "gcc {{ ins }} -o {{ outs }}"
 
-<span class="token property">targets</span>:
-  - <span class="token property">name</span>: <span class="token string">"app"</span>
-    <span class="token property">rule</span>: <span class="token string">"link"</span>
-    <span class="token property">sources</span>: [<span class="token string">"main.o"</span>, <span class="token string">"utils.o"</span>]</code></pre>
+targets:
+  - name: "app"
+    rule: "link"
+    sources: ["main.o", "utils.o"]
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                 </div>
 
@@ -298,9 +290,9 @@
                         <div class="ml-4">
                             <h3 class="text-sm font-bold text-charcoal">CLI Tip: Querying Targets</h3>
                             <div class="mt-2 text-sm text-charcoal-mid">
-                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke manifest</code> to inspect the plan without running a full build.</p>
+                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke generate</code> to inspect the plan without running a full build.</p>
                                 <div class="bg-charcoal text-stone-light p-3 rounded font-mono text-xs">
-                                    $ netsuke graph app
+                                    $ netsuke graph --output build.dot
                                 </div>
                             </div>
                         </div>
@@ -323,7 +315,7 @@
                         <ul class="text-sm text-charcoal-mid space-y-2">
                             <li class="flex items-center"><span class="iconify text-matcha mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Consistent across machines</li>
                             <li class="flex items-center"><span class="iconify text-matcha mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Bit-for-bit identical builds</li>
-                            <li class="flex items-center"><span class="iconify text-matcha mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Byte-for-byte stable <code>build.ninja</code> output</li>
+                            <li class="flex items-center"><span class="iconify text-matcha mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Byte-for-byte stable <code>build.ninja</code> output</span></li>
                         </ul>
                     </div>
 
@@ -335,7 +327,7 @@
                         <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
                             The reviewed docs emphasize validation, deterministic plan generation, and explicit shell escaping. Treat those as the documented safety story.
                         </p>
-                        <a href="/netsuke/docs/cli-security-and-configuration/#security" class="text-indigo text-sm font-medium hover:underline">Read Security Model &rarr;</a>
+                        <a href="/netsuke/docs/security/" class="text-indigo text-sm font-medium hover:underline">Read Security Model &rarr;</a>
                     </div>
                 </div>
             </section>
@@ -344,7 +336,7 @@
             <section id="performance" class="mb-20 pt-8 border-t border-stone-light">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Performance Impact</h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Using granular targets and proper rule definitions significantly improves build times. Here's a comparison of clean vs. incremental builds with optimized rules.
+                    Using granular targets and proper rule definitions significantly improves build times. The chart below is an illustrative comparison of clean vs. incremental builds with optimized rules, not a measured benchmark.
                 </p>
 
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
@@ -365,7 +357,7 @@
                         </div>
                     </a>
 
-                    <a href="/netsuke/docs/templating-and-standard-library/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                    <a href="/netsuke/docs/templating/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
                         <div class="text-right">
                             <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
                             <div class="font-medium text-sm">Templating</div>

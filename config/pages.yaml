@@ -227,7 +227,7 @@ about:
         variant: neutral
   hero:
     name: Payton McIntosh
-    email: pmcintosh@df12.net
+    email: hello@df12.studio
     intro: >-
       The software gremlin behind df12, building small sharp tools, humane infra and retro-tinted experiments in code,
       maps, audio and story.
@@ -238,9 +238,9 @@ about:
       height: 480
   about:
     blurb: >-
-      Payton cares about humane infra, observability and making AI workflows safer, calmer and less brittle. They've
-      spent years leading teams in big organisations; df12 is their way of turning that experience into a coherent
-      boutique studio instead of a junkyard of side projects.
+      Payton has spent years leading teams in large organisations — long enough to know where the sharp edges hide.
+      df12 is their way of turning that scar tissue into a coherent boutique studio instead of a junkyard of side
+      projects.
     location:
       title: Based in Edinburgh, Scotland
       description: Mediaeval skyline, liminal closes, and a surprisingly feral little tech scene.
@@ -248,15 +248,18 @@ about:
   focus:
     cards:
       - title: Humane Infrastructure
-        description: Building systems that respect developer time and cognitive load.
+        description: Building for the people who maintain systems, not just those who use them. Good infra stays out
+          of your way until you need it.
         icon: carbon:person-favorite
         tone: primary
-      - title: Observability
-        description: Making complex systems transparent and understandable.
+      - title: Legible Systems
+        description: If you can't reason about a system, you can't trust it. Observability isn't an add-on — it's
+          the foundation everything else rests on.
         icon: carbon:cloud-monitoring
         tone: accent
-      - title: Safer AI Workflows
-        description: Reducing brittleness in AI-powered systems and tooling.
+      - title: Calmer AI Tooling
+        description: AI workflows fail in novel ways. The answer isn't more guardrails — it's designing for
+          graceful degradation and predictable recovery.
         icon: carbon:ai-governance-lifecycle
         tone: neutral
   principles:
@@ -267,10 +270,10 @@ about:
         description: From installation to first successful run in under five minutes. Every tool includes quickstart 
           documentation.
       - title: Repeatability Over Magic
-        description: Predictable behavior across environments. Green-path repeatability means fewer surprises in 
+        description: Predictable behaviour across environments. Green-path repeatability means fewer surprises in
           production.
       - title: Respect Cognitive Load
-        description: Systems should be transparent and understandable. Complexity exists in the implementation, not the 
+        description: Systems should be legible and unsurprising. Complexity exists in the implementation, not the
           interface.
   footer: *site_footer
 
@@ -418,16 +421,34 @@ pages:
 shared_content:
   terms-of-use:
     label: "Terms of Use"
+    eyebrow: "Website Terms"
+    summary: "Website usage terms and conditions."
     source: config/shared/terms-of-use.md
     output_slug: terms-of-use
   privacy-policy:
     label: "Privacy Policy"
+    eyebrow: "Customer Privacy Notice"
+    summary: >-
+      This privacy notice tells you what to expect us to do with your personal
+      information.
     source: config/shared/privacy-policy.md
     output_slug: privacy-policy
+    sections: true
+    toc: true
+    toc_exclude: ["Last updated"]
+    divider_sections: ["Last updated"]
   code-of-conduct:
     label: "Code of Conduct"
+    eyebrow: "Contributor Covenant 3.0"
+    summary: >-
+      This project follows the Contributor Covenant Code of Conduct,
+      version 3.0.
     source: config/shared/code-of-conduct.md
     output_slug: code-of-conduct
+    sections: true
+    toc: true
+    toc_exclude: ["Attribution"]
+    divider_sections: ["Attribution"]
 
 sites:
   mxd:
@@ -529,8 +550,8 @@ sites:
         href: /netsuke/examples/
       - label: Guides
         href: /netsuke/guides/
-      - label: Blog
-        href: /netsuke/blog/
+      - label: Roadmap
+        href: /netsuke/roadmap/
     shared_content:
       - terms-of-use
       - privacy-policy
@@ -538,14 +559,14 @@ sites:
     homepage:
       title: "Netsuke - Build systems, not build scripts"
     content_pages:
-      - key: blog
-        label: Blog
-        template: pages/blog.jinja
-        output_slug: blog
-      - key: contributing
+      - key: roadmap
+        label: Roadmap
+        template: pages/roadmap.jinja
+        output_slug: roadmap
+      - key: guides-contributing
         label: Contributing
-        template: pages/contributing.jinja
-        output_slug: contributing
+        template: pages/guides-contributing.jinja
+        output_slug: guides/contributing
       - key: design
         label: Design
         template: pages/design.jinja
@@ -554,10 +575,18 @@ sites:
         label: Docs
         template: pages/docs.jinja
         output_slug: docs
-      - key: docs-cli-security-and-configuration
-        label: "CLI, Security, and Configuration"
-        template: pages/docs-cli-security-and-configuration.jinja
-        output_slug: docs/cli-security-and-configuration
+      - key: docs-cli
+        label: CLI Commands
+        template: pages/docs-cli.jinja
+        output_slug: docs/cli
+      - key: docs-configuration
+        label: Configuration
+        template: pages/docs-configuration.jinja
+        output_slug: docs/configuration
+      - key: docs-security
+        label: Security Model
+        template: pages/docs-security.jinja
+        output_slug: docs/security
       - key: docs-getting-started
         label: Getting Started
         template: pages/docs-getting-started.jinja
@@ -570,10 +599,14 @@ sites:
         label: Rules and Targets
         template: pages/docs-rules-and-targets.jinja
         output_slug: docs/rules-and-targets
-      - key: docs-templating-and-standard-library
-        label: Templating and Standard Library
-        template: pages/docs-templating-and-standard-library.jinja
-        output_slug: docs/templating-and-standard-library
+      - key: docs-templating
+        label: Templating
+        template: pages/docs-templating.jinja
+        output_slug: docs/templating
+      - key: docs-standard-library
+        label: Standard Library
+        template: pages/docs-standard-library.jinja
+        output_slug: docs/standard-library
       - key: examples
         label: Examples
         template: pages/examples.jinja
@@ -606,6 +639,14 @@ sites:
         label: Guides
         template: pages/guides.jinja
         output_slug: guides
+      - key: guides-translating
+        label: Translating Netsuke
+        template: pages/guides-translating.jinja
+        output_slug: guides/translating
+      - key: guides-writing-examples
+        label: "Writing Examples and Showcases"
+        template: pages/guides-writing-examples.jinja
+        output_slug: guides/writing-examples
       - key: install
         label: Install
         template: pages/install.jinja

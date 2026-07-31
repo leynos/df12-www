@@ -1,33 +1,7 @@
 {% extends "doc_page.jinja" %}
+{% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Batch Photo Processing - Netsuke Examples{% endblock %}
-{% block extra_head %}
-    <style>
-        .file-tree-item {
-            position: relative;
-            padding-left: 1.5rem;
-        }
-        .file-tree-item::before {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background-color: #D1C7B8;
-        }
-        .file-tree-item:last-child::before { height: 14px; }
-        .file-tree-item::after {
-            content: '';
-            position: absolute;
-            left: 6px;
-            top: 14px;
-            width: 12px;
-            height: 1px;
-            background-color: #D1C7B8;
-        }
-    </style>
-{% endblock %}
 {% block content %}
 {% raw %}
 <main id="main-content" class="flex-grow pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -54,7 +28,7 @@
                 </div>
                 <div class="flex flex-col gap-3 w-full lg:w-auto shrink-0">
                     <a href="/netsuke/examples/" class="inline-flex items-center justify-center px-6 py-3 bg-indigo text-white rounded-md font-medium shadow-sm hover:bg-indigo-light transition-all w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:arrow-left" aria-hidden="true"></span> Back to Examples</a>
-                    <a href="/netsuke/docs/templating-and-standard-library/" class="inline-flex items-center justify-center px-6 py-3 bg-white border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:template" aria-hidden="true"></span> Templating Guide</a>
+                    <a href="/netsuke/docs/templating/" class="inline-flex items-center justify-center px-6 py-3 bg-white border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:template" aria-hidden="true"></span> Templating Guide</a>
                 </div>
             </div>
         </header>
@@ -66,17 +40,17 @@
                     <div class="grid md:grid-cols-2 gap-8">
                         <div class="font-mono text-sm text-charcoal-mid bg-boxwood-pale p-6 rounded-lg border border-stone">
                             <div class="flex items-center mb-2"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span class="font-bold">photo-workflow/</span></div>
-                            <div class="file-tree-item"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span>raw_photos/</span></div>
-                            <div class="file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:image" aria-hidden="true"></span><span>IMG_1001.CR2</span></div>
-                            <div class="file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:image" aria-hidden="true"></span><span>IMG_1002.CR2</span></div>
-                            <div class="file-tree-item"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span>processed/</span></div>
-                            <div class="file-tree-item"><span class="iconify text-vermillion mr-2" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>raw_photos/</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:image" aria-hidden="true"></span><span>IMG_1001.CR2</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:image" aria-hidden="true"></span><span>IMG_1002.CR2</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>processed/</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-vermillion" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></div>
                         </div>
                         <div class="flex flex-col justify-center space-y-4">
-                            <p class="text-charcoal-mid">The manifest treats `raw_photos/*.CR2` as the source set, writes converted JPEGs into `processed/`, then rebuilds `processed/gallery.html` from the output directory.</p>
+                            <p class="text-charcoal-mid">The manifest declares the photo set once, writes converted JPEGs into `processed/`, then rebuilds `processed/gallery.html` from the converted outputs.</p>
                             <div class="text-sm border-l-2 border-indigo pl-4 py-1">
                                 <p class="text-indigo font-medium mb-1">Why it matters</p>
-                                <p class="text-charcoal-light">`glob(...)` is not just a convenience helper. It is how one manifest describes a changing file set and still compiles to a static Ninja graph.</p>
+                                <p class="text-charcoal-light">`foreach` stamps out one target per entry, so a growing photo set stays a one-line change while still compiling to a static Ninja graph. Use `glob('raw_photos/*.CR2')` instead when the set should track the filesystem.</p>
                             </div>
                         </div>
                     </div>
@@ -85,44 +59,55 @@
                 <section id="manifest">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest</h2>
-                        <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">docs/examples/photo_edit.yml</span>
+                        <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/photo_edit.yml</span>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
-<pre><code class="language-yaml">netsuke_version: "1.0.0"
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
 
 vars:
-  raw_dir: raw_photos
   out_dir: processed
+  photos:
+    - portrait
+    - landscape
 
 rules:
   - name: convert_raw
     command: "darktable-cli {{ ins }} {{ outs }} --core --width 100% --height 100% --quality 92"
-    description: "Converting {{ outs }}"
+    description: "Converting RAW photo"
 
   - name: make_gallery
     command: "make-gallery {{ out_dir }} > {{ outs }}"
 
 targets:
-  - foreach: glob(raw_dir ~ '/*.CR2')
-    name: "{{ out_dir }}/{{ item | basename | replace('.CR2', '.jpg') }}"
+  - name: "{{ out_dir }}"
+    command: "mkdir -p {{ outs }}"
+
+  - foreach: photos
+    name: "{{ out_dir }}/{{ item }}.jpg"
     rule: convert_raw
-    sources: "{{ item }}"
+    sources: "raw_photos/{{ item }}.CR2"
+    order_only_deps: "{{ out_dir }}"
 
   - name: "{{ out_dir }}/gallery.html"
     rule: make_gallery
-    sources: "{{ glob(out_dir ~ '/*.jpg') }}"
+    sources:
+      - "{{ out_dir }}/portrait.jpg"
+      - "{{ out_dir }}/landscape.jpg"
+    order_only_deps: "{{ out_dir }}"
     always: true
 
 actions:
   - name: preview
     script: |
-      feh {{ out_dir }} &amp;
+      feh {{ out_dir }} &
 
 defaults:
-  - "{{ out_dir }}/gallery.html"</code></pre>
+  - processed/gallery.html
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="grid gap-4 mt-6">
-                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">One target template, many outputs</h4><p class="text-sm text-charcoal-mid">`foreach` walks every CR2 file and stamps out one JPEG target per input.</p></div></div>
+                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">One target template, many outputs</h4><p class="text-sm text-charcoal-mid">`foreach` walks the `photos` list and stamps out one JPEG target per input.</p></div></div>
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">The gallery target is marked `always`</h4><p class="text-sm text-charcoal-mid">The HTML page should always refresh when invoked, even if the output file already exists.</p></div></div>
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">3</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">Actions stay outside the default graph</h4><p class="text-sm text-charcoal-mid">`preview` is useful, but it is not part of the build product. Actions let the manifest describe both.</p></div></div>
                     </div>
@@ -133,12 +118,13 @@ defaults:
                     <div class="hm-example-terminal bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
                         <div class="hm-example-terminal__titlebar bg-charcoal-mid/30 px-4 py-2 flex items-center justify-between border-b border-white/10"><div class="flex space-x-2"><div class="w-3 h-3 rounded-full bg-vermillion"></div><div class="w-3 h-3 rounded-full bg-amber"></div><div class="w-3 h-3 rounded-full bg-matcha"></div></div><div class="text-xs font-mono text-charcoal-light">Terminal</div><div class="w-12"></div></div>
                         <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
-                            <div class="text-boxwood-pale mb-2"><span class="text-matcha">➜</span> <span class="text-indigo-light">~/photo-workflow</span> <span class="text-boxwood">netsuke build processed/gallery.html</span></div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">0.0s</span> <span class="text-indigo font-bold">INFO</span> Expanded 42 RAW inputs from `raw_photos/`.</div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">0.3s</span> <span class="text-indigo font-bold">INFO</span> [1/43] Converting `IMG_1001.CR2`</div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">2.8s</span> <span class="text-indigo font-bold">INFO</span> [42/43] Converting `IMG_1042.CR2`</div>
-                            <div class="text-stone-light/80 mb-3"><span class="text-charcoal-light">2.9s</span> <span class="text-indigo font-bold">INFO</span> [43/43] Rebuilding `processed/gallery.html`</div>
-                            <div class="text-matcha">Build complete: processed/gallery.html</div>
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke build processed/gallery.html
+[1/4] mkdir -p processed
+[2/4] Converting RAW photo
+[3/4] Converting RAW photo
+[4/4] make-gallery processed > processed/gallery.html
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
                 </section>
@@ -146,44 +132,41 @@ defaults:
                 <section id="build-flow" class="bg-white rounded-xl border border-stone shadow-sm p-6 lg:p-8">
                     <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:flow-stream" aria-hidden="true"></span> Build Flow</h2>
                     <div class="grid md:grid-cols-4 gap-4 text-sm">
-                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">1. Discover</p><p class="text-charcoal-mid">Find every CR2 file in `raw_photos/`.</p></div>
+                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">1. Declare</p><p class="text-charcoal-mid">List the photo names once in `vars.photos`.</p></div>
                         <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">2. Convert</p><p class="text-charcoal-mid">Run `darktable-cli` once per source file.</p></div>
-                        <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">3. Gather</p><p class="text-charcoal-mid">Collect the generated JPEG paths with `glob(...)`.</p></div>
+                        <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">3. Gather</p><p class="text-charcoal-mid">The gallery target lists the converted JPEGs as sources.</p></div>
                         <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">4. Publish</p><p class="text-charcoal-mid">Write `processed/gallery.html` from the output set.</p></div>
                     </div>
                 </section>
             </div>
 
-            <aside class="lg:col-span-4 space-y-8">
-                <div class="bg-white rounded-lg shadow-sm border border-stone p-6 sticky top-24">
+            <aside class="lg:col-span-4">
+                <div class="sticky top-24 space-y-8">
+                <div class="bg-white rounded-lg shadow-sm border border-stone p-6">
                     <h3 class="font-serif text-lg font-bold text-charcoal mb-4">On this page</h3>
-                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1">
+                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1" data-page-toc>
                         <li><a href="#structure" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Directory Structure</a></li>
-                        <li><a href="#manifest" class="block pl-4 text-charcoal font-medium border-l-2 border-vermillion -ml-[1px]">Annotated Manifest</a></li>
+                        <li><a href="#manifest" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Annotated Manifest</a></li>
                         <li><a href="#terminal-preview" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Running the Build</a></li>
                         <li><a href="#build-flow" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Build Flow</a></li>
                     </ul>
                     <div class="mt-8 pt-6 border-t border-stone-light">
                         <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Related Documentation</h3>
                         <ul class="space-y-3">
-                            <li><a href="/netsuke/docs/templating-and-standard-library/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Helpers such as `glob`, `basename`, and `replace`</span></div></a></li>
+                            <li><a href="/netsuke/docs/templating/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Helpers such as `glob`, `basename`, and `replace`</span></div></a></li>
                             <li><a href="/netsuke/docs/rules-and-targets/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Rules &amp; Targets</span><span class="text-xs text-charcoal-light">`always`, actions, and reusable commands</span></div></a></li>
-                            <li><a href="/netsuke/docs/cli-security-and-configuration/#cli" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:terminal" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">CLI Reference</span><span class="text-xs text-charcoal-light">Run the default build or a named target</span></div></a></li>
+                            <li><a href="/netsuke/docs/cli/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:terminal" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">CLI Reference</span><span class="text-xs text-charcoal-light">Run the default build or a named target</span></div></a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                    <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
-                    <p class="text-indigo-100 text-sm mb-4 relative z-10">Switch from media output to interface assets. The same `foreach` pattern can rasterise every SVG in a design directory.</p>
-                    <a href="/netsuke/examples/visual-design-assets/" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
-                        <div class="flex justify-between items-center mb-1"><span class="text-xs font-mono text-amber">Design</span><span class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span></div>
-                        <div class="font-bold text-sm">Visual Design Assets</div>
-                    </a>
+                {% endraw %}
+{{ exdata.up_next('batch-photo-processing') }}
+{% raw %}
                 </div>
             </aside>
         </div>
     </main>
+    <script defer src="/netsuke/assets/js/example-toc.js"></script>
 {% endraw %}
 {% endblock %}

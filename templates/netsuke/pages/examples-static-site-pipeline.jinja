@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Static Site Pipeline - Netsuke Examples{% endblock %}
 {% block content %}
@@ -63,16 +64,16 @@
                                 <span class="font-bold">site-example/</span>
                             </div>
                             <ul class="hm-file-tree">
-                                <li class="hm-file-tree-item"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span>pages/</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:document" aria-hidden="true"></span><span>index.md</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-stone mr-2" data-icon="carbon:document" aria-hidden="true"></span><span>about.md</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span>site/</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-vermillion mr-2" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>pages/</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>index.md</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>about.md</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>site/</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-vermillion" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></li>
                             </ul>
                         </div>
                         <div class="flex flex-col justify-center space-y-4">
                             <p class="text-charcoal-mid">
-                                The manifest reads Markdown from <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">pages/</code>, writes HTML into <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">site/</code>, then synthesises an index page from the generated files.
+                                The manifest reads Markdown from <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">pages/</code>, writes HTML into <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">site/</code>, then synthesises an index page from the same sources.
                             </p>
                             <div class="text-sm border-l-2 border-indigo pl-4 py-1">
                                 <p class="text-indigo font-medium mb-1">Why it matters</p>
@@ -87,49 +88,62 @@
                         <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center">
                             <span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest
                         </h2>
-                        <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">docs/examples/website.yml</span>
+                        <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/website.yml</span>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-paper-lg">
-<pre><code class="language-yaml">netsuke_version: "1.0.0"
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
 
 vars:
   pages_dir: pages
   site_dir: site
+  pages:
+    - about
+    - contact
 
 rules:
   - name: page
     command: "pandoc {{ ins }} -o {{ outs }}"
 
   - name: index
-    script: |
-      cat {{ ins }} > {{ outs }}
+    command: "pandoc --standalone {{ ins }} -o {{ outs }}"
 
 targets:
-  - foreach: glob(pages_dir ~ '/*.md')
-    name: "{{ site_dir }}/{{ item | basename | replace('.md', '.partial.html') }}"
+  - name: "{{ site_dir }}"
+    command: "mkdir -p {{ outs }}"
+
+  - foreach: pages
+    name: "{{ site_dir }}/{{ item }}.html"
     rule: page
-    sources: "{{ item }}"
+    sources: "{{ pages_dir }}/{{ item }}.md"
+    order_only_deps: "{{ site_dir }}"
 
   - name: "{{ site_dir }}/index.html"
     rule: index
-    sources: "{{ glob(site_dir ~ '/*.partial.html') | sorted }}"
+    sources:
+      - "{{ pages_dir }}/about.md"
+      - "{{ pages_dir }}/contact.md"
+    order_only_deps: "{{ site_dir }}"
 
 defaults:
-  - "{{ site_dir }}/index.html"</code></pre>
+  - site/index.html
+  - site/about.html
+  - site/contact.html
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
                             <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div>
                             <div class="ml-4">
                                 <h4 class="font-bold text-charcoal text-sm mb-1">`foreach` expands the page set</h4>
-                                <p class="text-sm text-charcoal-mid">The target list comes from `glob(...)`, so each Markdown file becomes one `.partial.html` output without duplicating the rule block.</p>
+                                <p class="text-sm text-charcoal-mid">The target list comes from the `pages` variable, so each Markdown file becomes one `.html` output without duplicating the rule block. Discovery with `glob(pages_dir ~ '/*.md')` works too when the page set should track the filesystem.</p>
                             </div>
                         </div>
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
                             <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div>
                             <div class="ml-4">
-                                <h4 class="font-bold text-charcoal text-sm mb-1">Scripts still live inside the manifest</h4>
-                                <p class="text-sm text-charcoal-mid">The `index` rule gathers `glob(site_dir ~ '/*.partial.html')` with a short shell script. Netsuke keeps it in the same graph as the Pandoc step instead of splitting logic across extra wrappers.</p>
+                                <h4 class="font-bold text-charcoal text-sm mb-1">`order_only_deps` sequences the output directory</h4>
+                                <p class="text-sm text-charcoal-mid">Every page target names `{{ site_dir }}` as an order-only dependency: the directory is created first, but touching it never triggers page rebuilds.</p>
                             </div>
                         </div>
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
@@ -157,12 +171,13 @@ defaults:
                             <div class="w-12"></div>
                         </div>
                         <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
-                            <div class="text-boxwood-pale mb-2"><span class="text-matcha">➜</span> <span class="text-indigo-light">~/site-example</span> <span class="text-boxwood">netsuke build site/index.html</span></div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">0.0s</span> <span class="text-indigo font-bold">INFO</span> Parsed `Netsukefile` and expanded page targets from `glob(...)`.</div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">0.1s</span> <span class="text-indigo font-bold">INFO</span> [1/3] Rendering `pages/about.md` to `site/about.partial.html`</div>
-                            <div class="text-stone-light/80 mb-1"><span class="text-charcoal-light">0.1s</span> <span class="text-indigo font-bold">INFO</span> [2/3] Rendering `pages/index.md` to `site/index.partial.html`</div>
-                            <div class="text-stone-light/80 mb-3"><span class="text-charcoal-light">0.2s</span> <span class="text-indigo font-bold">INFO</span> [3/3] Rebuilding `site/index.html` from `glob(site_dir ~ '/*.partial.html')`</div>
-                            <div class="text-matcha">Build complete: site/index.html</div>
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke build
+[1/4] mkdir -p site
+[2/4] pandoc pages/about.md -o site/about.html
+[3/4] pandoc pages/contact.md -o site/contact.html
+[4/4] pandoc --standalone pages/about.md pages/contact.md -o site/index.html
+{% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
                 </section>
@@ -172,20 +187,21 @@ defaults:
                         <span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:flow-data" aria-hidden="true"></span> Build Flow
                     </h2>
                     <div class="grid md:grid-cols-4 gap-4 text-sm">
-                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">1. Discover</p><p class="text-charcoal-mid">Read `pages/*.md` with `glob(...)`.</p></div>
-                        <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">2. Expand</p><p class="text-charcoal-mid">Create one `page` target per input file.</p></div>
+                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">1. Declare</p><p class="text-charcoal-mid">List the page names once in `vars.pages`.</p></div>
+                        <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">2. Expand</p><p class="text-charcoal-mid">`foreach` creates one `page` target per entry.</p></div>
                         <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">3. Render</p><p class="text-charcoal-mid">Invoke Pandoc for each Markdown page.</p></div>
-                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">4. Assemble</p><p class="text-charcoal-mid">Concatenate the generated `.partial.html` files into `site/index.html`.</p></div>
+                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">4. Assemble</p><p class="text-charcoal-mid">Build `site/index.html` from the source pages with `pandoc --standalone`.</p></div>
                     </div>
                 </section>
             </div>
 
-            <aside class="lg:col-span-4 space-y-8">
-                <div class="bg-white rounded-lg shadow-sm border border-stone p-6 sticky top-24">
+            <aside class="lg:col-span-4">
+                <div class="sticky top-24 space-y-8">
+                <div class="bg-white rounded-lg shadow-sm border border-stone p-6">
                     <h3 class="font-serif text-lg font-bold text-charcoal mb-4">On this page</h3>
-                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1">
+                    <ul class="space-y-3 text-sm border-l border-stone-light ml-1" data-page-toc>
                         <li><a href="#structure" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Directory Structure</a></li>
-                        <li><a href="#manifest" class="block pl-4 text-charcoal font-medium border-l-2 border-vermillion -ml-[1px]">Annotated Manifest</a></li>
+                        <li><a href="#manifest" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Annotated Manifest</a></li>
                         <li><a href="#terminal-preview" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Running the Build</a></li>
                         <li><a href="#build-flow" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Build Flow</a></li>
                     </ul>
@@ -194,25 +210,18 @@ defaults:
                         <ul class="space-y-3">
                             <li><a href="/netsuke/docs/getting-started/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Getting Started</span><span class="text-xs text-charcoal-light">Build defaults and named targets</span></div></a></li>
                             <li><a href="/netsuke/docs/rules-and-targets/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Rules &amp; Targets</span><span class="text-xs text-charcoal-light">Reusable rules, `foreach`, and dependencies</span></div></a></li>
-                            <li><a href="/netsuke/docs/templating-and-standard-library/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Jinja helpers such as `glob` and `sorted`</span></div></a></li>
+                            <li><a href="/netsuke/docs/templating/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Jinja helpers such as `glob` and `basename`</span></div></a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                    <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
-                    <p class="text-indigo-100 text-sm mb-4 relative z-10">Follow the same pattern into media work: fan out one rule over a directory and gather the outputs again at the end.</p>
-                    <a href="/netsuke/examples/batch-photo-processing/" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-mono text-amber">Media</span>
-                            <span class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                        <div class="font-bold text-sm">Batch Photo Processing</div>
-                    </a>
+                {% endraw %}
+{{ exdata.up_next('static-site-pipeline') }}
+{% raw %}
                 </div>
             </aside>
         </div>
     </main>
+    <script defer src="/netsuke/assets/js/example-toc.js"></script>
 {% endraw %}
 {% endblock %}

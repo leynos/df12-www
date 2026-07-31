@@ -1,34 +1,8 @@
 {% extends "doc_page.jinja" %}
 {% set active_nav = 'docs' %}
-{% block page_title %}Templating &amp; Standard Library - Netsuke Build System{% endblock %}
+{% block page_title %}Standard Library - Netsuke Build System{% endblock %}
 {% block extra_head %}
-    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
     <style>
-        /* Syntax Highlighting */
-        .token.comment { color: #8A8279; font-style: italic; }
-        .token.string { color: #4A7C59; }
-        .token.keyword { color: #C23B22; font-weight: bold; }
-        .token.function { color: #2B4162; }
-        .token.operator { color: #C48B2C; }
-        .token.number { color: #C48B2C; }
-        .token.property { color: #2E2A25; }
-        .token.type { color: #C48B2C; }
-
-        .code-container {
-            counter-reset: line;
-        }
-        .code-line::before {
-            counter-increment: line;
-            content: counter(line);
-            display: inline-block;
-            width: 1.5rem;
-            margin-right: 1rem;
-            text-align: right;
-            color: #5C554D;
-            opacity: 0.5;
-            user-select: none;
-        }
-
         .function-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(46, 42, 37, 0.1), 0 4px 6px -2px rgba(46, 42, 37, 0.05);
@@ -76,7 +50,6 @@
                     <ul class="space-y-1">
                         <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
                         <li><a href="/netsuke/docs/getting-started/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Getting Started</a></li>
-                        <li><a href="/netsuke/install/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
                     </ul>
                 </div>
 
@@ -85,19 +58,20 @@
                     <ul class="space-y-1">
                         <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
                         <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
-                        <li><a href="#starlark-intro" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="#stdlib-reference" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Core Standard Library</a></li>
-                        <li><a href="#stdlib-extended" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Extended Library</a></li>
-                        <li><a href="#patterns" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Patterns</a></li>
+                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
+                        <li><a href="/netsuke/docs/standard-library/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Standard Library</a></li>
+                        <li><a href="#stdlib-reference" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Core reference</a></li>
+                        <li><a href="#stdlib-extended" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Extended library</a></li>
+                        <li><a href="#purity" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Pure vs host-observing</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
                     <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#cli" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#configuration" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#security" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
+                        <li><a href="/netsuke/docs/cli/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
+                        <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
+                        <li><a href="/netsuke/docs/security/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
                     </ul>
                 </div>
             </nav>
@@ -110,92 +84,24 @@
             <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
                 <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
                 <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">Templating &amp; StdLib</span>
+                <span class="text-charcoal font-medium">Standard Library</span>
             </nav>
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
-                        Core Concepts
+                        Reference
                     </div>
                     <span class="text-charcoal-mid text-xs font-mono bg-white px-2 py-1 rounded border border-stone">Jinja helpers</span>
                 </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Templating &amp; Standard Library</h1>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Standard Library</h1>
                 <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Netsuke uses MiniJinja inside YAML values. The structure stays as data; templating fills in strings, expands <code>foreach</code>, and gates entries with <code>when</code>.
+                    The functions, filters, and tests available inside a <code>Netsukefile</code>: paths, file contents,
+                    collections, time, command execution, executable discovery, and network access &mdash; each labelled
+                    pure or host-observing.
                 </p>
             </div>
-
-            <!-- Introduction to templating -->
-            <section id="starlark-intro" class="mb-16">
-                <div class="grid lg:grid-cols-2 gap-12 items-start">
-                    <div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal mb-4">Why Jinja inside YAML?</h2>
-                        <p class="text-charcoal-mid mb-6 leading-relaxed">
-                            Netsuke validates YAML before rendering templates. That keeps the manifest legible, keeps the structure explicit, and still leaves room for loops, macros, and conditional expansion.
-                        </p>
-                        <ul class="space-y-4 mb-8">
-                            <li class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
-                                    <span class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
-                                </div>
-                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">YAML first:</strong> Structure is checked before templating is allowed to render commands.</span>
-                            </li>
-                            <li class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
-                                    <span class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
-                                </div>
-                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">Controlled expansion:</strong> <code>foreach</code> and <code>when</code> handle structural repetition without turning the file into a programming language.</span>
-                            </li>
-                            <li class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-matcha/10 flex items-center justify-center mt-1 mr-3 shrink-0">
-                                    <span class="iconify text-matcha text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
-                                </div>
-                                <span class="text-sm text-charcoal-mid"><strong class="text-charcoal">Reusable helpers:</strong> Macros, filters, and built-in functions cover common path and environment tasks.</span>
-                            </li>
-                        </ul>
-                        <div class="bg-boxwood-pale p-5 rounded-lg border border-stone text-sm text-charcoal-mid">
-                            <p class="font-bold text-charcoal mb-2"><span class="iconify mr-2 text-indigo" data-icon="carbon:book" aria-hidden="true"></span> Learn More</p>
-                            The goal is not to hide the build graph. The goal is to keep repeated YAML short enough to tolerate.
-                        </div>
-                    </div>
-
-                    <!-- Code Example Card -->
-                    <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                        <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                            <div class="flex space-x-2">
-                                <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                                <div class="w-3 h-3 rounded-full bg-amber"></div>
-                                <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                            </div>
-                            <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                            <div class="w-12"></div>
-                        </div>
-                        <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light code-container">
-                            <div class="code-line"><span class="token property">macros</span>:</div>
-                            <div class="code-line">  - <span class="token property">signature</span>: <span class="token string">"obj_name(src)"</span></div>
-                            <div class="code-line">    <span class="token property">body</span>: <span class="token string">|</span></div>
-                            <div class="code-line">      <span class="token string">{{ src | basename | replace('.c', '.o') }}</span></div>
-                            <div class="code-line"></div>
-                            <div class="code-line"><span class="token property">targets</span>:</div>
-                            <div class="code-line">  - <span class="token property">foreach</span>: <span class="token string">glob('src/*.c')</span></div>
-                            <div class="code-line">    <span class="token property">name</span>: <span class="token string">"build/{{ obj_name(item) }}"</span></div>
-                            <div class="code-line">    <span class="token property">rule</span>: <span class="token string">"compile"</span></div>
-                            <div class="code-line">    <span class="token property">sources</span>: <span class="token string">"{{ item }}"</span></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Library Usage Stats Chart -->
-            <section id="stats" class="mb-20 pt-8 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Standard Library Usage</h2>
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                    <div id="stdLibChart" class="h-[350px] w-full"></div>
-                    <p class="text-xs text-center text-charcoal-light mt-4 font-mono">Illustrative relative frequency across example manifests in the Netsuke repository</p>
-                </div>
-            </section>
 
             <!-- Standard Library Reference -->
             <section id="stdlib-reference" class="mb-16">
@@ -215,7 +121,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">fetch()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Network</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. HTTPS is the only allowed scheme by default; the <code>--fetch-*</code> CLI options widen or narrow the policy. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             fetch("https://example.com/data", cache=true)
                         </div>
@@ -224,12 +130,12 @@
                     <!-- Function Card 2 -->
                     <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">shell_escape</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Security</span>
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">command_available()</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Discovery</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Safely quotes a string for use as a single shell argument. Use this whenever interpolating paths or variables into commands.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns <code>true</code> when an executable can be found on <code>PATH</code>, <code>false</code> otherwise. Accepts the same keyword arguments as <code>which</code>. Ideal in <code>when</code> conditions.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | shell_escape }}
+                            when: command_available('pandoc')
                         </div>
                     </div>
 
@@ -239,7 +145,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">with_suffix</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Replaces the file extension of a path. Accepts an optional count to replace multiple trailing extensions.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Replaces the file extension of a path. Accepts an optional count to replace multiple trailing extensions, and an optional separator (default <code>.</code>).</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ item | basename | with_suffix('.o') }}
                         </div>
@@ -251,7 +157,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">env()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Data</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Read environment variables into the templating context when the manifest needs host-specific values.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Reads one required environment variable. There is no default-value argument; a missing or non-Unicode value is an error.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             env("CC")
                         </div>
@@ -260,12 +166,12 @@
                     <!-- Function Card 5 -->
                     <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">sorted</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Logic</span>
+                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">basename / dirname</code>
+                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Sort a list deterministically before it becomes part of the final static graph.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Pure path filters: <code>basename</code> returns the final path component; <code>dirname</code> returns the parent (or <code>.</code> when there is none).</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            glob('build/*.html') | sorted
+                            {{ 'reports/daily.csv' | basename }}
                         </div>
                     </div>
 
@@ -275,9 +181,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">glob</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Finds all files matching a pattern. Use sparingly to maintain explicit dependencies.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Finds workspace paths matching a pattern. Host-observing: results depend on workspace contents and platform. Use sparingly to maintain explicit dependencies.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            glob(include=[], exclude=[])
+                            glob('src/*.c')
                         </div>
                     </div>
                 </div>
@@ -327,7 +233,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">contents</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional <code>encoding</code> argument (default: <code>'utf-8'</code>).</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional encoding argument; <code>'utf-8'</code> (alias <code>'utf8'</code>) is currently the only supported encoding.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ "VERSION" | contents }}
                         </div>
@@ -357,9 +263,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">hash</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Returns the full hex digest of a file. Supports <code>sha256</code> (default) and <code>sha512</code>.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns the full hex digest of a file. Supports <code>sha256</code> (default) and <code>sha512</code>; MD5 and SHA-1 need the <code>legacy-digests</code> build feature.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | hash(alg='sha256') }}
+                            {{ path | hash('sha512') }}
                         </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
@@ -367,9 +273,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">digest</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Returns a truncated hex digest of a file. Accepts <code>len</code> (default: <code>8</code>) and <code>alg</code> arguments. Useful for short cache-busting hashes in output filenames.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns a truncated hex digest of a file. Accepts a length (default: <code>8</code>) and an algorithm (default: <code>sha256</code>). Useful for short cache-busting hashes in output filenames.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | digest(len=8) }}
+                            {{ path | digest(12, 'sha512') }}
                         </div>
                     </div>
                 </div>
@@ -462,7 +368,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">shell()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Pipes the input value as stdin to a shell command string. Returns captured stdout (up to 1 MiB by default). Pass <code>{'mode': 'tempfile'}</code> to stream larger output to a temporary file instead.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Pipes the input value as stdin to a shell command string. Capture mode (the default) returns the command's stdout. Pass <code>{'mode': 'tempfile'}</code> (also spelled <code>stream</code> or <code>streaming</code>) to write bounded output to a persisted temporary file; those modes return the file's path, not its contents.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ user_list | shell('grep admin') }}
                         </div>
@@ -472,9 +378,9 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">grep()</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Filters input lines matching a pattern. The <code>flags</code> argument accepts a string (e.g. <code>'-i'</code>) or list of strings. Implemented via <code>shell</code>.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Runs the host <code>grep</code> executable over the input value. The <code>flags</code> argument is a sequence such as <code>['-i']</code>; availability and flag spelling are platform-dependent. Options share the same modes as <code>shell</code>.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ log_lines | grep('ERROR', flags='-i') }}
+                            {{ log_lines | grep('ERROR', ['-i']) }}
                         </div>
                     </div>
                 </div>
@@ -535,9 +441,9 @@
                 </h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                     Use Jinja's <code>is</code> keyword with these tests to gate targets conditionally.
-                    Type tests do not follow symbolic links; permission tests check for the current user.
+                    Tests are host-observing; a missing path or non-string value yields <code>false</code>, and the symlink test does not follow links.
                 </p>
-                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
                     <div class="bg-white p-4 rounded-lg border border-stone text-xs">
                         <div class="font-bold text-charcoal mb-2">Type tests</div>
                         <div class="space-y-1 font-mono text-charcoal-mid">
@@ -547,100 +453,60 @@
                         </div>
                     </div>
                     <div class="bg-white p-4 rounded-lg border border-stone text-xs">
-                        <div class="font-bold text-charcoal mb-2">Permission tests</div>
+                        <div class="font-bold text-charcoal mb-2">Special-file tests <span class="text-charcoal-light font-normal">(always <code>false</code> off Unix)</span></div>
                         <div class="space-y-1 font-mono text-charcoal-mid">
-                            <div><code class="text-indigo">is readable</code></div>
-                            <div><code class="text-indigo">is writable</code></div>
-                            <div><code class="text-indigo">is executable</code></div>
-                        </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
-                        <div class="font-bold text-charcoal mb-2">Path tests</div>
-                        <div class="space-y-1 font-mono text-charcoal-mid">
-                            <div><code class="text-indigo">is absolute</code></div>
-                            <div><code class="text-indigo">is relative</code></div>
+                            <div><code class="text-indigo">is pipe</code> &mdash; named pipe</div>
+                            <div><code class="text-indigo">is block_device</code> / <code class="text-indigo">is char_device</code></div>
+                            <div><code class="text-indigo">is device</code> &mdash; either device kind</div>
                         </div>
                     </div>
                 </div>
                 <div class="bg-charcoal rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
-                    <pre><code><span class="token property">targets</span>:
-  - <span class="token property">when</span>: <span class="token string">env('CC') | which is executable</span>
-    <span class="token property">name</span>: <span class="token string">"build/main.o"</span>
-    <span class="token property">rule</span>: <span class="token string">"compile"</span></code></pre>
+                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  - when: 'src/main.c' is file and command_available('clang')
+    name: "build/main.o"
+    rule: "compile"
+{% endraw %}{% endhighlight %}{% raw %}
                 </div>
             </section>
 
-            <!-- Advanced Patterns -->
-            <section id="patterns" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Common Patterns</h2>
-
-                <div class="bg-boxwood-pale border border-stone rounded-xl overflow-hidden">
-                    <div class="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-stone">
-                        <!-- Sidebar for patterns -->
-                        <div class="md:col-span-4 p-6 bg-white/50">
-                            <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Recipes</h3>
-                            <ul class="space-y-2">
-                                <li>
-                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-indigo bg-indigo/5 rounded-md border border-indigo/10">
-                                        Cross-Compilation
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-charcoal-mid hover:bg-white/60 rounded-md transition-colors">
-                                        Test Suites
-                                    </button>
-                                </li>
-                                <li>
-                                    <button class="w-full text-left px-3 py-2 text-sm font-medium text-charcoal-mid hover:bg-white/60 rounded-md transition-colors">
-                                        Code Generation
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Content for patterns -->
-                        <div class="md:col-span-8 p-8 bg-white">
-                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Platform-specific sources with `when`</h4>
-                            <p class="text-sm text-charcoal-mid mb-6">
-                                Use <code class="bg-stone-light/30 px-1 rounded text-xs">when</code> on repeated entries to include targets only when the current variables match the platform you want.
-                            </p>
-
-                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-<pre><code><span class="token property">targets</span>:
-  - <span class="token property">when</span>: <span class="token string">target_os == 'linux'</span>
-    <span class="token property">name</span>: <span class="token string">"sys/linux.o"</span>
-    <span class="token property">rule</span>: <span class="token string">"compile"</span>
-    <span class="token property">sources</span>: <span class="token string">"src/linux_utils.c"</span>
-
-  - <span class="token property">when</span>: <span class="token string">target_os == 'macos'</span>
-    <span class="token property">name</span>: <span class="token string">"sys/macos.o"</span>
-    <span class="token property">rule</span>: <span class="token string">"compile"</span>
-    <span class="token property">sources</span>: <span class="token string">"src/macos_utils.c"</span></code></pre>
-                            </div>
-
-                            <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
-                                <p>Keep conditions coarse-grained. Avoid selecting on individual compiler versions unless absolutely necessary.</p>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Purity -->
+            <section id="purity" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:certificate" aria-hidden="true"></span> Pure vs host-observing
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    &ldquo;Pure&rdquo; means the result depends only on the supplied value and arguments. Host-observing helpers
+                    read the clock, environment, filesystem, network, or subprocess state; <code>fetch</code> with a cache may
+                    also write beneath <code>.netsuke/</code>. Pure helpers make generated build graphs reproducible;
+                    host-observing helpers are useful for discovery and conditional planning, but their results can vary
+                    between machines or invocations.
+                </p>
+                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:idea" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        Prefer explicit manifest inputs when a value is part of the build's reproducibility contract, and keep
+                        network or command execution out of untrusted <code>Netsukefile</code> content &mdash; Netsuke bounds
+                        helper output, but it does not sandbox template evaluation.
+                    </p>
                 </div>
             </section>
 
             <!-- Help Footer -->
             <div class="mt-10 pt-10 border-t border-stone-light">
                 <div class="flex justify-between items-center">
-                    <a href="/netsuke/docs/rules-and-targets/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                    <a href="/netsuke/docs/templating/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
                         <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
                             <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
                         </div>
                         <div class="text-left">
                             <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
-                            <div class="font-medium text-sm">Rules &amp; Targets</div>
+                            <div class="font-medium text-sm">Templating</div>
                         </div>
                     </a>
 
-                    <a href="/netsuke/docs/cli-security-and-configuration/#cli" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                    <a href="/netsuke/docs/cli/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
                         <div class="text-right">
                             <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
                             <div class="font-medium text-sm">CLI Commands</div>
@@ -657,38 +523,5 @@
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-    <script>
-        window.addEventListener('load', function() {
-            try {
-                // Bar Chart for StdLib Usage
-                const trace1 = {
-                    x: ['glob', 'env', 'basename', 'with_suffix', 'shell_escape', 'fetch', 'which', 'sorted', 'relative_to', 'contents', 'shell', 'now', 'hash', 'uniq', 'flatten'],
-                    y: [95, 82, 76, 65, 45, 30, 28, 25, 22, 18, 14, 12, 10, 9, 7],
-                    type: 'bar',
-                    marker: {
-                        color: ['#2B4162', '#3A5A7C', '#4A7C59', '#C48B2C', '#C23B22', '#8A8279',
-                                '#2B4162', '#3A5A7C', '#4A7C59', '#C48B2C', '#C23B22', '#8A8279',
-                                '#2B4162', '#3A5A7C', '#4A7C59']
-                    }
-                };
-
-                const layout = {
-                    title: { text: 'Most Used Standard Library Functions (%)', font: { family: 'Fraunces', size: 16, color: '#2E2A25' } },
-                    margin: { t: 50, r: 20, b: 60, l: 50 },
-                    plot_bgcolor: '#FFFFFF',
-                    paper_bgcolor: '#FFFFFF',
-                    font: { family: 'Source Sans 3', color: '#5C554D' },
-                    xaxis: { gridcolor: '#F5EDE0', tickangle: -45 },
-                    yaxis: { gridcolor: '#F5EDE0', range: [0, 100] },
-                    showlegend: false
-                };
-
-                Plotly.newPlot('stdLibChart', [trace1], layout, {responsive: true, displayModeBar: false});
-
-            } catch(e) {
-                console.error("Chart generation failed:", e);
-            }
-        });
-    </script>
 {% endraw %}
 {% endblock %}

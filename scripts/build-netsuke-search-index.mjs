@@ -15,11 +15,12 @@ import MiniSearch from "minisearch";
 
 const SITE_DIR = "public/netsuke";
 const DOCS_DIR = path.join(SITE_DIR, "docs");
-const SEARCH_OUTPUT_PATH = path.join(
-  SITE_DIR,
-  "assets",
-  "search",
-  "docs-search.json",
+const EXAMPLES_DIR = path.join(SITE_DIR, "examples");
+const SEARCH_OUTPUT_DIR = path.join(SITE_DIR, "assets", "search");
+const SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "docs-search.json");
+const EXAMPLES_SEARCH_OUTPUT_PATH = path.join(
+  SEARCH_OUTPUT_DIR,
+  "examples-search.json",
 );
 
 const INDEX_OPTIONS = {
@@ -50,13 +51,30 @@ async function main() {
     path.join(DOCS_DIR, "getting-started", "index.html"),
     path.join(DOCS_DIR, "manifest-reference", "index.html"),
     path.join(DOCS_DIR, "rules-and-targets", "index.html"),
-    path.join(DOCS_DIR, "templating-and-standard-library", "index.html"),
-    path.join(DOCS_DIR, "cli-security-and-configuration", "index.html"),
+    path.join(DOCS_DIR, "templating", "index.html"),
+    path.join(DOCS_DIR, "standard-library", "index.html"),
+    path.join(DOCS_DIR, "cli", "index.html"),
+    path.join(DOCS_DIR, "configuration", "index.html"),
+    path.join(DOCS_DIR, "security", "index.html"),
+  ];
+  const exampleFiles = [
+    path.join(EXAMPLES_DIR, "index.html"),
+    path.join(EXAMPLES_DIR, "hello-world", "index.html"),
+    path.join(EXAMPLES_DIR, "static-site-pipeline", "index.html"),
+    path.join(EXAMPLES_DIR, "batch-photo-processing", "index.html"),
+    path.join(EXAMPLES_DIR, "visual-design-assets", "index.html"),
+    path.join(EXAMPLES_DIR, "basic-c-application", "index.html"),
+    path.join(EXAMPLES_DIR, "multi-format-documentation", "index.html"),
   ];
 
+  await buildIndex(docFiles, SEARCH_OUTPUT_PATH);
+  await buildIndex(exampleFiles, EXAMPLES_SEARCH_OUTPUT_PATH);
+}
+
+async function buildIndex(files, outputPath) {
   const documents = [];
 
-  for (const filePath of docFiles) {
+  for (const filePath of files) {
     const html = await readFile(filePath, "utf8");
     documents.push(...extractDocuments(filePath, html));
   }
@@ -68,9 +86,9 @@ async function main() {
 
   miniSearch.addAll(documents);
 
-  await mkdir(path.dirname(SEARCH_OUTPUT_PATH), { recursive: true });
+  await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(
-    SEARCH_OUTPUT_PATH,
+    outputPath,
     JSON.stringify(
       {
         generatedAt: new Date().toISOString(),
@@ -82,9 +100,7 @@ async function main() {
     ),
   );
 
-  console.log(
-    `wrote ${SEARCH_OUTPUT_PATH} (${documents.length} documents indexed)`,
-  );
+  console.log(`wrote ${outputPath} (${documents.length} documents indexed)`);
 }
 
 function extractDocuments(filePath, html) {

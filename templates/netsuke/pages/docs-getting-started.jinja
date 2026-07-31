@@ -3,11 +3,6 @@
 {% block page_title %}Getting Started - Netsuke Build System{% endblock %}
 {% block extra_head %}
     <style>
-        /* Syntax Highlighting Base */
-        .token.comment { color: #8A8279; }
-        .token.string { color: #4A7C59; }
-        .token.keyword { color: #C23B22; font-weight: bold; }
-        .token.function { color: #2B4162; }
     </style>
 {% endblock %}
 {% block content %}
@@ -51,7 +46,7 @@
                     <ul class="space-y-1">
                         <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
                         <li><a href="/netsuke/docs/getting-started/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Getting Started</a></li>
-                        <li><a href="/netsuke/docs/getting-started/#installation" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
+                        <li><a href="/netsuke/docs/getting-started/#installation" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
                     </ul>
                 </div>
 
@@ -60,17 +55,17 @@
                     <ul class="space-y-1">
                         <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
                         <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
-                        <li><a href="/netsuke/docs/templating-and-standard-library/#starlark-intro" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="/netsuke/docs/templating-and-standard-library/#stdlib-reference" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
+                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
+                        <li><a href="/netsuke/docs/standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
                     <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#cli" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#configuration" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
-                        <li><a href="/netsuke/docs/cli-security-and-configuration/#security" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
+                        <li><a href="/netsuke/docs/cli/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
+                        <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
+                        <li><a href="/netsuke/docs/security/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
                     </ul>
                 </div>
             </nav>
@@ -152,17 +147,16 @@
                         </button>
                     </div>
                     <div class="bg-charcoal rounded-lg p-5 font-mono text-sm overflow-x-auto border border-charcoal-mid shadow-lg">
-                        <div class="flex text-stone-light">
-                            <span class="text-vermillion mr-2">$</span>
-                            <span class="text-boxwood">cargo</span> install netsuke
-                        </div>
+                        {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ cargo install netsuke-build
+                        {% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <span class="sr-only" aria-live="polite" data-copy-status></span>
                 </div>
 
                 <div class="flex items-center text-sm text-charcoal-mid">
-                    <span class="mr-2">Alternatively, install via Cargo:</span>
-                    <code class="bg-stone-light/30 px-2 py-1 rounded font-mono text-charcoal">cargo install netsuke</code>
+                    <span class="mr-2">The crate is published as <code class="bg-stone-light/30 px-1 rounded font-mono text-charcoal">netsuke-build</code>; the installed binary is named</span>
+                    <code class="bg-stone-light/30 px-2 py-1 rounded font-mono text-charcoal">netsuke</code>
                 </div>
             </section>
 
@@ -181,14 +175,10 @@
                     <div>
                         <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">1. Create Project Directory</h3>
                         <div class="bg-charcoal rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
-                            <div class="text-stone-light mb-2">
-                                <span class="text-vermillion mr-2">$</span>
-                                mkdir my-first-build &amp;&amp; cd my-first-build
-                            </div>
-                            <div class="text-stone-light">
-                                <span class="text-vermillion mr-2">$</span>
-                                touch Netsukefile
-                            </div>
+                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ mkdir my-first-build && cd my-first-build
+$ touch Netsukefile
+                            {% endraw %}{% endhighlight %}{% raw %}
                         </div>
                         <p class="text-sm text-charcoal-mid">
                             This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared.
@@ -209,17 +199,19 @@
                                 <div class="w-12"></div>
                             </div>
                             <div class="hm-faux-window__body p-5 font-mono text-sm text-stone-light overflow-x-auto">
-<pre><code><span class="text-indigo-light">netsuke_version</span>: <span class="text-matcha">"1.0.0"</span>
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
 
-<span class="text-indigo-light">targets</span>:
-  - <span class="text-amber">name</span>: <span class="text-matcha">"hello.txt"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"printf 'Hello, Netsuke!\n' &gt; {{ outs }}"</span>
+targets:
+  - name: "hello.txt"
+    command: "printf 'Hello, Netsuke!\n' > {{ outs }}"
 
-  - <span class="text-amber">name</span>: <span class="text-matcha">"shout.txt"</span>
-    <span class="text-amber">command</span>: <span class="text-matcha">"tr 'a-z' 'A-Z' &lt; {{ ins }} &gt; {{ outs }}"</span>
-    <span class="text-amber">sources</span>: <span class="text-matcha">"hello.txt"</span>
+  - name: "shout.txt"
+    command: "tr 'a-z' 'A-Z' < {{ ins }} > {{ outs }}"
+    sources: "hello.txt"
 
-<span class="text-indigo-light">defaults</span>: [<span class="text-matcha">"shout.txt"</span>]</code></pre>
+defaults: ["shout.txt"]
+{% endraw %}{% endhighlight %}{% raw %}
                             </div>
                         </div>
                     </div>
@@ -247,32 +239,13 @@
                         <div class="w-12"></div>
                     </div>
                     <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-                        <div class="text-boxwood-pale mb-4">
-                            <span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~/my-first-build</span> <span class="text-boxwood">netsuke build shout.txt</span>
-                        </div>
-
-                        <div class="text-stone-light">
-                            <span class="text-charcoal-light">0.02s</span> <span class="text-indigo font-bold">INFO</span>  <span class="text-stone">Parsing Netsukefile...</span>
-                        </div>
-                        <div class="text-stone-light">
-                            <span class="text-charcoal-light">0.05s</span> <span class="text-indigo font-bold">INFO</span>  <span class="text-stone">Generated build.ninja for 2 targets.</span>
-                        </div>
-                        <div class="text-stone-light mt-2">
-                            <span class="text-charcoal-light">[1/2]</span> <span class="text-amber">Running</span> hello.txt
-                        </div>
-                        <div class="text-stone-light">
-                            <span class="text-charcoal-light">[2/2]</span> <span class="text-amber">Running</span> shout.txt
-                        </div>
-
-                        <div class="text-stone-light mt-4">
-                            <span class="text-matcha font-bold">SUCCESS</span> Build completed in 0.12s
-                        </div>
-                        <div class="text-stone-light mt-4">
-                             <span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~/my-first-build</span> <span class="text-boxwood">cat shout.txt</span>
-                        </div>
-                         <div class="text-stone-light">
-                            HELLO, NETSUKE!
-                        </div>
+{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke build shout.txt
+[1/2] printf 'Hello, Netsuke!\n' > hello.txt
+[2/2] tr 'a-z' 'A-Z' < hello.txt > shout.txt
+$ cat shout.txt
+HELLO, NETSUKE!
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                 </div>
 

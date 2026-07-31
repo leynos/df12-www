@@ -1,0 +1,402 @@
+{% extends "doc_page.jinja" %}
+{% set active_nav = 'guides' %}
+{% block page_title %}Translating Netsuke - Netsuke Build System{% endblock %}
+{% block content %}
+{% raw %}
+    <!-- Main Content Area with Sidebar -->
+    <div class="site-container pt-16 flex-grow flex">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            <nav class="space-y-8">
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#how-it-works" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">How localization works</a></li>
+                        <li><a href="#file-structure" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">File structure</a></li>
+                        <li><a href="#message-keys" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Message keys</a></li>
+                        <li><a href="#variables-plurals" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Variables &amp; plurals</a></li>
+                        <li><a href="#new-locale" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Adding a new locale</a></li>
+                        <li><a href="#quality" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Quality &amp; validation</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Helpful links</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/guides/contributing/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Contributing Guide</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/translators-guide.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Translator Guide (source)</a></li>
+                        <li><a href="https://projectfluent.org/fluent/guide/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Fluent Syntax Guide</a></li>
+                        <li><a href="https://cldr.unicode.org/index/cldr-spec/plural-rules" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLDR Plural Rules</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono" aria-label="Breadcrumb">
+                <ol class="flex items-center">
+                    <li><a href="/netsuke/guides/" class="hover:text-vermillion transition-colors">Guides</a></li>
+                    <li aria-hidden="true"><span class="mx-2 text-stone">/</span></li>
+                    <li><span class="text-charcoal font-medium" aria-current="page">Translating Netsuke</span></li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
+                        Localization
+                    </div>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Translating Netsuke</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    Every user-facing message in Netsuke lives in a <a href="https://projectfluent.org/" class="text-indigo hover:underline">Project Fluent</a> resource file, not in Rust source.
+                    Translating the whole CLI means editing one file per locale — this guide covers the format, the conventions, and the checks that keep translations honest.
+                </p>
+            </div>
+
+            <!-- How localization works -->
+            <section id="how-it-works" class="mb-20">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:translate" aria-hidden="true"></span> How localization works
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Fluent handles the hard parts of natural language — plurals, variables, and grammatical agreement — while keeping translation files readable.
+                    Two locales ship today: English (<code>en-US</code>, the source locale) and Spanish (<code>es-ES</code>, the reference translation).
+                    Unsupported locales fall back to English.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Locale precedence</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">Highest wins:</p>
+                        <ol class="space-y-2">
+                            <li class="flex items-center text-sm">
+                                <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">1</span>
+                                <span class="text-charcoal-mid">CLI flag: <code class="font-mono text-indigo">--locale es-ES</code></span>
+                            </li>
+                            <li class="flex items-center text-sm">
+                                <span class="w-6 h-6 rounded-full bg-indigo/70 text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">2</span>
+                                <span class="text-charcoal-mid">Environment: <code class="font-mono text-indigo">NETSUKE_LOCALE=es-ES</code></span>
+                            </li>
+                            <li class="flex items-center text-sm">
+                                <span class="w-6 h-6 rounded-full bg-indigo/40 text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">3</span>
+                                <span class="text-charcoal-mid">Config file: <code class="font-mono text-indigo">locale = "es-ES"</code></span>
+                            </li>
+                            <li class="flex items-center text-sm">
+                                <span class="w-6 h-6 rounded-full bg-stone text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">4</span>
+                                <span class="text-charcoal-mid">System default locale</span>
+                            </li>
+                            <li class="flex items-center text-sm">
+                                <span class="w-6 h-6 rounded-full bg-stone text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">5</span>
+                                <span class="text-charcoal-mid">Fallback to <code class="font-mono text-indigo">en-US</code></span>
+                            </li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">What gets translated</h3>
+                        <ul class="space-y-2 text-sm text-charcoal-mid">
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                CLI help text, flag descriptions, and validation messages
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                Command-line parser errors
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                Manifest parse, template, and intermediate representation (IR) diagnostics
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                Standard-library and network-policy errors
+                            </li>
+                            <li class="flex items-start">
+                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                Ninja-generation failures
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- File structure -->
+            <section id="file-structure" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:folder" aria-hidden="true"></span> File structure
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    One directory per locale, one <code>messages.ftl</code> file per directory. That is the whole layout.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-5 rounded-xl border border-stone text-xs font-mono space-y-1 text-charcoal-mid">
+                        <div>locales/</div>
+                        <div class="pl-4 text-indigo">en-US/messages.ftl  <span class="text-charcoal-light font-sans">(source locale)</span></div>
+                        <div class="pl-4 text-matcha">es-ES/messages.ftl  <span class="text-charcoal-light font-sans">(reference translation)</span></div>
+                        <div class="pl-4 text-amber">fr-FR/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
+                    </div>
+                    <div class="bg-charcoal rounded-xl overflow-hidden">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">FTL format in four lines</div>
+                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Comment explaining the message context.</span>
+message-key = The translated message text.
+
+<span class="text-charcoal-light"># Message with a variable.</span>
+greeting = Hello, { $name }!</code></pre>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <div>
+                        <h4 class="font-bold text-indigo text-sm mb-1">Key rules</h4>
+                        <p class="text-xs text-charcoal-mid">
+                            Message keys use lowercase with hyphens or dots. Comments start with <code>#</code> and give translators context.
+                            Lines starting with <code>.</code> are attributes (sub-messages); lines starting with <code>-</code> are terms (reusable fragments).
+                            Never rename a key — key names are referenced by the Rust code and must stay identical.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Message keys -->
+            <section id="message-keys" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:tag" aria-hidden="true"></span> Message keys
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Keys use hierarchical dot-notation, organized by domain: <code>domain.subdomain.specific_message</code>.
+                    The corresponding Rust constants live in <code>src/localization/keys.rs</code> in UPPER_SNAKE_CASE
+                    (<code>CLI_FLAG_FILE_HELP</code> maps to <code>cli.flag.file.help</code>).
+                </p>
+
+                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto">
+                    <table class="min-w-full divide-y divide-stone-light">
+                        <thead class="bg-boxwood-pale">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Domain</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Purpose</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-stone-light">
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">cli.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">CLI help text and validation</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">cli.flag.file.help</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">clap-error-*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">Command-line parser errors</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">clap-error-missing-argument</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">runner.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">Manifest loading and I/O</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">runner.manifest.not_found</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">manifest.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">YAML parse and template errors</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">manifest.yaml.parse</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">ir.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">Intermediate representation errors</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">ir.rule_not_found</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">ninja_gen.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">Ninja file generation</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">ninja_gen.missing_action</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">stdlib.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">Standard library helpers</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">stdlib.fetch.url_invalid</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">host_pattern.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">Network host validation</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">host_pattern.empty</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">network_policy.*</td>
+                                <td class="px-6 py-3 text-sm text-charcoal-mid">Network access control</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-xs font-mono text-charcoal-mid">network_policy.host.blocked</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Variables and plurals -->
+            <section id="variables-plurals" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:character-whole-number" aria-hidden="true"></span> Variables &amp; plurals
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Variables are placeholders replaced at runtime. Keep the same names and the same count as the English source —
+                    the quality checks compare them. Plural forms use Common Locale Data Repository (CLDR) categories, which differ per language.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-charcoal rounded-xl overflow-hidden">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Variables</div>
+                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Basic variable substitution.</span>
+error-at-path = Error at { $path }: { $details }
+
+<span class="text-charcoal-light"># Variables can appear multiple times.</span>
+range-error = Value { $value } must be
+    between { $min } and { $max }.</code></pre>
+                    </div>
+                    <div class="bg-charcoal rounded-xl overflow-hidden">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Plural forms (English vs Spanish)</div>
+                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code>example.files_processed = { $count -&gt;
+    [one] Processed { $count } file.
+   *[other] Processed { $count } files.
+}
+
+example.files_processed = { $count -&gt;
+    [one] Se procesó { $count } archivo.
+   *[other] Se procesaron { $count } archivos.
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">CLDR categories by language</h3>
+                        <ul class="space-y-1.5 text-xs text-charcoal-mid font-mono">
+                            <li>English, Spanish, French &mdash; <code>one</code>, <code>other</code></li>
+                            <li>Russian &mdash; <code>one</code>, <code>few</code>, <code>many</code>, <code>other</code></li>
+                            <li>Arabic &mdash; <code>zero</code>, <code>one</code>, <code>two</code>, <code>few</code>, <code>many</code>, <code>other</code></li>
+                            <li>Japanese &mdash; <code>other</code> only</li>
+                        </ul>
+                        <p class="text-xs text-charcoal-light mt-3">The <code>*</code> marks the required default variant. Explicit numeric matches like <code>[0]</code> handle special cases.</p>
+                    </div>
+                    <div class="bg-amber/5 border border-amber/20 rounded-xl p-6 flex items-start">
+                        <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                        <div>
+                            <h3 class="font-bold text-amber text-sm mb-1">Current limitation</h3>
+                            <p class="text-xs text-charcoal-mid">
+                                The localization API currently passes all arguments as strings, so CLDR selectors like <code>[one]</code> will not match &mdash;
+                                messages resolve to the default <code>*[other]</code> variant. Write correct plural syntax anyway: it becomes active when numeric
+                                argument support lands, with no retranslation needed.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Adding a new locale -->
+            <section id="new-locale" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:add-alt" aria-hidden="true"></span> Adding a new locale
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Six steps take a locale from nothing to a passing build. French (<code>fr-FR</code>) stands in for your language below.
+                </p>
+
+                <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Steps 1&ndash;3: create, copy, translate</div>
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+# 1. Create the locale directory
+$ mkdir -p locales/fr-FR
+
+# 2. Copy the English source file
+$ cp locales/en-US/messages.ftl locales/fr-FR/messages.ftl
+
+# 3. Translate values, keep keys. For example:
+#   cli.about = Netsuke compile les manifestes YAML + Jinja
+#               en plans Ninja.
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Step 4: register the locale</h3>
+                        <p class="text-xs text-charcoal-mid mb-3">Edit <code>src/cli_localization.rs</code>:</p>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto">
+                            <pre class="font-mono text-xs text-stone-light"><code>const NETSUKE_FR_FR: &amp;str =
+    include_str!("../locales/fr-FR/messages.ftl");</code></pre>
+                        </div>
+                        <p class="text-xs text-charcoal-mid mt-3">Then update <code>build_localizer()</code> to handle the new locale tag.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Steps 5&ndash;6: build and test</h3>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto mb-3">
+                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ cargo build
+$ cargo run -- --locale fr-FR --help
+{% endraw %}{% endhighlight %}{% raw %}
+                        </div>
+                        <p class="text-xs text-charcoal-mid">
+                            The compile-time audit verifies every key is present; missing or orphaned keys fail the build with a detailed error.
+                            The second command should print help text in French.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quality and validation -->
+            <section id="quality" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Quality &amp; validation
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Translations are validated twice: at compile time by <code>build_l10n_audit.rs</code>, and at test time by
+                    localization unit tests, smoke tests for secondary locales, and fallback tests. Run <code>make test</code> before opening a pull request.
+                </p>
+
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <h3 class="font-bold text-charcoal mb-4 text-sm">Pre-submission checklist</h3>
+                    <ul class="grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>All keys from <code>en-US/messages.ftl</code> are present</span></li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> No extra (orphaned) keys exist</li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Variables match the English source (names and count)</li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Plural forms use correct CLDR categories</li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Comments are translated or preserved for context</li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>cargo build</code> passes</span></li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>netsuke --locale &lt;tag&gt; --help</code> renders correctly</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Help Footer -->
+            <div class="mt-10 pt-10 border-t border-stone-light">
+                <div class="flex justify-between items-center">
+                    <a href="/netsuke/guides/contributing/#translation" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
+                        </div>
+                        <div class="text-left">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Back</div>
+                            <div class="font-medium text-sm">Contributing</div>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/leynos/netsuke/pulls" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                        <div class="text-right">
+                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Ready?</div>
+                            <div class="font-medium text-sm">Open a Pull Request</div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
+    <script defer src="/netsuke/assets/js/doc-search.js"></script>
+{% endraw %}
+{% endblock %}

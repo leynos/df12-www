@@ -258,6 +258,12 @@ class SharedContentConfig:
     label: str
     source: str
     output_slug: str
+    eyebrow: str | None = None
+    summary: str | None = None
+    sections: bool = False
+    toc: bool = False
+    toc_exclude: tuple[str, ...] = ()
+    divider_sections: tuple[str, ...] = ()
 
 
 @dc.dataclass(slots=True)

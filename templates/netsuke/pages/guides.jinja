@@ -122,12 +122,12 @@
                         </a>
 
                         <!-- Card 2 -->
-                        <a href="/netsuke/blog/" class="hm-guide-card hm-card p-6 block h-full">
-                            <h3 class="font-serif text-lg font-bold text-charcoal mb-3">Blog &amp; Release Notes</h3>
+                        <a href="/netsuke/roadmap/" class="hm-guide-card hm-card p-6 block h-full">
+                            <h3 class="font-serif text-lg font-bold text-charcoal mb-3">Roadmap &amp; Release Status</h3>
                             <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
-                                Browse the blog hub for release notes, implementation write-ups, and broader commentary around the Netsuke project.
+                                See what shipped in v0.1.0, the known limitations, and the phased plan for the work ahead.
                             </p>
-                            <span class="text-xs font-mono text-indigo font-medium">Open Blog Hub &rarr;</span>
+                            <span class="text-xs font-mono text-indigo font-medium">Open Roadmap &rarr;</span>
                         </a>
                     </div>
                 </section>
@@ -143,7 +143,7 @@
 
                     <div class="hm-card overflow-hidden">
                         <div class="divide-y divide-stone-light">
-                            <a href="/netsuke/contributing/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
+                            <a href="/netsuke/guides/contributing/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0 mt-1">
                                         <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:notebook" aria-hidden="true"></span>
@@ -157,28 +157,28 @@
                                     </div>
                                 </div>
                             </a>
-                            <a href="/netsuke/contributing/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
+                            <a href="/netsuke/guides/translating/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0 mt-1">
                                         <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:language" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">
-                                        <h3 class="text-base font-bold text-charcoal group-hover:text-indigo transition-colors">Translating Documentation</h3>
-                                        <p class="text-sm text-charcoal-mid mt-1">Help us localize Netsuke. Guide to our i18n workflow and glossary.</p>
+                                        <h3 class="text-base font-bold text-charcoal group-hover:text-indigo transition-colors">Translating Netsuke</h3>
+                                        <p class="text-sm text-charcoal-mid mt-1">Full localization guide: Fluent files, message keys, plurals, and adding a new locale.</p>
                                     </div>
                                     <div class="ml-auto pl-4">
                                         <span  class="iconify text-stone text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
                                     </div>
                                 </div>
                             </a>
-                            <a href="/netsuke/docs/templating-and-standard-library/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
+                            <a href="/netsuke/guides/writing-examples/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0 mt-1">
                                         <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:cube" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">
-                                        <h3 class="text-base font-bold text-charcoal group-hover:text-indigo transition-colors">Writing Rules</h3>
-                                        <p class="text-sm text-charcoal-mid mt-1">Advanced guide to reusable rules, macros, and template helpers in YAML manifests.</p>
+                                        <h3 class="text-base font-bold text-charcoal group-hover:text-indigo transition-colors">Writing Examples &amp; Showcases</h3>
+                                        <p class="text-sm text-charcoal-mid mt-1">Full guide to contributing example manifests and turning them into showcase pages.</p>
                                     </div>
                                     <div class="ml-auto pl-4">
                                         <span  class="iconify text-stone text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
@@ -200,22 +200,23 @@
 
                     <div class="grid md:grid-cols-3 gap-6">
                         <div class="hm-card hm-card--accent p-6 text-center">
-                            <span  class="iconify text-3xl text-indigo mb-4" data-icon="carbon:repository" aria-hidden="true"></span>
+                            <!-- Git logo, modelled on the official Git icon -->
+                            <svg class="block mx-auto h-8 w-8 mb-4" viewBox="0 0 24 24" fill="#f05133" aria-hidden="true"><path d="M23.546 10.93 13.067.452c-.604-.603-1.582-.603-2.188 0L8.708 2.627l2.76 2.76c.645-.215 1.379-.07 1.889.441.516.515.658 1.258.438 1.9l2.658 2.66c.645-.223 1.387-.078 1.9.435.721.72.721 1.884 0 2.604-.719.719-1.881.719-2.6 0-.539-.541-.674-1.337-.404-1.996L12.86 8.955v6.525c.176.086.342.203.488.348.713.721.713 1.883 0 2.6-.719.721-1.889.721-2.609 0-.719-.719-.719-1.879 0-2.598.182-.18.387-.316.605-.406V8.835c-.217-.091-.424-.222-.6-.401-.545-.545-.676-1.342-.396-2.009L7.636 3.7.45 10.881c-.6.605-.6 1.584 0 2.189l10.48 10.477c.604.604 1.582.604 2.186 0l10.43-10.43c.605-.603.605-1.582 0-2.187"/></svg>
                             <h3 class="font-bold text-charcoal mb-2">Project Repository</h3>
                             <p class="text-xs text-charcoal-mid mb-4">Browse the prototype source, assets, and roadmap in one place.</p>
                             <a href="https://github.com/leynos/netsuke" class="text-indigo text-sm font-bold hover:underline">Open Repository</a>
                         </div>
                         <div class="hm-card hm-card--accent p-6 text-center">
-                            <span  class="iconify text-3xl text-charcoal mb-4" data-icon="carbon:logo-github" aria-hidden="true"></span>
+                            <span  class="iconify block mx-auto text-3xl text-charcoal mb-4" data-icon="carbon:logo-github" aria-hidden="true"></span>
                             <h3 class="font-bold text-charcoal mb-2">Issue Tracker</h3>
                             <p class="text-xs text-charcoal-mid mb-4">Report bugs, request improvements, and track the prototype backlog.</p>
                             <a href="https://github.com/leynos/netsuke/issues" class="text-indigo text-sm font-bold hover:underline">Open Issues</a>
                         </div>
                         <div class="hm-card hm-card--accent p-6 text-center">
-                            <span  class="iconify text-3xl text-vermillion mb-4" data-icon="carbon:calendar" aria-hidden="true"></span>
-                            <h3 class="font-bold text-charcoal mb-2">Latest Updates</h3>
-                            <p class="text-xs text-charcoal-mid mb-4">Follow release notes, design commentary, and implementation updates.</p>
-                            <a href="/netsuke/blog/" class="text-indigo text-sm font-bold hover:underline">Read the Blog</a>
+                            <span  class="iconify block mx-auto text-3xl text-vermillion mb-4" data-icon="carbon:calendar" aria-hidden="true"></span>
+                            <h3 class="font-bold text-charcoal mb-2">Roadmap</h3>
+                            <p class="text-xs text-charcoal-mid mb-4">Follow what shipped, what is still rough, and the phased plan ahead.</p>
+                            <a href="/netsuke/roadmap/" class="text-indigo text-sm font-bold hover:underline">View the Roadmap</a>
                         </div>
                     </div>
                 </section>
@@ -231,24 +232,24 @@
 
                     <div class="relative pl-4 border-l-2 border-stone-light space-y-6">
                         <div class="relative">
-                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-indigo border-2 border-white"></div>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-indigo border-2 border-white"></div>
                             <h4 class="text-sm font-bold text-indigo">1. Why Netsuke?</h4>
                             <p class="text-xs text-charcoal-mid mt-1">Understanding the problem space.</p>
                         </div>
                         <div class="relative">
-                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
                             <h4 class="text-sm font-bold text-charcoal">2. Getting Started</h4>
                             <p class="text-xs text-charcoal-mid mt-1">Installation and first build.</p>
                         </div>
                         <div class="relative">
-                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
                             <h4 class="text-sm font-bold text-charcoal">3. How it Works</h4>
                             <p class="text-xs text-charcoal-mid mt-1">Deep dive into the graph.</p>
                         </div>
                         <div class="relative">
-                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
-                            <h4 class="text-sm font-bold text-charcoal">4. Writing Rules</h4>
-                            <p class="text-xs text-charcoal-mid mt-1">Extending the system.</p>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
+                            <h4 class="text-sm font-bold text-charcoal">4. Writing Examples</h4>
+                            <p class="text-xs text-charcoal-mid mt-1">Contributing your own manifests.</p>
                         </div>
                     </div>
                 </div>
@@ -264,13 +265,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/netsuke/blog/" class="flex items-start group">
+                            <a href="/netsuke/roadmap/" class="flex items-start group">
                                 <span class="text-stone mr-3 text-xs mt-1">02</span>
-                                <span class="text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Latest Updates</span>
+                                <span class="text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Roadmap</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/netsuke/docs/cli-security-and-configuration/" class="flex items-start group">
+                            <a href="/netsuke/docs/cli/" class="flex items-start group">
                                 <span class="text-stone mr-3 text-xs mt-1">03</span>
                                 <span class="text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Command Line &amp; Configuration</span>
                             </a>

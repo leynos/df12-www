@@ -562,3 +562,65 @@ html {
 .mxd-table-row:hover {
   background-color: var(--mxd-sandstone-light);
 }
+
+/* Structured shared-content pages (legal pages: TOC, sections, badge cards) */
+.content-toc {
+  border: 1px solid var(--mxd-accent, #c54b2a);
+  border-radius: 0.5rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.content-toc ul {
+  display: grid;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.content-section {
+  margin-top: 2rem;
+}
+
+.content-section--divider {
+  border-top: 1px solid var(--mxd-accent, #c54b2a);
+  padding-top: 1.5rem;
+}
+
+.content-card {
+  align-items: flex-start;
+  border: 1px solid var(--mxd-accent, #c54b2a);
+  border-radius: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1.25rem 1.5rem;
+}
+
+.content-card__badge {
+  align-items: center;
+  border: 1px solid var(--mxd-indigo, #2d3a8c);
+  border-radius: 9999px;
+  color: var(--mxd-indigo, #2d3a8c);
+  display: flex;
+  flex: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: 2.5rem;
+  justify-content: center;
+  margin-top: 0.25rem;
+  width: 2.5rem;
+}
+
+.content-card--accent .content-card__badge {
+  border-color: var(--mxd-accent, #c54b2a);
+  color: var(--mxd-accent, #c54b2a);
+}
+
+.content-card__body {
+  min-width: 0;
+}
+
+.content-card__body > :first-child {
+  margin-top: 0;
+}

@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from df12_pages import deploy
+from df12_pages import cli, deploy
 
 _EXPECTED_FILE_MODE = 0o600
 
@@ -231,6 +231,7 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
 
     assert calls[0] == ["ensure"]
+    assert "-reconfigure" in init_call
     assert not backend_path.exists()
     assert not tfvars_path.exists()
 
@@ -265,6 +266,7 @@ def test_plan_stack_runs_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
 
     assert calls[0] == ["ensure"]
+    assert "-reconfigure" in init_call
     assert plan_call[-1] == str(plan_file)
     assert not backend_path.exists()
     assert not tfvars_path.exists()
@@ -302,6 +304,65 @@ def test_apply_stack_uses_plan_file(
     tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
 
     assert calls[0] == ["ensure"]
+    assert "-reconfigure" in init_call
     assert apply_call[1] == str(plan_file)
     assert not backend_path.exists()
     assert not tfvars_path.exists()
+
+
+def test_main_reports_subprocess_failure(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test that main converts CalledProcessError into a one-line message."""
+
+    def boom() -> None:
+        raise subprocess.CalledProcessError(
+            1, ["/usr/sbin/tofu", "init", "-reconfigure"]
+        )
+
+    monkeypatch.setattr(cli, "app", boom)
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli.main()
+
+    assert excinfo.value.code == 1
+    err = capsys.readouterr().err
+    assert "error: tofu init exited with status 1" in err
+    assert "Traceback" not in err
+
+
+def test_main_reports_missing_binary(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test that main converts FileNotFoundError into a one-line message."""
+
+    def boom() -> None:
+        msg = "tofu binary not found on PATH"
+        raise FileNotFoundError(msg)
+
+    monkeypatch.setattr(cli, "app", boom)
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli.main()
+
+    assert excinfo.value.code == 1
+    assert "error: tofu binary not found on PATH" in capsys.readouterr().err
+
+
+def test_main_reports_credential_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test that main converts CredentialError into a one-line message."""
+
+    def boom() -> None:
+        msg = "AWS access key and secret key are required"
+        raise deploy.CredentialError(msg)
+
+    monkeypatch.setattr(cli, "app", boom)
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli.main()
+
+    assert excinfo.value.code == 1
+    err = capsys.readouterr().err
+    assert "error: AWS access key and secret key are required" in err

@@ -145,6 +145,28 @@ def run_tofu(args: list[str], env: dict[str, str]) -> subprocess.CompletedProces
     )
 
 
+def _run_tofu_init(
+    materialized_backend: Path, materialized_tfvars: Path, env: dict[str, str]
+) -> None:
+    """Run ``tofu init -reconfigure`` with the materialized backend and vars.
+
+    The backend configuration is rendered fresh from the TOML config on every
+    run, so the record cached in ``.terraform/`` carries no authoritative
+    information; ``-reconfigure`` stops tofu aborting when the two drift.
+    """
+    run_tofu(
+        [
+            "init",
+            "-reconfigure",
+            "-backend-config",
+            str(materialized_backend),
+            "-var-file",
+            str(materialized_tfvars),
+        ],
+        env=env,
+    )
+
+
 def init_stack(
     *,
     config_path: Path = DEFAULT_CONFIG_PATH,
@@ -189,16 +211,7 @@ def init_stack(
     try:
         if ensure_bucket:
             ensure_backend_bucket(backend, env)
-        run_tofu(
-            [
-                "init",
-                "-backend-config",
-                str(materialized_backend),
-                "-var-file",
-                str(materialized_tfvars),
-            ],
-            env=env,
-        )
+        _run_tofu_init(materialized_backend, materialized_tfvars, env)
     finally:
         materialized_backend.unlink(missing_ok=True)
         materialized_tfvars.unlink(missing_ok=True)
@@ -227,7 +240,7 @@ def plan_stack(  # noqa: PLR0913 -- orchestration entry point needs explicit pla
     save_credentials_flag : bool, optional
         Persist resolved credentials back to *config_path* when ``True``.
     run_init : bool, optional
-        Run ``tofu init`` before planning when ``True``.
+        Run ``tofu init -reconfigure`` before planning when ``True``.
     destroy : bool, optional
         Pass ``-destroy`` to ``tofu plan`` when ``True``.
 
@@ -253,16 +266,7 @@ def plan_stack(  # noqa: PLR0913 -- orchestration entry point needs explicit pla
     try:
         ensure_backend_bucket(backend, env)
         if run_init:
-            run_tofu(
-                [
-                    "init",
-                    "-backend-config",
-                    str(materialized_backend),
-                    "-var-file",
-                    str(materialized_tfvars),
-                ],
-                env=env,
-            )
+            _run_tofu_init(materialized_backend, materialized_tfvars, env)
         plan_args = [
             "plan",
             "-destroy" if destroy else None,
@@ -300,7 +304,7 @@ def apply_stack(
     save_credentials_flag : bool, optional
         Persist resolved credentials back to *config_path* when ``True``.
     run_init : bool, optional
-        Run ``tofu init`` before applying when ``True``.
+        Run ``tofu init -reconfigure`` before applying when ``True``.
 
     Raises
     ------
@@ -324,16 +328,7 @@ def apply_stack(
     try:
         ensure_backend_bucket(backend, env)
         if run_init:
-            run_tofu(
-                [
-                    "init",
-                    "-backend-config",
-                    str(materialized_backend),
-                    "-var-file",
-                    str(materialized_tfvars),
-                ],
-                env=env,
-            )
+            _run_tofu_init(materialized_backend, materialized_tfvars, env)
         if plan_file:
             args = ["apply", str(plan_file)]
         else:

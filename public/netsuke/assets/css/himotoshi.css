@@ -264,6 +264,16 @@ a.sidebar-link--sub.active {
   padding-inline: 1rem;
 }
 
+/* Scrollable pill rows keep their overflow but hide the scrollbar. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .hm-sidebar-card {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(209, 199, 184, 0.85);

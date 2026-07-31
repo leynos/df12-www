@@ -1,0 +1,69 @@
+{#
+  Floating docs sub-menu bar for mobile devices.
+
+  A clone of the examples-hub filter/search bar, repurposed as docs
+  navigation. Rendered only below the `lg` breakpoint; desktop keeps the
+  left-hand sidebar (`hidden lg:block`), so the two are exactly
+  complementary. The pages are offered as a single dropdown (a native
+  select, so mobile browsers present their own picker); navigation on
+  change is wired up by assets/js/docs-nav.js. The search box reuses the
+  shared doc-search widget via its `data-doc-search-*` hooks, which
+  support multiple roots per page.
+#}
+{% macro mobile_docs_bar(active='') %}
+        <section class="hm-filter-shell lg:hidden sticky top-20 z-40 mb-8 py-3 -mx-4 px-4 sm:mx-0 sm:px-0 [contain:inline-size]" aria-label="Documentation menu">
+            <div class="hm-filter-shell__row flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="relative w-full sm:w-auto sm:flex-1 sm:max-w-[16rem]">
+                    <label for="docs-nav-select" class="visually-hidden">Documentation pages</label>
+                    <span class="iconify absolute left-3 top-2.5 text-stone text-sm pointer-events-none" data-icon="carbon:book" aria-hidden="true"></span>
+                    <select
+                        id="docs-nav-select"
+                        data-docs-nav-select
+                        class="search-input w-full appearance-none pl-9 pr-8 py-1.5 bg-white border border-stone rounded-md text-sm text-charcoal focus:border-indigo focus:ring-1 focus:ring-indigo transition-colors"
+                    >
+                        {% for slug, label in [
+                            ('', 'Docs Hub'),
+                            ('getting-started', 'Getting Started'),
+                            ('manifest-reference', 'Manifest Reference'),
+                            ('rules-and-targets', 'Rules & Targets'),
+                            ('templating', 'Templating'),
+                            ('standard-library', 'Standard Library'),
+                            ('cli', 'CLI Commands'),
+                            ('configuration', 'Configuration'),
+                            ('security', 'Security Model'),
+                        ] %}
+                        <option value="/netsuke/docs/{% if slug %}{{ slug }}/{% endif %}"{% if active == slug %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="iconify absolute right-3 top-2.5 text-stone text-sm pointer-events-none" data-icon="carbon:chevron-down" aria-hidden="true"></span>
+                </div>
+
+                <div
+                    class="relative w-full sm:w-64 sm:flex-shrink-0"
+                    data-doc-search-root
+                    data-doc-search-index="/netsuke/assets/search/docs-search.json"
+                >
+                    <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                    <input
+                        type="text"
+                        placeholder="Search docs..."
+                        class="search-input w-full pl-9 pr-4 py-1.5 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo focus:ring-1 focus:ring-indigo transition-colors"
+                        data-doc-search-input
+                        aria-label="Search the documentation"
+                        role="combobox"
+                        aria-autocomplete="list"
+                        aria-expanded="false"
+                    >
+                    <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
+                        <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
+                            <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                            <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                                Type at least 2 characters to search the docs.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script defer src="/netsuke/assets/js/docs-nav.js"></script>
+{% endmacro %}

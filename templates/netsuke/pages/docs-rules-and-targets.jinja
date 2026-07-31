@@ -9,21 +9,6 @@
         /* Custom Table Styling */
         .prop-table tr:last-child td { border-bottom: none; }
         .prop-table th { font-family: 'Fraunces', serif; }
-
-        /* Step connector line */
-        .step-connector::after {
-            content: '';
-            position: absolute;
-            top: 2rem;
-            bottom: -1rem;
-            left: 1rem;
-            width: 2px;
-            background-color: #E5DDD0;
-            z-index: 0;
-        }
-        .step-item:last-child .step-connector::after {
-            display: none;
-        }
     </style>
 {% endblock %}
 {% block content %}
@@ -217,24 +202,18 @@ targets:
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm step-item relative">
-                        <div class="step-connector">
-                            <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3 relative z-10">1</div>
-                        </div>
+                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">1</div>
                         <h4 class="font-bold text-charcoal mb-2">Rule name</h4>
                         <p class="text-sm text-charcoal-mid">Targets refer to a rule by <code class="font-mono text-xs">name</code>. Keep names short and literal.</p>
                     </div>
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm step-item relative">
-                        <div class="step-connector">
-                            <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3 relative z-10">2</div>
-                        </div>
+                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">2</div>
                         <h4 class="font-bold text-charcoal mb-2">Recipe field</h4>
                         <p class="text-sm text-charcoal-mid">A rule carries exactly one recipe: <code class="font-mono text-xs">command</code> or <code class="font-mono text-xs">script</code>.</p>
                     </div>
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm step-item relative">
-                        <div class="step-connector">
-                            <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3 relative z-10">3</div>
-                        </div>
+                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">3</div>
                         <h4 class="font-bold text-charcoal mb-2">Target wiring</h4>
                         <p class="text-sm text-charcoal-mid">Targets supply the concrete <code class="font-mono text-xs">sources</code>, outputs, and optional per-target variables.</p>
                     </div>

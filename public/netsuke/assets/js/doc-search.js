@@ -39,6 +39,7 @@
     const payload = await response.json();
     const searchOptions = payload.indexOptions.searchOptions;
     const miniSearch = window.MiniSearch.loadJSON(payload.index, payload.indexOptions);
+    const siteRoot = siteRootFromIndexPath(searchIndexPath);
 
     let activeIndex = -1;
     let activeResults = [];
@@ -70,6 +71,7 @@
         meta,
         panel,
         resultsList,
+        siteRoot,
       });
     });
 
@@ -96,7 +98,7 @@
         event.preventDefault();
         const selected = activeResults[activeIndex];
         if (selected) {
-          window.location.href = toAbsoluteSiteHref(selected.sitePath);
+          window.location.href = toAbsoluteSiteHref(siteRoot, selected.sitePath);
         }
         return;
       }
@@ -148,6 +150,7 @@
     meta,
     panel,
     resultsList,
+    siteRoot,
   }) {
     const query = input.value.trim();
 
@@ -167,7 +170,7 @@
 
     resultsList.innerHTML = activeResults
       .map((result, index) => {
-        const href = toAbsoluteSiteHref(result.sitePath);
+        const href = toAbsoluteSiteHref(siteRoot, result.sitePath);
         const subtitle = result.sectionTitle || result.pageTitle;
         const excerpt = escapeHtml(result.excerpt || "");
 
@@ -218,11 +221,15 @@
     input.setAttribute("aria-expanded", "false");
   }
 
-  function toAbsoluteSiteHref(sitePath) {
-    const docsMarker = "/docs/";
-    const pathname = window.location.pathname;
-    const markerIndex = pathname.indexOf(docsMarker);
-    const siteRoot = markerIndex >= 0 ? pathname.slice(0, markerIndex + 1) : "/";
+  function siteRootFromIndexPath(indexPath) {
+    // Index files live at "<siteRoot>assets/search/<name>.json", so the
+    // prefix before that marker is the sub-site root the results belong to.
+    const marker = "assets/search/";
+    const markerIndex = indexPath.indexOf(marker);
+    return markerIndex >= 0 ? indexPath.slice(0, markerIndex) : "/";
+  }
+
+  function toAbsoluteSiteHref(siteRoot, sitePath) {
     const url = new URL(siteRoot + sitePath, window.location.origin);
     return `${url.pathname}${url.hash}`;
   }

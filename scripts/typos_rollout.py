@@ -50,14 +50,13 @@ class Dictionary:
 
 def _string_list(table: cabc.Mapping[str, object], key: str) -> tuple[str, ...]:
     """Read and validate a list of strings from a TOML table."""
+    message = f"{key!r} must be a list of strings"
     value = table.get(key, [])
     if not isinstance(value, list):
-        message = f"{key!r} must be a list of strings"
         raise TypeError(message)
     items: list[str] = []
     for item in value:
         if not isinstance(item, str):
-            message = f"{key!r} must be a list of strings"
             raise TypeError(message)
         items.append(item)
     return tuple(sorted(set(items)))

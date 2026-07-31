@@ -150,13 +150,13 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#remote-section" class="flex items-center justify-between group p-2 rounded hover:bg-white transition-colors">
+                                    <a href="#output-section" class="flex items-center justify-between group p-2 rounded hover:bg-white transition-colors">
                                         <span class="font-mono text-indigo font-medium">Output</span>
                                         <span class="iconify text-xs text-stone group-hover:text-indigo" data-icon="carbon:chevron-right" aria-hidden="true"></span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#cache-section" class="flex items-center justify-between group p-2 rounded hover:bg-white transition-colors">
+                                    <a href="#network-section" class="flex items-center justify-between group p-2 rounded hover:bg-white transition-colors">
                                         <span class="font-mono text-indigo font-medium">Network</span>
                                         <span class="iconify text-xs text-stone group-hover:text-indigo" data-icon="carbon:chevron-right" aria-hidden="true"></span>
                                     </a>
@@ -164,26 +164,36 @@
                             </ul>
                         </div>
                         <div class="md:col-span-8 p-0">
-                            <div class="bg-charcoal p-6 overflow-x-auto h-full min-h-[300px]">
-                                <pre class="font-mono text-sm text-stone-light"><code><span id="build-section" class="text-charcoal-light"># Keys are flat; this mirrors docs/sample-netsuke.toml</span>
-<span class="text-charcoal-light"># Manifest path override</span>
-file = <span class="text-matcha">"Netsukefile"</span>
-<span class="text-charcoal-light"># Number of parallel jobs (1-64)</span>
-jobs = <span class="text-vermillion">8</span>
-<span class="text-charcoal-light"># Default build targets when the CLI names none</span>
-default_targets = [<span class="text-matcha">"fmt"</span>, <span class="text-matcha">"lint"</span>, <span class="text-matcha">"test"</span>]
-
-<span id="remote-section" class="text-charcoal-light"># Output policies</span>
-progress = <span class="text-matcha">"auto"</span>       <span class="text-charcoal-light"># auto | always | never</span>
-accessibility = <span class="text-matcha">"auto"</span>  <span class="text-charcoal-light"># auto | on | off</span>
-emoji = <span class="text-matcha">"auto"</span>          <span class="text-charcoal-light"># auto | always | never</span>
-color = <span class="text-matcha">"auto"</span>          <span class="text-charcoal-light"># auto | always | never</span>
-locale = <span class="text-matcha">"en-US"</span>
-
-<span id="cache-section" class="text-charcoal-light"># Network policy for the fetch() helper</span>
-fetch_default_deny = <span class="text-matcha">false</span>
-fetch_allow_host = [<span class="text-matcha">"*.example.com"</span>]
-fetch_block_host = [<span class="text-matcha">"metadata.internal"</span>]</code></pre>
+                            <div class="bg-charcoal p-6 overflow-x-auto h-full min-h-[300px] space-y-6">
+                                <div id="build-section" class="hm-example-code-block">
+{% endraw %}{% highlight 'toml' %}{% raw %}
+# Keys are flat; this mirrors docs/sample-netsuke.toml
+# Manifest path override
+file = "Netsukefile"
+# Number of parallel jobs (1-64)
+jobs = 8
+# Default build targets when the CLI names none
+default_targets = ["fmt", "lint", "test"]
+{% endraw %}{% endhighlight %}{% raw %}
+                                </div>
+                                <div id="output-section" class="hm-example-code-block">
+{% endraw %}{% highlight 'toml' %}{% raw %}
+# Output policies
+progress = "auto"       # auto | always | never
+accessibility = "auto"  # auto | on | off
+emoji = "auto"          # auto | always | never
+color = "auto"          # auto | always | never
+locale = "en-US"
+{% endraw %}{% endhighlight %}{% raw %}
+                                </div>
+                                <div id="network-section" class="hm-example-code-block">
+{% endraw %}{% highlight 'toml' %}{% raw %}
+# Network policy for the fetch() helper
+fetch_default_deny = false
+fetch_allow_host = ["*.example.com"]
+fetch_block_host = ["metadata.internal"]
+{% endraw %}{% endhighlight %}{% raw %}
+                                </div>
                             </div>
                         </div>
                     </div>

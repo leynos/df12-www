@@ -216,6 +216,7 @@ name = "df12-pages"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "beautifulsoup4" },
     { name = "cyclopts" },
     { name = "github3-py" },
     { name = "jinja2" },
@@ -230,7 +231,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "beautifulsoup4" },
     { name = "betamax" },
     { name = "jqpy" },
     { name = "msgspec" },
@@ -245,6 +245,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "beautifulsoup4", specifier = ">=4.12" },
     { name = "cyclopts", specifier = ">=2.9" },
     { name = "github3-py", specifier = ">=4.0" },
     { name = "jinja2", specifier = ">=3.1" },
@@ -259,7 +260,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "beautifulsoup4" },
     { name = "betamax" },
     { name = "jqpy" },
     { name = "msgspec" },

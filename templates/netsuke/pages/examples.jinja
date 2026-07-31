@@ -101,11 +101,12 @@ targets:
                         aria-label="Search the examples"
                         role="combobox"
                         aria-autocomplete="list"
+                        aria-controls="example-search-results"
                         aria-expanded="false"
                     >
                     <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
                         <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                            <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                            <ul id="example-search-results" class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
                             <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
                                 Type at least 2 characters to search the examples.
                             </p>

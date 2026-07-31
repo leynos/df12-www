@@ -28,15 +28,19 @@ from __future__ import annotations
 import textwrap
 import typing as typ
 
-from jinja2 import nodes
+from jinja2 import TemplateRuntimeError, nodes
 from jinja2.ext import Extension
 from markupsafe import Markup
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
+from pygments.util import ClassNotFound
 
 if typ.TYPE_CHECKING:
     from jinja2.parser import Parser
+
+#: Shared formatter; its configuration is immutable and rendering is stateless.
+_FORMATTER = HtmlFormatter(cssclass="hm-syntax", wrapcode=True)
 
 
 class HighlightExtension(Extension):
@@ -55,9 +59,14 @@ class HighlightExtension(Extension):
     def _render(self, lexer_name: str, caller: typ.Callable[[], str]) -> Markup:
         """Highlight the block body with the named Pygments lexer."""
         source = textwrap.dedent(str(caller())).strip("\n")
-        lexer = get_lexer_by_name(lexer_name)
-        formatter = HtmlFormatter(cssclass="hm-syntax", wrapcode=True)
-        return Markup(highlight(source, lexer, formatter))  # noqa: S704 -- Pygments escapes the untrusted source text
+        try:
+            lexer = get_lexer_by_name(lexer_name)
+        except ClassNotFound as exc:
+            message = (
+                f"{{% highlight {lexer_name!r} %}} names an unknown Pygments lexer"
+            )
+            raise TemplateRuntimeError(message) from exc
+        return Markup(highlight(source, lexer, _FORMATTER))  # noqa: S704 -- Pygments escapes the untrusted source text
 
 
 __all__ = ["HighlightExtension"]

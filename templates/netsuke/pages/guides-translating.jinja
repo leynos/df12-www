@@ -12,7 +12,7 @@
                 <div>
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
                     <ul class="space-y-1">
-                        <li><a href="#how-it-works" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">How localization works</a></li>
+                        <li><a href="#how-it-works" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">How localization works</a></li>
                         <li><a href="#file-structure" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">File structure</a></li>
                         <li><a href="#message-keys" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Message keys</a></li>
                         <li><a href="#variables-plurals" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Variables &amp; plurals</a></li>
@@ -257,11 +257,13 @@ range-error = Value { $value } must be
                     </div>
                     <div class="bg-charcoal rounded-xl overflow-hidden">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Plural forms (English vs Spanish)</div>
-                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code>example.files_processed = { $count -&gt;
+                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># en-US/messages.ftl</span>
+example.files_processed = { $count -&gt;
     [one] Processed { $count } file.
    *[other] Processed { $count } files.
 }
 
+<span class="text-charcoal-light"># es-ES/messages.ftl</span>
 example.files_processed = { $count -&gt;
     [one] Se procesó { $count } archivo.
    *[other] Se procesaron { $count } archivos.

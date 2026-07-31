@@ -60,24 +60,7 @@
                         <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/hello-world/Netsukefile</span>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
-netsuke_version: "1.0.0"
-
-vars:
-  greeting: "Hello from Netsuke"
-
-targets:
-  - name: output.txt
-    command: "cat input.txt | tr 'a-z' 'A-Z' > output.txt"
-    sources: input.txt
-
-  - name: greeting.txt
-    command: "printf '%s\n' '{{ greeting }}!' > greeting.txt"
-
-defaults:
-  - output.txt
-  - greeting.txt
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_hello_world }}{% endhighlight %}{% raw %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">Variables are templated directly</h4><p class="text-sm text-charcoal-mid">The `greeting` variable is expanded inside the command string with standard Jinja syntax.</p></div></div>

@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 license = { text = "ISC" }
 authors = [{ name = "Payton McIntosh", email = "pmcintosh@df12.net" }]
 dependencies = [
+    "beautifulsoup4>=4.12",
     "cyclopts>=2.9",
     "Jinja2>=3.1",
     "Markdown>=3.5",
@@ -39,7 +40,6 @@ dev = [
     "pytest-bdd",
     "betamax",
     "parse_type",
-    "beautifulsoup4",
     "msgspec",
     "jqpy",
 ]

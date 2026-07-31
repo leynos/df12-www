@@ -9,7 +9,7 @@
         <!-- Header Section -->
         <header class="text-center max-w-3xl mx-auto mb-16">
             <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone mb-6">
-                <span class="w-2 h-2 rounded-full bg-matcha mr-2"></span> v0.1.0 released 5 August
+                <span class="w-2 h-2 rounded-full bg-amber mr-2"></span> v0.1.0 scheduled for 5 August 2026
             </div>
             <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Roadmap</h1>
             <p class="text-xl text-charcoal-mid font-light leading-relaxed">
@@ -139,14 +139,14 @@
                                 </div>
                                 <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-amber mr-1.5"></span> In progress</span>
                             </div>
-                            <div class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical command and flag names replacing the pre-0.1.0 surface</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Non-interactive and mutation-safety guarantees (<code>--no-input</code>, <code>--force</code>, <code>--dry-run</code>)</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical structured <code>--json</code> output with stable exit codes and enumerable errors</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Bounded output for every large response</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Assistive-technology verification of accessible output</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Regression coverage for configuration precedence and terminal rendering</span></div>
-                            </div>
+                            <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical command and flag names replacing the pre-0.1.0 surface</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Non-interactive and mutation-safety guarantees (<code>--no-input</code>, <code>--force</code>, <code>--dry-run</code>)</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical structured <code>--json</code> output with stable exit codes and enumerable errors</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Bounded output for every large response</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Assistive-technology verification of accessible output</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Regression coverage for configuration precedence and terminal rendering</span></li>
+                            </ul>
                         </div>
 
                         <!-- Recipe model -->
@@ -158,13 +158,13 @@
                                 </div>
                                 <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-amber mr-1.5"></span> In progress</span>
                             </div>
-                            <div class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured <code>exec</code> recipes for argv-safe commands</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured recipe environment mappings</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Rule-level <code>deps_from</code> for compiler dependency imports (GCC depfiles)</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Backend dollar escaping after placeholder lowering</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Clearer feedback when conditional actions are selected</span></div>
-                            </div>
+                            <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured <code>exec</code> recipes for argv-safe commands</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured recipe environment mappings</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Rule-level <code>deps_from</code> for compiler dependency imports (GCC depfiles)</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Backend dollar escaping after placeholder lowering</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Clearer feedback when conditional actions are selected</span></li>
+                            </ul>
                         </div>
 
                         <!-- Phase 4 -->
@@ -176,12 +176,12 @@
                                 </div>
                                 <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-amber mr-1.5"></span> Started</span>
                             </div>
-                            <div class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
-                                <div class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Kani tooling, CI smoke job, and harnesses for manifest-to-IR safety and cycle canonicalization</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Kani harnesses for command interpolation</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Property tests for deterministic Ninja emission, expansion invariants, and render stability</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Documented placeholder and cycle-detection contracts; evaluation of a minimal Verus proof kernel</span></div>
-                            </div>
+                            <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
+                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Kani tooling, CI smoke job, and harnesses for manifest-to-IR safety and cycle canonicalization</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Kani harnesses for command interpolation</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Property tests for deterministic Ninja emission, expansion invariants, and render stability</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Documented placeholder and cycle-detection contracts; evaluation of a minimal Verus proof kernel</span></li>
+                            </ul>
                         </div>
 
                         <!-- Phase 5 -->
@@ -193,12 +193,12 @@
                                 </div>
                                 <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-stone mr-1.5"></span> Planned</span>
                             </div>
-                            <div class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Machine-readable context: <code>netsuke context --json</code> and <code>skill-path</code></span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A run ledger: <code>runs list</code>, <code>runs get</code>, and <code>runs prune</code></span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Named profiles with redaction and secret handling</span></div>
-                                <div class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured artefact delivery and local-first feedback</span></div>
-                            </div>
+                            <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Machine-readable context: <code>netsuke context --json</code> and <code>skill-path</code></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A run ledger: <code>runs list</code>, <code>runs get</code>, and <code>runs prune</code></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Named profiles with redaction and secret handling</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured artefact delivery and local-first feedback</span></li>
+                            </ul>
                         </div>
                     </div>
                 </section>
@@ -214,13 +214,13 @@
                         </h3>
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-charcoal">v0.1.0</span></div>
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Released</span><span class="font-mono text-charcoal">5 August 2026</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Release date</span><span class="font-mono text-charcoal">5 August 2026</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Licence</span><span class="font-mono text-charcoal">ISC</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Rust (source builds)</span><span class="font-mono text-charcoal">1.89+</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Crate</span><span class="font-mono text-charcoal">netsuke-build</span></div>
                         </div>
                         <div class="mt-5 pt-4 border-t border-stone-light space-y-2">
-                            <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">Release notes &amp; installers</a>
+                            <a href="https://github.com/leynos/netsuke/releases" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">Release notes &amp; installers (from 5 August 2026)</a>
                             <a href="/netsuke/install/" class="block w-full py-2 px-4 bg-transparent border border-stone text-charcoal text-center rounded text-sm font-bold hover:bg-boxwood-pale transition-colors">Install Netsuke</a>
                         </div>
                     </div>
@@ -229,8 +229,8 @@
                     <div class="bg-charcoal rounded-xl overflow-hidden">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Canonical vocabulary (target state)</div>
                         <div class="p-5 font-mono text-xs text-stone-light space-y-1">
-                            <div><span class="text-matcha">build</span> · <span class="text-matcha">check</span> · <span class="text-matcha">clean</span> · <span class="text-matcha">generate</span> · <span class="text-matcha">graph</span></div>
-                            <div><span class="text-amber">context</span> · <span class="text-amber">skill-path</span> · <span class="text-amber">runs</span> · <span class="text-amber">profile</span> · <span class="text-amber">feedback</span></div>
+                            <div><span class="text-stone-light">Shipped:</span> <span class="text-matcha">build</span> · <span class="text-matcha">check</span> · <span class="text-matcha">clean</span> · <span class="text-matcha">generate</span> · <span class="text-matcha">graph</span></div>
+                            <div><span class="text-stone-light">Planned:</span> <span class="text-amber">context</span> · <span class="text-amber">skill-path</span> · <span class="text-amber">runs</span> · <span class="text-amber">profile</span> · <span class="text-amber">feedback</span></div>
                             <div class="pt-2 text-charcoal-light">--json · --no-input · --force · --dry-run</div>
                             <div class="text-charcoal-light">--limit · --cursor · --output · --deliver</div>
                         </div>

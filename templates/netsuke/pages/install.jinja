@@ -50,22 +50,22 @@
             <div class="hm-card overflow-hidden">
                 <!-- OS Tabs -->
                 <div class="flex border-b border-stone bg-boxwood-pale/50 overflow-x-auto" role="tablist" aria-label="Installation methods">
-                    <button type="button" class="tab-btn active px-6 py-4 text-sm font-bold text-charcoal border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="cargo" role="tab" aria-selected="true" aria-controls="install-panel-cargo">
+                    <button type="button" id="install-tab-cargo" class="tab-btn active px-6 py-4 text-sm font-bold text-charcoal border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="cargo" role="tab" aria-selected="true" aria-controls="install-panel-cargo" tabindex="0">
                         <span  class="iconify mr-2" data-icon="carbon:development" aria-hidden="true"></span> Cargo
                     </button>
-                    <button type="button" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="linux" role="tab" aria-selected="false" aria-controls="install-panel-linux">
+                    <button type="button" id="install-tab-linux" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="linux" role="tab" aria-selected="false" aria-controls="install-panel-linux" tabindex="-1">
                         <span  class="iconify mr-2" data-icon="carbon:linux" aria-hidden="true"></span> Linux
                     </button>
-                    <button type="button" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="macos" role="tab" aria-selected="false" aria-controls="install-panel-macos">
+                    <button type="button" id="install-tab-macos" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="macos" role="tab" aria-selected="false" aria-controls="install-panel-macos" tabindex="-1">
                         <span  class="iconify mr-2" data-icon="carbon:apple" aria-hidden="true"></span> macOS
                     </button>
-                    <button type="button" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="windows" role="tab" aria-selected="false" aria-controls="install-panel-windows">
+                    <button type="button" id="install-tab-windows" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="windows" role="tab" aria-selected="false" aria-controls="install-panel-windows" tabindex="-1">
                         <span  class="iconify mr-2" data-icon="carbon:windows" aria-hidden="true"></span> Windows
                     </button>
                 </div>
 
                 <!-- Cargo panel -->
-                <div class="p-8 lg:p-10" id="install-panel-cargo" data-install-panel="cargo" role="tabpanel">
+                <div class="p-8 lg:p-10" id="install-panel-cargo" data-install-panel="cargo" role="tabpanel" aria-labelledby="install-tab-cargo">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Install with Cargo</h3>
                         <p class="text-charcoal-mid text-sm">Netsuke is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Source builds require Rust 1.89 or later, and <code>ninja</code> must be installed separately.</p>
@@ -97,7 +97,7 @@ $ cargo install netsuke-build
                 </div>
 
                 <!-- Linux panel -->
-                <div class="p-8 lg:p-10 hidden" id="install-panel-linux" data-install-panel="linux" role="tabpanel">
+                <div class="p-8 lg:p-10 hidden" id="install-panel-linux" data-install-panel="linux" role="tabpanel" aria-labelledby="install-tab-linux">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Linux packages</h3>
                         <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
@@ -115,7 +115,7 @@ $ sudo dnf install ./PACKAGE.rpm
                 </div>
 
                 <!-- macOS panel -->
-                <div class="p-8 lg:p-10 hidden" id="install-panel-macos" data-install-panel="macos" role="tabpanel">
+                <div class="p-8 lg:p-10 hidden" id="install-panel-macos" data-install-panel="macos" role="tabpanel" aria-labelledby="install-tab-macos">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">macOS installer package</h3>
                         <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
@@ -133,20 +133,24 @@ $ brew install ninja
                 </div>
 
                 <!-- Windows panel -->
-                <div class="p-8 lg:p-10 hidden" id="install-panel-windows" data-install-panel="windows" role="tabpanel">
+                <div class="p-8 lg:p-10 hidden" id="install-panel-windows" data-install-panel="windows" role="tabpanel" aria-labelledby="install-tab-windows">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Windows installer</h3>
                         <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v0.1.0" class="text-indigo hover:underline">v0.1.0 release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts.</p>
                     </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light space-y-3 overflow-x-auto">
-                        <div><span class="text-charcoal-light"># Install the downloaded package</span></div>
-                        <div>msiexec.exe /i PACKAGE.msi</div>
-                        <div class="pt-2"><span class="text-charcoal-light"># Add the install directory to the current user's PATH</span></div>
-                        <div>$dir = Join-Path $env:ProgramFiles 'netsuke'</div>
-                        <div>[Environment]::SetEnvironmentVariable('Path',</div>
-                        <div>&nbsp;&nbsp;"$([Environment]::GetEnvironmentVariable('Path', 'User'));$dir", 'User')</div>
-                        <div>$env:Path = "$env:Path;$dir"</div>
-                        <div class="pt-2">netsuke --version</div>
+                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light overflow-x-auto">
+{% endraw %}{% highlight 'powershell' %}{% raw %}
+# Install the downloaded package
+msiexec.exe /i PACKAGE.msi
+
+# Add the install directory to the current user's PATH
+$dir = Join-Path $env:ProgramFiles 'netsuke'
+[Environment]::SetEnvironmentVariable('Path',
+  "$([Environment]::GetEnvironmentVariable('Path', 'User'));$dir", 'User')
+$env:Path = "$env:Path;$dir"
+
+netsuke --version
+{% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <p class="mt-6 text-xs text-charcoal-mid">See the <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#complete-windows-setup" class="text-indigo hover:underline">complete Windows setup</a> for the idempotent PATH script and the PowerShell help module install.</p>
                 </div>
@@ -308,26 +312,48 @@ $ netsuke build
     <script>
         // Installation tab switcher
         document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('[data-install-tab]');
+            const tabs = Array.from(document.querySelectorAll('[data-install-tab]'));
             const panels = document.querySelectorAll('[data-install-panel]');
 
-            tabs.forEach((tab) => {
-                tab.addEventListener('click', () => {
-                    const key = tab.getAttribute('data-install-tab');
+            function selectTab(tab) {
+                const key = tab.getAttribute('data-install-tab');
 
-                    tabs.forEach((other) => {
-                        const active = other === tab;
-                        other.classList.toggle('active', active);
-                        other.classList.toggle('font-bold', active);
-                        other.classList.toggle('text-charcoal', active);
-                        other.classList.toggle('font-medium', !active);
-                        other.classList.toggle('text-charcoal-mid', !active);
-                        other.setAttribute('aria-selected', String(active));
-                    });
+                tabs.forEach((other) => {
+                    const active = other === tab;
+                    other.classList.toggle('active', active);
+                    other.classList.toggle('font-bold', active);
+                    other.classList.toggle('text-charcoal', active);
+                    other.classList.toggle('font-medium', !active);
+                    other.classList.toggle('text-charcoal-mid', !active);
+                    other.setAttribute('aria-selected', String(active));
+                    other.setAttribute('tabindex', active ? '0' : '-1');
+                });
 
-                    panels.forEach((panel) => {
-                        panel.classList.toggle('hidden', panel.getAttribute('data-install-panel') !== key);
-                    });
+                panels.forEach((panel) => {
+                    panel.classList.toggle('hidden', panel.getAttribute('data-install-panel') !== key);
+                });
+            }
+
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => selectTab(tab));
+                tab.addEventListener('keydown', (event) => {
+                    let targetIndex = null;
+                    if (event.key === 'ArrowRight') {
+                        targetIndex = (index + 1) % tabs.length;
+                    } else if (event.key === 'ArrowLeft') {
+                        targetIndex = (index - 1 + tabs.length) % tabs.length;
+                    } else if (event.key === 'Home') {
+                        targetIndex = 0;
+                    } else if (event.key === 'End') {
+                        targetIndex = tabs.length - 1;
+                    }
+                    if (targetIndex === null) {
+                        return;
+                    }
+                    event.preventDefault();
+                    const target = tabs[targetIndex];
+                    selectTab(target);
+                    target.focus();
                 });
             });
         });

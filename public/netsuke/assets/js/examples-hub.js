@@ -54,11 +54,17 @@
 
   function flash(button, message, colourClass) {
     const originalTitle = button.getAttribute("title");
+    const originalAriaLabel = button.getAttribute("aria-label");
     button.setAttribute("title", message);
     button.setAttribute("aria-label", message);
     button.classList.add(colourClass);
     window.setTimeout(() => {
       button.setAttribute("title", originalTitle);
+      if (originalAriaLabel === null) {
+        button.removeAttribute("aria-label");
+      } else {
+        button.setAttribute("aria-label", originalAriaLabel);
+      }
       button.classList.remove(colourClass);
     }, 1500);
   }

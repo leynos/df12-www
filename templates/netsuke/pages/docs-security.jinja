@@ -2,7 +2,7 @@
 {% set active_nav = 'docs' %}
 {% block page_title %}Security Model - Netsuke Build System{% endblock %}
 {% block extra_head %}
-    <script defer src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <script defer src="https://cdn.plot.ly/plotly-3.1.1.min.js" integrity="sha384-eyWfwv4NWkH7sLjk6s+Al2SBmZhX8gcLellpr+PLrfiNaHoTlAQTG9zDi4Z0liz8" crossorigin="anonymous"></script>
 {% endblock %}
 {% block content %}
 {% raw %}
@@ -151,7 +151,7 @@ $ netsuke \
                 </div>
 
                 <p class="text-charcoal-mid mb-10 max-w-3xl">
-                    The reviewed docs emphasize safer command construction, clear diagnostics, and explicit manifest structure. This page therefore sticks to the validation boundaries Netsuke actually documents.
+                    Netsuke validates every manifest against a schema before template expansion runs, and escapes shell interpolation to prevent injection. Diagnostics are typed, so validation failures point to the exact manifest location rather than surfacing as opaque errors.
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
@@ -184,9 +184,8 @@ $ netsuke \
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Vulnerability Mitigation</h3>
                     <p class="text-xs text-charcoal-mid mb-4">Qualitative comparison based on documented safety features; no numeric mitigation claim is implied.</p>
-                    <div id="securityChart" class="h-[400px] w-full">
-                        <p class="text-xs text-charcoal-mid">Sandboxing and capability checks provide stronger qualitative mitigation than direct execution. Interactive charting requires JavaScript.</p>
-                    </div>
+                    <p id="securityChartSummary" class="text-xs text-charcoal-mid mb-4">Manifest schema validation, default shell escaping, and typed diagnostics give Netsuke stronger qualitative mitigation than ad hoc scripts on each documented boundary. Interactive charting requires JavaScript.</p>
+                    <div id="securityChart" class="h-[400px] w-full" role="img" aria-label="Bar chart comparing vulnerability mitigation between Netsuke and ad hoc scripts" aria-describedby="securityChartSummary"></div>
                 </div>
             </section>
 
@@ -222,15 +221,13 @@ $ netsuke \
         window.addEventListener('load', function() {
             try {
                 const categories = [
-                    'Cache Poisoning',
-                    'Unpinned Deps',
-                    'Environment Leakage',
-                    'Build Injection',
-                    'Dependency Confusion',
+                    'Malformed manifests',
+                    'Shell injection',
+                    'Opaque diagnostics',
                 ];
                 const levels = { Low: 1, Moderate: 2, High: 3 };
-                const netsuke = ['Moderate', 'Moderate', 'High', 'High', 'High'];
-                const adHoc = ['Moderate', 'Moderate', 'Moderate', 'Low', 'Low'];
+                const netsuke = ['High', 'High', 'High'];
+                const adHoc = ['Low', 'Moderate', 'Low'];
 
                 const bar = (name, values, colour) => ({
                     y: categories,

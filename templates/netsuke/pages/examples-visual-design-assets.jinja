@@ -23,7 +23,7 @@
                     </div>
                     <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Visual Design Assets</h1>
                     <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                        Rasterise every SVG in a design directory into PNG output with Inkscape. The manifest uses environment-backed variables, `foreach`, and a dedicated clean action without turning a small asset pipeline into a custom script.
+                        Rasterise every SVG in a design directory into PNG output with Inkscape. The manifest keeps the Inkscape command configurable through a plain `inkscape` variable, alongside `foreach` and a dedicated clean action, without turning a small asset pipeline into a custom script.
                     </p>
                 </div>
                 <div class="flex flex-col gap-3 w-full lg:w-auto shrink-0">
@@ -50,7 +50,7 @@
                             <p class="text-charcoal-mid">The example keeps the source tree readable: SVG assets stay under `design/svg/`, generated PNGs land in `build/raster/`, and the manifest carries both the conversion rule and the clean action.</p>
                             <div class="text-sm border-l-2 border-indigo pl-4 py-1">
                                 <p class="text-indigo font-medium mb-1">Why it matters</p>
-                                <p class="text-charcoal-light">Variable definitions are first-class. `inkscape` comes from the environment when needed, but the rest of the graph stays explicit and reproducible.</p>
+                                <p class="text-charcoal-light">Variable definitions are first-class. `inkscape` is a plain manifest variable set to the command name, and the rest of the graph stays explicit and reproducible.</p>
                             </div>
                         </div>
                     </div>

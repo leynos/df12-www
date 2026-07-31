@@ -81,24 +81,32 @@ def test_structured_shared_content_renders_toc_sections_and_cards(
     soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
 
     toc = soup.find("nav", class_="content-toc")
-    assert toc is not None
+    assert toc is not None, "structured page should render a content-toc nav"
     toc_targets = [link.get("href") for link in toc.find_all("a")]
-    assert toc_targets == ["#contact", "#complain"]
+    assert toc_targets == ["#contact", "#complain"], (
+        "TOC should link each section except excluded titles"
+    )
 
     section_ids = [section.get("id") for section in soup.find_all("section")]
-    assert section_ids == ["contact", "complain", "last-updated"]
+    assert section_ids == ["contact", "complain", "last-updated"], (
+        "each h2-delimited run should become a section with a slug id"
+    )
     divider = soup.find("section", class_="content-section--divider")
-    assert divider is not None
-    assert divider.get("id") == "last-updated"
+    assert divider is not None, "divider_sections titles should gain the modifier"
+    assert divider.get("id") == "last-updated", (
+        "the divider modifier should apply to the configured section"
+    )
 
     badges = [
         badge.get_text(strip=True)
         for badge in soup.find_all("div", class_="content-card__badge")
     ]
-    assert badges == ["@", "ICO"]
+    assert badges == ["@", "ICO"], "card admonitions should render badge circles"
     accent_card = soup.find("div", class_="content-card--accent")
-    assert accent_card is not None
-    assert "admonition" not in output_path.read_text(encoding="utf-8")
+    assert accent_card is not None, "the accent card variant should style the ICO card"
+    assert "admonition" not in output_path.read_text(encoding="utf-8"), (
+        "admonition markup should be fully rewritten into card markup"
+    )
 
 
 def test_unstructured_shared_content_body_is_unchanged(tmp_path: Path) -> None:
@@ -119,8 +127,14 @@ def test_unstructured_shared_content_body_is_unchanged(tmp_path: Path) -> None:
     output_path = SharedContentGenerator(config, tmp_path).run()
     soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
 
-    assert soup.find("nav", class_="content-toc") is None
-    assert soup.find("section") is None
+    assert soup.find("nav", class_="content-toc") is None, (
+        "pages without toc enabled should not render a TOC"
+    )
+    assert soup.find("section") is None, (
+        "pages without structure flags should not wrap sections"
+    )
     heading = soup.find("h2")
-    assert heading is not None
-    assert heading.get_text(strip=True) == "Scope"
+    assert heading is not None, "the body headings should be preserved"
+    assert heading.get_text(strip=True) == "Scope", (
+        "the body heading text should pass through unchanged"
+    )

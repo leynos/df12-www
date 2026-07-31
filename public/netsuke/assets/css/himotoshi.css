@@ -552,7 +552,7 @@ a.sidebar-link--sub.active {
 }
 
 .hm-prose h2 {
-  font-family: "Fraunces", serif;
+  font-family: Fraunces, serif;
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -561,7 +561,7 @@ a.sidebar-link--sub.active {
 }
 
 .hm-prose h3 {
-  font-family: "Fraunces", serif;
+  font-family: Fraunces, serif;
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -570,7 +570,7 @@ a.sidebar-link--sub.active {
 }
 
 .hm-prose h4 {
-  font-family: "Fraunces", serif;
+  font-family: Fraunces, serif;
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.6rem;
@@ -1076,7 +1076,7 @@ a.sidebar-link--sub.active {
 .hm-syntax .k { color: var(--netsuke-syntax-keyword); }
 .hm-syntax .o { color: var(--netsuke-syntax-operator); }
 .hm-syntax .p { color: var(--netsuke-syntax-punctuation); }
-.hm-syntax .p p-Indicator { color: var(--netsuke-syntax-punctuation-indicator); }
+.hm-syntax .p.p-Indicator { color: var(--netsuke-syntax-punctuation-indicator); }
 .hm-syntax .nt { color: var(--netsuke-syntax-name-tag); }
 .hm-syntax .nv { color: var(--netsuke-syntax-name-variable); }
 .hm-syntax .nf { color: var(--netsuke-syntax-name-function); }

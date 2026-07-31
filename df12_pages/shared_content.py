@@ -152,20 +152,7 @@ class SharedContentGenerator:
         return output_path
 
     def _apply_structure(self, body_html: str) -> str:
-        """Rewrite rendered Markdown into the structured page layout.
-
-        Three transformations run in order, each driven by content markers or
-        configuration so pages without them pass through unchanged:
-
-        1. ``card`` admonitions become badge cards
-           (``.content-card`` with a ``.content-card__badge`` circle).
-        2. When ``sections`` is enabled, each ``h2``-delimited run of content
-           is wrapped in ``<section class="content-section">``; the section
-           takes the heading's ``attr_list`` id (or a slug of its title), and
-           titles listed in ``divider_sections`` gain a top-border modifier.
-        3. When ``toc`` is enabled, a ``<nav class="content-toc">`` linking to
-           each section (minus ``toc_exclude`` titles) is inserted first.
-        """
+        """Convert cards, wrap h2 sections and TOC when sections or toc is enabled."""
         config = self.shared_config
         has_cards = "admonition" in body_html
         if not (has_cards or config.sections or config.toc):

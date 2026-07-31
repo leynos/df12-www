@@ -3,7 +3,8 @@
 Reads the token colours from
 :class:`df12_pages.highlighting.HimotoshiStyle`, exposes each as a
 ``--netsuke-syntax-*`` CSS variable, and rewrites the marked block in
-``public/netsuke/assets/css/himotoshi.css``. Run from the repository root:
+``public/netsuke/assets/css/himotoshi.css``. The stylesheet path is resolved
+relative to this script, so it may be run from any directory:
 
     uv run python scripts/generate_himotoshi_pygments_css.py
 
@@ -21,7 +22,14 @@ from pygments.formatters.html import HtmlFormatter
 
 from df12_pages.highlighting import HimotoshiStyle
 
-STYLESHEET = Path("public/netsuke/assets/css/himotoshi.css")
+STYLESHEET = (
+    Path(__file__).resolve().parent.parent
+    / "public"
+    / "netsuke"
+    / "assets"
+    / "css"
+    / "himotoshi.css"
+)
 BEGIN = (
     "/* BEGIN generated himotoshi-pygments"
     " (scripts/generate_himotoshi_pygments_css.py) */"
@@ -60,8 +68,11 @@ def build_css() -> str:
         variables.append(f"  {var}: {colour};")
         if css_class:
             extra = " ".join(extras)
+            # Compound tokens yield space-separated classes (e.g. "p p-Indicator")
+            # which must chain into one compound selector.
+            selector = "." + ".".join(css_class.split())
             rules.append(
-                f".hm-syntax .{css_class} {{ color: var({var});"
+                f".hm-syntax {selector} {{ color: var({var});"
                 f"{' ' + extra if extra else ''} }}"
             )
         else:

@@ -41,8 +41,8 @@
                         <div class="font-mono text-sm text-charcoal-mid bg-boxwood-pale p-6 rounded-lg border border-stone">
                             <div class="flex items-center mb-2"><span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span><span class="font-bold">book-project/</span></div>
                             <div class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>chapters/</span></div>
-                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>01-intro.md</span></div>
-                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>02-build-graph.md</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>introduction.md</span></div>
+                            <div class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>architecture.md</span></div>
                             <div class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>build/</span></div>
                             <div class="hm-file-tree-item"><span class="iconify text-vermillion" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></div>
                         </div>
@@ -62,49 +62,7 @@
                         <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/writing.yml</span>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
-netsuke_version: "1.0.0"
-
-vars:
-  chapters_dir: chapters
-  build_dir: build
-  pandoc_flags: "-N --pdf-engine=xelatex"
-  chapters:
-    - introduction
-    - architecture
-
-rules:
-  - name: tex
-    command: "pandoc {{ pandoc_flags }} {{ ins }} -o {{ outs }}"
-
-  - name: combine
-    command: >-
-      pandoc --standalone {{ ins }} -o {{ build_dir }}/book.tex &&
-      latexmk -pdf -outdir={{ build_dir }} {{ build_dir }}/book.tex
-
-  - name: mkdir
-    command: "mkdir -p {{ outs }}"
-
-targets:
-  - foreach: chapters
-    name: "{{ build_dir }}/{{ item }}.tex"
-    rule: tex
-    sources: "{{ chapters_dir }}/{{ item }}.md"
-    deps:
-      - "{{ build_dir }}"
-
-  - name: "{{ build_dir }}/book.pdf"
-    rule: combine
-    sources:
-      - "{{ build_dir }}/introduction.tex"
-      - "{{ build_dir }}/architecture.tex"
-
-  - name: "{{ build_dir }}"
-    rule: mkdir
-
-defaults:
-  - build/book.pdf
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_writing }}{% endhighlight %}{% raw %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone"><div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-charcoal text-sm mb-1">Intermediates are explicit</h4><p class="text-sm text-charcoal-mid">Each Markdown chapter becomes a TeX file in `build/`. Those files are not hand-waved away; they are graph nodes.</p></div></div>
@@ -123,7 +81,7 @@ $ netsuke build build/book.pdf
 [1/4] mkdir -p build
 [2/4] pandoc -N --pdf-engine=xelatex chapters/introduction.md -o build/introduction.tex
 [3/4] pandoc -N --pdf-engine=xelatex chapters/architecture.md -o build/architecture.tex
-[4/4] pandoc --standalone build/*.tex -o build/book.tex && latexmk -pdf -outdir=build build/book.tex
+[4/4] pandoc --standalone build/introduction.tex build/architecture.tex -o build/book.tex && latexmk -pdf -outdir=build build/book.tex
 {% endraw %}{% endhighlight %}{% raw %}
                         </div>
                     </div>
@@ -154,7 +112,7 @@ $ netsuke build build/book.pdf
                         <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Related Documentation</h3>
                         <ul class="space-y-3">
                             <li><a href="/netsuke/docs/rules-and-targets/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Rules &amp; Targets</span><span class="text-xs text-charcoal-light">Dependencies, defaults, and ordered sources</span></div></a></li>
-                            <li><a href="/netsuke/docs/templating/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Filters such as `sort` and path rewriting</span></div></a></li>
+                            <li><a href="/netsuke/docs/templating/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Variable expansion and `foreach` templating</span></div></a></li>
                             <li><a href="/netsuke/docs/manifest-reference/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:data-structured" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Manifest Reference</span><span class="text-xs text-charcoal-light">`deps`, actions, and build directory targets</span></div></a></li>
                         </ul>
                     </div>

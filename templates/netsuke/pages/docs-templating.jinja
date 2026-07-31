@@ -338,19 +338,19 @@ targets:
                         <!-- Sidebar for patterns -->
                         <div class="md:col-span-4 p-6 bg-white/50">
                             <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Recipes</h3>
-                            <ul class="space-y-2">
-                                <li>
-                                    <button type="button" class="recipe-btn recipe-btn--active w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="cross-compilation" aria-selected="true">
+                            <ul class="space-y-2" role="tablist" aria-label="Recipes" aria-orientation="vertical">
+                                <li role="presentation">
+                                    <button type="button" id="recipe-tab-cross-compilation" class="recipe-btn recipe-btn--active w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="cross-compilation" role="tab" aria-selected="true" aria-controls="recipe-panel-cross-compilation" tabindex="0">
                                         Cross-Compilation
                                     </button>
                                 </li>
-                                <li>
-                                    <button type="button" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="test-suites" aria-selected="false">
+                                <li role="presentation">
+                                    <button type="button" id="recipe-tab-test-suites" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="test-suites" role="tab" aria-selected="false" aria-controls="recipe-panel-test-suites" tabindex="-1">
                                         Test Suites
                                     </button>
                                 </li>
-                                <li>
-                                    <button type="button" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="code-generation" aria-selected="false">
+                                <li role="presentation">
+                                    <button type="button" id="recipe-tab-code-generation" class="recipe-btn w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="code-generation" role="tab" aria-selected="false" aria-controls="recipe-panel-code-generation" tabindex="-1">
                                         Code Generation
                                     </button>
                                 </li>
@@ -358,7 +358,7 @@ targets:
                         </div>
 
                         <!-- Content for patterns -->
-                        <div class="md:col-span-8 p-8 bg-white" data-recipe-panel="cross-compilation">
+                        <div class="md:col-span-8 p-8 bg-white" id="recipe-panel-cross-compilation" data-recipe-panel="cross-compilation" role="tabpanel" aria-labelledby="recipe-tab-cross-compilation">
                             <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Platform-specific sources with `when`</h4>
                             <p class="text-sm text-charcoal-mid mb-6">
                                 Use <code class="bg-stone-light/30 px-1 rounded text-xs">when</code> on repeated entries to include targets only when the current variables match the platform you want.
@@ -385,7 +385,7 @@ targets:
                             </div>
                         </div>
 
-                        <div class="md:col-span-8 p-8 bg-white hidden" data-recipe-panel="test-suites">
+                        <div class="md:col-span-8 p-8 bg-white hidden" id="recipe-panel-test-suites" data-recipe-panel="test-suites" role="tabpanel" aria-labelledby="recipe-tab-test-suites">
                             <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Test runs with `actions` and `always`</h4>
                             <p class="text-sm text-charcoal-mid mb-6">
                                 Put operator-run test suites in <code class="bg-stone-light/30 px-1 rounded text-xs">actions</code> so they stay outside the default graph, and mark report targets <code class="bg-stone-light/30 px-1 rounded text-xs">always</code> when they should rerun on every invocation.
@@ -411,7 +411,7 @@ actions:
                             </div>
                         </div>
 
-                        <div class="md:col-span-8 p-8 bg-white hidden" data-recipe-panel="code-generation">
+                        <div class="md:col-span-8 p-8 bg-white hidden" id="recipe-panel-code-generation" data-recipe-panel="code-generation" role="tabpanel" aria-labelledby="recipe-tab-code-generation">
                             <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Generated sources as first-class targets</h4>
                             <p class="text-sm text-charcoal-mid mb-6">
                                 Model generated code as its own target and let downstream targets name it in <code class="bg-stone-light/30 px-1 rounded text-xs">sources</code>: the implicit dependency keeps generation ordered before compilation.
@@ -473,20 +473,42 @@ targets:
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('[data-recipe-tab]');
+            const tabs = Array.from(document.querySelectorAll('[data-recipe-tab]'));
             const panels = document.querySelectorAll('[data-recipe-panel]');
 
-            tabs.forEach((tab) => {
-                tab.addEventListener('click', () => {
-                    const key = tab.getAttribute('data-recipe-tab');
-                    tabs.forEach((other) => {
-                        const active = other === tab;
-                        other.classList.toggle('recipe-btn--active', active);
-                        other.setAttribute('aria-selected', String(active));
-                    });
-                    panels.forEach((panel) => {
-                        panel.classList.toggle('hidden', panel.getAttribute('data-recipe-panel') !== key);
-                    });
+            function selectTab(tab) {
+                const key = tab.getAttribute('data-recipe-tab');
+                tabs.forEach((other) => {
+                    const active = other === tab;
+                    other.classList.toggle('recipe-btn--active', active);
+                    other.setAttribute('aria-selected', String(active));
+                    other.setAttribute('tabindex', active ? '0' : '-1');
+                });
+                panels.forEach((panel) => {
+                    panel.classList.toggle('hidden', panel.getAttribute('data-recipe-panel') !== key);
+                });
+            }
+
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => selectTab(tab));
+                tab.addEventListener('keydown', (event) => {
+                    let targetIndex = null;
+                    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                        targetIndex = (index + 1) % tabs.length;
+                    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                        targetIndex = (index - 1 + tabs.length) % tabs.length;
+                    } else if (event.key === 'Home') {
+                        targetIndex = 0;
+                    } else if (event.key === 'End') {
+                        targetIndex = tabs.length - 1;
+                    }
+                    if (targetIndex === null) {
+                        return;
+                    }
+                    event.preventDefault();
+                    const target = tabs[targetIndex];
+                    selectTab(target);
+                    target.focus();
                 });
             });
         });

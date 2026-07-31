@@ -25,70 +25,76 @@ MANIFEST_FRAGMENT = (
 SESSION_FRAGMENT = "$ cargo build \\\n    --release\n   Compiling netsuke\n"
 
 
-def test_netsuke_lexer_tokenizes_yaml_keys_and_jinja() -> None:
-    """The ``netsuke`` lexer marks YAML keys and Jinja expressions distinctly."""
-    lexer = get_lexer_by_name("netsuke")
-    tokens = list(lexer.get_tokens(MANIFEST_FRAGMENT))
+class TestNetsukeHighlighting:
+    """The Netsuke lexers, the Himotoshi style, and the highlight tag."""
 
-    key_values = [value for token, value in tokens if token in Name.Tag]
-    assert "netsuke_version" in key_values
-    assert "rules" in key_values
+    def test_netsuke_lexer_tokenizes_yaml_keys_and_jinja(self) -> None:
+        """The ``netsuke`` lexer marks YAML keys and Jinja expressions distinctly."""
+        lexer = get_lexer_by_name("netsuke")
+        tokens = list(lexer.get_tokens(MANIFEST_FRAGMENT))
 
-    jinja_values = {
-        value
-        for token, value in tokens
-        if token not in Token.Literal.String and "cc" in value
-    }
-    assert jinja_values, "Jinja variable inside {{ ... }} should not lex as string"
+        key_values = [value for token, value in tokens if token in Name.Tag]
+        assert "netsuke_version" in key_values, "top-level keys should lex as tags"
+        assert "rules" in key_values, "mapping keys should lex as tags"
 
+        jinja_values = {
+            value
+            for token, value in tokens
+            if token not in Token.Literal.String and "cc" in value
+        }
+        assert jinja_values, "Jinja variable inside {{ ... }} should not lex as string"
 
-def test_netsuke_console_lexer_commands_and_output() -> None:
-    """``netsuke-console`` treats ``$`` lines as commands and others as output."""
-    lexer = get_lexer_by_name("netsuke-console")
-    tokens = list(lexer.get_tokens(SESSION_FRAGMENT))
+    def test_netsuke_console_lexer_commands_and_output(self) -> None:
+        """``netsuke-console`` treats ``$`` lines as commands and others as output."""
+        lexer = get_lexer_by_name("netsuke-console")
+        tokens = list(lexer.get_tokens(SESSION_FRAGMENT))
 
-    prompts = [value for token, value in tokens if token in Generic.Prompt]
-    assert prompts == ["$ "]
+        prompts = [value for token, value in tokens if token in Generic.Prompt]
+        assert prompts == ["$ "], "exactly the leading `$ ` should lex as a prompt"
 
-    output = "".join(value for token, value in tokens if token in Generic.Output)
-    assert "Compiling netsuke" in output
-    assert "--release" not in output, "continued command line must not lex as output"
+        output = "".join(value for token, value in tokens if token in Generic.Output)
+        assert "Compiling netsuke" in output, "build output should lex as output"
+        assert "--release" not in output, (
+            "continued command line must not lex as output"
+        )
 
+    def test_himotoshi_style_uses_charcoal_background(self) -> None:
+        """The shared style renders on the Himotoshi charcoal surface."""
+        style = get_style_by_name("himotoshi")
+        assert style.background_color == "#2e2a25", (
+            "the style background should be the Himotoshi charcoal"
+        )
 
-def test_himotoshi_style_uses_charcoal_background() -> None:
-    """The shared style renders on the Himotoshi charcoal surface."""
-    style = get_style_by_name("himotoshi")
-    assert style.background_color == "#2e2a25"
+    def test_highlight_tag_renders_hm_syntax_block(self, tmp_path: Path) -> None:
+        """The ``{% highlight %}`` tag renders Pygments markup with intact text."""
+        templates_dir = tmp_path / "templates"
+        templates_dir.mkdir()
+        (templates_dir / "page.jinja").write_text(
+            "{% highlight 'netsuke' %}{% raw %}\n"
+            + MANIFEST_FRAGMENT
+            + "{% endraw %}{% endhighlight %}\n",
+            encoding="utf-8",
+        )
 
+        config = ContentPageConfig(
+            key="page",
+            label="Page",
+            template="page.jinja",
+            output_slug="page",
+        )
+        generator = ContentPageGenerator(
+            config,
+            tmp_path / "out",
+            templates_dir=templates_dir,
+            nav_links=[],
+            stylesheet="assets/site.css",
+        )
+        output_path = generator.run()
 
-def test_highlight_tag_renders_hm_syntax_block(tmp_path: Path) -> None:
-    """The ``{% highlight %}`` tag renders Pygments markup with intact text."""
-    templates_dir = tmp_path / "templates"
-    templates_dir.mkdir()
-    (templates_dir / "page.jinja").write_text(
-        "{% highlight 'netsuke' %}{% raw %}\n"
-        + MANIFEST_FRAGMENT
-        + "{% endraw %}{% endhighlight %}\n",
-        encoding="utf-8",
-    )
-
-    config = ContentPageConfig(
-        key="page",
-        label="Page",
-        template="page.jinja",
-        output_slug="page",
-    )
-    generator = ContentPageGenerator(
-        config,
-        tmp_path / "out",
-        templates_dir=templates_dir,
-        nav_links=[],
-        stylesheet="assets/site.css",
-    )
-    output_path = generator.run()
-
-    soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
-    block = soup.find("div", class_="hm-syntax")
-    assert block is not None, "highlight tag should emit a .hm-syntax wrapper"
-    assert block.find("span", class_="nt") is not None, "YAML keys should be .nt"
-    assert block.get_text().strip() == MANIFEST_FRAGMENT.strip()
+        soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
+        block = soup.find("div", class_="hm-syntax")
+        assert block is not None, "highlight tag should emit a .hm-syntax wrapper"
+        assert block.find("span", class_="nt") is not None, "YAML keys should be .nt"
+        assert block.get_text().strip() == MANIFEST_FRAGMENT.strip(), (
+            "highlighted source text should round-trip unchanged"
+        )

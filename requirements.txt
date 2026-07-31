@@ -4,5 +4,5 @@ Markdown>=3.5
 Pygments>=2.17
 requests>=2.34.2
 ruamel.yaml>=0.19.1
-python-hcl2>=4.3
+python-hcl2>=8.1.2
 tomlkit>=0.13

@@ -29,6 +29,9 @@ from pytest_bdd import given, scenarios, then, when
 from df12_pages.config import load_site_config
 from df12_pages.generator import PageContentGenerator
 
+if typ.TYPE_CHECKING:
+    from requests.adapters import BaseAdapter
+
 FEATURE_FILE = Path(__file__).resolve().parents[2] / "features" / "docs_release.feature"
 scenarios(str(FEATURE_FILE))
 
@@ -100,9 +103,9 @@ def when_render_docs(
             self._delegate = delegate
 
         def mount(
-            self, *args: object, **kwargs: object
+            self, prefix: str, adapter: BaseAdapter
         ) -> None:  # pragma: no cover - passthrough
-            self._delegate.mount(*args, **kwargs)
+            self._delegate.mount(prefix, adapter)
 
         def get(self, url: str, timeout: int = 30) -> requests.Response:
             calls.append(url)

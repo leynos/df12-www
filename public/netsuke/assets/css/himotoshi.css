@@ -1045,6 +1045,9 @@ a.sidebar-link--sub.active {
 .hm-syntax {
   background: var(--netsuke-charcoal);
   border-radius: 0.5rem;
+  /* Stop long code lines propagating min-content width up the
+     flex chain and widening the page on narrow viewports. */
+  contain: inline-size;
   overflow-x: auto;
 }
 

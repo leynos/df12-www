@@ -29,7 +29,7 @@
                 <div class="hidden md:block">
                     <ul class="flex list-none space-x-8">
                         {% if parent_link %}
-                        <li><a href="{{ parent_link.href }}" class="text-vermillion font-medium transition-colors text-sm py-1">{{ parent_link.label }}</a></li>
+                        <li><a href="{{ parent_link.href }}" class="text-vermillion font-medium transition-colors text-sm py-1"><span class="max-[960px]:hidden">{{ parent_link.label }}</span><span class="hidden max-[960px]:inline">&larr; df12</span></a></li>
                         {% endif %}
                         {% for link in nav_links %}
                         <li><a href="{{ link.href }}" class="{% if link.current %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>

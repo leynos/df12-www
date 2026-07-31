@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
+import sys
 import typing as typ
 from pathlib import Path
 from types import SimpleNamespace
@@ -45,6 +47,20 @@ scaleway_project_id = "11111111-2222-3333-4444-555555555555"
         encoding="utf-8",
     )
     return path
+
+
+_STALE_LOCAL_BACKEND_CACHE: dict[str, object] = {
+    "version": 3,
+    "backend": {"type": "local", "config": {"path": None, "workspace_dir": None}},
+    "modules": [{"path": ["root"], "outputs": {}, "resources": {}, "depends_on": []}],
+}
+
+
+def _write_backend_cache(root: Path, record: dict[str, object] | str) -> None:
+    cache_dir = root / ".terraform"
+    cache_dir.mkdir(exist_ok=True)
+    text = record if isinstance(record, str) else json.dumps(record)
+    (cache_dir / "terraform.tfstate").write_text(text, encoding="utf-8")
 
 
 def test_credentials_round_trip(tmp_path: Path) -> None:
@@ -210,6 +226,7 @@ def test_ensure_backend_bucket_uses_env_endpoint(
 def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Test that init_stack runs terraform init."""
     config_path = _write_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
     calls: list[list[str]] = []
 
     monkeypatch.setattr(
@@ -230,15 +247,117 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     backend_path = Path(init_call[init_call.index("-backend-config") + 1])
     tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
 
-    assert calls[0] == ["ensure"]
-    assert "-reconfigure" in init_call
-    assert not backend_path.exists()
-    assert not tfvars_path.exists()
+    assert calls[0] == ["ensure"], "backend bucket must be ensured before tofu runs"
+    assert "-reconfigure" not in init_call, (
+        "plain init must not discard a trusted backend cache"
+    )
+    assert not backend_path.exists(), "temporary backend file must be cleaned up"
+    assert not tfvars_path.exists(), "temporary tfvars file must be cleaned up"
+
+
+def test_init_stack_reconfigures_stale_local_backend(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Test that init discards a provably stale local backend cache."""
+    config_path = _write_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    _write_backend_cache(tmp_path, _STALE_LOCAL_BACKEND_CACHE)
+    calls: list[list[str]] = []
+
+    monkeypatch.setattr(
+        deploy,
+        "ensure_backend_bucket",
+        lambda *args, **kwargs: calls.append(["ensure"]),
+    )
+
+    def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:
+        calls.append(args)
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(deploy, "run_tofu", fake_run)
+
+    deploy.init_stack(config_path=config_path, save_credentials_flag=False)
+
+    init_call = next(call for call in calls if call and call[0] == "init")
+    assert "-reconfigure" in init_call, (
+        "a stale empty local backend cache must be discarded via -reconfigure"
+    )
+
+
+def test_cached_backend_discardable_for_stale_local_record(tmp_path: Path) -> None:
+    """Test that an empty local backend cache is judged discardable."""
+    _write_backend_cache(tmp_path, _STALE_LOCAL_BACKEND_CACHE)
+    assert deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+        "an empty local backend cache with no local state must be discardable"
+    )
+
+
+def test_cached_backend_discardable_despite_empty_local_state(tmp_path: Path) -> None:
+    """Test that an empty root state file does not block discarding."""
+    _write_backend_cache(tmp_path, _STALE_LOCAL_BACKEND_CACHE)
+    (tmp_path / "terraform.tfstate").write_text(
+        json.dumps({"version": 4, "resources": []}), encoding="utf-8"
+    )
+    assert deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+        "a resource-free local state file must not block discarding"
+    )
+
+
+def test_cached_backend_absent_is_not_discardable(tmp_path: Path) -> None:
+    """Test that a missing cache never triggers -reconfigure."""
+    assert not deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+        "without a cached record plain init suffices"
+    )
+
+
+def test_cached_backend_kept_when_local_state_has_resources(tmp_path: Path) -> None:
+    """Test that real local state blocks discarding the cache."""
+    _write_backend_cache(tmp_path, _STALE_LOCAL_BACKEND_CACHE)
+    (tmp_path / "terraform.tfstate").write_text(
+        json.dumps({"version": 4, "resources": [{"type": "scaleway_bucket"}]}),
+        encoding="utf-8",
+    )
+    assert not deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+        "local state holding resources must keep the migration safety check"
+    )
+
+
+@pytest.mark.parametrize(
+    "record",
+    [
+        pytest.param(
+            {"backend": {"type": "s3", "config": {"bucket": "other"}}},
+            id="remote-backend",
+        ),
+        pytest.param(
+            {"backend": {"type": "local", "config": {"path": "custom.tfstate"}}},
+            id="custom-state-path",
+        ),
+        pytest.param(
+            {
+                "backend": {"type": "local", "config": {"path": None}},
+                "modules": [{"resources": {"aws_s3_bucket.site": {}}}],
+            },
+            id="cached-resources",
+        ),
+        pytest.param("not json", id="malformed-cache"),
+        pytest.param("[]", id="non-dict-cache"),
+    ],
+)
+def test_cached_backend_kept_for_unsafe_records(
+    tmp_path: Path, record: dict[str, object] | str
+) -> None:
+    """Test that anything but a provably stale local cache keeps tofu's check."""
+    _write_backend_cache(tmp_path, record)
+    assert not deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+        "only a provably stale local backend cache may be discarded"
+    )
 
 
 def test_plan_stack_runs_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Test that plan_stack runs terraform plan."""
     config_path = _write_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
     calls: list[list[str]] = []
 
     monkeypatch.setattr(
@@ -265,11 +384,15 @@ def test_plan_stack_runs_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     backend_path = Path(init_call[init_call.index("-backend-config") + 1])
     tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
 
-    assert calls[0] == ["ensure"]
-    assert "-reconfigure" in init_call
-    assert plan_call[-1] == str(plan_file)
-    assert not backend_path.exists()
-    assert not tfvars_path.exists()
+    assert calls[0] == ["ensure"], "backend bucket must be ensured before tofu runs"
+    assert "-reconfigure" not in init_call, (
+        "plain init must not discard a trusted backend cache"
+    )
+    assert plan_call[-1] == str(plan_file), (
+        "plan output path must be forwarded to tofu plan"
+    )
+    assert not backend_path.exists(), "temporary backend file must be cleaned up"
+    assert not tfvars_path.exists(), "temporary tfvars file must be cleaned up"
 
 
 def test_apply_stack_uses_plan_file(
@@ -277,6 +400,7 @@ def test_apply_stack_uses_plan_file(
 ) -> None:
     """Test that apply_stack uses the plan file."""
     config_path = _write_config(tmp_path)
+    monkeypatch.chdir(tmp_path)
     calls: list[list[str]] = []
 
     monkeypatch.setattr(
@@ -303,21 +427,23 @@ def test_apply_stack_uses_plan_file(
     backend_path = Path(init_call[init_call.index("-backend-config") + 1])
     tfvars_path = Path(init_call[init_call.index("-var-file") + 1])
 
-    assert calls[0] == ["ensure"]
-    assert "-reconfigure" in init_call
-    assert apply_call[1] == str(plan_file)
-    assert not backend_path.exists()
-    assert not tfvars_path.exists()
+    assert calls[0] == ["ensure"], "backend bucket must be ensured before tofu runs"
+    assert "-reconfigure" not in init_call, (
+        "plain init must not discard a trusted backend cache"
+    )
+    assert apply_call[1] == str(plan_file), "apply must consume the supplied plan file"
+    assert not backend_path.exists(), "temporary backend file must be cleaned up"
+    assert not tfvars_path.exists(), "temporary tfvars file must be cleaned up"
 
 
 def test_main_reports_subprocess_failure(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """Test that main converts CalledProcessError into a one-line message."""
+    """Test that main maps CalledProcessError to one line and its status."""
 
     def boom() -> None:
         raise subprocess.CalledProcessError(
-            1, ["/usr/sbin/tofu", "init", "-reconfigure"]
+            42, ["/usr/sbin/tofu", "init", "-reconfigure"]
         )
 
     monkeypatch.setattr(cli, "app", boom)
@@ -325,10 +451,38 @@ def test_main_reports_subprocess_failure(
     with pytest.raises(SystemExit) as excinfo:
         cli.main()
 
-    assert excinfo.value.code == 1
-    err = capsys.readouterr().err
-    assert "error: tofu init exited with status 1" in err
-    assert "Traceback" not in err
+    assert excinfo.value.code == 42, (
+        "exit status must preserve the subprocess's return code"
+    )
+    assert capsys.readouterr().err == "error: tofu init exited with status 42\n", (
+        "stderr must be exactly one error line naming the failed command"
+    )
+
+
+def test_main_relays_captured_stderr(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test that captured subprocess stderr is relayed before the error line."""
+
+    def boom() -> None:
+        raise subprocess.CalledProcessError(
+            255,
+            ["/usr/bin/aws", "s3api", "head-bucket"],
+            stderr="An error occurred (403) when calling HeadBucket: Forbidden\n",
+        )
+
+    monkeypatch.setattr(cli, "app", boom)
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli.main()
+
+    assert excinfo.value.code == 255, (
+        "exit status must preserve the subprocess's return code"
+    )
+    assert capsys.readouterr().err == (
+        "An error occurred (403) when calling HeadBucket: Forbidden\n"
+        "error: aws s3api exited with status 255\n"
+    ), "captured stderr must be relayed, followed by exactly one error line"
 
 
 def test_main_reports_missing_binary(
@@ -345,8 +499,10 @@ def test_main_reports_missing_binary(
     with pytest.raises(SystemExit) as excinfo:
         cli.main()
 
-    assert excinfo.value.code == 1
-    assert "error: tofu binary not found on PATH" in capsys.readouterr().err
+    assert excinfo.value.code == 1, "a missing binary must exit with status 1"
+    assert capsys.readouterr().err == "error: tofu binary not found on PATH\n", (
+        "stderr must be exactly one error line naming the missing binary"
+    )
 
 
 def test_main_reports_credential_error(
@@ -363,6 +519,29 @@ def test_main_reports_credential_error(
     with pytest.raises(SystemExit) as excinfo:
         cli.main()
 
-    assert excinfo.value.code == 1
-    err = capsys.readouterr().err
-    assert "error: AWS access key and secret key are required" in err
+    assert excinfo.value.code == 1, "a credential error must exit with status 1"
+    assert capsys.readouterr().err == (
+        "error: AWS access key and secret key are required\n"
+    ), "stderr must be exactly one error line stating the credential problem"
+
+
+def test_pages_apply_failure_via_entry_point(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test that the console entry point maps a failed apply to clean stderr."""
+
+    def boom(**kwargs: object) -> None:
+        raise subprocess.CalledProcessError(42, ["/usr/sbin/tofu", "apply"])
+
+    monkeypatch.setattr(cli, "apply_stack", boom)
+    monkeypatch.setattr(sys, "argv", ["pages", "apply"])
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli.main()
+
+    assert excinfo.value.code == 42, (
+        "exit status must preserve the subprocess's return code"
+    )
+    assert capsys.readouterr().err == "error: tofu apply exited with status 42\n", (
+        "stderr must be exactly one error line naming the failed command"
+    )

@@ -583,14 +583,18 @@ def apply(
     )
 
 
+_STDERR_DETAIL_LIMIT = 2000
+
+
 def _describe_failed_command(exc: subprocess.CalledProcessError) -> str:
     """Return a short human-readable name for the command that failed."""
-    cmd = exc.cmd
-    if isinstance(cmd, (list, tuple)) and cmd:
-        parts = [str(part) for part in cmd[:2]]
-        parts[0] = Path(parts[0]).name
-        return " ".join(parts)
-    return str(cmd)
+    match exc.cmd:
+        case [exe, arg, *_]:
+            return f"{Path(str(exe)).name} {arg}"
+        case [exe]:
+            return Path(str(exe)).name
+        case cmd:
+            return str(cmd)
 
 
 def main() -> None:
@@ -598,8 +602,10 @@ def main() -> None:
 
     Expected operational failures (a subprocess exiting non-zero, a missing
     binary, or unresolvable credentials) are reported as a single-line error
-    message rather than a traceback; the subprocess has already written its
-    own diagnostics to the terminal by the time they are caught.
+    message rather than a traceback.  When the failed subprocess captured
+    its stderr (as the backend-bucket bootstrap does), a bounded excerpt is
+    relayed first so the diagnostic is not lost; otherwise the subprocess
+    has already written its diagnostics to the terminal.
 
     Parameters
     ----------
@@ -624,6 +630,9 @@ def main() -> None:
     try:
         app()
     except subprocess.CalledProcessError as exc:
+        detail = (exc.stderr or "").strip()
+        if detail:
+            print(detail[:_STDERR_DETAIL_LIMIT], file=sys.stderr)
         print(
             f"error: {_describe_failed_command(exc)} exited with "
             f"status {exc.returncode}",
@@ -633,6 +642,8 @@ def main() -> None:
     except (FileNotFoundError, CredentialError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         raise SystemExit(1) from None
+    else:
+        return
 
 
 if __name__ == "__main__":  # pragma: no cover - manual invocation helper

@@ -17,8 +17,10 @@ that tests can patch ``deploy.subprocess.run`` directly.
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
+import typing as typ
 from pathlib import Path
 
 from ._backend import (
@@ -145,26 +147,76 @@ def run_tofu(args: list[str], env: dict[str, str]) -> subprocess.CompletedProces
     )
 
 
+def _state_has_resources(state: dict[str, typ.Any]) -> bool:
+    """Whether a parsed state document records any managed resources."""
+    if state.get("resources"):
+        return True
+    modules = state.get("modules") or []
+    return any(module.get("resources") for module in modules)
+
+
+def _load_json_dict(path: Path) -> dict[str, typ.Any] | None:
+    """Parse *path* as JSON, returning the document or ``None`` if not a dict."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _local_state_blocks_discard(root: Path) -> bool:
+    """Whether a root ``terraform.tfstate`` prevents discarding the cache."""
+    local_state = root / "terraform.tfstate"
+    if not local_state.exists():
+        return False
+    state = _load_json_dict(local_state)
+    return state is None or _state_has_resources(state)
+
+
+def _cached_backend_is_discardable(workdir: Path | None = None) -> bool:
+    """Whether the cached backend record is a stale local backend safe to drop.
+
+    Return ``True`` only when ``.terraform/terraform.tfstate`` records a
+    ``local`` backend with the default state path and no resources, and no
+    root ``terraform.tfstate`` with resources exists.  Any other drift —
+    including an unreadable cache — keeps tofu's backend-change safety
+    check in place so that real backend moves still demand an explicit
+    migration decision.
+    """
+    root = workdir or Path.cwd()
+    cache_path = root / ".terraform" / "terraform.tfstate"
+    if not cache_path.exists():
+        return False
+    cached = _load_json_dict(cache_path)
+    if cached is None:
+        return False
+    backend = cached.get("backend") or {}
+    if backend.get("type") != "local" or (backend.get("config") or {}).get("path"):
+        return False
+    if _state_has_resources(cached):
+        return False
+    return not _local_state_blocks_discard(root)
+
+
 def _run_tofu_init(
     materialized_backend: Path, materialized_tfvars: Path, env: dict[str, str]
 ) -> None:
-    """Run ``tofu init -reconfigure`` with the materialized backend and vars.
-
-    The backend configuration is rendered fresh from the TOML config on every
-    run, so the record cached in ``.terraform/`` carries no authoritative
-    information; ``-reconfigure`` stops tofu aborting when the two drift.
-    """
-    run_tofu(
-        [
-            "init",
-            "-reconfigure",
-            "-backend-config",
-            str(materialized_backend),
-            "-var-file",
-            str(materialized_tfvars),
-        ],
-        env=env,
-    )
+    """Run ``tofu init``, discarding a provably stale local backend record."""
+    args = ["init"]
+    # The backend config is rendered fresh from the TOML config on every
+    # run, so a cached local-backend record holding no state can be
+    # discarded via -reconfigure; any other drift keeps tofu's
+    # backend-change check so that real backend moves still demand an
+    # explicit migration decision.
+    if _cached_backend_is_discardable():
+        args.append("-reconfigure")
+    args += [
+        "-backend-config",
+        str(materialized_backend),
+        "-var-file",
+        str(materialized_tfvars),
+    ]
+    run_tofu(args, env=env)
 
 
 def init_stack(

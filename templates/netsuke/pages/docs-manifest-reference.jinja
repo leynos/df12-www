@@ -245,9 +245,9 @@ targets:
                         <div class="mt-4 p-4 bg-boxwood-pale border border-stone rounded-lg">
                             <h5 class="text-sm font-bold text-charcoal mb-2">Common placeholders</h5>
                             <ul class="text-sm text-charcoal-mid space-y-2">
-                                <li class="flex items-start"><code class="font-mono text-indigo w-16 shrink-0">{{ ins }}</code> <span>Space-separated list of quoted input paths</span></li>
-                                <li class="flex items-start"><code class="font-mono text-indigo w-16 shrink-0">{{ outs }}</code> <span>Space-separated list of quoted output paths</span></li>
-                                <li class="flex items-start"><code class="font-mono text-indigo w-16 shrink-0">vars</code> <span>Global and target-local values exposed to Jinja rendering</span></li>
+                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">{{ ins }}</code> <span>Space-separated list of quoted input paths</span></li>
+                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">{{ outs }}</code> <span>Space-separated list of quoted output paths</span></li>
+                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">vars</code> <span>Global and target-local values exposed to Jinja rendering</span></li>
                             </ul>
                         </div>
                     </div>
@@ -259,7 +259,7 @@ targets:
                             <div class="border-l-2 border-indigo pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
                                     <code class="font-mono font-bold text-indigo">name</code>
-                                    <span class="text-xs text-charcoal-light font-mono">String (single-output) or List of String (multi-output)</span>
+                                    <span class="text-xs text-charcoal-light font-mono text-right">String (single-output) or<br>List of String (multi-output)</span>
                                 </div>
                                 <p class="text-sm text-charcoal-mid mt-1">Primary output path for this target. For single-output targets, use a String. For multi-output targets, use a List of Strings; all listed paths are produced by the same target and share a single identity in the build graph. Dependencies and <code class="bg-stone-light/30 px-1 rounded">sources</code> entries refer to the target as a whole, not to individual output paths.</p>
                             </div>

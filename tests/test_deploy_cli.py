@@ -14,6 +14,8 @@ import pytest
 from df12_pages import cli, deploy
 
 _EXPECTED_FILE_MODE = 0o600
+_TOFU_FAILURE_STATUS = 42
+_AWS_FAILURE_STATUS = 255
 
 
 def _write_config(tmp_path: Path) -> Path:
@@ -287,7 +289,7 @@ def test_init_stack_reconfigures_stale_local_backend(
 def test_cached_backend_discardable_for_stale_local_record(tmp_path: Path) -> None:
     """Test that an empty local backend cache is judged discardable."""
     _write_backend_cache(tmp_path, _STALE_LOCAL_BACKEND_CACHE)
-    assert deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+    assert deploy._cached_backend_is_discardable(tmp_path), (
         "an empty local backend cache with no local state must be discardable"
     )
 
@@ -298,14 +300,14 @@ def test_cached_backend_discardable_despite_empty_local_state(tmp_path: Path) ->
     (tmp_path / "terraform.tfstate").write_text(
         json.dumps({"version": 4, "resources": []}), encoding="utf-8"
     )
-    assert deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+    assert deploy._cached_backend_is_discardable(tmp_path), (
         "a resource-free local state file must not block discarding"
     )
 
 
 def test_cached_backend_absent_is_not_discardable(tmp_path: Path) -> None:
     """Test that a missing cache never triggers -reconfigure."""
-    assert not deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+    assert not deploy._cached_backend_is_discardable(tmp_path), (
         "without a cached record plain init suffices"
     )
 
@@ -317,7 +319,7 @@ def test_cached_backend_kept_when_local_state_has_resources(tmp_path: Path) -> N
         json.dumps({"version": 4, "resources": [{"type": "scaleway_bucket"}]}),
         encoding="utf-8",
     )
-    assert not deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+    assert not deploy._cached_backend_is_discardable(tmp_path), (
         "local state holding resources must keep the migration safety check"
     )
 
@@ -340,6 +342,20 @@ def test_cached_backend_kept_when_local_state_has_resources(tmp_path: Path) -> N
             },
             id="cached-resources",
         ),
+        pytest.param(
+            {
+                "backend": {"type": "local", "config": {"path": None}},
+                "modules": ["bogus"],
+            },
+            id="malformed-module-entry",
+        ),
+        pytest.param(
+            {
+                "backend": {"type": "local", "config": {"path": None}},
+                "modules": "bogus",
+            },
+            id="non-list-modules",
+        ),
         pytest.param("not json", id="malformed-cache"),
         pytest.param("[]", id="non-dict-cache"),
     ],
@@ -349,7 +365,7 @@ def test_cached_backend_kept_for_unsafe_records(
 ) -> None:
     """Test that anything but a provably stale local cache keeps tofu's check."""
     _write_backend_cache(tmp_path, record)
-    assert not deploy._cached_backend_is_discardable(tmp_path), (  # noqa: SLF001
+    assert not deploy._cached_backend_is_discardable(tmp_path), (
         "only a provably stale local backend cache may be discarded"
     )
 
@@ -443,7 +459,7 @@ def test_main_reports_subprocess_failure(
 
     def boom() -> None:
         raise subprocess.CalledProcessError(
-            42, ["/usr/sbin/tofu", "init", "-reconfigure"]
+            _TOFU_FAILURE_STATUS, ["/usr/sbin/tofu", "init", "-reconfigure"]
         )
 
     monkeypatch.setattr(cli, "app", boom)
@@ -451,12 +467,12 @@ def test_main_reports_subprocess_failure(
     with pytest.raises(SystemExit) as excinfo:
         cli.main()
 
-    assert excinfo.value.code == 42, (
+    assert excinfo.value.code == _TOFU_FAILURE_STATUS, (
         "exit status must preserve the subprocess's return code"
     )
-    assert capsys.readouterr().err == "error: tofu init exited with status 42\n", (
-        "stderr must be exactly one error line naming the failed command"
-    )
+    assert capsys.readouterr().err == (
+        f"error: tofu init exited with status {_TOFU_FAILURE_STATUS}\n"
+    ), "stderr must be exactly one error line naming the failed command"
 
 
 def test_main_relays_captured_stderr(
@@ -466,7 +482,7 @@ def test_main_relays_captured_stderr(
 
     def boom() -> None:
         raise subprocess.CalledProcessError(
-            255,
+            _AWS_FAILURE_STATUS,
             ["/usr/bin/aws", "s3api", "head-bucket"],
             stderr="An error occurred (403) when calling HeadBucket: Forbidden\n",
         )
@@ -476,12 +492,12 @@ def test_main_relays_captured_stderr(
     with pytest.raises(SystemExit) as excinfo:
         cli.main()
 
-    assert excinfo.value.code == 255, (
+    assert excinfo.value.code == _AWS_FAILURE_STATUS, (
         "exit status must preserve the subprocess's return code"
     )
     assert capsys.readouterr().err == (
         "An error occurred (403) when calling HeadBucket: Forbidden\n"
-        "error: aws s3api exited with status 255\n"
+        f"error: aws s3api exited with status {_AWS_FAILURE_STATUS}\n"
     ), "captured stderr must be relayed, followed by exactly one error line"
 
 
@@ -531,7 +547,9 @@ def test_pages_apply_failure_via_entry_point(
     """Test that the console entry point maps a failed apply to clean stderr."""
 
     def boom(**kwargs: object) -> None:
-        raise subprocess.CalledProcessError(42, ["/usr/sbin/tofu", "apply"])
+        raise subprocess.CalledProcessError(
+            _TOFU_FAILURE_STATUS, ["/usr/sbin/tofu", "apply"]
+        )
 
     monkeypatch.setattr(cli, "apply_stack", boom)
     monkeypatch.setattr(sys, "argv", ["pages", "apply"])
@@ -539,9 +557,9 @@ def test_pages_apply_failure_via_entry_point(
     with pytest.raises(SystemExit) as excinfo:
         cli.main()
 
-    assert excinfo.value.code == 42, (
+    assert excinfo.value.code == _TOFU_FAILURE_STATUS, (
         "exit status must preserve the subprocess's return code"
     )
-    assert capsys.readouterr().err == "error: tofu apply exited with status 42\n", (
-        "stderr must be exactly one error line naming the failed command"
-    )
+    assert capsys.readouterr().err == (
+        f"error: tofu apply exited with status {_TOFU_FAILURE_STATUS}\n"
+    ), "stderr must be exactly one error line naming the failed command"

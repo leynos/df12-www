@@ -151,8 +151,14 @@ def _state_has_resources(state: dict[str, typ.Any]) -> bool:
     """Whether a parsed state document records any managed resources."""
     if state.get("resources"):
         return True
+    # Malformed entries are treated as holding resources so that an
+    # uninterpretable state document is never judged discardable.
     modules = state.get("modules") or []
-    return any(module.get("resources") for module in modules)
+    if not isinstance(modules, list):
+        return True
+    return any(
+        not isinstance(module, dict) or module.get("resources") for module in modules
+    )
 
 
 def _load_json_dict(path: Path) -> dict[str, typ.Any] | None:
@@ -174,15 +180,7 @@ def _local_state_blocks_discard(root: Path) -> bool:
 
 
 def _cached_backend_is_discardable(workdir: Path | None = None) -> bool:
-    """Whether the cached backend record is a stale local backend safe to drop.
-
-    Return ``True`` only when ``.terraform/terraform.tfstate`` records a
-    ``local`` backend with the default state path and no resources, and no
-    root ``terraform.tfstate`` with resources exists.  Any other drift —
-    including an unreadable cache — keeps tofu's backend-change safety
-    check in place so that real backend moves still demand an explicit
-    migration decision.
-    """
+    """Whether the cached backend record is a stale local backend safe to drop."""
     root = workdir or Path.cwd()
     cache_path = root / ".terraform" / "terraform.tfstate"
     if not cache_path.exists():
@@ -190,6 +188,11 @@ def _cached_backend_is_discardable(workdir: Path | None = None) -> bool:
     cached = _load_json_dict(cache_path)
     if cached is None:
         return False
+    # Discard only a `local` backend record with the default state path,
+    # no resources in the cached state, and no root terraform.tfstate
+    # holding resources.  Any other drift — including an unreadable
+    # cache — keeps tofu's backend-change safety check so that real
+    # backend moves still demand an explicit migration decision.
     backend = cached.get("backend") or {}
     if backend.get("type") != "local" or (backend.get("config") or {}).get("path"):
         return False
@@ -217,6 +220,7 @@ def _run_tofu_init(
         str(materialized_tfvars),
     ]
     run_tofu(args, env=env)
+    return  # noqa: PLR1711 -- explicit success return requested by review
 
 
 def init_stack(
@@ -292,7 +296,7 @@ def plan_stack(  # noqa: PLR0913 -- orchestration entry point needs explicit pla
     save_credentials_flag : bool, optional
         Persist resolved credentials back to *config_path* when ``True``.
     run_init : bool, optional
-        Run ``tofu init -reconfigure`` before planning when ``True``.
+        Run ``tofu init`` before planning when ``True``.
     destroy : bool, optional
         Pass ``-destroy`` to ``tofu plan`` when ``True``.
 
@@ -356,7 +360,7 @@ def apply_stack(
     save_credentials_flag : bool, optional
         Persist resolved credentials back to *config_path* when ``True``.
     run_init : bool, optional
-        Run ``tofu init -reconfigure`` before applying when ``True``.
+        Run ``tofu init`` before applying when ``True``.
 
     Raises
     ------

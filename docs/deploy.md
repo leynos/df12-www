@@ -156,12 +156,13 @@ explicit decision; resolve it manually with `tofu init -migrate-state` or
 `tofu init -reconfigure` as appropriate. The wrappers never migrate state
 themselves.
 
-Operational failures — a subprocess exiting non-zero, a missing `tofu` or
-`aws` binary, or unresolvable credentials — are reported as a single
-`error:` line on stderr rather than a Python traceback, and the CLI exits
-with the failing subprocess's status. Stderr captured from the backend
-bucket bootstrap (the `aws` CLI) is relayed before the error line so its
-diagnostics are preserved.
+Operational failures are reported as a single `error:` line on stderr
+rather than a Python traceback. When a `tofu` or `aws` subprocess exits
+non-zero, the CLI preserves that status and exits with it; local
+failures — a missing `tofu` or `aws` binary, or unresolvable
+credentials — exit with status 1. Stderr captured from the backend
+bucket bootstrap (the `aws` CLI) is relayed before the error line, so
+its diagnostics are preserved.
 
 #### Config file example
 

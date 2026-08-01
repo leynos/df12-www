@@ -1,6 +1,9 @@
 /* Tailwind v4 core */
 @import "tailwindcss";
 
+/* The oxide scanner does not pick up .jinja sources on its own. */
+@source "../../df12_pages/templates/**/*.jinja";
+
 /* daisyUI v5 plugin */
 @plugin "daisyui" {
   themes:
@@ -473,6 +476,24 @@
     @apply mt-auto pt-6 inline-flex items-center gap-2 font-mono text-sm text-primary;
   }
 
+  .doc-mermaid {
+    @apply my-6 flex justify-center overflow-x-auto;
+  }
+
+  .doc-mermaid svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .product-card__link {
+    @apply inline-flex items-center gap-2 text-sm text-base-content transition-colors duration-200;
+  }
+
+  .product-card__link:hover,
+  .product-card__link:focus-visible {
+    @apply text-primary;
+  }
+
   .world-card {
     @apply grid gap-10 rounded-2xl border border-accent/40 bg-neutral/60 px-8 py-11;
     container-type: inline-size;
@@ -685,8 +706,13 @@
   --color-error: #dc2626;
 
   --radius-box: 1.5rem;
-  --radius-btn: 0.9rem;
-  --radius-badge: 1rem;
+  --radius-field: 0.9rem;
+  --radius-selector: 1rem;
+  --size-field: 0.25rem;
+  --size-selector: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
 }
 
 @container world-card (min-width: 48rem) {

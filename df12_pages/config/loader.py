@@ -21,6 +21,7 @@ from .helpers import (
 )
 from .homepage import _build_homepage_config, _build_nav_links
 from .models import (
+    PAGE_CATEGORIES,
     ContentPageConfig,
     FooterConfig,
     NavLinkConfig,
@@ -98,6 +99,7 @@ def load_site_config(path: Path) -> SiteConfig:
     default_doc_path = defaults.get("doc_path", DEFAULT_DOC_PATH)
     default_repo = defaults.get("repo")
     default_language = defaults.get("language")
+    default_category = defaults.get("category", PAGE_CATEGORIES[0])
     docs_index_output = Path(defaults.get("docs_index_output", "public/docs.html"))
 
     shared_layouts = raw.get("layouts", {}) or {}
@@ -118,6 +120,7 @@ def load_site_config(path: Path) -> SiteConfig:
         doc_path=default_doc_path,
         repo=default_repo,
         language=default_language,
+        category=default_category,
         shared_layouts=shared_layouts,
     )
 
@@ -177,6 +180,7 @@ class _PageDefaults:
     doc_path: str
     repo: str | None
     language: str | None
+    category: str
     shared_layouts: typ.Mapping[str, typ.Any]
 
 
@@ -220,6 +224,11 @@ def _build_page_config(
     latest_release_published_at = _parse_timestamp(
         payload.get("latest_release_published_at")
     )
+    category = payload.get("category", defaults.category)
+    if category not in PAGE_CATEGORIES:
+        allowed = ", ".join(PAGE_CATEGORIES)
+        msg = f"Page '{key}' has unknown category '{category}'. Allowed: {allowed}"
+        raise SiteConfigError(msg)
 
     return PageConfig(
         key=key,
@@ -241,6 +250,7 @@ def _build_page_config(
         doc_path=doc_path,
         latest_release=latest_release,
         latest_release_published_at=latest_release_published_at,
+        category=category,
     )
 
 

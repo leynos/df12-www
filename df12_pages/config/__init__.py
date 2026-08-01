@@ -19,6 +19,7 @@ Examples
 
 from .loader import load_site_config
 from .models import (
+    PAGE_CATEGORIES,
     AboutLocationConfig,
     AboutPageConfig,
     AvatarConfig,
@@ -48,6 +49,7 @@ from .models import (
 )
 
 __all__ = [
+    "PAGE_CATEGORIES",
     "AboutLocationConfig",
     "AboutPageConfig",
     "AvatarConfig",

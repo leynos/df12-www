@@ -264,7 +264,12 @@ class PageContentGenerator:
         return result
 
     def _fetch_markdown(self) -> str:
-        """Download markdown from the resolved source URL, updating doc timestamps."""
+        """Download markdown from the resolved source URL, updating doc timestamps.
+
+        When the release-pinned URL is missing the document (a guide added
+        after the release was cut), fall back to the branch source URL and
+        drop the version pin rather than failing the whole generation run.
+        """
         session = requests.Session()
         retry = Retry(
             total=5,
@@ -279,6 +284,18 @@ class PageContentGenerator:
         session.mount("http://", adapter)
         try:
             resp = session.get(self.source_url, timeout=30)
+            fallback_url = self.page.source_url
+            if (
+                getattr(resp, "status_code", None) == requests.codes.not_found
+                and self.doc_version
+                and fallback_url
+                and fallback_url != self.source_url
+            ):
+                self.doc_version = None
+                self.doc_version_display = None
+                self.doc_updated_at = None
+                self.source_url = fallback_url
+                resp = session.get(fallback_url, timeout=30)
             resp.raise_for_status()
             if not self.doc_updated_at:
                 self.doc_updated_at = self._extract_timestamp(

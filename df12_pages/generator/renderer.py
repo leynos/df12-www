@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
+import os
 import re
+import subprocess
+import sys
 import typing as typ
 from html import escape
 
@@ -23,6 +27,72 @@ FENCE_LABEL_PATTERN = re.compile(
     r"^([`~]{3,})([A-Za-z0-9_+#.-]+)?(,[^\r\n]+)$", re.MULTILINE
 )
 CODEHILITE_OPEN_TAG = re.compile(r'<div class="codehilite">')
+MERMAID_BLOCK_PATTERN = re.compile(r"```mermaid[^\n]*\n(.*?)```", re.DOTALL)
+
+
+class MermaidRenderer:
+    """Compile Mermaid sources to inline SVG with a headless renderer.
+
+    The renderer shells out to ``merman-cli`` (override the executable with
+    the ``DF12_MERMAID_CLI`` environment variable). Failures are reported on
+    stderr and return ``None`` so callers can fall back to a highlighted code
+    block rather than aborting a build.
+    """
+
+    def __init__(self, executable: str | None = None) -> None:
+        """Initialize the renderer.
+
+        Parameters
+        ----------
+        executable : str, optional
+            Mermaid CLI to invoke. Defaults to the ``DF12_MERMAID_CLI``
+            environment variable, then ``"merman-cli"``.
+        """
+        self.executable = (
+            executable or os.environ.get("DF12_MERMAID_CLI") or "merman-cli"
+        )
+        self._cache: dict[str, str | None] = {}
+
+    def render(self, source: str) -> str | None:
+        """Return inline SVG for ``source`` or ``None`` when rendering fails.
+
+        Results are cached per source text, and the ``id`` attribute the CLI
+        stamps on every SVG is rewritten to a content-derived value so several
+        diagrams can share a page without colliding style scopes.
+        """
+        key = source.strip()
+        if key in self._cache:
+            return self._cache[key]
+        svg = self._invoke(key)
+        if svg is not None:
+            unique = f"merman-{hashlib.sha256(key.encode('utf-8')).hexdigest()[:12]}"
+            svg = svg.replace('id="merman"', f'id="{unique}"').replace(
+                "#merman", f"#{unique}"
+            )
+        self._cache[key] = svg
+        return svg
+
+    def _invoke(self, source: str) -> str | None:
+        """Run the Mermaid CLI over ``source`` and capture the SVG output."""
+        command = [self.executable, "-i", "-", "-o", "-", "-e", "svg"]
+        try:
+            proc = subprocess.run(  # noqa: S603 - fixed command, repo-controlled input
+                command,
+                input=source.encode("utf-8"),
+                capture_output=True,
+                timeout=120,
+                check=True,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            detail = ""
+            if isinstance(exc, subprocess.CalledProcessError) and exc.stderr:
+                detail = f": {exc.stderr.decode('utf-8', 'replace').strip()[:500]}"
+            print(
+                f"warning: mermaid rendering failed ({exc.__class__.__name__}){detail}",
+                file=sys.stderr,
+            )
+            return None
+        return proc.stdout.decode("utf-8")
 
 
 class HtmlContentRenderer:
@@ -45,6 +115,7 @@ class HtmlContentRenderer:
         self.pygments_style = pygments_style
         self._formatter = HtmlFormatter(style=pygments_style, cssclass="codehilite")
         self._link_extension = link_extension
+        self._mermaid = MermaidRenderer()
 
     @property
     def stylesheet(self) -> str:
@@ -52,10 +123,16 @@ class HtmlContentRenderer:
         return self._formatter.get_style_defs(".codehilite")
 
     def markdown(self, text: str) -> str:
-        """Render markdown into HTML using the configured extensions."""
+        """Render markdown into HTML using the configured extensions.
+
+        Mermaid fences are compiled to inline SVG figures at build time; a
+        fence whose diagram fails to render falls back to a highlighted code
+        block.
+        """
         normalized = self._normalize_fenced_blocks(text)
         if not normalized.strip():
             return ""
+        normalized, mermaid_figures = self._extract_mermaid_blocks(normalized)
         extensions: list[Extension | str] = [
             "fenced_code",
             "codehilite",
@@ -76,7 +153,38 @@ class HtmlContentRenderer:
             },
         )
         html = md.convert(normalized)
-        return self._annotate_codehilite(html, normalized)
+        html = self._annotate_codehilite(html, normalized)
+        return self._restore_mermaid_blocks(html, mermaid_figures)
+
+    def _extract_mermaid_blocks(self, text: str) -> tuple[str, dict[str, str]]:
+        """Swap renderable Mermaid fences for placeholder tokens.
+
+        Returns the rewritten markdown plus a mapping of placeholder token to
+        the rendered ``<figure>`` markup. Fences whose diagrams fail to render
+        are left in place so they fall through to code highlighting.
+        """
+        figures: dict[str, str] = {}
+
+        def _replace(match: re.Match[str]) -> str:
+            svg = self._mermaid.render(match.group(1))
+            if svg is None:
+                return match.group(0)
+            token = f"df12-mermaid-placeholder-{len(figures)}"
+            figures[token] = f'<figure class="doc-mermaid">{svg}</figure>'
+            return f"\n\n{token}\n\n"
+
+        return MERMAID_BLOCK_PATTERN.sub(_replace, text), figures
+
+    @staticmethod
+    def _restore_mermaid_blocks(html: str, figures: dict[str, str]) -> str:
+        """Replace placeholder tokens with their rendered Mermaid figures."""
+        for token, figure in figures.items():
+            wrapped = f"<p>{token}</p>"
+            if wrapped in html:
+                html = html.replace(wrapped, figure)
+            else:  # pragma: no cover - defensive: token outside a paragraph
+                html = html.replace(token, figure)
+        return html
 
     def code_block(self, code: str, language: str | None = None) -> str:
         """Render ``code`` into highlighted HTML with an optional language tag.
@@ -143,4 +251,4 @@ class HtmlContentRenderer:
         return FENCE_LABEL_PATTERN.sub(_strip_labels, without_indent)
 
 
-__all__ = ["CODE_BLOCK_PATTERN", "HtmlContentRenderer"]
+__all__ = ["CODE_BLOCK_PATTERN", "HtmlContentRenderer", "MermaidRenderer"]

@@ -248,18 +248,18 @@ about:
   focus:
     cards:
       - title: Humane Infrastructure
-        description: Building for the people who maintain systems, not just those who use them. Good infra stays out
-          of your way until you need it.
+        description: Building for the people who maintain systems, not just those who use them. Good infra stays out of 
+          your way until you need it.
         icon: carbon:person-favorite
         tone: primary
       - title: Legible Systems
-        description: If you can't reason about a system, you can't trust it. Observability isn't an add-on — it's
-          the foundation everything else rests on.
+        description: If you can't reason about a system, you can't trust it. Observability isn't an add-on — it's the 
+          foundation everything else rests on.
         icon: carbon:cloud-monitoring
         tone: accent
       - title: Calmer AI Tooling
-        description: AI workflows fail in novel ways. The answer isn't more guardrails — it's designing for
-          graceful degradation and predictable recovery.
+        description: AI workflows fail in novel ways. The answer isn't more guardrails — it's designing for graceful 
+          degradation and predictable recovery.
         icon: carbon:ai-governance-lifecycle
         tone: neutral
   principles:
@@ -270,18 +270,231 @@ about:
         description: From installation to first successful run in under five minutes. Every tool includes quickstart 
           documentation.
       - title: Repeatability Over Magic
-        description: Predictable behaviour across environments. Green-path repeatability means fewer surprises in
+        description: Predictable behaviour across environments. Green-path repeatability means fewer surprises in 
           production.
       - title: Respect Cognitive Load
-        description: Systems should be legible and unsurprising. Complexity exists in the implementation, not the
+        description: Systems should be legible and unsurprising. Complexity exists in the implementation, not the 
           interface.
   footer: *site_footer
 
 pages:
+  # -- Tools ---------------------------------------------------------------
+  catnap:
+    label: "Catnap"
+    repo: leynos/catnap
+    latest_release: v0.1.0
+    latest_release_published_at: '2026-06-28T22:52:52Z'
+    language: rust
+    category: tool
+    filename_prefix: docs-catnap-
+    page_title_suffix: "Catnap"
+    description: >
+      GNU-style `sleep` that reports time remaining on stderr while stdout
+      stays clean. Scripts read silence; humans read progress.
+
+  claude-q:
+    label: "claude-q"
+    repo: leynos/claude-q
+    language: python
+    category: tool
+    filename_prefix: docs-claude-q-
+    page_title_suffix: "claude-q"
+    description: >
+      Topic-based FIFO task queue for Claude Code. Queue work with `q put`,
+      dequeue when context allows – nothing gets forgotten between sessions.
+
+  concordat:
+    label: "Concordat"
+    repo: leynos/concordat
+    language: python
+    category: tool
+    filename_prefix: docs-concordat-
+    page_title_suffix: "Concordat"
+    description: >
+      Enforces consistent GitHub repository settings across an estate of
+      enrolled repos by driving OpenTofu. Plan, review, apply – settings
+      drift ends here.
+
+  create-labels:
+    label: "create-labels"
+    repo: leynos/create-labels
+    language: python
+    category: tool
+    filename_prefix: docs-create-labels-
+    page_title_suffix: "create-labels"
+    description: >
+      Creates and updates GitHub labels from a TOML file or a sensible
+      default set. Idempotent, Enterprise-aware, and deletes nothing.
+
+  css-view:
+    label: "css-view"
+    repo: leynos/css-view
+    language: typescript
+    category: tool
+    filename_prefix: docs-css-view-
+    page_title_suffix: "css-view"
+    description: >
+      Gives agents a view of computed styles. Captures deduplicated CSS
+      snapshots from a live page via agent-browser, the Chromium DevTools
+      Protocol, or Playwright – DevTools for terminals.
+
+  dakar:
+    label: "Dakar"
+    repo: leynos/Dakar
+    language: javascript
+    category: tool
+    filename_prefix: docs-dakar-
+    page_title_suffix: "Dakar"
+    description: >
+      Code review with a hard per-review cost ceiling. Bounded model lanes,
+      admission control, and a `dakar-review` CLI.
+
+  ddlint:
+    label: "ddlint"
+    repo: leynos/ddlint
+    language: rust
+    category: tool
+    filename_prefix: docs-ddlint-
+    page_title_suffix: "ddlint"
+    description: >
+      Linter for Differential Datalog. A Logos tokenizer, an error-recovering
+      Chumsky parser, and a Rowan syntax tree – lints that survive broken
+      input.
+
+  dear-diary:
+    label: "Dear Diary"
+    repo: leynos/dear-diary
+    language: rust
+    category: tool
+    filename_prefix: docs-dear-diary-
+    page_title_suffix: "Dear Diary"
+    description: >
+      MCP server giving coding agents persistent semantic memory. Qdrant
+      vectors and local FastEmbed embeddings – no cloud round-trips.
+
+  df12-build:
+    label: "df12-build"
+    repo: leynos/df12-build
+    language: typescript
+    category: tool
+    filename_prefix: docs-df12-build-
+    page_title_suffix: "df12-build"
+    description: >
+      ODW workflows plus a supervisor skill that drive a project from
+      roadmap through planning, review, implementation, and merge. Happy
+      robots build happy code.
+
+  df12-lints:
+    label: "df12-lints"
+    repo: leynos/df12-lints
+    language: javascript
+    category: tool
+    filename_prefix: docs-df12-lints-
+    page_title_suffix: "df12-lints"
+    description: >
+      Shared lint tooling for JavaScript and TypeScript: an Oxlint plugin
+      with local rules for conditional complexity and documentation.
+
+  digitalpuddle:
+    label: "Digital Puddle"
+    repo: leynos/digitalpuddle
+    language: typescript
+    category: tool
+    filename_prefix: docs-digitalpuddle-
+    page_title_suffix: "Digital Puddle"
+    description: >
+      Local DigitalOcean v2 API simulator. A deterministic, seeded control
+      plane with action polling and eventual consistency for infrastructure
+      tests.
+
+  frankie:
+    label: "Frankie"
+    repo: leynos/frankie
+    language: rust
+    category: tool
+    filename_prefix: docs-frankie-
+    page_title_suffix: "Frankie"
+    description: >
+      Terminal code review assistant. Pulls pull-request comments into a
+      keyboard-driven TUI with SQLite caching and background refresh.
+
+  git-donkey:
+    label: "git-donkey"
+    repo: leynos/git-donkey
+    language: python
+    category: tool
+    filename_prefix: docs-git-donkey-
+    page_title_suffix: "git-donkey"
+    description: >
+      Git subcommands that make branch-based development less of a… well,
+      you know. Linked worktrees, branch tracking, and repository
+      scaffolding.
+
+  hecate:
+    label: "Hecate"
+    repo: leynos/hecate
+    language: python
+    category: tool
+    filename_prefix: docs-hecate-
+    page_title_suffix: "Hecate"
+    description: >
+      Architecture checker for hexagonal Python projects. Walks package
+      roots with `ast`, classifies imports, and reports boundary violations.
+
+  lading:
+    label: "Lading"
+    repo: leynos/lading
+    latest_release: v0.2.0
+    latest_release_published_at: '2026-06-21T14:18:45Z'
+    language: python
+    category: tool
+    filename_prefix: docs-lading-
+    page_title_suffix: "Lading"
+    description: >
+      Coordinates version bumps and publication plans across a Rust
+      workspace from one `lading.toml`. Dry runs before releases.
+
+  mapsplice:
+    label: "Mapsplice"
+    repo: leynos/mapsplice
+    language: rust
+    category: tool
+    filename_prefix: docs-mapsplice-
+    page_title_suffix: "Mapsplice"
+    description: >
+      Splices one Markdown roadmap into another. Structural edits,
+      renumbered phases, and rewritten cross-references – no manual
+      renumbering.
+
+  mdtablefix:
+    label: "mdtablefix"
+    repo: leynos/mdtablefix
+    latest_release: v0.5.0
+    latest_release_published_at: '2026-07-27T18:21:15Z'
+    language: rust
+    category: tool
+    filename_prefix: docs-mdtablefix-
+    page_title_suffix: "mdtablefix"
+    description: >
+      Unb0rks Markdown tables. Reflows columns to uniform widths and wraps
+      prose to 80 columns with Markdown-aware tokenization.
+
+  mriya:
+    label: "Mriya"
+    repo: leynos/mriya
+    language: rust
+    category: tool
+    filename_prefix: docs-mriya-
+    page_title_suffix: "Mriya"
+    description: >
+      Syncs the working directory to a short-lived cloud VM, runs the build
+      there over SSH, streams output back, and destroys the evidence.
+
   netsuke:
     label: "Netsuke"
     repo: leynos/netsuke
     language: rust
+    category: tool
     source_label: "Netsuke User Guide (main)"
     page_title_suffix: "Netsuke"
     filename_prefix: docs-netsuke-
@@ -318,59 +531,164 @@ pages:
           - Commands
           - Exit Codes
 
-  rstest-bdd:
-    label: "rstest-bdd"
-    repo: leynos/rstest-bdd
-    latest_release: v0.2.0
-    latest_release_published_at: '2025-12-08T00:37:34Z'
-    language: rust
-    filename_prefix: docs-rstest-bdd-
-    page_title_suffix: "rstest-bdd"
+  nixie:
+    label: "Nixie"
+    repo: leynos/nixie
+    latest_release: v1.1.0
+    latest_release_published_at: '2026-06-28T22:50:23Z'
+    language: python
+    category: tool
+    filename_prefix: docs-nixie-
+    page_title_suffix: "Nixie"
     description: >
-      Behavior-driven testing macros layered on top of `rstest`. Narrative
-      clarity without the ceremony.
+      Finds Mermaid blocks in Markdown and renders every one to prove it
+      compiles. Broken diagrams fail the build, not the reader.
 
-  ortho-config:
-    label: "Ortho Config"
-    repo: leynos/ortho-config
-    latest_release: v0.6.0
-    latest_release_published_at: '2025-11-12T02:07:16Z'
-    language: rust
-    filename_prefix: docs-ortho-config-
-    page_title_suffix: "Ortho Config"
+  odw-lint:
+    label: "odw-lint"
+    repo: leynos/odw-lint
+    language: typescript
+    category: tool
+    filename_prefix: docs-odw-lint-
+    page_title_suffix: "odw-lint"
     description: >
-      Configuration engine inspired by esbuild’s ergonomics—one schema, many
-      surfaces. Generate matching CLI flags, env vars, and config files for
-      Rust services without losing type safety or your mind.
+      Static linter for Open Dynamic Workflow files. Checks workflows before
+      they run – without executing source or dispatching agents.
 
-  pg-embedded-setup-unpriv:
-    label: "pg-embedded-setup-unpriv"
-    repo: leynos/pg-embedded-setup-unpriv
-    latest_release: v0.1.0
-    latest_release_published_at: '2025-11-08T01:31:06Z'
+  podbot:
+    label: "Podbot"
+    repo: leynos/podbot
     language: rust
-    filename_prefix: docs-pg-embedded-
-    page_title_suffix: "pg-embedded-setup-unpriv"
+    category: tool
+    filename_prefix: docs-podbot-
+    page_title_suffix: "Podbot"
     description: >
-      Bootstrap `postgresql_embedded` clusters as root while delegating
-      filesystem work to unprivileged users. Keep CI environments reproducible
-      without burning down your permissions tree.
+      Runs AI coding agents inside isolated Podman containers. Credentials
+      and the container socket stay with the trusted host side.
 
-  wireframe:
-    label: "Wireframe"
-    repo: leynos/wireframe
-    language: rust
-    filename_prefix: docs-wireframe-
-    page_title_suffix: "Wireframe"
+  polythene:
+    label: "Polythene"
+    repo: leynos/polythene
+    language: python
+    category: tool
+    filename_prefix: docs-polythene-
+    page_title_suffix: "Polythene"
     description: >
-      Framework for building binary protocol servers and clients in
-      Rust—think Actix Web, but for everything not HTTP. Message routing,
-      framing, and backpressure included; bring your own transport.
+      Temu-tier isolation for unit testing. Pulls container images, exports
+      them to disposable root filesystems, and executes commands via podman,
+      bwrap, proot, or chroot.
+
+  post-turn-quality-stop-hook:
+    label: "post-turn-quality-stop-hook"
+    repo: leynos/post-turn-quality-stop-hook
+    language: python
+    category: tool
+    filename_prefix: docs-post-turn-quality-
+    page_title_suffix: "post-turn-quality-stop-hook"
+    description: >
+      Claude Code stop hook that works out which files a turn changed, runs
+      the matching quality targets, and blocks the turn until they pass.
+
+  repo-local-tools:
+    label: "repo-local-tools"
+    repo: leynos/repo-local-tools
+    language: python
+    category: tool
+    filename_prefix: docs-repo-local-tools-
+    page_title_suffix: "repo-local-tools"
+    description: >
+      Renders shared MCP configuration and reusable agent skills from one
+      XDG data directory into repository-local files for Claude, Codex, and
+      friends.
+
+  rust-prover-tools:
+    label: "rust-prover-tools"
+    repo: leynos/rust-prover-tools
+    language: python
+    category: tool
+    filename_prefix: docs-rust-prover-tools-
+    page_title_suffix: "rust-prover-tools"
+    description: >
+      Installs, version-checks, and runs the Kani and Verus verification
+      toolchains for Rust repositories. One CLI instead of four READMEs.
+
+  stilyagi:
+    label: "Stilyagi"
+    repo: leynos/stilyagi
+    language: rust
+    category: tool
+    filename_prefix: docs-stilyagi-
+    page_title_suffix: "Stilyagi"
+    description: >
+      Prose linter for Markdown and source-code doc comments. Tree-sitter
+      extraction, a Rust core, and Python bindings – style enforcement that
+      reads the code too.
+
+  typos-config-builder:
+    label: "typos-config-builder"
+    repo: leynos/typos-config-builder
+    language: python
+    category: tool
+    filename_prefix: docs-typos-config-builder-
+    page_title_suffix: "typos-config-builder"
+    description: >
+      Generates en-GB-oxendict `typos.toml` configuration. Refreshes a
+      shared Oxford dictionary cache and merges repository-local overrides.
+
+  vk:
+    label: "vk"
+    repo: leynos/vk
+    latest_release: v0.5.0
+    latest_release_published_at: '2025-09-18T21:43:05Z'
+    language: rust
+    category: tool
+    filename_prefix: docs-vk-
+    page_title_suffix: "vk"
+    description: >
+      Fetches unresolved pull-request review comments and renders them as
+      terminal Markdown. Issues and CI status included.
+
+  weaver:
+    label: "Weaver"
+    repo: leynos/weaver
+    language: rust
+    category: tool
+    filename_prefix: docs-weaver-
+    page_title_suffix: "Weaver"
+    description: >
+      Semantic CLI for codebases. A light client, a `weaverd` daemon,
+      sandboxed language servers, and tree-sitter – observe, act, verify.
+
+  whitaker:
+    label: "Whitaker"
+    repo: leynos/whitaker
+    latest_release: v0.2.7
+    latest_release_published_at: '2026-07-22T22:35:51Z'
+    language: rust
+    category: tool
+    filename_prefix: docs-whitaker-
+    page_title_suffix: "Whitaker"
+    description: >
+      Nine opinionated Dylint lints for Rust, plus one experimental opt-in.
+      Snark included at no extra charge.
+
+  # -- Libraries -----------------------------------------------------------
+  actix-v2a:
+    label: "actix-v2a"
+    repo: leynos/actix-v2a
+    language: rust
+    category: library
+    filename_prefix: docs-actix-v2a-
+    page_title_suffix: "actix-v2a"
+    description: >
+      Shared Actix Web building blocks: keyset cursor pagination,
+      idempotency handling, server-sent events, and OpenAPI helpers.
 
   chutoro:
     label: "Chutoro"
     repo: leynos/chutoro
     language: rust
+    category: library
     filename_prefix: docs-chutoro-
     page_title_suffix: "Chutoro"
     description: >
@@ -384,9 +702,9 @@ pages:
     repo: leynos/cmd-mox
     latest_release: v0.2.0
     latest_release_published_at: '2025-11-27T02:51:36Z'
-    branch: refs/tags/v0.1.0
     doc_path: docs/usage-guide.md
     language: python
+    category: library
     filename_prefix: docs-cmd-mox-
     page_title_suffix: "CmdMox"
     description: >
@@ -394,22 +712,49 @@ pages:
       over Unix domain sockets so pytest suites can spy, stub, and replay shell
       workflows without brittle bash fixtures.
 
-  femtologging:
-    label: "femtologging"
-    repo: leynos/femtologging
+  cuprum:
+    label: "Cuprum"
+    repo: leynos/cuprum
+    latest_release: v0.1.0
+    latest_release_published_at: '2026-01-30T18:58:38Z'
     language: python
-    filename_prefix: docs-femtologging-
-    page_title_suffix: "femtologging"
+    category: library
+    filename_prefix: docs-cuprum-
+    page_title_suffix: "Cuprum"
     description: >
-      Hybrid Python/Rust logging library that channels picologging’s
-      minimalism through PyO3. Log records stream through crossbeam-channel
-      workers for thread-friendly, low-latency structured logging.
+      Typed, async-first process execution from a curated catalogue of
+      approved executables. Structured results, synchronous wrappers
+      included.
+
+  diesel-cte-ext:
+    label: "diesel-cte-ext"
+    repo: leynos/diesel-cte-ext
+    latest_release: v0.3.0
+    latest_release_published_at: '2026-07-22T22:47:37Z'
+    language: rust
+    category: library
+    filename_prefix: docs-diesel-cte-ext-
+    page_title_suffix: "diesel-cte-ext"
+    description: >
+      Common Table Expressions for Diesel. Builders for recursive and
+      non-recursive CTEs, with column metadata helpers.
+
+  falcon-correlate:
+    label: "Falcon Correlate"
+    repo: leynos/falcon-correlate
+    language: python
+    category: library
+    filename_prefix: docs-falcon-correlate-
+    page_title_suffix: "Falcon Correlate"
+    description: >
+      Correlation IDs for Falcon web applications. One middleware,
+      traceable requests.
 
   falcon-pachinko:
     label: "Falcon Pachinko"
     repo: leynos/falcon-pachinko
-    doc_path: docs/falcon-websocket-extension-design.md
     language: python
+    category: library
     filename_prefix: docs-falcon-pachinko-
     page_title_suffix: "Falcon Pachinko"
     description: >
@@ -418,6 +763,363 @@ pages:
       workers, and broadcast updates to rooms—all without turning your ASGI
       app into spaghetti.
 
+  femtologging:
+    label: "femtologging"
+    repo: leynos/femtologging
+    language: python
+    category: library
+    filename_prefix: docs-femtologging-
+    page_title_suffix: "femtologging"
+    description: >
+      Hybrid Python/Rust logging library that channels picologging’s
+      minimalism through PyO3. Log records stream through crossbeam-channel
+      workers for thread-friendly, low-latency structured logging.
+
+  monotony:
+    label: "Monotony"
+    repo: leynos/monotony
+    latest_release: v0.1.0
+    latest_release_published_at: '2026-06-28T22:49:39Z'
+    language: rust
+    category: library
+    filename_prefix: docs-monotony-
+    page_title_suffix: "Monotony"
+    description: >
+      Low-dependency Rust microcrate for injecting monotonic clocks.
+      Elapsed-time logic becomes deterministic under test.
+
+  ortho-config:
+    label: "Ortho Config"
+    repo: leynos/ortho-config
+    latest_release: v0.7.0
+    latest_release_published_at: '2026-01-02T06:16:15Z'
+    language: rust
+    category: library
+    filename_prefix: docs-ortho-config-
+    page_title_suffix: "Ortho Config"
+    description: >
+      Configuration engine inspired by esbuild’s ergonomics—one schema, many
+      surfaces. Generate matching CLI flags, env vars, and config files for
+      Rust services without losing type safety or your mind.
+
+  pg-embedded-setup-unpriv:
+    label: "pg-embedded-setup-unpriv"
+    repo: leynos/pg-embed-setup-unpriv
+    latest_release: v0.5.2
+    latest_release_published_at: '2026-07-20T22:38:16Z'
+    language: rust
+    category: library
+    filename_prefix: docs-pg-embedded-
+    page_title_suffix: "pg-embedded-setup-unpriv"
+    description: >
+      Bootstrap `postgresql_embedded` clusters as root while delegating
+      filesystem work to unprivileged users. Keep CI environments reproducible
+      without burning down your permissions tree.
+
+  pylint-pypy-shim:
+    label: "pylint-pypy-shim"
+    repo: leynos/pylint-pypy-shim
+    language: python
+    category: library
+    filename_prefix: docs-pylint-pypy-shim-
+    page_title_suffix: "pylint-pypy-shim"
+    description: >
+      Pylint on PyPy without the crashes. Patches Astroid's runtime
+      introspection so linting works where CPython assumptions don't hold.
+
+  rstest-bdd:
+    label: "rstest-bdd"
+    repo: leynos/rstest-bdd
+    latest_release: v0.5.0
+    latest_release_published_at: '2026-02-09T02:17:55Z'
+    language: rust
+    category: library
+    filename_prefix: docs-rstest-bdd-
+    page_title_suffix: "rstest-bdd"
+    description: >
+      Behavior-driven testing macros layered on top of `rstest`. Narrative
+      clarity without the ceremony.
+
+  simulacat:
+    label: "Simulacat"
+    repo: leynos/simulacat
+    language: python
+    category: library
+    filename_prefix: docs-simulacat-
+    page_title_suffix: "Simulacat"
+    description: >
+      pytest fixtures that run tests against a local, stateful GitHub API
+      simulator. Scenario configuration, seeded repository state, and no
+      rate limits.
+
+  simulacat-core:
+    label: "Simulacat Core"
+    repo: leynos/simulacat-core
+    language: typescript
+    category: library
+    filename_prefix: docs-simulacat-core-
+    page_title_suffix: "Simulacat Core"
+    description: >
+      The stateful mock GitHub REST and GraphQL engine behind Simulacat,
+      built on Simulacrum.
+
+  spycatcher-harness:
+    label: "Spycatcher Harness"
+    repo: leynos/spycatcher-harness
+    language: rust
+    category: library
+    filename_prefix: docs-spycatcher-
+    page_title_suffix: "Spycatcher Harness"
+    description: >
+      Record/replay HTTP proxy for OpenAI-compatible chat APIs. Captures
+      real exchanges into cassettes for deterministic tests.
+
+  tei-rapporteur:
+    label: "TEI Rapporteur"
+    repo: leynos/tei-rapporteur
+    language: rust
+    category: library
+    filename_prefix: docs-tei-rapporteur-
+    page_title_suffix: "TEI Rapporteur"
+    description: >
+      Podcast-grade TEI P5: a Rust data model with parser and emitter,
+      exposed to Python via PyO3 and msgspec.
+
+  theoremc:
+    label: "theoremc"
+    repo: leynos/theoremc
+    language: rust
+    category: library
+    filename_prefix: docs-theoremc-
+    page_title_suffix: "theoremc"
+    description: >
+      Formally verified theorems as engineering artefacts. A `theorem_file!`
+      macro expands `.theorem` schemas into compile-time verification
+      modules for Kani.
+
+  wildside-engine:
+    label: "Wildside Engine"
+    repo: leynos/wildside-engine
+    language: rust
+    category: library
+    filename_prefix: docs-wildside-engine-
+    page_title_suffix: "Wildside Engine"
+    description: >
+      The recommendation engine behind Wildside. Domain model, OSM and
+      Wikidata ETL, and relevance scoring as a Cargo workspace.
+
+  wireframe:
+    label: "Wireframe"
+    repo: leynos/wireframe
+    latest_release: v0.3.0
+    latest_release_published_at: '2026-04-06T01:16:19Z'
+    language: rust
+    category: library
+    filename_prefix: docs-wireframe-
+    page_title_suffix: "Wireframe"
+    description: >
+      Framework for building binary protocol servers and clients in
+      Rust—think Actix Web, but for everything not HTTP. Message routing,
+      framing, and backpressure included; bring your own transport.
+
+  zamburak:
+    label: "Zamburak"
+    repo: leynos/zamburak
+    language: rust
+    category: library
+    filename_prefix: docs-zamburak-
+    page_title_suffix: "Zamburak"
+    description: >
+      Prompt-injection defence for tool-using agents. Capability-based
+      control- and data-flow policy enforced at runtime, following the CaMeL
+      design.
+
+  # -- Apps ----------------------------------------------------------------
+  axinite:
+    label: "Axinite"
+    repo: leynos/axinite
+    language: rust
+    category: app
+    filename_prefix: docs-axinite-
+    page_title_suffix: "Axinite"
+    description: >
+      Local-first personal AI assistant. REPL, web gateway, webhooks,
+      routines, and background jobs with sandboxed WASM tools.
+
+  corbusier:
+    label: "Corbusier"
+    repo: leynos/corbusier
+    language: rust
+    category: app
+    filename_prefix: docs-corbusier-
+    page_title_suffix: "Corbusier"
+    description: >
+      AI agent orchestration that keeps canonical conversation and task
+      history across backend handoffs. The best room, not the smartest
+      agent.
+
+  episodic:
+    label: "Episodic"
+    repo: leynos/episodic
+    language: python
+    category: app
+    filename_prefix: docs-episodic-
+    page_title_suffix: "Episodic"
+    description: >
+      Agentic podcast studio. Turns heterogeneous sources into scripted,
+      mastered audio with a human in the loop for polish.
+
+  gauss:
+    label: "Gauss"
+    repo: leynos/gauss
+    language: rust
+    category: app
+    filename_prefix: docs-gauss-
+    page_title_suffix: "Gauss"
+    description: >
+      Vector illustration with pervasive accessibility and scriptability.
+      A GPUI editor with SVG import and export, plus undo history that
+      remembers selections.
+
+  ghillie:
+    label: "Ghillie"
+    repo: leynos/ghillie
+    language: python
+    category: app
+    filename_prefix: docs-ghillie-
+    page_title_suffix: "Ghillie"
+    description: >
+      Estate-level status reporting. Ingests GitHub activity through a
+      medallion pipeline and produces repository health reports.
+
+  mxd:
+    label: "mxd"
+    repo: leynos/mxd
+    language: rust
+    category: app
+    filename_prefix: docs-mxd-
+    page_title_suffix: "mxd"
+    description: >
+      Hotline-style daemon for joyful file-sharing and retro chat. Tokio,
+      Diesel, and Argon2 behind a protocol from 1997.
+
+  repovec-appliance:
+    label: "Repovec Appliance"
+    repo: leynos/repovec-appliance
+    language: rust
+    category: app
+    filename_prefix: docs-repovec-
+    page_title_suffix: "Repovec Appliance"
+    description: >
+      Self-hosted appliance that indexes private repositories into a
+      semantic search corpus. grepai and Qdrant, without leaving the
+      building.
+
+  velocetty:
+    label: "Velocetty"
+    repo: leynos/velocetty
+    doc_path: docs/developers-guide.md
+    language: typescript
+    category: app
+    filename_prefix: docs-velocetty-
+    page_title_suffix: "Velocetty"
+    description: >
+      Modern, extensible terminal built on open web standards. A Hyper fork
+      with a command-driven architecture, WebGL rendering, and a robust
+      plugin system.
+
+  wildside:
+    label: "Wildside"
+    repo: leynos/wildside
+    language: rust
+    category: app
+    filename_prefix: docs-wildside-
+    page_title_suffix: "Wildside"
+    description: >
+      Serendipity for urban wanderers. Narrative walking routes from
+      OpenStreetMap and Wikidata, shipped as a PWA with a Rust backend.
+
+  # -- Games ---------------------------------------------------------------
+  lille:
+    label: "Lille"
+    repo: leynos/lille
+    doc_path: docs/developers-guide.md
+    language: rust
+    category: game
+    filename_prefix: docs-lille-
+    page_title_suffix: "Lille"
+    description: >
+      Overengineered real-time strategy. A dataflow-driven game loop built on
+      DBSP, with optional Bevy rendering subsystems.
+
+  vibe-coder:
+    label: "Vibe Coder"
+    repo: leynos/vibe-coder
+    language: typescript
+    category: game
+    filename_prefix: docs-vibe-coder-
+    page_title_suffix: "Vibe Coder"
+    description: >
+      Offline-first idle strategy about shipping software. Allocate effort
+      across shipping, open source, quality, security, and marketing; a
+      deterministic simulation decides what breaks.
+
+  # -- Skills --------------------------------------------------------------
+  agent-helper-scripts:
+    label: "agent-helper-scripts"
+    repo: leynos/agent-helper-scripts
+    language: python
+    category: skill
+    filename_prefix: docs-agent-helper-scripts-
+    page_title_suffix: "agent-helper-scripts"
+    description: >
+      Bootstrap scripts, hooks, sub-agents, and a bundled skill collection
+      for provisioning agent development environments across the estate.
+
+  novel-ralph-skill:
+    label: "novel-ralph-skill"
+    repo: leynos/novel-ralph-skill
+    language: python
+    category: skill
+    filename_prefix: docs-novel-ralph-
+    page_title_suffix: "novel-ralph-skill"
+    description: >
+      Claude Code skill that writes novels under a Ralph Loop harness –
+      treatment, beats, outline, draft, revision, repeat until done.
+
+  python-skill:
+    label: "python-skill"
+    repo: leynos/python-skill
+    language: python
+    category: skill
+    filename_prefix: docs-python-skill-
+    page_title_suffix: "python-skill"
+    description: >
+      Compact Python skill catalogue for coding agents: one router, focused
+      language skills, a verification selector, and a quality-tools guide.
+
+  rust-skill:
+    label: "rust-skill"
+    repo: leynos/rust-skill
+    language: rust
+    category: skill
+    filename_prefix: docs-rust-skill-
+    page_title_suffix: "rust-skill"
+    description: >
+      Compact Rust skill catalogue for coding agents. Keeps the useful
+      decision surfaces, drops the boilerplate.
+
+  visual-storytelling-skills:
+    label: "visual-storytelling-skills"
+    repo: leynos/visual-storytelling-skills
+    language: python
+    category: skill
+    filename_prefix: docs-visual-storytelling-
+    page_title_suffix: "visual-storytelling-skills"
+    description: >
+      Agent skills for AI film production – from prose to picture.
+      Continuity extraction, reference images, shot direction, and
+      model-routed video prompts, with a TTS phoneticizer for good measure.
 shared_content:
   terms-of-use:
     label: "Terms of Use"

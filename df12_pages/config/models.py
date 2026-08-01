@@ -225,6 +225,16 @@ class AboutPageConfig:
     brand_text: str = "df12"
 
 
+#: Valid project categories for docs index grouping, in display order.
+PAGE_CATEGORIES: typ.Final[tuple[str, ...]] = (
+    "tool",
+    "library",
+    "app",
+    "game",
+    "skill",
+)
+
+
 @dc.dataclass(slots=True)
 class PageConfig:
     """A fully resolved page definition sourced from YAML config."""
@@ -248,6 +258,7 @@ class PageConfig:
     doc_path: str
     latest_release: str | None
     latest_release_published_at: dt.datetime | None
+    category: str = "tool"
 
 
 @dc.dataclass(slots=True)
@@ -356,6 +367,7 @@ class SiteConfig:
 
 
 __all__ = [
+    "PAGE_CATEGORIES",
     "AboutLocationConfig",
     "AboutPageConfig",
     "AvatarConfig",

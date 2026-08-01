@@ -132,3 +132,60 @@ def test_content_pages_defaults(tmp_path: Path) -> None:
     cp = config.sites["demo"].content_pages[0]
     assert cp.label == "Database Backends"
     assert cp.output_slug == "database-backends"
+
+
+def test_page_category_defaults_to_tool(tmp_path: Path) -> None:
+    """Pages without an explicit category fall back to the 'tool' default."""
+    pages_yaml = tmp_path / "pages.yaml"
+    pages_yaml.write_text(
+        """\
+defaults:
+  docs_index_output: public/docs.html
+pages:
+  getting-started:
+    source_url: https://example.com/guide.md
+""",
+        encoding="utf-8",
+    )
+    config = load_site_config(pages_yaml)
+    assert config.pages["getting-started"].category == "tool"
+
+
+def test_page_category_parsed_and_default_overridable(tmp_path: Path) -> None:
+    """Explicit page categories win over the defaults-level category."""
+    pages_yaml = tmp_path / "pages.yaml"
+    pages_yaml.write_text(
+        """\
+defaults:
+  docs_index_output: public/docs.html
+  category: library
+pages:
+  getting-started:
+    source_url: https://example.com/guide.md
+  helper:
+    source_url: https://example.com/helper.md
+    category: skill
+""",
+        encoding="utf-8",
+    )
+    config = load_site_config(pages_yaml)
+    assert config.pages["getting-started"].category == "library"
+    assert config.pages["helper"].category == "skill"
+
+
+def test_page_category_invalid_raises(tmp_path: Path) -> None:
+    """An unknown category value fails loading with a clear error."""
+    pages_yaml = tmp_path / "pages.yaml"
+    pages_yaml.write_text(
+        """\
+defaults:
+  docs_index_output: public/docs.html
+pages:
+  getting-started:
+    source_url: https://example.com/guide.md
+    category: gadget
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(SiteConfigError, match="unknown category 'gadget'"):
+        load_site_config(pages_yaml)

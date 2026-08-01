@@ -103,6 +103,17 @@ def _promote_bold_headings(body: str) -> str:
     return BOLD_HEADING_PATTERN.sub(_replace, body)
 
 
+def _extract_preamble(text: str) -> str:
+    """Return document prose preceding the first ``##`` heading.
+
+    The top-level ``#`` heading itself is dropped; the remaining text becomes
+    the body of a synthetic "Introduction" section. Returns an empty string
+    when nothing but the title precedes the first section.
+    """
+    without_title = re.sub(r"^#\s[^\n]*\n", "", text.lstrip(), count=1)
+    return without_title.strip()
+
+
 def _split_subsections(body: str) -> tuple[str, list[Subsection]]:
     """Return intro text and parsed Subsections from section body."""
     body = _promote_bold_headings(body)
@@ -143,6 +154,21 @@ def parse_sections(markdown_text: str) -> list[Section]:
 
     sections: list[Section] = []
     used_slugs: set[str] = set()
+    preamble = _extract_preamble(markdown_text[: entries[0].start()])
+    if preamble:
+        slug = _unique_slug(_slugify("Introduction"), used_slugs)
+        intro, subsections = _split_subsections(preamble)
+        sections.append(
+            Section(
+                title="Introduction",
+                short_title="Introduction",
+                slug=slug,
+                order=1,
+                markdown=preamble,
+                intro_markdown=intro,
+                subsections=subsections,
+            )
+        )
     for idx, match in enumerate(entries):
         start = match.end()
         end = entries[idx + 1].start() if idx + 1 < len(entries) else len(markdown_text)
@@ -156,7 +182,7 @@ def parse_sections(markdown_text: str) -> list[Section]:
                 title=heading,
                 short_title=short_title or heading,
                 slug=slug,
-                order=idx + 1,
+                order=len(sections) + 1,
                 markdown=body,
                 intro_markdown=intro,
                 subsections=subsections,

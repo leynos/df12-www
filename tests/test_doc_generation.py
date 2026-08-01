@@ -90,6 +90,7 @@ from types import SimpleNamespace
 
 import msgspec.json as msgspec_json
 import pytest
+import requests
 from bs4 import BeautifulSoup
 
 from df12_pages._constants import PAGE_META_TEMPLATE
@@ -592,4 +593,71 @@ def test_release_version_and_date_prefer_tag_metadata(
     requested_url = markdown_response["calls"][0]
     assert "refs/tags/v9.9.9" in requested_url, (
         f"expected request URL {requested_url!r} to reference release tag 'v9.9.9'"
+    )
+
+
+def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
+    page_config: PageConfig,
+    sample_markdown: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A 404 on the release-pinned guide URL falls back to the branch source."""
+    release_config = dc.replace(
+        page_config,
+        repo="octo/tool",
+        source_url=page_config.source_url,
+        doc_path="docs/users-guide.md",
+        latest_release="v9.9.9",
+        latest_release_published_at=dt.datetime(2024, 12, 25, tzinfo=dt.UTC),
+    )
+    calls: list[str] = []
+
+    class _Response:
+        def __init__(self, status_code: int, body: str) -> None:
+            self.status_code = status_code
+            self.text = body
+            self.headers = {"Last-Modified": "Mon, 01 Jan 2024 12:00:00 GMT"}
+
+        def raise_for_status(self) -> None:
+            if self.status_code >= http.HTTPStatus.BAD_REQUEST:
+                msg = f"{self.status_code} for test"
+                raise requests.HTTPError(msg)
+
+    class _Session:
+        def mount(self, *_args: object, **_kwargs: object) -> None:
+            return None
+
+        def get(self, url: str, timeout: int = 30) -> _Response:
+            calls.append(url)
+            if "refs/tags/" in url:
+                return _Response(404, "missing")
+            return _Response(200, sample_markdown)
+
+        def close(self) -> None:
+            return None
+
+    monkeypatch.setattr(
+        "df12_pages.generator.page_generator.requests.Session", _Session
+    )
+
+    generator = PageContentGenerator(release_config)
+    written = generator.run()
+
+    expected_fetches = 2
+    assert len(calls) == expected_fetches, (
+        f"expected tag fetch then branch fallback, got {calls!r}"
+    )
+    assert "refs/tags/v9.9.9" in calls[0]
+    assert calls[1] == release_config.source_url
+    assert generator.doc_version is None, "version pin should be dropped on fallback"
+
+    intro_path = next(
+        path for path in written if path.name.endswith("introduction.html")
+    )
+    soup = BeautifulSoup(intro_path.read_text(encoding="utf-8"), "html.parser")
+    meta_items = [
+        span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
+    ]
+    assert "Version 9.9.9" not in meta_items, (
+        f"fallback content must not claim the release version, got {meta_items!r}"
     )

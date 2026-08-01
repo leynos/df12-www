@@ -37,9 +37,47 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown import markdown
 
 from ._constants import PAGE_META_TEMPLATE
+from .config import PAGE_CATEGORIES
 
 if typ.TYPE_CHECKING:  # pragma: no cover - import for type hints only
     from .config import PageConfig, SiteConfig
+
+#: Display metadata for each docs index section, keyed by page category.
+CATEGORY_SECTIONS: dict[str, dict[str, str]] = {
+    "tool": {
+        "anchor": "tools",
+        "title": "Tools",
+        "lede": (
+            "Command-line tools that do one thing well and then get out of the way."
+        ),
+    },
+    "library": {
+        "anchor": "libraries",
+        "title": "Libraries",
+        "lede": (
+            "Crates and packages built to be depended on: typed, tested,"
+            " and documented."
+        ),
+    },
+    "app": {
+        "anchor": "apps",
+        "title": "Apps",
+        "lede": (
+            "Applications for desktop and browser."
+            " Products with a surface, not just a prompt."
+        ),
+    },
+    "game": {
+        "anchor": "games",
+        "title": "Games",
+        "lede": "Playful worlds in executable form.",
+    },
+    "skill": {
+        "anchor": "skills",
+        "title": "Skills",
+        "lede": "Skill collections that teach coding agents the house style.",
+    },
+}
 
 
 class DocsIndexBuilder:
@@ -80,6 +118,7 @@ class DocsIndexBuilder:
         context = {
             "theme": self.site_config.theme,
             "entries": entries,
+            "sections": _group_entries_by_category(entries),
             "generated_at": generated_at,
         }
         html = self.template.render(**context)
@@ -109,6 +148,7 @@ class DocsIndexBuilder:
                     "release_url": _build_release_link(page.repo, page.latest_release),
                     "package_url": _build_package_url(page),
                     "package_label": _package_label(page.language),
+                    "category": page.category,
                 }
             )
         return entries
@@ -122,6 +162,34 @@ class DocsIndexBuilder:
             extensions=self._markdown_extensions,
             output_format="html5",
         )
+
+
+def _group_entries_by_category(
+    entries: list[dict[str, str | None]],
+) -> list[dict[str, typ.Any]]:
+    """Group docs index entries into display sections by page category.
+
+    Parameters
+    ----------
+    entries : list of dict
+        Entry dictionaries produced by ``DocsIndexBuilder._gather_entries``,
+        each carrying a ``category`` key.
+
+    Returns
+    -------
+    list of dict
+        One section per category in :data:`PAGE_CATEGORIES` order, each with
+        ``anchor``, ``title``, ``lede``, and ``entries`` keys. Categories with
+        no entries are omitted.
+    """
+    sections: list[dict[str, typ.Any]] = []
+    for category in PAGE_CATEGORIES:
+        matching = [entry for entry in entries if entry.get("category") == category]
+        if not matching:
+            continue
+        meta = CATEGORY_SECTIONS[category]
+        sections.append({**meta, "entries": matching})
+    return sections
 
 
 def _discover_entry_href(page: PageConfig, relative_to: Path) -> str | None:

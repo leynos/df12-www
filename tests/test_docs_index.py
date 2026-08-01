@@ -21,8 +21,12 @@ from __future__ import annotations
 
 import typing as typ
 
-from df12_pages.config import PageConfig, ThemeConfig
-from df12_pages.docs_index import _build_package_url
+from df12_pages.config import PageConfig, SiteConfig, ThemeConfig
+from df12_pages.docs_index import (
+    DocsIndexBuilder,
+    _build_package_url,
+    _group_entries_by_category,
+)
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -80,3 +84,37 @@ def test_package_url_present_for_rust_release(tmp_path: Path) -> None:
     assert actual == "https://crates.io/crates/pkg", (
         f"Expected crates.io URL for rust releases, got {actual!r}"
     )
+
+
+def test_group_entries_by_category_orders_and_omits_empty() -> None:
+    """Sections follow PAGE_CATEGORIES order and skip empty categories."""
+    entries: list[dict[str, str | None]] = [
+        {"label": "Lib", "category": "library"},
+        {"label": "Tool", "category": "tool"},
+        {"label": "Skill", "category": "skill"},
+        {"label": "Tool 2", "category": "tool"},
+    ]
+    sections = _group_entries_by_category(entries)
+    assert [section["title"] for section in sections] == [
+        "Tools",
+        "Libraries",
+        "Skills",
+    ]
+    tools = sections[0]["entries"]
+    assert [entry["label"] for entry in tools] == ["Tool", "Tool 2"]
+    assert all(section["anchor"] for section in sections)
+
+
+def test_gather_entries_carries_category(tmp_path: Path) -> None:
+    """Docs index entries expose the page category for template grouping."""
+    page = _base_page(tmp_path, overrides={"category": "library"})
+    (page.output_dir / "docs-test-introduction.html").write_text(
+        "<html></html>", encoding="utf-8"
+    )
+    site = SiteConfig(
+        pages={"test": page},
+        docs_index_output=page.output_dir / "docs.html",
+    )
+    builder = DocsIndexBuilder(site)
+    entries = builder._gather_entries()
+    assert entries[0]["category"] == "library"

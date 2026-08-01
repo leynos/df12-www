@@ -26,6 +26,8 @@ from __future__ import annotations
 
 import os
 import shutil
+import subprocess
+import sys
 import typing as typ
 from pathlib import Path
 
@@ -38,6 +40,7 @@ from .config import SharedContentPageChrome, SiteConfig, SubSiteConfig, load_sit
 from .content_page import ContentPageGenerator
 from .deploy import (
     DEFAULT_CONFIG_PATH,
+    CredentialError,
     apply_stack,
     init_stack,
     plan_stack,
@@ -580,8 +583,29 @@ def apply(
     )
 
 
+_STDERR_DETAIL_LIMIT = 2000
+
+
+def _describe_failed_command(exc: subprocess.CalledProcessError) -> str:
+    """Return a short human-readable name for the command that failed."""
+    match exc.cmd:
+        case [exe, arg, *_]:
+            return f"{Path(str(exe)).name} {arg}"
+        case [exe]:
+            return Path(str(exe)).name
+        case cmd:
+            return str(cmd)
+
+
 def main() -> None:
     """Invoke the Cyclopts application that powers the `pages` console command.
+
+    Expected operational failures (a subprocess exiting non-zero, a missing
+    binary, or unresolvable credentials) are reported as a single-line error
+    message rather than a traceback.  When the failed subprocess captured
+    its stderr (as the backend-bucket bootstrap does), a bounded excerpt is
+    relayed first so the diagnostic is not lost; otherwise the subprocess
+    has already written its diagnostics to the terminal.
 
     Parameters
     ----------
@@ -593,11 +617,33 @@ def main() -> None:
         This function executes for its side effects of parsing CLI arguments
         and running the requested subcommand.
 
+    Raises
+    ------
+    SystemExit
+        With the subprocess's exit status when a command fails, or ``1`` for
+        missing binaries and credential errors.
+
     Examples
     --------
     >>> main()  # doctest: +SKIP
     """
-    app()
+    try:
+        app()
+    except subprocess.CalledProcessError as exc:
+        detail = (exc.stderr or "").strip()
+        if detail:
+            print(detail[:_STDERR_DETAIL_LIMIT], file=sys.stderr)
+        print(
+            f"error: {_describe_failed_command(exc)} exited with "
+            f"status {exc.returncode}",
+            file=sys.stderr,
+        )
+        raise SystemExit(exc.returncode or 1) from None
+    except (FileNotFoundError, CredentialError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(1) from None
+    else:
+        return
 
 
 if __name__ == "__main__":  # pragma: no cover - manual invocation helper

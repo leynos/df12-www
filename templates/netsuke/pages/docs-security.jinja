@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Security Model - Netsuke Build System{% endblock %}
 {% block extra_head %}
@@ -73,6 +74,7 @@
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+{% endraw %}{{ docsnav.mobile_docs_bar('security') }}{% raw %}
 
             <!-- Breadcrumbs -->
             <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
@@ -83,11 +85,10 @@
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center mb-4">
                     <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
                         Reference
                     </div>
-                    <span class="text-charcoal-mid text-xs font-mono bg-white px-2 py-1 rounded border border-stone">Safe by default</span>
                 </div>
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Security Model</h1>
                 <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
@@ -190,29 +191,7 @@ $ netsuke \
             </section>
 
             <!-- Help Footer -->
-            <div class="mt-10 pt-10 border-t border-stone-light">
-                <div class="flex justify-between items-center">
-                    <a href="/netsuke/docs/configuration/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
-                        </div>
-                        <div class="text-left">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
-                            <div class="font-medium text-sm">Configuration</div>
-                        </div>
-                    </a>
-
-                    <a href="/netsuke/examples/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="text-right">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
-                            <div class="font-medium text-sm">Examples Hub</div>
-                        </div>
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                    </a>
-                </div>
-            </div>
+{% endraw %}{{ docsnav.docs_footer('security') }}{% raw %}
 
         </main>
     </div>

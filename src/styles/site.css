@@ -725,6 +725,11 @@
     order: 1;
   }
 
+  /* Sit the image lower in the crop frame on the wide layout. */
+  .world-card--crop-low .world-card__media img {
+    object-position: center calc(50% + 0.5cm);
+  }
+
   .world-card__body {
     order: 2;
   }

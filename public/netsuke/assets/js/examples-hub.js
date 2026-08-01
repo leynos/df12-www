@@ -1,7 +1,14 @@
+/* Category filtering for the examples hub.
+ *
+ * The filter pills (`[data-example-filter]`, rendered by the
+ * filter_buttons macro in templates/netsuke/examples_data.jinja) toggle
+ * which example cards (`[data-example-card]`) are visible by matching
+ * each card's `data-category`. Copy-to-clipboard behaviour for the
+ * cards lives in copy-buttons.js.
+ */
 (function () {
   document.addEventListener("DOMContentLoaded", () => {
     initFilters();
-    initCopyButtons();
   });
 
   function initFilters() {
@@ -31,41 +38,4 @@
     }
   }
 
-  function initCopyButtons() {
-    for (const button of document.querySelectorAll("[data-copy-snippet]")) {
-      button.addEventListener("click", async () => {
-        const card = button.closest("[data-example-card]");
-        const snippet = card ? card.getAttribute("data-snippet") : null;
-
-        if (!snippet || !navigator.clipboard) {
-          flash(button, "Copy unavailable", "text-vermillion");
-          return;
-        }
-
-        try {
-          await navigator.clipboard.writeText(snippet.trim() + "\n");
-          flash(button, "Copied", "text-matcha");
-        } catch {
-          flash(button, "Copy failed", "text-vermillion");
-        }
-      });
-    }
-  }
-
-  function flash(button, message, colourClass) {
-    const originalTitle = button.getAttribute("title");
-    const originalAriaLabel = button.getAttribute("aria-label");
-    button.setAttribute("title", message);
-    button.setAttribute("aria-label", message);
-    button.classList.add(colourClass);
-    window.setTimeout(() => {
-      button.setAttribute("title", originalTitle);
-      if (originalAriaLabel === null) {
-        button.removeAttribute("aria-label");
-      } else {
-        button.setAttribute("aria-label", originalAriaLabel);
-      }
-      button.classList.remove(colourClass);
-    }, 1500);
-  }
 })();

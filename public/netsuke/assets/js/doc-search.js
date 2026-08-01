@@ -1,16 +1,29 @@
+/* Client-side documentation search.
+ *
+ * Wires every `[data-doc-search-root]` element (the desktop sidebar box
+ * and the mobile docs bar both declare one) to a MiniSearch index named
+ * by its `data-doc-search-index` attribute. Each root keeps its own
+ * input, results panel, and keyboard handling, while index loads are
+ * fetched, parsed, and deserialized once per index path and shared. The
+ * indexes are built by scripts/build-netsuke-search-index.mjs; the
+ * markup contract lives in the sidebar blocks of the docs page
+ * templates and in templates/netsuke/docs_nav.jinja.
+ */
 (function () {
   const SEARCH_MIN_LENGTH = 2;
   const RESULT_LIMIT = 6;
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const searchRoots = document.querySelectorAll("[data-doc-search-root]");
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchRoots = document.querySelectorAll("[data-doc-search-root]");
 
-    for (const root of searchRoots) {
-      initializeDocSearch(root).catch((error) => {
-        console.warn("Doc search initialization failed.", error);
-      });
-    }
-  });
+      for (const root of searchRoots) {
+        initializeDocSearch(root).catch((error) => {
+          console.warn("Doc search initialization failed.", error);
+        });
+      }
+    });
+  }
 
   async function initializeDocSearch(root) {
     const input = root.querySelector("[data-doc-search-input]");
@@ -29,16 +42,19 @@
       return;
     }
 
-    const response = await fetch(searchIndexPath);
-    if (!response.ok) {
+    let loaded;
+    try {
+      loaded = await loadSearchIndex(searchIndexPath);
+    } catch {
+      loaded = null;
+    }
+    if (!loaded) {
       meta.textContent = "Search index is not available in this build.";
       showPanel(panel, input);
       return;
     }
 
-    const payload = await response.json();
-    const searchOptions = payload.indexOptions.searchOptions;
-    const miniSearch = window.MiniSearch.loadJSON(payload.index, payload.indexOptions);
+    const { miniSearch, searchOptions } = loaded;
     const siteRoot = siteRootFromIndexPath(searchIndexPath);
 
     let activeIndex = -1;
@@ -53,6 +69,13 @@
         (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
 
       if (!wantsShortcut) {
+        return;
+      }
+
+      // Pages can carry more than one search root (desktop sidebar and the
+      // mobile docs bar); each installs this handler, so only the root that
+      // is visible at the current breakpoint may claim the shortcut.
+      if (input.offsetParent === null) {
         return;
       }
 
@@ -221,6 +244,50 @@
     input.setAttribute("aria-expanded", "false");
   }
 
+  // Pages can carry more than one search root for the same index (desktop
+  // sidebar plus the mobile docs bar). Fetch, parse, and deserialize each
+  // index once, sharing the MiniSearch instance across roots; UI state and
+  // listeners stay per-root. The cache stores promises so concurrent roots
+  // reuse the in-flight load, and a failed or empty load is evicted so a
+  // later root can retry. `load` is injectable for tests.
+  function createIndexCache(load) {
+    const cache = new Map();
+    return function loadCached(path) {
+      if (!cache.has(path)) {
+        const pending = Promise.resolve()
+          .then(() => load(path))
+          .then(
+            (loaded) => {
+              if (!loaded) {
+                cache.delete(path);
+              }
+              return loaded;
+            },
+            (error) => {
+              cache.delete(path);
+              throw error;
+            }
+          );
+        cache.set(path, pending);
+      }
+      return cache.get(path);
+    };
+  }
+
+  async function fetchSearchIndex(searchIndexPath) {
+    const response = await fetch(searchIndexPath);
+    if (!response.ok) {
+      return null;
+    }
+    const payload = await response.json();
+    return {
+      miniSearch: window.MiniSearch.loadJSON(payload.index, payload.indexOptions),
+      searchOptions: payload.indexOptions.searchOptions,
+    };
+  }
+
+  const loadSearchIndex = createIndexCache(fetchSearchIndex);
+
   function siteRootFromIndexPath(indexPath) {
     // Index files live at "<siteRoot>assets/search/<name>.json", so the
     // prefix before that marker is the sub-site root the results belong to.
@@ -241,5 +308,9 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#39;");
+  }
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = { createIndexCache, siteRootFromIndexPath };
   }
 })();

@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Contributing - Netsuke Build System{% endblock %}
 {% block content %}
@@ -12,11 +13,11 @@
                 <div>
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
                     <ul class="space-y-1">
-                        <li><a href="#ways-to-contribute" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Ways to Contribute</a></li>
-                        <li><a href="#dev-workflow" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Development Workflow</a></li>
-                        <li><a href="#quality-gates" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Quality Gates</a></li>
-                        <li><a href="#translation" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Translating Netsuke</a></li>
-                        <li><a href="#commit-style" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Commit Style</a></li>
+                        <li><a href="#ways-to-contribute" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Ways to Contribute</a></li>
+                        <li><a href="#dev-workflow" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Development Workflow</a></li>
+                        <li><a href="#quality-gates" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Quality Gates</a></li>
+                        <li><a href="#translation" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Translating Netsuke</a></li>
+                        <li><a href="#commit-style" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Commit Style</a></li>
                     </ul>
                 </div>
 
@@ -374,29 +375,7 @@ progress-target-count = Building { $count -&gt;
             </section>
 
             <!-- Footer nav -->
-            <div class="mt-10 pt-10 border-t border-stone-light">
-                <div class="flex justify-between items-center">
-                    <a href="/netsuke/guides/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
-                        </div>
-                        <div class="text-left">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Back</div>
-                            <div class="font-medium text-sm">Guides</div>
-                        </div>
-                    </a>
-
-                    <a href="https://github.com/leynos/netsuke/issues" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="text-right">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Open an</div>
-                            <div class="font-medium text-sm">Issue on GitHub</div>
-                        </div>
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                    </a>
-                </div>
-            </div>
+{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'kicker': 'Open an', 'label': 'Issue on GitHub', 'href': 'https://github.com/leynos/netsuke/issues'}) }}{% raw %}
 
         </main>
     </div>

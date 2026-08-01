@@ -138,6 +138,7 @@ homepage:
           - cq
           - world-card
           - world-card--media-after
+          - world-card--crop-low
           - pressable
           - border-accent/20
           - bg-neutral/40
@@ -1269,6 +1270,10 @@ sites:
         label: Contributing
         template: pages/guides-contributing.jinja
         output_slug: guides/contributing
+      - key: guides-architecture
+        label: How Netsuke Works
+        template: pages/guides-architecture.jinja
+        output_slug: guides/architecture
       - key: design
         label: Design
         template: pages/design.jinja

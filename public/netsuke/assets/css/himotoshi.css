@@ -90,6 +90,11 @@ body {
   margin-inline: auto;
   max-width: 80rem;
   padding-inline: 1rem;
+  /* Pin to the viewport rather than growing to content min-content:
+     as a flex item of the body column layout, an auto-width container
+     would otherwise inherit the widest descendant's intrinsic width
+     and push the page sideways on narrow screens. */
+  width: 100%;
 }
 
 .sidebar-link.active {
@@ -865,10 +870,6 @@ a.sidebar-link--sub.active {
 }
 
 @media (max-width: 459.98px) {
-  .site-container {
-    margin-inline: 0;
-    width: 100%;
-  }
 
   main.hm-docs-content {
     overflow-wrap: break-word;
@@ -1019,6 +1020,52 @@ a.sidebar-link--sub.active {
   font-weight: 500;
 }
 
+/* Ghost toast for transient feedback (copy-to-clipboard on the examples hub).
+   Stays in the DOM so it remains a registered aria-live region; hidden with
+   opacity alone so screen readers still see the text change. */
+.hm-toast {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  z-index: 60;
+  max-width: min(90vw, 22rem);
+  padding: 0.625rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--netsuke-stone-light) 22%, transparent);
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--netsuke-charcoal) 94%, transparent);
+  box-shadow: var(--netsuke-paper-shadow-lg);
+  color: var(--netsuke-stone-light);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateX(-50%) translateY(0.5rem);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+  pointer-events: none;
+}
+
+.hm-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.hm-toast--error {
+  border-color: color-mix(in srgb, var(--netsuke-vermillion) 70%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-toast {
+    transform: translateX(-50%);
+    transition: none;
+  }
+
+  .hm-toast--visible {
+    transform: translateX(-50%);
+  }
+}
+
 /* BEGIN generated himotoshi-pygments (scripts/generate_himotoshi_pygments_css.py) */
 
 :root {
@@ -1045,6 +1092,9 @@ a.sidebar-link--sub.active {
 .hm-syntax {
   background: var(--netsuke-charcoal);
   border-radius: 0.5rem;
+  /* Stop long code lines propagating min-content width up the
+     flex chain and widening the page on narrow viewports. */
+  contain: inline-size;
   overflow-x: auto;
 }
 

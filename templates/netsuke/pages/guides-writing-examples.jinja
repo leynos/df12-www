@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Writing Examples &amp; Showcases - Netsuke Build System{% endblock %}
 {% block content %}
@@ -12,12 +13,12 @@
                 <div>
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
                     <ul class="space-y-1">
-                        <li><a href="#good-example" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">What makes a good example</a></li>
-                        <li><a href="#anatomy" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Anatomy of an example</a></li>
-                        <li><a href="#conventions" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest conventions</a></li>
-                        <li><a href="#repository" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Where examples live</a></li>
-                        <li><a href="#showcases" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Showcase pages</a></li>
-                        <li><a href="#submitting" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Submitting</a></li>
+                        <li><a href="#good-example" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">What makes a good example</a></li>
+                        <li><a href="#anatomy" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Anatomy of an example</a></li>
+                        <li><a href="#conventions" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest conventions</a></li>
+                        <li><a href="#repository" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Where examples live</a></li>
+                        <li><a href="#showcases" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Showcase pages</a></li>
+                        <li><a href="#submitting" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Submitting</a></li>
                     </ul>
                 </div>
 
@@ -334,29 +335,7 @@ defaults:
             </section>
 
             <!-- Help Footer -->
-            <div class="mt-10 pt-10 border-t border-stone-light">
-                <div class="flex justify-between items-center">
-                    <a href="/netsuke/guides/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
-                        </div>
-                        <div class="text-left">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Back</div>
-                            <div class="font-medium text-sm">Guides</div>
-                        </div>
-                    </a>
-
-                    <a href="/netsuke/examples/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="text-right">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
-                            <div class="font-medium text-sm">Examples Hub</div>
-                        </div>
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                    </a>
-                </div>
-            </div>
+{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'label': 'Examples Hub', 'href': '/netsuke/examples/'}) }}{% raw %}
 
         </main>
     </div>

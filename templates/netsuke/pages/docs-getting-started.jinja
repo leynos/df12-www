@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Getting Started - Netsuke Build System{% endblock %}
 {% block extra_head %}
@@ -6,6 +7,7 @@
     </style>
 {% endblock %}
 {% block content %}
+{% set install_command = 'cargo install netsuke-build' %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
@@ -73,6 +75,7 @@
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+{% endraw %}{{ docsnav.mobile_docs_bar('getting-started') }}{% raw %}
 
             <!-- Breadcrumbs -->
             <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
@@ -83,12 +86,9 @@
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center mb-4">
                     <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
                         Tutorial
-                    </div>
-                    <div class="text-sm text-charcoal-mid font-mono">
-                        <span class="iconify mr-1" data-icon="carbon:time" aria-hidden="true"></span> 5 min read
                     </div>
                 </div>
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Getting Started with Netsuke</h1>
@@ -108,7 +108,7 @@
                     <ul class="space-y-3">
                         <li class="flex items-start">
                             <span class="iconify text-matcha mt-1 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
-                            <span class="text-charcoal">A Unix-like environment (macOS, Linux, or WSL2)</span>
+                            <span class="text-charcoal">macOS, Linux, or Windows (PowerShell natively, or WSL2)</span>
                         </li>
                         <li class="flex items-start">
                             <span class="iconify text-matcha mt-1 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
@@ -142,16 +142,13 @@
 
                 <div class="relative group mb-6">
                     <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button class="bg-charcoal-light/20 hover:bg-charcoal-light/40 text-stone-light p-1.5 rounded transition-colors" type="button" title="Copy to clipboard" aria-label="Copy install command" data-copy-code>
+                        {% endraw %}<button class="bg-charcoal-light/20 hover:bg-charcoal-light/40 text-stone-light p-1.5 rounded transition-colors" type="button" title="Copy to clipboard" aria-label="Copy install command" data-copy-text="{{ install_command }}">{% raw %}
                             <span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span>
                         </button>
                     </div>
                     <div class="bg-charcoal rounded-lg p-5 font-mono text-sm overflow-x-auto border border-charcoal-mid shadow-lg">
-                        {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
-$ cargo install netsuke-build
-                        {% endraw %}{% endhighlight %}{% raw %}
+                        {% endraw %}{% highlight 'netsuke-console' %}$ {{ install_command }}{% endhighlight %}{% raw %}
                     </div>
-                    <span class="sr-only" aria-live="polite" data-copy-status></span>
                 </div>
 
                 <div class="flex items-center text-sm text-charcoal-mid">
@@ -174,14 +171,22 @@ $ cargo install netsuke-build
                     <!-- Step 1: File Structure -->
                     <div>
                         <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">1. Create Project Directory</h3>
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-light mb-2">macOS, Linux, or WSL2</p>
                         <div class="bg-charcoal rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
                             {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ mkdir my-first-build && cd my-first-build
 $ touch Netsukefile
                             {% endraw %}{% endhighlight %}{% raw %}
                         </div>
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-light mb-2">Windows PowerShell</p>
+                        <div class="bg-charcoal rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
+                            {% endraw %}{% highlight 'powershell' %}{% raw %}
+mkdir my-first-build; cd my-first-build
+New-Item Netsukefile -ItemType File
+                            {% endraw %}{% endhighlight %}{% raw %}
+                        </div>
                         <p class="text-sm text-charcoal-mid">
-                            This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared.
+                            This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared. Windows PowerShell 5.1 has no <code class="font-mono text-xs">&amp;&amp;</code> operator, so the two commands are separated by a semicolon.
                         </p>
                     </div>
 
@@ -296,60 +301,11 @@ HELLO, NETSUKE!
             </section>
 
             <!-- Help Footer -->
-            <div class="mt-10 pt-10 border-t border-stone-light">
-                <div class="flex justify-between items-center">
-                    <a href="/netsuke/docs/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
-                        </div>
-                        <div class="text-left">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
-                            <div class="font-medium text-sm">Documentation Hub</div>
-                        </div>
-                    </a>
-
-                    <a href="/netsuke/docs/manifest-reference/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="text-right">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
-                            <div class="font-medium text-sm">Manifest Reference</div>
-                        </div>
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                    </a>
-                </div>
-            </div>
+{% endraw %}{{ docsnav.docs_footer('getting-started') }}{% raw %}
 
         </main>
     </div>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-    <script>
-        document.querySelectorAll('[data-copy-code]').forEach((button) => {
-            button.addEventListener('click', async () => {
-                const block = button.closest('.relative.group.mb-6');
-                const sample = block?.querySelector('.bg-charcoal');
-                const status = block?.querySelector('[data-copy-status]');
-                const text = sample?.textContent?.replace(/\s+/g, ' ').trim().replace(/^\$ /, '');
-
-                if (!text || !navigator.clipboard) {
-                    if (status) status.textContent = 'Copy unavailable';
-                    return;
-                }
-
-                try {
-                    await navigator.clipboard.writeText(text);
-                    button.setAttribute('aria-label', 'Copied install command');
-                    if (status) status.textContent = 'Copied install command';
-                    window.setTimeout(() => {
-                        button.setAttribute('aria-label', 'Copy install command');
-                        if (status) status.textContent = '';
-                    }, 1800);
-                } catch {
-                    if (status) status.textContent = 'Copy failed';
-                }
-            });
-        });
-    </script>
 {% endraw %}
 {% endblock %}

@@ -132,27 +132,7 @@
                             <div class="absolute top-4 right-4 flex space-x-2">
                                 {% endraw %}{{ exdata.copy_manifest_button('basic-c-application') }}{% raw %}
                             </div>
-                            {% endraw %}{% highlight 'netsuke' %}{% raw %}
-# Global manifest version
-netsuke_version: "1.0.0"
-
-# Reusable compile step
-rules:
-  - name: "compile"
-    command: "gcc -c {{ ins }} -o {{ outs }}"
-
-# Targets either reuse a rule or define an inline command
-targets:
-  - name: "main.o"
-    rule: "compile"
-    sources: "main.c"
-
-  - name: "app"
-    command: "gcc {{ ins }} -o {{ outs }}"
-    sources: ["main.o", "utils.o"]
-
-defaults: ["app"]
-{% endraw %}{% endhighlight %}{% raw %}
+                            {% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_basic_c }}{% endhighlight %}{% raw %}
                         </div>
                     </div>
 

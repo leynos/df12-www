@@ -13,12 +13,18 @@
 
     function init() {
         var links = Array.prototype.slice.call(
-            document.querySelectorAll('#sidebar a.sidebar-link--sub[href^="#"]')
+            document.querySelectorAll('#sidebar a.sidebar-link--sub[href*="#"]')
         );
         var targets = links
             .map(function (link) {
+                // Sub-links may use bare fragments or absolute same-page
+                // URLs such as /netsuke/docs/getting-started/#installation.
+                var url = new URL(link.getAttribute("href"), window.location.href);
+                if (url.pathname !== window.location.pathname || !url.hash) {
+                    return null;
+                }
                 var el = document.getElementById(
-                    decodeURIComponent(link.getAttribute("href").slice(1))
+                    decodeURIComponent(url.hash.slice(1))
                 );
                 return el ? { link: link, el: el } : null;
             })

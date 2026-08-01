@@ -56,6 +56,13 @@
         return;
       }
 
+      // Pages can carry more than one search root (desktop sidebar and the
+      // mobile docs bar); each installs this handler, so only the root that
+      // is visible at the current breakpoint may claim the shortcut.
+      if (input.offsetParent === null) {
+        return;
+      }
+
       event.preventDefault();
       input.focus();
       input.select();

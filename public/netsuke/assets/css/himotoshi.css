@@ -90,6 +90,11 @@ body {
   margin-inline: auto;
   max-width: 80rem;
   padding-inline: 1rem;
+  /* Pin to the viewport rather than growing to content min-content:
+     as a flex item of the body column layout, an auto-width container
+     would otherwise inherit the widest descendant's intrinsic width
+     and push the page sideways on narrow screens. */
+  width: 100%;
 }
 
 .sidebar-link.active {
@@ -865,10 +870,6 @@ a.sidebar-link--sub.active {
 }
 
 @media (max-width: 459.98px) {
-  .site-container {
-    margin-inline: 0;
-    width: 100%;
-  }
 
   main.hm-docs-content {
     overflow-wrap: break-word;

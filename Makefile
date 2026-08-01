@@ -19,7 +19,7 @@ endif
 
 .DEFAULT_GOAL := all
 
-all: build check-fmt test typecheck spelling
+all: build check-fmt lint test typecheck spelling
 
 .venv: pyproject.toml
 	$(UV_ENV) uv venv --clear

@@ -138,6 +138,7 @@ homepage:
           - cq
           - world-card
           - world-card--media-after
+          - world-card--crop-low
           - pressable
           - border-accent/20
           - bg-neutral/40

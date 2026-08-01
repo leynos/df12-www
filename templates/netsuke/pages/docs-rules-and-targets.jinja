@@ -366,29 +366,7 @@ targets:
             </section>
 
             <!-- Help Footer -->
-            <div class="mt-10 pt-10 border-t border-stone-light">
-                <div class="flex justify-between items-center">
-                    <a href="/netsuke/docs/manifest-reference/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
-                        </div>
-                        <div class="text-left">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Previous</div>
-                            <div class="font-medium text-sm">Manifest Reference</div>
-                        </div>
-                    </a>
-
-                    <a href="/netsuke/docs/templating/" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="text-right">
-                            <div class="text-xs text-charcoal-light uppercase tracking-wide">Next</div>
-                            <div class="font-medium text-sm">Templating</div>
-                        </div>
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
-                            <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                        </div>
-                    </a>
-                </div>
-            </div>
+{% endraw %}{{ docsnav.docs_footer('rules-and-targets') }}{% raw %}
 
         </main>
     </div>

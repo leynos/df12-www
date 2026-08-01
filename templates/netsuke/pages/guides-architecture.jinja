@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}How Netsuke Works - Netsuke Build System{% endblock %}
 {% block content %}
@@ -258,22 +259,7 @@
             </section>
 
             <!-- Footer Navigation -->
-            <div class="mt-10 pt-10 border-t border-stone-light flex flex-col sm:flex-row justify-between gap-4">
-                <a href="/netsuke/guides/" class="group flex items-center text-charcoal-mid hover:text-indigo transition-colors">
-                    <span class="iconify mr-2 transition-transform group-hover:-translate-x-1" data-icon="carbon:arrow-left" aria-hidden="true"></span>
-                    <div>
-                        <div class="text-xs text-charcoal-light">Back to</div>
-                        <div class="font-medium">Guides</div>
-                    </div>
-                </a>
-                <a href="/netsuke/docs/manifest-reference/" class="group flex items-center text-right text-charcoal-mid hover:text-indigo transition-colors sm:flex-row-reverse">
-                    <span class="iconify ml-2 transition-transform group-hover:translate-x-1 sm:ml-0 sm:mr-2" data-icon="carbon:arrow-right" aria-hidden="true"></span>
-                    <div>
-                        <div class="text-xs text-charcoal-light">Next</div>
-                        <div class="font-medium">Manifest Reference</div>
-                    </div>
-                </a>
-            </div>
+{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'label': 'Manifest Reference', 'href': '/netsuke/docs/manifest-reference/'}) }}{% raw %}
 
         </main>
     </div>

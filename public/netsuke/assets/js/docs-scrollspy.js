@@ -54,17 +54,11 @@
             var atBottom =
                 window.innerHeight + window.scrollY >=
                 document.documentElement.scrollHeight - 2;
-            if (atBottom) {
-                setActive(targets[targets.length - 1]);
-                return;
-            }
-            var active = null;
-            for (var i = 0; i < targets.length; i += 1) {
-                if (targets[i].el.getBoundingClientRect().top <= OFFSET) {
-                    active = targets[i];
-                }
-            }
-            setActive(active);
+            var tops = targets.map(function (target) {
+                return target.el.getBoundingClientRect().top;
+            });
+            var index = pickActiveIndex(tops, OFFSET, atBottom);
+            setActive(index >= 0 ? targets[index] : null);
         }
 
         var ticking = false;
@@ -83,9 +77,32 @@
         update();
     }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-    } else {
-        init();
+    // Decide which section is being read: the last one whose heading has
+    // passed `offset`, or the final section once the page is scrolled to
+    // the bottom (so short closing sections can still activate). Returns
+    // an index into `tops`, or -1 when nothing has been reached.
+    function pickActiveIndex(tops, offset, atBottom) {
+        if (atBottom && tops.length > 0) {
+            return tops.length - 1;
+        }
+        var active = -1;
+        for (var i = 0; i < tops.length; i += 1) {
+            if (tops[i] <= offset) {
+                active = i;
+            }
+        }
+        return active;
+    }
+
+    if (typeof document !== "undefined") {
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        } else {
+            init();
+        }
+    }
+
+    if (typeof module !== "undefined" && module.exports) {
+        module.exports = { pickActiveIndex: pickActiveIndex };
     }
 })();

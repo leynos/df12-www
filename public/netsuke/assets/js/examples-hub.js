@@ -1,3 +1,11 @@
+/* Category filtering for the examples hub.
+ *
+ * The filter pills (`[data-example-filter]`, rendered by the
+ * filter_buttons macro in templates/netsuke/examples_data.jinja) toggle
+ * which example cards (`[data-example-card]`) are visible by matching
+ * each card's `data-category`. Copy-to-clipboard behaviour for the
+ * cards lives in copy-buttons.js.
+ */
 (function () {
   document.addEventListener("DOMContentLoaded", () => {
     initFilters();

@@ -1,3 +1,10 @@
+/* Navigation for the mobile docs sub-menu dropdown.
+ *
+ * The floating docs bar (templates/netsuke/docs_nav.jinja) renders the
+ * docs pages as a native <select> marked `data-docs-nav-select`, with
+ * the current page pre-selected. This module navigates to the chosen
+ * page's URL on change, skipping no-op selections of the current path.
+ */
 (function () {
     "use strict";
 

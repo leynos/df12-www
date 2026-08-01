@@ -307,7 +307,7 @@ defaults:
 ] %}
 
 {% macro card(ex) %}
-            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full" data-example-card data-category="{{ ex.category }}" data-snippet="{{ ex.snippet | forceescape }}">
+            <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full" data-example-card data-category="{{ ex.category }}">
                 <div class="h-48 bg-charcoal relative overflow-hidden group">
                      <div class="absolute inset-0 bg-[url('{{ ex.image }}')] bg-cover bg-center opacity-95"></div>
                     <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
@@ -333,7 +333,7 @@ defaults:
                             Read Guide <span class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
                         </a>
                         <div class="flex space-x-3">
-                            <button type="button" class="text-stone hover:text-charcoal transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-snippet><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+                            <button type="button" class="text-stone hover:text-charcoal transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-text="{{ ex.snippet | forceescape }}"><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
                             <a href="{{ ex.github }}" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
                         </div>
                     </div>
@@ -348,6 +348,17 @@ defaults:
                     <button type="button" class="hm-chip hm-chip--filter" data-example-filter="{{ ex.category }}" aria-pressed="false">{{ ex.category }}</button>
                     {% endif %}
                     {% endfor %}
+{% endmacro %}
+
+{#
+  A copy button for one example's manifest, looked up by key so the
+  copied text always matches the canonical snippet above. Pass classes
+  suited to the surrounding background (defaults suit a dark block).
+#}
+{% macro copy_manifest_button(key, classes='text-stone-light hover:text-white') %}
+{%- for ex in examples if ex.key == key -%}
+<button type="button" class="{{ classes }} transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-text="{{ ex.snippet | forceescape }}"><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+{%- endfor -%}
 {% endmacro %}
 
 {% macro up_next(current_key) %}

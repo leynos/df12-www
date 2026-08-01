@@ -57,7 +57,7 @@
                 <section id="manifest">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest</h2>
-                        <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/hello-world/Netsukefile</span>
+                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/hello-world/Netsukefile</span>{% endraw %}{{ exdata.copy_manifest_button('hello-world', 'text-charcoal-light hover:text-vermillion') }}{% raw %}</div>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_hello_world }}{% endhighlight %}{% raw %}

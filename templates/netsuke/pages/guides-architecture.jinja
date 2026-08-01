@@ -131,7 +131,7 @@
                 </div>
                 <div class="mt-8 p-4 bg-boxwood-pale border border-stone rounded-lg flex items-start">
                     <span class="iconify text-matcha mt-1 mr-3 flex-shrink-0" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
-                    <p class="text-sm text-charcoal-mid"><strong class="text-charcoal">Deterministic by construction.</strong> Given the same <code>Netsukefile</code> and environment variables, the generated <code>build.ninja</code> is byte-for-byte identical. Reproducible builds fall out for free, and the output is safe to cache or commit.</p>
+                    <p class="text-sm text-charcoal-mid"><strong class="text-charcoal">Deterministic by construction.</strong> Given the same <code>Netsukefile</code> and environment variables, the generated <code>build.ninja</code> is byte-for-byte identical &mdash; so long as the manifest avoids impure helpers such as <code>fetch()</code> and <code>shell()</code>, which observe the host at evaluation time, or explicitly declares their outputs as inputs. Under that discipline, reproducible builds fall out for free, and the output is safe to cache or commit.</p>
                 </div>
             </section>
 

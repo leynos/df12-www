@@ -171,14 +171,22 @@
                     <!-- Step 1: File Structure -->
                     <div>
                         <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">1. Create Project Directory</h3>
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-light mb-2">macOS, Linux, or WSL2</p>
                         <div class="bg-charcoal rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
                             {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ mkdir my-first-build && cd my-first-build
 $ touch Netsukefile
                             {% endraw %}{% endhighlight %}{% raw %}
                         </div>
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-light mb-2">Windows PowerShell</p>
+                        <div class="bg-charcoal rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
+                            {% endraw %}{% highlight 'powershell' %}{% raw %}
+mkdir my-first-build; cd my-first-build
+New-Item Netsukefile -ItemType File
+                            {% endraw %}{% endhighlight %}{% raw %}
+                        </div>
                         <p class="text-sm text-charcoal-mid">
-                            This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared.
+                            This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared. Windows PowerShell 5.1 has no <code class="font-mono text-xs">&amp;&amp;</code> operator, so the two commands are separated by a semicolon.
                         </p>
                     </div>
 

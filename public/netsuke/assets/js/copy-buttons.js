@@ -11,36 +11,54 @@
     var TOAST_LINGER_MS = 2000;
     // Matches the .hm-toast fade-out duration in himotoshi.css.
     var TOAST_FADE_MS = 220;
+    // Gap between emptying the live region and refilling it.
+    var ANNOUNCE_DELAY_MS = 100;
 
-    // A single reusable ghost notification. It is created once and left in
-    // the DOM so assistive tech treats it as a live region; repeat calls to
-    // show() restart the timer rather than stacking further toasts.
+    // A single reusable ghost notification. The visible pill is hidden from
+    // assistive tech and paired with an off-screen live region created once
+    // and left in the DOM; repeat calls to show() restart the timers rather
+    // than stacking further toasts.
     function createToast() {
         var element = document.createElement("div");
         element.className = "hm-toast";
-        element.setAttribute("role", "status");
-        element.setAttribute("aria-live", "polite");
+        element.setAttribute("aria-hidden", "true");
         document.body.append(element);
+
+        var announcer = document.createElement("div");
+        announcer.className = "visually-hidden";
+        announcer.setAttribute("role", "status");
+        announcer.setAttribute("aria-live", "polite");
+        document.body.append(announcer);
 
         var lingerTimer = 0;
         var clearTimer = 0;
+        var announceTimer = 0;
 
         function show(message, isError) {
             window.clearTimeout(lingerTimer);
             window.clearTimeout(clearTimer);
+            window.clearTimeout(announceTimer);
 
-            if (element.textContent !== message) {
-                element.textContent = message;
-            }
+            element.textContent = message;
             element.classList.toggle("hm-toast--error", isError);
             element.classList.add("hm-toast--visible");
 
+            // Empty the region and refill it on a later task. Reassigning an
+            // identical string in one go can settle back to the same text
+            // before assistive tech reads it, leaving a repeat copy silent.
+            // The region is off-screen, so the gap costs nothing visually.
+            announcer.textContent = "";
+            announceTimer = window.setTimeout(function () {
+                announcer.textContent = message;
+            }, ANNOUNCE_DELAY_MS);
+
             lingerTimer = window.setTimeout(function () {
                 element.classList.remove("hm-toast--visible");
-                // Wait for the fade to finish before emptying the live
-                // region, so the text does not vanish mid-transition.
+                // Wait for the fade to finish before emptying the toast, so
+                // the text does not vanish mid-transition.
                 clearTimer = window.setTimeout(function () {
                     element.textContent = "";
+                    announcer.textContent = "";
                 }, TOAST_FADE_MS);
             }, TOAST_LINGER_MS);
         }

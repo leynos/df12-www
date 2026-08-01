@@ -29,16 +29,14 @@
       return;
     }
 
-    const response = await fetch(searchIndexPath);
-    if (!response.ok) {
+    const loaded = await loadSearchIndex(searchIndexPath);
+    if (!loaded) {
       meta.textContent = "Search index is not available in this build.";
       showPanel(panel, input);
       return;
     }
 
-    const payload = await response.json();
-    const searchOptions = payload.indexOptions.searchOptions;
-    const miniSearch = window.MiniSearch.loadJSON(payload.index, payload.indexOptions);
+    const { miniSearch, searchOptions } = loaded;
     const siteRoot = siteRootFromIndexPath(searchIndexPath);
 
     let activeIndex = -1;
@@ -226,6 +224,43 @@
   function hidePanel(panel, input) {
     panel.classList.add("hidden");
     input.setAttribute("aria-expanded", "false");
+  }
+
+  // Pages can carry more than one search root for the same index (desktop
+  // sidebar plus the mobile docs bar). Fetch, parse, and deserialize each
+  // index once, sharing the MiniSearch instance across roots; UI state and
+  // listeners stay per-root. The cache stores promises so concurrent roots
+  // reuse the in-flight load, and a failed load is not cached so a later
+  // root can retry.
+  const indexCache = new Map();
+
+  function loadSearchIndex(searchIndexPath) {
+    if (!indexCache.has(searchIndexPath)) {
+      const pending = (async () => {
+        const response = await fetch(searchIndexPath);
+        if (!response.ok) {
+          return null;
+        }
+        const payload = await response.json();
+        return {
+          miniSearch: window.MiniSearch.loadJSON(payload.index, payload.indexOptions),
+          searchOptions: payload.indexOptions.searchOptions,
+        };
+      })().then(
+        (loaded) => {
+          if (!loaded) {
+            indexCache.delete(searchIndexPath);
+          }
+          return loaded;
+        },
+        (error) => {
+          indexCache.delete(searchIndexPath);
+          throw error;
+        }
+      );
+      indexCache.set(searchIndexPath, pending);
+    }
+    return indexCache.get(searchIndexPath);
   }
 
   function siteRootFromIndexPath(indexPath) {

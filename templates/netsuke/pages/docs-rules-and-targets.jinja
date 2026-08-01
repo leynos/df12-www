@@ -3,7 +3,6 @@
 {% set active_nav = 'docs' %}
 {% block page_title %}Rules &amp; Targets Reference - Netsuke Build System{% endblock %}
 {% block extra_head %}
-    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js" integrity="sha384-eyWfwv4NWkH7sLjk6s+Al2SBmZhX8gcLellpr+PLrfiNaHoTlAQTG9zDi4Z0liz8" crossorigin="anonymous"></script>
     <style>
 
         /* Custom Table Styling */
@@ -312,15 +311,57 @@ targets:
                 </div>
             </section>
 
-            <!-- Performance Chart -->
+            <!-- Clean & Incremental Builds -->
             <section id="performance" class="mb-20 pt-8 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Performance Impact</h2>
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Clean and incremental builds</h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Using granular targets and proper rule definitions significantly improves build times. The chart below is an illustrative comparison of clean vs. incremental builds with optimized rules, not a measured benchmark.
+                    Netsuke does not execute the build itself. It compiles the manifest into a static plan and hands that plan to Ninja, which decides what actually needs to run. How granular the rules and targets are therefore determines how much work an incremental build can skip.
                 </p>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                    <div id="buildPerfChart" class="h-[350px] w-full"></div>
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
+                            <span class="iconify" data-icon="carbon:play-outline" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-3">Clean build</h3>
+                        <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
+                            With no outputs on disk, every edge in the plan is out of date, so Ninja runs every command once. This is the upper bound on build work: the whole graph, in dependency order.
+                        </p>
+                        <ul class="text-sm text-charcoal-mid space-y-2">
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Each target's recipe executes exactly once</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordering follows <code class="font-mono text-xs">sources</code>, <code class="font-mono text-xs">deps</code>, and <code class="font-mono text-xs">order_only_deps</code></span></li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
+                            <span class="iconify" data-icon="carbon:renew" aria-hidden="true"></span>
+                        </div>
+                        <h3 class="font-bold text-charcoal mb-3">Incremental build</h3>
+                        <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
+                            Ninja walks the same static graph and compares each edge's declared inputs against its outputs. Only the commands whose inputs changed are re-run, along with whatever depends on their results.
+                        </p>
+                        <ul class="text-sm text-charcoal-mid space-y-2">
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unchanged subgraphs are skipped, not re-checked command by command</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code class="font-mono text-xs">order_only_deps</code> constrain ordering without forcing a rebuild</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Targets marked <code class="font-mono text-xs">always</code> run regardless of input state</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-boxwood-pale border-l-4 border-indigo p-6 rounded-r-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <span class="iconify text-indigo mt-1" data-icon="carbon:flow" aria-hidden="true"></span>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-bold text-charcoal">Where the cost sits</h3>
+                            <div class="mt-2 text-sm text-charcoal-mid space-y-2">
+                                <p>All the dynamic work happens once, at generation time. Jinja expansion, <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">foreach</code>, <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">when</code>, and glob resolution are all evaluated before <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">build.ninja</code> is written. The plan Ninja receives contains no conditionals, no string manipulation, and no filesystem discovery, so the execution phase spends its time on dependency checking and on running commands.</p>
+                                <p>Generation is deterministic: the same manifest and environment produce a byte-for-byte identical <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">build.ninja</code>. An unchanged manifest therefore yields an unchanged plan, and a build with nothing to do collapses to a dependency check with no recipes executed.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -354,46 +395,5 @@ targets:
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-    <script>
-        window.addEventListener('load', function() {
-            try {
-                // Bar Chart for Build Performance
-                const trace1 = {
-                    x: ['Clean Build', 'Incremental (No Change)', 'Incremental (Small Change)'],
-                    y: [45, 0.5, 2.1],
-                    name: 'Netsuke (Optimized)',
-                    type: 'bar',
-                    marker: { color: '#2B4162' } // Indigo
-                };
-
-                const trace2 = {
-                    x: ['Clean Build', 'Incremental (No Change)', 'Incremental (Small Change)'],
-                    y: [120, 15, 45],
-                    name: 'Traditional Make',
-                    type: 'bar',
-                    marker: { color: '#D1C7B8' } // Stone
-                };
-
-                const data = [trace1, trace2];
-
-                const layout = {
-                    title: { text: 'Build Time Comparison (Seconds)', font: { family: 'Fraunces', size: 16, color: '#2E2A25' } },
-                    margin: { t: 50, r: 20, b: 40, l: 50 },
-                    plot_bgcolor: '#FFFFFF',
-                    paper_bgcolor: '#FFFFFF',
-                    font: { family: 'Source Sans 3', color: '#5C554D' },
-                    xaxis: { gridcolor: '#F5EDE0' },
-                    yaxis: { gridcolor: '#F5EDE0', title: 'Time (s)' },
-                    showlegend: true,
-                    legend: { orientation: 'h', y: -0.2 }
-                };
-
-                Plotly.newPlot('buildPerfChart', data, layout, {responsive: true, displayModeBar: false});
-
-            } catch(e) {
-                console.error("Chart generation failed:", e);
-            }
-        });
-    </script>
 {% endraw %}
 {% endblock %}

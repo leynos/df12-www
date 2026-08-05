@@ -310,6 +310,7 @@ def _generate_subsite(
             nav_links=subsite.nav_links,
             parent_link=subsite.parent_link,
             base_path=subsite.base_path,
+            template_vars=subsite.template_vars,
         ).run()
         print(f"[{subsite.key}] wrote {_format_path(hp_path)}")
 
@@ -351,6 +352,7 @@ def _generate_subsite(
             stylesheet=subsite.stylesheet,
             parent_link=subsite.parent_link,
             base_path=subsite.base_path,
+            template_vars=subsite.template_vars,
         ).run()
         print(f"[{subsite.key}] wrote {_format_path(cp_path)}")
 

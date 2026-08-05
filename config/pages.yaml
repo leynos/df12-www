@@ -1237,6 +1237,10 @@ sites:
     templates_dir: templates/netsuke
     stylesheet: assets/css/himotoshi.css
     base_path: /netsuke/
+    template_vars:
+      # Single source of truth for the current Netsuke release shown on the
+      # sub-site. Bump this once per release.
+      netsuke_version: "0.1.0-beta1"
     theme:
       site_name: Netsuke
       hero_eyebrow: Netsuke Documentation

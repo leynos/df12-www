@@ -329,6 +329,7 @@ class SubSiteConfig:
     parent_link: NavLinkConfig | None
     static_assets_dir: Path | None
     content_pages: list[ContentPageConfig] = dc.field(default_factory=list)
+    template_vars: dict[str, typ.Any] = dc.field(default_factory=dict)
 
 
 @dc.dataclass(slots=True)

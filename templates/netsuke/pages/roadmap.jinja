@@ -9,11 +9,11 @@
         <!-- Header Section -->
         <header class="text-center max-w-3xl mx-auto mb-16">
             <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone mb-6">
-                <span class="w-2 h-2 rounded-full bg-amber mr-2"></span> v0.1.0 scheduled for 5 August 2026
+                <span class="w-2 h-2 rounded-full bg-amber mr-2"></span> Current version v{% endraw %}{{ netsuke_version }}{% raw %} &middot; v0.1.0 scheduled for 5 August 2026
             </div>
             <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Roadmap</h1>
             <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                v0.1.0 is a useful preview for early adopters, not a declaration that Netsuke is finished.
+                v{% endraw %}{{ netsuke_version }}{% raw %} is a useful preview for early adopters, not a declaration that Netsuke is finished.
                 This page tracks what shipped, what is honestly still rough, and the order of the work ahead.
             </p>
         </header>
@@ -29,7 +29,7 @@
                         <div class="w-10 h-10 rounded-full bg-matcha/10 text-matcha flex items-center justify-center mr-4">
                             <span class="iconify" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Shipped in v0.1.0</h2>
+                        <h2 class="font-serif text-2xl font-bold text-charcoal">Shipped in v{% endraw %}{{ netsuke_version }}{% raw %}</h2>
                     </div>
                     <p class="text-charcoal-mid mb-6 max-w-3xl">
                         The core build-system compiler is implemented and packaged for Linux, macOS, and Windows.
@@ -213,10 +213,10 @@
                             <span class="iconify text-matcha mr-2 text-sm" data-icon="carbon:tag" aria-hidden="true"></span> Current release
                         </h3>
                         <div class="space-y-3 text-sm">
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-charcoal">v0.1.0</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-charcoal">v{% endraw %}{{ netsuke_version }}{% raw %}</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Release date</span><span class="font-mono text-charcoal">5 August 2026</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Licence</span><span class="font-mono text-charcoal">ISC</span></div>
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Rust (source builds)</span><span class="font-mono text-charcoal">1.89+</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Rust (source builds)</span><span class="font-mono text-charcoal">nightly-2026-06-25</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Crate</span><span class="font-mono text-charcoal">netsuke-build</span></div>
                         </div>
                         <div class="mt-5 pt-4 border-t border-stone-light space-y-2">

@@ -39,6 +39,7 @@ class ContentPageGenerator:
         stylesheet: str,
         parent_link: NavLinkConfig | None = None,
         base_path: str | None = None,
+        template_vars: dict[str, typ.Any] | None = None,
     ) -> None:
         self.config = config
         self.output_dir = output_dir
@@ -54,6 +55,8 @@ class ContentPageGenerator:
             lstrip_blocks=True,
             extensions=[HighlightExtension],
         )
+        if template_vars:
+            self.env.globals.update(template_vars)
 
     def run(self) -> Path:
         """Render the page template and write the output file.

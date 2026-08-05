@@ -216,6 +216,22 @@ a.sidebar-link--sub.active {
   }
 }
 
+@media (max-width: 639.98px) {
+  /* Pin image pixel 960 of the 1376px-wide hero to the viewport's right
+     edge so narrowing the viewport crops the left-hand side. The image
+     fills the hero height; translateX shifts it right by the 416px of
+     source image beyond the pin point, as a fraction of rendered width. */
+  .hm-hero-overlay .hm-hero-image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: auto;
+    max-width: none;
+    transform: translateX(calc(416 / 1376 * 100%));
+  }
+}
+
 .hm-kicker--hero {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
@@ -888,7 +904,7 @@ a.sidebar-link--sub.active {
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     margin-inline: -1rem;
   }
 
@@ -911,7 +927,7 @@ a.sidebar-link--sub.active {
   section .hm-example-code-block {
     border-radius: 0;
     box-shadow: none;
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     margin-inline: -1rem;
     padding: 1rem;
   }
@@ -920,7 +936,7 @@ a.sidebar-link--sub.active {
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     margin-inline: -1rem;
   }
 
@@ -1118,6 +1134,15 @@ a.sidebar-link--sub.active {
 .hm-example-code-block .hm-syntax pre,
 .hm-example-terminal__body .hm-syntax pre {
   padding: 0;
+}
+
+/* Small mobile: shrink terminal text so long lines fit without
+   horizontal scrolling as often. Placed after the base rule above so
+   equal specificity resolves in this rule's favour. */
+@media (max-width: 459.98px) {
+  .hm-syntax pre {
+    font-size: 0.7rem;
+  }
 }
 
 .hm-syntax { color: var(--netsuke-syntax-text); }

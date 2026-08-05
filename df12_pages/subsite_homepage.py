@@ -25,7 +25,7 @@ if typ.TYPE_CHECKING:
 class SubSiteHomePageBuilder:
     """Render a sub-site homepage from freeform context data."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913 -- rendering needs config, templates, nav, parent, base path, vars
         self,
         config: SubSiteHomepageConfig,
         *,
@@ -33,6 +33,7 @@ class SubSiteHomePageBuilder:
         nav_links: list[NavLinkConfig] | None = None,
         parent_link: NavLinkConfig | None = None,
         base_path: str | None = None,
+        template_vars: dict[str, typ.Any] | None = None,
     ) -> None:
         """Initialize the sub-site homepage builder.
 
@@ -51,6 +52,9 @@ class SubSiteHomePageBuilder:
             Absolute path prefix for the sub-site (e.g. ``/mxd/``).  When
             provided, the nav link whose href equals *base_path* is marked
             as current.
+        template_vars : dict, optional
+            Site-wide constants exposed to the template as Jinja globals
+            (e.g. the current release version).
         """
         self.config = config
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
@@ -64,6 +68,8 @@ class SubSiteHomePageBuilder:
             lstrip_blocks=True,
             extensions=[HighlightExtension],
         )
+        if template_vars:
+            self.env.globals.update(template_vars)
         self.template = self.env.get_template("home_page.jinja")
 
     def run(self) -> Path:

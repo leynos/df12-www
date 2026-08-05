@@ -7,7 +7,7 @@
     </style>
 {% endblock %}
 {% block content %}
-{% set install_command = 'cargo install netsuke-build' %}
+{% set install_command = 'cargo binstall netsuke-build' %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
@@ -151,10 +151,12 @@
                     </div>
                 </div>
 
-                <div class="flex items-center text-sm text-charcoal-mid">
-                    <span class="mr-2">The crate is published as <code class="bg-stone-light/30 px-1 rounded font-mono text-charcoal">netsuke-build</code>; the installed binary is named</span>
-                    <code class="bg-stone-light/30 px-2 py-1 rounded font-mono text-charcoal">netsuke</code>
-                </div>
+                <p class="text-sm text-charcoal-mid">
+                    The crate is published as <code class="bg-stone-light/30 px-1 rounded font-mono text-charcoal">netsuke-build</code> (current version {% endraw %}{{ netsuke_version }}{% raw %}); the installed binary is named <code class="bg-stone-light/30 px-1 rounded font-mono text-charcoal">netsuke</code>.
+                </p>
+                <p class="mt-3 text-sm text-charcoal-mid max-w-3xl">
+                    <code>cargo binstall</code> fetches a prebuilt release binary. Building from crates.io or from a source checkout instead requires the pinned nightly toolchain — see the <a href="/netsuke/install/" class="text-vermillion hover:underline">install page</a> for the full instructions and platform installers.
+                </p>
             </section>
 
             <!-- First Project Section -->

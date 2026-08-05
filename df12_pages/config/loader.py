@@ -425,6 +425,9 @@ def _build_subsite_config(
     static_raw = payload.get("static_assets_dir")
     static_assets_dir = Path(static_raw) if static_raw else None
 
+    # Template variables shared by every page in the sub-site
+    template_vars = _build_template_vars(key, payload.get("template_vars"))
+
     return SubSiteConfig(
         key=key,
         output_dir=output_dir,
@@ -441,7 +444,24 @@ def _build_subsite_config(
         parent_link=parent_link,
         static_assets_dir=static_assets_dir,
         content_pages=content_pages,
+        template_vars=template_vars,
     )
+
+
+def _build_template_vars(
+    site_key: str,
+    raw: typ.Any,  # noqa: ANN401 - YAML payload is untyped
+) -> dict[str, typ.Any]:
+    """Parse a sub-site ``template_vars`` mapping into a plain dict."""
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        msg = (
+            f"Site '{site_key}' template_vars must be a mapping,"
+            f" got: {type(raw).__name__}"
+        )
+        raise SiteConfigError(msg)
+    return {str(name): value for name, value in raw.items()}
 
 
 def _build_subsite_homepage(

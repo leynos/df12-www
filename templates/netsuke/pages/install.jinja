@@ -72,7 +72,7 @@
                     </div>
                     <div class="bg-charcoal rounded-lg p-6 code-block-wrapper">
                         {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
-$ cargo binstall netsuke-build
+$ cargo binstall netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}
                         {% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="mt-6 mb-2">
@@ -303,14 +303,14 @@ $ netsuke build
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal text-lg mb-2">How do I update Netsuke?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Re-run <code>cargo binstall netsuke-build</code> to fetch the latest prebuilt release, or run <code>cargo install netsuke-build --force</code> with the nightly toolchain and <code>RUSTFLAGS</code> shown above to rebuild from crates.io. Either way the existing <code>netsuke</code> binary is replaced.
+                        Re-run <code>cargo binstall netsuke-build@&lt;VERSION&gt;</code> with the new version to fetch its prebuilt release, or run <code>cargo install netsuke-build --force</code> with the nightly toolchain and <code>RUSTFLAGS</code> shown above to rebuild from crates.io. Either way the existing <code>netsuke</code> binary is replaced.
                     </p>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal text-lg mb-2">Does it work with CI/CD?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Install Netsuke on your continuous integration (CI) agent via <code>cargo binstall netsuke-build</code> (pin the version in automated workflows) and run <code>netsuke build</code> as a build step. When standard error (stderr) is not a teletype/terminal (TTY), progress falls back to plain text automatically, and <code>--json</code> emits a machine-readable result document. Dedicated CI integrations are planned but not yet available.
+                        Yes. Install Netsuke on your continuous integration (CI) agent via <code>cargo binstall netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}</code> (pin the version in automated workflows) and run <code>netsuke build</code> as a build step. When standard error (stderr) is not a teletype/terminal (TTY), progress falls back to plain text automatically, and <code>--json</code> emits a machine-readable result document. Dedicated CI integrations are planned but not yet available.
                     </p>
                 </div>
             </div>

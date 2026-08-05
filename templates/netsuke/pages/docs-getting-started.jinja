@@ -7,7 +7,7 @@
     </style>
 {% endblock %}
 {% block content %}
-{% set install_command = 'cargo binstall netsuke-build' %}
+{% set install_command = 'cargo binstall netsuke-build@' ~ netsuke_version %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">

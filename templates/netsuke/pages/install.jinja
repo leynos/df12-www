@@ -82,7 +82,7 @@ $ cargo binstall netsuke-build
                     <div class="bg-charcoal rounded-lg p-6 code-block-wrapper">
                         {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ rustup toolchain install nightly-2026-06-25
-$ RUSTFLAGS=-Zpolonius=next cargo +nightly-2026-06-25 install netsuke-build
+$ RUSTFLAGS=-Zpolonius=next cargo +nightly-2026-06-25 install netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}
                         {% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="mt-8 grid md:grid-cols-2 gap-6">

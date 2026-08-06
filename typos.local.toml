@@ -14,7 +14,29 @@ accepted = [
 [words.corrections]
 
 [patterns]
-ignore = []
+# Inline code is checked by default so misspelled identifiers stay visible.
+# These are the exact upstream names that are intentionally spelled the US
+# way; prose and any other identifier remain subject to the en-GB rules.
+ignore = [
+  # CSS keywords and functions.
+  'currentColor',
+  'color-mix\(\)',
+  # Tailwind and daisyUI colour tokens, and the placeholder used to describe
+  # them in the migration guides.
+  '--(?:tw-)?color-[a-z0-9*-]+',
+  '--my-brand-color',
+  '\{color\}',
+  '`color`',
+  # daisyUI placement modifiers.
+  '(?:carousel|dropdown|footer|indicator|navbar|toast)-center',
+  # Netsuke design token, spelled with the double-l variant in the stylesheet.
+  '--netsuke-vermillion',
+  # Pygments/OpenTofu API names that predate the en-GB policy.
+  'background_color',
+  # Deliberate fixture: an error-message example demonstrating a mistyped
+  # variable reference.
+  'var\.iamge_id',
+]
 
 [files]
 exclude = []

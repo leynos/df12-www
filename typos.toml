@@ -30,9 +30,18 @@ extend-exclude = [
 [default]
 locale = "en-gb"
 extend-ignore-re = [
+    "(?:carousel|dropdown|footer|indicator|navbar|toast)-center",
     "(?s)```.*?```",
+    "--(?:tw-)?color-[a-z0-9*-]+",
+    "--my-brand-color",
+    "--netsuke-vermillion",
     "\\brust-analyzer\\b",
-    "`[^`\\n]+`",
+    "\\{color\\}",
+    "`color`",
+    "background_color",
+    "color-mix\\(\\)",
+    "currentColor",
+    "var\\.iamge_id",
 ]
 
 [default.extend-words]

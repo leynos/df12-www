@@ -10,8 +10,10 @@
 }
 
 :root {
-  /* Core palette — Marrakesh */
-  --mxd-accent: #c54b2a;
+  /* Core palette — Marrakesh.
+     Colour identity comes from the daisyUI "mxd" theme (see
+     src/styles/mxd.css); fallbacks match the theme values. */
+  --mxd-accent: var(--color-primary, #bc4626);
   --mxd-accent-light: #d4714f;
   --mxd-accent-dark: #9a3a1f;
   --mxd-gold: #e8a838;
@@ -32,7 +34,7 @@
   --mxd-paper: #fdf8f0;
 
   /* Semantic — Protocol signals */
-  --mxd-mint: #4a8c5c;
+  --mxd-mint: var(--color-success, #3a7049);
   --mxd-mint-light: #6aaf7a;
   --mxd-amber: #ffb347;
   --mxd-error: #c43a3a;
@@ -437,9 +439,11 @@ html {
   transition: all var(--mxd-duration-med) var(--mxd-ease);
 }
 
+/* Ghost buttons sit on the dark hero panel, so both states must stay
+   light against --mxd-ink. */
 .mxd-btn--ghost:hover {
-  border-color: var(--mxd-muted);
-  color: var(--mxd-ink);
+  border-color: var(--mxd-sandstone);
+  color: var(--mxd-sandstone);
   transform: translateY(-2px);
 }
 
@@ -522,7 +526,7 @@ html {
 .mxd-badge--partial {
   background: var(--mxd-badge-partial-bg);
   border-color: var(--mxd-badge-partial-border);
-  color: var(--mxd-gold-muted);
+  color: var(--color-warning, #8a6420);
 }
 
 .mxd-badge--planned {
@@ -565,7 +569,7 @@ html {
 
 /* Structured shared-content pages (legal pages: TOC, sections, badge cards) */
 .content-toc {
-  border: 1px solid var(--mxd-accent, #c54b2a);
+  border: 1px solid var(--mxd-accent, #bc4626);
   border-radius: 0.5rem;
   padding: 1.25rem 1.5rem;
 }
@@ -583,13 +587,13 @@ html {
 }
 
 .content-section--divider {
-  border-top: 1px solid var(--mxd-accent, #c54b2a);
+  border-top: 1px solid var(--mxd-accent, #bc4626);
   padding-top: 1.5rem;
 }
 
 .content-card {
   align-items: flex-start;
-  border: 1px solid var(--mxd-accent, #c54b2a);
+  border: 1px solid var(--mxd-accent, #bc4626);
   border-radius: 0.5rem;
   display: flex;
   gap: 1rem;
@@ -613,8 +617,8 @@ html {
 }
 
 .content-card--accent .content-card__badge {
-  border-color: var(--mxd-accent, #c54b2a);
-  color: var(--mxd-accent, #c54b2a);
+  border-color: var(--mxd-accent, #bc4626);
+  color: var(--mxd-accent, #bc4626);
 }
 
 .content-card__body {

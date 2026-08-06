@@ -3,8 +3,83 @@
 @source "../../templates/mxd/**/*.jinja";
 @source "../../public/mxd/index.html";
 
+/* daisyUI v5 plugin */
+@plugin "daisyui" {
+  themes: mxd --default;
+  logs: false;
+}
+
+/* Marrakesh palette as a daisyUI theme. Every pairing meets WCAG 2.2 AA:
+   primary/base-100 4.9:1, success/success-soft 5.2:1, warning/base-100 5.5:1. */
+@plugin "daisyui/theme" {
+  name: "mxd";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-primary: #bc4626;
+  --color-primary-content: #ffffff;
+
+  --color-secondary: #2d3a8c;
+  --color-secondary-content: #ffffff;
+
+  --color-accent: #e8a838;
+  --color-accent-content: #12121f;
+
+  --color-neutral: #12121f;
+  --color-neutral-content: #f5e6d0;
+
+  --color-base-100: #fdf8f0;
+  --color-base-200: #faf3ea;
+  --color-base-300: #e8d5b8;
+  --color-base-content: #12121f;
+
+  --color-info: #2d3a8c;
+  --color-info-content: #e8eaf6;
+  --color-success: #3a7049;
+  --color-success-content: #ffffff;
+  --color-warning: #8a6420;
+  --color-warning-content: #fff4e0;
+  --color-error: #c43a3a;
+  --color-error-content: #ffffff;
+
+  --radius-box: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-selector: 1rem;
+  --size-field: 0.25rem;
+  --size-selector: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
 @theme {
   --font-primary: "JetBrains Mono", monospace;
   --font-secondary: "DM Serif Display", serif;
   --font-tertiary: "Source Serif 4", serif;
+
+  /* Roles the daisyUI token set does not model.
+     night-* are the raised dark surfaces inside neutral panels;
+     night-muted (not ink-muted) is the only muted text colour that
+     meets AA on them. */
+  --color-ink-muted: #3a3a55;
+  --color-night: #1a1a2e;
+  --color-night-line: #2a2a42;
+  --color-night-muted: #9a9ab8;
+  --color-flare: #d4714f;
+  --color-primary-deep: #9a3a1f;
+  --color-amber-deep: #c89430;
+  --color-indigo-deep: #1e2760;
+  --color-code-type: #8ea2f5;
+  --color-code-string: #6aaf7a;
+  --color-magenta: #a855a0;
+
+  /* Badge tint ramps (backgrounds/borders only — text uses the
+     matching daisyUI colour). */
+  --color-success-soft: #e8f5ec;
+  --color-success-line: #c4e5cc;
+  --color-warning-soft: #fff4e0;
+  --color-warning-line: #f2dca8;
+  --color-info-soft: #e8eaf6;
+  --color-info-line: #c5cae9;
 }

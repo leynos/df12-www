@@ -10,7 +10,7 @@
     <link rel="icon" href="/mxd/assets/logo-mark.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/mxd/{{ stylesheet or 'assets/site.css' }}">
 </head>
-<body class="bg-[#fdf8f0]">
+<body class="bg-base-100">
 <a class="mxd-skip-link" href="#main-content">Skip to content</a>
 <header class="mxd-site-header">
   <div class="mxd-site-header__inner">
@@ -23,7 +23,7 @@
     </a>
     <nav class="mxd-site-nav" aria-label="Primary">
       {% if parent_link %}
-      <a href="{{ parent_link.href }}" class="text-[#e8a838]">{{ parent_link.label }}</a>
+      <a href="{{ parent_link.href }}" class="text-accent">{{ parent_link.label }}</a>
       {% endif %}
       {% for link in nav_links %}<a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>{% endfor %}
     </nav>
@@ -41,26 +41,26 @@
 
 </main>
 
-<footer id="footer" class="bg-[#12121f] relative">
-    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+<footer id="footer" class="bg-neutral relative">
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary"></div>
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 py-12 text-center">
         <div class="mb-6 opacity-40">
-            <span class="text-[#e8d5b8] text-[23px] font-normal font-primary">◆</span>
+            <span class="text-base-300 text-[23px] font-normal font-primary">◆</span>
         </div>
-        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
-            Protocol Souk — Design System for <span class="text-[#e8a838]">mxd</span>
+        <p class="text-night-muted text-[11.10px] font-normal font-secondary leading-[18.88px] mb-2">
+            Protocol Souk — Design System for <span class="text-accent">mxd</span>
         </p>
-        <p class="text-[#3a3a55] text-[11.10px] font-normal font-secondary leading-[18.88px]">
-            A <span class="text-[#e8a838]">df12 Productions</span> artefact · Edinburgh · 2026
+        <p class="text-night-muted text-[11.10px] font-normal font-secondary leading-[18.88px]">
+            A <span class="text-accent">df12 Productions</span> artefact · Edinburgh · 2026
         </p>
     </div>
-    <div class="border-t border-[#2a2a42] py-6">
+    <div class="border-t border-night-line py-6">
         <div class="max-w-[900px] mx-auto px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center text-[11.10px] font-primary">
-            <p class="text-[#9a9ab0] mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
+            <p class="text-night-muted mb-3 sm:mb-0">&copy; 2026 df12 Productions</p>
             <nav class="mxd-legal-nav flex space-x-6" aria-label="Legal">
-                <a href="/mxd/privacy-policy/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Privacy Policy</a>
-                <a href="/mxd/terms-of-use/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Terms of Use</a>
-                <a href="/mxd/code-of-conduct/" class="text-[#9a9ab0] hover:text-[#e8d5b8] transition-colors">Code of Conduct</a>
+                <a href="/mxd/privacy-policy/" class="text-night-muted hover:text-base-300 transition-colors">Privacy Policy</a>
+                <a href="/mxd/terms-of-use/" class="text-night-muted hover:text-base-300 transition-colors">Terms of Use</a>
+                <a href="/mxd/code-of-conduct/" class="text-night-muted hover:text-base-300 transition-colors">Code of Conduct</a>
             </nav>
         </div>
     </div>

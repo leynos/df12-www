@@ -1,28 +1,28 @@
 {% extends "doc_page.jinja" %}
 {% block page_title %}Configuration{% endblock %}
 {% block hero %}
-<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+<section id="hero-section" class="relative bg-neutral overflow-hidden">
     <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
 
-    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-primary via-accent to-secondary"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
-        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
-            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Configuration</div>
+        <div class="inline-flex px-3 py-1 rounded-sm border border-amber-deep mb-6">
+            <div class="text-accent text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Configuration</div>
         </div>
 
         <h1 class="mb-6">
-            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Configuration</span>
+            <span class="text-neutral-content text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Configuration</span>
         </h1>
 
-        <div class="text-[#e8d5b8] text-base font-normal font-tertiary leading-[27.20px] max-w-[700px]">
+        <div class="text-base-300 text-base font-normal font-tertiary leading-[27.20px] max-w-[700px]">
             <p>
-                mxd uses OrthoConfig to merge settings from four sources in ascending priority: compiled defaults, <span class="text-[#e8a838] text-base font-normal font-primary">.mxd.toml</span>, environment variables prefixed <span class="text-[#e8a838] text-base font-normal font-primary">MXD_</span>, and CLI flags. Database backend selection is a compile-time choice via Cargo features.
+                mxd uses OrthoConfig to merge settings from four sources in ascending priority: compiled defaults, <span class="text-accent text-base font-normal font-primary">.mxd.toml</span>, environment variables prefixed <span class="text-accent text-base font-normal font-primary">MXD_</span>, and CLI flags. Database backend selection is a compile-time choice via Cargo features.
             </p>
         </div>
     </div>
 
-    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary"></div>
 </section>
 {% endblock %}
 {% block route_map %}
@@ -43,116 +43,116 @@
      CONFIGURATION
      ═══════════════════════════════════════════════════════════════════════ -->
 
-<div id="section-configuration" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-configuration" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">Configuration</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Configuration reference</h2>
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Configuration reference</h2>
     </div>
 </div>
 
-<div id="section-fields" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-fields" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Configuration fields</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">Configuration fields</h3>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             Each field can be set through any of the four configuration sources. The precedence order is fixed: CLI flags override environment variables, environment variables override the TOML file, the TOML file overrides compiled defaults.
         </p>
 
-        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
+        <div class="bg-white rounded-lg border border-base-300 overflow-hidden mb-8">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="border-b-2 border-[#e8d5b8] bg-[#faf3ea]">
-                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Field</th>
-                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">CLI flag</th>
-                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Env var</th>
-                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Default</th>
-                            <th class="px-6 py-4 text-left text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Description</th>
+                        <tr class="border-b-2 border-base-300 bg-base-200">
+                            <th class="px-6 py-4 text-left text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Field</th>
+                            <th class="px-6 py-4 text-left text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">CLI flag</th>
+                            <th class="px-6 py-4 text-left text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Env var</th>
+                            <th class="px-6 py-4 text-left text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Default</th>
+                            <th class="px-6 py-4 text-left text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Description</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-[#e8d5b8]">
+                    <tbody class="divide-y divide-base-300">
                         <tr class="mxd-table-row">
                             <td class="px-6 py-4">
-                                <code class="text-[#c54b2a] text-sm font-normal font-primary">bind</code>
+                                <code class="text-primary text-sm font-normal font-primary">bind</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--bind</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">--bind</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_BIND</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">MXD_BIND</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">0.0.0.0:5500</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">0.0.0.0:5500</code>
                             </td>
-                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
                                 Socket address to listen on
                             </td>
                         </tr>
                         <tr class="mxd-table-row">
                             <td class="px-6 py-4">
-                                <code class="text-[#c54b2a] text-sm font-normal font-primary">database</code>
+                                <code class="text-primary text-sm font-normal font-primary">database</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--database</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">--database</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_DATABASE</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">MXD_DATABASE</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">mxd.db</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">mxd.db</code>
                             </td>
-                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
                                 SQLite path or PostgreSQL connection string
                             </td>
                         </tr>
                         <tr class="mxd-table-row">
                             <td class="px-6 py-4">
-                                <code class="text-[#c54b2a] text-sm font-normal font-primary">argon2_m_cost</code>
+                                <code class="text-primary text-sm font-normal font-primary">argon2_m_cost</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--argon2-m-cost</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">--argon2-m-cost</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_ARGON2_M_COST</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">MXD_ARGON2_M_COST</code>
                             </td>
-                            <td class="px-6 py-4 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                                 Argon2 default
                             </td>
-                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
                                 Memory cost for password hashing
                             </td>
                         </tr>
                         <tr class="mxd-table-row">
                             <td class="px-6 py-4">
-                                <code class="text-[#c54b2a] text-sm font-normal font-primary">argon2_t_cost</code>
+                                <code class="text-primary text-sm font-normal font-primary">argon2_t_cost</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--argon2-t-cost</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">--argon2-t-cost</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_ARGON2_T_COST</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">MXD_ARGON2_T_COST</code>
                             </td>
-                            <td class="px-6 py-4 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                                 Argon2 default
                             </td>
-                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
                                 Time cost for password hashing
                             </td>
                         </tr>
                         <tr class="mxd-table-row">
                             <td class="px-6 py-4">
-                                <code class="text-[#c54b2a] text-sm font-normal font-primary">argon2_p_cost</code>
+                                <code class="text-primary text-sm font-normal font-primary">argon2_p_cost</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">--argon2-p-cost</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">--argon2-p-cost</code>
                             </td>
                             <td class="px-6 py-4">
-                                <code class="text-[#3a3a55] text-sm font-normal font-primary">MXD_ARGON2_P_COST</code>
+                                <code class="text-ink-muted text-sm font-normal font-primary">MXD_ARGON2_P_COST</code>
                             </td>
-                            <td class="px-6 py-4 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                                 Argon2 default
                             </td>
-                            <td class="px-6 py-4 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+                            <td class="px-6 py-4 text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
                                 Parallelism cost for password hashing
                             </td>
                         </tr>
@@ -163,91 +163,91 @@
     </div>
 </div>
 
-<div id="section-toml" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-toml" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">TOML configuration file</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">TOML configuration file</h3>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
-            The TOML file is named <span class="text-[#c54b2a] text-base font-normal font-primary">.mxd.toml</span> and searched in the current working directory. Keys match the field names above:
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The TOML file is named <span class="text-primary text-base font-normal font-primary">.mxd.toml</span> and searched in the current working directory. Keys match the field names above:
         </p>
 
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">.mxd.toml</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">.mxd.toml</span>
                 </div>
             </div>
             <div class="px-6 py-6">
-                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">bind</span> = <span class="text-[#4a8c5c]">"0.0.0.0:6600"</span>
-<span class="text-[#e8a838]">database</span> = <span class="text-[#4a8c5c]">"postgres://user:&lt;password&gt;@localhost/mxd"</span></pre>
+                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">bind</span> = <span class="text-code-string">"0.0.0.0:6600"</span>
+<span class="text-accent">database</span> = <span class="text-code-string">"postgres://user:&lt;password&gt;@localhost/mxd"</span></pre>
             </div>
         </div>
 
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-8">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">File location:</span> The TOML file must be in the current working directory. When mxd is launched from a different directory, place the file there or use environment variables or CLI flags instead.
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary mb-8">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">File location:</span> The TOML file must be in the current working directory. When mxd is launched from a different directory, place the file there or use environment variables or CLI flags instead.
             </p>
         </div>
     </div>
 </div>
 
-<div id="section-precedence" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-precedence" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Precedence order</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">Precedence order</h3>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             CLI flags override environment variables. Environment variables override the TOML file. The TOML file overrides compiled defaults. That sequence defines the precedence order.
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#2a2a42] rounded flex items-center justify-center mb-4">
-                        <span class="text-[#f5e6d0] text-xl font-bold font-primary">1</span>
+                    <div class="w-10 h-10 bg-night-line rounded flex items-center justify-center mb-4">
+                        <span class="text-neutral-content text-xl font-bold font-primary">1</span>
                     </div>
-                    <h4 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">Compiled defaults</h4>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <h4 class="text-base-content text-lg font-semibold font-secondary mb-2">Compiled defaults</h4>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         Lowest priority. Embedded in the binary.
                     </p>
                 </div>
             </div>
 
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center mb-4">
+                    <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center mb-4">
                         <span class="text-white text-xl font-bold font-primary">2</span>
                     </div>
-                    <h4 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">.mxd.toml</h4>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <h4 class="text-base-content text-lg font-semibold font-secondary mb-2">.mxd.toml</h4>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         File-based configuration in current directory.
                     </p>
                 </div>
             </div>
 
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#e8a838] rounded flex items-center justify-center mb-4">
-                        <span class="text-[#12121f] text-xl font-bold font-primary">3</span>
+                    <div class="w-10 h-10 bg-accent rounded flex items-center justify-center mb-4">
+                        <span class="text-base-content text-xl font-bold font-primary">3</span>
                     </div>
-                    <h4 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">Environment</h4>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
-                        Variables prefixed with <code class="text-[#c54b2a] text-xs font-normal font-primary">MXD_</code>
+                    <h4 class="text-base-content text-lg font-semibold font-secondary mb-2">Environment</h4>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
+                        Variables prefixed with <code class="text-primary text-xs font-normal font-primary">MXD_</code>
                     </p>
                 </div>
             </div>
 
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center mb-4">
+                    <div class="w-10 h-10 bg-primary rounded flex items-center justify-center mb-4">
                         <span class="text-white text-xl font-bold font-primary">4</span>
                     </div>
-                    <h4 class="text-[#12121f] text-lg font-semibold font-secondary mb-2">CLI flags</h4>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <h4 class="text-base-content text-lg font-semibold font-secondary mb-2">CLI flags</h4>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         Highest priority. Always wins.
                     </p>
                 </div>
@@ -256,84 +256,84 @@
     </div>
 </div>
 
-<div id="section-examples" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-examples" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Usage examples</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">Usage examples</h3>
 
-        <h4 class="text-[#12121f] text-xl font-normal font-secondary mb-4">Using environment variables</h4>
+        <h4 class="text-base-content text-xl font-normal font-secondary mb-4">Using environment variables</h4>
 
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">bash</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">bash</span>
                 </div>
             </div>
             <div class="px-6 py-6">
-                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">export</span> MXD_BIND=<span class="text-[#4a8c5c]">"127.0.0.1:5501"</span>
-<span class="text-[#e8a838]">export</span> MXD_DATABASE=<span class="text-[#4a8c5c]">"postgres://mxd:${MXD_DB_PASSWORD}@db.example.com/mxd_prod"</span>
+                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">export</span> MXD_BIND=<span class="text-code-string">"127.0.0.1:5501"</span>
+<span class="text-accent">export</span> MXD_DATABASE=<span class="text-code-string">"postgres://mxd:${MXD_DB_PASSWORD}@db.example.com/mxd_prod"</span>
 mxd</pre>
             </div>
         </div>
 
-        <h4 class="text-[#12121f] text-xl font-normal font-secondary mb-4">Using CLI flags</h4>
+        <h4 class="text-base-content text-xl font-normal font-secondary mb-4">Using CLI flags</h4>
 
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">bash</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">bash</span>
                 </div>
             </div>
             <div class="px-6 py-6">
-                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]">mxd --bind <span class="text-[#4a8c5c]">0.0.0.0:6600</span> --database <span class="text-[#4a8c5c]">mxd_production.db</span></pre>
+                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]">mxd --bind <span class="text-code-string">0.0.0.0:6600</span> --database <span class="text-code-string">mxd_production.db</span></pre>
             </div>
         </div>
 
-        <h4 class="text-[#12121f] text-xl font-normal font-secondary mb-4">Mixing sources</h4>
+        <h4 class="text-base-content text-xl font-normal font-secondary mb-4">Mixing sources</h4>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-4">
             TOML file sets database path, environment variable overrides bind address, CLI flag overrides both for Argon2 memory cost:
         </p>
 
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-4">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-4">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">.mxd.toml</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">.mxd.toml</span>
                 </div>
             </div>
             <div class="px-6 py-6">
-                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">database</span> = <span class="text-[#4a8c5c]">"mxd_local.db"</span></pre>
+                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">database</span> = <span class="text-code-string">"mxd_local.db"</span></pre>
             </div>
         </div>
 
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">bash</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">bash</span>
                 </div>
             </div>
             <div class="px-6 py-6">
-                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">export</span> MXD_BIND=<span class="text-[#4a8c5c]">"0.0.0.0:7700"</span>
-mxd --argon2-m-cost <span class="text-[#d4714f]">65536</span></pre>
+                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">export</span> MXD_BIND=<span class="text-code-string">"0.0.0.0:7700"</span>
+mxd --argon2-m-cost <span class="text-flare">65536</span></pre>
             </div>
         </div>
 
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">Result:</span> mxd binds to <code class="text-[#12121f] text-xs font-normal font-primary">0.0.0.0:7700</code> (from environment), uses <code class="text-[#12121f] text-xs font-normal font-primary">mxd_local.db</code> (from TOML), and sets Argon2 memory cost to 65536 (from CLI flag).
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">Result:</span> mxd binds to <code class="text-base-content text-xs font-normal font-primary">0.0.0.0:7700</code> (from environment), uses <code class="text-base-content text-xs font-normal font-primary">mxd_local.db</code> (from TOML), and sets Argon2 memory cost to 65536 (from CLI flag).
             </p>
         </div>
     </div>
@@ -343,70 +343,70 @@ mxd --argon2-m-cost <span class="text-[#d4714f]">65536</span></pre>
      DATABASE BACKENDS
      ═══════════════════════════════════════════════════════════════════════ -->
 
-<div id="section-databases" class="border-t-4 border-[#e8a838] py-16 sm:py-20">
+<div id="section-databases" class="border-t-4 border-accent py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">Database backends</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Database backends</h2>
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Database backends</h2>
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
             mxd compiles for exactly one backend at a time. The choice is made via Cargo features.
         </p>
     </div>
 </div>
 
-<div id="section-compile-time" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-compile-time" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">Compile-time selection</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">Compile-time selection</h3>
 
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-8">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary mb-8">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
                 mxd compiles for exactly one backend at a time. The choice is made via Cargo features: <code class="text-xs font-primary bg-white px-2 py-1 rounded">sqlite</code> (default) or <code class="text-xs font-primary bg-white px-2 py-1 rounded">postgres</code>. Enabling both is a compile error. Enabling neither is also a compile error.
             </p>
         </div>
     </div>
 </div>
 
-<div id="section-sqlite" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-sqlite" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">SQLite</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">SQLite</h3>
 
         <div class="space-y-6">
-            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
                 The simplest deployment. The database is a single file. Migrations are embedded in the binary and run automatically at startup. WAL mode is enabled by default. Foreign key enforcement is enabled by default.
             </p>
 
-            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
-                Recursive CTEs and <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">json_each</code> are used for news path resolution. The design calls for mxd to verify at startup that the bundled SQLite supports both features and exit with a diagnostic message rather than produce wrong results silently.
+            <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
+                Recursive CTEs and <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">json_each</code> are used for news path resolution. The design calls for mxd to verify at startup that the bundled SQLite supports both features and exit with a diagnostic message rather than produce wrong results silently.
             </p>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 mxd-card-hover">
+            <div class="bg-white rounded-lg border border-base-300 p-6 mxd-card-hover">
                 <div class="flex items-start gap-4 mb-4">
-                    <div class="w-10 h-10 bg-[#e8a838] rounded flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-file-code text-[#12121f] text-lg"></i>
+                    <div class="w-10 h-10 bg-accent rounded flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-file-code text-base-content text-lg"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="text-[#12121f] text-xl font-normal font-secondary mb-2">Startup verification</h4>
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px]">
+                        <h4 class="text-base-content text-xl font-normal font-secondary mb-2">Startup verification</h4>
+                        <p class="text-ink-muted text-sm font-normal font-tertiary leading-[21.32px]">
                             The design specifies that mxd queries the SQLite compile-time options to confirm recursive CTE and JSON support. If either is missing, the daemon refuses to start and logs which feature is absent, preventing runtime failures in news path traversal.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
-                <div class="bg-[#12121f] overflow-hidden">
-                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+                <div class="bg-neutral overflow-hidden">
+                    <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                        <div class="w-2 h-2 bg-error rounded"></div>
+                        <div class="w-2 h-2 bg-accent rounded"></div>
+                        <div class="w-2 h-2 bg-success rounded"></div>
                         <div class="flex-1 text-right">
-                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                            <span class="text-night-muted text-[11.10px] font-normal font-primary">terminal</span>
                         </div>
                     </div>
                     <div class="px-6 py-6 overflow-x-auto">
-                        <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">cargo</span> build --release
-<span class="text-[#e8a838]">./target/release/mxd</span> --database mxd.db</pre>
+                        <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">cargo</span> build --release
+<span class="text-accent">./target/release/mxd</span> --database mxd.db</pre>
                     </div>
                 </div>
             </div>
@@ -414,58 +414,58 @@ mxd --argon2-m-cost <span class="text-[#d4714f]">65536</span></pre>
     </div>
 </div>
 
-<div id="section-postgresql" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-postgresql" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6">PostgreSQL</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">PostgreSQL</h3>
 
         <div class="space-y-6">
-            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
-                For concurrent access, connection pooling, and the ability to share the database between multiple processes. Build with <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">--no-default-features --features postgres</code>. Migrations are embedded and run automatically, same as SQLite.
+            <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
+                For concurrent access, connection pooling, and the ability to share the database between multiple processes. Build with <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">--no-default-features --features postgres</code>. Migrations are embedded and run automatically, same as SQLite.
             </p>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mxd-card-hover">
-                <div class="bg-[#12121f] overflow-hidden">
-                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+                <div class="bg-neutral overflow-hidden">
+                    <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                        <div class="w-2 h-2 bg-error rounded"></div>
+                        <div class="w-2 h-2 bg-accent rounded"></div>
+                        <div class="w-2 h-2 bg-success rounded"></div>
                         <div class="flex-1 text-right">
-                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">terminal</span>
+                            <span class="text-night-muted text-[11.10px] font-normal font-primary">terminal</span>
                         </div>
                     </div>
                     <div class="px-6 py-6 overflow-x-auto">
-                        <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">cargo</span> build --release --no-default-features --features postgres
-<span class="text-[#e8a838]">./target/release/mxd</span> --database <span class="text-[#4a8c5c]">postgres://user:pass@localhost/mxd</span></pre>
+                        <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">cargo</span> build --release --no-default-features --features postgres
+<span class="text-accent">./target/release/mxd</span> --database <span class="text-code-string">postgres://user:pass@localhost/mxd</span></pre>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 mxd-card-hover">
+            <div class="bg-white rounded-lg border border-base-300 p-6 mxd-card-hover">
                 <div class="flex items-start gap-4">
-                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
+                    <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center flex-shrink-0">
                         <i class="fa-solid fa-flask text-white text-lg"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="text-[#12121f] text-xl font-normal font-secondary mb-3">Development helper</h4>
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mb-4">
-                            The <code class="text-xs font-primary bg-[#faf3ea] px-2 py-1 rounded">pg-embed-setup-unpriv</code> helper stages a PostgreSQL distribution with unprivileged ownership for development and testing. It requires no root access.
+                        <h4 class="text-base-content text-xl font-normal font-secondary mb-3">Development helper</h4>
+                        <p class="text-ink-muted text-sm font-normal font-tertiary leading-[21.32px] mb-4">
+                            The <code class="text-xs font-primary bg-base-200 px-2 py-1 rounded">pg-embed-setup-unpriv</code> helper stages a PostgreSQL distribution with unprivileged ownership for development and testing. It requires no root access.
                         </p>
-                        <div class="bg-[#12121f] rounded-lg overflow-hidden">
-                            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                        <div class="bg-neutral rounded-lg overflow-hidden">
+                            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                                <div class="w-2 h-2 bg-error rounded"></div>
+                                <div class="w-2 h-2 bg-accent rounded"></div>
+                                <div class="w-2 h-2 bg-success rounded"></div>
                             </div>
                             <div class="px-4 py-4">
-                                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">cargo</span> install --locked pg-embed-setup-unpriv
-<span class="text-[#e8a838]">pg_embedded_setup_unpriv</span>
-<span class="text-[#e8a838]">make</span> test</pre>
+                                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">cargo</span> install --locked pg-embed-setup-unpriv
+<span class="text-accent">pg_embedded_setup_unpriv</span>
+<span class="text-accent">make</span> test</pre>
                             </div>
                         </div>
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[21.32px] mt-3">
-                            Install it once, run the setup, then <code class="text-xs font-primary bg-[#faf3ea] px-2 py-1 rounded">make test</code> will exercise both SQLite and PostgreSQL suites.
+                        <p class="text-ink-muted text-sm font-normal font-tertiary leading-[21.32px] mt-3">
+                            Install it once, run the setup, then <code class="text-xs font-primary bg-base-200 px-2 py-1 rounded">make test</code> will exercise both SQLite and PostgreSQL suites.
                         </p>
                     </div>
                 </div>
@@ -474,69 +474,69 @@ mxd --argon2-m-cost <span class="text-[#d4714f]">65536</span></pre>
     </div>
 </div>
 
-<div id="section-comparison" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+<div id="section-comparison" class="border-t border-base-300 py-16 sm:py-20 bg-white">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-6 text-center">When to choose which</h3>
+        <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6 text-center">When to choose which</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <div class="bg-[#fdf8f0] rounded-lg border-2 border-[#e8a838] p-6">
+            <div class="bg-base-100 rounded-lg border-2 border-accent p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-[#e8a838] rounded flex items-center justify-center">
-                        <i class="fa-solid fa-file-code text-[#12121f] text-lg"></i>
+                    <div class="w-10 h-10 bg-accent rounded flex items-center justify-center">
+                        <i class="fa-solid fa-file-code text-base-content text-lg"></i>
                     </div>
-                    <h4 class="text-[#12121f] text-2xl font-normal font-secondary">SQLite</h4>
+                    <h4 class="text-base-content text-2xl font-normal font-secondary">SQLite</h4>
                 </div>
                 <ul class="space-y-3">
                     <li class="flex items-start gap-2">
-                        <span class="text-[#e8a838] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Single-process deployment</span>
+                        <span class="text-accent mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Single-process deployment</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#e8a838] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Embedded systems</span>
+                        <span class="text-accent mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Embedded systems</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#e8a838] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Development and testing</span>
+                        <span class="text-accent mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Development and testing</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#e8a838] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Small to medium deployments</span>
+                        <span class="text-accent mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Small to medium deployments</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#e8a838] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Zero configuration required</span>
+                        <span class="text-accent mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Zero configuration required</span>
                     </li>
                 </ul>
             </div>
 
-            <div class="bg-[#fdf8f0] rounded-lg border-2 border-[#2d3a8c] p-6">
+            <div class="bg-base-100 rounded-lg border-2 border-secondary p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center">
+                    <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center">
                         <i class="fa-solid fa-database text-white text-lg"></i>
                     </div>
-                    <h4 class="text-[#12121f] text-2xl font-normal font-secondary">PostgreSQL</h4>
+                    <h4 class="text-base-content text-2xl font-normal font-secondary">PostgreSQL</h4>
                 </div>
                 <ul class="space-y-3">
                     <li class="flex items-start gap-2">
-                        <span class="text-[#2d3a8c] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Multi-process access</span>
+                        <span class="text-secondary mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Multi-process access</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#2d3a8c] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Connection pooling</span>
+                        <span class="text-secondary mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Connection pooling</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#2d3a8c] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Horizontal scaling</span>
+                        <span class="text-secondary mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Horizontal scaling</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#2d3a8c] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Large deployments</span>
+                        <span class="text-secondary mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Large deployments</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <span class="text-[#2d3a8c] mt-1">◆</span>
-                        <span class="text-[#12121f] text-sm font-normal font-tertiary leading-[21.32px]">Shared database infrastructure</span>
+                        <span class="text-secondary mt-1">◆</span>
+                        <span class="text-base-content text-sm font-normal font-tertiary leading-[21.32px]">Shared database infrastructure</span>
                     </li>
                 </ul>
             </div>
@@ -549,18 +549,18 @@ mxd --argon2-m-cost <span class="text-[#d4714f]">65536</span></pre>
      ═══════════════════════════════════════════════════════════════════════ -->
 {% endblock %}
 {% block footer_cta %}
-<div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-white">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Next steps</h2>
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-4">Next steps</h2>
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
             With configuration and database backend selected, explore the deployment strategies or architecture documentation.
         </p>
 
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/getting-started/#section-deployment">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-white text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/getting-started/#section-deployment">
                 Deployment
             </a>
-            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/architecture/">
+            <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/architecture/">
                 Architecture
             </a>
         </div>

@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "bunx concurrently -k -n watch,serve -c blue,green \"bunx chokidar-cli 'src/**/*' 'df12_pages/**/*' 'config/**/*' 'scripts/**/*' 'pyproject.toml' --initial -i '**/*.pyc' -i '**/__pycache__/**' -c 'bun run build'\" \"bunx http-server public -p 8080 -c-1\"",
-    "build": "bun run build:css && bun run build:images && bun run build:pages && bun run build:search",
+    "build": "bun run build:static && bun run build:css && bun run build:images && bun run build:pages && bun run build:search",
+    "build:static": "bun run scripts/copy-static.ts",
     "build:search": "bun run scripts/build-netsuke-search-index.mjs",
     "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify && bun run build:css:mxd",
     "build:css:mxd": "bunx tailwindcss -i ./src/styles/mxd.css -o ./public/mxd/assets/tailwind.css --minify",

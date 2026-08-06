@@ -51,16 +51,46 @@ is authored directly as HTML.
   `doc_path` and `source_url` recorded in the page's config entry.
 - **`templates/<site>/`** holds each sub-site's Jinja2 templates;
   `df12_pages/templates/` holds the main site's.
+- **`src/static/`** holds hand-crafted assets that are copied verbatim into
+  the published tree — stylesheets, scripts, images, fonts, and favicons. Its
+  layout mirrors the output, so `src/static/mxd/assets/site.css` is published as
+  `/mxd/assets/site.css`.
+- **`src/styles/`** holds the Tailwind entrypoints, which are compiled rather
+  than copied.
 
 To change what a page *says*, edit the YAML or the Markdown. To change how it
-*looks*, edit the template or the stylesheet. Never edit the rendered result.
+*looks*, edit the template, the Tailwind entrypoint, or the relevant file under
+`src/static/`. Never edit the rendered result.
+
+### Nothing under `public/` is tracked
+
+`public/` is build output in its entirety and is git-ignored. Files placed
+there by hand are invisible to review, are lost the moment anyone rebuilds from
+a clean tree, and will not deploy.
+
+Every published file therefore has a source elsewhere in the repository:
+
+| Published under `public/`                    | Comes from                                            |
+| -------------------------------------------- | ----------------------------------------------------- |
+| `**/*.html`                                  | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`, `mxd/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`             | `scripts/generate-image-variants.ts`                  |
+| `netsuke/assets/search/*.json`               | `scripts/build-netsuke-search-index.mjs`              |
+| everything else                              | `src/static/`, copied by `scripts/copy-static.ts`     |
+
+To add an asset, put it in `src/static/` at the path it should occupy in the
+published site, then rebuild.
 
 ### Building
 
 ```bash
-bun run build          # CSS, images, pages, and search indices
+bun run build          # static assets, CSS, images, pages, and search indices
 bun run dev            # watch and rebuild, serving on :8080
 ```
+
+The steps run in order, because each depends on the last: `build:static` first,
+since the image step reads the source images it places; then `build:css`,
+`build:images`, `build:pages`, and `build:search`.
 
 `bun run build:pages` wraps the generator, which can also be driven directly:
 
@@ -72,17 +102,11 @@ uv run pages generate --site mxd      # one sub-site
 Regenerate after editing a template or config file; a stale `public/` tree is
 the usual reason a change appears not to have taken effect.
 
-### Do not edit generated output
-
-Everything matching `public/**/*.html` is git-ignored build output, as is
-`public/mxd/assets/tailwind.css` and the Netsuke search indices. Editing those
-files produces changes that vanish on the next build and cannot be reviewed.
-
-Hand-crafted assets do live under `public/`, which makes the boundary easy to
-misjudge. Check `.gitignore` when unsure: if a file is ignored, it is
-generated. The per-sub-site stylesheets referenced by `stylesheet:` in
-`config/pages.yaml` are hand-crafted and tracked; the compiled Tailwind output
-alongside them is not.
+The copy and image steps skip work when the destination is newer than its
+source, so repeated builds stay cheap. Neither step prunes, because it cannot
+tell a deleted asset from another step's output. Remove `public/` and rebuild
+when a stale file needs clearing — the tree is disposable by design, and a
+clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
@@ -232,15 +256,19 @@ equivalents) when updating infrastructure.
 
 ## Commit Messages
 
-Use concise, conventional titles such as:
+Write the summary line in the imperative mood, under 72 characters, with no
+trailing full stop and no prefix:
 
-- `feat: add new monitoring alarms`
-- `fix: correct bucket policy`
+- `Add monitoring alarms for the static site bucket`
+- `Correct the bucket policy for public asset reads`
 
-Mention the affected module or script in the body if necessary.
+Do not use conventional-commit prefixes such as `feat:` or `fix:`. They add a
+taxonomy that belongs in labels and changelogs, and they crowd out the part of
+the line that actually tells a reader what happened.
 
-For more details, see the
-[Conventional Commits](https://www.conventionalcommits.org/) specification.
+Explain what changed and why in the body, wrapped at 72 characters; the diff
+already shows how. Mention the affected module or script where that aids
+navigation, and reference related issues or pull requests where relevant.
 
 For further background, consult the `docs/` directory before making significant
 changes.

@@ -3,18 +3,12 @@ node_modules
 .bun_tmp
 .bun_install
 *.tgz
-public/assets/site.css
-public/images/*.webp
-public/images/*.avif
 reference/
 
-# Generated site output
-public/*.html
-public/**/*.html
-public/.df12-pages-*-meta.json
-public/netsuke/assets/search/docs-search.json
-public/netsuke/assets/search/examples-search.json
-public/mxd/assets/tailwind.css
+# Generated site output. The published tree is built entirely from src/,
+# config/, and templates/; nothing under public/ is tracked. Hand-crafted
+# assets live in src/static and are copied here by `bun run build:static`.
+public/
 
 # Project build outputs
 out

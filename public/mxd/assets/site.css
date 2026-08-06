@@ -567,6 +567,123 @@ html {
   background-color: var(--mxd-sandstone-light);
 }
 
+/* Long-form prose rendered from shared Markdown sources, where the generated
+   markup carries no utility classes of its own. Mirrors .hm-prose on the
+   Netsuke site. Declared before the structured components below so those keep
+   their overrides at equal specificity. */
+.mxd-prose {
+  font-family: "Source Serif 4", serif;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Flow spacing is applied at each level that holds prose, because this
+   site wraps sections and cards around the generated Markdown. */
+.mxd-prose > * + *,
+.mxd-prose section > * + *,
+.mxd-prose .content-card__body > * + * {
+  margin-top: 1.5rem;
+}
+
+.mxd-prose > :first-child {
+  margin-top: 0;
+}
+
+.mxd-prose h2,
+.mxd-prose h3,
+.mxd-prose h4 {
+  color: var(--mxd-ink);
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+}
+
+.mxd-prose h2 {
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  margin-top: 2.5rem;
+}
+
+.mxd-prose h3 {
+  font-size: 1.35rem;
+  line-height: 1.8rem;
+  margin-top: 2rem;
+}
+
+.mxd-prose h4 {
+  font-size: 1.1rem;
+  line-height: 1.6rem;
+  margin-top: 1.75rem;
+}
+
+/* Sections and cards supply their own leading space. */
+.mxd-prose section > :first-child,
+.mxd-prose .content-card__body > :first-child {
+  margin-top: 0;
+}
+
+.mxd-prose ul,
+.mxd-prose ol {
+  padding-left: 1.5rem;
+}
+
+.mxd-prose ul {
+  list-style: disc;
+}
+
+.mxd-prose ol {
+  list-style: decimal;
+}
+
+.mxd-prose li + li {
+  margin-top: 0.5rem;
+}
+
+.mxd-prose li > ul,
+.mxd-prose li > ol {
+  margin-top: 0.5rem;
+}
+
+.mxd-prose a {
+  color: var(--mxd-accent);
+  text-decoration-color: var(--mxd-border);
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+  transition: color var(--mxd-duration-fast) var(--mxd-ease);
+}
+
+.mxd-prose a:hover {
+  color: var(--mxd-accent-dark);
+}
+
+.mxd-prose strong {
+  color: var(--mxd-ink);
+  font-weight: 600;
+}
+
+.mxd-prose code {
+  background: var(--mxd-sandstone-light);
+  border: 1px solid var(--mxd-border);
+  border-radius: 0.25rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875em;
+  padding: 0.1rem 0.35rem;
+}
+
+.mxd-prose pre {
+  background: var(--mxd-ink);
+  border-radius: 0.5rem;
+  color: var(--mxd-sandstone);
+  line-height: 1.6;
+  overflow-x: auto;
+  padding: 1.25rem;
+}
+
+.mxd-prose pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
 /* Structured shared-content pages (legal pages: TOC, sections, badge cards) */
 .content-toc {
   border: 1px solid var(--mxd-accent, #bc4626);

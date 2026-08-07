@@ -212,7 +212,7 @@
     gap: 4px;
     min-width: 13em;
     padding: 14px 18px;
-    border: var(--rule-weight-2) solid var(--ink);
+    border: var(--rule-weight) solid var(--ink);
     background: var(--paper);
     box-shadow: 6px 6px 0 var(--press-red);
   }

@@ -412,7 +412,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   gap: calc(var(--unit) * 3);
-  align-items: baseline;
+  align-items: end;
   margin-bottom: calc(var(--unit) * 4);
   padding-bottom: calc(var(--unit) * 2);
   border-bottom: var(--rule-weight) solid var(--ink);

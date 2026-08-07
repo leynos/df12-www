@@ -257,6 +257,7 @@
   border: var(--rule-weight-2) solid var(--ink);
   display: block;
   mix-blend-mode: multiply;
+  margin-top: calc(var(--unit) * 3);
 }
 .pacing {
   margin-top: 26px;

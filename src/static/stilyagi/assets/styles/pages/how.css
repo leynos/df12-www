@@ -97,6 +97,10 @@
   font-size: 1.8rem;
   color: var(--accent-text);
 }
+.arrow-row span {
+  text-align: right;
+  margin-right: -12px;
+}
 .arrow-row span:last-child {
   visibility: hidden;
 }

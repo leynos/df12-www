@@ -615,7 +615,20 @@
               aria-labelledby="suppress-tab-md"
               data-panel="md"
               tabindex="0"
-            ><span class="com">&lt;!-- stilyagi: disable-next-line PUN201 --&gt;</span>She said "no" — a single word, straight-quoted on purpose. This paragraph opts out of the sentence-length check for dramatic effect.<span class="com">&lt;!-- stilyagi: disable-block GRAM210 --&gt;</span>It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness, it was the spring of hope, it was the winter of despair.<span class="com">&lt;!-- stilyagi: enable-block GRAM210 --&gt;</span>Ordinary prose resumes here. <span class="com">&lt;!-- stilyagi: disable-line PUN101 --&gt;</span><span class="dim"># ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ # disables only the preceding line</span></pre>
+            >
+<span class="com">&lt;!-- stilyagi: disable-next-line PUN201 --&gt;</span>
+She said "no" — a single word, straight-quoted on purpose. This paragraph
+opts out of the sentence-length check for dramatic effect.
+
+<span class="com">&lt;!-- stilyagi: disable-block GRAM210 --&gt;</span>
+It was the best of times, it was the worst of times, it was the age of
+wisdom, it was the age of foolishness, it was the epoch of belief, it was
+the epoch of incredulity, it was the season of light, it was the season of
+darkness, it was the spring of hope, it was the winter of despair.
+<span class="com">&lt;!-- stilyagi: enable-block GRAM210 --&gt;</span>
+
+Ordinary prose resumes here. <span class="com">&lt;!-- stilyagi: disable-line PUN101 --&gt;</span>
+<span class="dim"># ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ # disables only the preceding line</span></pre>
             <pre
               id="suppress-panel-py"
               role="tabpanel"
@@ -623,7 +636,20 @@
               data-panel="py"
               tabindex="0"
               hidden=""
-            ><span class="com">def</span> <span class="com">compute_metrics</span>(series, window=7):<span class="dim">"""</span><span class="dim"> Compute rolling metrics across the given series.</span><span class="dim"> The smoothing window is in trading days, not calendar days.</span><span class="dim"> Args:</span><span class="dim"> series: price series, normalized.</span><span class="dim"> window: lookback in trading days (default: 7).</span><span class="com"> # stilyagi: disable-line PYDOC103</span><span class="dim"> _internal_debug_flag: unused; retained for historical instrumentation and compatibility.</span><span class="dim"> """</span>...</pre>
+            >
+<span class="com">def</span> <span class="com">compute_metrics</span>(series, window=7):
+    <span class="dim">"""</span>
+    <span class="dim">Compute rolling metrics across the given series.</span>
+    <span class="dim">The smoothing window is in trading days, not calendar days.</span>
+
+    <span class="dim">Args:</span>
+        <span class="dim">series: price series, normalized.</span>
+        <span class="dim">window: lookback in trading days (default: 7).</span>
+        <span class="com"># stilyagi: disable-line PYDOC103</span>
+        <span class="dim">_internal_debug_flag: unused; retained for historical</span>
+        <span class="dim">instrumentation and compatibility.</span>
+    <span class="dim">"""</span>
+    ...</pre>
             <p
               style="
                 font-family: var(--font-editorial);

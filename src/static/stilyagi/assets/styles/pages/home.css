@@ -119,8 +119,10 @@
 
      .poster-annotation {
        position: absolute;
-top: 145px;
-       right: 275px;
+       /* Percentages of the art frame, so the line stays on the drawn paper
+          sheet however large the 1672/941 crop renders. */
+       top: 22%;
+       right: 23.4%;
        z-index: 2;
        width: 8em;
        text-align: center;
@@ -619,13 +621,20 @@ top: 145px;
          top: 48px;
          max-width: 3.8ch;
          font-size: clamp(3rem, 14vw, 4.8rem);
+         /* A paper-coloured halo lifts the title off the busy artwork the
+            tighter mobile crop puts behind it. */
+         text-shadow:
+           0 0 6px var(--paper),
+           0 0 18px var(--paper),
+           2px 2px 0 var(--paper);
        }
 
        .poster-annotation {
-         /* On the flat white of the drawn paper sheet as the 4/5 crop
-            frames it, clear of the masthead line and the curled top edge. */
-         top: 92px;
-         right: 14px;
+         /* Percentages of the 4/5-cropped frame: on the flat white of the
+            drawn paper sheet, clear of the masthead line and the curled top
+            edge, at any phone width. */
+         top: 19%;
+         right: 3.6%;
          width: 6.5em;
          font-size: 0.62rem;
          line-height: 1.45;
@@ -637,6 +646,10 @@ top: 145px;
          width: calc(100% - 36px);
          font-size: 0.62rem;
          gap: 10px;
+         text-shadow:
+           0 0 4px var(--paper),
+           0 0 10px var(--paper),
+           1px 1px 0 var(--paper);
        }
 
        .poster-tiles {

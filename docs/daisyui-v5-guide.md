@@ -162,13 +162,11 @@ disabled
    theme
 4. There's no need to use `dark:` for daisyUI colour names
 5. Ideally only daisyUI colour names should be used for colours so the colours
-   can
-   change automatically based on the theme
+   can change automatically based on the theme
 6. If a Tailwind CSS colour name (like `red-500`) is used, it will be same red
    colour on all themes
 7. If a daisyUI colour name (like `primary`) is used, it will change colour
-   based
-   on the theme
+   based on the theme
 8. Using Tailwind CSS colour names for text colours should be avoided because
    Tailwind CSS colour `text-gray-800` on `bg-base-100` would be unreadable on
    a dark theme - because on dark theme, `bg-base-100` is a dark colour

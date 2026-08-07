@@ -1,20 +1,19 @@
 # Consistent Pygments highlighting for Netsuke code blocks
 
-This ExecPlan (execution plan) is a living document. The sections
-`Constraints`, `Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`,
-`Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
-proceeds.
+This ExecPlan (execution plan) is a living document. The sections `Constraints`,
+`Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`, `Decision Log`,
+and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
 Status: COMPLETE
 
 ## Purpose / big picture
 
 The Netsuke sub-site renders code in three inconsistent ways: hand-written
-`<span class="text-indigo-light">` markup with per-page colour conventions,
-bare `<pre><code class="language-yaml">` blocks with no highlighting at all,
-and bespoke terminal transcripts assembled from utility-classed `<div>`s. The
-same YAML key is indigo on one page, amber on another, and unstyled on a
-third, and every content change means hand-editing span soup.
+`<span class="text-indigo-light">` markup with per-page colour conventions, bare
+`<pre><code class="language-yaml">` blocks with no highlighting at all, and
+bespoke terminal transcripts assembled from utility-classed `<div>`s. The same
+YAML key is indigo on one page, amber on another, and unstyled on a third, and
+every content change means hand-editing span soup.
 
 After this change, authors write plain source text inside a template tag and
 two Pygments syntaxes render it consistently everywhere:
@@ -22,9 +21,8 @@ two Pygments syntaxes render it consistently everywhere:
 - `netsuke` — YAML with embedded Jinja expressions (`{{ ... }}`, `{% ... %}`)
   for `Netsukefile` manifests.
 - `netsuke-console` — shell sessions where lines beginning with a `$`
-  prompt are commands
-  (with backslash line-continuation carrying the command across lines) and
-  all other lines are program output.
+  prompt are commands (with backslash line-continuation carrying the command
+  across lines) and all other lines are program output.
 
 Both syntaxes use a single Himotoshi Pygments style so every block on the
 sub-site shares one palette, and the palette lives in exactly one place.
@@ -42,10 +40,10 @@ extension existed.
 - The visual design language must not change: blocks keep the existing
   charcoal "faux window" chrome (`hm-faux-window`, `hm-example-code-block`,
   `hm-example-terminal`), and the palette must be drawn from the Himotoshi
-  colour variables already defined in
-  `public/netsuke/assets/css/himotoshi.css` (`--netsuke-indigo-light`,
-  `--netsuke-matcha`, `--netsuke-amber`, `--netsuke-vermillion`,
-  `--netsuke-stone-light`, `--netsuke-charcoal-light`, `--netsuke-boxwood`).
+  colour variables already defined in `public/netsuke/assets/css/himotoshi.css`
+  (`--netsuke-indigo-light`, `--netsuke-matcha`, `--netsuke-amber`,
+  `--netsuke-vermillion`, `--netsuke-stone-light`, `--netsuke-charcoal-light`,
+  `--netsuke-boxwood`).
 - Generated pages for the mxd, Weaver, and root sites must be byte-identical
   before and after this change; only the Netsuke sub-site and the shared
   `df12_pages` pipeline (in a backwards-compatible way) may change.
@@ -63,8 +61,8 @@ extension existed.
 
 - Scope: the pipeline change (lexers, style, extension, tests) should stay
   under 10 new/modified files outside `templates/netsuke/`; escalate beyond
-  that. Template migration may touch every file under `templates/netsuke/`
-  but must not change rendered prose.
+  that. Template migration may touch every file under `templates/netsuke/` but
+  must not change rendered prose.
 - Dependencies: adding `jinja2-highlight` is pre-approved by the requester.
   Choosing the in-house extension instead (see Decision Log) requires no new
   dependency. Any other new dependency: stop and escalate.
@@ -79,33 +77,29 @@ extension existed.
 ## Risks
 
 - Risk: Pygments tokenizes YAML-with-Jinja differently from the hand-rolled
-  colouring, so pages change appearance in detail (e.g. nested keys lose
-  their amber accent because Pygments emits `Name.Tag` for every key).
-  Severity: medium. Likelihood: high.
-  Mitigation: treat the Pygments output as the new canon; the acceptance
-  screenshots compare consistency across pages, not pixel-parity with the
-  old hand-rolled markup. Note representative before/after screenshots in
-  `Artefacts` for sign-off.
+  colouring, so pages change appearance in detail (e.g. nested keys lose their
+  amber accent because Pygments emits `Name.Tag` for every key). Severity:
+  medium. Likelihood: high. Mitigation: treat the Pygments output as the new
+  canon; the acceptance screenshots compare consistency across pages, not
+  pixel-parity with the old hand-rolled markup. Note representative
+  before/after screenshots in `Artefacts` for sign-off.
 - Risk: `--netsuke-indigo-light` (#3A5A7C) on charcoal (#2E2A25) is
-  low-contrast (~2.1:1), failing WCAG AA for key names.
-  Severity: medium. Likelihood: high.
-  Mitigation: the style defines dedicated `--netsuke-syntax-*` variables in
-  `himotoshi.css`, initialized from the closest accessible tints of the brand
-  hues; validate with the a11y contrast tooling before migration (Stage C
-  gate).
+  low-contrast (~2.1:1), failing WCAG AA for key names. Severity: medium.
+  Likelihood: high. Mitigation: the style defines dedicated
+  `--netsuke-syntax-*` variables in `himotoshi.css`, initialized from the
+  closest accessible tints of the brand hues; validate with the a11y contrast
+  tooling before migration (Stage C gate).
 - Risk: template migration moves large blocks out of `{% raw %}` regions;
-  a mismatched `{% raw %}`/`{% endraw %}` pair breaks a whole page.
-  Severity: medium. Likelihood: medium.
-  Mitigation: migrate one template per commit, regenerate, and diff the
-  rendered page text (`lynx -dump`-style extraction via BeautifulSoup)
-  against the pre-migration text.
+  a mismatched `{% raw %}`/`{% endraw %}` pair breaks a whole page. Severity:
+  medium. Likelihood: medium. Mitigation: migrate one template per commit,
+  regenerate, and diff the rendered page text (`lynx -dump`-style extraction
+  via BeautifulSoup) against the pre-migration text.
 - Risk: bash embedded inside YAML command strings (e.g.
   `command: "gcc -c {{ ins }}"`) is not highlighted as bash by the stock
-  `yaml+jinja` lexer; full bash-in-string delegation is complex.
-  Severity: low. Likelihood: certain.
-  Mitigation: explicitly out of scope for v1 (see Decision Log); the string
-  colour covers the whole command. A prototyping milestone evaluates
-  feasibility and records findings without blocking delivery.
+  `yaml+jinja` lexer; full bash-in-string delegation is complex. Severity: low.
+  Likelihood: certain. Mitigation: explicitly out of scope for v1 (see Decision
+  Log); the string colour covers the whole command. A prototyping milestone
+  evaluates feasibility and records findings without blocking delivery.
 
 ## Progress
 
@@ -115,117 +109,103 @@ extension existed.
   the expected reasons (`ClassNotFound`, `TemplateSyntaxError`).
 - [x] (2026-07-30 18:35Z) Stage C: lexers, style, entry points, extension,
   environment wiring, and generated `.hm-syntax` CSS; tests green; contrast
-  validated (all tokens at 5.0:1 or better; comment tint lifted to
-  `#a39a8e`).
+  validated (all tokens at 5.0:1 or better; comment tint lifted to `#a39a8e`).
 - [x] (2026-07-30 19:10Z) Stage D: all fourteen templates migrated; manifest
-  block text verified identical to baseline; terminal transcripts
-  re-authored as `netsuke-console` sessions.
+  block text verified identical to baseline; terminal transcripts re-authored as
+  `netsuke-console` sessions.
 - [x] (2026-07-30 19:30Z) Stage E: dead per-page `.token`/`.code-line` CSS
-  removed; cross-page colour identity verified via computed styles; all
-  sites regenerated with no tracked diffs outside the Netsuke work.
+  removed; cross-page colour identity verified via computed styles; all sites
+  regenerated with no tracked diffs outside the Netsuke work.
 
 ## Surprises & discoveries
 
 - Observation: Pygments' stock `BashSessionLexer` (alias `console`) already
   implements the requested session semantics: `$`-prefixed lines lex as
   commands, a trailing backslash continues the command on the next line, and
-  all other lines emit `Generic.Output`.
-  Evidence: tokenizing `$ echo one \\\n    two\nresponse line\n` yields
-  `Generic.Prompt`, command tokens across both lines, then
-  `Generic.Output 'response line\n'`.
-  Impact: `netsuke-console` is a naming/branding subclass, not new parsing
-  logic.
+  all other lines emit `Generic.Output`. Evidence: tokenizing
+  `$ echo one \\\n    two\nresponse line\n` yields `Generic.Prompt`, command
+  tokens across both lines, then `Generic.Output 'response line\n'`. Impact:
+  `netsuke-console` is a naming/branding subclass, not new parsing logic.
 - Observation: Pygments ships `YamlJinjaLexer` (alias `yaml+jinja`), which
-  tokenizes YAML keys as `Name.Tag` and Jinja expressions with distinct
-  tokens.
-  Evidence: tokenizing a `Netsukefile` fragment produces `Name.Tag` for
-  keys and string tokens for quoted values.
-  Impact: the `netsuke` lexer is a thin subclass; effort concentrates in the
-  style, CSS, and migration.
+  tokenizes YAML keys as `Name.Tag` and Jinja expressions with distinct tokens.
+  Evidence: tokenizing a `Netsukefile` fragment produces `Name.Tag` for keys
+  and string tokens for quoted values. Impact: the `netsuke` lexer is a thin
+  subclass; effort concentrates in the style, CSS, and migration.
 
 ## Decision log
 
 - Decision: the `{% highlight %}` body must wrap Jinja-bearing source in
-  `{% raw %}` (documented in `df12_pages/jinja_highlight.py`).
-  Rationale: Jinja lexes the tag body before any extension runs, so
-  `{{ ins }}` placeholders would be interpolated away; a lexer-level tag
-  like `raw` is the only way to protect them, and the sub-site templates
-  already use `raw` blocks pervasively.
-  Date/Author: 2026-07-30, Claude (implementation).
+  `{% raw %}` (documented in `df12_pages/jinja_highlight.py`). Rationale: Jinja
+  lexes the tag body before any extension runs, so `{{ ins }}` placeholders
+  would be interpolated away; a lexer-level tag like `raw` is the only way to
+  protect them, and the sub-site templates already use `raw` blocks
+  pervasively. Date/Author: 2026-07-30, Claude (implementation).
 
 - Decision: implement the template tag as a small in-house Jinja extension
   (`df12_pages/jinja_highlight.py`) modelled on `jinja2-highlight`'s
   `{% highlight %}` tag, rather than depending on the `jinja2-highlight`
-  package.
-  Rationale: the package's last release predates 2016 and pins none of its
-  behaviour; the needed functionality is ~50 lines (parse tag, dedent body,
+  package. Rationale: the package's last release predates 2016 and pins none of
+  its behaviour; the needed functionality is ~50 lines (parse tag, dedent body,
   `pygments.highlight()` with our formatter); an in-house extension lets the
-  formatter emit Himotoshi CSS classes and a window-chrome wrapper option.
-  The requester allowed "jinja2-highlight or similar". Revisit if the
-  in-house tag exceeds 100 lines.
-  Date/Author: 2026-07-30, Claude (proposal draft).
+  formatter emit Himotoshi CSS classes and a window-chrome wrapper option. The
+  requester allowed "jinja2-highlight or similar". Revisit if the in-house tag
+  exceeds 100 lines. Date/Author: 2026-07-30, Claude (proposal draft).
 - Decision: subclass stock lexers (`YamlJinjaLexer` → `NetsukeLexer`,
-  `BashSessionLexer` → `NetsukeConsoleLexer`) instead of writing grammars
-  from scratch.
-  Rationale: both stock lexers already produce the required token streams
-  (see Surprises); subclassing preserves upstream fixes and keeps the diff
-  reviewable.
-  Date/Author: 2026-07-30, Claude (proposal draft).
+  `BashSessionLexer` → `NetsukeConsoleLexer`) instead of writing grammars from
+  scratch. Rationale: both stock lexers already produce the required token
+  streams (see Surprises); subclassing preserves upstream fixes and keeps the
+  diff reviewable. Date/Author: 2026-07-30, Claude (proposal draft).
 - Decision: highlighting bash *inside* YAML command strings is out of scope
-  for v1; a bounded prototype (Stage E, optional) may explore
-  `DelegatingLexer` over `command:`/`script:` scalar values.
-  Rationale: the stock lexer colours command strings as strings, which is
-  consistent and legible; string-internal delegation risks fragile parsing
-  of block scalars for marginal gain.
+  for v1; a bounded prototype (Stage E, optional) may explore `DelegatingLexer`
+  over `command:`/`script:` scalar values. Rationale: the stock lexer colours
+  command strings as strings, which is consistent and legible; string-internal
+  delegation risks fragile parsing of block scalars for marginal gain.
   Date/Author: 2026-07-30, Claude (proposal draft).
 - Decision: register the lexers and style by name through Pygments plugin
   entry points in `pyproject.toml` (`[project.entry-points."pygments.lexers"]`
-  and `[project.entry-points."pygments.styles"]`).
-  Rationale: makes `get_lexer_by_name('netsuke')` work everywhere (the Jinja
-  tag, the Markdown docs pipeline in
-  `df12_pages/generator/renderer.py`, and any future tooling) without import
-  side effects.
-  Date/Author: 2026-07-30, Claude (proposal draft).
+  and `[project.entry-points."pygments.styles"]`). Rationale: makes
+  `get_lexer_by_name('netsuke')` work everywhere (the Jinja tag, the Markdown
+  docs pipeline in `df12_pages/generator/renderer.py`, and any future tooling)
+  without import side effects. Date/Author: 2026-07-30, Claude (proposal draft).
 
 ## Outcomes & retrospective
 
-Delivered as planned. The `netsuke` and `netsuke-console` syntaxes render
-every manifest and shell-session block on the sub-site through one
-`himotoshi` style; computed key/string colours are byte-identical across
-pages and resolve from `--netsuke-syntax-*` variables, all at 5.0:1
-contrast or better. Copy-paste fidelity held: rendered manifest text equals
-the shipped `examples/*.yml` content. The mxd, Weaver, and root outputs are
-unchanged.
+Delivered as planned. The `netsuke` and `netsuke-console` syntaxes render every
+manifest and shell-session block on the sub-site through one `himotoshi` style;
+computed key/string colours are byte-identical across pages and resolve from
+`--netsuke-syntax-*` variables, all at 5.0:1 contrast or better. Copy-paste
+fidelity held: rendered manifest text equals the shipped `examples/*.yml`
+content. The mxd, Weaver, and root outputs are unchanged.
 
 Deviations from the letter of the plan, both logged: template migration was
 committed per family rather than per file (structurally identical changes;
-recoverability preserved by the fidelity checks), and three block kinds
-were deliberately left bespoke as design elements — the home-page marketing
-terminal with its diagnostic panel, the install page's Windows
-PowerShell/MSI panel, and non-target languages (TOML, Fluent, Rust). The
-optional bash-in-string delegation prototype was not pursued; the string
-colouring reads well and the risk log stands.
+recoverability preserved by the fidelity checks), and three block kinds were
+deliberately left bespoke as design elements — the home-page marketing terminal
+with its diagnostic panel, the install page's Windows PowerShell/MSI panel, and
+non-target languages (TOML, Fluent, Rust). The optional bash-in-string
+delegation prototype was not pursued; the string colouring reads well and the
+risk log stands.
 
-Lesson: Jinja's lexer runs before extensions, so any tag carrying literal
-Jinja syntax needs a `{% raw %}` inner wrapper — worth remembering for any
-future content-bearing tag.
+Lesson: Jinja's lexer runs before extensions, so any tag carrying literal Jinja
+syntax needs a `{% raw %}` inner wrapper — worth remembering for any future
+content-bearing tag.
 
 ## Context and orientation
 
 This repository (`df12-www`) generates the df12 Productions website. The
-Netsuke sub-site is generated from Jinja templates in `templates/netsuke/`
-by the `pages` command (`uv run pages generate --site netsuke`), configured
-in `config/pages.yaml`. Content pages are rendered by
+Netsuke sub-site is generated from Jinja templates in `templates/netsuke/` by
+the `pages` command (`uv run pages generate --site netsuke`), configured in
+`config/pages.yaml`. Content pages are rendered by
 `df12_pages/content_page.py`, which builds a Jinja `Environment` over
 `templates/netsuke/` with `autoescape=True`. Generated HTML under
 `public/netsuke/` is gitignored; a dev server at `http://127.0.0.1:8080/`
 serves it with auto rebuild.
 
-A separate Markdown pipeline (`df12_pages/generator/renderer.py`) already
-uses Pygments with `HtmlFormatter` and a configurable style (currently
-`monokai`) for the main-site docs pages; it resolves lexers with
-`pygments.lexers.get_lexer_by_name`. This plan does not restyle the main
-site, but name-registered lexers become available to it for free.
+A separate Markdown pipeline (`df12_pages/generator/renderer.py`) already uses
+Pygments with `HtmlFormatter` and a configurable style (currently `monokai`)
+for the main-site docs pages; it resolves lexers with
+`pygments.lexers.get_lexer_by_name`. This plan does not restyle the main site,
+but name-registered lexers become available to it for free.
 
 Today's code blocks in `templates/netsuke/` fall into three families, with
 roughly one hundred blocks across fourteen templates:
@@ -235,26 +215,26 @@ roughly one hundred blocks across fourteen templates:
    Different pages assign different colours to the same token kind.
 2. Unhighlighted literals, e.g.
    `templates/netsuke/pages/examples-static-site-pipeline.jinja`:
-   `<pre><code class="language-yaml">netsuke_version: "1.0.0" ...` renders
-   as a single colour because nothing processes the `language-yaml` class.
+   `<pre><code class="language-yaml">netsuke_version: "1.0.0" ...` renders as a
+   single colour because nothing processes the `language-yaml` class.
 3. Terminal transcripts, e.g. the "Running the Build" sections on example
    pages: sequences of utility-classed `<div>`s imitating a prompt.
 
 "Pygments" is the Python syntax-highlighting library: a *lexer* turns source
 text into a token stream, a *style* maps token types to colours, and a
-*formatter* renders tokens to HTML spans with CSS classes. A *Jinja
-extension* adds custom template tags to the template engine.
+*formatter* renders tokens to HTML spans with CSS classes. A *Jinja extension*
+adds custom template tags to the template engine.
 
 ## Plan of work
 
 Stage A — approval. No code changes. The requester reviews this plan;
 implementation begins only on explicit approval.
 
-Stage B — red tests. Create `tests/test_netsuke_highlight.py` with tests
-that fail because the modules do not exist yet (import failure counts as the
-red state; mark expected behaviours with
-`@pytest.mark.xfail(strict=True, reason="netsuke lexers not implemented")`
-only where imports succeed but behaviour is missing):
+Stage B — red tests. Create `tests/test_netsuke_highlight.py` with tests that
+fail because the modules do not exist yet (import failure counts as the red
+state; mark expected behaviours with
+`@pytest.mark.xfail(strict=True, reason="netsuke lexers not implemented")` only
+where imports succeed but behaviour is missing):
 
 1. `get_lexer_by_name('netsuke')` returns a lexer whose tokens for a
    representative `Netsukefile` fragment include `Name.Tag` for keys and a
@@ -275,41 +255,38 @@ Stage C — pipeline implementation, in `df12_pages/`:
    `name='Netsuke'`, `aliases=['netsuke']`; and
    `NetsukeConsoleLexer(BashSessionLexer)` with `aliases=['netsuke-console']`.
 2. In the same module, define `HimotoshiStyle(pygments.style.Style)` with
-   `background_color = '#2e2a25'` and the token map below (Interfaces
-   section). Register both lexers and the style via entry points in
-   `pyproject.toml`; reinstall the package (`make build`) so the entry
-   points load.
+   `background_color = '#2e2a25'` and the token map below (Interfaces section).
+   Register both lexers and the style via entry points in `pyproject.toml`;
+   reinstall the package (`make build`) so the entry points load.
 3. `df12_pages/jinja_highlight.py`: `HighlightExtension` implementing
-   `{% highlight '<lexer>' %} ... {% endhighlight %}`: dedent the body,
-   look up the lexer by name, render with
-   `HtmlFormatter(cssclass='hm-syntax', wrapcode=True)`, and return the
-   result marked safe. Wire the extension into the `Environment` in
+   `{% highlight '<lexer>' %} ... {% endhighlight %}`: dedent the body, look up
+   the lexer by name, render with
+   `HtmlFormatter(cssclass='hm-syntax', wrapcode=True)`, and return the result
+   marked safe. Wire the extension into the `Environment` in
    `df12_pages/content_page.py` (and `df12_pages/subsite_homepage.py`, which
    renders `home_page.jinja`).
 4. CSS: add a `.hm-syntax` block to
    `public/netsuke/assets/css/himotoshi.css`, generated once from
    `HimotoshiStyle` (`python -m pygments -S` equivalent via a small
-   `scripts/generate_himotoshi_pygments_css.py`, committed output, script
-   kept for regeneration) and hand-scoped to the `--netsuke-syntax-*`
-   variables. Validate contrast (Stage C gate) with the a11y tooling before
-   proceeding.
+   `scripts/generate_himotoshi_pygments_css.py`, committed output, script kept
+   for regeneration) and hand-scoped to the `--netsuke-syntax-*` variables.
+   Validate contrast (Stage C gate) with the a11y tooling before proceeding.
 
 Stage D — migration. Convert templates one per commit, starting with the
-lowest-risk page and ending with the highest-traffic:
-`examples-*.jinja` manifest and terminal blocks, `docs-*.jinja`,
-`home_page.jinja`, `install.jinja`, `roadmap.jinja`, and the
-`examples_data.jinja` card snippets' annotated-manifest siblings. For each:
-replace the hand-rolled block with the tag (splicing `{% endraw %}` /
-`{% raw %}` as needed), regenerate, and compare extracted block text against
-the pre-migration rendering. Terminal transcripts convert to
-`netsuke-console` source text (prompt lines gain a leading `$` prompt; status-only
-mock transcripts stay bespoke where they are design elements rather than
-code, listed explicitly during migration).
+lowest-risk page and ending with the highest-traffic: `examples-*.jinja`
+manifest and terminal blocks, `docs-*.jinja`, `home_page.jinja`,
+`install.jinja`, `roadmap.jinja`, and the `examples_data.jinja` card snippets'
+annotated-manifest siblings. For each: replace the hand-rolled block with the
+tag (splicing `{% endraw %}` / `{% raw %}` as needed), regenerate, and compare
+extracted block text against the pre-migration rendering. Terminal transcripts
+convert to `netsuke-console` source text (prompt lines gain a leading `$`
+prompt; status-only mock transcripts stay bespoke where they are design
+elements rather than code, listed explicitly during migration).
 
 Stage E — refactor and evidence. Remove now-unused per-page `.token` style
-blocks and colour conventions; capture before/after screenshots of one page
-per family; optionally prototype bash-in-string delegation and record the
-outcome in this plan; complete `Outcomes & retrospective`.
+blocks and colour conventions; capture before/after screenshots of one page per
+family; optionally prototype bash-in-string delegation and record the outcome
+in this plan; complete `Outcomes & retrospective`.
 
 ## Concrete steps
 
@@ -348,11 +325,11 @@ Acceptance as behaviour:
    exits 0.
 2. On `http://127.0.0.1:8080/netsuke/docs/getting-started/` and
    `/netsuke/docs/manifest-reference/`, YAML keys, strings, and Jinja
-   expressions carry identical computed colours (verified with `css-view`),
-   and those colours resolve from `--netsuke-syntax-*` variables.
+   expressions carry identical computed colours (verified with `css-view`), and
+   those colours resolve from `--netsuke-syntax-*` variables.
 3. In a rendered terminal block, the `$` prefixes are visually
-   distinct from output lines, and a continued command (`\` at end of line)
-   is coloured as command on both lines.
+   distinct from output lines, and a continued command (`\` at end of line) is
+   coloured as command on both lines.
 4. Selecting and copying a rendered manifest block yields the original YAML
    exactly.
 5. Every quality gate passes; mxd, Weaver, and root generated output is
@@ -362,10 +339,9 @@ Acceptance as behaviour:
 ## Idempotence and recovery
 
 Template migration commits are independent; a broken page is recovered with
-`git checkout <file>` and regeneration. The CSS generator script is
-idempotent (regenerates the same committed block). Entry-point registration
-is additive; removing the `pyproject.toml` entries and reinstalling fully
-reverts it.
+`git checkout <file>` and regeneration. The CSS generator script is idempotent
+(regenerates the same committed block). Entry-point registration is additive;
+removing the `pyproject.toml` entries and reinstalling fully reverts it.
 
 ## Artefacts and notes
 
@@ -375,14 +351,14 @@ The generated `.hm-syntax` CSS block lives in
 `/* END generated himotoshi-pygments */` markers, and is regenerated by
 `scripts/generate_himotoshi_pygments_css.py`. Test coverage lives in
 `tests/test_netsuke_highlight.py` (lexers, style, highlight tag) and
-`tests/test_subsite_homepage.py` (homepage builder highlight regression),
-run via `make test`. Before/after screenshots were not retained.
+`tests/test_subsite_homepage.py` (homepage builder highlight regression), run
+via `make test`. Before/after screenshots were not retained.
 
 ## Interfaces and dependencies
 
-No new external dependencies. Pygments (already a `df12_pages` dependency
-via the docs pipeline) provides `YamlJinjaLexer`, `BashSessionLexer`,
-`Style`, and `HtmlFormatter`. Jinja2 provides the extension mechanism.
+No new external dependencies. Pygments (already a `df12_pages` dependency via
+the docs pipeline) provides `YamlJinjaLexer`, `BashSessionLexer`, `Style`, and
+`HtmlFormatter`. Jinja2 provides the extension mechanism.
 
 In `df12_pages/highlighting.py`:
 
@@ -442,7 +418,7 @@ himotoshi = "df12_pages.highlighting:HimotoshiStyle"
 
 ## Revision note
 
-2026-07-30: Stages B-E implemented and validated. Progress, Surprises,
-Decision Log, and Outcomes updated; status moved to COMPLETE. Remaining
-follow-up ideas (bash-in-string delegation, light-background variant) are
-recorded as out of scope rather than open work.
+2026-07-30: Stages B-E implemented and validated. Progress, Surprises, Decision
+Log, and Outcomes updated; status moved to COMPLETE. Remaining follow-up ideas
+(bash-in-string delegation, light-background variant) are recorded as out of
+scope rather than open work.

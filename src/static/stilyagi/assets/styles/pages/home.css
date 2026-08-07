@@ -629,17 +629,6 @@
            2px 2px 0 var(--paper);
        }
 
-       .poster-annotation {
-         /* Percentages of the 4/5-cropped frame: on the flat white of the
-            drawn paper sheet, clear of the masthead line and the curled top
-            edge, at any phone width. */
-         top: 19%;
-         right: 3.6%;
-         width: 6.5em;
-         font-size: 0.62rem;
-         line-height: 1.45;
-       }
-
        .poster-hero-copy {
          left: 18px;
          top: 12px;
@@ -688,5 +677,38 @@
 
        .pipeline-frame img {
          border-inline: 0;
+       }
+     }
+
+     /* The annotation rides the drawn paper sheet through the 4/5 crop, so
+        its size and anchor step with the viewport rather than scaling
+        smoothly: three bands keep it on the flat white at phone widths. */
+     @media (640px < width <= 720px) {
+       .poster-annotation {
+         top: 22%;
+         right: 3.6%;
+         width: 9em;
+         font-size: 0.9rem;
+         line-height: 1.45;
+       }
+     }
+
+     @media (420px < width <= 640px) {
+       .poster-annotation {
+         top: 21%;
+         right: 3.6%;
+         width: 8em;
+         font-size: 0.7rem;
+         line-height: 1.45;
+       }
+     }
+
+     @media (width <= 420px) {
+       .poster-annotation {
+         top: 21%;
+         right: 2.8%;
+         width: 8em;
+         font-size: 0.65rem;
+         line-height: 1.45;
        }
      }

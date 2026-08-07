@@ -349,6 +349,17 @@
   .risks {
     grid-template-columns: 1fr;
   }
+  /* Stacked one-up, the sticky note travels over the prose instead of beside
+     it, so it needs a surface of its own.  Same treatment as the masthead: a
+     near-opaque paper wash over a blur, lifted above the body column. */
+  .margin-note {
+    z-index: 1;
+    margin-inline: calc(var(--unit) * -2);
+    padding: calc(var(--unit) * 1.5) calc(var(--unit) * 2);
+    background: rgba(239, 228, 206, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: var(--rule-weight) solid var(--ink);
+  }
   .pacing {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

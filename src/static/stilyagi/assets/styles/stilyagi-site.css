@@ -101,6 +101,13 @@
   color: var(--fg-muted);
   text-transform: uppercase;
 }
+/* On the narrowest phones the imprint wraps to two lines and pushes the
+   masthead out of shape; dropping the publisher prefix keeps it on one. */
+@media (width <= 460px) {
+  .brand-lockup .brand-org {
+    display: none;
+  }
+}
 .site-mast nav {
   justify-self: end;
 }

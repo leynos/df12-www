@@ -1,21 +1,21 @@
 {% extends "doc_page.jinja" %}
 {% block page_title %}Architecture{% endblock %}
 {% block hero %}
-<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+<section id="hero-section" class="relative bg-neutral overflow-hidden">
     <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
     
-    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-primary via-accent to-secondary"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
-        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
-            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Architecture</div>
+        <div class="inline-flex px-3 py-1 rounded-sm border border-amber-deep mb-6">
+            <div class="text-accent text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Architecture</div>
         </div>
         
         <h1 class="mb-6">
-            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Hexagonal, not by accident</span>
+            <span class="text-neutral-content text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Hexagonal, not by accident</span>
         </h1>
         
-        <div class="text-[#e8d5b8] text-base font-normal font-tertiary leading-[27.20px] max-w-[700px] space-y-4">
+        <div class="text-base-300 text-base font-normal font-tertiary leading-[27.20px] max-w-[700px] space-y-4">
             <p>
                 mxd separates domain logic from transport and persistence using a ports-and-adapters architecture. The domain core — a library crate — owns protocol semantics without specifying how external needs are met.
             </p>
@@ -25,7 +25,7 @@
         </div>
     </div>
     
-    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary"></div>
 </section>
 {% endblock %}
 {% block route_map %}
@@ -42,124 +42,124 @@
 </section>
 {% endblock %}
 {% block content %}
-<div id="section-overview" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-overview" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">01 — Ports and Adapters</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Domain core and adapters</h2>
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Domain core and adapters</h2>
         
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             The domain core is a library crate that owns protocol semantics: how a login is validated, how a news thread's linked-list pointers update, how privileges gate operations. It defines ports for what it needs from the outside world — a user record, a database connection, a way to push a notification — without specifying how those needs are met.
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center mb-4">
-                        <span class="text-white text-xl font-bold font-primary">Wf</span>
+                    <div class="w-10 h-10 bg-primary rounded flex items-center justify-center mb-4">
+                        <span class="text-primary-content text-xl font-bold font-primary">Wf</span>
                     </div>
-                    <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-3">Wireframe transport adapter</h3>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-3">Wireframe transport adapter</h3>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         Handles the Hotline binary protocol: TCP socket management, the 12-byte handshake, the 20-byte frame codec, transaction routing, XOR detection, client compatibility shims, and the streaming and push primitives that shape later subsystem work.
                     </p>
                 </div>
             </div>
             
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center mb-4">
-                        <span class="text-white text-xl font-bold font-primary">Db</span>
+                    <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center mb-4">
+                        <span class="text-secondary-content text-xl font-bold font-primary">Db</span>
                     </div>
-                    <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-3">Diesel storage adapter</h3>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-3">Diesel storage adapter</h3>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         Implements database operations for SQLite and PostgreSQL through a single set of repository functions, with backend selection at compile time via Cargo features.
                     </p>
                 </div>
             </div>
         </div>
         
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">Structural enforcement:</span> The <span class="text-[#12121f] text-xs font-normal font-primary">WireframeRouter</span> is the sole public routing entrypoint; internal routing functions are <span class="text-[#12121f] text-xs font-normal font-primary">pub(crate)</span>. New routes cannot accidentally bypass compatibility hooks because there is no public surface through which to do so.
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">Structural enforcement:</span> The <span class="text-base-content text-xs font-normal font-primary">WireframeRouter</span> is the sole public routing entrypoint; internal routing functions are <span class="text-base-content text-xs font-normal font-primary">pub(crate)</span>. New routes cannot accidentally bypass compatibility hooks because there is no public surface through which to do so.
             </p>
         </div>
     </div>
 </div>
 
-<section id="section-runtime-modes" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden" aria-labelledby="runtime-modes-heading">
+<section id="section-runtime-modes" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden" aria-labelledby="runtime-modes-heading">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">02 — Runtime Modes</div>
-        <h2 id="runtime-modes-heading" class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Runtime modes and binary selection</h2>
+        <h2 id="runtime-modes-heading" class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Runtime modes and binary selection</h2>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             mxd ships two operational binaries whose availability depends on the
-            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">legacy-networking</code>
+            <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">legacy-networking</code>
             Cargo feature. With the feature enabled (the default), both binaries
             are produced. Disabling it removes the legacy frame handler, causes
-            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">server::run()</code>
+            <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">server::run()</code>
             to delegate to the Wireframe runtime, and omits the
-            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">mxd</code>
+            <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">mxd</code>
             binary via
-            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">required-features</code>.
+            <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">required-features</code>.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center mb-4">
-                        <span class="text-white text-xl font-bold font-primary">Lg</span>
+                    <div class="w-10 h-10 bg-primary rounded flex items-center justify-center mb-4">
+                        <span class="text-primary-content text-xl font-bold font-primary">Lg</span>
                     </div>
-                    <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-3">Legacy networking</h3>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-3">
+                    <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-3">Legacy networking</h3>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px] mb-3">
                         The
-                        <code class="text-[#12121f] text-xs font-normal font-primary">mxd</code>
+                        <code class="text-base-content text-xs font-normal font-primary">mxd</code>
                         binary. Uses the original frame handler with the legacy
                         networking runtime. Available when the
-                        <code class="text-[#12121f] text-xs font-normal font-primary">legacy-networking</code>
+                        <code class="text-base-content text-xs font-normal font-primary">legacy-networking</code>
                         feature is enabled (the default).
                     </p>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
-                        <code class="text-[#12121f] text-xs font-normal font-primary">cargo build</code> produces both
-                        <code class="text-[#12121f] text-xs font-normal font-primary">mxd</code> and
-                        <code class="text-[#12121f] text-xs font-normal font-primary">mxd-wireframe-server</code>.
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
+                        <code class="text-base-content text-xs font-normal font-primary">cargo build</code> produces both
+                        <code class="text-base-content text-xs font-normal font-primary">mxd</code> and
+                        <code class="text-base-content text-xs font-normal font-primary">mxd-wireframe-server</code>.
                     </p>
                 </div>
             </div>
 
-            <div class="mxd-card-hover bg-white rounded-lg border border-[#e8d5b8] overflow-hidden">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 overflow-hidden">
                 <div class="px-6 py-6">
-                    <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center mb-4">
-                        <span class="text-white text-xl font-bold font-primary">Wf</span>
+                    <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center mb-4">
+                        <span class="text-secondary-content text-xl font-bold font-primary">Wf</span>
                     </div>
-                    <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-3">Wireframe-only</h3>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-3">
+                    <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-3">Wireframe-only</h3>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px] mb-3">
                         The
-                        <code class="text-[#12121f] text-xs font-normal font-primary">mxd-wireframe-server</code>
+                        <code class="text-base-content text-xs font-normal font-primary">mxd-wireframe-server</code>
                         binary only. Built with
-                        <code class="text-[#12121f] text-xs font-normal font-primary">--no-default-features --features "sqlite toml"</code>.
+                        <code class="text-base-content text-xs font-normal font-primary">--no-default-features --features "sqlite toml"</code>.
                     </p>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         The legacy binary is omitted entirely. This is a
                         deliberate build configuration, not an accidental
                         omission. Tested with
-                        <code class="text-[#12121f] text-xs font-normal font-primary">make test-wireframe-only</code>.
+                        <code class="text-base-content text-xs font-normal font-primary">make test-wireframe-only</code>.
                     </p>
                 </div>
             </div>
         </div>
 
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">Shared CLI surface:</span>
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">Shared CLI surface:</span>
                 Both binaries share the CLI module
-                (<code class="text-[#12121f] text-xs font-normal font-primary">mxd::server::cli</code>),
+                (<code class="text-base-content text-xs font-normal font-primary">mxd::server::cli</code>),
                 environment overrides,
-                <code class="text-[#12121f] text-xs font-normal font-primary">.mxd.toml</code>
+                <code class="text-base-content text-xs font-normal font-primary">.mxd.toml</code>
                 defaults, and admin commands such as
-                <code class="text-[#12121f] text-xs font-normal font-primary">create-user</code>
+                <code class="text-base-content text-xs font-normal font-primary">create-user</code>
                 (via
-                <code class="text-[#12121f] text-xs font-normal font-primary">server::admin::run_command</code>).
+                <code class="text-base-content text-xs font-normal font-primary">server::admin::run_command</code>).
                 The operator experience is identical regardless of which binary
                 is running.
             </p>
@@ -167,21 +167,21 @@
     </div>
 </section>
 
-<div id="section-wireframe-capabilities" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-wireframe-capabilities" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">03 — Wireframe</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Wireframe capabilities that power mxd</h2>
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Wireframe capabilities that power mxd</h2>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-4">
             Wireframe is the transport adapter that sits behind mxd's transport
             port. The domain core defines what it needs — framed request
             dispatch, streaming bodies, server-initiated push — and Wireframe
             fulfils those contracts without leaking transport concerns back
             across the boundary.
         </p>
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             Because the adapter owns connection lifecycle, codec selection, and
             middleware layering, the domain remains testable in isolation: mock
             the port, exercise the domain, and verify invariants without a
@@ -190,84 +190,84 @@
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
-                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Framing and streaming</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
+                <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Framing and streaming</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px] mb-4">
                     The adapter translates Hotline's binary wire format into
                     the typed requests the domain port expects, and reassembles
                     multi-fragment payloads before they cross the boundary.
                 </p>
-                <ul class="space-y-2 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">FrameCodec</code> trait: <code class="text-[#12121f] text-xs font-normal font-primary">frame_payload()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">wrap_payload()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">correlation_id()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">max_frame_length()</code></li>
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> Fragmenter/Reassembler with <code class="text-[#12121f] text-xs font-normal font-primary">MessageId</code>, sequential <code class="text-[#12121f] text-xs font-normal font-primary">FragmentIndex</code>, max assembled size, <code class="text-[#12121f] text-xs font-normal font-primary">purge_expired</code></li>
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">RequestParts</code> separation of routing metadata from streaming bodies</li>
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">Response</code> enum: single frame, vector, streamed, channel-backed multi-packet</li>
+                <ul class="space-y-2 text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> <code class="text-base-content text-xs font-normal font-primary">FrameCodec</code> trait: <code class="text-base-content text-xs font-normal font-primary">frame_payload()</code>, <code class="text-base-content text-xs font-normal font-primary">wrap_payload()</code>, <code class="text-base-content text-xs font-normal font-primary">correlation_id()</code>, <code class="text-base-content text-xs font-normal font-primary">max_frame_length()</code></li>
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> Fragmenter/Reassembler with <code class="text-base-content text-xs font-normal font-primary">MessageId</code>, sequential <code class="text-base-content text-xs font-normal font-primary">FragmentIndex</code>, max assembled size, <code class="text-base-content text-xs font-normal font-primary">purge_expired</code></li>
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> <code class="text-base-content text-xs font-normal font-primary">RequestParts</code> separation of routing metadata from streaming bodies</li>
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> <code class="text-base-content text-xs font-normal font-primary">Response</code> enum: single frame, vector, streamed, channel-backed multi-packet</li>
                 </ul>
             </div>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
-                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Middleware and lifecycle</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
+                <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Middleware and lifecycle</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px] mb-4">
                     Connection setup, teardown, and middleware layering are
                     adapter responsibilities. The domain sees dispatched
                     requests; the adapter handles everything before and after.
                 </p>
-                <ul class="space-y-2 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">from_fn</code> async middleware with <code class="text-[#12121f] text-xs font-normal font-primary">frame()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">frame_mut()</code>, <code class="text-[#12121f] text-xs font-normal font-primary">Next</code> continuation</li>
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> Setup/teardown callbacks per connection with retained state</li>
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> Read timeouts and preamble-timeout handling</li>
+                <ul class="space-y-2 text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> <code class="text-base-content text-xs font-normal font-primary">from_fn</code> async middleware with <code class="text-base-content text-xs font-normal font-primary">frame()</code>, <code class="text-base-content text-xs font-normal font-primary">frame_mut()</code>, <code class="text-base-content text-xs font-normal font-primary">Next</code> continuation</li>
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> Setup/teardown callbacks per connection with retained state</li>
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> Read timeouts and preamble-timeout handling</li>
                 </ul>
             </div>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
-                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Push queues and observability</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px] mb-4">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
+                <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Push queues and observability</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px] mb-4">
                     Server-initiated push and metrics live in the adapter,
                     fulfilling the domain's notification port without exposing
                     transport-level queuing to the core.
                 </p>
-                <ul class="space-y-2 text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">PushQueues</code> with high/low-priority capacities, rate limits, dead-letter queue</li>
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> <code class="text-[#12121f] text-xs font-normal font-primary">ConnectionActor::run()</code> with biased <code class="text-[#12121f] text-xs font-normal font-primary">select!</code> over shutdown, push, response</li>
-                    <li class="flex gap-2"><span class="text-[#c54b2a] flex-shrink-0">&#9654;</span> Optional <code class="text-[#12121f] text-xs font-normal font-primary">metrics</code> feature: <code class="text-[#12121f] text-xs font-normal font-primary">wireframe_connections_active</code> gauge, frame counters, error counters, panic counter</li>
+                <ul class="space-y-2 text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> <code class="text-base-content text-xs font-normal font-primary">PushQueues</code> with high/low-priority capacities, rate limits, dead-letter queue</li>
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> <code class="text-base-content text-xs font-normal font-primary">ConnectionActor::run()</code> with biased <code class="text-base-content text-xs font-normal font-primary">select!</code> over shutdown, push, response</li>
+                    <li class="flex gap-2"><span class="text-primary flex-shrink-0">&#9654;</span> Optional <code class="text-base-content text-xs font-normal font-primary">metrics</code> feature: <code class="text-base-content text-xs font-normal font-primary">wireframe_connections_active</code> gauge, frame counters, error counters, panic counter</li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
 
-<div id="section-compatibility" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-compatibility" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">04 — Compatibility</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Compatibility guardrails</h2>
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Compatibility guardrails</h2>
         
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
-            <span class="text-[#12121f] text-base font-normal font-primary">WireframeRouter</span> embeds a <span class="text-[#12121f] text-base font-normal font-primary">CompatibilityLayer</span> that orchestrates request-side and reply-side hooks on every routed transaction. On the request path, it decodes XOR-encoded payloads and records the login version. On the reply path, it augments responses with client-specific extras — banner fields for Hotline 1.8.5 and 1.9 clients, omission of those fields for SynHX.
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            <span class="text-base-content text-base font-normal font-primary">WireframeRouter</span> embeds a <span class="text-base-content text-base font-normal font-primary">CompatibilityLayer</span> that orchestrates request-side and reply-side hooks on every routed transaction. On the request path, it decodes XOR-encoded payloads and records the login version. On the reply path, it augments responses with client-specific extras — banner fields for Hotline 1.8.5 and 1.9 clients, omission of those fields for SynHX.
         </p>
         
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8 transition-all duration-300 hover:shadow-[0px_12px_32px_0px_rgba(18,18,31,0.24)]">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <div class="bg-neutral rounded-lg shadow-panel overflow-hidden mb-8 transition-all duration-300 hover:shadow-panel-raised">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">compatibility_layer.rs</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">compatibility_layer.rs</span>
                 </div>
             </div>
             <div class="px-6 py-6">
-                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#3a3a55]">// Request → Compatibility hooks → Domain → Reply hooks</span>
-<span class="text-[#e8a838]">impl</span> <span class="text-[#2d3a8c]">CompatibilityLayer</span> {
-    <span class="text-[#e8a838]">fn</span> <span class="text-[#f5e6d0]">on_request</span>(&amp;<span class="text-[#e8a838]">mut</span> <span class="text-[#e8a838]">self</span>, frame: &amp;<span class="text-[#e8a838]">mut</span> <span class="text-[#2d3a8c]">Frame</span>) {
-        <span class="text-[#e8a838]">if</span> frame.is_xor_encoded() {
+                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]"><span class="text-night-muted">// Request → Compatibility hooks → Domain → Reply hooks</span>
+<span class="text-accent">impl</span> <span class="text-code-type">CompatibilityLayer</span> {
+    <span class="text-accent">fn</span> <span class="text-neutral-content">on_request</span>(&amp;<span class="text-accent">mut</span> <span class="text-accent">self</span>, frame: &amp;<span class="text-accent">mut</span> <span class="text-code-type">Frame</span>) {
+        <span class="text-accent">if</span> frame.is_xor_encoded() {
             frame.decode_xor();
-            <span class="text-[#e8a838]">self</span>.client_uses_xor = <span class="text-[#d4714f]">true</span>;
+            <span class="text-accent">self</span>.client_uses_xor = <span class="text-flare">true</span>;
         }
     }
     
-    <span class="text-[#e8a838]">fn</span> <span class="text-[#f5e6d0]">on_reply</span>(&amp;<span class="text-[#e8a838]">self</span>, reply: &amp;<span class="text-[#e8a838]">mut</span> <span class="text-[#2d3a8c]">Frame</span>) {
-        <span class="text-[#e8a838]">if</span> <span class="text-[#e8a838]">self</span>.client_kind == <span class="text-[#2d3a8c]">ClientKind</span>::Hotline185 {
+    <span class="text-accent">fn</span> <span class="text-neutral-content">on_reply</span>(&amp;<span class="text-accent">self</span>, reply: &amp;<span class="text-accent">mut</span> <span class="text-code-type">Frame</span>) {
+        <span class="text-accent">if</span> <span class="text-accent">self</span>.client_kind == <span class="text-code-type">ClientKind</span>::Hotline185 {
             reply.add_banner_fields();
         }
     }
@@ -275,58 +275,58 @@
             </div>
         </div>
         
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
-            Hook ordering is verified by a spy-based test: <span class="text-[#12121f] text-base font-normal font-primary">on_request</span> → dispatch → <span class="text-[#12121f] text-base font-normal font-primary">on_reply</span>, asserted for both login and non-login transactions. This is the kind of property that looks obvious until someone adds a new route and forgets to wire it through the router. The test exists so that "forgets" becomes "gets a failing CI run."
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Hook ordering is verified by a spy-based test: <span class="text-base-content text-base font-normal font-primary">on_request</span> → dispatch → <span class="text-base-content text-base font-normal font-primary">on_reply</span>, asserted for both login and non-login transactions. This is the kind of property that looks obvious until someone adds a new route and forgets to wire it through the router. The test exists so that "forgets" becomes "gets a failing CI run."
         </p>
     </div>
 </div>
 
-<div id="section-authentication" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-authentication" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">05 — Authentication</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Authentication and reply augmentation</h2>
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Authentication and reply augmentation</h2>
         
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
-            Login handling splits into two responsibilities. <span class="text-[#12121f] text-base font-normal font-primary">AuthStrategy</span> owns request validation and credential checking. <span class="text-[#12121f] text-base font-normal font-primary">LoginReplyAugmenter</span> decorates the reply with fields determined by client compatibility metadata. Both are selected by <span class="text-[#12121f] text-base font-normal font-primary">ClientKind</span> and orchestrated by the compatibility layer.
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Login handling splits into two responsibilities. <span class="text-base-content text-base font-normal font-primary">AuthStrategy</span> owns request validation and credential checking. <span class="text-base-content text-base font-normal font-primary">LoginReplyAugmenter</span> decorates the reply with fields determined by client compatibility metadata. Both are selected by <span class="text-base-content text-base font-normal font-primary">ClientKind</span> and orchestrated by the compatibility layer.
         </p>
         
-        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
-            <div class="px-6 py-4 border-b border-[#e8d5b8]">
-                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Client-specific behaviour</h3>
+        <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mb-8">
+            <div class="px-6 py-4 border-b border-base-300">
+                <h3 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Client-specific behaviour</h3>
             </div>
-            <div class="divide-y divide-[#e8d5b8]">
+            <div class="divide-y divide-base-300">
                 <div class="px-6 py-4">
                     <div class="flex items-baseline gap-3 mb-2">
-                        <span class="text-[#e8a838] text-sm font-bold font-primary">Default Hotline</span>
-                        <span class="px-2.5 py-1 bg-[#e8f5ec] rounded-full border border-[#c4e5cc]">
-                        <span class="text-[#4a8c5c] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Supported</span>
+                        <span class="text-warning text-sm font-bold font-primary">Default Hotline</span>
+                        <span class="px-2.5 py-1 bg-success-soft rounded-full border border-success-line">
+                        <span class="text-success text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Supported</span>
                         </span>
                     </div>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         Conservative fallback path. Unknown and legacy versions
                         stay protocol-valid without claiming feature parity.
                     </p>
                 </div>
                 <div class="px-6 py-4">
                     <div class="flex items-baseline gap-3 mb-2">
-                        <span class="text-[#e8a838] text-sm font-bold font-primary">SynHX</span>
-                        <span class="px-2.5 py-1 bg-[#fff4e0] rounded-full border border-[#f2dca8]">
-                            <span class="text-[#c89430] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Partial</span>
+                        <span class="text-warning text-sm font-bold font-primary">SynHX</span>
+                        <span class="px-2.5 py-1 bg-warning-soft rounded-full border border-warning-line">
+                            <span class="text-warning text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Partial</span>
                         </span>
                     </div>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         Login flow omits banner fields. Broader field-level
                         parity remains roadmap work.
                     </p>
                 </div>
                 <div class="px-6 py-4">
                     <div class="flex items-baseline gap-3 mb-2">
-                        <span class="text-[#e8a838] text-sm font-bold font-primary">Hotline 1.8.5 and 1.9</span>
-                        <span class="px-2.5 py-1 bg-[#fff4e0] rounded-full border border-[#f2dca8]">
-                            <span class="text-[#c89430] text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Partial</span>
+                        <span class="text-warning text-sm font-bold font-primary">Hotline 1.8.5 and 1.9</span>
+                        <span class="px-2.5 py-1 bg-warning-soft rounded-full border border-warning-line">
+                            <span class="text-warning text-[10.40px] font-bold font-primary uppercase tracking-[0.08em]">Partial</span>
                         </span>
                     </div>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                    <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                         Login replies add banner fields 161/162, but user-list
                         and messaging parity remain pending later roadmap items.
                     </p>
@@ -334,9 +334,9 @@
             </div>
         </div>
         
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">Extensibility:</span>
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">Extensibility:</span>
                 The split exists to give HOPE reply extensions and SynHX hashed
                 authentication a place to land without reopening the core login
                 handler. Those remain extension points, not current shipped
@@ -346,51 +346,51 @@
     </div>
 </div>
 
-<div id="section-diagrams" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-diagrams" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
         <div class="mxd-section-label">06 — Diagrams</div>
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-6">Architecture diagrams</h2>
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Architecture diagrams</h2>
         
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
-            The architecture page is generated from <span class="text-[#12121f] text-base font-normal font-primary">docs/design.md</span> and the three ADRs. The detailed diagrams and class relationships are pulled from the source documents.
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            The architecture page is generated from <span class="text-base-content text-base font-normal font-primary">docs/design.md</span> and the three ADRs. The detailed diagrams and class relationships are pulled from the source documents.
         </p>
         
-        <div class="bg-white rounded-lg border border-[#e8d5b8] p-8 mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 p-8 mb-8">
             <div class="text-center mb-6">
-                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em] mb-4">Hexagonal architecture layers</h3>
+                <h3 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em] mb-4">Hexagonal architecture layers</h3>
             </div>
             
             <div class="space-y-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-32 h-24 bg-[#e8eaf6] border-2 border-[#2d3a8c] rounded flex items-center justify-center">
-                        <span class="text-[#2d3a8c] text-sm font-bold font-primary">Domain Core</span>
+                    <div class="w-32 h-24 bg-info-soft border-2 border-secondary rounded flex items-center justify-center">
+                        <span class="text-secondary text-sm font-bold font-primary">Domain Core</span>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                             Protocol semantics, business logic, pure functions
                         </p>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <div class="w-32 h-24 bg-[#faf3ea] border-2 border-[#c54b2a] rounded flex items-center justify-center">
-                        <span class="text-[#c54b2a] text-sm font-bold font-primary">Wireframe</span>
+                    <div class="w-32 h-24 bg-base-200 border-2 border-primary rounded flex items-center justify-center">
+                        <span class="text-primary text-sm font-bold font-primary">Wireframe</span>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                             Transport adapter: TCP, frames, routing, compatibility
                         </p>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <div class="w-32 h-24 bg-[#faf3ea] border-2 border-[#2d3a8c] rounded flex items-center justify-center">
-                        <span class="text-[#2d3a8c] text-sm font-bold font-primary">Diesel</span>
+                    <div class="w-32 h-24 bg-base-200 border-2 border-secondary rounded flex items-center justify-center">
+                        <span class="text-secondary text-sm font-bold font-primary">Diesel</span>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+                        <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                             Storage adapter: SQLite/PostgreSQL, repositories, migrations
                         </p>
                     </div>
@@ -398,27 +398,27 @@
             </div>
         </div>
         
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">Dependency direction:</span> Domain depends on nothing. Adapters depend on domain. Application wires adapters to domain through dependency injection.
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">Dependency direction:</span> Domain depends on nothing. Adapters depend on domain. Application wires adapters to domain through dependency injection.
             </p>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block footer_cta %}
-<div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-surface">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
-        <h2 class="text-[#12121f] text-[39.80px] font-normal font-secondary mb-4">Verification artefacts</h2>
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+        <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-4">Verification artefacts</h2>
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
             Explore the formal methods, property-based tests, and compatibility matrices that verify this architecture.
         </p>
         
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/verification/">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/verification/">
                 Verification
             </a>
-            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/protocol/">
+            <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/protocol/">
                 Protocol Reference
             </a>
         </div>

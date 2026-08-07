@@ -1,26 +1,26 @@
 {% extends "doc_page.jinja" %}
 {% block page_title %}Changelog{% endblock %}
 {% block hero %}
-<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+<section id="hero-section" class="relative bg-neutral overflow-hidden">
     <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
     
-    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-primary via-accent to-secondary"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
-        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
-            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Changelog</div>
+        <div class="inline-flex px-3 py-1 rounded-sm border border-amber-deep mb-6">
+            <div class="text-accent text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Changelog</div>
         </div>
         
         <h1 class="mb-6">
-            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Changelog</span>
+            <span class="text-neutral-content text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Changelog</span>
         </h1>
         
-        <div class="text-[#e8d5b8] text-base sm:text-lg font-light font-tertiary leading-[27.20px] sm:leading-[39.17px] max-w-[700px]">
+        <div class="text-base-300 text-base sm:text-lg font-light font-tertiary leading-[27.20px] sm:leading-[39.17px] max-w-[700px]">
             <p>This page documents release-note governance, not a canonical public release history. The reference set for this prototype includes the QA sign-off checklist and the internal compatibility matrix, but it does not include tagged release notes or a verified `CHANGELOG.md` timeline.</p>
         </div>
     </div>
     
-    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary"></div>
 </section>
 {% endblock %}
 {% block route_map %}
@@ -37,19 +37,19 @@
 </section>
 {% endblock %}
 {% block content %}
-<div id="section-status" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-status" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="mxd-release-card bg-white rounded-lg border-2 border-[#e8d5b8] p-6 sm:p-8 mb-8">
-            <h2 class="text-[#12121f] text-2xl sm:text-3xl font-normal font-secondary mb-4">Current status</h2>
-            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+        <div class="mxd-release-card bg-surface rounded-lg border-2 border-base-300 p-6 sm:p-8 mb-8">
+            <h2 class="text-base-content text-2xl sm:text-3xl font-normal font-secondary mb-4">Current status</h2>
+            <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-4">
                 The prototype documentation set does not contain a canonical
                 public changelog, tagged release history, or verified release
                 note archive. Inventing versions, dates, or supporting artefacts
                 here would overstate what the repository currently proves.
             </p>
-            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
                 What the repository does provide is a release-note QA process:
                 compatibility-sensitive notes must cite the internal matrix and
                 must avoid claiming support beyond its status labels.
@@ -58,75 +58,75 @@
     </div>
 </div>
 
-<div id="section-governance" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-governance" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary mb-8">Release Governance</h2>
+        <h2 class="text-base-content text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary mb-8">Release Governance</h2>
         
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-8">
-            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-4">
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary mb-8">
+            <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-4">
                 Every release that modifies client-facing behaviour requires a
                 QA sign-off statement. The repository checklist requires it to:
             </p>
             <ul class="space-y-2 pl-5">
-                <li class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] list-disc">Link to <code class="text-xs font-primary bg-white px-2 py-1 rounded">docs/internal-compatibility-matrix.md</code></li>
-                <li class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] list-disc">Confirm the affected matrix rows were reviewed</li>
-                <li class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] list-disc">Confirm the evidence listed in the matrix still matches current behaviour</li>
-                <li class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] list-disc">Record any newly discovered deviations in both the release notes and the matrix</li>
+                <li class="text-base-content text-base font-normal font-tertiary leading-[27.20px] list-disc">Link to <code class="text-xs font-primary bg-surface px-2 py-1 rounded">docs/internal-compatibility-matrix.md</code></li>
+                <li class="text-base-content text-base font-normal font-tertiary leading-[27.20px] list-disc">Confirm the affected matrix rows were reviewed</li>
+                <li class="text-base-content text-base font-normal font-tertiary leading-[27.20px] list-disc">Confirm the evidence listed in the matrix still matches current behaviour</li>
+                <li class="text-base-content text-base font-normal font-tertiary leading-[27.20px] list-disc">Record any newly discovered deviations in both the release notes and the matrix</li>
             </ul>
         </div>
         
         <div class="space-y-4">
-            <h3 class="text-[#12121f] text-xl font-normal font-secondary">Reviewer prompts</h3>
-            <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+            <h3 class="text-base-content text-xl font-normal font-secondary">Reviewer prompts</h3>
+            <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
                 Reviewers are expected to ask whether the matrix and the release
                 notes still agree.
             </p>
             <ul class="space-y-2 pl-5">
-                <li class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] list-disc">Are supported clients and required toggles unchanged from the matrix?</li>
-                <li class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] list-disc">Are any behaviour changes still marked <code class="text-xs font-primary bg-white px-2 py-1 rounded">Partial</code> or <code class="text-xs font-primary bg-white px-2 py-1 rounded">Planned</code> in the matrix?</li>
-                <li class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] list-disc">Do release notes avoid claiming support that is not present in matrix status?</li>
+                <li class="text-base-content text-base font-normal font-tertiary leading-[27.20px] list-disc">Are supported clients and required toggles unchanged from the matrix?</li>
+                <li class="text-base-content text-base font-normal font-tertiary leading-[27.20px] list-disc">Are any behaviour changes still marked <code class="text-xs font-primary bg-surface px-2 py-1 rounded">Partial</code> or <code class="text-xs font-primary bg-surface px-2 py-1 rounded">Planned</code> in the matrix?</li>
+                <li class="text-base-content text-base font-normal font-tertiary leading-[27.20px] list-disc">Do release notes avoid claiming support that is not present in matrix status?</li>
             </ul>
         </div>
     </div>
 </div>
 
-<div id="section-qa" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+<div id="section-qa" class="border-t border-base-300 py-16 sm:py-20 bg-surface">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary mb-8">QA sign-off statement</h2>
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <h2 class="text-base-content text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary mb-8">QA sign-off statement</h2>
+        <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">required release-note text</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">required release-note text</span>
                 </div>
             </div>
             <div class="px-6 py-6">
-                <pre class="text-[#f5e6d0] text-sm font-normal font-primary leading-[21.32px]">QA sign-off: compatibility matrix reviewed at docs/internal-compatibility-matrix.md
+                <pre class="text-neutral-content text-sm font-normal font-primary leading-[21.32px]">QA sign-off: compatibility matrix reviewed at docs/internal-compatibility-matrix.md
 Deviation recorded in docs/internal-compatibility-matrix.md</pre>
             </div>
         </div>
     </div>
 </div>
 
-<div id="section-matrix" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-matrix" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 text-center">
-        <h2 class="text-[#12121f] text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary mb-6">Compatibility source of truth</h2>
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+        <h2 class="text-base-content text-2xl sm:text-3xl md:text-[39.80px] font-normal font-secondary mb-6">Compatibility source of truth</h2>
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
             For current support claims, use the compatibility page and the
             internal matrix it mirrors. This page stays focused on the release
             governance contract until a verified public changelog exists in the
             repository.
         </p>
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/compatibility/">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/compatibility/">
                 View Compatibility Matrix
             </a>
-            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="/mxd/roadmap/">
+            <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/roadmap/">
                 View Roadmap
             </a>
         </div>

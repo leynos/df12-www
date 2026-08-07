@@ -1,28 +1,28 @@
 {% extends "doc_page.jinja" %}
 {% block page_title %}Verification{% endblock %}
 {% block hero %}
-<section id="hero-section" class="relative bg-[#12121f] overflow-hidden">
+<section id="hero-section" class="relative bg-neutral overflow-hidden">
     <div class="mxd-pattern mxd-pattern--hero absolute inset-0 opacity-60" aria-hidden="true"></div>
     
-    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute top-0 left-0 right-0 h-1 mxd-express-line bg-gradient-to-r from-primary via-accent to-secondary"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8 pt-20 pb-12">
-        <div class="inline-flex px-3 py-1 rounded-sm border border-[#c89430] mb-6">
-            <div class="text-[#e8a838] text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Verification</div>
+        <div class="inline-flex px-3 py-1 rounded-sm border border-amber-deep mb-6">
+            <div class="text-accent text-[11.10px] font-bold font-primary uppercase tracking-[0.15em]">Docs · Verification</div>
         </div>
         
         <h1 class="mb-6">
-            <span class="text-[#f5e6d0] text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Verification strategy</span>
+            <span class="text-neutral-content text-4xl sm:text-5xl md:text-[68.80px] font-normal font-secondary leading-tight sm:leading-[72.24px]">Verification strategy</span>
         </h1>
         
-        <div class="text-[#e8d5b8] text-base font-normal font-tertiary leading-[27.20px] max-w-[700px]">
+        <div class="text-base-300 text-base font-normal font-tertiary leading-[27.20px] max-w-[700px]">
             <p class="mb-4">
                 mxd treats verification as a deliverable, not an afterthought. Each roadmap item includes an explicit verification acceptance criterion alongside its implementation criteria. The tooling spans three layers, chosen to match the risk profile of the property being checked.
             </p>
         </div>
     </div>
     
-    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c54b2a] via-[#e8a838] to-[#2d3a8c]"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary"></div>
 </section>
 {% endblock %}
 {% block route_map %}
@@ -39,32 +39,32 @@
 </section>
 {% endblock %}
 {% block content %}
-<div id="section-boundary" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-boundary" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <h2 class="text-[#12121f] text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Verification boundary</h2>
+        <h2 class="text-base-content text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Verification boundary</h2>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             Verification assumes the domain core is a deterministic transition
             system:
-            <code class="text-[#12121f] text-xs font-normal font-primary bg-[#faf3ea] px-2 py-1 rounded">step(state, event) -&gt; (state', effects)</code>.
+            <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">step(state, event) -&gt; (state', effects)</code>.
             Wireframe framing, persistence, and object storage live on the
             adapter side. That keeps proofs focused on protocol semantics
             rather than on incidental I/O mechanics.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
-                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Domain side</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
+                <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Domain side</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Server-wide and per-session state, semantic inputs, and
                     semantic effects. This is where handshake gating, privilege
                     rules, drop-box hiding, and news-thread linkage belong.
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
-                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Adapter side</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
+                <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Adapter side</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Wireframe framing, transport timeouts, persistence wiring,
                     and object-store interactions are validated with focused
                     integration tests and harnesses, not treated as the domain's
@@ -73,68 +73,68 @@
             </div>
         </div>
 
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a] mb-6">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">Tool-choice rule:</span>
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary mb-6">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">Tool-choice rule:</span>
                 use TLA+ for state-machine progression and policy invariants,
                 Stateright for concurrent interleavings and ordering, and Kani
                 for bounded pure-function invariants and panic freedom.
             </p>
         </div>
 
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#2d3a8c]">
-            <p class="text-[#12121f] text-sm font-semibold font-tertiary leading-[22.66px] mb-2">
-                <span class="text-[#2d3a8c] font-semibold">Specific domain invariants called out in the reference set:</span>
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-secondary">
+            <p class="text-base-content text-sm font-semibold font-tertiary leading-[22.66px] mb-2">
+                <span class="text-secondary font-semibold">Specific domain invariants called out in the reference set:</span>
             </p>
-            <ul class="space-y-1.5 text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <li class="flex gap-2"><span class="text-[#2d3a8c] flex-shrink-0">&#9654;</span> <strong class="font-semibold">Privilege gating:</strong> no privileged effect before authentication</li>
-                <li class="flex gap-2"><span class="text-[#2d3a8c] flex-shrink-0">&#9654;</span> <strong class="font-semibold">News threading:</strong> linked-list pointer consistency after insert and delete</li>
-                <li class="flex gap-2"><span class="text-[#2d3a8c] flex-shrink-0">&#9654;</span> <strong class="font-semibold">Drop-box visibility:</strong> upload-only folders never expose contents to unprivileged sessions</li>
+            <ul class="space-y-1.5 text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <li class="flex gap-2"><span class="text-secondary flex-shrink-0">&#9654;</span> <strong class="font-semibold">Privilege gating:</strong> no privileged effect before authentication</li>
+                <li class="flex gap-2"><span class="text-secondary flex-shrink-0">&#9654;</span> <strong class="font-semibold">News threading:</strong> linked-list pointer consistency after insert and delete</li>
+                <li class="flex gap-2"><span class="text-secondary flex-shrink-0">&#9654;</span> <strong class="font-semibold">Drop-box visibility:</strong> upload-only folders never expose contents to unprivileged sessions</li>
             </ul>
         </div>
     </div>
 </div>
 
-<div id="section-tla-plus" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-tla-plus" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 sm:p-8 mxd-card-hover mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
             <div class="flex items-start gap-4 mb-6">
-                <div class="w-10 h-10 bg-[#c54b2a] rounded flex items-center justify-center flex-shrink-0">
-                    <span class="text-white text-xl font-bold font-primary">T+</span>
+                <div class="w-10 h-10 bg-primary rounded flex items-center justify-center flex-shrink-0">
+                    <span class="text-primary-content text-xl font-bold font-primary">T+</span>
                 </div>
                 <div>
-                    <h2 class="text-[#12121f] text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">TLA+/TLC</h2>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary italic">State-machine progression and policy invariants</p>
+                    <h2 class="text-base-content text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">TLA+/TLC</h2>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary italic">State-machine progression and policy invariants</p>
                 </div>
             </div>
             
             <div class="space-y-4">
-                <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
-                    For state-machine progression and policy invariants. The handshake specification models Idle → AwaitingHandshake → Validating → Ready/Error transitions across multiple concurrent clients with discrete time ticks. TLC explores approximately 10⁶ states at <code class="text-[#12121f] text-xs font-normal font-primary">MaxClients = 3</code> and <code class="text-[#12121f] text-xs font-normal font-primary">TimeoutTicks = 5</code>.
+                <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
+                    For state-machine progression and policy invariants. The handshake specification models Idle → AwaitingHandshake → Validating → Ready/Error transitions across multiple concurrent clients with discrete time ticks. TLC explores approximately 10⁶ states at <code class="text-base-content text-xs font-normal font-primary">MaxClients = 3</code> and <code class="text-base-content text-xs font-normal font-primary">TimeoutTicks = 5</code>.
                 </p>
                 
-                <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
-                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
+                    <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                        <div class="w-2 h-2 bg-error rounded"></div>
+                        <div class="w-2 h-2 bg-accent rounded"></div>
+                        <div class="w-2 h-2 bg-success rounded"></div>
                         <div class="flex-1 text-right">
-                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">crates/mxd-verification/tla/MxdHandshake.tla</span>
+                            <span class="text-night-muted text-[11.10px] font-normal font-primary">crates/mxd-verification/tla/MxdHandshake.tla</span>
                         </div>
                     </div>
                     <div class="px-6 py-6 overflow-x-auto">
-                        <pre class="text-[#f5e6d0] text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">INVARIANT</span> NoClientStuckInValidating ==
-  <span class="text-[#e8a838]">\A</span> c <span class="text-[#e8a838]">\in</span> Clients:
-    (clientState[c] = <span class="text-[#4a8c5c]">"Validating"</span>) =&gt;
-      (<span class="text-[#e8a838]">\E</span> t <span class="text-[#e8a838]">\in</span> Nat: t &lt;= TimeoutTicks)</pre>
+                        <pre class="text-neutral-content text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">INVARIANT</span> NoClientStuckInValidating ==
+  <span class="text-accent">\A</span> c <span class="text-accent">\in</span> Clients:
+    (clientState[c] = <span class="text-code-string">"Validating"</span>) =&gt;
+      (<span class="text-accent">\E</span> t <span class="text-accent">\in</span> Nat: t &lt;= TimeoutTicks)</pre>
                     </div>
                 </div>
                 
-                <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-                    <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                        <span class="text-[#9a3a1f] font-semibold">Model checking:</span>
+                <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+                    <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                        <span class="text-primary-deep font-semibold">Model checking:</span>
                         TLC verifies that no client remains in the Validating
                         state beyond the timeout threshold, that all successful
                         handshakes reach Ready, and that protocol violations
@@ -148,48 +148,48 @@
     </div>
 </div>
 
-<div id="section-stateright" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-stateright" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 sm:p-8 mxd-card-hover mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
             <div class="flex items-start gap-4 mb-6">
-                <div class="w-10 h-10 bg-[#e8a838] rounded flex items-center justify-center flex-shrink-0">
-                    <span class="text-[#12121f] text-xl font-bold font-primary">Sr</span>
+                <div class="w-10 h-10 bg-accent rounded flex items-center justify-center flex-shrink-0">
+                    <span class="text-base-content text-xl font-bold font-primary">Sr</span>
                 </div>
                 <div>
-                    <h2 class="text-[#12121f] text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">Stateright</h2>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary italic">Concurrency interleavings</p>
+                    <h2 class="text-base-content text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">Stateright</h2>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary italic">Concurrency interleavings</p>
                 </div>
             </div>
             
             <div class="space-y-4">
-                <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
                     For concurrency interleavings. The session gating model explores login, logout, privilege checks, and out-of-order delivery across multiple clients. It asserts that privileged effects never occur before authentication and that insufficient privileges produce rejections — not silent drops.
                 </p>
                 
-                <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
-                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
+                    <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                        <div class="w-2 h-2 bg-error rounded"></div>
+                        <div class="w-2 h-2 bg-accent rounded"></div>
+                        <div class="w-2 h-2 bg-success rounded"></div>
                         <div class="flex-1 text-right">
-                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">crates/mxd-verification/src/session_model</span>
+                            <span class="text-night-muted text-[11.10px] font-normal font-primary">crates/mxd-verification/src/session_model</span>
                         </div>
                     </div>
                     <div class="px-6 py-6 overflow-x-auto">
-                        <pre class="text-[#f5e6d0] text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#e8a838]">fn</span> <span class="text-[#f5e6d0]">check_privilege_invariant</span>(state: &amp;<span class="text-[#4a58b0]">SessionState</span>) {
-    <span class="text-[#e8a838]">for</span> session <span class="text-[#e8a838]">in</span> &amp;state.sessions {
-        <span class="text-[#e8a838]">if</span> session.privileged_action_attempted {
-            <span class="text-[#3a3a55]">// Must be authenticated first</span>
-            <span class="text-[#e8a838]">assert!</span>(session.authenticated);
+                        <pre class="text-neutral-content text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-accent">fn</span> <span class="text-neutral-content">check_privilege_invariant</span>(state: &amp;<span class="text-code-type">SessionState</span>) {
+    <span class="text-accent">for</span> session <span class="text-accent">in</span> &amp;state.sessions {
+        <span class="text-accent">if</span> session.privileged_action_attempted {
+            <span class="text-night-muted">// Must be authenticated first</span>
+            <span class="text-accent">assert!</span>(session.authenticated);
         }
     }
 }</pre>
                     </div>
                 </div>
                 
-                <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-                    <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                        <span class="text-[#9a3a1f] font-semibold">Interleaving exploration:</span> Stateright systematically explores all possible orderings of concurrent operations. If any sequence allows a privilege escalation or silent failure, the model checker produces a minimal counterexample trace.
+                <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+                    <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                        <span class="text-primary-deep font-semibold">Interleaving exploration:</span> Stateright systematically explores all possible orderings of concurrent operations. If any sequence allows a privilege escalation or silent failure, the model checker produces a minimal counterexample trace.
                     </p>
                 </div>
             </div>
@@ -197,23 +197,23 @@
     </div>
 </div>
 
-<div id="section-kani" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-kani" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="bg-white rounded-lg border border-[#e8d5b8] p-6 sm:p-8 mxd-card-hover mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
             <div class="flex items-start gap-4 mb-6">
-                <div class="w-10 h-10 bg-[#2d3a8c] rounded flex items-center justify-center flex-shrink-0">
-                    <span class="text-white text-xl font-bold font-primary">Kn</span>
+                <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center flex-shrink-0">
+                    <span class="text-secondary-content text-xl font-bold font-primary">Kn</span>
                 </div>
                 <div>
-                    <h2 class="text-[#12121f] text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">Kani</h2>
-                    <p class="text-[#3a3a55] text-sm font-normal font-tertiary italic">Bounded invariants in pure Rust functions</p>
+                    <h2 class="text-base-content text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">Kani</h2>
+                    <p class="text-ink-muted text-sm font-normal font-tertiary italic">Bounded invariants in pure Rust functions</p>
                 </div>
             </div>
             
             <div class="space-y-4">
-                <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px]">
+                <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px]">
                     For bounded invariants in pure Rust functions. Current
                     harnesses prove XOR encode/decode round-trips, header
                     validation predicates, fragment sizing coverage, and
@@ -222,57 +222,57 @@
                     sharp local invariants that should never panic.
                 </p>
                 
-                <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
-                    <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                        <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                        <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                        <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+                <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
+                    <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                        <div class="w-2 h-2 bg-error rounded"></div>
+                        <div class="w-2 h-2 bg-accent rounded"></div>
+                        <div class="w-2 h-2 bg-success rounded"></div>
                         <div class="flex-1 text-right">
-                            <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">src/wireframe/codec/kani.rs</span>
+                            <span class="text-night-muted text-[11.10px] font-normal font-primary">src/wireframe/codec/kani.rs</span>
                         </div>
                     </div>
                     <div class="px-6 py-6 overflow-x-auto">
-                        <pre class="text-[#f5e6d0] text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#3a3a55]">#[kani::proof]</span>
-<span class="text-[#e8a838]">fn</span> <span class="text-[#f5e6d0]">xor_roundtrip</span>() {
-    <span class="text-[#e8a838]">let</span> data: [<span class="text-[#4a58b0]">u8</span>; <span class="text-[#d4714f]">32</span>] = kani::any();
-    <span class="text-[#e8a838]">let</span> encoded = xor_encode(&amp;data);
-    <span class="text-[#e8a838]">let</span> decoded = xor_decode(&amp;encoded);
-    <span class="text-[#e8a838]">assert_eq!</span>(data, decoded);
+                        <pre class="text-neutral-content text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-night-muted">#[kani::proof]</span>
+<span class="text-accent">fn</span> <span class="text-neutral-content">xor_roundtrip</span>() {
+    <span class="text-accent">let</span> data: [<span class="text-code-type">u8</span>; <span class="text-flare">32</span>] = kani::any();
+    <span class="text-accent">let</span> encoded = xor_encode(&amp;data);
+    <span class="text-accent">let</span> decoded = xor_decode(&amp;encoded);
+    <span class="text-accent">assert_eq!</span>(data, decoded);
 }</pre>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="bg-[#faf3ea] rounded-lg border border-[#e8d5b8] p-4">
+                    <div class="bg-base-200 rounded-lg border border-base-300 p-4">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="text-[#4a8c5c]"><i class="fa-solid fa-check-circle text-lg"></i></span>
-                            <span class="text-[#12121f] text-sm font-semibold font-tertiary">XOR encode/decode</span>
+                            <span class="text-success"><i class="fa-solid fa-check-circle text-lg"></i></span>
+                            <span class="text-base-content text-sm font-semibold font-tertiary">XOR encode/decode</span>
                         </div>
-                        <p class="text-[#3a3a55] text-xs font-normal font-tertiary">Proves round-trip correctness for all 32-byte inputs</p>
+                        <p class="text-ink-muted text-xs font-normal font-tertiary">Proves round-trip correctness for all 32-byte inputs</p>
                     </div>
                     
-                    <div class="bg-[#faf3ea] rounded-lg border border-[#e8d5b8] p-4">
+                    <div class="bg-base-200 rounded-lg border border-base-300 p-4">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="text-[#4a8c5c]"><i class="fa-solid fa-check-circle text-lg"></i></span>
-                            <span class="text-[#12121f] text-sm font-semibold font-tertiary">Header validation</span>
+                            <span class="text-success"><i class="fa-solid fa-check-circle text-lg"></i></span>
+                            <span class="text-base-content text-sm font-semibold font-tertiary">Header validation</span>
                         </div>
-                        <p class="text-[#3a3a55] text-xs font-normal font-tertiary">Validates field bounds and flag combinations</p>
+                        <p class="text-ink-muted text-xs font-normal font-tertiary">Validates field bounds and flag combinations</p>
                     </div>
                     
-                    <div class="bg-[#faf3ea] rounded-lg border border-[#e8d5b8] p-4">
+                    <div class="bg-base-200 rounded-lg border border-base-300 p-4">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="text-[#4a8c5c]"><i class="fa-solid fa-check-circle text-lg"></i></span>
-                            <span class="text-[#12121f] text-sm font-semibold font-tertiary">Fragment sizing</span>
+                            <span class="text-success"><i class="fa-solid fa-check-circle text-lg"></i></span>
+                            <span class="text-base-content text-sm font-semibold font-tertiary">Fragment sizing</span>
                         </div>
-                        <p class="text-[#3a3a55] text-xs font-normal font-tertiary">Proves no overflow in fragment reassembly</p>
+                        <p class="text-ink-muted text-xs font-normal font-tertiary">Proves no overflow in fragment reassembly</p>
                     </div>
                     
-                    <div class="bg-[#faf3ea] rounded-lg border border-[#e8d5b8] p-4">
+                    <div class="bg-base-200 rounded-lg border border-base-300 p-4">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="text-[#4a8c5c]"><i class="fa-solid fa-check-circle text-lg"></i></span>
-                            <span class="text-[#12121f] text-sm font-semibold font-tertiary">Transaction ID echo</span>
+                            <span class="text-success"><i class="fa-solid fa-check-circle text-lg"></i></span>
+                            <span class="text-base-content text-sm font-semibold font-tertiary">Transaction ID echo</span>
                         </div>
-                        <p class="text-[#3a3a55] text-xs font-normal font-tertiary">Reply ID matches request ID in all cases</p>
+                        <p class="text-ink-muted text-xs font-normal font-tertiary">Reply ID matches request ID in all cases</p>
                     </div>
                 </div>
             </div>
@@ -280,119 +280,119 @@
     </div>
 </div>
 
-<div id="section-regression" class="border-t border-[#e8d5b8] py-16 sm:py-20">
+<div id="section-regression" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <h2 class="text-[#12121f] text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Regression test integration</h2>
+        <h2 class="text-base-content text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Regression test integration</h2>
         
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
-            Any counterexample trace produced by these tools becomes a regression test that replays the failing sequence through the domain's <code class="text-[#12121f] text-xs font-normal font-primary">step</code> function. The verifier finds the bug. The regression test prevents it from coming back.
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
+            Any counterexample trace produced by these tools becomes a regression test that replays the failing sequence through the domain's <code class="text-base-content text-xs font-normal font-primary">step</code> function. The verifier finds the bug. The regression test prevents it from coming back.
         </p>
         
-        <div class="bg-white rounded-lg border border-[#e8d5b8] overflow-hidden mb-8">
-            <div class="px-6 py-4 bg-[#faf3ea] border-b border-[#e8d5b8]">
-                <h3 class="text-[#2d3a8c] text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Counterexample to regression test workflow</h3>
+        <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mb-8">
+            <div class="px-6 py-4 bg-base-200 border-b border-base-300">
+                <h3 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Counterexample to regression test workflow</h3>
             </div>
-            <div class="divide-y divide-[#e8d5b8]">
+            <div class="divide-y divide-base-300">
                 <div class="px-6 py-4 flex items-start gap-4">
-                    <div class="w-8 h-8 bg-[#c54b2a] rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-white text-sm font-bold font-primary">1</span>
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-primary-content text-sm font-bold font-primary">1</span>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[#12121f] text-sm font-semibold font-tertiary mb-1">Model checker finds violation</p>
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">TLA+, Stateright, or Kani produces a minimal counterexample trace</p>
+                        <p class="text-base-content text-sm font-semibold font-tertiary mb-1">Model checker finds violation</p>
+                        <p class="text-ink-muted text-sm font-normal font-tertiary">TLA+, Stateright, or Kani produces a minimal counterexample trace</p>
                     </div>
                 </div>
                 
                 <div class="px-6 py-4 flex items-start gap-4">
-                    <div class="w-8 h-8 bg-[#e8a838] rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-[#12121f] text-sm font-bold font-primary">2</span>
+                    <div class="w-8 h-8 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-base-content text-sm font-bold font-primary">2</span>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[#12121f] text-sm font-semibold font-tertiary mb-1">Convert to Rust test</p>
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Replay the exact sequence of operations through the domain code</p>
+                        <p class="text-base-content text-sm font-semibold font-tertiary mb-1">Convert to Rust test</p>
+                        <p class="text-ink-muted text-sm font-normal font-tertiary">Replay the exact sequence of operations through the domain code</p>
                     </div>
                 </div>
                 
                 <div class="px-6 py-4 flex items-start gap-4">
-                    <div class="w-8 h-8 bg-[#2d3a8c] rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-white text-sm font-bold font-primary">3</span>
+                    <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-secondary-content text-sm font-bold font-primary">3</span>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[#12121f] text-sm font-semibold font-tertiary mb-1">Fix implementation</p>
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Modify domain logic until the test passes</p>
+                        <p class="text-base-content text-sm font-semibold font-tertiary mb-1">Fix implementation</p>
+                        <p class="text-ink-muted text-sm font-normal font-tertiary">Modify domain logic until the test passes</p>
                     </div>
                 </div>
                 
                 <div class="px-6 py-4 flex items-start gap-4">
-                    <div class="w-8 h-8 bg-[#4a8c5c] rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-white text-sm font-bold font-primary">4</span>
+                    <div class="w-8 h-8 bg-success rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-success-content text-sm font-bold font-primary">4</span>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[#12121f] text-sm font-semibold font-tertiary mb-1">CI enforcement</p>
-                        <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Test runs on every commit, preventing reintroduction</p>
+                        <p class="text-base-content text-sm font-semibold font-tertiary mb-1">CI enforcement</p>
+                        <p class="text-ink-muted text-sm font-normal font-tertiary">Test runs on every commit, preventing reintroduction</p>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="px-6 py-4 bg-[#faf3ea] rounded-tr rounded-br border-l-[3px] border-[#c54b2a]">
-            <p class="text-[#12121f] text-sm font-normal font-tertiary leading-[22.66px]">
-                <span class="text-[#9a3a1f] font-semibold">Test suite location:</span> Regression tests from verification tools live in <code class="text-[#12121f] text-xs font-normal font-primary">tests/regression/</code> with a comment header citing the original model checker output. This maintains traceability from formal proof to implementation.
+        <div class="px-6 py-4 bg-base-200 rounded-tr rounded-br border-l-[3px] border-primary">
+            <p class="text-base-content text-sm font-normal font-tertiary leading-[22.66px]">
+                <span class="text-primary-deep font-semibold">Test suite location:</span> Regression tests from verification tools live in <code class="text-base-content text-xs font-normal font-primary">tests/regression/</code> with a comment header citing the original model checker output. This maintains traceability from formal proof to implementation.
             </p>
         </div>
     </div>
 </div>
 
-<div id="section-local-workflow" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-local-workflow" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
 
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <h2 class="text-[#12121f] text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Local commands and CI depth</h2>
+        <h2 class="text-base-content text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Local commands and CI depth</h2>
 
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             The verification strategy is meant to be runnable, not just admired.
             Pull requests run a fast subset; nightly jobs deepen the bounds and
             publish counterexample artefacts for triage.
         </p>
 
-        <div class="bg-[#12121f] rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
-            <div class="px-4 py-3 bg-[#1a1a2e] border-b border-[#2a2a42] flex items-center gap-3">
-                <div class="w-2 h-2 bg-[#c43a3a] rounded"></div>
-                <div class="w-2 h-2 bg-[#e8a838] rounded"></div>
-                <div class="w-2 h-2 bg-[#4a8c5c] rounded"></div>
+        <div class="bg-neutral rounded-lg shadow-panel overflow-hidden mb-8">
+            <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
+                <div class="w-2 h-2 bg-error rounded"></div>
+                <div class="w-2 h-2 bg-accent rounded"></div>
+                <div class="w-2 h-2 bg-success rounded"></div>
                 <div class="flex-1 text-right">
-                    <span class="text-[#3a3a55] text-[11.10px] font-normal font-primary">local verification commands</span>
+                    <span class="text-night-muted text-[11.10px] font-normal font-primary">local verification commands</span>
                 </div>
             </div>
             <div class="px-6 py-6 overflow-x-auto">
-                <pre class="text-[#f5e6d0] text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-[#3a3a55]"># TLC via Makefile</span>
-<span class="text-[#e8a838]">make</span> tlc-handshake
+                <pre class="text-neutral-content text-xs sm:text-sm font-normal font-primary leading-[21.32px]"><span class="text-night-muted"># TLC via Makefile</span>
+<span class="text-accent">make</span> tlc-handshake
 
-<span class="text-[#3a3a55]"># Stateright models</span>
-<span class="text-[#e8a838]">cargo</span> test -p mxd-verification -- --nocapture
-<span class="text-[#e8a838]">cargo</span> test -p mxd-verification --test session_gating -- --nocapture
+<span class="text-night-muted"># Stateright models</span>
+<span class="text-accent">cargo</span> test -p mxd-verification -- --nocapture
+<span class="text-accent">cargo</span> test -p mxd-verification --test session_gating -- --nocapture
 
-<span class="text-[#3a3a55]"># Kani harnesses</span>
-<span class="text-[#e8a838]">cargo</span> kani -p mxd --harness kani_validate_header_matches_predicate
-<span class="text-[#e8a838]">cargo</span> kani -p mxd --harness kani_reply_header_echoes_id
-<span class="text-[#e8a838]">cargo</span> kani -p mxd --harness kani_xor_bytes_round_trip_bounded
-<span class="text-[#e8a838]">cargo</span> kani -p mxd --harness kani_login_extras_boundary_gate</pre>
+<span class="text-night-muted"># Kani harnesses</span>
+<span class="text-accent">cargo</span> kani -p mxd --harness kani_validate_header_matches_predicate
+<span class="text-accent">cargo</span> kani -p mxd --harness kani_reply_header_echoes_id
+<span class="text-accent">cargo</span> kani -p mxd --harness kani_xor_bytes_round_trip_bounded
+<span class="text-accent">cargo</span> kani -p mxd --harness kani_login_extras_boundary_gate</pre>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
-                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Pull requests</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
+                <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Pull requests</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Run the critical TLC specs, conservative Stateright bounds,
                     and the highest-value Kani harnesses so verification stays
                     fast enough to gate review.
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-[#e8d5b8] p-6">
-                <h3 class="text-[#12121f] text-[27.60px] font-normal font-secondary mb-4">Nightly jobs</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary leading-[22.66px]">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
+                <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Nightly jobs</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Increase the exploration bounds, run the deeper verification
                     set, and publish any counterexample artefacts so failures can
                     be triaged without guessing what the model checker found.
@@ -402,57 +402,57 @@
     </div>
 </div>
 
-<div id="section-verification-summary" class="relative border-t border-[#e8d5b8] py-16 sm:py-20 overflow-hidden">
+<div id="section-verification-summary" class="relative border-t border-base-300 py-16 sm:py-20 overflow-hidden">
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <h2 class="text-[#12121f] text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Three layers, one goal</h2>
+        <h2 class="text-base-content text-3xl sm:text-[39.80px] font-normal font-secondary mb-6">Three layers, one goal</h2>
         
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8">
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
             The verification strategy uses three complementary tools because different properties require different proof techniques. TLA+ models abstract state machines. Stateright explores concrete Rust implementations. Kani proves mathematical properties about pure functions. Together they provide defence in depth.
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white rounded-lg border-2 border-[#c54b2a] p-6 text-center">
-                <div class="w-12 h-12 bg-[#c54b2a] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="text-white text-xl font-bold font-primary">T+</span>
+            <div class="bg-surface rounded-lg border-2 border-primary p-6 text-center">
+                <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-primary-content text-xl font-bold font-primary">T+</span>
                 </div>
-                <h3 class="text-[#12121f] text-lg font-semibold font-tertiary mb-2">State machines</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Protocol flow correctness</p>
+                <h3 class="text-base-content text-lg font-semibold font-tertiary mb-2">State machines</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary">Protocol flow correctness</p>
             </div>
             
-            <div class="bg-white rounded-lg border-2 border-[#e8a838] p-6 text-center">
-                <div class="w-12 h-12 bg-[#e8a838] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="text-[#12121f] text-xl font-bold font-primary">Sr</span>
+            <div class="bg-surface rounded-lg border-2 border-accent p-6 text-center">
+                <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-base-content text-xl font-bold font-primary">Sr</span>
                 </div>
-                <h3 class="text-[#12121f] text-lg font-semibold font-tertiary mb-2">Concurrency</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Race condition elimination</p>
+                <h3 class="text-base-content text-lg font-semibold font-tertiary mb-2">Concurrency</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary">Race condition elimination</p>
             </div>
             
-            <div class="bg-white rounded-lg border-2 border-[#2d3a8c] p-6 text-center">
-                <div class="w-12 h-12 bg-[#2d3a8c] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="text-white text-xl font-bold font-primary">Kn</span>
+            <div class="bg-surface rounded-lg border-2 border-secondary p-6 text-center">
+                <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-secondary-content text-xl font-bold font-primary">Kn</span>
                 </div>
-                <h3 class="text-[#12121f] text-lg font-semibold font-tertiary mb-2">Function proofs</h3>
-                <p class="text-[#3a3a55] text-sm font-normal font-tertiary">Mathematical guarantees</p>
+                <h3 class="text-base-content text-lg font-semibold font-tertiary mb-2">Function proofs</h3>
+                <p class="text-ink-muted text-sm font-normal font-tertiary">Mathematical guarantees</p>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block footer_cta %}
-<div id="footer-cta" class="border-t border-[#e8d5b8] py-16 sm:py-20 bg-white">
+<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-surface">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
-        <h2 class="text-[#12121f] text-3xl sm:text-[39.80px] font-normal font-secondary mb-4">Verification specifications</h2>
-        <p class="text-[#12121f] text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
+        <h2 class="text-base-content text-3xl sm:text-[39.80px] font-normal font-secondary mb-4">Verification specifications</h2>
+        <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
             Explore the complete formal specifications and model checking configurations.
         </p>
         
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-[#c54b2a] text-white text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="#section-verification-summary">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="#section-verification-summary">
                 View Specifications
             </a>
-            <a class="mxd-btn--outline px-6 py-3 text-[#c54b2a] text-sm font-semibold font-primary rounded border-2 border-[#c54b2a] mxd-site-button" href="#section-regression">
+            <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="#section-regression">
                 CI Pipeline
             </a>
         </div>

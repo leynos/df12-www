@@ -251,13 +251,54 @@
   margin: 0 auto;
   padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 4);
 }
+.roadmap-illo .illo-frame {
+  position: relative;
+  border: var(--rule-weight-2) solid var(--ink);
+  margin-top: calc(var(--unit) * 3);
+}
 .roadmap-illo img {
   width: 100%;
   height: auto;
-  border: var(--rule-weight-2) solid var(--ink);
   display: block;
   mix-blend-mode: multiply;
-  margin-top: calc(var(--unit) * 3);
+}
+/* Each label names the slice a call-out line in the artwork points at.
+   Coordinates are percentages of the frame, set inline per label, so the
+   labels track their lines as the image scales. */
+.illo-label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -100%);
+  font-family: var(--font-sans);
+  font-size: clamp(0.5rem, 1.1vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 2px 7px 1px;
+  white-space: nowrap;
+}
+.illo-label--below {
+  transform: translate(-50%, 0);
+}
+/* At phone widths the image goes full-bleed — the section's inline
+   padding and the frame's side borders drop so the artwork runs edge to
+   edge — which buys enough room to keep the labels; they tighten their
+   tracking and padding to fit the smaller frame. */
+@media (max-width: 640px) {
+  .roadmap-illo {
+    padding-inline: 0;
+  }
+  .roadmap-illo .illo-frame {
+    border-inline: 0;
+  }
+  .illo-label {
+    letter-spacing: 0.06em;
+    padding: 1px 4px;
+  }
 }
 .pacing {
   margin-top: 26px;

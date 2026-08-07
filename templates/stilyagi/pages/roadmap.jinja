@@ -22,10 +22,20 @@
         </div>
       </section>
       <section class="roadmap-illo">
-        <img
-          src="/stilyagi/assets/images/graph.webp"
-          alt="The Vertical Slices — phases building upward from foundations to 1.0"
-        />
+        <div class="illo-frame">
+          <img
+            src="/stilyagi/assets/images/graph.webp"
+            alt="The Vertical Slices — phases building upward from foundations to 1.0"
+          />
+          {# Labels sit at the free end of each call-out line drawn in the
+             artwork, one per slice in the timeline below. #}
+          <span class="illo-label" style="--x: 18.5%; --y: 50%">00 · Foundations</span>
+          <span class="illo-label" style="--x: 27%; --y: 39%">01 · Markdown pack</span>
+          <span class="illo-label" style="--x: 43.5%; --y: 30%">02 · Capability planner</span>
+          <span class="illo-label" style="--x: 62%; --y: 24%">03 · Grammar &amp; spelling</span>
+          <span class="illo-label illo-label--below" style="--x: 76.5%; --y: 72%">04 · CI &amp; packaging</span>
+          <span class="illo-label illo-label--below" style="--x: 88.5%; --y: 57%">05 · Editor &amp; LSP</span>
+        </div>
       </section>
       <section class="roadmap-wrap">
         <div class="legend-bar">

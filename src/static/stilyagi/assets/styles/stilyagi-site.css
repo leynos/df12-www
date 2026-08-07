@@ -104,6 +104,30 @@
 .site-mast nav {
   justify-self: end;
 }
+.nav-toggle {
+  display: none;
+  border: var(--rule-weight) solid var(--ink);
+  background: var(--paper);
+  padding: 10px 9px;
+  cursor: pointer;
+}
+.nav-toggle-bars {
+  display: block;
+  width: 22px;
+  height: 13px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--ink) 0 3px,
+    transparent 3px 8px
+  );
+}
+.nav-toggle:hover .nav-toggle-bars {
+  background: repeating-linear-gradient(
+    180deg,
+    var(--press-red) 0 3px,
+    transparent 3px 8px
+  );
+}
 .site-mast nav ol {
   list-style: none;
   padding: 0;
@@ -147,6 +171,40 @@
 .site-mast nav a:hover::after,
 .site-mast nav a.active::after {
   transform: scaleX(1);
+}
+
+/* At narrow widths the primary nav collapses behind a hamburger; the list
+   is a native popover, so opening, closing, Escape, and light dismiss all
+   work without script. The unlayered flex rule above would defeat the UA's
+   closed-popover hiding, so the closed state is hidden explicitly here. */
+@media (width <= 1080px) {
+  .nav-toggle {
+    display: grid;
+  }
+  .site-mast nav ol:not(:popover-open) {
+    display: none;
+  }
+  .site-mast nav ol:popover-open {
+    position: fixed;
+    inset: auto;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+    display: grid;
+    gap: 4px;
+    min-width: 13em;
+    padding: 14px 18px;
+    border: var(--rule-weight-2) solid var(--ink);
+    background: var(--paper);
+    box-shadow: 6px 6px 0 var(--press-red);
+  }
+  .site-mast nav ol:popover-open a {
+    display: block;
+    padding: 8px 0;
+  }
+  .site-mast nav ol::backdrop {
+    background: rgba(15, 15, 15, 0.25);
+  }
 }
 
 /* ---------- Page intro (non-home pages) ---------------------------- */
@@ -372,13 +430,6 @@
   .colophon-footer .wrap {
     grid-template-columns: 1fr 1fr;
   }
-  .site-mast-inner {
-    grid-template-columns: 1fr;
-    justify-items: start;
-  }
-  .site-mast nav {
-    justify-self: start;
-  }
 }
 
 @media (max-width: 640px) {
@@ -388,10 +439,6 @@
   }
   .brand-lockup .brand-stripe {
     width: 26px;
-  }
-  .site-mast nav ol {
-    gap: 14px 18px;
-    justify-content: flex-start;
   }
   .colophon-footer .wrap {
     grid-template-columns: 1fr;

@@ -28,7 +28,14 @@
           <span class="brand-imprint">df12 · deterministic prose analysis</span>
         </a>
         <nav aria-label="Primary">
-          <ol>
+          {#- At narrow widths the list becomes a native popover; the button
+              needs no script, and browsers wire its expanded state up
+              through the popovertarget association. -#}
+          <button class="nav-toggle" type="button" popovertarget="primary-nav">
+            <span class="sr-only">Menu</span>
+            <span class="nav-toggle-bars" aria-hidden="true"></span>
+          </button>
+          <ol id="primary-nav" popover>
             {% for link in nav_links %}
             <li>
               <a href="{{ link.href }}"{% if link.current %} class="active" aria-current="page"{% endif %}><span>{{ link.label }}</span></a>

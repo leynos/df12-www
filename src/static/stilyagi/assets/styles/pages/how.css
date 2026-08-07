@@ -182,16 +182,21 @@
 }
 .ex-wrap {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 61fr 39fr;
   gap: 0;
   border: var(--rule-weight-2) solid var(--ink);
 }
 .ex-wrap > .ex-col {
   padding: 0;
   background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 .ex-wrap > .ex-col + .ex-col {
-  border-left: var(--rule-weight) solid var(--ink);
+  /* The split runs across both the paper header and the ink panels below,
+     where --ink would be invisible. */
+  border-left: var(--rule-weight) solid var(--rule-on-ink);
 }
 .ex-header {
   padding: 14px 20px;
@@ -212,6 +217,13 @@
 }
 .ex-body {
   padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ex-body > * {
+  flex: 1;
 }
 .ex-body pre {
   margin: 0;
@@ -225,7 +237,6 @@
   font-family: var(--font-mono);
   font-size: 0.88rem;
   padding: 20px 22px;
-  min-height: 100%;
   line-height: 1.55;
   overflow-x: auto;
 }

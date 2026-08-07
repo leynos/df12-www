@@ -67,6 +67,10 @@
      invisible as type against --ink (1.3:1), so dark panels use this. */
   --fg2-on-ink: #a8a396;
 
+  /* Structural dividers that cross both the paper and the ink grounds.
+     --ink is invisible against --ink, so panel splits use this instead. */
+  --rule-on-ink: #4a4a4a;
+
   /* Semantic aliases */
   --fg1: var(--ink);
   --fg2: var(--ink-soft);

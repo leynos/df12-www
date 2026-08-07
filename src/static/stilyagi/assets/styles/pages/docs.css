@@ -68,7 +68,18 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  padding: 14px 0 18px;
+  /* The bar and the table are the only children of #catalogue, so sticking
+     the bar to the section keeps it in reach for exactly as long as the
+     table is on screen and releases it at the section's end.  The masthead
+     runs 74–90px tall depending on how the brand imprint wraps: anchoring
+     the box at 74px and padding the chips down to 90px means the wash always
+     meets the masthead without ever hiding a control behind it. */
+  position: sticky;
+  top: 74px;
+  z-index: 5;
+  padding: 16px 0 18px;
+  background: rgba(239, 228, 206, 0.96);
+  backdrop-filter: blur(8px);
   border-bottom: var(--rule-weight) solid var(--ink);
   align-items: center;
 }
@@ -126,6 +137,25 @@
   background: var(--jazz-ochre);
   border-color: var(--jazz-ochre);
   color: var(--ink);
+}
+/* The chip row is the wide-viewport control; the select takes over below.
+   Exactly one of the pair is ever displayed — see the 1280px rule. */
+.filter-select {
+  display: none;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 5px 10px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+.filter-select:focus-visible {
+  outline: 2px solid var(--press-red);
+  outline-offset: 1px;
 }
 .search-box {
   margin-left: auto;
@@ -438,9 +468,97 @@
   background: rgba(0, 0, 0, 0.35);
 }
 
+/* Seven chips plus a search box stop fitting on one line well before the
+   layout collapses, and a wrapped chip row makes the sticky bar tall enough
+   to eat the viewport.  Below this width the native select does the job in
+   one line. */
+@media (width <= 1280px) {
+  .filter-chip {
+    display: none;
+  }
+  .filter-select {
+    display: inline-block;
+  }
+}
+
+/* The namespace tally cannot hold its own column beside the heading at phone
+   widths — it is a single unbreakable line, so it pushes the page sideways.
+   Stack it under the heading and let it read left to right. */
+@media (width < 680px) {
+  .cat-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .cat-head .counts {
+    text-align: left;
+  }
+}
+
+/* Stacked: the rule id keeps a column of its own down the left, while the
+   title, severity, and autofix stack in the column beside it — severity and
+   autofix sharing the row underneath the description.  The row becomes a
+   grid, which costs the table its implicit ARIA roles, so the markup states
+   them explicitly. */
+@media (width < 680px) {
+  .rules-table,
+  .rules-table tbody,
+  .rules-table td {
+    display: block;
+  }
+  .rules-table thead {
+    display: none;
+  }
+  .rules-table tr {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 4px 12px;
+    padding: 12px 0;
+    border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  }
+  /* A grid display would otherwise beat the UA rule that hides filtered-out
+     rows, so restate it at matching specificity. */
+  .rules-table tr[hidden] {
+    display: none;
+  }
+  .rules-table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+  .rules-table td.id {
+    grid-area: 1 / 1 / 3 / 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .rules-table td:nth-child(2) {
+    grid-area: 1 / 2 / 2 / 4;
+  }
+  .rules-table td:nth-child(3) {
+    grid-area: 2 / 2 / 3 / 3;
+    align-self: center;
+  }
+  .rules-table td:nth-child(4) {
+    grid-area: 2 / 3 / 3 / 4;
+    align-self: center;
+    justify-self: start;
+  }
+  /* The column headers are gone, and "safe" on its own does not say what it
+     is safe to do. */
+  .rules-table td:nth-child(4)::before {
+    content: "autofix ";
+    color: var(--ink-soft);
+  }
+  .rules-table .empty-row td {
+    grid-area: auto / 1 / auto / -1;
+  }
+}
+
 @media (max-width: 900px) {
   .docs-layout {
-    grid-template-columns: 1fr;
+    /* A bare 1fr takes its minimum from the content, which the config TOML
+       block drags out to 2700px; the pre already scrolls, so cap the track
+       and let it. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .side-toc {
     position: static;

@@ -456,18 +456,18 @@
   .product-logo--stilyagi .product-logo__stilyagi-rule,
   .product-logo--stilyagi .product-logo__stilyagi-caret {
     transform-origin: 50% 50%;
-    transition: transform 260ms cubic-bezier(0.2, 0.8, 0.3, 1);
   }
 
-  /* The rule tips anticlockwise, lifting its right end clear of the caret. */
+  /* The rule tips anticlockwise, lifting its right end clear of the caret.
+     Both halves share one duration so the line and the mark breathe together. */
   .group:hover .product-logo--stilyagi .product-logo__stilyagi-rule,
   .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-rule {
-    transform: rotate(-8deg);
+    animation: stilyagiMakeWay 2.6s ease-in-out infinite;
   }
 
   .group:hover .product-logo--stilyagi .product-logo__stilyagi-caret,
   .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-caret {
-    transform: translateY(-3px);
+    animation: stilyagiInsert 2.6s ease-in-out infinite;
   }
 
   .group:hover .product-logo--episodic .product-logo__episodic-track,
@@ -815,6 +815,29 @@
   }
 }
 
+/* The rule lifts its right end as the caret rises into the space. */
+@keyframes stilyagiMakeWay {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes stilyagiInsert {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .neon-pulse {
     animation: none;
@@ -835,11 +858,6 @@
   .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-caret {
     animation: none;
     transform: none;
-  }
-
-  .product-logo--stilyagi .product-logo__stilyagi-rule,
-  .product-logo--stilyagi .product-logo__stilyagi-caret {
-    transition: none;
   }
 }
 

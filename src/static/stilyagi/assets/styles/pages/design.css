@@ -75,7 +75,9 @@
     outline 80ms;
   outline: 1px solid transparent;
 }
-.region:hover {
+/* :not(.active) lifts the specificity above the per-type tints below, so
+   hover feedback shows on tinted regions without disturbing an active one. */
+.region:not(.active):hover {
   background: rgba(198, 40, 40, 0.12);
 }
 .region.active {
@@ -102,6 +104,17 @@
 }
 .region.type-list-item {
   background: rgba(91, 123, 97, 0.15);
+}
+/* The per-type tints above share specificity with .region.active but follow
+   it in source order, so without these rules an active paragraph, code, link,
+   or list-item region keeps its pale tint under the active paper text —
+   unreadable. Heading has its own ochre active rule. */
+.region.type-paragraph.active,
+.region.type-code.active,
+.region.type-link.active,
+.region.type-list-item.active {
+  background: var(--press-red);
+  color: var(--paper);
 }
 
 .ir-tree {
@@ -144,9 +157,16 @@
 .tree-node .d {
   color: var(--ink-soft);
 }
-.tree-node .indent {
+/* Scoped to the tree, not the node: the plain lines (content_hash,
+   line_index, regions, the closing brackets) carry indents too. */
+.ir-tree .indent {
   display: inline-block;
   width: 1.6em;
+}
+/* Match the tree-node's 6px inline padding so plain lines and interactive
+   nodes share a left edge. */
+.ir-tree > div {
+  padding-inline: 6px;
 }
 
 .ir-foot {

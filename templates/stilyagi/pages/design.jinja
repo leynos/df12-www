@@ -31,6 +31,9 @@
               <span>docs/<span class="red">configuring.md</span></span
               ><span class="red">source view</span>
             </div>
+            {# Each span carries the data-region of the IR node whose byte
+               range covers it; the ranges in the tree opposite are the real
+               UTF-8 offsets of this mock document. #}
             <div class="src-view">
               <div class="src-line">
                 <span class="gut">1</span
@@ -44,42 +47,36 @@
               <div class="src-line">
                 <span class="gut">3</span
                 ><span class="content"
-                  ><span>S</span
                   ><span data-region="p-1" class="region type-paragraph"
-                    >tilyagi is configured by `stil</span
-                  ><span data-region="cf-1" class="region type-code">yagi.toml` or </span
-                  ><span data-region="p-1" class="region type-paragraph">by th</span
-                  ><span data-region="cf-2" class="region type-code">e `[tool.stilyagi]`</span></span
+                    >Stilyagi is configured by </span
+                  ><span data-region="cf-1" class="region type-code">`stilyagi.toml`</span
+                  ><span data-region="p-1" class="region type-paragraph"> or by the </span
+                  ><span data-region="cf-2" class="region type-code">`[tool.stilyagi]`</span></span
                 >
               </div>
               <div class="src-line">
                 <span class="gut">4</span
                 ><span class="content"
-                  ><span data-region="cf-2" class="region type-code">s</span
-                  ><span data-region="p-1" class="region type-paragraph">ection of y</span
+                  ><span data-region="p-1" class="region type-paragraph"
+                    >section of your `pyproject.toml`. See the </span
                   ><span data-region="link-1" class="region type-link active"
-                    >our `pyproject.toml`. See the [conf</span
-                  ><span data-region="p-1" class="region type-paragraph">i</span><span>g </span
-                  ><span data-region="h2-1" class="region type-heading">reference](docs.h</span
-                  ><span>tm</span
-                  ><span data-region="p-2" class="region type-paragraph">l#config).</span></span
+                    >[config reference](docs.html#config)</span
+                  ><span data-region="p-1" class="region type-paragraph">.</span></span
                 >
               </div>
               <div class="src-line"><span class="gut">5</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">6</span
                 ><span class="content"
-                  ><span data-region="p-2" class="region type-paragraph">## Rule selection</span></span
+                  ><span data-region="h2-1" class="region type-heading">## Rule selection</span></span
                 >
               </div>
               <div class="src-line"><span class="gut">7</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">8</span
                 ><span class="content"
-                  ><span data-region="p-2" class="region type-paragraph">Use `select` and `ignore`</span
-                  ><span> to</span
-                  ><span data-region="li-1" class="region type-list-item">
-                    scope the active ruleset:</span
+                  ><span data-region="p-2" class="region type-paragraph"
+                    >Use `select` and `ignore` to scope the active ruleset:</span
                   ></span
                 >
               </div>
@@ -88,45 +85,41 @@
                 <span class="gut">10</span
                 ><span class="content"
                   ><span data-region="li-1" class="region type-list-item"
-                    >- `select = ["MD", "PUN201"]` — enable</span
-                  ><span> </span
-                  ><span data-region="li-2" class="region type-list-item"
-                    >all Markdown rules plus PUN201.</span
+                    >- `select = ["MD", "PUN201"]` — enable all Markdown rules plus PUN201.</span
                   ></span
                 >
               </div>
               <div class="src-line">
                 <span class="gut">11</span
                 ><span class="content"
-                  ><span data-region="li-2" class="region type-list-item">- `ignore =</span
-                  ><span> ["</span
-                  ><span data-region="h3-1" class="region type-heading">MD401"]` — skip MD401 </span
-                  ><span>gl</span
-                  ><span data-region="p-3" class="region type-paragraph">obally.</span></span
+                  ><span data-region="li-2" class="region type-list-item"
+                    >- `ignore = ["MD401"]` — skip MD401 globally.</span
+                  ></span
                 >
               </div>
               <div class="src-line"><span class="gut">12</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">13</span
                 ><span class="content"
-                  ><span data-region="cf-3" class="region type-code">### Capability ex</span
-                  ><span data-region="p-3" class="region type-paragraph">tras</span></span
+                  ><span data-region="h3-1" class="region type-heading">### Capability extras</span></span
                 >
               </div>
               <div class="src-line"><span class="gut">14</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">15</span
                 ><span class="content"
+                  ><span data-region="p-3" class="region type-paragraph">Install </span
+                  ><span data-region="cf-3" class="region type-code">`stilyagi[grammar]`</span
                   ><span data-region="p-3" class="region type-paragraph"
-                    >Install `stilyagi[grammar]` to</span
-                  ><span> enable the spaCy-backed rule pack.</span></span
+                    > to enable the spaCy-backed rule pack.</span
+                  ></span
                 >
               </div>
               <div class="src-line"><span class="gut">16</span><span class="content">&nbsp;</span></div>
             </div>
             <div class="ir-foot">
               <span data-ir-label="true" aria-live="polite">Link</span
-              ><span>range <code data-ir-range="true">[106,141]</code></span
+              ><span>range <code data-ir-range="true">[136,172]</code></span
               ><span class="red">source-faithful · no rewrites</span>
             </div>
           </div>
@@ -143,7 +136,7 @@
               </div>
               <div>
                 <span class="indent"></span><span class="k">line_index:</span>
-                <span class="v">[0, 24, 25, 143, …, 422]</span>
+                <span class="v">[0, 23, 24, 94, …, 461]</span>
               </div>
               <div>
                 <span class="indent"></span><span class="k">regions:</span> <span class="v">[</span>
@@ -153,12 +146,12 @@
                 tabindex="0"
                 data-region="h1-1"
                 data-label="Heading depth=1"
-                data-range="0,23"
+                data-range="0,22"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">heading</span
-                ><span class="d"> · </span><span class="v">range=[0,23]</span
+                ><span class="d"> · </span><span class="v">range=[0,22]</span
                 ><span class="v"> depth=1</span>
               </div>
               <div
@@ -166,24 +159,24 @@
                 tabindex="0"
                 data-region="p-1"
                 data-label="Paragraph"
-                data-range="25,142"
+                data-range="24,173"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
-                ><span class="d"> · </span><span class="v">range=[25,142]</span>
+                ><span class="d"> · </span><span class="v">range=[24,173]</span>
               </div>
               <div
                 role="button"
                 tabindex="0"
                 data-region="cf-1"
                 data-label="Inline code"
-                data-range="55,69"
+                data-range="50,65"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">code</span
-                ><span class="d"> · </span><span class="v">range=[55,69]</span
+                ><span class="d"> · </span><span class="v">range=[50,65]</span
                 ><span class="v"> lang="toml"</span>
               </div>
               <div
@@ -191,12 +184,12 @@
                 tabindex="0"
                 data-region="cf-2"
                 data-label="Inline code"
-                data-range="74,95"
+                data-range="76,93"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">code</span
-                ><span class="d"> · </span><span class="v">range=[74,95]</span
+                ><span class="d"> · </span><span class="v">range=[76,93]</span
                 ><span class="v"> lang="toml"</span>
               </div>
               <div
@@ -204,12 +197,12 @@
                 tabindex="0"
                 data-region="link-1"
                 data-label="Link"
-                data-range="106,141"
+                data-range="136,172"
                 aria-pressed="true"
                 class="tree-node active"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">link</span
-                ><span class="d"> · </span><span class="v">range=[106,141]</span
+                ><span class="d"> · </span><span class="v">range=[136,172]</span
                 ><span class="v"> scheme="relative"</span>
               </div>
               <div
@@ -217,12 +210,12 @@
                 tabindex="0"
                 data-region="h2-1"
                 data-label="Heading depth=2"
-                data-range="144,161"
+                data-range="175,192"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">heading</span
-                ><span class="d"> · </span><span class="v">range=[144,161]</span
+                ><span class="d"> · </span><span class="v">range=[175,192]</span
                 ><span class="v"> depth=2</span>
               </div>
               <div
@@ -230,24 +223,24 @@
                 tabindex="0"
                 data-region="p-2"
                 data-label="Paragraph"
-                data-range="163,219"
+                data-range="194,248"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
-                ><span class="d"> · </span><span class="v">range=[163,219]</span>
+                ><span class="d"> · </span><span class="v">range=[194,248]</span>
               </div>
               <div
                 role="button"
                 tabindex="0"
                 data-region="li-1"
                 data-label="List item"
-                data-range="222,288"
+                data-range="250,322"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">list-item</span
-                ><span class="d"> · </span><span class="v">range=[222,288]</span
+                ><span class="d"> · </span><span class="v">range=[250,322]</span
                 ><span class="v"> depth=0</span><span class="v"> marker="-"</span>
               </div>
               <div
@@ -255,12 +248,12 @@
                 tabindex="0"
                 data-region="li-2"
                 data-label="List item"
-                data-range="289,332"
+                data-range="323,370"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">list-item</span
-                ><span class="d"> · </span><span class="v">range=[289,332]</span
+                ><span class="d"> · </span><span class="v">range=[323,370]</span
                 ><span class="v"> depth=0</span><span class="v"> marker="-"</span>
               </div>
               <div
@@ -268,12 +261,12 @@
                 tabindex="0"
                 data-region="h3-1"
                 data-label="Heading depth=3"
-                data-range="335,357"
+                data-range="372,393"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">heading</span
-                ><span class="d"> · </span><span class="v">range=[335,357]</span
+                ><span class="d"> · </span><span class="v">range=[372,393]</span
                 ><span class="v"> depth=3</span>
               </div>
               <div
@@ -281,24 +274,24 @@
                 tabindex="0"
                 data-region="p-3"
                 data-label="Paragraph"
-                data-range="359,421"
+                data-range="395,460"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
-                ><span class="d"> · </span><span class="v">range=[359,421]</span>
+                ><span class="d"> · </span><span class="v">range=[395,460]</span>
               </div>
               <div
                 role="button"
                 tabindex="0"
                 data-region="cf-3"
                 data-label="Inline code"
-                data-range="367,385"
+                data-range="403,422"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">code</span
-                ><span class="d"> · </span><span class="v">range=[367,385]</span
+                ><span class="d"> · </span><span class="v">range=[403,422]</span
                 ><span class="v"> lang="python"</span>
               </div>
               <div><span class="indent"></span><span class="v">]</span></div>

@@ -1,0 +1,285 @@
+{% extends "_layout.jinja" %}
+{% block title %}{{ homepage.title }}{% endblock %}
+{% block description %}Stilyagi is a deterministic prose linter for Markdown and source-code doc comments: Rust extraction, Python rules, and diagnostics anchored to the bytes they describe.{% endblock %}
+{% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/home.css" />
+{% endblock %}
+{% block main_class %} class="home-shell"{% endblock %}
+{% block content %}
+        <section class="poster-board" aria-labelledby="home-title">
+          <div class="poster-showcase">
+            <div class="poster-art-frame">
+              <div class="poster-hero-copy" aria-hidden="true">
+                <span>Rust + Python static analysis</span><span class="accent">Edition № 001</span>
+              </div>
+              <img
+                src="/stilyagi/assets/images/hero-collage-generated.webp"
+                alt="Poster collage of a typewriter, gears, and a saxophonist beside a conveyor of analysis tiles"
+              />
+              <h1 id="home-title" class="poster-title">
+                A Compiler<br />for <span class="red">Prose</span>
+              </h1>
+              <code class="poster-annotation">Industrial parsing meets jazz-age rulecraft.</code>
+            </div>
+            <div class="poster-tiles" aria-hidden="true">
+              <div class="poster-tile red">Parse</div>
+              <div class="poster-tile cyan">Analyse</div>
+              <div class="poster-tile ochre">Diagnose</div>
+              <div class="poster-tile magenta">Fix</div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="section-flag">
+            <h2>Explore the <span class="red">tool</span></h2>
+          </div>
+          <div class="explore-grid">
+            <article class="tool-card" style="--accent-color: var(--press-red)">
+              <div class="eyebrow">Foundation</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-architecture-generated.webp"
+                  alt="Poster-style architecture illustration showing industrial gears meeting expressive musical forms"
+                />
+              </div>
+              <div>
+                <h3>Architecture</h3>
+                <p>
+                  Separate the iron from the jazz: Rust extraction up front, Python rule execution behind
+                  a stable contract.
+                </p>
+              </div>
+              <a href="/stilyagi/design/">Read more →</a>
+            </article>
+            <article class="tool-card" style="--accent-color: var(--signal-sage)">
+              <div class="eyebrow">Contract</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-ir-contract-generated.webp"
+                  alt="Poster-style intermediate representation contract illustration centred on a precise schema sheet"
+                />
+              </div>
+              <div>
+                <h3>IR Contract</h3>
+                <p>
+                  A deterministic schema between parsing and analysis so rules operate on regions, spans,
+                  and capability-planned detail.
+                </p>
+              </div>
+              <a href="/stilyagi/design/">Read more →</a>
+            </article>
+            <article class="tool-card" style="--accent-color: var(--jazz-cyan)">
+              <div class="eyebrow">Rules</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-rule-engine-generated.webp"
+                  alt="Poster-style rule engine illustration combining a checklist, analysis symbols, and musical curves"
+                />
+              </div>
+              <div>
+                <h3>Rule Engine</h3>
+                <p>
+                  Typed Python rules with direct navigability, explicit capabilities, and diagnostics
+                  rendered without guesswork.
+                </p>
+              </div>
+              <a href="/stilyagi/docs/">Read more →</a>
+            </article>
+            <article class="tool-card" style="--accent-color: var(--jazz-ochre)">
+              <div class="eyebrow">Grammar</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-grammar-generated.webp"
+                  alt="Poster-style grammar layer illustration showing stacked symbolic blocks and linking brackets"
+                />
+              </div>
+              <div>
+                <h3>Grammar Layer</h3>
+                <p>
+                  From tokens to clauses only when capability planning requires it. Syntax stays
+                  subordinate to fidelity.
+                </p>
+              </div>
+              <a href="/stilyagi/how/">Read more →</a>
+            </article>
+            <article class="tool-card" style="--accent-color: var(--ink)">
+              <div class="eyebrow">CLI</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-cli-generated.webp"
+                  alt="Poster-style command-line illustration with a terminal silhouette, a prompt marker, and careful controls"
+                />
+              </div>
+              <div>
+                <h3>CLI &amp; UX</h3>
+                <p>
+                  Ruff-inspired commands, legible configuration, and safe fixes that never lose track of
+                  the underlying source.
+                </p>
+              </div>
+              <a href="/stilyagi/how/">Read more →</a>
+            </article>
+            <article class="tool-card" style="--accent-color: var(--jazz-magenta)">
+              <div class="eyebrow">Testing</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-testing-generated.webp"
+                  alt="Poster-style testing sandbox illustration with a sealed chamber containing a cube and a check token"
+                />
+              </div>
+              <div>
+                <h3>Testing Sandbox</h3>
+                <p>
+                  Hermetic fixtures, isolated runs, and typed outputs so rule development behaves like
+                  software engineering, not divination.
+                </p>
+              </div>
+              <a href="/stilyagi/docs/">Read more →</a>
+            </article>
+            <article class="tool-card" style="--accent-color: var(--press-red)">
+              <div class="eyebrow">Diagnostics</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-diagnostics-generated.webp"
+                  alt="Poster-style diagnostics illustration with a magnifying glass over a structured evidence board"
+                />
+              </div>
+              <div>
+                <h3>Diagnostic Matrix</h3>
+                <p>
+                  Readable verdicts with span truth, provenance, and byte-level evidence instead of
+                  flattened guesswork.
+                </p>
+              </div>
+              <a href="/stilyagi/why/">Read more →</a>
+            </article>
+            <article class="tool-card" style="--accent-color: var(--jazz-ochre)">
+              <div class="eyebrow">Plan</div>
+              <div class="tool-art">
+                <img
+                  src="/stilyagi/assets/images/tool-roadmap-generated.webp"
+                  alt="Poster-style roadmap illustration with a flag, milestones, and directional route markers"
+                />
+              </div>
+              <div>
+                <h3>Roadmap</h3>
+                <p>
+                  Vertical slices from Markdown core to rule packs, richer editors, and sharper contracts
+                  at each phase boundary.
+                </p>
+              </div>
+              <a href="/stilyagi/roadmap/">Read more →</a>
+            </article>
+          </div>
+        </section>
+        <section class="value-band" aria-labelledby="why-stilyagi">
+          <div class="value-grid">
+            <article class="value-card">
+              <div class="eyebrow">Why Stilyagi</div>
+              <h3 id="why-stilyagi">Absolute Source Fidelity</h3>
+              <p>
+                Findings map to exact byte spans. No lossy transforms, no invented context, no flattened
+                approximation.
+              </p>
+            </article>
+            <article class="value-card">
+              <div class="eyebrow">Policy</div>
+              <h3>Programmable Policy</h3>
+              <p>
+                Typed Python rules over a rich IR let teams encode house style, compliance, and taste
+                without falling back to regex folklore.
+              </p>
+            </article>
+            <article class="value-card">
+              <div class="eyebrow">Planning</div>
+              <h3>Capability-Planned Analysis</h3>
+              <p>
+                Run only the analysis you need. Fast by default, deeper when requested, always explicit
+                about the cost.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section class="pipeline-poster">
+          <div class="section-flag">
+            <h2>The pipeline, <span class="red">as printed</span></h2>
+          </div>
+          <div class="pipeline-frame">
+            <img
+              src="/stilyagi/assets/images/pipeline-board.webp"
+              alt="Poster showing the Stilyagi pipeline from Rust parsing through IR schema to Python rules and final diagnostics"
+            />
+          </div>
+          <div class="pipeline-caption">
+            Figure 01 · Presentation board from the Stilyagi deck, reused here as the canonical overview
+            of the processing chain.
+          </div>
+        </section>
+        <section class="command-rail" aria-labelledby="three-commands">
+          <div class="command-label" id="three-commands">
+            Start in <span class="red">three commands</span>
+          </div>
+          <div class="command-steps">
+            <article class="command-step">
+              <code>$ stilyagi check</code>
+              <p>Run analysis and print diagnostics with source-backed spans and stable ordering.</p>
+            </article>
+            <article class="command-step">
+              <code>$ stilyagi dump-ir</code>
+              <p>
+                Inspect the intermediate representation so rules can reason about the same contract the
+                extractor emitted.
+              </p>
+            </article>
+            <article class="command-step">
+              <code>$ stilyagi clean</code>
+              <p>
+                Remove caches and temporary artefacts when you want a fresh run or a tidier working tree.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section>
+          <div class="section-flag">
+            <h2>Choose your <span class="red">briefing room</span></h2>
+          </div>
+          <div class="reading-grid">
+            <article class="reading-room">
+              <div class="eyebrow">Manifesto</div>
+              <h3>Why</h3>
+              <p>
+                The case against the weak camps and the argument for source-faithful documentation
+                analysis.
+              </p>
+              <a href="/stilyagi/why/">Read the manifesto →</a>
+            </article>
+            <article class="reading-room">
+              <div class="eyebrow">Mechanics</div>
+              <h3>How</h3>
+              <p>
+                Architecture, CLI shape, capability planning, and the line between extraction and rule
+                execution.
+              </p>
+              <a href="/stilyagi/how/">Inspect the mechanics →</a>
+            </article>
+            <article class="reading-room">
+              <div class="eyebrow">Reference</div>
+              <h3>Docs</h3>
+              <p>
+                Rules catalogue, configuration shape, suppressions, and the growing manual for the tool
+                itself.
+              </p>
+              <a href="/stilyagi/docs/">Open the docs →</a>
+            </article>
+            <article class="reading-room">
+              <div class="eyebrow">Planning</div>
+              <h3>Roadmap</h3>
+              <p>
+                The phase plan from markdown core through plugins, diagnostics, and richer editor
+                integrations.
+              </p>
+              <a href="/stilyagi/roadmap/">See the roadmap →</a>
+            </article>
+          </div>
+        </section>
+{% endblock %}

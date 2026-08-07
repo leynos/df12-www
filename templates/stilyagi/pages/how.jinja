@@ -1,0 +1,427 @@
+{% extends "_layout.jinja" %}
+{% block title %}Stilyagi · How — the mechanism{% endblock %}
+{% block description %}How Stilyagi works: Rust extraction, the intermediate representation contract, capability planning, and the Ruff-inspired command line.{% endblock %}
+{% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/how.css" />
+{% endblock %}
+{% block content %}
+      <section class="page-intro">
+        <div class="wrap">
+          <div>
+            <div class="folio">§ 02 · The mechanism</div>
+            <h1>How <span class="accent">Stilyagi</span> works.</h1>
+          </div>
+          <p class="lede">
+            Five stages from filesystem to diagnostic. Rust extracts structure. Python analyses it. A
+            capability planner decides which linguistic providers to load. The formatter renders verdicts.
+            CI reads them.
+          </p>
+        </div>
+      </section>
+      <section class="arch">
+        <div class="section-head">
+          <div class="num">A</div>
+          <div>
+            <div class="tag">§ Architecture · pipeline</div>
+            <h2>Five stages, one contract.</h2>
+          </div>
+        </div>
+        <div class="arch-diagram">
+          <div class="pipeline">
+            <div class="stage">
+              <div class="sidx">01</div>
+              <h3>Discover</h3>
+              <p class="editorial">
+                Config loading, path walking, owner attribution. A normalised set of FileInputs arrives at
+                the extractor.
+              </p>
+              <span class="layer-tag layer-py">Python</span>
+            </div>
+            <div class="stage">
+              <div class="sidx">02</div>
+              <h3>Extract</h3>
+              <p class="editorial">
+                Rust reads source bytes and emits a region-oriented Document IR with segments, a
+                line_index, and a content_hash.
+              </p>
+              <span class="layer-tag layer-rust">Rust</span>
+            </div>
+            <div class="stage">
+              <div class="sidx">03</div>
+              <h3>Plan</h3>
+              <p class="editorial">
+                The capability planner inspects enabled rules and materialises only the annotators that
+                are actually required.
+              </p>
+              <span class="layer-tag layer-bridge">Bridge</span>
+            </div>
+            <div class="stage">
+              <div class="sidx">04</div>
+              <h3>Analyse</h3>
+              <p class="editorial">
+                Rules run against typed region wrappers. Diagnostics, suppressions, and fix payloads are
+                accumulated deterministically.
+              </p>
+              <span class="layer-tag layer-py">Python</span>
+            </div>
+            <div class="stage">
+              <div class="sidx">05</div>
+              <h3>Report</h3>
+              <p class="editorial">
+                The formatter renders plain text, JSON, or SARIF. Exit codes are disciplined. CI is happy.
+              </p>
+              <span class="layer-tag layer-py">Python</span>
+            </div>
+          </div>
+          <div class="arrow-row">
+            <span>☞</span><span>☞</span><span>☞</span><span>☞</span><span>—</span>
+          </div>
+          <div class="boundary">
+            <div class="layer-card rust">
+              <div class="sub" style="color: var(--accent-text)">§ Rust layer</div>
+              <h3>Extraction only.</h3>
+              <ul>
+                <li>Parses Markdown, MDX, reStructuredText, Python, and Rust source.</li>
+                <li>Emits a region-oriented Document IR keyed by byte offsets.</li>
+                <li>Computes the <code>line_index</code> and <code>content_hash</code>.</li>
+                <li>Owns <em>no</em> rules. Owns <em>no</em> diagnostics. Owns <em>no</em> policy.</li>
+                <li>Narrow FFI boundary: one data structure crosses the line.</li>
+              </ul>
+            </div>
+            <div class="layer-card">
+              <div class="sub">§ Python layer</div>
+              <h3>Analysis, fixes, and output.</h3>
+              <ul>
+                <li>Owns the rule engine, capability planner, and diagnostic model.</li>
+                <li>Provides typed wrappers over regions: Heading, Paragraph, Code, Docstring.</li>
+                <li>Plans spaCy and spellchecker providers on demand.</li>
+                <li>Applies safe fixes; flags unsafe fixes; refuses to touch synthetic spans.</li>
+                <li>Emits text, JSON, and SARIF with stable ordering.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="layer-illo">
+            <figure>
+              <img
+                src="/stilyagi/assets/images/iron.webp"
+                alt="The Iron — Rust extraction, gears, structural machinery"
+              />
+              <figcaption>☞ The Iron · Rust · extraction only</figcaption>
+            </figure>
+            <figure>
+              <img
+                src="/stilyagi/assets/images/jazz.webp"
+                alt="The Jazz — Python analysis, instruments, colourful expression"
+              />
+              <figcaption>☞ The Jazz · Python · analysis &amp; policy</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+      <section class="rule-example">
+        <div class="section-head">
+          <div class="num">B</div>
+          <div>
+            <div class="tag">§ Live rule · author → output</div>
+            <h2>A rule is a Python class.</h2>
+          </div>
+        </div>
+        <div class="ex-wrap">
+          <div class="ex-col">
+            <div class="ex-header">
+              <span>rules/<span class="red">heading_depth.py</span></span
+              ><span class="red">author view</span>
+            </div>
+            <div class="ex-body">
+              <pre class="code"><code># rules/heading_depth.py
+      from stilyagi.rule import Rule, Level
+      from stilyagi.regions import Heading
+
+      class HeadingDepthRule(Rule):
+          """Reject Markdown headings deeper than level 3."""
+          code = "MD201"
+          name = "heading-depth"
+          level = Level.WARNING
+          pack = "default"
+          capabilities = ()   # no spaCy, no spellchecker
+
+          def check_heading(self, h: Heading) -&gt; None:
+              if h.depth &gt; 3:
+                  self.report(
+                      span=h.marker_span,
+                      message=f"Heading depth {h.depth} exceeds maximum of 3.",
+                      suggestion="Promote to a new section or demote to bold text.",
+                  )</code></pre>
+            </div>
+          </div>
+          <div class="ex-col">
+            <div class="ex-header">
+              <span>$ <span class="red">stilyagi check</span> docs/</span
+              ><span class="red">diagnostic view</span>
+            </div>
+            <div class="ex-body">
+              <div class="term">
+                <div><span class="prompt">$</span> <span class="cmd">stilyagi check docs/</span></div>
+                <div class="dim">stilyagi 0.4.0 · loaded 1 pack · planned 0 annotators</div>
+                <div class="dim">scanning 14 files · cache hit 11 · analysed 3</div>
+                <br />
+                <div><span class="path">docs/guide/advanced.md</span><span class="dim">:72:1</span></div>
+                <div>
+                  <span class="err">warning[MD201]</span>
+                  <span class="msg">Heading depth 4 exceeds maximum of 3.</span>
+                </div>
+                <br />
+                <div class="dim">70 │ ### Advanced topics</div>
+                <div class="dim">71 │</div>
+                <div>72 │ <span class="code">#### Caching strategy</span></div>
+                <div>
+                  │ <span class="caret">^^^^</span> <span class="rule">heading-depth (MD201)</span>
+                </div>
+                <div class="dim">73 │</div>
+                <br />
+                <div class="dim">= help: Promote to a new section or demote to bold text.</div>
+                <div class="dim">= suppress: &lt;!-- stilyagi: disable-line MD201 --&gt;</div>
+                <br />
+                <div><span class="final">1 warning · 0 errors · 3 files analysed in 142 ms</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="flowtext">
+        <aside class="margin-note">
+          <span class="red">§ Note · FFI discipline</span>The Rust → Python boundary is crossed
+          <em>once</em> per file, not per rule.<br /><br /><span class="red">§ Note · Caching</span
+          >Diagnostics are keyed by <code>(content_hash, ruleset_id, capability_set)</code>.
+        </aside>
+        <div class="body">
+          <h3>The IR is the <span style="color: var(--accent-text)">contract</span>.</h3>
+          <p class="editorial">
+            Rules never see raw source bytes directly, and never drive a parser. They receive a typed
+            region — a <code>Heading</code>, a<code> Paragraph</code>, a <code>Docstring</code> — backed
+            by a single shared Document IR. The region knows its span, its depth, its content, its
+            markers. It knows whether it was synthesised from structural inference or extracted verbatim.
+          </p>
+          <p class="editorial">
+            This is what separates Stilyagi from a regex harness. A regex doesn't know whether it is
+            inside a code block, a docstring, a comment, or a heading. A Stilyagi rule subscribes to
+            region classes and is only ever called for the ones it asked for — which is also what lets the
+            capability planner skip spaCy loading when no enabled rule needs it.
+          </p>
+          <h3>Determinism is load-bearing.</h3>
+          <p class="editorial">
+            Every diagnostic carries a canonical sort key. Files are ordered by normalised path;
+            diagnostics within a file by byte offset, rule code, and stable message hash. Two rules cannot
+            emit fixes to overlapping, non-identical ranges without one losing explicitly. Stilyagi wants
+            CI to be bored, and agents to have something they can trust.
+          </p>
+        </div>
+      </section>
+      <section class="cli">
+        <div class="section-head">
+          <div class="num">C</div>
+          <div>
+            <div class="tag">§ CLI contract</div>
+            <h2>Six verbs. No surprises.</h2>
+          </div>
+        </div>
+        <div class="cli-frame-img">
+          <img
+            src="/stilyagi/assets/images/frame.webp"
+            alt="The Ruff-inspired UX — compact command surface, legible configuration, fix safety"
+          />
+        </div>
+        <div class="cli-table" style="margin-top: calc(var(--unit) * 4)">
+          <div class="cli-row">
+            <div class="cmd">
+              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              ><span class="accent">check</span>
+            </div>
+            <div class="sum">
+              Analyse paths or stdin. The primary verb. Emits diagnostics and the only verb CI runs.
+            </div>
+            <div class="opts">
+              <div><code>--format</code> text|json|sarif</div>
+              <div><code>--fix=safe|unsafe|none</code></div>
+              <div><code>--select</code> CODE,CODE</div>
+              <div><code>--ignore</code> PATTERN</div>
+              <div><code>--stdin-filename</code> PATH</div>
+              <div><code>--config</code> PATH</div>
+            </div>
+          </div>
+          <div class="cli-row">
+            <div class="cmd">
+              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              ><span class="accent">fix</span>
+            </div>
+            <div class="sum">
+              Apply autofixes within the declared safety class. Refuses overlapping non-identical edits.
+            </div>
+            <div class="opts">
+              <div><code>--safety</code> safe|unsafe</div>
+              <div><code>--dry-run</code></div>
+              <div><code>--diff</code></div>
+              <div><code>--preview</code></div>
+            </div>
+          </div>
+          <div class="cli-row">
+            <div class="cmd">
+              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              ><span class="accent">rule</span>
+            </div>
+            <div class="sum">
+              Inspect rules. list, show &lt;code&gt;, describe &lt;code&gt;, explain &lt;code&gt;. For
+              humans and for agents.
+            </div>
+            <div class="opts">
+              <div>list</div>
+              <div>show MD201</div>
+              <div>describe MD201</div>
+              <div>explain MD201</div>
+            </div>
+          </div>
+          <div class="cli-row">
+            <div class="cmd">
+              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              ><span class="accent">dump-ir</span>
+            </div>
+            <div class="sum">
+              Emit the extractor's view of a file. Essential for debugging rule authors and maintainers
+              alike.
+            </div>
+            <div class="opts">
+              <div><code>--file</code> PATH</div>
+              <div><code>--format</code> json|pretty</div>
+              <div><code>--include</code> annotations</div>
+              <div><code>--mask-hashes</code></div>
+            </div>
+          </div>
+          <div class="cli-row">
+            <div class="cmd">
+              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              ><span class="accent">config</span>
+            </div>
+            <div class="sum">
+              Print, validate, or discover configuration. Respects precedence: CLI → file → pyproject →
+              defaults.
+            </div>
+            <div class="opts">
+              <div>print</div>
+              <div>validate</div>
+              <div>explain KEY</div>
+              <div>locate</div>
+            </div>
+          </div>
+          <div class="cli-row">
+            <div class="cmd">
+              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              ><span class="accent">cache</span>
+            </div>
+            <div class="sum">
+              Inspect and clear the analysis cache. Per-file keys derive from content_hash, ruleset,
+              capabilities.
+            </div>
+            <div class="opts">
+              <div>info</div>
+              <div>prune</div>
+              <div>clear</div>
+              <div>path</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="flowtext">
+        <aside class="margin-note">
+          <span class="red">§ Planner · what it does</span>Inspects enabled rules. Collects their declared
+          capabilities. Loads grammar, spelling, terminology, and custom providers on demand. Never loads
+          what no enabled rule asked for.
+        </aside>
+        <div class="body">
+          <h3>The <span style="color: var(--accent-text)">capability planner</span>.</h3>
+          <p class="editorial">
+            Linguistic providers are expensive. A small lint run that only checks heading depth should not
+            pay for spaCy model loading, a symspell dictionary, or a terminology index. The planner exists
+            to prevent this tax.
+          </p>
+          <p class="editorial">
+            Each rule declares a <code>capabilities</code> tuple. At startup, the planner intersects the
+            enabled ruleset with the capability graph and materialises only the providers required. Rules
+            never import providers directly — they ask the region for an annotation, and the planner
+            guarantees it will be there or the rule will be skipped with a single loud diagnostic.
+          </p>
+          <p class="editorial">
+            The same mechanism lets Stilyagi stay offline: grammar and spelling providers ship as optional
+            extras, <em>stilyagi[grammar]</em> and<em> stilyagi[spell]</em>, and the planner refuses to
+            enable a rule whose capability is absent. The base install does nothing clever, reaches no
+            network, and stays useful.
+          </p>
+        </div>
+      </section>
+      <section
+        style="
+          max-width: 1240px;
+          margin: 0px auto;
+          padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 10);
+          text-align: center;
+        "
+      >
+        <div class="pullquote" style="max-width: 36ch; margin: 0px auto; font-size: 2rem">
+          "The IR is the contract. The rule is the policy. Everything else is scaffolding."<cite
+            >— Maintainer's rubric, § 4</cite
+          >
+        </div>
+        <div
+          style="
+            margin-top: calc(var(--unit) * 4);
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+          "
+        >
+          <a
+            href="/stilyagi/design/"
+            style="
+              font-family: var(--font-sans);
+              font-weight: 700;
+              font-size: 0.82rem;
+              letter-spacing: 0.14em;
+              text-transform: uppercase;
+              color: var(--ink);
+              text-decoration: none;
+              border-bottom: 2px solid var(--press-red);
+              padding-bottom: 2px;
+            "
+            >☞ Open the IR inspector</a
+          ><a
+            href="/stilyagi/roadmap/"
+            style="
+              font-family: var(--font-sans);
+              font-weight: 700;
+              font-size: 0.82rem;
+              letter-spacing: 0.14em;
+              text-transform: uppercase;
+              color: var(--ink);
+              text-decoration: none;
+              border-bottom: 2px solid var(--press-red);
+              padding-bottom: 2px;
+            "
+            >☞ Read the roadmap</a
+          ><a
+            href="/stilyagi/docs/"
+            style="
+              font-family: var(--font-sans);
+              font-weight: 700;
+              font-size: 0.82rem;
+              letter-spacing: 0.14em;
+              text-transform: uppercase;
+              color: var(--ink);
+              text-decoration: none;
+              border-bottom: 2px solid var(--press-red);
+              padding-bottom: 2px;
+            "
+            >☞ Rules &amp; config</a
+          >
+        </div>
+      </section>
+{% endblock %}

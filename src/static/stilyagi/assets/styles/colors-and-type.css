@@ -1,0 +1,297 @@
+/* =================================================================
+   STILYAGI DESIGN LANGUAGE · colors + type tokens
+   Agitprop rigour · jazz-age swagger · university-press authority
+   ================================================================= */
+
+/* Big Shoulders — local variable font (brand-supplied) */
+@font-face {
+  font-family: "Big Shoulders Display";
+  src: url("../fonts/BigShoulders-VariableFont_opsz_wght.woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+/* EB Garamond — local roman, Google Fonts for italic fallback */
+@font-face {
+  font-family: "EB Garamond";
+  src: url("../fonts/EBGaramond-VariableFont_wght.woff2")
+    format("woff2-variations");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+/* Italic + sans + mono via Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  /* ---------- COLOR ------------------------------------------------ */
+  /* Surface — warm newsprint; never clinical white */
+  --paper: #efe4ce; /* primary surface */
+  --paper-shade: #e4d7b9; /* recessed panel */
+  --paper-deep: #d8c9a4; /* samizdat ground */
+
+  /* Ink */
+  --ink: #0f0f0f; /* lamp-black; display + body */
+  --ink-soft: #2a2a2a; /* rules, secondary type */
+  --rule-faint: #9b8f79; /* graph-paper line */
+  --rule-strong: #1a1a1a; /* structural divider */
+
+  /* Agitprop — press-red carries judgement.
+     The base red is a fill, border, and stamp colour; it clears the 3:1 floor
+     for non-text against every paper surface but not the 4.5:1 body-text
+     floor, so text takes one of the two variants below instead. */
+  --press-red: #c2272e; /* verdicts, stamps, rules */
+  --press-red-deep: #992024; /* pressure-printed shadow */
+  --press-red-ink: #7a1a1f; /* editorial accent, links */
+  --press-red-text: #a42127; /* red type on paper — 4.5:1 to paper-deep */
+  --press-red-on-ink: #da474e; /* red type on the ink ground — 4.5:1 */
+
+  /* Jazz — sparingly, as splashes on covers + posters */
+  --jazz-magenta: #d81e79;
+  --jazz-magenta-solid: #c31b6d; /* magenta behind paper type — 4.5:1 */
+  --jazz-cyan: #29b4c4;
+  --jazz-ochre: #d69f2e;
+
+  /* Signal */
+  --signal-sage: #6b7145; /* quiet affirmation */
+  --signal-sage-solid: #646940; /* sage behind paper type — 4.5:1 */
+  --signal-sage-on-ink: #787f4e; /* sage type on the ink ground — 4.5:1 */
+  --signal-rust: #a4522a; /* warning, subordinate to press-red */
+  /* The source site referenced --rust-patina for the PYDOC namespace badge
+     but never defined it, leaving paper type on a transparent ground.  It is
+     the signal rust, darkened to carry paper type at 4.5:1. */
+  --rust-patina: #93491f;
+
+  /* Secondary type on the ink ground.  --ink-soft is a rule colour and is
+     invisible as type against --ink (1.3:1), so dark panels use this. */
+  --fg2-on-ink: #a8a396;
+
+  /* Semantic aliases */
+  --fg1: var(--ink);
+  --fg2: var(--ink-soft);
+  --fg-muted: var(--rule-faint);
+  --fg-link: var(--press-red-ink);
+  --fg-link-hover: var(--press-red);
+  --bg: var(--paper);
+  --bg-recessed: var(--paper-shade);
+  --bg-deep: var(--paper-deep);
+  --bg-inverse: var(--ink);
+  --fg-inverse: var(--paper);
+  --accent: var(--press-red);
+  /* Red type, resolved against whatever ground it sits on.  Dark panels
+     re-point this below, and because custom properties inherit, every
+     descendant — including elements carrying an inline colour — follows. */
+  --accent-text: var(--press-red-text);
+  --border: var(--ink);
+  --border-soft: rgba(15, 15, 15, 0.25);
+  --selection-bg: var(--press-red);
+  --selection-fg: var(--paper);
+
+  /* ---------- TYPE ------------------------------------------------- */
+  --font-display: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
+  --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;
+  --font-sans:
+    "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+
+  /* Modular scale — double-stranded */
+  --t-caption: 0.78rem;
+  --t-body: 1.0625rem; /* 17px at root 16 — trade-book */
+  --t-lede: 1.25rem;
+  --t-h4: 1.15rem;
+  --t-h3: 1.5rem;
+  --t-h2: 2.25rem;
+  --t-h1: clamp(2.6rem, 5vw + 1rem, 5.5rem);
+  --t-cover: clamp(3.5rem, 8vw + 1rem, 8rem);
+
+  /* Tracking */
+  --track-label: 0.08em;
+  --track-caption: 0.12em;
+  --track-cover: 0.24em;
+
+  /* ---------- GEOMETRY -------------------------------------------- */
+  --unit: 8px;
+  --col: 72ch; /* editorial measure */
+  --rule-weight: 2px;
+  --rule-weight-2: 4px;
+  --rule-weight-3: 8px;
+  --grid-pitch: 24px;
+
+  /* No rounded corners, as a rule. This system is printed, not plastic. */
+  --radius: 0;
+
+  /* ---------- MOTION ---------------------------------------------- */
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --tempo-fast: 140ms;
+  --tempo: 260ms;
+}
+
+/* =================================================================
+   Base — graph-paper substrate + reading defaults
+   ================================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  color: var(--fg1);
+  background: var(--bg);
+  font-family: var(--font-editorial);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  font-feature-settings: "onum", "liga", "kern";
+  -webkit-font-smoothing: antialiased;
+
+  /* The ruled-paper signature. Never remove. */
+  background-image:
+    linear-gradient(to right, rgba(155, 143, 121, 0.22) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(155, 143, 121, 0.22) 1px, transparent 1px);
+  background-size: var(--grid-pitch) var(--grid-pitch);
+}
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
+a {
+  color: var(--fg-link);
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--fg-link-hover);
+}
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* =================================================================
+   Typography — four voices, each with a fixed job
+   Display shouts · Editorial argues · Sans labels · Mono testifies
+   ================================================================= */
+.display,
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--fg1);
+}
+h1 {
+  font-size: var(--t-h1);
+  margin: 0 0 0.3em;
+}
+h2 {
+  font-size: var(--t-h2);
+  margin: 0 0 0.4em;
+  letter-spacing: 0.015em;
+}
+
+h3,
+h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 0.5em;
+  color: var(--fg1);
+}
+h3 {
+  font-size: var(--t-h3);
+}
+h4 {
+  font-size: var(--t-h4);
+}
+
+.editorial {
+  font-family: var(--font-editorial);
+}
+.sans {
+  font-family: var(--font-sans);
+}
+.mono,
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
+  font-feature-settings: "ss02";
+}
+
+p {
+  margin: 0 0 1em;
+}
+p + p {
+  text-indent: 1.8em;
+} /* trade-book continuation */
+p.lede {
+  font-size: var(--t-lede);
+  text-indent: 0;
+}
+p.lede::first-line {
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+}
+
+.caption {
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--fg2);
+}
+
+blockquote {
+  margin: 2em 0;
+  padding: 0 0 0 2em;
+  border-left: var(--rule-weight-3) solid var(--press-red);
+  font-style: italic;
+  font-size: var(--t-lede);
+}
+blockquote footer {
+  margin-top: 0.5em;
+  font-style: normal;
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--fg2);
+}
+
+hr.scholar {
+  border: 0;
+  border-top: var(--rule-weight) solid var(--ink);
+  margin: 2.5em auto;
+  width: 8ch;
+}
+
+/* =================================================================
+   Ink grounds — re-point the inheriting type tokens
+   Red, sage, and secondary greys tuned for paper all fall below the
+   4.5:1 body-text floor against --ink, so every dark panel switches
+   them here rather than at each call site.
+   ================================================================= */
+.ink-panel,
+.agitprop,
+pre.code,
+.personas,
+.term,
+.layer-rust,
+.boundary .layer-card.rust,
+.config-grid pre,
+.colophon-sec,
+.ns-rsdoc,
+.filter-chip.ns-rsdoc.active,
+.provider.loaded .ptag,
+.btn.ghost:hover {
+  --accent-text: var(--press-red-on-ink);
+  --fg2: var(--fg2-on-ink);
+  --signal-sage: var(--signal-sage-on-ink);
+}

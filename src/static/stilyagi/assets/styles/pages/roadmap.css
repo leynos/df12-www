@@ -1,0 +1,297 @@
+/* Stilyagi · page styles for roadmap. Extracted from the source site's inline <style>. */
+
+.roadmap-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: calc(var(--unit) * 4) calc(var(--unit) * 4)
+    calc(var(--unit) * 6);
+}
+.timeline {
+  border-top: var(--rule-weight-2) solid var(--ink);
+  margin-top: calc(var(--unit) * 3);
+}
+.phase {
+  border-bottom: var(--rule-weight) solid var(--ink);
+  background: var(--paper);
+}
+.phase:hover:not(.open) {
+  background: var(--paper-shade);
+}
+.phase .ph-head {
+  display: grid;
+  grid-template-columns: 120px 1fr 200px 60px;
+  align-items: center;
+  padding: calc(var(--unit) * 3);
+  cursor: pointer;
+  gap: calc(var(--unit) * 3);
+  user-select: none;
+}
+.ph-num {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 3.4rem;
+  line-height: 1;
+}
+.phase.done .ph-num {
+  color: var(--signal-sage);
+}
+.phase.current .ph-num {
+  color: var(--accent-text);
+}
+.phase.later .ph-num {
+  color: var(--ink-soft);
+}
+.ph-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  /* Pinned so the promotion from h3 to h2 (for heading order) does not
+     inherit the display heading's tighter tracking. */
+  letter-spacing: 0.04em;
+  font-size: 1.75rem;
+  line-height: 1.05;
+  margin: 0;
+  color: var(--ink);
+}
+.ph-tag {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--accent-text);
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.ph-meta {
+  text-align: right;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.ph-status {
+  display: inline-block;
+  padding: 3px 8px 2px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin-bottom: 6px;
+}
+.phase.done .ph-status {
+  background: var(--signal-sage-solid);
+  color: var(--paper);
+}
+.phase.current .ph-status {
+  background: var(--press-red);
+  color: var(--paper);
+}
+.phase.later .ph-status {
+  background: var(--paper-shade);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+.ph-toggle {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--accent-text);
+  text-align: center;
+  transition: transform 180ms;
+}
+.phase.open .ph-toggle {
+  transform: rotate(45deg);
+  color: var(--ink);
+}
+.ph-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 280ms ease-out;
+  background: var(--paper-shade);
+}
+.phase.open .ph-body {
+  max-height: 2200px;
+  border-top: var(--rule-weight) solid var(--ink);
+}
+.ph-body-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: calc(var(--unit) * 5);
+  padding: calc(var(--unit) * 5) calc(var(--unit) * 4);
+}
+.goal h3,
+.deliverables h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 1.15rem;
+  margin: 0 0 10px;
+}
+.goal h3 .red {
+  color: var(--accent-text);
+}
+.goal p {
+  font-family: var(--font-editorial);
+  font-size: 1.08rem;
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+.ship-strip {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--press-red);
+  background: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+.ship-strip b {
+  color: var(--accent-text);
+}
+.deliverables ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.deliverables li {
+  padding: 8px 0 8px 1.8em;
+  position: relative;
+  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  font-family: var(--font-editorial);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+.deliverables li:last-child {
+  border-bottom: 0;
+}
+.deliverables li::before {
+  content: "§";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: var(--accent-text);
+}
+.legend-bar {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.legend-bar .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.dot-done {
+  background: var(--signal-sage);
+}
+.dot-cur {
+  background: var(--press-red);
+}
+.dot-later {
+  background: var(--paper-shade);
+  border: 1px solid var(--ink);
+}
+.risks {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: calc(var(--unit) * 6) calc(var(--unit) * 4);
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: calc(var(--unit) * 6);
+}
+.margin-note {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.8;
+  position: sticky;
+  top: 100px;
+  align-self: start;
+}
+.margin-note .red {
+  color: var(--accent-text);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 6px;
+}
+.risks .body h3 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  text-transform: uppercase;
+  margin: 0 0 calc(var(--unit) * 2);
+  line-height: 0.95;
+}
+.risks .body p {
+  font-family: var(--font-editorial);
+  font-size: 1.08rem;
+  line-height: 1.55;
+  max-width: 64ch;
+}
+.risks .body p + p {
+  text-indent: 1.8em;
+  margin-top: 10px;
+}
+.roadmap-illo {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 4);
+}
+.roadmap-illo img {
+  width: 100%;
+  height: auto;
+  border: var(--rule-weight-2) solid var(--ink);
+  display: block;
+  mix-blend-mode: multiply;
+}
+.pacing {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.pacing .card {
+  border: 1px solid var(--ink);
+  padding: 14px 16px;
+  background: var(--paper);
+}
+.pacing .card .tt {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--accent-text);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.pacing .card .body-t {
+  font-family: var(--font-editorial);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+@media (max-width: 900px) {
+  .phase .ph-head {
+    grid-template-columns: 60px 1fr 50px;
+  }
+  .ph-meta {
+    display: none;
+  }
+  .ph-body-inner,
+  .risks {
+    grid-template-columns: 1fr;
+  }
+}

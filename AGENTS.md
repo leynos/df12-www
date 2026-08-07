@@ -40,10 +40,10 @@ is authored directly as HTML.
 
 - **`config/pages.yaml`** is the single source of layout and copy data. It
   defines the main site's homepage, about page, and documentation bundles, and a
-  `sites:` mapping that configures each sub-site (`mxd`, `netsuke`, `weaver`).
-  A sub-site entry declares its `output_dir`, `templates_dir`, `stylesheet`,
-  `base_path`, theme metadata, navigation links, shared-content pages, and
-  content pages.
+  `sites:` mapping that configures each sub-site (`mxd`, `netsuke`, `weaver`,
+  `stilyagi`). A sub-site entry declares its `output_dir`, `templates_dir`,
+  `stylesheet`, `base_path`, theme metadata, navigation links, shared-content
+  pages, and content pages.
 - **`config/shared/*.md`** holds copy shared across sub-sites — the privacy
   policy, terms of use, and code of conduct. Each sub-site opts in through its
   `shared_content` list and renders the same Markdown through its own chrome.
@@ -113,8 +113,16 @@ clean rebuild is the check that everything really is sourced from `src/`.
 The site uses **Tailwind CSS v4** with **daisyUI v5**. Two entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode) and `src/styles/mxd.css` for the mxd sub-site (the
-`mxd` theme). The Netsuke and Weaver sub-sites are styled by their own
-hand-crafted stylesheets.
+`mxd` theme). The Netsuke, Weaver, and Stilyagi sub-sites are styled by their
+own hand-crafted stylesheets, which use neither Tailwind nor daisyUI. Their
+colour tokens live in those stylesheets, and the accessibility rules below
+apply to them just the same.
+
+Stilyagi's palette is split by role rather than by hue: `--press-red` paints
+fills, borders, and stamps, while red *type* uses `--accent-text`, which each
+dark panel re-points from the paper-surface red to the ink-ground one. Because
+custom properties inherit, setting `--accent-text` on a container is enough —
+prefer that over adding a colour at the call site.
 
 ### Prefer semantic classes over literal colours
 

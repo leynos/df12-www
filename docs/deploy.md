@@ -144,25 +144,23 @@ alternate location.
 
 #### Backend cache recovery and error reporting
 
-Each wrapper runs `tofu init` with a backend configuration rendered fresh
-from `config.toml`. If the record cached in `.terraform/terraform.tfstate`
-is a provably stale local backend — a `local` backend with the default
-state path, no resources in the cached state, and no root
-`terraform.tfstate` holding resources — the wrapper passes `-reconfigure`
-so the stale record is discarded automatically. Any other mismatch (for
-example a changed bucket, region, or endpoint while state exists) is left
-to OpenTofu's backend-change safety check, which stops and asks for an
-explicit decision; resolve it manually with `tofu init -migrate-state` or
-`tofu init -reconfigure` as appropriate. The wrappers never migrate state
-themselves.
+Each wrapper runs `tofu init` with a backend configuration rendered fresh from
+`config.toml`. If the record cached in `.terraform/terraform.tfstate` is a
+provably stale local backend — a `local` backend with the default state path,
+no resources in the cached state, and no root `terraform.tfstate` holding
+resources — the wrapper passes `-reconfigure` so the stale record is discarded
+automatically. Any other mismatch (for example a changed bucket, region, or
+endpoint while state exists) is left to OpenTofu's backend-change safety check,
+which stops and asks for an explicit decision; resolve it manually with
+`tofu init -migrate-state` or `tofu init -reconfigure` as appropriate. The
+wrappers never migrate state themselves.
 
-Operational failures are reported as a single `error:` line on stderr
-rather than a Python traceback. When a `tofu` or `aws` subprocess exits
-non-zero, the CLI preserves that status and exits with it; local
-failures — a missing `tofu` or `aws` binary, or unresolvable
-credentials — exit with status 1. Stderr captured from the backend
-bucket bootstrap (the `aws` CLI) is relayed before the error line, so
-its diagnostics are preserved.
+Operational failures are reported as a single `error:` line on stderr rather
+than a Python traceback. When a `tofu` or `aws` subprocess exits non-zero, the
+CLI preserves that status and exits with it; local failures — a missing `tofu`
+or `aws` binary, or unresolvable credentials — exit with status 1. Stderr
+captured from the backend bucket bootstrap (the `aws` CLI) is relayed before
+the error line, so its diagnostics are preserved.
 
 #### Config file example
 

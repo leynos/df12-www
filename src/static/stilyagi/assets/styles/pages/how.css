@@ -408,11 +408,43 @@
   margin-top: calc(var(--unit) * 4);
   border: var(--rule-weight-2) solid var(--ink);
   overflow: hidden;
+  position: relative;
+  /* Lets the overlay's font-size track the rendered artwork via cqw. */
+  container-type: inline-size;
 }
 .cli-frame-img img {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Terminal overlay inside the window drawn in the artwork. The inset
+   percentages trace the window's content area within the 1376x768 image,
+   so the transcript sits inside the drawn frame at any rendered size. */
+.frame-term {
+  position: absolute;
+  left: 20.6%;
+  top: 31.6%;
+  width: 58.3%;
+  height: 57.2%;
+  /* Tinted rather than solid ink so the halftone art ghosts through. */
+  background: rgba(15, 15, 15, 0.88);
+  padding: 1.4em 1.6em;
+  font-size: clamp(0.55rem, 1.2cqw, 0.92rem);
+  overflow-y: auto;
+  /* A single flex child laid out column-reverse anchors the initial scroll
+     position to the end of the transcript without any script. */
+  display: flex;
+  flex-direction: column-reverse;
+}
+.frame-term:focus-visible {
+  outline: 3px solid var(--press-red);
+  outline-offset: -3px;
+}
+.frame-term .transcript {
+  /* Breathing room below the resting prompt so the window is not filled
+     edge to edge with text. */
+  padding-bottom: 3em;
 }
 
 @media (max-width: 900px) {

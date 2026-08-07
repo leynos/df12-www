@@ -86,7 +86,11 @@ published site, then rebuild.
 ```bash
 bun run build          # static assets, CSS, images, pages, and search indices
 bun run dev            # watch and rebuild, serving on :8080
+DF12_PORT=8090 make dev  # same, on another port
 ```
+
+`DF12_PORT` overrides the port `bun run dev` and `bun run serve` listen on,
+which matters when several worktrees are served at once.
 
 The steps run in order, because each depends on the last: `build:static` first,
 since the image step reads the source images it places; then `build:css`,

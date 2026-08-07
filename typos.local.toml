@@ -15,8 +15,10 @@ accepted = [
 
 [patterns]
 # Inline code is checked by default so misspelled identifiers stay visible.
-# These are the exact upstream names that are intentionally spelled the US
-# way; prose and any other identifier remain subject to the en-GB rules.
+# The exemptions below cover CSS tokens and keywords, the placeholders the
+# migration guides use to describe them, upstream identifiers that carry US
+# spelling, and one deliberate fixture typo. Prose and every other identifier
+# remain subject to the en-GB rules.
 ignore = [
   # CSS keywords and functions.
   'currentColor',

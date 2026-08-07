@@ -63,6 +63,9 @@
      .poster-art-frame {
        position: relative;
        isolation: isolate;
+       /* Lets the annotation size itself against the rendered artwork, so the
+          typed line keeps its proportions on the drawn sheet at any width. */
+       container-type: inline-size;
        border: var(--rule-weight-2) solid var(--ink);
        background: var(--paper);
        padding: 0;
@@ -130,7 +133,11 @@
        text-align: center;
        transform: rotate(3deg);
        font-family: var(--font-mono);
-       font-size: 12px;
+       /* One curve instead of tablet breakpoints: the frame caps at 1164px, so
+          1.03cqw resolves to the 12px desktop size and shrinks with the
+          artwork below it.  The 9px floor holds legibility from roughly 960px
+          down to the 720px mobile bands, which override this outright. */
+       font-size: clamp(9px, 1.03cqw, 12px);
        line-height: 1.6;
        color: var(--ink);
        pointer-events: none;
@@ -725,24 +732,5 @@
        }
      }
 
-     /* Two more annotation bands hold the line on the sheet through the
-        tablet bleed, where the 1672/941 crop shrinks the drawn paper. */
-     @media (840px < width <= 960px) {
-       .poster-annotation {
-         top: 20%;
-         right: 22%;
-         width: 8em;
-         font-size: 12px;
-         line-height: 1.6;
-       }
-     }
-
-     @media (720px < width <= 840px) {
-       .poster-annotation {
-         top: 21%;
-         right: 22%;
-         width: 8em;
-         font-size: 9px;
-         line-height: 1.6;
-       }
-     }
+     /* Tablet widths need no annotation bands: the cqw font size scales the
+        whole box with the artwork, so the base percentage anchors hold. */

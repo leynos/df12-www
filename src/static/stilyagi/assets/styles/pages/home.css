@@ -588,8 +588,25 @@ top: 145px;
          padding-inline: calc(var(--unit) * 2);
        }
 
+       /* Full-bleed hero: the board sheds the shell's inline padding and its
+          side borders, and the nested showcase and art frames collapse so the
+          artwork runs edge to edge with a single rule top and bottom. The
+          tiles keep an inset so they read as a card row under the bleed. */
+       .poster-board {
+         margin-inline: calc(var(--unit) * -2);
+         border-inline: 0;
+         padding: 0;
+       }
+
        .poster-showcase {
-         padding: 14px;
+         border: 0;
+         padding: 0;
+         gap: 14px;
+       }
+
+       .poster-art-frame {
+         border-inline: 0;
+         border-top: 0;
        }
 
        .poster-art-frame img {
@@ -605,9 +622,11 @@ top: 145px;
        }
 
        .poster-annotation {
-         top: 16px;
-         right: 22px;
-         width: 7em;
+         /* On the flat white of the drawn paper sheet as the 4/5 crop
+            frames it, clear of the masthead line and the curled top edge. */
+         top: 92px;
+         right: 14px;
+         width: 6.5em;
          font-size: 0.62rem;
          line-height: 1.45;
        }
@@ -623,6 +642,7 @@ top: 145px;
        .poster-tiles {
          grid-template-columns: repeat(2, minmax(0, 1fr));
          gap: 10px;
+         padding: 0 14px 14px;
        }
 
        .poster-tile {
@@ -643,5 +663,17 @@ top: 145px;
        .section-flag::before,
        .section-flag::after {
          display: none;
+       }
+
+       /* Full-bleed pipeline board: the frame sheds the shell's inline
+          padding and every side border that would hug the screen edge. */
+       .pipeline-frame {
+         margin-inline: calc(var(--unit) * -2);
+         border-inline: 0;
+         padding-inline: 0;
+       }
+
+       .pipeline-frame img {
+         border-inline: 0;
        }
      }

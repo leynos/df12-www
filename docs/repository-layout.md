@@ -85,8 +85,8 @@ Scaleway-specific variants, and deployment configuration).
 
 Generated output directory. The main df12 site pages live at the top level.
 Sub-site output lands under path-prefixed subdirectories (`mxd/`, `netsuke/`,
-`weaver/`, `stilyagi/`), each containing the full static site including
-assets, doc pages, and shared content pages. This directory is the deployment root.
+`weaver/`, `stilyagi/`), each containing the full static site including assets,
+doc pages, and shared content pages. This directory is the deployment root.
 
 ### `reference/`
 

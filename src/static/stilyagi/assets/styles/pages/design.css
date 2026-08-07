@@ -573,12 +573,12 @@
   .grammar-illo .inner {
     grid-template-columns: 1fr;
   }
-  /* Stacked one-up there is no column for the artwork to fill: the 95% height
-     resolves against an auto row, so the image shrinks to its intrinsic size
-     and sits left of centre.  Hand the panel width back below the prose. */
+  /* Stacked one-up the artwork carries its own proportions; the deeper
+     negative offset pulls the drawing up against the prose above it. */
   .grammar-illo .inner img {
-    width: 100%;
-    height: auto;
-    margin-top: 0;
+    object-fit: cover;
+    display: block;
+    mix-blend-mode: multiply;
+    margin-top: -12%;
   }
 }

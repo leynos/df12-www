@@ -32,6 +32,10 @@
      grid and widening the page on narrow viewports. */
   contain: inline-size;
   overflow-x: auto;
+  /* Pass a stretched height through to the block inside, so the ink
+     ground fills the column when the panel beside it is taller. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Matches the pre.code component this replaced: the ink ground and
@@ -39,6 +43,7 @@
    ground painted across the full scroll extent, not just the
    visible width. */
 .stilyagi-syntax {
+  flex: 1;
   background: var(--ink);
   border-left: var(--rule-weight-3) solid var(--press-red);
   width: max-content;

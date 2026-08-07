@@ -182,7 +182,7 @@
 }
 .ex-wrap {
   display: grid;
-  grid-template-columns: 61fr 39fr;
+  grid-template-columns: 57fr 43fr;
   gap: 0;
   border: var(--rule-weight-2) solid var(--ink);
 }

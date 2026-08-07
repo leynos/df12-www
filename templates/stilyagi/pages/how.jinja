@@ -156,7 +156,7 @@
                           self.report(
                               span=h.marker_span,
                               message=f"Heading depth {h.depth} exceeds maximum of 3.",
-                              suggestion="Promote to a new section or demote to bold text.",
+                              suggestion="Promote to a new section, or use bold text.",
                           )
               {% endhighlight %}
               </div>
@@ -183,7 +183,8 @@
                 <div class="dim">71 │</div>
                 <div>72 │ <span class="code">#### Caching strategy</span></div>
                 <div>
-                  │ <span class="caret">^^^^</span> <span class="rule">heading-depth (MD201)</span>
+                  <span aria-hidden="true">&nbsp;&nbsp;&nbsp;</span>│
+                  <span class="caret">^^^^</span> <span class="rule">heading-depth (MD201)</span>
                 </div>
                 <div class="dim">73 │</div>
                 <br />

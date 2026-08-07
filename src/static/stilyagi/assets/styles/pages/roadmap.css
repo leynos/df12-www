@@ -340,7 +340,10 @@
 }
 @media (max-width: 900px) {
   .phase .ph-head {
-    grid-template-columns: 60px 1fr 50px;
+    /* A bare 1fr takes its minimum from the title, so the longer phase names
+       widen the track and shove the toggle past the panel's right edge.
+       Capping the track lets the title wrap instead. */
+    grid-template-columns: 60px minmax(0, 1fr) 50px;
   }
   .ph-meta {
     display: none;

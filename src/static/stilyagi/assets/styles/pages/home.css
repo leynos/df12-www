@@ -712,3 +712,13 @@
          line-height: 1.45;
        }
      }
+
+     /* Tablet widths: the hero board runs full bleed, shedding the shell's
+        inline padding and its side borders, but keeps the desktop layout
+        inside — showcase framing, overlay positions, and the four-up tiles. */
+     @media (720px < width <= 1080px) {
+       .poster-board {
+         margin-inline: calc(var(--unit) * -4);
+         border-inline: 0;
+       }
+     }

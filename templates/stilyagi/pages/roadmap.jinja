@@ -340,6 +340,34 @@
           </div>
         </div>
       </section>
+      <section class="pacing">
+        <div class="card">
+          <div class="tt">§ Cadence</div>
+          <div class="body-t">
+            Minor releases every six to ten weeks. Patches as needed. No sprint theatre.
+          </div>
+        </div>
+        <div class="card">
+          <div class="tt">§ Deprecations</div>
+          <div class="body-t">
+            One minor-version warning before removal. Renames ship with aliases that outlive two minors.
+          </div>
+        </div>
+        <div class="card">
+          <div class="tt">§ Stability</div>
+          <div class="body-t">
+            Rule IDs never change meaning. If a rule evolves, it gets a new ID; the old one is retired,
+            never reassigned.
+          </div>
+        </div>
+        <div class="card">
+          <div class="tt">§ Governance</div>
+          <div class="body-t">
+            New rules require a one-page RFC. New providers require a two-page RFC and a performance
+            budget.
+          </div>
+        </div>
+      </section>
       <section class="risks">
         <aside class="margin-note">
           <span class="red">§ Margin note</span>A roadmap is not a promise.<br /><br />It is a public
@@ -366,35 +394,6 @@
             opinions. Each rule ships with a rationale paragraph and — where the rationale is contestable
             — a citation.
           </p>
-          <div class="pacing">
-            <div class="card">
-              <div class="tt">§ Cadence</div>
-              <div class="body-t">
-                Minor releases every six to ten weeks. Patches as needed. No sprint theatre.
-              </div>
-            </div>
-            <div class="card">
-              <div class="tt">§ Deprecations</div>
-              <div class="body-t">
-                One minor-version warning before removal. Renames ship with aliases that outlive two
-                minors.
-              </div>
-            </div>
-            <div class="card">
-              <div class="tt">§ Stability</div>
-              <div class="body-t">
-                Rule IDs never change meaning. If a rule evolves, it gets a new ID; the old one is
-                retired, never reassigned.
-              </div>
-            </div>
-            <div class="card">
-              <div class="tt">§ Governance</div>
-              <div class="body-t">
-                New rules require a one-page RFC. New providers require a two-page RFC and a performance
-                budget.
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 {% endblock %}

@@ -308,10 +308,15 @@
     transform: translate(-50%, calc(-100% - 8px));
   }
 }
+/* A band of four policy cards spanning the content column, above the
+   "what we will not do" section. It carries the top padding; the section
+   below supplies the gap beneath. */
 .pacing {
-  margin-top: 26px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: calc(var(--unit) * 6) calc(var(--unit) * 4) 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 .pacing .card {
@@ -342,6 +347,14 @@
   }
   .ph-body-inner,
   .risks {
+    grid-template-columns: 1fr;
+  }
+  .pacing {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .pacing {
     grid-template-columns: 1fr;
   }
 }

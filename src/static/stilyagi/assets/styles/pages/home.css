@@ -484,6 +484,78 @@ top: 145px;
        color: var(--accent-text);
      }
 
+/* =================================================================
+   Load animations — the press coming up to speed.
+   Each runs once, and none uses a forwards fill: every keyframe list
+   omits its `to` step, so the browser synthesises the final frame from
+   the element's own computed style and the resting state above is what
+   remains when the animation is over.
+   ================================================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The hero word is struck in ink, then the red plate lands on it. */
+  .poster-title .red {
+    animation: prose-inking 1s var(--ease);
+  }
+
+  @keyframes prose-inking {
+    from {
+      color: var(--ink);
+    }
+  }
+
+  /* The tiles chase left to right, each washing out, over-saturating, and
+     settling.  Their type and rules are lamp-black, which saturate() cannot
+     move, so only the tint travels. `backwards` holds the opening frame
+     through the delay, so a tile does not show its resting tint and then jump.
+     Three 200ms steps plus an 800ms tile is 1.4s end to end. */
+  .poster-tile {
+    animation: tile-chase 800ms ease-in-out backwards;
+  }
+
+  .poster-tiles .poster-tile:nth-child(2) {
+    animation-delay: 200ms;
+  }
+
+  .poster-tiles .poster-tile:nth-child(3) {
+    animation-delay: 400ms;
+  }
+
+  .poster-tiles .poster-tile:nth-child(4) {
+    animation-delay: 600ms;
+  }
+
+  @keyframes tile-chase {
+    from {
+      filter: saturate(0);
+    }
+    45% {
+      filter: saturate(2.4);
+    }
+  }
+
+  /* Typed onto the paper. home.js splits the annotation into indexed spans
+     and sets the two custom properties; the fallbacks keep this legible if it
+     is ever read without that script in mind.  The mono face makes the bold
+     and regular weights the same width, so the line does not reflow as each
+     character settles. */
+  .poster-annotation.is-typing .typed-letter {
+    animation: letter-strike var(--typed-duration, 260ms) ease-out backwards;
+    animation-delay: calc(var(--typed-index, 0) * var(--typed-stagger, 12ms));
+  }
+
+  @keyframes letter-strike {
+    from {
+      opacity: 0;
+      font-weight: 600;
+    }
+    55% {
+      opacity: 1;
+      font-weight: 600;
+    }
+  }
+}
+
      @media (max-width: 1180px) {
        .explore-grid,
        .reading-grid {

@@ -570,6 +570,11 @@
     border-right: 0;
     border-bottom: var(--rule-weight) solid var(--ink);
   }
+}
+
+/* The grammar panel stacks earlier than the rest of the page: below 1080px
+   the 4fr text column is too narrow to hold the heading on one line. */
+@media (max-width: 1080px) {
   .grammar-illo .inner {
     grid-template-columns: 1fr;
   }

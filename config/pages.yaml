@@ -99,12 +99,12 @@ homepage:
         icon: corbusier
         meta_label: View on GitHub
         external: true
-      - label: Zamburak
-        description: Prompt-injection defence for tool-using agents. Security by architecture.
-        href: "https://github.com/leynos/zamburak"
-        icon: zamburak
-        meta_label: View on GitHub
-        external: true
+      - label: Stilyagi
+        description: Deterministic prose linting for docs and doc comments. A compiler for prose.
+        href: "stilyagi/"
+        icon: stilyagi
+        meta_label: Learn more
+        external: false
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.

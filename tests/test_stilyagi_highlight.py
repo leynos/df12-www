@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
+import re
 import typing as typ
 
 from bs4 import BeautifulSoup
+from pygments import highlight
+from pygments.formatters.html import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
 from pygments.styles import get_style_by_name
 from pygments.token import Comment, Keyword, Token
 
 from df12_pages.config import ContentPageConfig
 from df12_pages.content_page import ContentPageGenerator
 from df12_pages.stilyagi_highlighting import StilyagiStyle
+from scripts.generate_stilyagi_pygments_css import build_css
 
 if typ.TYPE_CHECKING:
     from pathlib import Path
@@ -23,6 +28,25 @@ RULE_FRAGMENT = (
     '    """Reject Markdown headings deeper than level 3."""\n'
     "\n"
     '    code = "MD201"\n'
+)
+
+#: Exercises the token families the sub-site's rule example uses: comments,
+#: imports, class and function definitions, docstrings, strings, and numbers.
+SAMPLE_SOURCE = (
+    "# rules/heading_depth.py\n"
+    "from stilyagi.rule import Rule, Level\n"
+    "\n"
+    "\n"
+    "class HeadingDepthRule(Rule):\n"
+    '    """Reject Markdown headings deeper than level 3."""\n'
+    "\n"
+    '    code = "MD201"\n'
+    "    level = Level.WARNING\n"
+    "    capabilities = ()\n"
+    "\n"
+    "    def check_heading(self, h) -> None:\n"
+    "        if h.depth > 3:\n"
+    '            self.report(span=h.marker_span, message=f"depth {h.depth}")\n'
 )
 
 #: The lamp-black ground the sub-site sets code on.
@@ -87,6 +111,29 @@ class TestStilyagiHighlighting:
         """Keywords and comments are styled rather than inheriting body text."""
         for token in (Keyword, Comment, Token):
             assert token in StilyagiStyle.styles, f"{token} should carry a colour"
+
+    def test_generated_css_styles_every_class_pygments_emits(self) -> None:
+        """The stylesheet covers token subtypes, not just declared categories.
+
+        Pygments emits the most specific class it has — ``c1`` for a
+        single-line comment, ``kn`` for an import keyword — while the style
+        declares broad categories and lets subtypes inherit. A generator that
+        emitted a rule per declared token would leave most of the markup's
+        classes unstyled, which is invisible until someone reads the page.
+        """
+        markup = highlight(
+            SAMPLE_SOURCE,
+            get_lexer_by_name("python"),
+            HtmlFormatter(cssclass="stilyagi-syntax", wrapcode=True),
+        )
+        emitted = set(re.findall(r'class="([a-z0-9]+)"', markup))
+        emitted.discard("stilyagi-syntax")
+        styled = set(re.findall(r"\.stilyagi-syntax \.([a-z0-9]+)[ ,{]", build_css()))
+
+        assert emitted, "the sample should produce token classes"
+        assert not emitted - styled, (
+            f"classes emitted but unstyled: {sorted(emitted - styled)}"
+        )
 
     def test_highlight_tag_honours_a_named_wrapper_class(
         self,

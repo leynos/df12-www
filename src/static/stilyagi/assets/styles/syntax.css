@@ -63,21 +63,80 @@
 }
 
 .stilyagi-syntax { color: var(--stilyagi-syntax-text); }
-.stilyagi-syntax .c { color: var(--stilyagi-syntax-comment); font-style: italic; }
+.stilyagi-syntax .esc,
+.stilyagi-syntax .g,
+.stilyagi-syntax .gd,
+.stilyagi-syntax .ge,
+.stilyagi-syntax .ges,
+.stilyagi-syntax .gh,
+.stilyagi-syntax .gi,
+.stilyagi-syntax .gs,
+.stilyagi-syntax .gt,
+.stilyagi-syntax .gu,
+.stilyagi-syntax .l,
+.stilyagi-syntax .ld,
+.stilyagi-syntax .w,
+.stilyagi-syntax .x { color: var(--stilyagi-syntax-text); }
+.stilyagi-syntax .c,
+.stilyagi-syntax .c1,
+.stilyagi-syntax .ch,
+.stilyagi-syntax .cm,
+.stilyagi-syntax .cpf,
+.stilyagi-syntax .cs { color: var(--stilyagi-syntax-comment); font-style: italic; }
 .stilyagi-syntax .cp { color: var(--stilyagi-syntax-comment-preproc); }
-.stilyagi-syntax .k { color: var(--stilyagi-syntax-keyword); }
-.stilyagi-syntax .o { color: var(--stilyagi-syntax-operator); }
-.stilyagi-syntax .p { color: var(--stilyagi-syntax-punctuation); }
-.stilyagi-syntax .n { color: var(--stilyagi-syntax-name); }
+.stilyagi-syntax .k,
+.stilyagi-syntax .kc,
+.stilyagi-syntax .kd,
+.stilyagi-syntax .kn,
+.stilyagi-syntax .kp,
+.stilyagi-syntax .kr,
+.stilyagi-syntax .kt { color: var(--stilyagi-syntax-keyword); }
+.stilyagi-syntax .o,
+.stilyagi-syntax .ow { color: var(--stilyagi-syntax-operator); }
+.stilyagi-syntax .p,
+.stilyagi-syntax .pm { color: var(--stilyagi-syntax-punctuation); }
+.stilyagi-syntax .n,
+.stilyagi-syntax .na,
+.stilyagi-syntax .ne,
+.stilyagi-syntax .ni,
+.stilyagi-syntax .nl,
+.stilyagi-syntax .nn,
+.stilyagi-syntax .no,
+.stilyagi-syntax .nt,
+.stilyagi-syntax .nv,
+.stilyagi-syntax .nx,
+.stilyagi-syntax .py,
+.stilyagi-syntax .vc,
+.stilyagi-syntax .vg,
+.stilyagi-syntax .vi,
+.stilyagi-syntax .vm { color: var(--stilyagi-syntax-name); }
 .stilyagi-syntax .nc { color: var(--stilyagi-syntax-name-class); }
+.stilyagi-syntax .fm,
 .stilyagi-syntax .nf { color: var(--stilyagi-syntax-name-function); }
 .stilyagi-syntax .nd { color: var(--stilyagi-syntax-name-decorator); }
 .stilyagi-syntax .nb { color: var(--stilyagi-syntax-name-builtin); }
 .stilyagi-syntax .bp { color: var(--stilyagi-syntax-name-builtin-pseudo); }
-.stilyagi-syntax .s { color: var(--stilyagi-syntax-literal-string); }
+.stilyagi-syntax .dl,
+.stilyagi-syntax .s,
+.stilyagi-syntax .s1,
+.stilyagi-syntax .s2,
+.stilyagi-syntax .sa,
+.stilyagi-syntax .sb,
+.stilyagi-syntax .sc,
+.stilyagi-syntax .sh,
+.stilyagi-syntax .si,
+.stilyagi-syntax .sr,
+.stilyagi-syntax .ss,
+.stilyagi-syntax .sx { color: var(--stilyagi-syntax-literal-string); }
 .stilyagi-syntax .sd { color: var(--stilyagi-syntax-literal-string-doc); font-style: italic; }
 .stilyagi-syntax .se { color: var(--stilyagi-syntax-literal-string-escape); }
-.stilyagi-syntax .m { color: var(--stilyagi-syntax-literal-number); }
+.stilyagi-syntax .il,
+.stilyagi-syntax .m,
+.stilyagi-syntax .mb,
+.stilyagi-syntax .mf,
+.stilyagi-syntax .mh,
+.stilyagi-syntax .mi,
+.stilyagi-syntax .mo { color: var(--stilyagi-syntax-literal-number); }
 .stilyagi-syntax .gp { color: var(--stilyagi-syntax-generic-prompt); font-weight: 700; }
 .stilyagi-syntax .go { color: var(--stilyagi-syntax-generic-output); }
 .stilyagi-syntax .gr { color: var(--stilyagi-syntax-generic-error); }

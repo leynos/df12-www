@@ -204,6 +204,14 @@
   background: var(--paper-shade);
   border: 1px solid var(--ink);
 }
+/* Three keys no longer share a line at phone widths — wrapping leaves one
+   stranded — so they stack into a short list instead. */
+@media (width <= 560px) {
+  .legend-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
 .risks {
   max-width: 1240px;
   margin: 0 auto;

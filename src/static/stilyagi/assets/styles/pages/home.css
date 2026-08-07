@@ -720,6 +720,26 @@
      /* Tablet widths need no annotation bands: the cqw font size scales the
         whole box with the artwork, so the base percentage anchors hold. */
 
+     /* The edition mark sits in red over the busiest part of the artwork once
+        the phone crop pulls the collage in behind it, so through the tablet
+        and phone range it gets a blurred paper glow of its own on top of the
+        hero copy's halo.  Below 360px there is no room for it beside the
+        overline at all, so it goes. */
+     @media (360px < width <= 720px) {
+       .poster-hero-copy .accent {
+         text-shadow:
+           0 0 6px var(--paper),
+           0 0 12px var(--paper),
+           0 0 20px var(--paper);
+       }
+     }
+
+     @media (width <= 360px) {
+       .poster-hero-copy .accent {
+         display: none;
+       }
+     }
+
      /* On the narrowest phones the value band and command rail join the hero
         in running full bleed, so the page reads as stacked bands rather than
         a column of framed boxes.  Each sheds the shell's inline padding; the

@@ -107,7 +107,9 @@
        z-index: 2;
        margin: 0;
        font-family: var(--font-display);
-       font-size: clamp(5rem, 9vw, 7rem);
+       /* The floor drops well below the ceiling so the title keeps shrinking
+          through tablet widths instead of colliding with the illustration. */
+       font-size: clamp(2rem, 8vw, 7rem);
        line-height: 0.83;
        max-width: 4.8ch;
        pointer-events: none;

@@ -690,35 +690,19 @@
        }
      }
 
-     /* The annotation rides the drawn paper sheet through the 4/5 crop, so
-        its size and anchor step with the viewport rather than scaling
-        smoothly: three bands keep it on the flat white at phone widths. */
-     @media (640px < width <= 720px) {
-       .poster-annotation {
-         top: 22%;
-         right: 3.6%;
-         width: 9em;
-         font-size: 0.9rem;
-         line-height: 1.45;
-       }
-     }
-
-     @media (420px < width <= 640px) {
+     /* The annotation rides the drawn paper sheet through the 4/5 phone crop,
+        where the frame runs full bleed so 1cqw is one viewport percent.  The
+        text cannot simply scale with the artwork — it would be unreadable by
+        360px — so size and box width follow linear curves fitted to the two
+        hand-tuned ends, 14.4px/130px at 720px and 11.2px/90px at 460px.  The
+        floors freeze the smallest phone sizes at what the old bottom band
+        used, and the ceilings hand over to the desktop rule at 720px. */
+     @media (width <= 720px) {
        .poster-annotation {
          top: 21%;
-         right: 3.6%;
-         width: 8em;
-         font-size: 0.7rem;
-         line-height: 1.45;
-       }
-     }
-
-     @media (width <= 420px) {
-       .poster-annotation {
-         top: 21%;
-         right: 2.8%;
-         width: 8em;
-         font-size: 0.65rem;
+         right: 3.2%;
+         width: clamp(83px, 18.8px + 15.4cqw, 130px);
+         font-size: clamp(10.4px, 5.54px + 1.23cqw, 14.4px);
          line-height: 1.45;
        }
      }

@@ -132,6 +132,17 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  /* The list carries the popover attribute for the narrow-width menu, and
+     the UA styles a popover as a fixed, inset-0, bordered box even while
+     closed; reset all of that so the desktop row lays out in flow. */
+  position: static;
+  inset: auto;
+  width: auto;
+  height: auto;
+  border: 0;
+  overflow: visible;
+  background: none;
+  color: inherit;
   display: flex;
   gap: 26px;
   flex-wrap: wrap;

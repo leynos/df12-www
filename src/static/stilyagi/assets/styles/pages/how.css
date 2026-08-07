@@ -423,10 +423,10 @@
    so the transcript sits inside the drawn frame at any rendered size. */
 .frame-term {
   position: absolute;
-  left: 20.6%;
-  top: 31.6%;
-  width: 58.3%;
-  height: 57.2%;
+  left: 20.2%;
+  top: 31.3%;
+  width: 59.3%;
+  height: 57%;
   /* Tinted rather than solid ink so the halftone art ghosts through. */
   background: rgba(15, 15, 15, 0.88);
   padding: 1.4em 1.6em;
@@ -470,5 +470,15 @@
   }
   .layer-illo {
     grid-template-columns: 1fr;
+  }
+  /* Full bleed: cancel the .cli side padding so the artwork spans the
+     viewport, and drop the side borders that would hug the screen edge. */
+  .cli-frame-img {
+    margin-inline: calc(var(--unit) * -4);
+    border-inline: 0;
+  }
+  .frame-term {
+    /* 80% of the desktop terminal size (0.88rem). */
+    font-size: 0.71rem;
   }
 }

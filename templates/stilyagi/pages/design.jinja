@@ -22,9 +22,43 @@
           <div class="num">D</div>
           <div>
             <div class="tag">§ IR inspector · stilyagi dump-ir</div>
-            <h2>Hover a region. Watch the bytes agree.</h2>
+            <h2>Every region remembers its bytes.</h2>
           </div>
         </div>
+        <div class="ir-explain">
+          <div>
+            <p>
+              The IR is what the Rust extractor hands to the Python rule engine, and it is the only thing
+              rules ever see. It is not a copy of the Markdown tree. It is a flat list of prose regions,
+              each carrying its kind, its structural owner, and the exact byte range it occupies in the
+              file on disk.
+            </p>
+            <p>
+              That byte range is the whole contract. Diagnostics and fixes are expressed in original source
+              offsets, so an edit can only ever land on text that was really there. Where markup was
+              elided — emphasis, link syntax, a soft line break — a segment map records which slice of the
+              region's text came from which source bytes, and marks the remainder synthetic so no fix can
+              touch it.
+            </p>
+          </div>
+          <div>
+            <p>
+              Two more fields are first-class rather than conveniences.
+              <code>content_hash</code> keys the extraction cache, so an unchanged file is never parsed
+              twice. <code>line_index</code> turns a byte offset into a line and column without reparsing
+              the source, which is what keeps diagnostic rendering cheap.
+            </p>
+            <p>
+              <code>stilyagi dump-ir</code> prints all of it as canonical JSON, and that is the debugging
+              surface the whole architecture leans on: when a rule misfires, the IR tells you whether the
+              extractor got the region wrong or the rule got the logic wrong.
+            </p>
+          </div>
+        </div>
+        <p class="ir-hint">
+          <span class="red">☞</span> Hover either side of the panel below — the source span and the IR node
+          that owns it light up together, and the footer reports the byte range.
+        </p>
         <div class="ir-frame">
           <div class="pane">
             <div class="ir-header">
@@ -463,10 +497,39 @@
           <div class="text-side">
             <h3>From <span class="red">tokens</span> to clauses</h3>
             <p>
-              Canonical UPos enums based on Universal Dependencies. Four derived syntactic nodes —
-              TokenNode, SentenceNode, NounPhraseNode, and CoordinationNode — are exposed to rule authors.
-              The Embassy Rule: Python rules talk only to stable Stilyagi grammar nodes, not raw, unstable
-              spaCy classes.
+              Part-of-speech tags are where a prose linter usually leaks its backend. Stilyagi normalizes
+              them into <code>UPos</code> — the seventeen coarse categories Universal Dependencies defines
+              once for every language it covers.
+            </p>
+            <ul class="upos-set" aria-label="The seventeen canonical UPos tags">
+              <li>ADJ</li>
+              <li>ADP</li>
+              <li>ADV</li>
+              <li>AUX</li>
+              <li>CCONJ</li>
+              <li>DET</li>
+              <li>INTJ</li>
+              <li>NOUN</li>
+              <li>NUM</li>
+              <li>PART</li>
+              <li>PRON</li>
+              <li>PROPN</li>
+              <li>PUNCT</li>
+              <li>SCONJ</li>
+              <li>SYM</li>
+              <li>VERB</li>
+              <li>X</li>
+            </ul>
+            <p>
+              Coarse is the point. UD keeps the inventory small and deliberately cross-linguistic, pushing
+              the finer detail into morphology — which Stilyagi carries separately as
+              <code>MorphFeatures</code>. The provider's own fine-grained tag stays reachable as
+              <code>fine_pos</code> for debugging, but it never becomes the cross-provider contract.
+            </p>
+            <p>
+              Four derived syntactic nodes — TokenNode, SentenceNode, NounPhraseNode, and
+              CoordinationNode — are exposed to rule authors on top of that. The Embassy Rule: Python rules
+              talk only to stable Stilyagi grammar nodes, not raw, unstable spaCy classes.
             </p>
           </div>
           <img

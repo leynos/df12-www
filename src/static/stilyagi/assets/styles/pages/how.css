@@ -471,9 +471,11 @@
   .layer-illo {
     grid-template-columns: 1fr;
   }
-  /* Full bleed: cancel the .cli side padding so the artwork spans the
+  /* Full bleed: cancel the section side padding so these boards span the
      viewport, and drop the side borders that would hug the screen edge. */
-  .cli-frame-img {
+  .cli-frame-img,
+  .arch-diagram,
+  .cli-table {
     margin-inline: calc(var(--unit) * -4);
     border-inline: 0;
   }

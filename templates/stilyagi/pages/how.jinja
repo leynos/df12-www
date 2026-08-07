@@ -2,6 +2,7 @@
 {% block title %}Stilyagi · How — the mechanism{% endblock %}
 {% block description %}How Stilyagi works: Rust extraction, the intermediate representation contract, capability planning, and the Ruff-inspired command line.{% endblock %}
 {% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/syntax.css" />
     <link rel="stylesheet" href="/stilyagi/assets/styles/pages/how.css" />
 {% endblock %}
 {% block content %}
@@ -133,25 +134,32 @@
               ><span class="red">author view</span>
             </div>
             <div class="ex-body">
-              <pre class="code"><code># rules/heading_depth.py
-      from stilyagi.rule import Rule, Level
-      from stilyagi.regions import Heading
+              <div class="code-scroll" tabindex="0" role="region"
+                   aria-label="rules/heading_depth.py source">
+              {% highlight 'python', 'stilyagi-syntax' %}
+              # rules/heading_depth.py
+              from stilyagi.rule import Rule, Level
+              from stilyagi.regions import Heading
 
-      class HeadingDepthRule(Rule):
-          """Reject Markdown headings deeper than level 3."""
-          code = "MD201"
-          name = "heading-depth"
-          level = Level.WARNING
-          pack = "default"
-          capabilities = ()   # no spaCy, no spellchecker
 
-          def check_heading(self, h: Heading) -&gt; None:
-              if h.depth &gt; 3:
-                  self.report(
-                      span=h.marker_span,
-                      message=f"Heading depth {h.depth} exceeds maximum of 3.",
-                      suggestion="Promote to a new section or demote to bold text.",
-                  )</code></pre>
+              class HeadingDepthRule(Rule):
+                  """Reject Markdown headings deeper than level 3."""
+
+                  code = "MD201"
+                  name = "heading-depth"
+                  level = Level.WARNING
+                  pack = "default"
+                  capabilities = ()   # no spaCy, no spellchecker
+
+                  def check_heading(self, h: Heading) -> None:
+                      if h.depth > 3:
+                          self.report(
+                              span=h.marker_span,
+                              message=f"Heading depth {h.depth} exceeds maximum of 3.",
+                              suggestion="Promote to a new section or demote to bold text.",
+                          )
+              {% endhighlight %}
+              </div>
             </div>
           </div>
           <div class="ex-col">

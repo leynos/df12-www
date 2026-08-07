@@ -122,6 +122,14 @@ own hand-crafted stylesheets, which use neither Tailwind nor daisyUI. Their
 colour tokens live in those stylesheets, and the accessibility rules below
 apply to them just the same.
 
+Code blocks on the Netsuke and Stilyagi sub-sites are highlighted at build
+time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which runs
+Pygments and emits token classes. The colours come from a Pygments `Style`
+(`HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is generated, not
+hand-written — rerun `scripts/generate_himotoshi_pygments_css.py` or
+`scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
+edit the marked block by hand.
+
 Stilyagi's palette is split by role rather than by hue: `--press-red` paints
 fills, borders, and stamps, while red *type* uses `--accent-text`, which each
 dark panel re-points from the paper-surface red to the ink-ground one. Because

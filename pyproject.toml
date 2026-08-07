@@ -29,6 +29,7 @@ netsuke-console = "df12_pages.highlighting:NetsukeConsoleLexer"
 
 [project.entry-points."pygments.styles"]
 himotoshi = "df12_pages.highlighting:HimotoshiStyle"
+stilyagi = "df12_pages.stilyagi_highlighting:StilyagiStyle"
 
 [dependency-groups]
 dev = [

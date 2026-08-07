@@ -382,6 +382,47 @@
   color: var(--ink-soft);
 }
 
+/* Testing sandbox — reuses the config section's two-column prose/code pairing,
+   so it only needs the status line and the inline code treatment of its own. */
+/* The stamp is rotated, so it sits in its own flex column rather than in the
+   text flow — inline, the second line of prose runs under its lower corner. */
+.sandbox .sandbox-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--unit) * 2);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-top: calc(var(--unit) * 2);
+  /* Clearance for the corners the rotation throws outside the layout box. */
+  padding-block: 8px;
+}
+.sandbox .sandbox-status .stamp {
+  flex: none;
+}
+.sandbox .sandbox-status span:last-child {
+  max-width: 72ch;
+}
+.sandbox .config-grid code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--paper-shade);
+  padding: 1px 4px;
+  /* Otherwise flag and dotted-path names break at their own punctuation —
+     "--isolated" splits after the dashes on a phone.  The longest token here
+     is sixteen characters, so holding them whole never overflows. */
+  white-space: nowrap;
+}
+/* The code blocks carry Python, not TOML, but they wear the same palette as
+   the configuration example so the page keeps one voice for machine text. */
+.sandbox .config-grid pre code {
+  background: transparent;
+  padding: 0;
+}
+
 /* Colophon */
 .colophon-sec {
   background: var(--ink);

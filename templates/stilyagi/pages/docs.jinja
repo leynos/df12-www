@@ -1,6 +1,6 @@
 {% extends "_layout.jinja" %}
 {% block title %}Stilyagi · Docs — rules catalogue, configuration, colophon{% endblock %}
-{% block description %}Stilyagi reference: the rules catalogue, configuration schema, suppression semantics, and the growing manual for the tool itself.{% endblock %}
+{% block description %}Stilyagi reference: the rules catalogue, configuration schema, suppression semantics, the testing sandbox for rule authors, and the growing manual for the tool itself.{% endblock %}
 {% block page_stylesheet %}
     <link rel="stylesheet" href="/stilyagi/assets/styles/pages/docs.css" />
 {% endblock %}
@@ -25,7 +25,7 @@
         <aside class="side-toc">
           <a href="#catalogue" class="active">§ I. Rules</a><a href="#config" class="">§ II. Config</a
           ><a href="#suppress" class="">§ III. Suppressions</a
-          ><a href="#colophon" class="">§ IV. Colophon</a>
+          ><a href="#testing" class="">§ IV. Sandbox</a><a href="#colophon" class="">§ V. Colophon</a>
         </aside>
         <div>
           <section id="catalogue" style="scroll-margin-top: 90px">
@@ -591,7 +591,24 @@
                 tabindex="0"
                 role="region"
                 aria-label="Example stilyagi.toml"
-              ><code><span class="c"># stilyagi.toml</span><span class="k">line-length</span> = <span class="n">100</span><span class="k">select</span> = [<span class="s">"MD"</span>, <span class="s">"PUN"</span>, <span class="s">"PYDOC"</span>]<span class="k">ignore</span> = [<span class="s">"MD260"</span>, <span class="s">"PUN204"</span>]<span class="c"># Per-rule configuration</span>[<span class="k">rule.PUN201</span>]<span class="k">style</span> = <span class="s">"british"</span><span class="k">allow-straight</span> = [<span class="s">"code"</span>, <span class="s">"inline_code"</span>] [<span class="k">rule.GRAM210</span>]<span class="k">max-words</span> = <span class="n">32</span><span class="c"># Per-file overrides — glob-matched</span>[<span class="k">per-file</span>]<span class="s">"docs/reference/**"</span> = { <span class="k">extend-select</span> = [<span class="s">"GRAM"</span>] }<span class="s">"**/CHANGELOG.md"</span> = { <span class="k">ignore</span> = [<span class="s">"MD201"</span>] }</code></pre>
+              >
+<span class="c"># stilyagi.toml</span>
+<span class="k">line-length</span> = <span class="n">100</span>
+<span class="k">select</span> = [<span class="s">"MD"</span>, <span class="s">"PUN"</span>, <span class="s">"PYDOC"</span>]
+<span class="k">ignore</span> = [<span class="s">"MD260"</span>, <span class="s">"PUN204"</span>]
+
+<span class="c"># Per-rule configuration</span>
+[<span class="k">rule.PUN201</span>]
+<span class="k">style</span> = <span class="s">"british"</span>
+<span class="k">allow-straight</span> = [<span class="s">"code"</span>, <span class="s">"inline_code"</span>]
+
+[<span class="k">rule.GRAM210</span>]
+<span class="k">max-words</span> = <span class="n">32</span>
+
+<span class="c"># Per-file overrides — glob-matched</span>
+[<span class="k">per-file</span>]
+<span class="s">"docs/reference/**"</span> = { <span class="k">extend-select</span> = [<span class="s">"GRAM"</span>] }
+<span class="s">"**/CHANGELOG.md"</span> = { <span class="k">ignore</span> = [<span class="s">"MD201"</span>] }</pre>
             </div>
           </section>
           <section id="suppress" class="suppress" style="margin-top: 80px; scroll-margin-top: 90px">
@@ -641,7 +658,8 @@ darkness, it was the spring of hope, it was the winter of despair.
 <span class="com">&lt;!-- stilyagi: enable-block GRAM210 --&gt;</span>
 
 Ordinary prose resumes here. <span class="com">&lt;!-- stilyagi: disable-line PUN101 --&gt;</span>
-<span class="dim"># ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ # disables only the preceding line</span></pre>
+<span class="dim">                           # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           # disables only the current line</span></pre>
             <pre
               id="suppress-panel-py"
               role="tabpanel"
@@ -657,8 +675,7 @@ Ordinary prose resumes here. <span class="com">&lt;!-- stilyagi: disable-line PU
 
     <span class="dim">Args:</span>
         <span class="dim">series: price series, normalized.</span>
-        <span class="dim">window: lookback in trading days (default: 7).</span>
-        <span class="com"># stilyagi: disable-line PYDOC103</span>
+        <span class="dim">window: lookback in trading days (default: 7).</span>  <span class="com"># stilyagi: disable-line PYDOC103</span>
         <span class="dim">_internal_debug_flag: unused; retained for historical</span>
         <span class="dim">instrumentation and compatibility.</span>
     <span class="dim">"""</span>
@@ -676,6 +693,119 @@ Ordinary prose resumes here. <span class="com">&lt;!-- stilyagi: disable-line PU
               A suppression must name its rule — wildcards are refused — so a reader can always answer the
               question: <em>why is this line exempt?</em>
             </p>
+          </section>
+          <section id="testing" class="sandbox" style="margin-top: 80px; scroll-margin-top: 90px">
+            <div class="cat-head">
+              <h2>The <span class="red">testing</span> sandbox</h2>
+              <div class="counts">pytest fixture<br />hermetic by default</div>
+            </div>
+            <p class="sandbox-status">
+              <span class="stamp small">Planned</span
+              ><span
+                >Specified in RFC 0004; the current tree carries an internal golden-IR and fix round-trip
+                scaffold while the public fixture is built.</span
+              >
+            </p>
+            <div class="config-grid">
+              <div>
+                <h3>Real runs, <span class="red">isolated</span> state</h3>
+                <p>
+                  Rule authoring is a first-class feature, so rule testing is one too. The sandbox is a
+                  pytest fixture — <code>stilyagi_path</code> — that wraps <code>tmp_path</code> into a
+                  temporary project root you write ordinary files into, then runs the real
+                  <code>stilyagi</code> against them and hands back typed diagnostics.
+                </p>
+                <p>
+                  Runs go through a subprocess by default, because that is what exercises the installed
+                  command surface, config discovery, entry-point loading, exit codes, JSON rendering, and
+                  the Rust extension import. An in-process fast path would test a different program from
+                  the one users run.
+                </p>
+                <p>
+                  Hermetic is the default, not a flag: <code>--isolated</code>, <code>--no-cache</code>, a
+                  working directory rooted in the temporary project, and UTF-8 forced. No user config
+                  leaks in, no cache survives, and output paths are normalized to
+                  <code>./like/this.md</code> so assertions read the same on every platform.
+                </p>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Example rule test using the stilyagi_path fixture"
+              >
+<span class="c"># tests/test_serial_comma.py</span>
+<span class="k">from</span> stilyagi.testing <span class="k">import</span> assert_has_diagnostic
+
+
+<span class="k">def</span> <span class="n">test_serial_comma</span>(stilyagi_path):
+    stilyagi_path.write_config(
+        <span class="s">'[tool.stilyagi.lint]\n'</span>
+        <span class="s">'select = ["PUN201"]\n'</span>
+    )
+    (stilyagi_path / <span class="s">"doc.md"</span>).write_text(
+        <span class="s">"Apples, bananas and pears.\n"</span>
+    )
+
+    result = stilyagi_path.run_check(<span class="s">"doc.md"</span>)
+
+    diag = assert_has_diagnostic(
+        result.diagnostics, code=<span class="s">"PUN201"</span>
+    )
+    <span class="k">assert</span> diag.fix.applicability == <span class="s">"safe"</span></pre>
+            </div>
+            <div class="config-grid" style="margin-top: 40px">
+              <div>
+                <h3>Packs and <span class="red">extraction</span>, both testable</h3>
+                <p>
+                  Third-party rules arrive through entry points, so the sandbox has to be able to
+                  manufacture something that looks installed.
+                  <code>install_rule_pack()</code> writes a package tree and a <code>.dist-info</code>
+                  directory with real <code>entry_points.txt</code> metadata, then puts it on the
+                  subprocess path — the same discovery contract production uses, without a virtual
+                  environment or a <code>pip install</code> per test.
+                </p>
+                <p>
+                  <code>run_dump_ir()</code> returns parsed IR documents, so a test can assert on region
+                  kinds, owner metadata, synthetic segments, and suppression state. That distinction
+                  matters: a false positive is either a bad rule or a bad extractor, and the harness
+                  should make it cheap to tell which.
+                </p>
+                <p>
+                  The assertion helpers stay deliberately dumb —
+                  <code>assert_has_diagnostic</code>, <code>assert_no_diagnostics</code>,
+                  <code>assert_only_codes</code>, <code>assert_has_fix</code>,
+                  <code>assert_ir_region</code>. They exist to delete repetitive test noise, not to become
+                  a second assertion language. And the name is a promise about isolation, not about
+                  safety: rule packs are trusted Python here exactly as they are everywhere else.
+                </p>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Example temporary rule pack installed into the sandbox"
+              >
+<span class="k">def</span> <span class="n">test_custom_pack</span>(stilyagi_path):
+    stilyagi_path.install_rule_pack(
+        name=<span class="s">"demo-pack"</span>,
+        modules={<span class="s">"demo_pack/rules.py"</span>: RULE_SOURCE},
+        rule_entry_points={
+            <span class="s">"demo"</span>: <span class="s">"demo_pack.rules"</span>
+        },
+    )
+    stilyagi_path.write_config(
+        <span class="s">'[tool.stilyagi]\n'</span>
+        <span class="s">'plugins = ["demo-pack"]\n'</span>
+    )
+    (stilyagi_path / <span class="s">"doc.md"</span>).write_text(
+        <span class="s">"foo appears here\n"</span>
+    )
+
+    result = stilyagi_path.run_check(<span class="s">"doc.md"</span>)
+
+    assert_has_diagnostic(
+        result.diagnostics, code=<span class="s">"DEMO001"</span>
+    )</pre>
+            </div>
           </section>
         </div>
       </div>

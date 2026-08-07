@@ -460,8 +460,15 @@
      near-opaque paper wash over a blur, lifted above the body column. */
   .flowtext .margin-note {
     z-index: 1;
+    /* The masthead runs 74–90px tall depending on how the brand imprint
+       wraps.  Anchoring the box at 74px and padding the text down to 98px
+       means the wash always meets the masthead — no strip of unblurred
+       prose scrolling through the gap — without ever tucking the text
+       underneath it. */
+    top: 74px;
     margin-inline: calc(var(--unit) * -2);
-    padding: calc(var(--unit) * 1.5) calc(var(--unit) * 2);
+    padding: calc(var(--unit) * 3) calc(var(--unit) * 2)
+      calc(var(--unit) * 1.5);
     background: rgba(239, 228, 206, 0.92);
     backdrop-filter: blur(8px);
     border-bottom: var(--rule-weight) solid var(--ink);

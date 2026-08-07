@@ -88,10 +88,6 @@
 .region.type-heading {
   background: rgba(212, 160, 23, 0.18);
 }
-.region.type-heading.active {
-  background: var(--jazz-ochre);
-  color: var(--ink);
-}
 .region.type-paragraph {
   background: transparent;
 }
@@ -106,9 +102,9 @@
   background: rgba(91, 123, 97, 0.15);
 }
 /* The per-type tints above share specificity with .region.active but follow
-   it in source order, so without these rules an active paragraph, code, link,
-   or list-item region keeps its pale tint under the active paper text —
-   unreadable. Heading has its own ochre active rule. */
+   it in source order, so without these rules an active region keeps its pale
+   tint under the active paper text — unreadable. */
+.region.type-heading.active,
 .region.type-paragraph.active,
 .region.type-code.active,
 .region.type-link.active,

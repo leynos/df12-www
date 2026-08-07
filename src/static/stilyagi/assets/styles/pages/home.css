@@ -135,9 +135,10 @@
        font-family: var(--font-mono);
        /* One curve instead of tablet breakpoints: the frame caps at 1164px, so
           1.03cqw resolves to the 12px desktop size and shrinks with the
-          artwork below it.  The 9px floor holds legibility from roughly 960px
-          down to the 720px mobile bands, which override this outright. */
-       font-size: clamp(9px, 1.03cqw, 12px);
+          artwork below it.  The 8px floor holds legibility from roughly 880px
+          down to the 720px mobile bands, which override this outright, while
+          keeping the line clear of the platen just above that handover. */
+       font-size: clamp(8px, 1.03cqw, 12px);
        line-height: 1.6;
        color: var(--ink);
        pointer-events: none;

@@ -23,7 +23,7 @@
     </a>
     <nav class="mxd-site-nav" aria-label="Primary">
       {% if parent_link %}
-      <a href="{{ parent_link.href }}" class="text-accent">{{ parent_link.label }}</a>
+      <a href="{{ parent_link.href }}">{{ parent_link.label }}</a>
       {% endif %}
       {% for link in nav_links %}<a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>{% endfor %}
     </nav>

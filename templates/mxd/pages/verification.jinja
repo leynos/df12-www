@@ -53,7 +53,7 @@
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Domain side</h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Server-wide and per-session state, semantic inputs, and
@@ -62,7 +62,7 @@
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Adapter side</h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Wireframe framing, transport timeouts, persistence wiring,
@@ -99,10 +99,10 @@
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="bg-white rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
             <div class="flex items-start gap-4 mb-6">
                 <div class="w-10 h-10 bg-primary rounded flex items-center justify-center flex-shrink-0">
-                    <span class="text-white text-xl font-bold font-primary">T+</span>
+                    <span class="text-primary-content text-xl font-bold font-primary">T+</span>
                 </div>
                 <div>
                     <h2 class="text-base-content text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">TLA+/TLC</h2>
@@ -115,7 +115,7 @@
                     For state-machine progression and policy invariants. The handshake specification models Idle → AwaitingHandshake → Validating → Ready/Error transitions across multiple concurrent clients with discrete time ticks. TLC explores approximately 10⁶ states at <code class="text-base-content text-xs font-normal font-primary">MaxClients = 3</code> and <code class="text-base-content text-xs font-normal font-primary">TimeoutTicks = 5</code>.
                 </p>
                 
-                <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
+                <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
                     <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                         <div class="w-2 h-2 bg-error rounded"></div>
                         <div class="w-2 h-2 bg-accent rounded"></div>
@@ -150,7 +150,7 @@
 
 <div id="section-stateright" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="bg-white rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
             <div class="flex items-start gap-4 mb-6">
                 <div class="w-10 h-10 bg-accent rounded flex items-center justify-center flex-shrink-0">
                     <span class="text-base-content text-xl font-bold font-primary">Sr</span>
@@ -166,7 +166,7 @@
                     For concurrency interleavings. The session gating model explores login, logout, privilege checks, and out-of-order delivery across multiple clients. It asserts that privileged effects never occur before authentication and that insufficient privileges produce rejections — not silent drops.
                 </p>
                 
-                <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
+                <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
                     <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                         <div class="w-2 h-2 bg-error rounded"></div>
                         <div class="w-2 h-2 bg-accent rounded"></div>
@@ -201,10 +201,10 @@
     <div class="mxd-pattern mxd-pattern--section absolute inset-0 opacity-10" aria-hidden="true"></div>
     
     <div class="relative max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="bg-white rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 p-6 sm:p-8 mxd-card-hover mb-8">
             <div class="flex items-start gap-4 mb-6">
                 <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center flex-shrink-0">
-                    <span class="text-white text-xl font-bold font-primary">Kn</span>
+                    <span class="text-secondary-content text-xl font-bold font-primary">Kn</span>
                 </div>
                 <div>
                     <h2 class="text-base-content text-2xl sm:text-[27.60px] font-normal font-secondary mb-2">Kani</h2>
@@ -222,7 +222,7 @@
                     sharp local invariants that should never panic.
                 </p>
                 
-                <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
+                <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
                     <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                         <div class="w-2 h-2 bg-error rounded"></div>
                         <div class="w-2 h-2 bg-accent rounded"></div>
@@ -288,14 +288,14 @@
             Any counterexample trace produced by these tools becomes a regression test that replays the failing sequence through the domain's <code class="text-base-content text-xs font-normal font-primary">step</code> function. The verifier finds the bug. The regression test prevents it from coming back.
         </p>
         
-        <div class="bg-white rounded-lg border border-base-300 overflow-hidden mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mb-8">
             <div class="px-6 py-4 bg-base-200 border-b border-base-300">
                 <h3 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Counterexample to regression test workflow</h3>
             </div>
             <div class="divide-y divide-base-300">
                 <div class="px-6 py-4 flex items-start gap-4">
                     <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-white text-sm font-bold font-primary">1</span>
+                        <span class="text-primary-content text-sm font-bold font-primary">1</span>
                     </div>
                     <div class="flex-1">
                         <p class="text-base-content text-sm font-semibold font-tertiary mb-1">Model checker finds violation</p>
@@ -315,7 +315,7 @@
                 
                 <div class="px-6 py-4 flex items-start gap-4">
                     <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-white text-sm font-bold font-primary">3</span>
+                        <span class="text-secondary-content text-sm font-bold font-primary">3</span>
                     </div>
                     <div class="flex-1">
                         <p class="text-base-content text-sm font-semibold font-tertiary mb-1">Fix implementation</p>
@@ -325,7 +325,7 @@
                 
                 <div class="px-6 py-4 flex items-start gap-4">
                     <div class="w-8 h-8 bg-success rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="text-white text-sm font-bold font-primary">4</span>
+                        <span class="text-success-content text-sm font-bold font-primary">4</span>
                     </div>
                     <div class="flex-1">
                         <p class="text-base-content text-sm font-semibold font-tertiary mb-1">CI enforcement</p>
@@ -355,7 +355,7 @@
             publish counterexample artefacts for triage.
         </p>
 
-        <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+        <div class="bg-neutral rounded-lg shadow-panel overflow-hidden mb-8">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -381,7 +381,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Pull requests</h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Run the critical TLC specs, conservative Stateright bounds,
@@ -390,7 +390,7 @@
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Nightly jobs</h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary leading-[22.66px]">
                     Increase the exploration bounds, run the deeper verification
@@ -413,15 +413,15 @@
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white rounded-lg border-2 border-primary p-6 text-center">
+            <div class="bg-surface rounded-lg border-2 border-primary p-6 text-center">
                 <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="text-white text-xl font-bold font-primary">T+</span>
+                    <span class="text-primary-content text-xl font-bold font-primary">T+</span>
                 </div>
                 <h3 class="text-base-content text-lg font-semibold font-tertiary mb-2">State machines</h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary">Protocol flow correctness</p>
             </div>
             
-            <div class="bg-white rounded-lg border-2 border-accent p-6 text-center">
+            <div class="bg-surface rounded-lg border-2 border-accent p-6 text-center">
                 <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                     <span class="text-base-content text-xl font-bold font-primary">Sr</span>
                 </div>
@@ -429,9 +429,9 @@
                 <p class="text-ink-muted text-sm font-normal font-tertiary">Race condition elimination</p>
             </div>
             
-            <div class="bg-white rounded-lg border-2 border-secondary p-6 text-center">
+            <div class="bg-surface rounded-lg border-2 border-secondary p-6 text-center">
                 <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span class="text-white text-xl font-bold font-primary">Kn</span>
+                    <span class="text-secondary-content text-xl font-bold font-primary">Kn</span>
                 </div>
                 <h3 class="text-base-content text-lg font-semibold font-tertiary mb-2">Function proofs</h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary">Mathematical guarantees</p>
@@ -441,7 +441,7 @@
 </div>
 {% endblock %}
 {% block footer_cta %}
-<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-white">
+<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-surface">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
         <h2 class="text-base-content text-3xl sm:text-[39.80px] font-normal font-secondary mb-4">Verification specifications</h2>
         <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
@@ -449,7 +449,7 @@
         </p>
         
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-primary text-white text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="#section-verification-summary">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="#section-verification-summary">
                 View Specifications
             </a>
             <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="#section-regression">

@@ -57,7 +57,7 @@
             mxd requires the Rust toolchain pinned by <span class="text-base-content text-base font-normal font-primary">rust-toolchain.toml</span>. Clone the repository and build the SQLite variant:
         </p>
 
-        <div class="mxd-code-block bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+        <div class="mxd-code-block bg-neutral rounded-lg shadow-panel overflow-hidden mb-8">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -84,7 +84,7 @@ make sqlite</pre>
         <div class="mxd-section-label">02 — User Account</div>
         <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">Create a user account</h3>
 
-        <div class="mxd-code-block bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+        <div class="mxd-code-block bg-neutral rounded-lg shadow-panel overflow-hidden mb-8">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -107,7 +107,7 @@ cargo run --bin mxd -- create-user --username alice</pre>
         <div class="mxd-section-label">03 — Start</div>
         <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">Start the daemon</h3>
 
-        <div class="mxd-code-block bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-6">
+        <div class="mxd-code-block bg-neutral rounded-lg shadow-panel overflow-hidden mb-6">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -138,7 +138,7 @@ cargo run --bin mxd -- create-user --username alice</pre>
             The <span class="text-base-content text-base font-normal font-primary">mxd-wireframe-server</span> binary runs the new transport runtime. It honours the same configuration surface — flags, env, TOML — and exposes identical admin subcommands.
         </p>
 
-        <div class="mxd-code-block bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+        <div class="mxd-code-block bg-neutral rounded-lg shadow-panel overflow-hidden mb-8">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -176,7 +176,7 @@ cargo run --bin mxd-wireframe-server -- --bind 0.0.0.0:6600 --database mxd.db</p
             Install the unprivileged embedded helper and switch the database URL:
         </p>
 
-        <div class="mxd-code-block bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-8">
+        <div class="mxd-code-block bg-neutral rounded-lg shadow-panel overflow-hidden mb-8">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -202,7 +202,7 @@ cargo run --bin mxd -- --database "$MXD_DATABASE"</pre>
         <div class="mxd-section-label">06 — Tests</div>
         <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-6">Running the test suite</h3>
 
-        <div class="mxd-code-block bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden mb-6">
+        <div class="mxd-code-block bg-neutral rounded-lg shadow-panel overflow-hidden mb-6">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -249,11 +249,11 @@ make test</pre>
                 The Rust toolchain version is pinned by <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">rust-toolchain.toml</code> in the repository root. <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">cargo</code> and <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">make</code> must be on the <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">PATH</code>. Optionally, install <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">pg-embed-setup-unpriv</code> for PostgreSQL-backed tests without a system-level database install.
             </p>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6 sm:p-8">
+            <div class="bg-surface rounded-lg border border-base-300 p-6 sm:p-8">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div class="flex items-start gap-3">
                         <div class="w-8 h-8 bg-primary rounded flex items-center justify-center flex-shrink-0 mt-1">
-                            <i class="fa-solid fa-box text-white text-sm"></i>
+                            <i class="fa-solid fa-box text-primary-content text-sm"></i>
                         </div>
                         <div>
                             <h4 class="text-base-content text-base font-semibold font-tertiary mb-1">Rust toolchain</h4>
@@ -273,7 +273,7 @@ make test</pre>
 
                     <div class="flex items-start gap-3 sm:col-span-2">
                         <div class="w-8 h-8 bg-secondary rounded flex items-center justify-center flex-shrink-0 mt-1">
-                            <i class="fa-solid fa-database text-white text-sm"></i>
+                            <i class="fa-solid fa-database text-secondary-content text-sm"></i>
                         </div>
                         <div>
                             <h4 class="text-base-content text-base font-semibold font-tertiary mb-1">PostgreSQL (optional)</h4>
@@ -291,7 +291,7 @@ make test</pre>
         <h3 class="text-base-content text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">Building</h3>
 
         <div class="space-y-8">
-            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
                 <div class="px-6 py-4 bg-base-200 border-b border-base-300">
                     <h4 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">For SQLite (the default)</h4>
                 </div>
@@ -312,7 +312,7 @@ make test</pre>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
                 <div class="px-6 py-4 bg-base-200 border-b border-base-300">
                     <h4 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">For PostgreSQL</h4>
                 </div>
@@ -333,7 +333,7 @@ make test</pre>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
                 <div class="px-6 py-4 bg-base-200 border-b border-base-300">
                     <h4 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">For the Wireframe server</h4>
                 </div>
@@ -380,7 +380,7 @@ make test</pre>
                 The <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">legacy-networking</code> Cargo feature is enabled by default. That keeps the classic <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">mxd</code> binary available. Disabling default features changes the produced binaries and selects the Wireframe runtime as the active listener path:
             </p>
 
-            <div class="bg-white rounded-lg border border-base-300 overflow-hidden">
+            <div class="bg-surface rounded-lg border border-base-300 overflow-hidden">
                 <div class="bg-neutral overflow-hidden">
                     <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                         <div class="w-2 h-2 bg-error rounded"></div>
@@ -444,7 +444,7 @@ make test</pre>
                 A recommended service unit:
             </p>
 
-            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
                 <div class="bg-neutral overflow-hidden">
                     <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                         <div class="w-2 h-2 bg-error rounded"></div>
@@ -495,7 +495,7 @@ make test</pre>
                 The default bind address <code class="text-base-content text-xs font-normal font-primary bg-base-200 px-2 py-1 rounded">0.0.0.0:5500</code> works inside a container without modification. Mount a volume at the database path for persistence:
             </p>
 
-            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
                 <div class="bg-neutral overflow-hidden">
                     <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                         <div class="w-2 h-2 bg-error rounded"></div>
@@ -516,7 +516,7 @@ make test</pre>
                 For PostgreSQL, pass the connection string as an environment variable:
             </p>
 
-            <div class="bg-white rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mxd-card-hover">
                 <div class="bg-neutral overflow-hidden">
                     <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                         <div class="w-2 h-2 bg-error rounded"></div>
@@ -549,10 +549,10 @@ make test</pre>
         <h3 class="text-base-content text-2xl sm:text-3xl md:text-[27.60px] font-normal font-secondary mb-6">Deployment considerations</h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg border border-base-300 p-6 mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 p-6 mxd-card-hover">
                 <div class="flex items-start gap-3 mb-4">
                     <div class="w-10 h-10 bg-primary rounded flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                        <i class="fa-solid fa-shield-halved text-primary-content text-lg"></i>
                     </div>
                     <div>
                         <h4 class="text-base-content text-[27.60px] font-normal font-secondary mb-2">User isolation</h4>
@@ -563,7 +563,7 @@ make test</pre>
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6 mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 p-6 mxd-card-hover">
                 <div class="flex items-start gap-3 mb-4">
                     <div class="w-10 h-10 bg-accent rounded flex items-center justify-center flex-shrink-0">
                         <i class="fa-solid fa-database text-base-content text-lg"></i>
@@ -577,10 +577,10 @@ make test</pre>
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6 mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 p-6 mxd-card-hover">
                 <div class="flex items-start gap-3 mb-4">
                     <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-network-wired text-white text-lg"></i>
+                        <i class="fa-solid fa-network-wired text-secondary-content text-lg"></i>
                     </div>
                     <div>
                         <h4 class="text-base-content text-[27.60px] font-normal font-secondary mb-2">Network binding</h4>
@@ -591,10 +591,10 @@ make test</pre>
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6 mxd-card-hover">
+            <div class="bg-surface rounded-lg border border-base-300 p-6 mxd-card-hover">
                 <div class="flex items-start gap-3 mb-4">
                     <div class="w-10 h-10 bg-success rounded flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-clock-rotate-left text-white text-lg"></i>
+                        <i class="fa-solid fa-clock-rotate-left text-success-content text-lg"></i>
                     </div>
                     <div>
                         <h4 class="text-base-content text-[27.60px] font-normal font-secondary mb-2">Restart policy</h4>
@@ -609,7 +609,7 @@ make test</pre>
 </div>
 {% endblock %}
 {% block footer_cta %}
-<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-white">
+<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-surface">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
         <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-4">Next steps</h2>
         <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
@@ -617,7 +617,7 @@ make test</pre>
         </p>
 
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-primary text-white text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/architecture/">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/architecture/">
                 Architecture Guide
             </a>
             <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/protocol/">

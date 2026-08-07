@@ -44,7 +44,7 @@
 {% block content %}
 <div id="section-matrix" class="border-t border-base-300 py-16 sm:py-20">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8">
-        <div class="bg-white rounded-lg border border-base-300 overflow-hidden mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mb-8">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
@@ -187,7 +187,7 @@
         <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-6">Status definitions</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <div class="mb-4">
                     <span class="mxd-badge mxd-badge--supported">Supported</span>
                 </div>
@@ -197,7 +197,7 @@
                 </p>
             </div>
             
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <div class="mb-4">
                     <span class="mxd-badge mxd-badge--partial">Partial</span>
                 </div>
@@ -207,7 +207,7 @@
                 </p>
             </div>
             
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <div class="mb-4">
                     <span class="mxd-badge mxd-badge--planned">Planned</span>
                 </div>
@@ -233,7 +233,7 @@
         
         <h3 class="text-base-content text-[27.60px] font-normal font-secondary mb-4">Test coverage requirements</h3>
         
-        <div class="bg-white rounded-lg border border-base-300 overflow-hidden mb-8">
+        <div class="bg-surface rounded-lg border border-base-300 overflow-hidden mb-8">
             <div class="px-6 py-4 border-b border-base-300">
                 <p class="text-base-content text-sm font-semibold font-tertiary">Current behavioural guarantees captured by tests include:</p>
             </div>
@@ -288,7 +288,7 @@
             matrix status.
         </p>
         
-        <div class="bg-neutral rounded-lg shadow-[0px_8px_32px_0px_rgba(18,18,31,0.18)] overflow-hidden">
+        <div class="bg-neutral rounded-lg shadow-panel overflow-hidden">
             <div class="px-4 py-3 bg-night border-b border-night-line flex items-center gap-3">
                 <div class="w-2 h-2 bg-error rounded"></div>
                 <div class="w-2 h-2 bg-accent rounded"></div>
@@ -303,7 +303,7 @@
             </div>
         </div>
 
-        <div class="mt-8 bg-white rounded-lg border border-base-300 overflow-hidden">
+        <div class="mt-8 bg-surface rounded-lg border border-base-300 overflow-hidden">
             <div class="px-6 py-4 border-b border-base-300">
                 <h3 class="text-secondary text-[11.10px] font-bold font-primary uppercase tracking-[0.10em]">Reviewer prompts</h3>
             </div>
@@ -332,7 +332,7 @@
 </div>
 {% endblock %}
 {% block footer_cta %}
-<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-white">
+<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-surface">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
         <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-4">Protocol documentation</h2>
         <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8 max-w-[600px] mx-auto">
@@ -340,7 +340,7 @@
         </p>
         
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-primary text-white text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/protocol/">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/protocol/">
                 Protocol Reference
             </a>
             <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/verification/#section-regression">

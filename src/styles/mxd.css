@@ -74,6 +74,22 @@
   --color-code-string: #6aaf7a;
   --color-magenta: #a855a0;
 
+  /* Cards sit raised above the parchment page, so this surface is lighter
+     than base-100 rather than darker; the daisyUI base ramp cannot express
+     that. Paired content token follows the daisyUI convention. */
+  --color-surface: #ffffff;
+  --color-surface-content: #12121f;
+
+  /* Content pairs for the two accent surfaces daisyUI does not model.
+     White clears AA on both: 7.0:1 and 4.7:1 respectively. */
+  --color-primary-deep-content: #ffffff;
+  --color-magenta-content: #ffffff;
+
+  /* Elevation ramp, previously repeated as arbitrary rgba values. */
+  --shadow-panel: 0 8px 32px rgba(18, 18, 31, 0.18);
+  --shadow-panel-raised: 0 12px 32px rgba(18, 18, 31, 0.24);
+  --shadow-card-raised: 0 8px 24px rgba(18, 18, 31, 0.12);
+
   /* Badge tint ramps (backgrounds/borders only — text uses the
      matching daisyUI colour). */
   --color-success-soft: #e8f5ec;

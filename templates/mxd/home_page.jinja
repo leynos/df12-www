@@ -23,7 +23,7 @@
     </a>
     <nav class="mxd-site-nav" aria-label="Primary">
       {% if parent_link %}
-      <a href="{{ parent_link.href }}" class="text-accent">{{ parent_link.label }}</a>
+      <a href="{{ parent_link.href }}">{{ parent_link.label }}</a>
       {% endif %}
       {% for link in nav_links %}<a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>{% endfor %}
     </nav>
@@ -60,10 +60,10 @@
         </div>
 
         <div class="flex flex-wrap gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-primary text-white text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/getting-started/">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/getting-started/">
                 Get Started
             </a>
-            <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="https://github.com/leynos/mxd" target="_blank" rel="noreferrer">
+            <a class="mxd-btn--outline px-6 py-3 text-accent text-sm font-semibold font-primary rounded border-2 border-accent mxd-site-button" href="https://github.com/leynos/mxd" target="_blank" rel="noreferrer">
                 View Source
             </a>
             <a class="mxd-btn--ghost px-6 py-3 text-base-300 text-sm font-semibold font-primary rounded border-2 border-base-300 mxd-site-button" href="/mxd/protocol/">
@@ -123,7 +123,7 @@
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <div class="mb-3">
                     <span class="mxd-badge mxd-badge--supported">Implemented now</span>
                 </div>
@@ -134,7 +134,7 @@
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <div class="mb-3">
                     <span class="mxd-badge mxd-badge--partial">Partial surface</span>
                 </div>
@@ -146,7 +146,7 @@
                 </p>
             </div>
 
-            <div class="bg-white rounded-lg border border-base-300 p-6">
+            <div class="bg-surface rounded-lg border border-base-300 p-6">
                 <div class="mb-3">
                     <span class="mxd-badge mxd-badge--planned">Designed in depth</span>
                 </div>
@@ -167,9 +167,9 @@
         <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-8">Built to be reasoned about</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 p-6">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 p-6">
                 <div class="w-10 h-10 bg-primary rounded flex items-center justify-center mb-6">
-                    <span class="text-white text-xl font-normal font-primary">Hx</span>
+                    <span class="text-primary-content text-xl font-normal font-primary">Hx</span>
                 </div>
                 <h3 class="text-base-content text-[27.60px] font-normal font-secondary leading-[34.56px] mb-3"><a href="/mxd/architecture/" class="underline decoration-transparent hover:decoration-current">Hexagonal Architecture</a></h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary leading-[21.32px]">
@@ -177,9 +177,9 @@
                 </p>
             </div>
 
-            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 p-6">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 p-6">
                 <div class="w-10 h-10 bg-secondary rounded flex items-center justify-center mb-6">
-                    <span class="text-white text-xl font-normal font-primary">Db</span>
+                    <span class="text-secondary-content text-xl font-normal font-primary">Db</span>
                 </div>
                 <h3 class="text-base-content text-[27.60px] font-normal font-secondary leading-[34.56px] mb-3"><a href="/mxd/configuration/" class="underline decoration-transparent hover:decoration-current">Dual Database</a></h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary leading-[21.32px]">
@@ -187,7 +187,7 @@
                 </p>
             </div>
 
-            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 p-6">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 p-6">
                 <div class="w-10 h-10 bg-accent rounded flex items-center justify-center mb-6">
                     <span class="text-base-content text-xl font-normal font-primary">Cx</span>
                 </div>
@@ -197,9 +197,9 @@
                 </p>
             </div>
 
-            <div class="mxd-card-hover bg-white rounded-lg border border-base-300 p-6">
+            <div class="mxd-card-hover bg-surface rounded-lg border border-base-300 p-6">
                 <div class="w-10 h-10 bg-success rounded flex items-center justify-center mb-6">
-                    <span class="text-white text-xl font-normal font-primary">Kn</span>
+                    <span class="text-success-content text-xl font-normal font-primary">Kn</span>
                 </div>
                 <h3 class="text-base-content text-[27.60px] font-normal font-secondary leading-[34.56px] mb-3"><a href="/mxd/verification/" class="underline decoration-transparent hover:decoration-current">Verified Correct</a></h3>
                 <p class="text-ink-muted text-sm font-normal font-tertiary leading-[21.32px]">
@@ -228,12 +228,12 @@
         <div class="mb-8 rounded-lg overflow-hidden">
             <div class="flex">
                 <div class="flex-1 px-2 py-3 bg-primary flex flex-col items-center gap-1">
-                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
-                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Flags</div>
+                    <div class="text-center text-primary-content text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-primary-content text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Flags</div>
                 </div>
                 <div class="flex-1 px-2 py-3 bg-primary-deep flex flex-col items-center gap-1">
-                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
-                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Reply</div>
+                    <div class="text-center text-primary-deep-content text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-primary-deep-content text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Reply</div>
                 </div>
                 <div class="flex-1 px-2 py-3 bg-accent flex flex-col items-center gap-1">
                     <div class="text-center text-base-content text-xl font-bold font-primary leading-8">00</div>
@@ -260,22 +260,22 @@
                     <div class="text-center text-base-content text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">ID</div>
                 </div>
                 <div class="flex-1 px-2 py-3 bg-secondary flex flex-col items-center gap-1">
-                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
-                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
+                    <div class="text-center text-secondary-content text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-secondary-content text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
                 </div>
                 <div class="flex-1 px-2 py-3 bg-secondary flex flex-col items-center gap-1">
-                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
-                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
+                    <div class="text-center text-secondary-content text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-secondary-content text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
                 </div>
             </div>
             <div class="flex">
                 <div class="flex-1 px-2 py-3 bg-secondary flex flex-col items-center gap-1">
-                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
-                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
+                    <div class="text-center text-secondary-content text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-secondary-content text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
                 </div>
                 <div class="flex-1 px-2 py-3 bg-secondary flex flex-col items-center gap-1">
-                    <div class="text-center text-white text-xl font-bold font-primary leading-8">00</div>
-                    <div class="text-center text-white text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
+                    <div class="text-center text-secondary-content text-xl font-bold font-primary leading-8">00</div>
+                    <div class="text-center text-secondary-content text-[9.60px] font-normal font-primary uppercase tracking-[0.05em]">Error</div>
                 </div>
                 <div class="flex-1 px-2 py-3 bg-indigo-deep flex flex-col items-center gap-1">
                     <div class="text-center text-neutral-content text-xl font-bold font-primary leading-8">00</div>
@@ -392,7 +392,7 @@
     </div>
 </div>
 
-<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-white">
+<div id="footer-cta" class="border-t border-base-300 py-16 sm:py-20 bg-surface">
     <div class="max-w-[900px] mx-auto px-4 sm:px-8 text-center">
         <h2 class="text-base-content text-[39.80px] font-normal font-secondary mb-4">Get the daemon running</h2>
         <p class="text-base-content text-base font-normal font-tertiary leading-[27.20px] mb-8">
@@ -400,7 +400,7 @@
         </p>
 
         <div class="flex flex-wrap justify-center gap-3">
-            <a class="mxd-btn--primary px-6 py-3 bg-primary text-white text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/getting-started/">
+            <a class="mxd-btn--primary px-6 py-3 bg-primary text-primary-content text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="/mxd/getting-started/">
                 Getting Started
             </a>
             <a class="mxd-btn--outline px-6 py-3 text-primary text-sm font-semibold font-primary rounded border-2 border-primary mxd-site-button" href="https://github.com/leynos/mxd" target="_blank" rel="noreferrer">

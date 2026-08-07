@@ -722,3 +722,25 @@
          border-inline: 0;
        }
      }
+
+     /* Two more annotation bands hold the line on the sheet through the
+        tablet bleed, where the 1672/941 crop shrinks the drawn paper. */
+     @media (840px < width <= 960px) {
+       .poster-annotation {
+         top: 20%;
+         right: 22%;
+         width: 8em;
+         font-size: 12px;
+         line-height: 1.6;
+       }
+     }
+
+     @media (720px < width <= 840px) {
+       .poster-annotation {
+         top: 21%;
+         right: 22%;
+         width: 8em;
+         font-size: 9px;
+         line-height: 1.6;
+       }
+     }

@@ -719,3 +719,19 @@
 
      /* Tablet widths need no annotation bands: the cqw font size scales the
         whole box with the artwork, so the base percentage anchors hold. */
+
+     /* On the narrowest phones the value band and command rail join the hero
+        in running full bleed, so the page reads as stacked bands rather than
+        a column of framed boxes.  Each sheds the shell's inline padding; the
+        rail also drops its side rules, keeping its own padding to hold the
+        content off the screen edge. */
+     @media (width <= 460px) {
+       .value-band {
+         margin-inline: calc(var(--unit) * -2);
+       }
+
+       .command-rail {
+         margin-inline: calc(var(--unit) * -2);
+         border-inline: 0;
+       }
+     }

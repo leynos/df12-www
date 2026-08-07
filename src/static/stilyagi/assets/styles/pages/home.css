@@ -56,9 +56,6 @@
        gap: 18px;
      }
 
-     .poster-showcase::before {
-       display: none;
-     }
 
      .poster-art-frame {
        position: relative;
@@ -144,9 +141,6 @@
        pointer-events: none;
      }
 
-     .stamp-pocket {
-       display: none;
-     }
 
      .poster-tiles {
        position: relative;

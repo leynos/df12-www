@@ -8,7 +8,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const { nextOpenIndex } = require(
-    "../../public/stilyagi/assets/js/roadmap.js"
+    "../../src/static/stilyagi/assets/js/roadmap.js"
 );
 
 describe("nextOpenIndex", () => {

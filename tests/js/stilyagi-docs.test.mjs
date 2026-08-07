@@ -9,7 +9,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const { matchesFilter } = require(
-    "../../public/stilyagi/assets/js/docs.js"
+    "../../src/static/stilyagi/assets/js/docs.js"
 );
 
 const HAYSTACK = "md201 heading depth headings must not skip levels";

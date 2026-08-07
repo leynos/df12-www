@@ -9,7 +9,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const { requiredCapabilities, coldStartFor } = require(
-    "../../public/stilyagi/assets/js/design.js"
+    "../../src/static/stilyagi/assets/js/design.js"
 );
 
 describe("requiredCapabilities", () => {

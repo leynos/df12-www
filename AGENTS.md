@@ -58,9 +58,15 @@ is authored directly as HTML.
 - **`src/styles/`** holds the Tailwind entrypoints, which are compiled rather
   than copied.
 
-To change what a page *says*, edit the YAML or the Markdown. To change how it
-*looks*, edit the template, the Tailwind entrypoint, or the relevant file under
-`src/static/`. Never edit the rendered result.
+The YAML is not where every word lives. A sub-site's `content_pages` entries
+route only — a key, a nav label, a template, and an output slug — so the prose
+on those pages is written directly in `templates/<site>/`. Documentation pages
+are the exception: they name a `doc_path` and are pulled from upstream sources.
+
+To change what a page *says*, edit the YAML, the Markdown, or the sub-site
+template that holds the copy. To change how it *looks*, edit the template, the
+Tailwind entrypoint, or the relevant file under `src/static/`. Never edit the
+rendered result.
 
 ### Nothing under `public/` is tracked
 

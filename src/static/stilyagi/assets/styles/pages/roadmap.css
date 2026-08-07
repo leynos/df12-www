@@ -387,3 +387,12 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* The accordion's height slide and the toggle's rotation are decoration on
+   top of aria-expanded; with reduced motion the panel opens at once. */
+@media (prefers-reduced-motion: reduce) {
+  .ph-body,
+  .ph-toggle {
+    transition: none;
+  }
+}

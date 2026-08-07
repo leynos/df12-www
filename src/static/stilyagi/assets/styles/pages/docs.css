@@ -432,11 +432,16 @@
   position: relative;
   overflow: hidden;
 }
+/* The halftone motif in .halftone prints dark dots for paper grounds; this
+   panel is ink-on-ink, so it takes the same gradient in paper. */
 .colophon-sec::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: var(--halftone-dot);
+  background-image: radial-gradient(
+    rgba(239, 228, 206, 0.85) 1px,
+    transparent 1.4px
+  );
   background-size: 9px 9px;
   opacity: 0.08;
 }

@@ -567,7 +567,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 2px 8px 1px;
-  border: 1px solid currentColor;
+  border: 1px solid currentcolor;
 }
 .verdict.red {
   color: var(--accent-text);
@@ -589,4 +589,12 @@ sup.ref {
   font-size: 0.7em;
   font-weight: 700;
   margin-left: 2px;
+}
+
+/* The nav underline sweeps in from the left; with reduced motion it simply
+   appears. See the shared guard in motifs-and-components.css. */
+@media (prefers-reduced-motion: reduce) {
+  .site-mast nav a::after {
+    transition: none;
+  }
 }

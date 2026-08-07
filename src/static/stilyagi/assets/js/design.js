@@ -53,7 +53,16 @@
     const range = inspector.querySelector("[data-ir-range]");
     if (!nodes.length) return;
 
-    const select = (id) => {
+    /**
+     * Highlight the region and report it in the footer.
+     *
+     * `pressed` is the difference between previewing a region and choosing
+     * one.  Hovering and focusing only preview, so they must leave
+     * `aria-pressed` alone: the tree nodes are real buttons, and flipping
+     * their pressed state under the pointer would tell assistive technology
+     * that a button had been activated when nothing was.
+     */
+    const select = (id, { pressed = false } = {}) => {
       for (const span of spans) {
         span.classList.toggle("active", span.dataset.region === id);
       }
@@ -61,7 +70,7 @@
       for (const node of nodes) {
         const on = node.dataset.region === id;
         node.classList.toggle("active", on);
-        node.setAttribute("aria-pressed", String(on));
+        if (pressed) node.setAttribute("aria-pressed", String(on));
         if (on) active = node;
       }
       if (!active) return;
@@ -69,15 +78,21 @@
       if (range) range.textContent = `[${active.dataset.range || ""}]`;
     };
 
-    for (const element of [...spans, ...nodes]) {
-      const id = element.dataset.region;
-      element.addEventListener("mouseenter", () => select(id));
-      element.addEventListener("focus", () => select(id));
-      element.addEventListener("click", () => select(id));
-      element.addEventListener("keydown", (event) => {
+    // The source spans are plain text, not controls: they preview on hover
+    // and take no part in the tab order, so they get no key handling.
+    for (const span of spans) {
+      span.addEventListener("mouseenter", () => select(span.dataset.region));
+    }
+
+    for (const node of nodes) {
+      const id = node.dataset.region;
+      node.addEventListener("mouseenter", () => select(id));
+      node.addEventListener("focus", () => select(id));
+      node.addEventListener("click", () => select(id, { pressed: true }));
+      node.addEventListener("keydown", (event) => {
         if (!isActivation(event)) return;
         event.preventDefault();
-        select(id);
+        select(id, { pressed: true });
       });
     }
   }

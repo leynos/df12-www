@@ -72,12 +72,16 @@
      the bar to the section keeps it in reach for exactly as long as the
      table is on screen and releases it at the section's end.  The masthead
      runs 74–90px tall depending on how the brand imprint wraps: anchoring
-     the box at 74px and padding the chips down to 90px means the wash always
-     meets the masthead without ever hiding a control behind it. */
+     masthead is 74px tall at the narrowest desktop and grows with the brand
+     type to a 90px ceiling around 1920px, so the anchor tracks it rather than
+     stepping at a breakpoint: the wash always meets the masthead with no gap,
+     and the padding holds the controls a constant 20px clear of its rule.
+     (Below 460px the imprint wraps to two lines and the masthead outgrows the
+     floor; the box simply tucks behind it, which is equally gapless.) */
   position: sticky;
-  top: 74px;
+  top: clamp(73px, 61px + 1.6vw, 89px);
   z-index: 5;
-  padding: 16px 0 18px;
+  padding: 20px 0 18px;
   background: rgba(239, 228, 206, 0.96);
   backdrop-filter: blur(8px);
   border-bottom: var(--rule-weight) solid var(--ink);

@@ -186,6 +186,19 @@
 .site-mast nav a:hover {
   color: var(--accent-text);
 }
+/* The way out of the sub-site is not one of its sections, so it sits a shade
+   back from the section links and takes a rule of its own to say so. */
+.site-mast nav .nav-up {
+  margin-right: 4px;
+  padding-right: 26px;
+  border-right: var(--rule-weight) solid var(--ink-soft);
+}
+.site-mast nav .nav-up a {
+  color: var(--ink-soft);
+}
+.site-mast nav .nav-up a:hover {
+  color: var(--accent-text);
+}
 .site-mast nav a:hover::after,
 .site-mast nav a.active::after {
   transform: scaleX(1);
@@ -195,7 +208,7 @@
    is a native popover, so opening, closing, Escape, and light dismiss all
    work without script. The unlayered flex rule above would defeat the UA's
    closed-popover hiding, so the closed state is hidden explicitly here. */
-@media (width <= 1080px) {
+@media (width <= 1280px) {
   .nav-toggle {
     display: grid;
   }
@@ -219,6 +232,15 @@
   .site-mast nav ol:popover-open a {
     display: block;
     padding: 8px 0;
+  }
+  /* Stacked in the menu, the divider belongs under the row, not beside it. */
+  .site-mast nav ol:popover-open .nav-up {
+    margin-right: 0;
+    padding-right: 0;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-right: 0;
+    border-bottom: var(--rule-weight) solid var(--ink-soft);
   }
   .site-mast nav ol::backdrop {
     background: rgba(15, 15, 15, 0.25);

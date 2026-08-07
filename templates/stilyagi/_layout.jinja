@@ -36,6 +36,11 @@
             <span class="nav-toggle-bars" aria-hidden="true"></span>
           </button>
           <ol id="primary-nav" popover>
+            {#- Stilyagi is one of several df12 sites, so the row starts with
+                the way back out of it. -#}
+            <li class="nav-up">
+              <a href="/" aria-label="df12 home"><span><span aria-hidden="true">←</span> df12</span></a>
+            </li>
             {% for link in nav_links %}
             <li>
               <a href="{{ link.href }}"{% if link.current %} class="active" aria-current="page"{% endif %}><span>{{ link.label }}</span></a>

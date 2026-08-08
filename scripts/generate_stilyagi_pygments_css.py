@@ -60,20 +60,17 @@ def _nearest_declared(token: object, declared: dict[object, str]) -> object | No
     return None
 
 
-def build_css() -> str:
-    """Build the generated CSS block from the Stilyagi style.
+def _declared_colours() -> tuple[dict[object, str], list[str], dict[object, str]]:
+    """Parse the style's specs into variables, keyed by declared token.
 
-    Pygments emits the most specific token class it has — ``c1`` for a
-    single-line comment, ``kn`` for an import keyword — while a style
-    declares broad categories such as ``Comment`` and ``Keyword`` and lets
-    the subtypes inherit. Emitting a rule only for each declared token would
-    therefore leave most of the classes that actually appear in the markup
-    unstyled, so each declared colour is emitted for its whole subtree.
+    Returns
+    -------
+    tuple
+        The variable name per declared token, the ``:root`` declarations in
+        declaration order, and the non-colour extras (italic, bold) per token.
+        Tokens whose spec carries no colour are skipped: they contribute no
+        variable and inherit from their nearest declared ancestor.
     """
-    formatter = HtmlFormatter(style=StilyagiStyle, cssclass="stilyagi-syntax")
-    # Pygments has no public token-to-class API.
-    class_for = formatter._get_css_classes
-
     declared: dict[object, str] = {}
     variables: list[str] = []
     extras_for: dict[object, str] = {}
@@ -93,9 +90,24 @@ def build_css() -> str:
         declared[token] = var
         extras_for[token] = " ".join(extras)
         variables.append(f"  {var}: {colour};")
+    return declared, variables, extras_for
 
-    # Group every token in the style under the declared ancestor it inherits
-    # from, preserving declaration order so the output stays stable.
+
+def _selectors_by_owner(
+    formatter: HtmlFormatter,
+    declared: dict[object, str],
+) -> tuple[dict[object, list[str]], str]:
+    """Group every token in the style under the ancestor it inherits from.
+
+    Returns
+    -------
+    tuple
+        The selectors owned by each declared token, and the rule for the
+        block's default text colour, which the bare ``Token`` type carries
+        and which has no class of its own.
+    """
+    # Pygments has no public token-to-class API.
+    class_for = formatter._get_css_classes
     selectors: dict[object, list[str]] = {token: [] for token in declared}
     root_rule = ""
     for token, _ndef in formatter.style:
@@ -110,6 +122,23 @@ def build_css() -> str:
         # Compound tokens yield space-separated classes (e.g. "s s-Doc")
         # which must chain into one compound selector.
         selectors[owner].append(".stilyagi-syntax ." + ".".join(css_class.split()))
+    return selectors, root_rule
+
+
+def build_css() -> str:
+    """Build the generated CSS block from the Stilyagi style.
+
+    Pygments emits the most specific token class it has — ``c1`` for a
+    single-line comment, ``kn`` for an import keyword — while a style
+    declares broad categories such as ``Comment`` and ``Keyword`` and lets
+    the subtypes inherit. Emitting a rule only for each declared token would
+    therefore leave most of the classes that actually appear in the markup
+    unstyled, so each declared colour is emitted for its whole subtree.
+    """
+    formatter = HtmlFormatter(style=StilyagiStyle, cssclass="stilyagi-syntax")
+    declared, variables, extras_for = _declared_colours()
+    # Declaration order is preserved throughout so the output stays stable.
+    selectors, root_rule = _selectors_by_owner(formatter, declared)
 
     rules: list[str] = []
     if root_rule:

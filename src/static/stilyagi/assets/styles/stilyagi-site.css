@@ -9,6 +9,12 @@
   display: none !important;
 }
 
+/* In-page anchor targets clear the sticky masthead, which runs 74-90px tall
+   depending on how the brand imprint wraps. */
+.section-anchor {
+  scroll-margin-top: 90px;
+}
+
 /* Labels that exist for assistive technology only. */
 .sr-only {
   position: absolute;

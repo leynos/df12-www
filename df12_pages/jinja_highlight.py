@@ -50,12 +50,17 @@ if typ.TYPE_CHECKING:
 DEFAULT_CSS_CLASS = "hm-syntax"
 
 
-@functools.cache
+@functools.lru_cache(maxsize=16)
 def _formatter(css_class: str) -> HtmlFormatter:
     """Return the formatter for a wrapper class.
 
     Formatter configuration is immutable and rendering is stateless, so one
     instance per wrapper class can be shared across every render.
+
+    The class name reaches this function from a template expression, so it is
+    bounded in practice — the repository uses two — but not by construction.
+    A bounded cache keeps a template that passed a computed class from
+    retaining a formatter per distinct value for the life of the process.
     """
     return HtmlFormatter(cssclass=css_class, wrapcode=True)
 

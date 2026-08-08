@@ -15,7 +15,12 @@ from pygments.token import Comment, Keyword, Token
 from df12_pages.config import ContentPageConfig
 from df12_pages.content_page import ContentPageGenerator
 from df12_pages.stilyagi_highlighting import StilyagiStyle
-from scripts.generate_stilyagi_pygments_css import build_css
+from scripts.generate_stilyagi_pygments_css import (
+    BEGIN,
+    END,
+    STYLESHEET,
+    build_css,
+)
 
 if typ.TYPE_CHECKING:
     from pathlib import Path
@@ -133,6 +138,27 @@ class TestStilyagiHighlighting:
         assert emitted, "the sample should produce token classes"
         assert not emitted - styled, (
             f"classes emitted but unstyled: {sorted(emitted - styled)}"
+        )
+
+    def test_committed_stylesheet_matches_the_generator(self) -> None:
+        """The checked-in block is regenerated, never hand-edited.
+
+        ``syntax.css`` is committed but its marked block is build output. A
+        style change that lands without rerunning the generator leaves the
+        stylesheet describing the old palette, which nothing else here would
+        notice: every other assertion reads ``build_css()`` directly.
+        """
+        css = STYLESHEET.read_text(encoding="utf-8")
+        start = css.find(BEGIN)
+        end = css.find(END)
+
+        assert start != -1, f"{STYLESHEET} should carry the BEGIN marker"
+        assert end != -1, f"{STYLESHEET} should carry the END marker"
+
+        committed = css[start : end + len(END)]
+
+        assert committed == build_css(), (
+            f"{STYLESHEET} is stale; rerun scripts/generate_stilyagi_pygments_css.py"
         )
 
     def test_highlight_tag_honours_a_named_wrapper_class(

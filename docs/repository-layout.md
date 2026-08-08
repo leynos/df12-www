@@ -112,8 +112,8 @@ Frontend source files. `styles/` contains the Tailwind CSS entry point (
 and favicons — that are copied verbatim into the published tree. Its layout
 mirrors the output, so `src/static/stilyagi/assets/styles/` is the
 authoritative source for the Stilyagi sub-site's CSS and is published at
-`/stilyagi/assets/styles/`. The copies under `public/` are build output; edit
-these.
+`/stilyagi/assets/styles/`. Edit the files here. The copies under `public/` are
+build output and are overwritten on the next build.
 
 ### `templates/`
 

@@ -531,6 +531,13 @@
   }
 }
 
+/* Each autofix cell carries its own "autofix" label for the stacked layout
+   below, where the column headers are hidden.  Wide enough for the headers to
+   show, the label would only repeat them. */
+.rules-table .col-label {
+  display: none;
+}
+
 /* The namespace tally cannot hold its own column beside the heading at phone
    widths — it is a single unbreakable line, so it pushes the page sideways.
    Stack it under the heading and let it read left to right. */
@@ -593,9 +600,9 @@
     justify-self: start;
   }
   /* The column headers are gone, and "safe" on its own does not say what it
-     is safe to do. */
-  .rules-table td:nth-child(4)::before {
-    content: "autofix ";
+     is safe to do, so each cell carries its own label. */
+  .rules-table .col-label {
+    display: inline;
     color: var(--ink-soft);
   }
   .rules-table .empty-row td {

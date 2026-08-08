@@ -62,7 +62,14 @@
      * their pressed state under the pointer would tell assistive technology
      * that a button had been activated when nothing was.
      */
-    const select = (id, { pressed = false } = {}) => {
+    // The region the reader actually chose, as opposed to the one currently
+    // under the pointer.  The markup ships with one node pressed.
+    let pressed =
+      nodes.find((node) => node.getAttribute("aria-pressed") === "true")
+        ?.dataset.region ?? null;
+
+    const select = (id, { press = false } = {}) => {
+      if (press) pressed = id;
       for (const span of spans) {
         span.classList.toggle("active", span.dataset.region === id);
       }
@@ -70,7 +77,7 @@
       for (const node of nodes) {
         const on = node.dataset.region === id;
         node.classList.toggle("active", on);
-        if (pressed) node.setAttribute("aria-pressed", String(on));
+        if (press) node.setAttribute("aria-pressed", String(on));
         if (on) active = node;
       }
       if (!active) return;
@@ -78,23 +85,35 @@
       if (range) range.textContent = `[${active.dataset.range || ""}]`;
     };
 
+    // Leaving a preview puts the panel back on the chosen region rather than
+    // stranding it on whatever the pointer last crossed.
+    const restore = () => {
+      if (pressed) select(pressed);
+    };
+
     // The source spans are plain text, not controls: they preview on hover
     // and take no part in the tab order, so they get no key handling.
     for (const span of spans) {
       span.addEventListener("mouseenter", () => select(span.dataset.region));
+      span.addEventListener("mouseleave", restore);
     }
 
     for (const node of nodes) {
       const id = node.dataset.region;
       node.addEventListener("mouseenter", () => select(id));
+      node.addEventListener("mouseleave", restore);
       node.addEventListener("focus", () => select(id));
-      node.addEventListener("click", () => select(id, { pressed: true }));
+      node.addEventListener("blur", restore);
+      node.addEventListener("click", () => select(id, { press: true }));
       node.addEventListener("keydown", (event) => {
         if (!isActivation(event)) return;
         event.preventDefault();
-        select(id, { pressed: true });
+        select(id, { press: true });
       });
     }
+
+    // Settle the panel on whichever node the markup shipped pressed.
+    restore();
   }
 
   /**

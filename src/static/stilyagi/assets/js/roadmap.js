@@ -40,7 +40,9 @@
 
     const activate = (index) => {
       const next = nextOpenIndex(currentIndex(), index);
-      heads.forEach((head, i) => setOpen(head, i === next));
+      heads.forEach((head, i) => {
+        setOpen(head, i === next);
+      });
     };
 
     heads.forEach((head, index) => {

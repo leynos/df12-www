@@ -46,6 +46,8 @@ class StilyagiStyle(Style):
     background_color = "#0f0f0f"
     highlight_color = "#2a2a2a"
 
+    # Pygments token types are not publicly typed, so the key is Any; the same
+    # rationale applies in scripts/generate_stilyagi_pygments_css.py.
     styles: typ.ClassVar[dict[typ.Any, str]] = {
         Token: "#efe4ce",  # paper: default text
         Comment: "italic #827b6a",  # lightened rule-faint; 4.6:1

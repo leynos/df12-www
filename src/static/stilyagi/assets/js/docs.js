@@ -90,7 +90,7 @@
     // A reload or a back-navigation restores the search text and the select's
     // value, but not the table they describe.  Settle the rows against
     // whatever the controls are actually showing.
-    if (select && select.value && select.value !== namespace) {
+    if (select?.value && select.value !== namespace) {
       choose(select.value);
     } else {
       apply();

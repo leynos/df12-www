@@ -12,7 +12,7 @@
       "!.act-stubs",
       "!public/assets",
       "!public/netsuke/assets/vendor",
-    "!src/static/**/vendor/**"
+      "!src/static/**/vendor"
     ],
     "ignoreUnknown": true
   },
@@ -38,7 +38,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "suspicious": {
         "noConsole": "off"
       },

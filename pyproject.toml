@@ -7,7 +7,7 @@ requires-python = ">=3.13"
 license = { text = "ISC" }
 authors = [{ name = "Payton McIntosh", email = "pmcintosh@df12.net" }]
 dependencies = [
-    "beautifulsoup4>=4.12",
+    "beautifulsoup4>=4.15.0",
     "cyclopts>=2.9",
     "Jinja2>=3.1",
     "Markdown>=3.5",

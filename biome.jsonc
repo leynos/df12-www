@@ -74,7 +74,7 @@
     {
       // The sub-site scripts are classic scripts, loaded with a plain
       // <script src>, not modules: each wraps itself in an IIFE and the
-      // "use strict" directive inside it is load-bearing, not redundant.
+      // "use strict" directive inside it does real work.
       "includes": ["src/static/**/assets/js/**"],
       "linter": {
         "rules": {

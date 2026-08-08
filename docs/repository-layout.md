@@ -20,6 +20,7 @@ df12-www/
 ├── public/
 │   ├── mxd/
 │   ├── netsuke/
+│   ├── stilyagi/
 │   └── weaver/
 ├── reference/
 ├── scripts/
@@ -28,6 +29,7 @@ df12-www/
 ├── templates/
 │   ├── mxd/
 │   ├── netsuke/
+│   ├── stilyagi/
 │   └── weaver/
 ├── tests/
 │   ├── bdd/
@@ -83,8 +85,8 @@ Scaleway-specific variants, and deployment configuration).
 
 Generated output directory. The main df12 site pages live at the top level.
 Sub-site output lands under path-prefixed subdirectories (`mxd/`, `netsuke/`,
-`weaver/`), each containing the full static site including assets, doc pages,
-and shared content pages. This directory is the deployment root.
+`weaver/`, `stilyagi/`), each containing the full static site including assets,
+doc pages, and shared content pages. This directory is the deployment root.
 
 ### `reference/`
 
@@ -108,10 +110,11 @@ Frontend source files. `styles/` contains the Tailwind CSS entry point (
 ### `templates/`
 
 Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `netsuke/`,
-`weaver/`) holds the template wrapper for that sub-site's design system,
-including `shared_content_page.jinja` and a `partials/` directory for shared
-macros and components. These are distinct from the main-site templates in
-`df12_pages/templates/`.
+`weaver/`, `stilyagi/`) holds the template wrapper for that sub-site's design
+system, including `shared_content_page.jinja` and a `partials/` directory for
+shared macros and components. Stilyagi instead centralizes its chrome in a
+`_layout.jinja` that every page extends. These are distinct from the main-site
+templates in `df12_pages/templates/`.
 
 ### `tests/`
 

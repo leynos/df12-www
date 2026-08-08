@@ -1,0 +1,630 @@
+{% extends "_layout.jinja" %}
+{% block title %}Stilyagi · Design — open the hood{% endblock %}
+{% block description %}The Stilyagi architecture in full: the boundary between extraction and rule execution, the IR schema, and the packaging split between the Rust core and the Python rule API.{% endblock %}
+{% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/design.css" />
+{% endblock %}
+{% block content %}
+      <section class="page-intro">
+        <div class="wrap">
+          <div>
+            <div class="folio">§ 03 · Open the hood</div>
+            <h1>Design <span class="accent">notes</span>.</h1>
+          </div>
+          <p class="lede">
+            Two working models — the IR as a contract, and the capability planner as a lazy loader — plus
+            the architecture decisions that pin them in place. Hover below. Toggle. Watch the machine.
+          </p>
+        </div>
+      </section>
+      <section class="ir-inspector">
+        <div class="section-head">
+          <div class="num">D</div>
+          <div>
+            <div class="tag">§ IR inspector · stilyagi dump-ir</div>
+            <h2>Hover a region. Watch the bytes agree.</h2>
+          </div>
+        </div>
+        <div class="ir-frame">
+          <div class="pane">
+            <div class="ir-header">
+              <span>docs/<span class="red">configuring.md</span></span
+              ><span class="red">source view</span>
+            </div>
+            <div class="src-view">
+              <div class="src-line">
+                <span class="gut">1</span
+                ><span class="content"
+                  ><span data-region="h1-1" class="region type-heading"
+                    ># Configuring Stilyagi</span
+                  ></span
+                >
+              </div>
+              <div class="src-line"><span class="gut">2</span><span class="content">&nbsp;</span></div>
+              <div class="src-line">
+                <span class="gut">3</span
+                ><span class="content"
+                  ><span>S</span
+                  ><span data-region="p-1" class="region type-paragraph"
+                    >tilyagi is configured by `stil</span
+                  ><span data-region="cf-1" class="region type-code">yagi.toml` or </span
+                  ><span data-region="p-1" class="region type-paragraph">by th</span
+                  ><span data-region="cf-2" class="region type-code">e `[tool.stilyagi]`</span></span
+                >
+              </div>
+              <div class="src-line">
+                <span class="gut">4</span
+                ><span class="content"
+                  ><span data-region="cf-2" class="region type-code">s</span
+                  ><span data-region="p-1" class="region type-paragraph">ection of y</span
+                  ><span data-region="link-1" class="region type-link active"
+                    >our `pyproject.toml`. See the [conf</span
+                  ><span data-region="p-1" class="region type-paragraph">i</span><span>g </span
+                  ><span data-region="h2-1" class="region type-heading">reference](docs.h</span
+                  ><span>tm</span
+                  ><span data-region="p-2" class="region type-paragraph">l#config).</span></span
+                >
+              </div>
+              <div class="src-line"><span class="gut">5</span><span class="content">&nbsp;</span></div>
+              <div class="src-line">
+                <span class="gut">6</span
+                ><span class="content"
+                  ><span data-region="p-2" class="region type-paragraph">## Rule selection</span></span
+                >
+              </div>
+              <div class="src-line"><span class="gut">7</span><span class="content">&nbsp;</span></div>
+              <div class="src-line">
+                <span class="gut">8</span
+                ><span class="content"
+                  ><span data-region="p-2" class="region type-paragraph">Use `select` and `ignore`</span
+                  ><span> to</span
+                  ><span data-region="li-1" class="region type-list-item">
+                    scope the active ruleset:</span
+                  ></span
+                >
+              </div>
+              <div class="src-line"><span class="gut">9</span><span class="content">&nbsp;</span></div>
+              <div class="src-line">
+                <span class="gut">10</span
+                ><span class="content"
+                  ><span data-region="li-1" class="region type-list-item"
+                    >- `select = ["MD", "PUN201"]` — enable</span
+                  ><span> </span
+                  ><span data-region="li-2" class="region type-list-item"
+                    >all Markdown rules plus PUN201.</span
+                  ></span
+                >
+              </div>
+              <div class="src-line">
+                <span class="gut">11</span
+                ><span class="content"
+                  ><span data-region="li-2" class="region type-list-item">- `ignore =</span
+                  ><span> ["</span
+                  ><span data-region="h3-1" class="region type-heading">MD401"]` — skip MD401 </span
+                  ><span>gl</span
+                  ><span data-region="p-3" class="region type-paragraph">obally.</span></span
+                >
+              </div>
+              <div class="src-line"><span class="gut">12</span><span class="content">&nbsp;</span></div>
+              <div class="src-line">
+                <span class="gut">13</span
+                ><span class="content"
+                  ><span data-region="cf-3" class="region type-code">### Capability ex</span
+                  ><span data-region="p-3" class="region type-paragraph">tras</span></span
+                >
+              </div>
+              <div class="src-line"><span class="gut">14</span><span class="content">&nbsp;</span></div>
+              <div class="src-line">
+                <span class="gut">15</span
+                ><span class="content"
+                  ><span data-region="p-3" class="region type-paragraph"
+                    >Install `stilyagi[grammar]` to</span
+                  ><span> enable the spaCy-backed rule pack.</span></span
+                >
+              </div>
+              <div class="src-line"><span class="gut">16</span><span class="content">&nbsp;</span></div>
+            </div>
+            <div class="ir-foot">
+              <span data-ir-label="true" aria-live="polite">Link</span
+              ><span>range <code data-ir-range="true">[106,141]</code></span
+              ><span class="red">source-faithful · no rewrites</span>
+            </div>
+          </div>
+          <div class="pane">
+            <div class="ir-header">
+              <span>Document IR <span class="red">· read-only</span></span
+              ><span class="red">dump-ir --pretty</span>
+            </div>
+            <div class="ir-tree">
+              <div><span class="d">Document</span> <span class="v">{</span></div>
+              <div>
+                <span class="indent"></span><span class="k">content_hash:</span>
+                <span class="v">"sha256:7a3f…e041"</span>
+              </div>
+              <div>
+                <span class="indent"></span><span class="k">line_index:</span>
+                <span class="v">[0, 24, 25, 143, …, 422]</span>
+              </div>
+              <div>
+                <span class="indent"></span><span class="k">regions:</span> <span class="v">[</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="h1-1"
+                data-label="Heading depth=1"
+                data-range="0,23"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">heading</span
+                ><span class="d"> · </span><span class="v">range=[0,23]</span
+                ><span class="v"> depth=1</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="p-1"
+                data-label="Paragraph"
+                data-range="25,142"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
+                ><span class="d"> · </span><span class="v">range=[25,142]</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="cf-1"
+                data-label="Inline code"
+                data-range="55,69"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">code</span
+                ><span class="d"> · </span><span class="v">range=[55,69]</span
+                ><span class="v"> lang="toml"</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="cf-2"
+                data-label="Inline code"
+                data-range="74,95"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">code</span
+                ><span class="d"> · </span><span class="v">range=[74,95]</span
+                ><span class="v"> lang="toml"</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="link-1"
+                data-label="Link"
+                data-range="106,141"
+                aria-pressed="true"
+                class="tree-node active"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">link</span
+                ><span class="d"> · </span><span class="v">range=[106,141]</span
+                ><span class="v"> scheme="relative"</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="h2-1"
+                data-label="Heading depth=2"
+                data-range="144,161"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">heading</span
+                ><span class="d"> · </span><span class="v">range=[144,161]</span
+                ><span class="v"> depth=2</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="p-2"
+                data-label="Paragraph"
+                data-range="163,219"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
+                ><span class="d"> · </span><span class="v">range=[163,219]</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="li-1"
+                data-label="List item"
+                data-range="222,288"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">list-item</span
+                ><span class="d"> · </span><span class="v">range=[222,288]</span
+                ><span class="v"> depth=0</span><span class="v"> marker="-"</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="li-2"
+                data-label="List item"
+                data-range="289,332"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">list-item</span
+                ><span class="d"> · </span><span class="v">range=[289,332]</span
+                ><span class="v"> depth=0</span><span class="v"> marker="-"</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="h3-1"
+                data-label="Heading depth=3"
+                data-range="335,357"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">heading</span
+                ><span class="d"> · </span><span class="v">range=[335,357]</span
+                ><span class="v"> depth=3</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="p-3"
+                data-label="Paragraph"
+                data-range="359,421"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
+                ><span class="d"> · </span><span class="v">range=[359,421]</span>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                data-region="cf-3"
+                data-label="Inline code"
+                data-range="367,385"
+                aria-pressed="false"
+                class="tree-node"
+              >
+                <span class="indent"></span><span class="indent"></span><span class="k">code</span
+                ><span class="d"> · </span><span class="v">range=[367,385]</span
+                ><span class="v"> lang="python"</span>
+              </div>
+              <div><span class="indent"></span><span class="v">]</span></div>
+              <div><span class="v">}</span></div>
+            </div>
+            <div class="ir-foot">
+              <span>regions <code>12</code></span
+              ><span>content_hash <code>sha256:7a3f…e041</code></span
+              ><span class="red">deterministic</span>
+            </div>
+          </div>
+        </div>
+        <div class="legend">
+          <span><span class="sw sw-heading"></span>Heading</span
+          ><span><span class="sw sw-para"></span>Paragraph</span
+          ><span><span class="sw sw-code"></span>Code</span
+          ><span><span class="sw sw-link"></span>Link</span
+          ><span><span class="sw sw-list"></span>List-item</span>
+        </div>
+      </section>
+      <section class="planner">
+        <div class="section-head">
+          <div class="num">E</div>
+          <div>
+            <div class="tag">§ Capability planner</div>
+            <h2>Toggle rules. See which providers load.</h2>
+          </div>
+        </div>
+        <div class="plan-frame">
+          <div class="plan-left">
+            <h3>Enabled ruleset</h3>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="MD201"
+              data-caps=""
+              aria-checked="true"
+              class="rule-toggle on"
+            >
+              <span class="check"></span><span class="code">MD201</span
+              ><span class="desc">Reject Markdown headings deeper than level 3.</span
+              ><span class="caps">—</span>
+            </div>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="MD401"
+              data-caps=""
+              aria-checked="true"
+              class="rule-toggle on"
+            >
+              <span class="check"></span><span class="code">MD401</span
+              ><span class="desc">Reject bare URLs and empty link text.</span><span class="caps">—</span>
+            </div>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="PUN201"
+              data-caps=""
+              aria-checked="true"
+              class="rule-toggle on"
+            >
+              <span class="check"></span><span class="code">PUN201</span
+              ><span class="desc">Require the serial comma in three-item lists.</span
+              ><span class="caps">—</span>
+            </div>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="PYDOC101"
+              data-caps=""
+              aria-checked="true"
+              class="rule-toggle on"
+            >
+              <span class="check"></span><span class="code">PYDOC101</span
+              ><span class="desc">Docstrings must start with a single-line summary.</span
+              ><span class="caps">—</span>
+            </div>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="GRAM301"
+              data-caps="grammar"
+              aria-checked="false"
+              class="rule-toggle"
+            >
+              <span class="check"></span><span class="code">GRAM301</span
+              ><span class="desc">Flag passive-voice constructions in prose regions.</span
+              ><span class="caps">+grammar</span>
+            </div>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="GRAM402"
+              data-caps="grammar"
+              aria-checked="false"
+              class="rule-toggle"
+            >
+              <span class="check"></span><span class="code">GRAM402</span
+              ><span class="desc">Warn when a sentence exceeds 40 words.</span
+              ><span class="caps">+grammar</span>
+            </div>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="SPELL101"
+              data-caps="spell"
+              aria-checked="false"
+              class="rule-toggle"
+            >
+              <span class="check"></span><span class="code">SPELL101</span
+              ><span class="desc">Check common words against the shipped dictionary.</span
+              ><span class="caps">+spell</span>
+            </div>
+            <div
+              role="switch"
+              tabindex="0"
+              data-code="TERM201"
+              data-caps="terminology"
+              aria-checked="false"
+              class="rule-toggle"
+            >
+              <span class="check"></span><span class="code">TERM201</span
+              ><span class="desc">Enforce the canonical form of a term (e.g. API, not api).</span
+              ><span class="caps">+terminology</span>
+            </div>
+          </div>
+          <div class="plan-right">
+            <h3>Planner verdict</h3>
+            <div class="providers">
+              <div data-provider="core" class="provider loaded">
+                <div>
+                  <div class="pname">Core extractor</div>
+                  <div class="pnote">always loaded</div>
+                </div>
+                <span class="ptag" data-provider-tag="true">Loaded</span>
+              </div>
+              <div data-provider="grammar" class="provider skipped">
+                <div>
+                  <div class="pname">Grammar · spaCy</div>
+                  <div class="pnote">stilyagi[grammar]</div>
+                </div>
+                <span class="ptag" data-provider-tag="true">Skipped</span>
+              </div>
+              <div data-provider="spell" class="provider skipped">
+                <div>
+                  <div class="pname">Spellchecker</div>
+                  <div class="pnote">stilyagi[spell]</div>
+                </div>
+                <span class="ptag" data-provider-tag="true">Skipped</span>
+              </div>
+              <div data-provider="terminology" class="provider skipped">
+                <div>
+                  <div class="pname">Terminology</div>
+                  <div class="pnote">stilyagi[term]</div>
+                </div>
+                <span class="ptag" data-provider-tag="true">Skipped</span>
+              </div>
+            </div>
+            <div class="plan-sum" aria-live="polite">
+              <b data-plan-rules="true">4</b> rules enabled ·<b data-plan-providers="true"> 0</b>
+              linguistic providers required · estimated cold start <b data-plan-coldstart="true">40 ms</b>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="grammar-illo">
+        <div class="inner">
+          <div class="text-side">
+            <h3>From <span class="red">tokens</span> to clauses</h3>
+            <p>
+              Canonical UPos enums based on Universal Dependencies. Four derived syntactic nodes —
+              TokenNode, SentenceNode, NounPhraseNode, and CoordinationNode — are exposed to rule authors.
+              The Embassy Rule: Python rules talk only to stable Stilyagi grammar nodes, not raw, unstable
+              spaCy classes.
+            </p>
+          </div>
+          <img
+            src="/stilyagi/assets/images/pyramid.webp"
+            alt="Grammar layer pyramid — tokens, POS/morphology, clauses/coordinations"
+          />
+        </div>
+      </section>
+      <section class="adrs">
+        <div class="section-head">
+          <div class="num">F</div>
+          <div>
+            <div class="tag">§ Architecture Decision Records</div>
+            <h2>Nine decisions, on the record.</h2>
+          </div>
+        </div>
+        <div class="adr-grid">
+          <div class="adr-card">
+            <div class="adr-num">ADR-001</div>
+            <h3>Python package, Rust extractor</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              Ship one wheel per platform. PyO3 bindings. Pre-built wheels for Linux, macOS, Windows;
+              sdist only if requested.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-002</div>
+            <h3>No bundled spellchecker in base</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              Spelling is an optional extra. Base install stays small and offline. Network-free by default
+              is a hard contract.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-003</div>
+            <h3>Rules are trusted code</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              Plugins run as ordinary Python. No sandbox. Documented loudly in the README, CLI help, and
+              the plugin guide.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-004</div>
+            <h3>Region IR, not raw AST</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              Rules subscribe to typed region classes. Raw AST is an implementation detail of the
+              extractor, not a public surface.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-005</div>
+            <h3>Capability planner</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              Providers load only when at least one enabled rule declares them. Runtime cost is
+              proportional to the enabled rule set.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-006</div>
+            <h3>Markdown first; MDX provisional</h3>
+            <span class="status prov">Provisional</span>
+            <p class="editorial">
+              MDX support ships behind a feature flag. Tree-sitter grammar stability is the pacing risk.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-007</div>
+            <h3>SARIF as primary machine format</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              JSON is the CLI-friendly fallback; SARIF is the CI integration format. One schema for both
+              versions, stable.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-008</div>
+            <h3>Fix safety is explicit</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              safe / unsafe / manual are first-class. The --fix flag accepts a safety class; unsafe fixes
+              never run without an opt-in.
+            </p>
+          </div>
+          <div class="adr-card">
+            <div class="adr-num">ADR-009</div>
+            <h3>Deterministic ordering</h3>
+            <span class="status">Accepted</span>
+            <p class="editorial">
+              Normalised path, byte offset, rule code, message hash. The same input yields the same output
+              bytes, always.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section
+        style="
+          max-width: 1240px;
+          margin: 0px auto;
+          padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 10);
+          text-align: center;
+        "
+      >
+        <div class="pullquote" style="max-width: 38ch; margin: 0px auto; font-size: 2rem">
+          "Runtime cost is proportional to the enabled rule set — and nothing else."<cite>— ADR-005</cite>
+        </div>
+        <div
+          style="
+            margin-top: calc(var(--unit) * 4);
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+          "
+        >
+          <a
+            href="/stilyagi/roadmap/"
+            style="
+              font-family: var(--font-sans);
+              font-weight: 700;
+              font-size: 0.82rem;
+              letter-spacing: 0.14em;
+              text-transform: uppercase;
+              color: var(--ink);
+              text-decoration: none;
+              border-bottom: 2px solid var(--press-red);
+              padding-bottom: 2px;
+            "
+            >☞ See the roadmap</a
+          ><a
+            href="/stilyagi/docs/"
+            style="
+              font-family: var(--font-sans);
+              font-weight: 700;
+              font-size: 0.82rem;
+              letter-spacing: 0.14em;
+              text-transform: uppercase;
+              color: var(--ink);
+              text-decoration: none;
+              border-bottom: 2px solid var(--press-red);
+              padding-bottom: 2px;
+            "
+            >☞ Open the docs</a
+          >
+        </div>
+      </section>
+{% endblock %}
+{% block scripts %}
+    <script src="/stilyagi/assets/js/design.js" defer></script>
+{% endblock %}

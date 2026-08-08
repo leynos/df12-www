@@ -1,0 +1,302 @@
+{% extends "_layout.jinja" %}
+{% block title %}Stilyagi · Why — the case against the weak camps{% endblock %}
+{% block description %}Existing prose tools trade away structure, programmability, determinism, or source fidelity. The case for a fifth camp that gives up none of them.{% endblock %}
+{% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/why.css" />
+{% endblock %}
+{% block content %}
+      <section class="page-intro">
+        <div class="wrap">
+          <div>
+            <div class="folio">§ 01 · The case</div>
+            <h1>Why <span class="accent">Stilyagi</span>.</h1>
+          </div>
+          <p class="lede">
+            Existing prose tools fall into four weak camps. Each solves part of the problem by giving up
+            on another. The document below is an argument for a fifth camp — one that keeps structural
+            awareness, programmability, determinism, and source-fidelity without cheating on any of them.
+          </p>
+        </div>
+      </section>
+      <section class="stack-section">
+        <div class="section-head">
+          <div class="num">I-IV</div>
+          <div>
+            <div class="tag">§ The four weak camps</div>
+            <h2>Everything almost works.</h2>
+          </div>
+        </div>
+        <div class="camps">
+          <div class="camp">
+            <div class="numeral">I</div>
+            <h3>Vale-like tools</h3>
+            <p class="editorial">
+              Understand structure — but the rule model is constrained by declarative YAML, canned check
+              families, and a deliberately limited extension surface.
+            </p>
+            <span class="verdict-tag">Structural, but capped</span>
+          </div>
+          <div class="camp">
+            <div class="numeral">II</div>
+            <h3>Ad-hoc regex</h3>
+            <p class="editorial">
+              Cheap to write. Poor structural awareness, poor fix safety, poor false-positive behaviour
+              once text lives inside headings, tables, docstrings, or mixed markup.
+            </p>
+            <span class="verdict-tag">Dumb in structure</span>
+          </div>
+          <div class="camp">
+            <div class="numeral">III</div>
+            <h3>Formatter-adjacent</h3>
+            <p class="editorial">
+              Catch layout and syntax-adjacent issues. Not designed to express editorial policy,
+              terminology rules, or documentation structure constraints.
+            </p>
+            <span class="verdict-tag red">Wrong register</span>
+          </div>
+          <div class="camp">
+            <div class="numeral">IV</div>
+            <h3>Broad NLP toolkits</h3>
+            <p class="editorial">
+              Flexible — but no source-faithful spans, no repository-friendly CLI, no suppression
+              semantics, no stable lint diagnostics out of the box.
+            </p>
+            <span class="verdict-tag red">Too much work</span>
+          </div>
+        </div>
+      </section>
+      <section class="style-hunter-panel">
+        <div class="inner">
+          <img
+            src="/stilyagi/assets/images/style-hunter.webp"
+            alt="The Style Hunter — a suited figure with magnifying glass inspects prose"
+          />
+          <div class="text">
+            <h3>The <span class="red">style hunters</span>.</h3>
+            <p>
+              Rules are written in expressive Python, operating on typed wrappers, not raw JSON
+              dictionaries. Inspired by astroid for node navigability, enabling parent/child traversal and
+              stable properties. Target explicit descriptors like
+              <code>RegionTarget(kind="heading")</code> rather than relying on abstract string matching.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="argument">
+        <aside class="margin-note">
+          <span class="red">§ 02 · Argument</span>The target user isn't struggling with English. They are
+          struggling with policy, structure, CI, and the current linting surface — which is either too
+          dumb to encode what they want, or too awkward to keep doing so.<br /><br /><span class="red"
+            >☞ Note.</span
+          >
+          This is an engineering problem, not a linguistic one.
+        </aside>
+        <div class="body">
+          <h3>The pain isn't "<span class="red">English is hard</span>."</h3>
+          <p class="editorial">
+            The target users of Stilyagi are engineers and technically literate writers maintaining
+            documentation inside source repositories. Their pain is not that English is hard.
+          </p>
+          <p class="editorial">
+            Their pain is that documentation policy is real, files are structured, CI needs determinism,
+            and the current linting surface is either too dumb to encode the intended policy, or too
+            awkward to continue encoding it.
+          </p>
+          <h3>The value is <span class="red">precise</span>.</h3>
+          <p class="editorial">
+            Against Vale, Stilyagi offers Python-authored rules over a typed runtime model instead of YAML
+            plus regex plus fixed rule families. Against in-house regex scripts, it provides structural
+            parsing, stable spans, fix planning, suppression semantics, and cacheable behaviour. Against
+            formatter-adjacent tools, it targets prose policy rather than code layout. Against raw spaCy
+            or NLTK, it adds the extraction, diagnostics, configuration, and CLI contracts that fit normal
+            software engineering workflows.
+          </p>
+          <h3>It is weaker, deliberately, in <span class="red">three</span> places.</h3>
+          <p class="editorial">
+            It will never match a Rust-only rule engine for raw execution speed. It deliberately trusts
+            plugin code, and so cannot truthfully promise sandboxing. It inherits Python packaging
+            complexity for third-party rule packs. These are acceptable costs. The product wins or loses
+            on expressiveness, debuggability, and adoption — not on shaving the last few milliseconds off
+            a single regex rule.
+          </p>
+        </div>
+      </section>
+      <section class="personas">
+        <div class="wrap">
+          <div class="folio-sm" style="color: var(--accent-text); margin-bottom: 18px">§ 03 · Who for</div>
+          <h2>Five <span class="red">personas</span>, one product surface.</h2>
+          <p class="intro">
+            The same tool must feed the CI pipeline, the doc engineer, the polyglot developer, and the
+            agent. Stilyagi defines its contracts so a single machine interface satisfies all of them
+            without growing a second rule engine.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Persona</th>
+                <th>Cares about</th>
+                <th>Ignores</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Doc &amp; tooling engineers</th>
+                <td>Deterministic CI, rule packs, SARIF, stable spans, repo-wide policy.</td>
+                <td class="ignore">Fancy linguistic research features that slow CI down.</td>
+              </tr>
+              <tr>
+                <th>API &amp; SDK docs teams</th>
+                <td>
+                  Markdown structure, terminology, heading policy, code-adjacent prose, per-file ignores.
+                </td>
+                <td class="ignore">Academic NLP purity.</td>
+              </tr>
+              <tr>
+                <th>Python &amp; Rust developers</th>
+                <td>Docstring summary rules, comment extraction, source-owner metadata, safe fixes.</td>
+                <td class="ignore">Deep support for every markup dialect on day one.</td>
+              </tr>
+              <tr>
+                <th>Technically opinionated solo devs</th>
+                <td>Fast CLI, expressive Python rules, debug visibility, local configuration.</td>
+                <td class="ignore">Enterprise plugin governance.</td>
+              </tr>
+              <tr>
+                <th>Agentic &amp; CI environments</th>
+                <td>
+                  JSON output, stdin support, exit-code discipline, predictable cache and suppression
+                  behaviour.
+                </td>
+                <td class="ignore">Interactive UI affordances.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="valuesbox">
+        <div class="section-head">
+          <div class="num">04</div>
+          <div>
+            <div class="tag">§ Non-negotiables</div>
+            <h2>Eight commitments the engine holds.</h2>
+          </div>
+        </div>
+        <div class="valueset">
+          <div class="card">
+            <div class="vs-num">§ 01</div>
+            <h3>Source-faithful</h3>
+            <p>
+              Every diagnostic and every applied edit maps back to original bytes. Synthetic spans cannot
+              be written to.
+            </p>
+          </div>
+          <div class="card">
+            <div class="vs-num">§ 02</div>
+            <h3>Deterministic</h3>
+            <p>
+              Rules sort by pack then code. Files sort by normalised path. The same input yields the same
+              diagnostics, always.
+            </p>
+          </div>
+          <div class="card">
+            <div class="vs-num">§ 03</div>
+            <h3>Offline</h3>
+            <p>
+              Core functionality never reaches the network. No model auto-downloads. No phone-home. CI
+              works on isolated runners.
+            </p>
+          </div>
+          <div class="card">
+            <div class="vs-num">§ 04</div>
+            <h3>Programmable</h3>
+            <p>
+              Rules are real Python. Typed wrappers. Capability declarations. No YAML ceiling, no bespoke
+              DSL, no recompile.
+            </p>
+          </div>
+          <div class="card">
+            <div class="vs-num">§ 05</div>
+            <h3>Structural</h3>
+            <p>
+              Regions, not bytes. Owners, not guesses. Headings, tables, docstrings, and comments — each a
+              first-class extraction target.
+            </p>
+          </div>
+          <div class="card">
+            <div class="vs-num">§ 06</div>
+            <h3>Conservative fixes</h3>
+            <p>
+              Safe, unsafe, and manual are distinct classes. Safe fixes stay narrow. Overlapping
+              non-identical edits fail loudly.
+            </p>
+          </div>
+          <div class="card">
+            <div class="vs-num">§ 07</div>
+            <h3>Honest about trust</h3>
+            <p>
+              Plugins are trusted code. The docs say so. The CLI help says so. No claims of sandboxing we
+              cannot keep.
+            </p>
+          </div>
+          <div class="card">
+            <div class="vs-num">§ 08</div>
+            <h3>Debuggable</h3>
+            <p>
+              dump-ir is not an afterthought. Maintainers can always ask, "what did the extractor see, and
+              what did the rule receive?"
+            </p>
+          </div>
+        </div>
+      </section>
+      <section class="weaknesses">
+        <div>
+          <div class="folio-sm" style="margin-bottom: 14px">§ 05 · Rejected alternatives</div>
+          <h2 style="font-size: 2.4rem; margin: 0px; line-height: 0.95">
+            What we considered, and <span style="color: var(--accent-text)">retired</span>.
+          </h2>
+          <p class="editorial" style="margin-top: 18px; font-size: 1.1rem">
+            A design document earns its authority by naming the roads it did not take. Each of these was
+            considered at length; each was rejected for reasons recorded below.
+          </p>
+          <div style="margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap">
+            <span class="chip">Pure Python</span><span class="chip">Rust-only engine</span
+            ><span class="chip">Vale wrapper</span><span class="chip">Raw-AST rules</span
+            ><span class="chip">LLM assist</span><span class="chip">No IR</span>
+          </div>
+        </div>
+        <div class="weakness-panel">
+          <h3>☞ Five no's</h3>
+          <ol>
+            <li>
+              <strong>Pure Python parsing.</strong> Makes source-fidelity and future editor performance
+              worse at the exact point where Stilyagi must be strongest.
+            </li>
+            <li>
+              <strong>Rust-only rule engine.</strong> Cripples the rule-authoring story. The whole point
+              is letting engineers write real rules without a bespoke DSL.
+            </li>
+            <li>
+              <strong>Vale-compatible wrapper.</strong> The requirement is wholesale replacement. Carrying
+              Vale packaging would preserve the wrong constraints.
+            </li>
+            <li>
+              <strong>Direct raw-AST rule authoring.</strong> Makes simple structural rules possible, but
+              text-oriented rules would repeatedly flatten markup and rebuild context.
+            </li>
+            <li>
+              <strong>Heavier LLM-assisted analysis.</strong> Nondeterministic, expensive, hostile to
+              offline CI. Belongs outside the core.
+            </li>
+          </ol>
+        </div>
+      </section>
+      <section class="closing">
+        <div class="pullquote">
+          "Rules govern regions, not raw bytes."<cite>— From the maintainer's rubric</cite>
+        </div>
+        <div class="next">
+          <a href="/stilyagi/how/">☞ See the mechanism</a><a href="/stilyagi/design/">☞ Open the design notes</a
+          ><a href="/stilyagi/roadmap/">☞ Read the roadmap</a>
+        </div>
+      </section>
+{% endblock %}

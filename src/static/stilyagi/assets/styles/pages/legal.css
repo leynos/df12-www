@@ -1,0 +1,179 @@
+/* Stilyagi · page styles for the shared legal pages.
+   The body arrives as plain sanitised HTML from Markdown, so everything here
+   is keyed off element selectors rather than authored classes. */
+
+.legal-section {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: calc(var(--unit) * 6) calc(var(--unit) * 4) calc(var(--unit) * 4);
+}
+
+.legal-prose {
+  max-width: 70ch;
+  font-family: var(--font-editorial);
+  font-size: var(--t-body);
+  line-height: 1.62;
+  color: var(--fg1);
+}
+
+/* Markdown emits a flat run of headings and paragraphs; a rule above each
+   H2 keeps the sections legible without any wrapping markup.  Pages
+   configured with `sections: true` wrap each H2 in .content-section instead,
+   so both shapes are given the same rule. */
+.legal-prose h2 {
+  font-size: var(--t-h3);
+  margin: calc(var(--unit) * 5) 0 calc(var(--unit) * 2);
+  padding-top: calc(var(--unit) * 2);
+  border-top: var(--rule-weight-2) solid var(--ink);
+}
+.legal-prose > h2:first-child,
+.legal-prose > .content-section:first-of-type h2 {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.legal-prose .content-section--divider {
+  margin-top: calc(var(--unit) * 5);
+  padding-top: calc(var(--unit) * 3);
+  border-top: var(--rule-weight-3) solid var(--press-red);
+}
+.legal-prose .content-section--divider h2 {
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Table of contents emitted for pages configured with `toc: true`. */
+.legal-prose .content-toc {
+  margin: 0 0 calc(var(--unit) * 5);
+  padding: calc(var(--unit) * 2) calc(var(--unit) * 3);
+  background: var(--paper-shade);
+  border: var(--rule-weight) solid var(--ink);
+}
+.legal-prose .content-toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: calc(var(--unit) * 4);
+}
+.legal-prose .content-toc li {
+  margin-bottom: 0.35em;
+  break-inside: avoid;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.legal-prose h3 {
+  font-size: var(--t-h4);
+  margin: calc(var(--unit) * 4) 0 calc(var(--unit) * 1.5);
+  color: var(--press-red-ink);
+}
+
+.legal-prose p {
+  margin: 0 0 1em;
+}
+/* The trade-book continuation indent reads as an error in legal copy, where
+   paragraphs are clauses rather than prose. */
+.legal-prose p + p {
+  text-indent: 0;
+}
+
+.legal-prose ul,
+.legal-prose ol {
+  margin: 0 0 1.2em;
+  padding-left: 1.6em;
+}
+.legal-prose li {
+  margin-bottom: 0.45em;
+}
+.legal-prose li::marker {
+  color: var(--accent-text);
+}
+
+.legal-prose a {
+  color: var(--fg-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+.legal-prose a:hover {
+  color: var(--fg-link-hover);
+}
+
+.legal-prose code {
+  font-size: 0.92em;
+  padding: 0.1em 0.35em;
+  background: var(--paper-shade);
+  border: 1px solid var(--border-soft);
+}
+
+/* `card` admonitions in the shared Markdown become a badge plus a body.  The
+   badge glyph is decorative (aria-hidden), so it is set as a stamp rather
+   than read as content. */
+.legal-prose .content-card {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--unit) * 2);
+  margin: calc(var(--unit) * 3) 0;
+  padding: calc(var(--unit) * 2.5) calc(var(--unit) * 3);
+  background: var(--paper-shade);
+  border: var(--rule-weight) solid var(--ink);
+  box-shadow: 4px 4px 0 var(--press-red);
+}
+.legal-prose .content-card__badge {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: var(--rule-weight) solid var(--press-red);
+  color: var(--accent-text);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.legal-prose .content-card__body {
+  min-width: 0;
+}
+.legal-prose .content-card__body > :first-child {
+  margin-top: 0;
+}
+.legal-prose .content-card__body > :last-child {
+  margin-bottom: 0;
+}
+.legal-prose .content-card__body h3 {
+  margin-top: 0;
+}
+
+.legal-prose blockquote {
+  margin: 1.6em 0;
+  font-size: inherit;
+}
+
+.legal-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.6em;
+  font-family: var(--font-sans);
+  font-size: 0.94rem;
+}
+.legal-prose th,
+.legal-prose td {
+  border: 1px solid var(--border-soft);
+  padding: 0.55em 0.7em;
+  text-align: left;
+  vertical-align: top;
+}
+.legal-prose thead th {
+  background: var(--paper-shade);
+  text-transform: uppercase;
+  letter-spacing: var(--track-caption);
+  font-size: var(--t-caption);
+}
+
+@media (max-width: 640px) {
+  .legal-section {
+    padding-left: calc(var(--unit) * 2);
+    padding-right: calc(var(--unit) * 2);
+  }
+}

@@ -453,6 +453,15 @@
     opacity: 0.7;
   }
 
+  .product-logo--stilyagi .product-logo__stilyagi-mark {
+    transform-origin: 50% 50%;
+  }
+
+  .group:hover .product-logo--stilyagi .product-logo__stilyagi-mark,
+  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-mark {
+    animation: stilyagiScan 1.8s ease-in-out infinite;
+  }
+
   .group:hover .product-logo--episodic .product-logo__episodic-track,
   .group:focus-visible .product-logo--episodic .product-logo__episodic-track {
     animation: episodicShimmer 1.4s ease-in-out infinite;
@@ -798,6 +807,18 @@
   }
 }
 
+/* The lint mark sweeps the line it flags. */
+@keyframes stilyagiScan {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(5px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .neon-pulse {
     animation: none;
@@ -811,7 +832,9 @@
   .group:hover .product-logo--mxd .product-logo__mxd-center,
   .group:focus-visible .product-logo--mxd .product-logo__mxd-center,
   .group:hover .product-logo--episodic .product-logo__episodic-track,
-  .group:focus-visible .product-logo--episodic .product-logo__episodic-track {
+  .group:focus-visible .product-logo--episodic .product-logo__episodic-track,
+  .group:hover .product-logo--stilyagi .product-logo__stilyagi-mark,
+  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-mark {
     animation: none;
     transform: none;
   }

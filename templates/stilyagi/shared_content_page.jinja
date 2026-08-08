@@ -1,0 +1,30 @@
+{#
+  Shared legal copy (terms, privacy, code of conduct) rendered through the
+  Stilyagi chrome.  The body arrives as sanitised HTML from the Markdown in
+  config/shared/, so it carries no classes of its own and is styled by the
+  element selectors under .legal-prose.
+#}
+{% extends "_layout.jinja" %}
+{% block title %}Stilyagi · {{ title }}{% endblock %}
+{% block description %}{{ summary or title ~ " for the Stilyagi documentation site." }}{% endblock %}
+{% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/legal.css" />
+{% endblock %}
+{% block content %}
+      <section class="page-intro">
+        <div class="wrap">
+          <div>
+            <div class="folio">§ {{ eyebrow or "Legal" }}</div>
+            <h1>{{ title }}</h1>
+          </div>
+          {% if summary %}
+          <p class="lede">{{ summary }}</p>
+          {% endif %}
+        </div>
+      </section>
+      <section class="legal-section">
+        <article class="legal-prose">
+          {{ body_html | safe }}
+        </article>
+      </section>
+{% endblock %}

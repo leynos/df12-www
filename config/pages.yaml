@@ -99,12 +99,12 @@ homepage:
         icon: corbusier
         meta_label: View on GitHub
         external: true
-      - label: Zamburak
-        description: Prompt-injection defence for tool-using agents. Security by architecture.
-        href: "https://github.com/leynos/zamburak"
-        icon: zamburak
-        meta_label: View on GitHub
-        external: true
+      - label: Stilyagi
+        description: Deterministic prose linting for docs and doc comments. A compiler for prose.
+        href: "stilyagi/"
+        icon: stilyagi
+        meta_label: Learn more
+        external: false
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.
@@ -1460,4 +1460,58 @@ sites:
         label: Design Language
         template: pages/design-language.jinja
         output_slug: design-language
+    pages: {}
+
+  stilyagi:
+    output_dir: public/stilyagi
+    templates_dir: templates/stilyagi
+    stylesheet: assets/styles/stilyagi-site.css
+    base_path: /stilyagi/
+    theme:
+      site_name: Stilyagi
+      hero_eyebrow: Stilyagi Documentation
+      hero_tagline: A compiler for prose
+    parent_link:
+      label: "← Back to df12 Productions"
+      href: /
+    nav_links:
+      - label: Overview
+        href: /stilyagi/
+      - label: Manifesto
+        href: /stilyagi/why/
+      - label: Mechanics
+        href: /stilyagi/how/
+      - label: Architecture
+        href: /stilyagi/design/
+      - label: Roadmap
+        href: /stilyagi/roadmap/
+      - label: Docs
+        href: /stilyagi/docs/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    homepage:
+      title: "Stilyagi · a deterministic prose linter"
+    content_pages:
+      - key: why
+        label: Manifesto
+        template: pages/why.jinja
+        output_slug: why
+      - key: how
+        label: Mechanics
+        template: pages/how.jinja
+        output_slug: how
+      - key: design
+        label: Architecture
+        template: pages/design.jinja
+        output_slug: design
+      - key: roadmap
+        label: Roadmap
+        template: pages/roadmap.jinja
+        output_slug: roadmap
+      - key: docs
+        label: Docs
+        template: pages/docs.jinja
+        output_slug: docs
     pages: {}

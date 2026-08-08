@@ -1,0 +1,393 @@
+{% extends "_layout.jinja" %}
+{% block title %}Stilyagi · Roadmap — six vertical slices{% endblock %}
+{% block description %}The Stilyagi delivery plan: six vertical slices from a Markdown core through rule packs, richer diagnostics, and editor integration.{% endblock %}
+{% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/roadmap.css" />
+{% endblock %}
+{% block content %}
+      <section class="page-intro">
+        <div class="wrap">
+          <div>
+            <div class="folio">§ Roadmap · six vertical slices</div>
+            <h1>The <span class="red">plan</span>, by slice.</h1>
+          </div>
+          <div>
+            <p class="lede editorial">
+              Each phase ships a thin strip through the whole system — extraction, IR, rule, output,
+              cache, docs. We do not build the entire extractor and then the entire rule catalogue. We
+              build one rule working end-to-end, then another, then another.
+            </p>
+            <div style="margin-top: 18px"><span class="stamp small">GROUNDED</span></div>
+          </div>
+        </div>
+      </section>
+      <section class="roadmap-illo">
+        <img
+          src="/stilyagi/assets/images/graph.webp"
+          alt="The Vertical Slices — phases building upward from foundations to 1.0"
+        />
+      </section>
+      <section class="roadmap-wrap">
+        <div class="legend-bar">
+          <span><span class="dot dot-done"></span>Shipped (0.1–0.2)</span
+          ><span><span class="dot dot-cur"></span>In flight (0.4)</span
+          ><span><span class="dot dot-later"></span>Planned (0.6 – 1.0)</span>
+        </div>
+        <div class="timeline">
+          <div class="phase done closed">
+            <div
+              class="ph-head"
+              role="button"
+              tabindex="0"
+              id="phase-head-0"
+              aria-controls="phase-body-0"
+              aria-expanded="false"
+            >
+              <div class="ph-num">00</div>
+              <div>
+                <span class="ph-tag">§ Foundations</span>
+                <h2 class="ph-title">Skeleton &amp; walking spine</h2>
+              </div>
+              <div class="ph-meta">
+                <span class="ph-status">Shipped</span><br /><span>0.1.0 · four weeks<br /></span
+                ><span>Rust + Python boundary<br /></span>
+              </div>
+              <div class="ph-toggle">+</div>
+            </div>
+            <div class="ph-body" id="phase-body-0" role="region" aria-labelledby="phase-head-0">
+              <div class="ph-body-inner">
+                <div class="goal">
+                  <h3>The <span class="red">goal</span> of this slice</h3>
+                  <p>
+                    The Rust extractor emits a minimal Document IR. The Python runtime loads one rule,
+                    receives regions, and prints diagnostics. PyO3 wheels build on three platforms. CI
+                    runs green. The product exists in outline.
+                  </p>
+                  <div class="ship-strip">
+                    <b>§</b> &nbsp; Shipped: a pipeline that runs one rule against one file and prints one
+                    diagnostic. Everything downstream is an embellishment.
+                  </div>
+                </div>
+                <div class="deliverables">
+                  <h3>Deliverables</h3>
+                  <ul>
+                    <li>PyO3 bindings with a narrow JSON-over-FFI boundary</li>
+                    <li>Document IR v0 — regions, ranges, content_hash</li>
+                    <li>One working rule: MD201 heading depth</li>
+                    <li>Text formatter with stable ordering</li>
+                    <li>stilyagi check reads paths and stdin</li>
+                    <li>CI green on Linux, macOS, Windows</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phase done closed">
+            <div
+              class="ph-head"
+              role="button"
+              tabindex="0"
+              id="phase-head-1"
+              aria-controls="phase-body-1"
+              aria-expanded="false"
+            >
+              <div class="ph-num">01</div>
+              <div>
+                <span class="ph-tag">§ Content slice I</span>
+                <h2 class="ph-title">Markdown policy pack</h2>
+              </div>
+              <div class="ph-meta">
+                <span class="ph-status">Shipped</span><br /><span>0.2.0 · six weeks<br /></span
+                ><span>MD rules · safe fixes<br /></span>
+              </div>
+              <div class="ph-toggle">+</div>
+            </div>
+            <div class="ph-body" id="phase-body-1" role="region" aria-labelledby="phase-head-1">
+              <div class="ph-body-inner">
+                <div class="goal">
+                  <h3>The <span class="red">goal</span> of this slice</h3>
+                  <p>
+                    Heading hygiene, list consistency, link policy, inline code usage, punctuation within
+                    prose. Suppression comments arrive at line and block scope. SARIF output lands. Early
+                    adopters can replace Vale for most of their configuration.
+                  </p>
+                  <div class="ship-strip">
+                    <b>§</b> &nbsp; Shipped: twenty-two Markdown rules with deterministic output, the
+                    first class of safe autofixes, and suppression comments at three scopes.
+                  </div>
+                </div>
+                <div class="deliverables">
+                  <h3>Deliverables</h3>
+                  <ul>
+                    <li>MD rule pack — 22 rules across headings, links, lists, code fences</li>
+                    <li>Suppressions: disable-line, disable-next-line, disable-block</li>
+                    <li>SARIF output, stable across invocations</li>
+                    <li>Safe-fix class with dry-run and --diff</li>
+                    <li>Cache v1 keyed by (content_hash, ruleset_id, capability_set)</li>
+                    <li>stilyagi rule list / show / describe</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phase current open">
+            <div
+              class="ph-head"
+              role="button"
+              tabindex="0"
+              id="phase-head-2"
+              aria-controls="phase-body-2"
+              aria-expanded="true"
+            >
+              <div class="ph-num">02</div>
+              <div>
+                <span class="ph-tag">§ Content slice II</span>
+                <h2 class="ph-title">Capability planner &amp; docstrings</h2>
+              </div>
+              <div class="ph-meta">
+                <span class="ph-status">In flight</span><br /><span>0.4.0 · eight weeks<br /></span
+                ><span>Python / Rust docstrings<br /></span>
+              </div>
+              <div class="ph-toggle">+</div>
+            </div>
+            <div class="ph-body" id="phase-body-2" role="region" aria-labelledby="phase-head-2">
+              <div class="ph-body-inner">
+                <div class="goal">
+                  <h3>The <span class="red">goal</span> of this slice</h3>
+                  <p>
+                    Extend Stilyagi's reach into source-embedded prose. Introduce the capability planner
+                    so linguistic providers are loaded on demand only, and ship docstring extraction for
+                    Python and Rust. The planner is the load-bearing move — it is what lets grammar and
+                    spelling join the catalogue without taxing every lint run.
+                  </p>
+                  <div class="ship-strip">
+                    <b>§</b> &nbsp; In flight: the planner is the hinge the whole design turns on. It
+                    guarantees that the base install stays small and fast, no matter what the rule
+                    catalogue grows into.
+                  </div>
+                </div>
+                <div class="deliverables">
+                  <h3>Deliverables</h3>
+                  <ul>
+                    <li>Capability planner with explicit provider declarations</li>
+                    <li>Python AST extractor for Module, Class, Function docstrings</li>
+                    <li>Rust syn extractor for /// doc comments</li>
+                    <li>PYDOC rule pack — 14 rules</li>
+                    <li>RSDOC rule pack — 9 rules</li>
+                    <li>stilyagi dump-ir with --include annotations</li>
+                    <li>Owner metadata surfaced in diagnostics</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phase later closed">
+            <div
+              class="ph-head"
+              role="button"
+              tabindex="0"
+              id="phase-head-3"
+              aria-controls="phase-body-3"
+              aria-expanded="false"
+            >
+              <div class="ph-num">03</div>
+              <div>
+                <span class="ph-tag">§ Linguistic layer</span>
+                <h2 class="ph-title">Grammar &amp; spelling providers</h2>
+              </div>
+              <div class="ph-meta">
+                <span class="ph-status">Planned</span><br /><span>0.6.0 · ten weeks<br /></span
+                ><span>Optional extras<br /></span>
+              </div>
+              <div class="ph-toggle">+</div>
+            </div>
+            <div class="ph-body" id="phase-body-3" role="region" aria-labelledby="phase-head-3">
+              <div class="ph-body-inner">
+                <div class="goal">
+                  <h3>The <span class="red">goal</span> of this slice</h3>
+                  <p>
+                    Add the linguistic providers behind the capability planner without compromising the
+                    offline base install. Grammar ships as stilyagi[grammar]; spelling as stilyagi[spell].
+                    Neither is required to use Stilyagi's core value — but when enabled, they unlock the
+                    GRAM, SPELL, and TERM families.
+                  </p>
+                  <div class="ship-strip">
+                    <b>§</b> &nbsp; Planned: prose-level checks arrive as optional extras. The base
+                    install remains under thirty megabytes.
+                  </div>
+                </div>
+                <div class="deliverables">
+                  <h3>Deliverables</h3>
+                  <ul>
+                    <li>spaCy provider with model pinning and cache</li>
+                    <li>symspell spellchecker with a bundled dictionary</li>
+                    <li>GRAM rule pack — passive voice, sentence length, modal verbs</li>
+                    <li>SPELL rule pack — common words, allowlists, per-region scoping</li>
+                    <li>TERM rule pack — canonical term enforcement</li>
+                    <li>Documented optional-extras install story</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phase later closed">
+            <div
+              class="ph-head"
+              role="button"
+              tabindex="0"
+              id="phase-head-4"
+              aria-controls="phase-body-4"
+              aria-expanded="false"
+            >
+              <div class="ph-num">04</div>
+              <div>
+                <span class="ph-tag">§ Adoption</span>
+                <h2 class="ph-title">CI, SARIF polish, packaging</h2>
+              </div>
+              <div class="ph-meta">
+                <span class="ph-status">Planned</span><br /><span>0.8.0 · six weeks<br /></span
+                ><span>Integrations<br /></span>
+              </div>
+              <div class="ph-toggle">+</div>
+            </div>
+            <div class="ph-body" id="phase-body-4" role="region" aria-labelledby="phase-head-4">
+              <div class="ph-body-inner">
+                <div class="goal">
+                  <h3>The <span class="red">goal</span> of this slice</h3>
+                  <p>
+                    Make Stilyagi trivial to adopt in CI pipelines, editors, and agentic workflows. Polish
+                    every surface a machine will read and every surface a developer will first encounter.
+                    Cached runs should be indistinguishable from clean runs modulo timestamp.
+                  </p>
+                  <div class="ship-strip">
+                    <b>§</b> &nbsp; Planned: Stilyagi becomes a line in a pre-commit config, a job in an
+                    Action, a format a reviewdog already speaks.
+                  </div>
+                </div>
+                <div class="deliverables">
+                  <h3>Deliverables</h3>
+                  <ul>
+                    <li>Pre-commit hook with a config template</li>
+                    <li>GitHub Action with matrix-friendly defaults</li>
+                    <li>Reviewdog format parity</li>
+                    <li>SARIF v2.1.0 full schema conformance</li>
+                    <li>stilyagi config print / validate / explain KEY / locate</li>
+                    <li>Auto-discovery of stilyagi.toml and pyproject.toml</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phase later closed">
+            <div
+              class="ph-head"
+              role="button"
+              tabindex="0"
+              id="phase-head-5"
+              aria-controls="phase-body-5"
+              aria-expanded="false"
+            >
+              <div class="ph-num">05</div>
+              <div>
+                <span class="ph-tag">§ Daily driver</span>
+                <h2 class="ph-title">Editor integration &amp; LSP</h2>
+              </div>
+              <div class="ph-meta">
+                <span class="ph-status">Planned</span><br /><span>1.0.0 · twelve weeks<br /></span
+                ><span>stilyagi-lsp<br /></span>
+              </div>
+              <div class="ph-toggle">+</div>
+            </div>
+            <div class="ph-body" id="phase-body-5" role="region" aria-labelledby="phase-head-5">
+              <div class="ph-body-inner">
+                <div class="goal">
+                  <h3>The <span class="red">goal</span> of this slice</h3>
+                  <p>
+                    Land the editor story. A language server that speaks textDocument/diagnostic, supports
+                    codeAction for safe fixes, and respects the capability planner's cost model under
+                    interactive load. Incremental analysis keyed by content_hash and line_index. The 1.0
+                    mark — Stilyagi is someone's daily driver.
+                  </p>
+                  <div class="ship-strip">
+                    <b>§</b> &nbsp; Planned: version 1.0.0 ships under semver with editor integrations and
+                    a public rule stability policy.
+                  </div>
+                </div>
+                <div class="deliverables">
+                  <h3>Deliverables</h3>
+                  <ul>
+                    <li>stilyagi-lsp process with workspace symbols</li>
+                    <li>Incremental re-analysis keyed by line_index</li>
+                    <li>codeAction handlers for safe and unsafe fixes</li>
+                    <li>Suppressions surfaced in hover &amp; relatedInformation</li>
+                    <li>VS Code extension (thin)</li>
+                    <li>Neovim and Zed recipes</li>
+                    <li>1.0.0 release with semver guarantees</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="risks">
+        <aside class="margin-note">
+          <span class="red">§ Margin note</span>A roadmap is not a promise.<br /><br />It is a public
+          commitment to ordering.<br /><br />Dates slip. Order does not.<br /><br /><span
+            class="red"
+            style="margin-top: 12px"
+            >Pacing</span
+          >One slice ≈ one quarter. Six slices ≈ eighteen months to 1.0.
+        </aside>
+        <div class="body">
+          <h3>What we will <em>not</em> do along the way</h3>
+          <p>
+            We will not ship a rule whose diagnostic we cannot justify in one sentence. We will not add a
+            capability to the planner without naming who asked for it. We will not accept a dependency
+            into the base install that pushes the wheel past thirty megabytes.
+          </p>
+          <p>
+            We will not invent a configuration key to paper over an ambiguous rule. If two users read a
+            rule's description and expect different outcomes, that rule is not ready. It sits in the draft
+            column until it is.
+          </p>
+          <p>
+            We will not write a linter that calls itself opinionated as a substitute for writing down the
+            opinions. Each rule ships with a rationale paragraph and — where the rationale is contestable
+            — a citation.
+          </p>
+          <div class="pacing">
+            <div class="card">
+              <div class="tt">§ Cadence</div>
+              <div class="body-t">
+                Minor releases every six to ten weeks. Patches as needed. No sprint theatre.
+              </div>
+            </div>
+            <div class="card">
+              <div class="tt">§ Deprecations</div>
+              <div class="body-t">
+                One minor-version warning before removal. Renames ship with aliases that outlive two
+                minors.
+              </div>
+            </div>
+            <div class="card">
+              <div class="tt">§ Stability</div>
+              <div class="body-t">
+                Rule IDs never change meaning. If a rule evolves, it gets a new ID; the old one is
+                retired, never reassigned.
+              </div>
+            </div>
+            <div class="card">
+              <div class="tt">§ Governance</div>
+              <div class="body-t">
+                New rules require a one-page RFC. New providers require a two-page RFC and a performance
+                budget.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+{% endblock %}
+{% block scripts %}
+    <script src="/stilyagi/assets/js/roadmap.js" defer></script>
+{% endblock %}

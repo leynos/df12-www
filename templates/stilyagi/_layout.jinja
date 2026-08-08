@@ -1,0 +1,93 @@
+{#
+  Shared chrome for the Stilyagi sub-site.
+
+  A page overrides `title`, `description`, and `page_stylesheet` (a link to its
+  own stylesheet under assets/styles/pages/), then fills `content`.  Set
+  `main_class` when the page body needs a class on the <main> wrapper.  The
+  masthead and colophon live here so every page shares one source.
+#}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}Stilyagi{% endblock %}</title>
+    <meta name="description" content="{% block description %}{% endblock %}" />
+    <link rel="stylesheet" href="/stilyagi/assets/styles/colors-and-type.css" />
+    <link rel="stylesheet" href="/stilyagi/assets/styles/motifs-and-components.css" />
+    <link rel="stylesheet" href="/stilyagi/assets/styles/stilyagi-site.css" />
+    {% block page_stylesheet %}{% endblock %}
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-mast">
+      <div class="site-mast-inner">
+        <a class="brand-lockup" href="/stilyagi/" aria-label="Stilyagi home">
+          <span class="brand-stripe" aria-hidden="true"></span>
+          <span class="brand-word">stilyagi</span>
+          <span class="brand-imprint">df12 · deterministic prose analysis</span>
+        </a>
+        <nav aria-label="Primary">
+          <ol>
+            {% for link in nav_links %}
+            <li>
+              <a href="{{ link.href }}"{% if link.current %} class="active" aria-current="page"{% endif %}><span>{{ link.label }}</span></a>
+            </li>
+            {% endfor %}
+          </ol>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content"{% block main_class %}{% endblock %}>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="colophon-footer">
+      <div class="wrap">
+        <div class="imprint">
+          <strong>Stilyagi<span class="r"> / </span>df12</strong>
+          A deterministic documentation-analysis pipeline with Rust extraction,
+          Python rules, source-faithful regions, and diagnostics that stay
+          anchored to the bytes they describe.
+          <div class="sig">Serious tools, playful <span class="r">worlds.</span></div>
+        </div>
+        <div>
+          <h2 class="colophon-heading">Read</h2>
+          <ul>
+            <li><a href="/stilyagi/why/">Manifesto</a></li>
+            <li><a href="/stilyagi/how/">Mechanics</a></li>
+            <li><a href="/stilyagi/design/">Architecture</a></li>
+            <li><a href="/stilyagi/roadmap/">Roadmap</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="colophon-heading">Reference</h2>
+          <ul>
+            <li><a href="/stilyagi/docs/">Documentation</a></li>
+            <li><a href="/stilyagi/docs/#catalogue">Rules catalogue</a></li>
+            <li><a href="/stilyagi/docs/#config">Config schema</a></li>
+            <li><a href="/stilyagi/docs/#suppress">Suppressions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="colophon-heading">df12</h2>
+          <ul>
+            {% if parent_link %}
+            <li><a href="{{ parent_link.href }}">{{ parent_link.label }}</a></li>
+            {% endif %}
+            <li><a href="/stilyagi/privacy-policy/">Privacy Policy</a></li>
+            <li><a href="/stilyagi/terms-of-use/">Terms of Use</a></li>
+            <li><a href="/stilyagi/code-of-conduct/">Code of Conduct</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="colophon-strip">
+        <span>§ A compiler for prose</span>
+        <span>Separate the iron from the jazz</span>
+        <span>Deterministic by default · deep by design</span>
+      </div>
+    </footer>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

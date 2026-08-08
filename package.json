@@ -12,10 +12,13 @@
     "build:images": "bun run scripts/generate-image-variants.ts",
     "build:pages": "uv run pages generate --all-sites",
     "serve": "bun run build && bunx http-server public -p ${DF12_PORT:-8080}",
+    "lint:js": "biome check .",
+    "lint:js:fix": "biome check --write .",
     "test:js": "bun test tests/js",
     "bump": "uv run pages bump"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.7",
     "@tailwindcss/cli": "^4.1.15",
     "@tailwindcss/typography": "^0.5.19",
     "@types/bun": "latest",

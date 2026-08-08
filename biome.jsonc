@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/stable/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.7/schema.json",
   "files": {
     "includes": [
       "**/*",
@@ -11,11 +11,12 @@
       "!.artifacts",
       "!.act-stubs",
       "!public/assets",
-      "!public/netsuke/assets/vendor"
+      "!public/netsuke/assets/vendor",
+    "!src/static/**/vendor/**"
     ],
     "ignoreUnknown": true
   },
-  "vcs": { "useIgnoreFile": true },
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -62,6 +63,24 @@
     {
       "includes": ["**/*.css"],
       "linter": { "enabled": false }
+    },
+    {
+      // Standalone .svg assets are referenced from CSS as images. The a11y
+      // rules that fire on them (noSvgWithoutTitle) are written for inline
+      // JSX, where the <svg> is part of a document's accessibility tree.
+      "includes": ["**/*.svg"],
+      "linter": { "enabled": false }
+    },
+    {
+      // The sub-site scripts are classic scripts, loaded with a plain
+      // <script src>, not modules: each wraps itself in an IIFE and the
+      // "use strict" directive inside it is load-bearing, not redundant.
+      "includes": ["src/static/**/assets/js/**"],
+      "linter": {
+        "rules": {
+          "suspicious": { "noRedundantUseStrict": "off" }
+        }
+      }
     }
   ]
 }

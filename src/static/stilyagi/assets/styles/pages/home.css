@@ -413,6 +413,31 @@
        color: var(--accent-text);
      }
 
+     /* Sits under the rail's heading, where a reader who has just been told
+        how to start looks next for where to get it. */
+     .command-source {
+       display: inline-block;
+       margin-top: calc(var(--unit) * 2);
+       font-family: var(--font-sans);
+       font-size: 0.76rem;
+       font-weight: 700;
+       letter-spacing: 0.14em;
+       text-transform: uppercase;
+       color: var(--ink);
+       text-decoration: none;
+       border-bottom: var(--rule-weight) solid var(--press-red);
+       padding-bottom: 3px;
+     }
+
+     .command-source:hover {
+       color: var(--accent-text);
+     }
+
+     .command-source .manicule {
+       color: var(--accent-text);
+       font-size: 1rem;
+     }
+
      .command-steps {
        display: grid;
        grid-template-columns: repeat(3, minmax(0, 1fr));

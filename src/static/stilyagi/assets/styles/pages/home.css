@@ -532,7 +532,7 @@
   }
 
   @keyframes tile-chase {
-    from {
+    0% {
       filter: saturate(0);
     }
     45% {
@@ -551,7 +551,7 @@
   }
 
   @keyframes letter-strike {
-    from {
+    0% {
       opacity: 0;
       font-weight: 600;
     }

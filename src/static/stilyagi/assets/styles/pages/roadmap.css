@@ -289,6 +289,26 @@
   padding: 2px 7px 1px;
   white-space: nowrap;
 }
+/* The call-outs wear the same status palette as the timeline below: paper on
+   sage for shipped (4.58:1), paper on press-red for in flight (4.60:1), and
+   the ink-on-paper default above for planned (15.21:1).  Each fill is paired
+   with a mark, so the three states are still told apart with colour absent;
+   the mark is decorative and the status is spoken by a visually hidden
+   suffix. */
+.illo-label.is-done {
+  background: var(--signal-sage-solid);
+  color: var(--paper);
+}
+.illo-label.is-current {
+  background: var(--press-red);
+  color: var(--paper);
+}
+.illo-mark {
+  font-weight: 900;
+  /* The marks are geometric shapes centred on the em box rather than seated
+     on the baseline; a small nudge lines them up with the label's capitals. */
+  vertical-align: -0.05em;
+}
 .illo-label--below {
   transform: translate(-50%, 0);
 }
@@ -314,6 +334,16 @@
   }
   .illo-label:nth-of-type(4) {
     transform: translate(-50%, calc(-100% - 8px));
+  }
+  /* The last call-out sits at 88.5% of the frame and is centred on that
+     point, so half its width hangs past the right edge and widens the whole
+     page.  Pinning it just inside the frame costs a little alignment with
+     the leader drawn beneath it and buys a page that does not scroll
+     sideways. */
+  .illo-label:nth-of-type(6) {
+    left: auto;
+    right: 4px;
+    transform: none;
   }
 }
 /* A band of four policy cards spanning the content column, above the

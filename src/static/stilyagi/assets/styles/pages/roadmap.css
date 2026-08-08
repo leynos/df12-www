@@ -305,8 +305,8 @@
 }
 .illo-mark {
   font-weight: 900;
-  /* The part-alternation mark carries no descender and sits high in its
-     em box; nudging it down aligns it with the label's capitals. */
+  /* The marks are geometric shapes centred on the em box rather than seated
+     on the baseline; a small nudge lines them up with the label's capitals. */
   vertical-align: -0.05em;
 }
 .illo-label--below {
@@ -334,6 +334,16 @@
   }
   .illo-label:nth-of-type(4) {
     transform: translate(-50%, calc(-100% - 8px));
+  }
+  /* The last call-out sits at 88.5% of the frame and is centred on that
+     point, so half its width hangs past the right edge and widens the whole
+     page.  Pinning it just inside the frame costs a little alignment with
+     the leader drawn beneath it and buys a page that does not scroll
+     sideways. */
+  .illo-label:nth-of-type(6) {
+    left: auto;
+    right: 4px;
+    transform: none;
   }
 }
 /* A band of four policy cards spanning the content column, above the

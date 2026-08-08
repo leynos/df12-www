@@ -204,6 +204,14 @@
   background: var(--paper-shade);
   border: 1px solid var(--ink);
 }
+/* Three keys no longer share a line at phone widths — wrapping leaves one
+   stranded — so they stack into a short list instead. */
+@media (width <= 560px) {
+  .legend-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
 .risks {
   max-width: 1240px;
   margin: 0 auto;
@@ -251,17 +259,72 @@
   margin: 0 auto;
   padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 4);
 }
+.roadmap-illo .illo-frame {
+  position: relative;
+  border: var(--rule-weight-2) solid var(--ink);
+  margin-top: calc(var(--unit) * 3);
+}
 .roadmap-illo img {
   width: 100%;
   height: auto;
-  border: var(--rule-weight-2) solid var(--ink);
   display: block;
   mix-blend-mode: multiply;
 }
+/* Each label names the slice a call-out line in the artwork points at.
+   Coordinates are percentages of the frame, set inline per label, so the
+   labels track their lines as the image scales. */
+.illo-label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -100%);
+  font-family: var(--font-sans);
+  font-size: clamp(0.5rem, 1.1vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 2px 7px 1px;
+  white-space: nowrap;
+}
+.illo-label--below {
+  transform: translate(-50%, 0);
+}
+/* At phone widths the image goes full-bleed — the section's inline
+   padding and the frame's side borders drop so the artwork runs edge to
+   edge — which buys enough room to keep the labels; they tighten their
+   tracking and padding to fit the smaller frame. */
+@media (max-width: 640px) {
+  .roadmap-illo {
+    padding-inline: 0;
+  }
+  .roadmap-illo .illo-frame {
+    border-inline: 0;
+  }
+  .illo-label {
+    letter-spacing: 0.06em;
+    padding: 1px 4px;
+  }
+  /* At this scale two labels sit a shade off their lines: 00 drifts over
+     01's leader and 03 crowds its dot. Counting spans, 1 is 00 and 4 is 03. */
+  .illo-label:nth-of-type(1) {
+    transform: translate(calc(-50% - 10px), -100%);
+  }
+  .illo-label:nth-of-type(4) {
+    transform: translate(-50%, calc(-100% - 8px));
+  }
+}
+/* A band of four policy cards spanning the content column, above the
+   "what we will not do" section. It carries the top padding; the section
+   below supplies the gap beneath. */
 .pacing {
-  margin-top: 26px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: calc(var(--unit) * 6) calc(var(--unit) * 4) 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 .pacing .card {
@@ -285,7 +348,10 @@
 }
 @media (max-width: 900px) {
   .phase .ph-head {
-    grid-template-columns: 60px 1fr 50px;
+    /* A bare 1fr takes its minimum from the title, so the longer phase names
+       widen the track and shove the toggle past the panel's right edge.
+       Capping the track lets the title wrap instead. */
+    grid-template-columns: 60px minmax(0, 1fr) 50px;
   }
   .ph-meta {
     display: none;
@@ -293,5 +359,40 @@
   .ph-body-inner,
   .risks {
     grid-template-columns: 1fr;
+  }
+  /* Stacked one-up, the sticky note travels over the prose instead of beside
+     it, so it needs a surface of its own.  Same treatment as the masthead: a
+     near-opaque paper wash over a blur, lifted above the body column. */
+  .margin-note {
+    z-index: 1;
+    /* The masthead runs 74–90px tall depending on how the brand imprint
+       wraps.  Anchoring the box at 74px and padding the text down to 98px
+       means the wash always meets the masthead — no strip of unblurred
+       prose scrolling through the gap — without ever tucking the text
+       underneath it. */
+    top: 74px;
+    margin-inline: calc(var(--unit) * -2);
+    padding: calc(var(--unit) * 3) calc(var(--unit) * 2)
+      calc(var(--unit) * 1.5);
+    background: rgba(239, 228, 206, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: var(--rule-weight) solid var(--ink);
+  }
+  .pacing {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .pacing {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The accordion's height slide and the toggle's rotation are decoration on
+   top of aria-expanded; with reduced motion the panel opens at once. */
+@media (prefers-reduced-motion: reduce) {
+  .ph-body,
+  .ph-toggle {
+    transition: none;
   }
 }

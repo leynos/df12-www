@@ -2,6 +2,7 @@
 {% block title %}Stilyagi · How — the mechanism{% endblock %}
 {% block description %}How Stilyagi works: Rust extraction, the intermediate representation contract, capability planning, and the Ruff-inspired command line.{% endblock %}
 {% block page_stylesheet %}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/syntax.css" />
     <link rel="stylesheet" href="/stilyagi/assets/styles/pages/how.css" />
 {% endblock %}
 {% block content %}
@@ -133,25 +134,32 @@
               ><span class="red">author view</span>
             </div>
             <div class="ex-body">
-              <pre class="code"><code># rules/heading_depth.py
-      from stilyagi.rule import Rule, Level
-      from stilyagi.regions import Heading
+              <div class="code-scroll" tabindex="0" role="region"
+                   aria-label="rules/heading_depth.py source">
+              {% highlight 'python', 'stilyagi-syntax' %}
+              # rules/heading_depth.py
+              from stilyagi.rule import Rule, Level
+              from stilyagi.regions import Heading
 
-      class HeadingDepthRule(Rule):
-          """Reject Markdown headings deeper than level 3."""
-          code = "MD201"
-          name = "heading-depth"
-          level = Level.WARNING
-          pack = "default"
-          capabilities = ()   # no spaCy, no spellchecker
 
-          def check_heading(self, h: Heading) -&gt; None:
-              if h.depth &gt; 3:
-                  self.report(
-                      span=h.marker_span,
-                      message=f"Heading depth {h.depth} exceeds maximum of 3.",
-                      suggestion="Promote to a new section or demote to bold text.",
-                  )</code></pre>
+              class HeadingDepthRule(Rule):
+                  """Reject Markdown headings deeper than level 3."""
+
+                  code = "MD201"
+                  name = "heading-depth"
+                  level = Level.WARNING
+                  pack = "default"
+                  capabilities = ()   # no spaCy, no spellchecker
+
+                  def check_heading(self, h: Heading) -> None:
+                      if h.depth > 3:
+                          self.report(
+                              span=h.marker_span,
+                              message=f"Heading depth {h.depth} exceeds maximum of 3.",
+                              suggestion="Promote to a new section, or use bold text.",
+                          )
+              {% endhighlight %}
+              </div>
             </div>
           </div>
           <div class="ex-col">
@@ -175,11 +183,12 @@
                 <div class="dim">71 │</div>
                 <div>72 │ <span class="code">#### Caching strategy</span></div>
                 <div>
-                  │ <span class="caret">^^^^</span> <span class="rule">heading-depth (MD201)</span>
+                  <span aria-hidden="true">&nbsp;&nbsp;&nbsp;</span>│
+                  <span class="caret">^^^^</span> <span class="rule">heading-depth (MD201)</span>
                 </div>
                 <div class="dim">73 │</div>
                 <br />
-                <div class="dim">= help: Promote to a new section or demote to bold text.</div>
+                <div class="dim">= help: Promote to a new section, or use bold text.</div>
                 <div class="dim">= suppress: &lt;!-- stilyagi: disable-line MD201 --&gt;</div>
                 <br />
                 <div><span class="final">1 warning · 0 errors · 3 files analysed in 142 ms</span></div>
@@ -208,7 +217,7 @@
             region classes and is only ever called for the ones it asked for — which is also what lets the
             capability planner skip spaCy loading when no enabled rule needs it.
           </p>
-          <h3>Determinism is load-bearing.</h3>
+          <h3>Determinism is designed, not incidental.</h3>
           <p class="editorial">
             Every diagnostic carries a canonical sort key. Files are ordered by normalised path;
             diagnostics within a file by byte offset, rule code, and stable message hash. Two rules cannot
@@ -217,7 +226,7 @@
           </p>
         </div>
       </section>
-      <section class="cli">
+      <section id="cli" class="cli section-anchor">
         <div class="section-head">
           <div class="num">C</div>
           <div>
@@ -230,6 +239,72 @@
             src="/stilyagi/assets/images/frame.webp"
             alt="The Ruff-inspired UX — compact command surface, legible configuration, fix safety"
           />
+          {#- The overlay is positioned over the window drawn in the artwork;
+              the inset percentages live in how.css. The single .transcript
+              child plus column-reverse on the scroller anchors the initial
+              scroll position to the end of the transcript. -#}
+          <div class="term frame-term" tabindex="0" role="region"
+               aria-label="Example stilyagi check transcript; scroll up for earlier output">
+            <div class="transcript">
+              <div><span class="prompt">$</span> <span class="cmd">stilyagi check docs/ --format text</span></div>
+              <div class="dim">stilyagi 0.4.0 · loaded 2 packs · planned 1 annotator</div>
+              <div class="dim">scanning 38 files · cache hit 31 · analysed 7</div>
+              <br />
+              <div><span class="path">docs/guide/install.md</span><span class="dim">:12:1</span></div>
+              <div>
+                <span class="err">warning[MD201]</span>
+                <span class="msg">Heading depth 4 exceeds maximum of 3.</span>
+              </div>
+              <br />
+              <div class="dim">10 │ ### Installing extras</div>
+              <div class="dim">11 │</div>
+              <div>12 │ <span class="code">#### With pipx</span></div>
+              <div>
+                <span aria-hidden="true">&nbsp;&nbsp;&nbsp;</span>│
+                <span class="caret">^^^^</span> <span class="rule">heading-depth (MD201)</span>
+              </div>
+              <div class="dim">13 │</div>
+              <br />
+              <div class="dim">= help: Promote to a new section, or use bold text.</div>
+              <div class="dim">= suppress: &lt;!-- stilyagi: disable-line MD201 --&gt;</div>
+              <br />
+              <div><span class="path">docs/guide/advanced.md</span><span class="dim">:72:1</span></div>
+              <div>
+                <span class="err">warning[MD201]</span>
+                <span class="msg">Heading depth 4 exceeds maximum of 3.</span>
+              </div>
+              <br />
+              <div class="dim">70 │ ### Advanced topics</div>
+              <div class="dim">71 │</div>
+              <div>72 │ <span class="code">#### Caching strategy</span></div>
+              <div>
+                <span aria-hidden="true">&nbsp;&nbsp;&nbsp;</span>│
+                <span class="caret">^^^^</span> <span class="rule">heading-depth (MD201)</span>
+              </div>
+              <br />
+              <div><span class="path">docs/reference/cli.md</span><span class="dim">:41:23</span></div>
+              <div>
+                <span class="err">error[PUN201]</span>
+                <span class="msg">Straight apostrophe in prose; use a typographic apostrophe.</span>
+              </div>
+              <br />
+              <div class="dim">40 │</div>
+              <div>41 │ <span class="code">The planner doesn't load providers no rule asked for.</span></div>
+              <div>
+                <span aria-hidden="true">&nbsp;&nbsp;&nbsp;</span>│
+                <span aria-hidden="true">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="caret">^</span>
+                <span class="rule">apostrophe-typography (PUN201)</span>
+              </div>
+              <br />
+              <div class="dim">= help: Replace ' with ’. A safe fix is available.</div>
+              <br />
+              <div class="dim">= fixable: 1 diagnostic may be fixed with `stilyagi fix --safety safe`</div>
+              <br />
+              <div><span class="final">2 warnings · 1 error · 7 files analysed in 214 ms</span></div>
+              <br />
+              <div><span class="prompt">$</span> <span class="cmd">▮</span></div>
+            </div>
+          </div>
         </div>
         <div class="cli-table" style="margin-top: calc(var(--unit) * 4)">
           <div class="cli-row">
@@ -330,7 +405,7 @@
           </div>
         </div>
       </section>
-      <section class="flowtext">
+      <section id="planner" class="flowtext section-anchor">
         <aside class="margin-note">
           <span class="red">§ Planner · what it does</span>Inspects enabled rules. Collects their declared
           capabilities. Loads grammar, spelling, terminology, and custom providers on demand. Never loads

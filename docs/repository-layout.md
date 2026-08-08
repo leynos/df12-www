@@ -25,6 +25,7 @@ df12-www/
 ├── reference/
 ├── scripts/
 ├── src/
+│   ├── static/
 │   └── styles/
 ├── templates/
 │   ├── mxd/
@@ -106,6 +107,13 @@ Build-time scripts outside the Python package:
 Frontend source files. `styles/` contains the Tailwind CSS entry point (
 `site.css`) and any plugins. The compiled output is written to
 `public/assets/site.css`.
+
+`static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
+and favicons — that are copied verbatim into the published tree. Its layout
+mirrors the output, so `src/static/stilyagi/assets/styles/` is the
+authoritative source for the Stilyagi sub-site's CSS and is published at
+`/stilyagi/assets/styles/`. Edit the files here. The copies under `public/` are
+build output and are overwritten on the next build.
 
 ### `templates/`
 

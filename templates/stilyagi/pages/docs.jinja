@@ -1,6 +1,6 @@
 {% extends "_layout.jinja" %}
 {% block title %}Stilyagi · Docs — rules catalogue, configuration, colophon{% endblock %}
-{% block description %}Stilyagi reference: the rules catalogue, configuration schema, suppression semantics, and the growing manual for the tool itself.{% endblock %}
+{% block description %}Stilyagi reference: the rules catalogue, configuration schema, suppression semantics, the testing sandbox for rule authors, and the growing manual for the tool itself.{% endblock %}
 {% block page_stylesheet %}
     <link rel="stylesheet" href="/stilyagi/assets/styles/pages/docs.css" />
 {% endblock %}
@@ -25,10 +25,10 @@
         <aside class="side-toc">
           <a href="#catalogue" class="active">§ I. Rules</a><a href="#config" class="">§ II. Config</a
           ><a href="#suppress" class="">§ III. Suppressions</a
-          ><a href="#colophon" class="">§ IV. Colophon</a>
+          ><a href="#testing" class="">§ IV. Sandbox</a><a href="#colophon" class="">§ V. Colophon</a>
         </aside>
         <div>
-          <section id="catalogue" style="scroll-margin-top: 90px">
+          <section id="catalogue" class="section-anchor">
             <div class="cat-head">
               <h2>The <span class="red">rules</span> catalogue</h2>
               <div class="counts">
@@ -96,6 +96,19 @@
                 class="filter-chip"
               >
                 Spell</button
+              >{#- The same namespace choice as a native control, for the
+                  widths where seven chips no longer fit on one line.  Only
+                  one of the two is displayed at a time; the script keeps
+                  them in step so either can drive the filter. -#}
+              <label class="sr-only" for="ns-filter">Filter rules by namespace</label
+              ><select id="ns-filter" class="filter-select">
+                <option value="all" selected>All namespaces</option>
+                <option value="md">Markdown</option>
+                <option value="pydoc">PyDoc</option>
+                <option value="rsdoc">RsDoc</option>
+                <option value="pun">Punctuation</option>
+                <option value="gram">Grammar</option>
+                <option value="spell">Spell</option></select
               ><label class="sr-only" for="rule-search">Search rules by name or ID</label
               ><input
                 id="rule-search"
@@ -105,451 +118,451 @@
                 value=""
               />
             </div>
-            <table class="rules-table">
-              <thead>
-                <tr>
-                  <th style="width: 110px">Rule</th>
-                  <th>Title &amp; description</th>
-                  <th style="width: 100px">Severity</th>
-                  <th style="width: 90px">Autofix</th>
+            <table class="rules-table" role="table">
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th role="columnheader" style="width: 110px">Rule</th>
+                  <th role="columnheader">Title &amp; description</th>
+                  <th role="columnheader" style="width: 100px">Severity</th>
+                  <th role="columnheader" style="width: 90px">Autofix</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr class="empty-row" hidden="">
-                  <td colspan="4">No rules match that filter.</td>
+              <tbody role="rowgroup">
+                <tr role="row" class="empty-row" hidden="">
+                  <td role="cell" colspan="4">No rules match that filter.</td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md201 heading depth headings must not skip levels (h2 → h4 is rejected)."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD201</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD201</td>
+                  <td role="cell">
                     <b>Heading depth</b><br /><span style="color: var(--ink-soft)"
                       >Headings must not skip levels (h2 → h4 is rejected).</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md202 atx heading style prefer # over === / --- setext headings."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD202</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD202</td>
+                  <td role="cell">
                     <b>ATX heading style</b><br /><span style="color: var(--ink-soft)"
                       >Prefer # over === / --- setext headings.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md203 trailing heading punctuation no trailing punctuation on headings except question marks."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD203</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD203</td>
+                  <td role="cell">
                     <b>Trailing heading punctuation</b><br /><span style="color: var(--ink-soft)"
                       >No trailing punctuation on headings except question marks.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md210 unordered list marker use - consistently across a document."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD210</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD210</td>
+                  <td role="cell">
                     <b>Unordered list marker</b><br /><span style="color: var(--ink-soft)"
                       >Use - consistently across a document.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md211 ordered list prefix order list items sequentially from 1, not all as 1."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD211</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD211</td>
+                  <td role="cell">
                     <b>Ordered list prefix</b><br /><span style="color: var(--ink-soft)"
                       >Order list items sequentially from 1, not all as 1.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md220 hard line break no trailing double-space line breaks; use \ or a blank line."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD220</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD220</td>
+                  <td role="cell">
                     <b>Hard line break</b><br /><span style="color: var(--ink-soft)"
                       >No trailing double-space line breaks; use \ or a blank line.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md230 fenced code language fenced code blocks must declare a language."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD230</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD230</td>
+                  <td role="cell">
                     <b>Fenced code language</b><br /><span style="color: var(--ink-soft)"
                       >Fenced code blocks must declare a language.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix unsafe">unsafe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix unsafe">unsafe</span></td>
                 </tr>
-                <tr data-ns="md" data-search="md231 indented code prefer fenced code over indented code.">
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD231</td>
-                  <td>
+                <tr role="row" data-ns="md" data-search="md231 indented code prefer fenced code over indented code.">
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD231</td>
+                  <td role="cell">
                     <b>Indented code</b><br /><span style="color: var(--ink-soft)"
                       >Prefer fenced code over indented code.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md240 autolink bare url wrap bare urls in &lt;…&gt; or a link."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD240</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD240</td>
+                  <td role="cell">
                     <b>Autolink bare URL</b><br /><span style="color: var(--ink-soft)"
                       >Wrap bare URLs in &lt;…&gt; or a link.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr data-ns="md" data-search="md241 link text empty links must have non-empty text.">
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD241</td>
-                  <td>
+                <tr role="row" data-ns="md" data-search="md241 link text empty links must have non-empty text.">
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD241</td>
+                  <td role="cell">
                     <b>Link text empty</b><br /><span style="color: var(--ink-soft)"
                       >Links must have non-empty text.</span
                     >
                   </td>
-                  <td><span class="sev sev-err">Error</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-err">Error</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr data-ns="md" data-search="md250 image alt text images must carry alt text.">
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD250</td>
-                  <td>
+                <tr role="row" data-ns="md" data-search="md250 image alt text images must carry alt text.">
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD250</td>
+                  <td role="cell">
                     <b>Image alt text</b><br /><span style="color: var(--ink-soft)"
                       >Images must carry alt text.</span
                     >
                   </td>
-                  <td><span class="sev sev-err">Error</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-err">Error</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="md"
                   data-search="md260 inline html inline html in markdown flagged; can be allowlisted."
                 >
-                  <td class="id"><span class="ns ns-md">MD</span><br />MD260</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD260</td>
+                  <td role="cell">
                     <b>Inline HTML</b><br /><span style="color: var(--ink-soft)"
                       >Inline HTML in Markdown flagged; can be allowlisted.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pun"
                   data-search="pun101 double space after period collapse double spaces after terminal punctuation."
                 >
-                  <td class="id"><span class="ns ns-pun">PUN</span><br />PUN101</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN101</td>
+                  <td role="cell">
                     <b>Double space after period</b><br /><span style="color: var(--ink-soft)"
                       >Collapse double spaces after terminal punctuation.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pun"
                   data-search="pun201 smart quotes curly quotes preferred over ascii quotes in prose regions."
                 >
-                  <td class="id"><span class="ns ns-pun">PUN</span><br />PUN201</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN201</td>
+                  <td role="cell">
                     <b>Smart quotes</b><br /><span style="color: var(--ink-soft)"
                       >Curly quotes preferred over ASCII quotes in prose regions.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pun"
                   data-search="pun202 em-dash spacing em-dashes must not be surrounded by spaces (house style)."
                 >
-                  <td class="id"><span class="ns ns-pun">PUN</span><br />PUN202</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN202</td>
+                  <td role="cell">
                     <b>Em-dash spacing</b><br /><span style="color: var(--ink-soft)"
                       >Em-dashes must not be surrounded by spaces (house style).</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pun"
                   data-search="pun203 oxford comma final comma before the conjunction in a list of three or more."
                 >
-                  <td class="id"><span class="ns ns-pun">PUN</span><br />PUN203</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN203</td>
+                  <td role="cell">
                     <b>Oxford comma</b><br /><span style="color: var(--ink-soft)"
                       >Final comma before the conjunction in a list of three or more.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pun"
                   data-search="pun204 ellipsis use the ellipsis character, not three periods."
                 >
-                  <td class="id"><span class="ns ns-pun">PUN</span><br />PUN204</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN204</td>
+                  <td role="cell">
                     <b>Ellipsis</b><br /><span style="color: var(--ink-soft)"
                       >Use the ellipsis character, not three periods.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pydoc"
                   data-search="pydoc101 missing docstring public modules, classes, and functions require a docstring."
                 >
-                  <td class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC101</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC101</td>
+                  <td role="cell">
                     <b>Missing docstring</b><br /><span style="color: var(--ink-soft)"
                       >Public modules, classes, and functions require a docstring.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pydoc"
                   data-search="pydoc102 summary line first docstring line must be a complete imperative sentence."
                 >
-                  <td class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC102</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC102</td>
+                  <td role="cell">
                     <b>Summary line</b><br /><span style="color: var(--ink-soft)"
                       >First docstring line must be a complete imperative sentence.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix unsafe">unsafe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix unsafe">unsafe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pydoc"
                   data-search="pydoc103 summary length summary line must be 80 characters or fewer."
                 >
-                  <td class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC103</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC103</td>
+                  <td role="cell">
                     <b>Summary length</b><br /><span style="color: var(--ink-soft)"
                       >Summary line must be 80 characters or fewer.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pydoc"
                   data-search='pydoc110 imperative mood summary should read "compute…" not "computes…".'
                 >
-                  <td class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC110</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC110</td>
+                  <td role="cell">
                     <b>Imperative mood</b><br /><span style="color: var(--ink-soft)"
                       >Summary should read "Compute…" not "Computes…".</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix unsafe">unsafe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix unsafe">unsafe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pydoc"
                   data-search="pydoc120 args alignment every declared parameter must be documented; no phantoms."
                 >
-                  <td class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC120</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC120</td>
+                  <td role="cell">
                     <b>Args alignment</b><br /><span style="color: var(--ink-soft)"
                       >Every declared parameter must be documented; no phantoms.</span
                     >
                   </td>
-                  <td><span class="sev sev-err">Error</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-err">Error</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pydoc"
                   data-search="pydoc121 returns documented functions with a return value require a returns section."
                 >
-                  <td class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC121</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC121</td>
+                  <td role="cell">
                     <b>Returns documented</b><br /><span style="color: var(--ink-soft)"
                       >Functions with a return value require a Returns section.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="pydoc"
                   data-search="pydoc130 raises cited documented exceptions must match actual raise statements."
                 >
-                  <td class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC130</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC130</td>
+                  <td role="cell">
                     <b>Raises cited</b><br /><span style="color: var(--ink-soft)"
                       >Documented exceptions must match actual raise statements.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="rsdoc"
                   data-search="rsdoc101 crate root docstring every crate root must carry a //! documentation comment."
                 >
-                  <td class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC101</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC101</td>
+                  <td role="cell">
                     <b>Crate root docstring</b><br /><span style="color: var(--ink-soft)"
                       >Every crate root must carry a //! documentation comment.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="rsdoc"
                   data-search="rsdoc110 public item doc public items require /// documentation."
                 >
-                  <td class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC110</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC110</td>
+                  <td role="cell">
                     <b>Public item doc</b><br /><span style="color: var(--ink-soft)"
                       >Public items require /// documentation.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="rsdoc"
                   data-search="rsdoc120 code example public api examples should compile under rustdoc."
                 >
-                  <td class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC120</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC120</td>
+                  <td role="cell">
                     <b>Code example</b><br /><span style="color: var(--ink-soft)"
                       >Public API examples should compile under rustdoc.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="rsdoc"
                   data-search="rsdoc130 intra-doc links prefer intra-doc links over bare paths."
                 >
-                  <td class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC130</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC130</td>
+                  <td role="cell">
                     <b>Intra-doc links</b><br /><span style="color: var(--ink-soft)"
                       >Prefer intra-doc links over bare paths.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="gram"
                   data-search="gram201 passive voice flag passive-voice sentences in prose regions."
                 >
-                  <td class="id"><span class="ns ns-gram">GRAM</span><br />GRAM201</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-gram">GRAM</span><br />GRAM201</td>
+                  <td role="cell">
                     <b>Passive voice</b><br /><span style="color: var(--ink-soft)"
                       >Flag passive-voice sentences in prose regions.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="gram"
                   data-search="gram210 sentence length flag sentences beyond the configured word ceiling."
                 >
-                  <td class="id"><span class="ns ns-gram">GRAM</span><br />GRAM210</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-gram">GRAM</span><br />GRAM210</td>
+                  <td role="cell">
                     <b>Sentence length</b><br /><span style="color: var(--ink-soft)"
                       >Flag sentences beyond the configured word ceiling.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="gram"
                   data-search='gram220 weasel words "very", "quite", "rather" — flagged, not forbidden.'
                 >
-                  <td class="id"><span class="ns ns-gram">GRAM</span><br />GRAM220</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-gram">GRAM</span><br />GRAM220</td>
+                  <td role="cell">
                     <b>Weasel words</b><br /><span style="color: var(--ink-soft)"
                       >"Very", "quite", "rather" — flagged, not forbidden.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="spell"
                   data-search="spell101 unknown word words absent from dictionary and allowlist."
                 >
-                  <td class="id"><span class="ns ns-spell">SPELL</span><br />SPELL101</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-spell">SPELL</span><br />SPELL101</td>
+                  <td role="cell">
                     <b>Unknown word</b><br /><span style="color: var(--ink-soft)"
                       >Words absent from dictionary and allowlist.</span
                     >
                   </td>
-                  <td><span class="sev sev-info">Info</span></td>
-                  <td><span class="fix none">—</span></td>
+                  <td role="cell"><span class="sev sev-info">Info</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix none">—</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="spell"
                   data-search="spell110 commonly misspelled high-confidence corrections for common misspellings."
                 >
-                  <td class="id"><span class="ns ns-spell">SPELL</span><br />SPELL110</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-spell">SPELL</span><br />SPELL110</td>
+                  <td role="cell">
                     <b>Commonly misspelled</b><br /><span style="color: var(--ink-soft)"
                       >High-confidence corrections for common misspellings.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
-                <tr
+                <tr role="row"
                   data-ns="spell"
                   data-search="spell120 terminology consistency enforce canonical spellings for project terms."
                 >
-                  <td class="id"><span class="ns ns-spell">SPELL</span><br />SPELL120</td>
-                  <td>
+                  <td role="cell" class="id"><span class="ns ns-spell">SPELL</span><br />SPELL120</td>
+                  <td role="cell">
                     <b>Terminology consistency</b><br /><span style="color: var(--ink-soft)"
                       >Enforce canonical spellings for project terms.</span
                     >
                   </td>
-                  <td><span class="sev sev-warn">Warning</span></td>
-                  <td><span class="fix safe">safe</span></td>
+                  <td role="cell"><span class="sev sev-warn">Warning</span></td>
+                  <td role="cell"><span class="col-label">autofix </span><span class="fix safe">safe</span></td>
                 </tr>
               </tbody>
             </table>
@@ -578,7 +591,24 @@
                 tabindex="0"
                 role="region"
                 aria-label="Example stilyagi.toml"
-              ><code><span class="c"># stilyagi.toml</span><span class="k">line-length</span> = <span class="n">100</span><span class="k">select</span> = [<span class="s">"MD"</span>, <span class="s">"PUN"</span>, <span class="s">"PYDOC"</span>]<span class="k">ignore</span> = [<span class="s">"MD260"</span>, <span class="s">"PUN204"</span>]<span class="c"># Per-rule configuration</span>[<span class="k">rule.PUN201</span>]<span class="k">style</span> = <span class="s">"british"</span><span class="k">allow-straight</span> = [<span class="s">"code"</span>, <span class="s">"inline_code"</span>] [<span class="k">rule.GRAM210</span>]<span class="k">max-words</span> = <span class="n">32</span><span class="c"># Per-file overrides — glob-matched</span>[<span class="k">per-file</span>]<span class="s">"docs/reference/**"</span> = { <span class="k">extend-select</span> = [<span class="s">"GRAM"</span>] }<span class="s">"**/CHANGELOG.md"</span> = { <span class="k">ignore</span> = [<span class="s">"MD201"</span>] }</code></pre>
+              >
+<span class="c"># stilyagi.toml</span>
+<span class="k">line-length</span> = <span class="n">100</span>
+<span class="k">select</span> = [<span class="s">"MD"</span>, <span class="s">"PUN"</span>, <span class="s">"PYDOC"</span>]
+<span class="k">ignore</span> = [<span class="s">"MD260"</span>, <span class="s">"PUN204"</span>]
+
+<span class="c"># Per-rule configuration</span>
+[<span class="k">rule.PUN201</span>]
+<span class="k">style</span> = <span class="s">"british"</span>
+<span class="k">allow-straight</span> = [<span class="s">"code"</span>, <span class="s">"inline_code"</span>]
+
+[<span class="k">rule.GRAM210</span>]
+<span class="k">max-words</span> = <span class="n">32</span>
+
+<span class="c"># Per-file overrides — glob-matched</span>
+[<span class="k">per-file</span>]
+<span class="s">"docs/reference/**"</span> = { <span class="k">extend-select</span> = [<span class="s">"GRAM"</span>] }
+<span class="s">"**/CHANGELOG.md"</span> = { <span class="k">ignore</span> = [<span class="s">"MD201"</span>] }</pre>
             </div>
           </section>
           <section id="suppress" class="suppress" style="margin-top: 80px; scroll-margin-top: 90px">
@@ -615,7 +645,21 @@
               aria-labelledby="suppress-tab-md"
               data-panel="md"
               tabindex="0"
-            ><span class="com">&lt;!-- stilyagi: disable-next-line PUN201 --&gt;</span>She said "no" — a single word, straight-quoted on purpose. This paragraph opts out of the sentence-length check for dramatic effect.<span class="com">&lt;!-- stilyagi: disable-block GRAM210 --&gt;</span>It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of light, it was the season of darkness, it was the spring of hope, it was the winter of despair.<span class="com">&lt;!-- stilyagi: enable-block GRAM210 --&gt;</span>Ordinary prose resumes here. <span class="com">&lt;!-- stilyagi: disable-line PUN101 --&gt;</span><span class="dim"># ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ # disables only the preceding line</span></pre>
+            >
+<span class="com">&lt;!-- stilyagi: disable-next-line PUN201 --&gt;</span>
+She said "no" — a single word, straight-quoted on purpose. This paragraph
+opts out of the sentence-length check for dramatic effect.
+
+<span class="com">&lt;!-- stilyagi: disable-block GRAM210 --&gt;</span>
+It was the best of times, it was the worst of times, it was the age of
+wisdom, it was the age of foolishness, it was the epoch of belief, it was
+the epoch of incredulity, it was the season of light, it was the season of
+darkness, it was the spring of hope, it was the winter of despair.
+<span class="com">&lt;!-- stilyagi: enable-block GRAM210 --&gt;</span>
+
+Ordinary prose resumes here. <span class="com">&lt;!-- stilyagi: disable-line PUN101 --&gt;</span>
+<span class="dim">                           # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                           # disables only the current line</span></pre>
             <pre
               id="suppress-panel-py"
               role="tabpanel"
@@ -623,7 +667,19 @@
               data-panel="py"
               tabindex="0"
               hidden=""
-            ><span class="com">def</span> <span class="com">compute_metrics</span>(series, window=7):<span class="dim">"""</span><span class="dim"> Compute rolling metrics across the given series.</span><span class="dim"> The smoothing window is in trading days, not calendar days.</span><span class="dim"> Args:</span><span class="dim"> series: price series, normalized.</span><span class="dim"> window: lookback in trading days (default: 7).</span><span class="com"> # stilyagi: disable-line PYDOC103</span><span class="dim"> _internal_debug_flag: unused; retained for historical instrumentation and compatibility.</span><span class="dim"> """</span>...</pre>
+            >
+def compute_metrics(series, window=7):
+    <span class="dim">"""</span>
+    <span class="dim">Compute rolling metrics across the given series.</span>
+    <span class="dim">The smoothing window is in trading days, not calendar days.</span>
+
+    <span class="dim">Args:</span>
+        <span class="dim">series: price series, normalized.</span>
+        <span class="dim">window: lookback in trading days (default: 7).</span>  <span class="com"># stilyagi: disable-line PYDOC103</span>
+        <span class="dim">_internal_debug_flag: unused; retained for historical</span>
+        <span class="dim">instrumentation and compatibility.</span>
+    <span class="dim">"""</span>
+    ...</pre>
             <p
               style="
                 font-family: var(--font-editorial);
@@ -638,9 +694,122 @@
               question: <em>why is this line exempt?</em>
             </p>
           </section>
+          <section id="testing" class="sandbox" style="margin-top: 80px; scroll-margin-top: 90px">
+            <div class="cat-head">
+              <h2>The <span class="red">testing</span> sandbox</h2>
+              <div class="counts">pytest fixture<br />hermetic by default</div>
+            </div>
+            <p class="sandbox-status">
+              <span class="stamp small">Planned</span
+              ><span
+                >Specified in RFC 0004; the current tree carries an internal golden-IR and fix round-trip
+                scaffold while the public fixture is built.</span
+              >
+            </p>
+            <div class="config-grid">
+              <div>
+                <h3>Real runs, <span class="red">isolated</span> state</h3>
+                <p>
+                  Rule authoring is a first-class feature, so rule testing is one too. The sandbox is a
+                  pytest fixture — <code>stilyagi_path</code> — that wraps <code>tmp_path</code> into a
+                  temporary project root you write ordinary files into, then runs the real
+                  <code>stilyagi</code> against them and hands back typed diagnostics.
+                </p>
+                <p>
+                  Runs go through a subprocess by default, because that is what exercises the installed
+                  command surface, config discovery, entry-point loading, exit codes, JSON rendering, and
+                  the Rust extension import. An in-process fast path would test a different program from
+                  the one users run.
+                </p>
+                <p>
+                  Hermetic is the default, not a flag: <code>--isolated</code>, <code>--no-cache</code>, a
+                  working directory rooted in the temporary project, and UTF-8 forced. No user config
+                  leaks in, no cache survives, and output paths are normalized to
+                  <code>./like/this.md</code> so assertions read the same on every platform.
+                </p>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Example rule test using the stilyagi_path fixture"
+              >
+<span class="c"># tests/test_serial_comma.py</span>
+<span class="k">from</span> stilyagi.testing <span class="k">import</span> assert_has_diagnostic
+
+
+<span class="k">def</span> <span class="n">test_serial_comma</span>(stilyagi_path):
+    stilyagi_path.write_config(
+        <span class="s">'[tool.stilyagi.lint]\n'</span>
+        <span class="s">'select = ["PUN201"]\n'</span>
+    )
+    (stilyagi_path / <span class="s">"doc.md"</span>).write_text(
+        <span class="s">"Apples, bananas and pears.\n"</span>
+    )
+
+    result = stilyagi_path.run_check(<span class="s">"doc.md"</span>)
+
+    diag = assert_has_diagnostic(
+        result.diagnostics, code=<span class="s">"PUN201"</span>
+    )
+    <span class="k">assert</span> diag.fix.applicability == <span class="s">"safe"</span></pre>
+            </div>
+            <div class="config-grid" style="margin-top: 40px">
+              <div>
+                <h3>Packs and <span class="red">extraction</span>, both testable</h3>
+                <p>
+                  Third-party rules arrive through entry points, so the sandbox has to be able to
+                  manufacture something that looks installed.
+                  <code>install_rule_pack()</code> writes a package tree and a <code>.dist-info</code>
+                  directory with real <code>entry_points.txt</code> metadata, then puts it on the
+                  subprocess path — the same discovery contract production uses, without a virtual
+                  environment or a <code>pip install</code> per test.
+                </p>
+                <p>
+                  <code>run_dump_ir()</code> returns parsed IR documents, so a test can assert on region
+                  kinds, owner metadata, synthetic segments, and suppression state. That distinction
+                  matters: a false positive is either a bad rule or a bad extractor, and the harness
+                  should make it cheap to tell which.
+                </p>
+                <p>
+                  The assertion helpers stay deliberately dumb —
+                  <code>assert_has_diagnostic</code>, <code>assert_no_diagnostics</code>,
+                  <code>assert_only_codes</code>, <code>assert_has_fix</code>,
+                  <code>assert_ir_region</code>. They exist to delete repetitive test noise, not to become
+                  a second assertion language. And the name is a promise about isolation, not about
+                  safety: rule packs are trusted Python here exactly as they are everywhere else.
+                </p>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Example temporary rule pack installed into the sandbox"
+              >
+<span class="k">def</span> <span class="n">test_custom_pack</span>(stilyagi_path):
+    stilyagi_path.install_rule_pack(
+        name=<span class="s">"demo-pack"</span>,
+        modules={<span class="s">"demo_pack/rules.py"</span>: RULE_SOURCE},
+        rule_entry_points={
+            <span class="s">"demo"</span>: <span class="s">"demo_pack.rules"</span>
+        },
+    )
+    stilyagi_path.write_config(
+        <span class="s">'[tool.stilyagi]\n'</span>
+        <span class="s">'plugins = ["demo-pack"]\n'</span>
+    )
+    (stilyagi_path / <span class="s">"doc.md"</span>).write_text(
+        <span class="s">"foo appears here\n"</span>
+    )
+
+    result = stilyagi_path.run_check(<span class="s">"doc.md"</span>)
+
+    assert_has_diagnostic(
+        result.diagnostics, code=<span class="s">"DEMO001"</span>
+    )</pre>
+            </div>
+          </section>
         </div>
       </div>
-      <section id="colophon" class="colophon-sec" style="scroll-margin-top: 90px">
+      <section id="colophon" class="colophon-sec section-anchor">
         <div class="agitprop-stamp">An agitprop object</div>
         <div class="colophon-inner">
           <div>
@@ -670,12 +839,12 @@
           <div class="credits">
             <div class="row"><b>Kind</b><span>Prose linter, dual-runtime</span></div>
             <div class="row">
-              <b>Extractor</b><span>Rust · PyO3 · pulldown-cmark · syn · rustpython-parser</span>
+              <b>Extractor</b><span>Rust · PyO3 · markdown-rs · tree-sitter</span>
             </div>
-            <div class="row"><b>Runtime</b><span>Python 3.11+ · typer · pluggy</span></div>
-            <div class="row"><b>Optional</b><span>spaCy · symspellpy</span></div>
-            <div class="row"><b>Output</b><span>text · json · sarif v2.1.0</span></div>
-            <div class="row"><b>License</b><span>Apache-2.0</span></div>
+            <div class="row"><b>Runtime</b><span>Python 3.14+ · cyclopts · entry-point plugins</span></div>
+            <div class="row"><b>Optional</b><span>spaCy (planned)</span></div>
+            <div class="row"><b>Output</b><span>text · json (sarif planned)</span></div>
+            <div class="row"><b>License</b><span>ISC</span></div>
             <div class="row">
               <b>Status</b
               ><span style="color: var(--accent-text); font-weight: 700">Draft · v0.4.0 in flight</span>

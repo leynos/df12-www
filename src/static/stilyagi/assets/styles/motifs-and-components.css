@@ -647,3 +647,21 @@ table.scholar tbody tr:last-child td {
   opacity: 1;
   transform: none;
 }
+
+/* ---------- Reduced motion ----------------------------------------- */
+/* The shared components animate to draw the eye, never to convey meaning,
+   so honouring the preference costs nothing: the reveal still resolves to
+   its visible state, the controls still show their hover and focus
+   treatments — they simply arrive rather than travel. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .btn,
+  .field > input,
+  .field > textarea,
+  .field > select {
+    transition: none;
+  }
+  .reveal {
+    transform: none;
+  }
+}

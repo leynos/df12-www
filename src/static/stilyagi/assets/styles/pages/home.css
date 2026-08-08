@@ -56,13 +56,13 @@
        gap: 18px;
      }
 
-     .poster-showcase::before {
-       display: none;
-     }
 
      .poster-art-frame {
        position: relative;
        isolation: isolate;
+       /* Lets the annotation size itself against the rendered artwork, so the
+          typed line keeps its proportions on the drawn sheet at any width. */
+       container-type: inline-size;
        border: var(--rule-weight-2) solid var(--ink);
        background: var(--paper);
        padding: 0;
@@ -107,7 +107,9 @@
        z-index: 2;
        margin: 0;
        font-family: var(--font-display);
-       font-size: clamp(5rem, 9vw, 7rem);
+       /* The floor drops well below the ceiling so the title keeps shrinking
+          through tablet widths instead of colliding with the illustration. */
+       font-size: clamp(2rem, 8vw, 7rem);
        line-height: 0.83;
        max-width: 4.8ch;
        pointer-events: none;
@@ -119,22 +121,26 @@
 
      .poster-annotation {
        position: absolute;
-top: 145px;
-       right: 275px;
+       /* Percentages of the art frame, so the line stays on the drawn paper
+          sheet however large the 1672/941 crop renders. */
+       top: 22%;
+       right: 23.4%;
        z-index: 2;
        width: 8em;
        text-align: center;
        transform: rotate(3deg);
        font-family: var(--font-mono);
-       font-size: 12px;
+       /* One curve instead of tablet breakpoints: the frame caps at 1164px, so
+          1.03cqw resolves to the 12px desktop size and shrinks with the
+          artwork below it.  The 8px floor holds legibility from roughly 880px
+          down to the 720px mobile bands, which override this outright, while
+          keeping the line clear of the platen just above that handover. */
+       font-size: clamp(8px, 1.03cqw, 12px);
        line-height: 1.6;
        color: var(--ink);
        pointer-events: none;
      }
 
-     .stamp-pocket {
-       display: none;
-     }
 
      .poster-tiles {
        position: relative;
@@ -407,6 +413,31 @@ top: 145px;
        color: var(--accent-text);
      }
 
+     /* Sits under the rail's heading, where a reader who has just been told
+        how to start looks next for where to get it. */
+     .command-source {
+       display: inline-block;
+       margin-top: calc(var(--unit) * 2);
+       font-family: var(--font-sans);
+       font-size: 0.76rem;
+       font-weight: 700;
+       letter-spacing: 0.14em;
+       text-transform: uppercase;
+       color: var(--ink);
+       text-decoration: none;
+       border-bottom: var(--rule-weight) solid var(--press-red);
+       padding-bottom: 3px;
+     }
+
+     .command-source:hover {
+       color: var(--accent-text);
+     }
+
+     .command-source .manicule {
+       color: var(--accent-text);
+       font-size: 1rem;
+     }
+
      .command-steps {
        display: grid;
        grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -484,6 +515,78 @@ top: 145px;
        color: var(--accent-text);
      }
 
+/* =================================================================
+   Load animations — the press coming up to speed.
+   Each runs once, and none uses a forwards fill: every keyframe list
+   omits its `to` step, so the browser synthesises the final frame from
+   the element's own computed style and the resting state above is what
+   remains when the animation is over.
+   ================================================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The hero word is struck in ink, then the red plate lands on it. */
+  .poster-title .red {
+    animation: prose-inking 1s var(--ease);
+  }
+
+  @keyframes prose-inking {
+    from {
+      color: var(--ink);
+    }
+  }
+
+  /* The tiles chase left to right, each washing out, over-saturating, and
+     settling.  Their type and rules are lamp-black, which saturate() cannot
+     move, so only the tint travels. `backwards` holds the opening frame
+     through the delay, so a tile does not show its resting tint and then jump.
+     Three 200ms steps plus an 800ms tile is 1.4s end to end. */
+  .poster-tile {
+    animation: tile-chase 800ms ease-in-out backwards;
+  }
+
+  .poster-tiles .poster-tile:nth-child(2) {
+    animation-delay: 200ms;
+  }
+
+  .poster-tiles .poster-tile:nth-child(3) {
+    animation-delay: 400ms;
+  }
+
+  .poster-tiles .poster-tile:nth-child(4) {
+    animation-delay: 600ms;
+  }
+
+  @keyframes tile-chase {
+    0% {
+      filter: saturate(0);
+    }
+    45% {
+      filter: saturate(2.4);
+    }
+  }
+
+  /* Typed onto the paper. home.js splits the annotation into indexed spans
+     and sets the two custom properties; the fallbacks keep this legible if it
+     is ever read without that script in mind.  The mono face makes the bold
+     and regular weights the same width, so the line does not reflow as each
+     character settles. */
+  .poster-annotation.is-typing .typed-letter {
+    animation: letter-strike var(--typed-duration, 260ms) ease-out backwards;
+    animation-delay: calc(var(--typed-index, 0) * var(--typed-stagger, 12ms));
+  }
+
+  @keyframes letter-strike {
+    0% {
+      opacity: 0;
+      font-weight: 600;
+    }
+    55% {
+      opacity: 1;
+      font-weight: 600;
+    }
+  }
+}
+
      @media (max-width: 1180px) {
        .explore-grid,
        .reading-grid {
@@ -516,8 +619,25 @@ top: 145px;
          padding-inline: calc(var(--unit) * 2);
        }
 
+       /* Full-bleed hero: the board sheds the shell's inline padding and its
+          side borders, and the nested showcase and art frames collapse so the
+          artwork runs edge to edge with a single rule top and bottom. The
+          tiles keep an inset so they read as a card row under the bleed. */
+       .poster-board {
+         margin-inline: calc(var(--unit) * -2);
+         border-inline: 0;
+         padding: 0;
+       }
+
        .poster-showcase {
-         padding: 14px;
+         border: 0;
+         padding: 0;
+         gap: 14px;
+       }
+
+       .poster-art-frame {
+         border-inline: 0;
+         border-top: 0;
        }
 
        .poster-art-frame img {
@@ -530,14 +650,12 @@ top: 145px;
          top: 48px;
          max-width: 3.8ch;
          font-size: clamp(3rem, 14vw, 4.8rem);
-       }
-
-       .poster-annotation {
-         top: 16px;
-         right: 22px;
-         width: 7em;
-         font-size: 0.62rem;
-         line-height: 1.45;
+         /* A paper-coloured halo lifts the title off the busy artwork the
+            tighter mobile crop puts behind it. */
+         text-shadow:
+           0 0 6px var(--paper),
+           0 0 18px var(--paper),
+           2px 2px 0 var(--paper);
        }
 
        .poster-hero-copy {
@@ -546,11 +664,16 @@ top: 145px;
          width: calc(100% - 36px);
          font-size: 0.62rem;
          gap: 10px;
+         text-shadow:
+           0 0 4px var(--paper),
+           0 0 10px var(--paper),
+           1px 1px 0 var(--paper);
        }
 
        .poster-tiles {
          grid-template-columns: repeat(2, minmax(0, 1fr));
          gap: 10px;
+         padding: 0 14px 14px;
        }
 
        .poster-tile {
@@ -571,5 +694,71 @@ top: 145px;
        .section-flag::before,
        .section-flag::after {
          display: none;
+       }
+
+       /* Full-bleed pipeline board: the frame sheds the shell's inline
+          padding and every side border that would hug the screen edge. */
+       .pipeline-frame {
+         margin-inline: calc(var(--unit) * -2);
+         border-inline: 0;
+         padding-inline: 0;
+       }
+
+       .pipeline-frame img {
+         border-inline: 0;
+       }
+     }
+
+     /* The annotation rides the drawn paper sheet through the 4/5 phone crop,
+        where the frame runs full bleed so 1cqw is one viewport percent.  The
+        text cannot simply scale with the artwork — it would be unreadable by
+        360px — so size and box width follow linear curves fitted to the two
+        hand-tuned ends, 14.4px/130px at 720px and 11.2px/90px at 460px.  The
+        floors freeze the smallest phone sizes at what the old bottom band
+        used, and the ceilings hand over to the desktop rule at 720px. */
+     @media (width <= 720px) {
+       .poster-annotation {
+         top: 21%;
+         right: 3.2%;
+         width: clamp(83px, 18.8px + 15.4cqw, 130px);
+         font-size: clamp(10.4px, 5.54px + 1.23cqw, 14.4px);
+         line-height: 1.45;
+       }
+     }
+
+     /* Tablet widths: the hero board runs full bleed, shedding the shell's
+        inline padding and its side borders, but keeps the desktop layout
+        inside — showcase framing, overlay positions, and the four-up tiles. */
+     @media (720px < width <= 1080px) {
+       .poster-board {
+         margin-inline: calc(var(--unit) * -4);
+         border-inline: 0;
+       }
+     }
+
+     /* Tablet widths need no annotation bands: the cqw font size scales the
+        whole box with the artwork, so the base percentage anchors hold. */
+
+     /* Below 360px the overline wraps and the edition mark lands on top of
+        it, and there is no room to place it elsewhere, so it goes. */
+     @media (width <= 360px) {
+       .poster-hero-copy .accent {
+         display: none;
+       }
+     }
+
+     /* On the narrowest phones the value band and command rail join the hero
+        in running full bleed, so the page reads as stacked bands rather than
+        a column of framed boxes.  Each sheds the shell's inline padding; the
+        rail also drops its side rules, keeping its own padding to hold the
+        content off the screen edge. */
+     @media (width <= 460px) {
+       .value-band {
+         margin-inline: calc(var(--unit) * -2);
+       }
+
+       .command-rail {
+         margin-inline: calc(var(--unit) * -2);
+         border-inline: 0;
        }
      }

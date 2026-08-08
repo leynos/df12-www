@@ -6,6 +6,46 @@
   padding: calc(var(--unit) * 4) calc(var(--unit) * 4)
     calc(var(--unit) * 6);
 }
+/* Prose above the inspector: what the IR is and why the byte ranges matter.
+   Two columns so the explanation fills the frame's width rather than leaving
+   a short measure stranded beside it. */
+.ir-explain {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: calc(var(--unit) * 5);
+  margin-bottom: calc(var(--unit) * 3);
+}
+.ir-explain p {
+  font-family: var(--font-editorial);
+  font-size: 1.08rem;
+  line-height: 1.55;
+  max-width: 62ch;
+}
+.ir-explain code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--paper-shade);
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+/* The instruction, demoted to a caption and moved next to the thing it
+   instructs — it is no longer carrying the section heading. */
+.ir-hint {
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-bottom: calc(var(--unit) * 1.5);
+  max-width: 90ch;
+}
+.ir-hint .red {
+  color: var(--accent-text);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 .ir-frame {
   border: var(--rule-weight-2) solid var(--ink);
   background: var(--paper);
@@ -61,7 +101,7 @@
 }
 .src-line .content {
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .region {
@@ -75,7 +115,9 @@
     outline 80ms;
   outline: 1px solid transparent;
 }
-.region:hover {
+/* :not(.active) lifts the specificity above the per-type tints below, so
+   hover feedback shows on tinted regions without disturbing an active one. */
+.region:not(.active):hover {
   background: rgba(198, 40, 40, 0.12);
 }
 .region.active {
@@ -85,10 +127,6 @@
 }
 .region.type-heading {
   background: rgba(212, 160, 23, 0.18);
-}
-.region.type-heading.active {
-  background: var(--jazz-ochre);
-  color: var(--ink);
 }
 .region.type-paragraph {
   background: transparent;
@@ -102,6 +140,17 @@
 }
 .region.type-list-item {
   background: rgba(91, 123, 97, 0.15);
+}
+/* The per-type tints above share specificity with .region.active but follow
+   it in source order, so without these rules an active region keeps its pale
+   tint under the active paper text — unreadable. */
+.region.type-heading.active,
+.region.type-paragraph.active,
+.region.type-code.active,
+.region.type-link.active,
+.region.type-list-item.active {
+  background: var(--press-red);
+  color: var(--paper);
 }
 
 .ir-tree {
@@ -144,9 +193,16 @@
 .tree-node .d {
   color: var(--ink-soft);
 }
-.tree-node .indent {
+/* Scoped to the tree, not the node: the plain lines (content_hash,
+   line_index, regions, the closing brackets) carry indents too. */
+.ir-tree .indent {
   display: inline-block;
   width: 1.6em;
+}
+/* Match the tree-node's 6px inline padding so plain lines and interactive
+   nodes share a left edge. */
+.ir-tree > div {
+  padding-inline: 6px;
 }
 
 .ir-foot {
@@ -433,7 +489,7 @@
   border: var(--rule-weight-2) solid var(--ink);
   background: var(--paper);
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 4fr 6fr;
   overflow: hidden;
 }
 .grammar-illo .inner .text-side {
@@ -460,20 +516,51 @@
   line-height: 1.5;
   max-width: 48ch;
 }
+.grammar-illo .inner .text-side code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--paper-shade);
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+/* The seventeen tags are the enum itself, so they are set as a specimen — a
+   wrapped row of chips rather than a sentence listing them. */
+.grammar-illo .upos-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin: calc(var(--unit) * 2) 0;
+  max-width: 48ch;
+}
+.grammar-illo .upos-set li {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 4px 6px 3px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  background: var(--paper-shade);
+}
 .grammar-illo .inner img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  height: 95%;
+  object-fit: cover;
   display: block;
-  background: var(--paper);
-  padding: calc(var(--unit) * 2);
+  mix-blend-mode: multiply;
+  margin-top: -3%;
 }
 
 @media (max-width: 900px) {
+  .ir-explain,
   .ir-frame,
   .plan-frame,
   .adr-grid {
     grid-template-columns: 1fr;
+  }
+  .ir-explain {
+    gap: 0;
   }
   .ir-frame .pane + .pane {
     border-left: 0;
@@ -483,7 +570,29 @@
     border-right: 0;
     border-bottom: var(--rule-weight) solid var(--ink);
   }
+}
+
+/* The grammar panel stacks earlier than the rest of the page: below 1080px
+   the 4fr text column is too narrow to hold the heading on one line. */
+@media (max-width: 1080px) {
   .grammar-illo .inner {
     grid-template-columns: 1fr;
+  }
+  /* Stacked one-up the artwork carries its own proportions; the deeper
+     negative offset pulls the drawing up against the prose above it. */
+  .grammar-illo .inner img {
+    object-fit: cover;
+    display: block;
+    mix-blend-mode: multiply;
+    margin-top: -12%;
+  }
+}
+
+/* The inspector and planner both animate state changes that are already
+   carried by colour and text; with reduced motion they change outright. */
+@media (prefers-reduced-motion: reduce) {
+  .region,
+  .provider {
+    transition: none;
   }
 }

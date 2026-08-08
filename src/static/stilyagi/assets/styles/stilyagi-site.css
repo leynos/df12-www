@@ -9,6 +9,12 @@
   display: none !important;
 }
 
+/* In-page anchor targets clear the sticky masthead, which runs 74-90px tall
+   depending on how the brand imprint wraps. */
+.section-anchor {
+  scroll-margin-top: 90px;
+}
+
 /* Labels that exist for assistive technology only. */
 .sr-only {
   position: absolute;
@@ -101,13 +107,55 @@
   color: var(--fg-muted);
   text-transform: uppercase;
 }
+/* On the narrowest phones the imprint wraps to two lines and pushes the
+   masthead out of shape; dropping the publisher prefix keeps it on one. */
+@media (width <= 460px) {
+  .brand-lockup .brand-org {
+    display: none;
+  }
+}
 .site-mast nav {
   justify-self: end;
+}
+.nav-toggle {
+  display: none;
+  border: var(--rule-weight) solid var(--ink);
+  background: var(--paper);
+  padding: 10px 9px;
+  cursor: pointer;
+}
+.nav-toggle-bars {
+  display: block;
+  width: 22px;
+  height: 13px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--ink) 0 3px,
+    transparent 3px 8px
+  );
+}
+.nav-toggle:hover .nav-toggle-bars {
+  background: repeating-linear-gradient(
+    180deg,
+    var(--press-red) 0 3px,
+    transparent 3px 8px
+  );
 }
 .site-mast nav ol {
   list-style: none;
   padding: 0;
   margin: 0;
+  /* The list carries the popover attribute for the narrow-width menu, and
+     the UA styles a popover as a fixed, inset-0, bordered box even while
+     closed; reset all of that so the desktop row lays out in flow. */
+  position: static;
+  inset: auto;
+  width: auto;
+  height: auto;
+  border: 0;
+  overflow: visible;
+  background: none;
+  color: inherit;
   display: flex;
   gap: 26px;
   flex-wrap: wrap;
@@ -144,9 +192,65 @@
 .site-mast nav a:hover {
   color: var(--accent-text);
 }
+/* The way out of the sub-site is not one of its sections, so it sits a shade
+   back from the section links and takes a rule of its own to say so. */
+.site-mast nav .nav-up {
+  margin-right: 4px;
+  padding-right: 26px;
+  border-right: var(--rule-weight) solid var(--ink-soft);
+}
+.site-mast nav .nav-up a {
+  color: var(--ink-soft);
+}
+.site-mast nav .nav-up a:hover {
+  color: var(--accent-text);
+}
 .site-mast nav a:hover::after,
 .site-mast nav a.active::after {
   transform: scaleX(1);
+}
+
+/* At narrow widths the primary nav collapses behind a hamburger; the list
+   is a native popover, so opening, closing, Escape, and light dismiss all
+   work without script. The unlayered flex rule above would defeat the UA's
+   closed-popover hiding, so the closed state is hidden explicitly here. */
+@media (width <= 1280px) {
+  .nav-toggle {
+    display: grid;
+  }
+  .site-mast nav ol:not(:popover-open) {
+    display: none;
+  }
+  .site-mast nav ol:popover-open {
+    position: fixed;
+    inset: auto;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+    display: grid;
+    gap: 4px;
+    min-width: 13em;
+    padding: 14px 18px;
+    border: var(--rule-weight) solid var(--ink);
+    background: var(--paper);
+    box-shadow: 6px 6px 0 var(--press-red);
+  }
+  .site-mast nav ol:popover-open a {
+    display: block;
+    padding: 8px 0;
+  }
+  /* Stacked in the menu, the divider belongs under the row, not beside it. */
+  .site-mast nav ol:popover-open .nav-up {
+    margin-right: 0;
+    padding-right: 0;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-right: 0;
+    border-bottom: var(--rule-weight) solid var(--ink-soft);
+  }
+  .site-mast nav ol::backdrop {
+    background: rgba(15, 15, 15, 0.25);
+  }
 }
 
 /* ---------- Page intro (non-home pages) ---------------------------- */
@@ -372,13 +476,6 @@
   .colophon-footer .wrap {
     grid-template-columns: 1fr 1fr;
   }
-  .site-mast-inner {
-    grid-template-columns: 1fr;
-    justify-items: start;
-  }
-  .site-mast nav {
-    justify-self: start;
-  }
 }
 
 @media (max-width: 640px) {
@@ -388,10 +485,6 @@
   }
   .brand-lockup .brand-stripe {
     width: 26px;
-  }
-  .site-mast nav ol {
-    gap: 14px 18px;
-    justify-content: flex-start;
   }
   .colophon-footer .wrap {
     grid-template-columns: 1fr;
@@ -412,7 +505,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   gap: calc(var(--unit) * 3);
-  align-items: baseline;
+  align-items: end;
   margin-bottom: calc(var(--unit) * 4);
   padding-bottom: calc(var(--unit) * 2);
   border-bottom: var(--rule-weight) solid var(--ink);
@@ -480,7 +573,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 2px 8px 1px;
-  border: 1px solid currentColor;
+  border: 1px solid currentcolor;
 }
 .verdict.red {
   color: var(--accent-text);
@@ -502,4 +595,12 @@ sup.ref {
   font-size: 0.7em;
   font-weight: 700;
   margin-left: 2px;
+}
+
+/* The nav underline sweeps in from the left; with reduced motion it simply
+   appears. See the shared guard in motifs-and-components.css. */
+@media (prefers-reduced-motion: reduce) {
+  .site-mast nav a::after {
+    transition: none;
+  }
 }

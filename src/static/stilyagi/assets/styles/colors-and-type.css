@@ -67,6 +67,12 @@
      invisible as type against --ink (1.3:1), so dark panels use this. */
   --fg2-on-ink: #a8a396;
 
+  /* Structural dividers that cross both the paper and the ink grounds.
+     --ink is invisible against --ink, so panel splits use this instead.
+     A divider is a non-text element, so it needs 3:1 against its ground;
+     the previous #4a4a4a managed only 2.16:1. This is 3.34:1 on --ink. */
+  --rule-on-ink: #666666;
+
   /* Semantic aliases */
   --fg1: var(--ink);
   --fg2: var(--ink-soft);
@@ -137,6 +143,13 @@
 }
 html {
   scroll-behavior: smooth;
+}
+/* Anchor links are the one place the site moves the whole viewport, which is
+   exactly the motion the preference is about. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 body {
   margin: 0;

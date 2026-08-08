@@ -9,7 +9,7 @@
         <div class="wrap">
           <div>
             <div class="folio">§ Roadmap · six vertical slices</div>
-            <h1>The <span class="red">plan</span>, by slice.</h1>
+            <h1>The <span class="red">plan</span>,<br />by slice.</h1>
           </div>
           <div>
             <p class="lede editorial">
@@ -22,10 +22,20 @@
         </div>
       </section>
       <section class="roadmap-illo">
-        <img
-          src="/stilyagi/assets/images/graph.webp"
-          alt="The Vertical Slices — phases building upward from foundations to 1.0"
-        />
+        <div class="illo-frame">
+          <img
+            src="/stilyagi/assets/images/graph.webp"
+            alt="The Vertical Slices — phases building upward from foundations to 1.0"
+          />
+          {# Labels sit at the free end of each call-out line drawn in the
+             artwork, one per slice in the timeline below. #}
+          <span class="illo-label" style="--x: 18.5%; --y: 50%">00 · Foundations</span>
+          <span class="illo-label" style="--x: 27%; --y: 39%">01 · Markdown pack</span>
+          <span class="illo-label" style="--x: 43.5%; --y: 30%">02 · Capability planner</span>
+          <span class="illo-label" style="--x: 62%; --y: 24%">03 · Grammar &amp; spelling</span>
+          <span class="illo-label illo-label--below" style="--x: 76.5%; --y: 72%">04 · CI &amp; packaging</span>
+          <span class="illo-label illo-label--below" style="--x: 88.5%; --y: 57%">05 · Editor &amp; LSP</span>
+        </div>
       </section>
       <section class="roadmap-wrap">
         <div class="legend-bar">
@@ -157,7 +167,7 @@
                   <p>
                     Extend Stilyagi's reach into source-embedded prose. Introduce the capability planner
                     so linguistic providers are loaded on demand only, and ship docstring extraction for
-                    Python and Rust. The planner is the load-bearing move — it is what lets grammar and
+                    Python and Rust. The planner is what makes the rest affordable: it lets grammar and
                     spelling join the catalogue without taxing every lint run.
                   </p>
                   <div class="ship-strip">
@@ -330,6 +340,34 @@
           </div>
         </div>
       </section>
+      <section class="pacing">
+        <div class="card">
+          <div class="tt">§ Cadence</div>
+          <div class="body-t">
+            Minor releases every six to ten weeks. Patches as needed. No sprint theatre.
+          </div>
+        </div>
+        <div class="card">
+          <div class="tt">§ Deprecations</div>
+          <div class="body-t">
+            One minor-version warning before removal. Renames ship with aliases that outlive two minors.
+          </div>
+        </div>
+        <div class="card">
+          <div class="tt">§ Stability</div>
+          <div class="body-t">
+            Rule IDs never change meaning. If a rule evolves, it gets a new ID; the old one is retired,
+            never reassigned.
+          </div>
+        </div>
+        <div class="card">
+          <div class="tt">§ Governance</div>
+          <div class="body-t">
+            New rules require a one-page RFC. New providers require a two-page RFC and a performance
+            budget.
+          </div>
+        </div>
+      </section>
       <section class="risks">
         <aside class="margin-note">
           <span class="red">§ Margin note</span>A roadmap is not a promise.<br /><br />It is a public
@@ -337,7 +375,7 @@
             class="red"
             style="margin-top: 12px"
             >Pacing</span
-          >One slice ≈ one quarter. Six slices ≈ eighteen months to 1.0.
+          >One slice ≈ one quarter.
         </aside>
         <div class="body">
           <h3>What we will <em>not</em> do along the way</h3>
@@ -356,35 +394,6 @@
             opinions. Each rule ships with a rationale paragraph and — where the rationale is contestable
             — a citation.
           </p>
-          <div class="pacing">
-            <div class="card">
-              <div class="tt">§ Cadence</div>
-              <div class="body-t">
-                Minor releases every six to ten weeks. Patches as needed. No sprint theatre.
-              </div>
-            </div>
-            <div class="card">
-              <div class="tt">§ Deprecations</div>
-              <div class="body-t">
-                One minor-version warning before removal. Renames ship with aliases that outlive two
-                minors.
-              </div>
-            </div>
-            <div class="card">
-              <div class="tt">§ Stability</div>
-              <div class="body-t">
-                Rule IDs never change meaning. If a rule evolves, it gets a new ID; the old one is
-                retired, never reassigned.
-              </div>
-            </div>
-            <div class="card">
-              <div class="tt">§ Governance</div>
-              <div class="body-t">
-                New rules require a one-page RFC. New providers require a two-page RFC and a performance
-                budget.
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 {% endblock %}

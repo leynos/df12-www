@@ -1,5 +1,5 @@
 {% extends "_layout.jinja" %}
-{% block title %}Stilyagi · Design — open the hood{% endblock %}
+{% block title %}Stilyagi · Design — under the bonnet{% endblock %}
 {% block description %}The Stilyagi architecture in full: the boundary between extraction and rule execution, the IR schema, and the packaging split between the Rust core and the Python rule API.{% endblock %}
 {% block page_stylesheet %}
     <link rel="stylesheet" href="/stilyagi/assets/styles/pages/design.css" />
@@ -8,7 +8,7 @@
       <section class="page-intro">
         <div class="wrap">
           <div>
-            <div class="folio">§ 03 · Open the hood</div>
+            <div class="folio">§ 03 · Under the bonnet</div>
             <h1>Design <span class="accent">notes</span>.</h1>
           </div>
           <p class="lede">
@@ -17,20 +17,57 @@
           </p>
         </div>
       </section>
-      <section class="ir-inspector">
+      <section id="ir-contract" class="ir-inspector section-anchor">
         <div class="section-head">
           <div class="num">D</div>
           <div>
             <div class="tag">§ IR inspector · stilyagi dump-ir</div>
-            <h2>Hover a region. Watch the bytes agree.</h2>
+            <h2>Every region remembers its bytes.</h2>
           </div>
         </div>
+        <div class="ir-explain">
+          <div>
+            <p>
+              The IR is what the Rust extractor hands to the Python rule engine, and it is the only thing
+              rules ever see. It is not a copy of the Markdown tree. It is a flat list of prose regions,
+              each carrying its kind, its structural owner, and the exact byte range it occupies in the
+              file on disk.
+            </p>
+            <p>
+              That byte range is the whole contract. Diagnostics and fixes are expressed in original source
+              offsets, so an edit can only ever land on text that was really there. Where markup was
+              elided — emphasis, link syntax, a soft line break — a segment map records which slice of the
+              region's text came from which source bytes, and marks the remainder synthetic so no fix can
+              touch it.
+            </p>
+          </div>
+          <div>
+            <p>
+              Two more fields are first-class rather than conveniences.
+              <code>content_hash</code> keys the extraction cache, so an unchanged file is never parsed
+              twice. <code>line_index</code> turns a byte offset into a line and column without reparsing
+              the source, which is what keeps diagnostic rendering cheap.
+            </p>
+            <p>
+              <code>stilyagi dump-ir</code> prints all of it as canonical JSON, and that is the debugging
+              surface the whole architecture leans on: when a rule misfires, the IR tells you whether the
+              extractor got the region wrong or the rule got the logic wrong.
+            </p>
+          </div>
+        </div>
+        <p class="ir-hint">
+          <span class="red">☞</span> Hover either side of the panel below — the source span and the IR node
+          that owns it light up together, and the footer reports the byte range.
+        </p>
         <div class="ir-frame">
           <div class="pane">
             <div class="ir-header">
               <span>docs/<span class="red">configuring.md</span></span
               ><span class="red">source view</span>
             </div>
+            {# Each span carries the data-region of the IR node whose byte
+               range covers it; the ranges in the tree opposite are the real
+               UTF-8 offsets of this mock document. #}
             <div class="src-view">
               <div class="src-line">
                 <span class="gut">1</span
@@ -44,42 +81,36 @@
               <div class="src-line">
                 <span class="gut">3</span
                 ><span class="content"
-                  ><span>S</span
                   ><span data-region="p-1" class="region type-paragraph"
-                    >tilyagi is configured by `stil</span
-                  ><span data-region="cf-1" class="region type-code">yagi.toml` or </span
-                  ><span data-region="p-1" class="region type-paragraph">by th</span
-                  ><span data-region="cf-2" class="region type-code">e `[tool.stilyagi]`</span></span
+                    >Stilyagi is configured by </span
+                  ><span data-region="cf-1" class="region type-code">`stilyagi.toml`</span
+                  ><span data-region="p-1" class="region type-paragraph"> or by the </span
+                  ><span data-region="cf-2" class="region type-code">`[tool.stilyagi]`</span></span
                 >
               </div>
               <div class="src-line">
                 <span class="gut">4</span
                 ><span class="content"
-                  ><span data-region="cf-2" class="region type-code">s</span
-                  ><span data-region="p-1" class="region type-paragraph">ection of y</span
+                  ><span data-region="p-1" class="region type-paragraph"
+                    >section of your `pyproject.toml`. See the </span
                   ><span data-region="link-1" class="region type-link active"
-                    >our `pyproject.toml`. See the [conf</span
-                  ><span data-region="p-1" class="region type-paragraph">i</span><span>g </span
-                  ><span data-region="h2-1" class="region type-heading">reference](docs.h</span
-                  ><span>tm</span
-                  ><span data-region="p-2" class="region type-paragraph">l#config).</span></span
+                    >[config reference](docs.html#config)</span
+                  ><span data-region="p-1" class="region type-paragraph">.</span></span
                 >
               </div>
               <div class="src-line"><span class="gut">5</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">6</span
                 ><span class="content"
-                  ><span data-region="p-2" class="region type-paragraph">## Rule selection</span></span
+                  ><span data-region="h2-1" class="region type-heading">## Rule selection</span></span
                 >
               </div>
               <div class="src-line"><span class="gut">7</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">8</span
                 ><span class="content"
-                  ><span data-region="p-2" class="region type-paragraph">Use `select` and `ignore`</span
-                  ><span> to</span
-                  ><span data-region="li-1" class="region type-list-item">
-                    scope the active ruleset:</span
+                  ><span data-region="p-2" class="region type-paragraph"
+                    >Use `select` and `ignore` to scope the active ruleset:</span
                   ></span
                 >
               </div>
@@ -88,45 +119,41 @@
                 <span class="gut">10</span
                 ><span class="content"
                   ><span data-region="li-1" class="region type-list-item"
-                    >- `select = ["MD", "PUN201"]` — enable</span
-                  ><span> </span
-                  ><span data-region="li-2" class="region type-list-item"
-                    >all Markdown rules plus PUN201.</span
+                    >- `select = ["MD", "PUN201"]` — enable all Markdown rules plus PUN201.</span
                   ></span
                 >
               </div>
               <div class="src-line">
                 <span class="gut">11</span
                 ><span class="content"
-                  ><span data-region="li-2" class="region type-list-item">- `ignore =</span
-                  ><span> ["</span
-                  ><span data-region="h3-1" class="region type-heading">MD401"]` — skip MD401 </span
-                  ><span>gl</span
-                  ><span data-region="p-3" class="region type-paragraph">obally.</span></span
+                  ><span data-region="li-2" class="region type-list-item"
+                    >- `ignore = ["MD401"]` — skip MD401 globally.</span
+                  ></span
                 >
               </div>
               <div class="src-line"><span class="gut">12</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">13</span
                 ><span class="content"
-                  ><span data-region="cf-3" class="region type-code">### Capability ex</span
-                  ><span data-region="p-3" class="region type-paragraph">tras</span></span
+                  ><span data-region="h3-1" class="region type-heading">### Capability extras</span></span
                 >
               </div>
               <div class="src-line"><span class="gut">14</span><span class="content">&nbsp;</span></div>
               <div class="src-line">
                 <span class="gut">15</span
                 ><span class="content"
+                  ><span data-region="p-3" class="region type-paragraph">Install </span
+                  ><span data-region="cf-3" class="region type-code">`stilyagi[grammar]`</span
                   ><span data-region="p-3" class="region type-paragraph"
-                    >Install `stilyagi[grammar]` to</span
-                  ><span> enable the spaCy-backed rule pack.</span></span
+                    > to enable the spaCy-backed rule pack.</span
+                  ></span
                 >
               </div>
               <div class="src-line"><span class="gut">16</span><span class="content">&nbsp;</span></div>
             </div>
             <div class="ir-foot">
               <span data-ir-label="true" aria-live="polite">Link</span
-              ><span>range <code data-ir-range="true">[106,141]</code></span
+              ><span>range <code data-ir-range="true">[136,172]</code></span
               ><span class="red">source-faithful · no rewrites</span>
             </div>
           </div>
@@ -143,7 +170,7 @@
               </div>
               <div>
                 <span class="indent"></span><span class="k">line_index:</span>
-                <span class="v">[0, 24, 25, 143, …, 422]</span>
+                <span class="v">[0, 23, 24, 94, …, 461]</span>
               </div>
               <div>
                 <span class="indent"></span><span class="k">regions:</span> <span class="v">[</span>
@@ -153,12 +180,12 @@
                 tabindex="0"
                 data-region="h1-1"
                 data-label="Heading depth=1"
-                data-range="0,23"
+                data-range="0,22"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">heading</span
-                ><span class="d"> · </span><span class="v">range=[0,23]</span
+                ><span class="d"> · </span><span class="v">range=[0,22]</span
                 ><span class="v"> depth=1</span>
               </div>
               <div
@@ -166,24 +193,24 @@
                 tabindex="0"
                 data-region="p-1"
                 data-label="Paragraph"
-                data-range="25,142"
+                data-range="24,173"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
-                ><span class="d"> · </span><span class="v">range=[25,142]</span>
+                ><span class="d"> · </span><span class="v">range=[24,173]</span>
               </div>
               <div
                 role="button"
                 tabindex="0"
                 data-region="cf-1"
                 data-label="Inline code"
-                data-range="55,69"
+                data-range="50,65"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">code</span
-                ><span class="d"> · </span><span class="v">range=[55,69]</span
+                ><span class="d"> · </span><span class="v">range=[50,65]</span
                 ><span class="v"> lang="toml"</span>
               </div>
               <div
@@ -191,12 +218,12 @@
                 tabindex="0"
                 data-region="cf-2"
                 data-label="Inline code"
-                data-range="74,95"
+                data-range="76,93"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">code</span
-                ><span class="d"> · </span><span class="v">range=[74,95]</span
+                ><span class="d"> · </span><span class="v">range=[76,93]</span
                 ><span class="v"> lang="toml"</span>
               </div>
               <div
@@ -204,12 +231,12 @@
                 tabindex="0"
                 data-region="link-1"
                 data-label="Link"
-                data-range="106,141"
+                data-range="136,172"
                 aria-pressed="true"
                 class="tree-node active"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">link</span
-                ><span class="d"> · </span><span class="v">range=[106,141]</span
+                ><span class="d"> · </span><span class="v">range=[136,172]</span
                 ><span class="v"> scheme="relative"</span>
               </div>
               <div
@@ -217,12 +244,12 @@
                 tabindex="0"
                 data-region="h2-1"
                 data-label="Heading depth=2"
-                data-range="144,161"
+                data-range="175,192"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">heading</span
-                ><span class="d"> · </span><span class="v">range=[144,161]</span
+                ><span class="d"> · </span><span class="v">range=[175,192]</span
                 ><span class="v"> depth=2</span>
               </div>
               <div
@@ -230,24 +257,24 @@
                 tabindex="0"
                 data-region="p-2"
                 data-label="Paragraph"
-                data-range="163,219"
+                data-range="194,248"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
-                ><span class="d"> · </span><span class="v">range=[163,219]</span>
+                ><span class="d"> · </span><span class="v">range=[194,248]</span>
               </div>
               <div
                 role="button"
                 tabindex="0"
                 data-region="li-1"
                 data-label="List item"
-                data-range="222,288"
+                data-range="250,322"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">list-item</span
-                ><span class="d"> · </span><span class="v">range=[222,288]</span
+                ><span class="d"> · </span><span class="v">range=[250,322]</span
                 ><span class="v"> depth=0</span><span class="v"> marker="-"</span>
               </div>
               <div
@@ -255,12 +282,12 @@
                 tabindex="0"
                 data-region="li-2"
                 data-label="List item"
-                data-range="289,332"
+                data-range="323,370"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">list-item</span
-                ><span class="d"> · </span><span class="v">range=[289,332]</span
+                ><span class="d"> · </span><span class="v">range=[323,370]</span
                 ><span class="v"> depth=0</span><span class="v"> marker="-"</span>
               </div>
               <div
@@ -268,12 +295,12 @@
                 tabindex="0"
                 data-region="h3-1"
                 data-label="Heading depth=3"
-                data-range="335,357"
+                data-range="372,393"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">heading</span
-                ><span class="d"> · </span><span class="v">range=[335,357]</span
+                ><span class="d"> · </span><span class="v">range=[372,393]</span
                 ><span class="v"> depth=3</span>
               </div>
               <div
@@ -281,24 +308,24 @@
                 tabindex="0"
                 data-region="p-3"
                 data-label="Paragraph"
-                data-range="359,421"
+                data-range="395,460"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">paragraph</span
-                ><span class="d"> · </span><span class="v">range=[359,421]</span>
+                ><span class="d"> · </span><span class="v">range=[395,460]</span>
               </div>
               <div
                 role="button"
                 tabindex="0"
                 data-region="cf-3"
                 data-label="Inline code"
-                data-range="367,385"
+                data-range="403,422"
                 aria-pressed="false"
                 class="tree-node"
               >
                 <span class="indent"></span><span class="indent"></span><span class="k">code</span
-                ><span class="d"> · </span><span class="v">range=[367,385]</span
+                ><span class="d"> · </span><span class="v">range=[403,422]</span
                 ><span class="v"> lang="python"</span>
               </div>
               <div><span class="indent"></span><span class="v">]</span></div>
@@ -470,10 +497,39 @@
           <div class="text-side">
             <h3>From <span class="red">tokens</span> to clauses</h3>
             <p>
-              Canonical UPos enums based on Universal Dependencies. Four derived syntactic nodes —
-              TokenNode, SentenceNode, NounPhraseNode, and CoordinationNode — are exposed to rule authors.
-              The Embassy Rule: Python rules talk only to stable Stilyagi grammar nodes, not raw, unstable
-              spaCy classes.
+              Part-of-speech tags are where a prose linter usually leaks its backend. Stilyagi normalizes
+              them into <code>UPos</code> — the seventeen coarse categories Universal Dependencies defines
+              once for every language it covers.
+            </p>
+            <ul class="upos-set" aria-label="The seventeen canonical UPos tags">
+              <li>ADJ</li>
+              <li>ADP</li>
+              <li>ADV</li>
+              <li>AUX</li>
+              <li>CCONJ</li>
+              <li>DET</li>
+              <li>INTJ</li>
+              <li>NOUN</li>
+              <li>NUM</li>
+              <li>PART</li>
+              <li>PRON</li>
+              <li>PROPN</li>
+              <li>PUNCT</li>
+              <li>SCONJ</li>
+              <li>SYM</li>
+              <li>VERB</li>
+              <li>X</li>
+            </ul>
+            <p>
+              Coarse is the point. UD keeps the inventory small and deliberately cross-linguistic, pushing
+              the finer detail into morphology — which Stilyagi carries separately as
+              <code>MorphFeatures</code>. The provider's own fine-grained tag stays reachable as
+              <code>fine_pos</code> for debugging, but it never becomes the cross-provider contract.
+            </p>
+            <p>
+              Four derived syntactic nodes — TokenNode, SentenceNode, NounPhraseNode, and
+              CoordinationNode — are exposed to rule authors on top of that. The Embassy Rule: Python rules
+              talk only to stable Stilyagi grammar nodes, not raw, unstable spaCy classes.
             </p>
           </div>
           <img

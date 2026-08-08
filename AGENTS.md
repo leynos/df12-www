@@ -58,9 +58,15 @@ is authored directly as HTML.
 - **`src/styles/`** holds the Tailwind entrypoints, which are compiled rather
   than copied.
 
-To change what a page *says*, edit the YAML or the Markdown. To change how it
-*looks*, edit the template, the Tailwind entrypoint, or the relevant file under
-`src/static/`. Never edit the rendered result.
+The YAML is not where every word lives. A sub-site's `content_pages` entries
+route only — a key, a nav label, a template, and an output slug — so the prose
+on those pages is written directly in `templates/<site>/`. Documentation pages
+are the exception: they name a `doc_path` and are pulled from upstream sources.
+
+To change what a page *says*, edit the YAML, the Markdown, or the sub-site
+template that holds the copy. To change how it *looks*, edit the template, the
+Tailwind entrypoint, or the relevant file under `src/static/`. Never edit the
+rendered result.
 
 ### Nothing under `public/` is tracked
 
@@ -86,7 +92,11 @@ published site, then rebuild.
 ```bash
 bun run build          # static assets, CSS, images, pages, and search indices
 bun run dev            # watch and rebuild, serving on :8080
+DF12_PORT=8090 make dev  # same, on another port
 ```
+
+`DF12_PORT` overrides the port `bun run dev` and `bun run serve` listen on,
+which matters when several worktrees are served at once.
 
 The steps run in order, because each depends on the last: `build:static` first,
 since the image step reads the source images it places; then `build:css`,
@@ -117,6 +127,14 @@ compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 own hand-crafted stylesheets, which use neither Tailwind nor daisyUI. Their
 colour tokens live in those stylesheets, and the accessibility rules below
 apply to them just the same.
+
+Code blocks on the Netsuke and Stilyagi sub-sites are highlighted at build time
+by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which runs Pygments
+and emits token classes. The colours come from a Pygments `Style`
+(`HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is generated, not
+hand-written — rerun `scripts/generate_himotoshi_pygments_css.py` or
+`scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
+edit the marked block by hand.
 
 Stilyagi's palette is split by role rather than by hue: `--press-red` paints
 fills, borders, and stamps, while red *type* uses `--accent-text`, which each

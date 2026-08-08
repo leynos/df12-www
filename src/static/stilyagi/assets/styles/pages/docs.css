@@ -68,7 +68,22 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  padding: 14px 0 18px;
+  /* The bar and the table are the only children of #catalogue, so sticking
+     the bar to the section keeps it in reach for exactly as long as the
+     table is on screen and releases it at the section's end.  The masthead
+     runs 74–90px tall depending on how the brand imprint wraps: anchoring
+     masthead is 74px tall at the narrowest desktop and grows with the brand
+     type to a 90px ceiling around 1920px, so the anchor tracks it rather than
+     stepping at a breakpoint: the wash always meets the masthead with no gap,
+     and the padding holds the controls a constant 20px clear of its rule.
+     (Below 460px the imprint wraps to two lines and the masthead outgrows the
+     floor; the box simply tucks behind it, which is equally gapless.) */
+  position: sticky;
+  top: clamp(73px, 61px + 1.6vw, 89px);
+  z-index: 5;
+  padding: 20px 0 18px;
+  background: rgba(239, 228, 206, 0.96);
+  backdrop-filter: blur(8px);
   border-bottom: var(--rule-weight) solid var(--ink);
   align-items: center;
 }
@@ -126,6 +141,25 @@
   background: var(--jazz-ochre);
   border-color: var(--jazz-ochre);
   color: var(--ink);
+}
+/* The chip row is the wide-viewport control; the select takes over below.
+   Exactly one of the pair is ever displayed — see the 1280px rule. */
+.filter-select {
+  display: none;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 5px 10px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+.filter-select:focus-visible {
+  outline: 2px solid var(--press-red);
+  outline-offset: 1px;
 }
 .search-box {
   margin-left: auto;
@@ -348,6 +382,47 @@
   color: var(--ink-soft);
 }
 
+/* Testing sandbox — reuses the config section's two-column prose/code pairing,
+   so it only needs the status line and the inline code treatment of its own. */
+/* The stamp is rotated, so it sits in its own flex column rather than in the
+   text flow — inline, the second line of prose runs under its lower corner. */
+.sandbox .sandbox-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--unit) * 2);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-top: calc(var(--unit) * 2);
+  /* Clearance for the corners the rotation throws outside the layout box. */
+  padding-block: 8px;
+}
+.sandbox .sandbox-status .stamp {
+  flex: none;
+}
+.sandbox .sandbox-status span:last-child {
+  max-width: 72ch;
+}
+.sandbox .config-grid code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--paper-shade);
+  padding: 1px 4px;
+  /* Otherwise flag and dotted-path names break at their own punctuation —
+     "--isolated" splits after the dashes on a phone.  The longest token here
+     is sixteen characters, so holding them whole never overflows. */
+  white-space: nowrap;
+}
+/* The code blocks carry Python, not TOML, but they wear the same palette as
+   the configuration example so the page keeps one voice for machine text. */
+.sandbox .config-grid pre code {
+  background: transparent;
+  padding: 0;
+}
+
 /* Colophon */
 .colophon-sec {
   background: var(--ink);
@@ -357,11 +432,16 @@
   position: relative;
   overflow: hidden;
 }
+/* The halftone motif in .halftone prints dark dots for paper grounds; this
+   panel is ink-on-ink, so it takes the same gradient in paper. */
 .colophon-sec::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: var(--halftone-dot);
+  background-image: radial-gradient(
+    rgba(239, 228, 206, 0.85) 1px,
+    transparent 1.4px
+  );
   background-size: 9px 9px;
   opacity: 0.08;
 }
@@ -438,9 +518,104 @@
   background: rgba(0, 0, 0, 0.35);
 }
 
+/* Seven chips plus a search box stop fitting on one line well before the
+   layout collapses, and a wrapped chip row makes the sticky bar tall enough
+   to eat the viewport.  Below this width the native select does the job in
+   one line. */
+@media (width <= 1280px) {
+  .filter-chip {
+    display: none;
+  }
+  .filter-select {
+    display: inline-block;
+  }
+}
+
+/* Each autofix cell carries its own "autofix" label for the stacked layout
+   below, where the column headers are hidden.  Wide enough for the headers to
+   show, the label would only repeat them. */
+.rules-table .col-label {
+  display: none;
+}
+
+/* The namespace tally cannot hold its own column beside the heading at phone
+   widths — it is a single unbreakable line, so it pushes the page sideways.
+   Stack it under the heading and let it read left to right. */
+@media (width < 680px) {
+  .cat-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .cat-head .counts {
+    text-align: left;
+  }
+}
+
+/* Stacked: the rule id keeps a column of its own down the left, while the
+   title, severity, and autofix stack in the column beside it — severity and
+   autofix sharing the row underneath the description.  The row becomes a
+   grid, which costs the table its implicit ARIA roles, so the markup states
+   them explicitly. */
+@media (width < 680px) {
+  .rules-table,
+  .rules-table tbody,
+  .rules-table td {
+    display: block;
+  }
+  .rules-table thead {
+    display: none;
+  }
+  .rules-table tr {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 4px 12px;
+    padding: 12px 0;
+    border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  }
+  /* A grid display would otherwise beat the UA rule that hides filtered-out
+     rows, so restate it at matching specificity. */
+  .rules-table tr[hidden] {
+    display: none;
+  }
+  .rules-table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+  .rules-table td.id {
+    grid-area: 1 / 1 / 3 / 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .rules-table td:nth-child(2) {
+    grid-area: 1 / 2 / 2 / 4;
+  }
+  .rules-table td:nth-child(3) {
+    grid-area: 2 / 2 / 3 / 3;
+    align-self: center;
+  }
+  .rules-table td:nth-child(4) {
+    grid-area: 2 / 3 / 3 / 4;
+    align-self: center;
+    justify-self: start;
+  }
+  /* The column headers are gone, and "safe" on its own does not say what it
+     is safe to do, so each cell carries its own label. */
+  .rules-table .col-label {
+    display: inline;
+    color: var(--ink-soft);
+  }
+  .rules-table .empty-row td {
+    grid-area: auto / 1 / auto / -1;
+  }
+}
+
 @media (max-width: 900px) {
   .docs-layout {
-    grid-template-columns: 1fr;
+    /* A bare 1fr takes its minimum from the content, which the config TOML
+       block drags out to 2700px; the pre already scrolls, so cap the track
+       and let it. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .side-toc {
     position: static;

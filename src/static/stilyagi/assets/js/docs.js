@@ -35,6 +35,7 @@
     if (!bar || !table) return;
 
     const chips = [...bar.querySelectorAll(".filter-chip[data-ns]")];
+    const select = bar.querySelector(".filter-select");
     const search = bar.querySelector("#rule-search");
     const rows = [...table.querySelectorAll("tbody tr[data-ns]")];
     const emptyRow = table.querySelector("tbody .empty-row");
@@ -58,23 +59,41 @@
       if (emptyRow) emptyRow.hidden = visible !== 0;
     };
 
+    // The chip row and the select are the same control at different widths,
+    // so a change to either has to leave the other showing the same answer.
+    const choose = (next) => {
+      namespace = next;
+      for (const chip of chips) {
+        const active = chip.dataset.ns === next;
+        chip.classList.toggle("active", active);
+        // The namespace tint is only worn while the chip is selected.
+        const tint = chip.dataset.nsClass;
+        if (tint) chip.classList.toggle(tint, active);
+        chip.setAttribute("aria-pressed", String(active));
+      }
+      if (select && select.value !== next) select.value = next;
+      apply();
+    };
+
     for (const chip of chips) {
-      chip.addEventListener("click", () => {
-        namespace = chip.dataset.ns;
-        for (const other of chips) {
-          const active = other === chip;
-          other.classList.toggle("active", active);
-          // The namespace tint is only worn while the chip is selected.
-          const tint = other.dataset.nsClass;
-          if (tint) other.classList.toggle(tint, active);
-          other.setAttribute("aria-pressed", String(active));
-        }
-        apply();
-      });
+      chip.addEventListener("click", () => choose(chip.dataset.ns));
+    }
+
+    if (select) {
+      select.addEventListener("change", () => choose(select.value));
     }
 
     if (search) {
       search.addEventListener("input", apply);
+    }
+
+    // A reload or a back-navigation restores the search text and the select's
+    // value, but not the table they describe.  Settle the rows against
+    // whatever the controls are actually showing.
+    if (select?.value && select.value !== namespace) {
+      choose(select.value);
+    } else {
+      apply();
     }
   }
 

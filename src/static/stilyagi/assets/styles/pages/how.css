@@ -97,6 +97,10 @@
   font-size: 1.8rem;
   color: var(--accent-text);
 }
+.arrow-row span {
+  text-align: right;
+  margin-right: -12px;
+}
 .arrow-row span:last-child {
   visibility: hidden;
 }
@@ -178,16 +182,21 @@
 }
 .ex-wrap {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 57fr 43fr;
   gap: 0;
   border: var(--rule-weight-2) solid var(--ink);
 }
 .ex-wrap > .ex-col {
   padding: 0;
   background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 .ex-wrap > .ex-col + .ex-col {
-  border-left: var(--rule-weight) solid var(--ink);
+  /* The split runs across both the paper header and the ink panels below,
+     where --ink would be invisible. */
+  border-left: var(--rule-weight) solid var(--rule-on-ink);
 }
 .ex-header {
   padding: 14px 20px;
@@ -208,6 +217,13 @@
 }
 .ex-body {
   padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ex-body > * {
+  flex: 1;
 }
 .ex-body pre {
   margin: 0;
@@ -221,7 +237,6 @@
   font-family: var(--font-mono);
   font-size: 0.88rem;
   padding: 20px 22px;
-  min-height: 100%;
   line-height: 1.55;
   overflow-x: auto;
 }
@@ -393,11 +408,43 @@
   margin-top: calc(var(--unit) * 4);
   border: var(--rule-weight-2) solid var(--ink);
   overflow: hidden;
+  position: relative;
+  /* Lets the overlay's font-size track the rendered artwork via cqw. */
+  container-type: inline-size;
 }
 .cli-frame-img img {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Terminal overlay inside the window drawn in the artwork. The inset
+   percentages trace the window's content area within the 1376x768 image,
+   so the transcript sits inside the drawn frame at any rendered size. */
+.frame-term {
+  position: absolute;
+  left: 20.2%;
+  top: 31.3%;
+  width: 59.3%;
+  height: 57%;
+  /* Tinted rather than solid ink so the halftone art ghosts through. */
+  background: rgba(15, 15, 15, 0.88);
+  padding: 1.4em 1.6em;
+  font-size: clamp(0.55rem, 1.2cqw, 0.92rem);
+  overflow-y: auto;
+  /* A single flex child laid out column-reverse anchors the initial scroll
+     position to the end of the transcript without any script. */
+  display: flex;
+  flex-direction: column-reverse;
+}
+.frame-term:focus-visible {
+  outline: 3px solid var(--press-red);
+  outline-offset: -3px;
+}
+.frame-term .transcript {
+  /* Breathing room below the resting prompt so the window is not filled
+     edge to edge with text. */
+  padding-bottom: 3em;
 }
 
 @media (max-width: 900px) {
@@ -407,6 +454,24 @@
   .cli-row,
   .flowtext {
     grid-template-columns: 1fr;
+  }
+  /* Stacked one-up, the sticky note travels over the prose instead of beside
+     it, so it needs a surface of its own.  Same treatment as the masthead: a
+     near-opaque paper wash over a blur, lifted above the body column. */
+  .flowtext .margin-note {
+    z-index: 1;
+    /* The masthead runs 74–90px tall depending on how the brand imprint
+       wraps.  Anchoring the box at 74px and padding the text down to 98px
+       means the wash always meets the masthead — no strip of unblurred
+       prose scrolling through the gap — without ever tucking the text
+       underneath it. */
+    top: 74px;
+    margin-inline: calc(var(--unit) * -2);
+    padding: calc(var(--unit) * 3) calc(var(--unit) * 2)
+      calc(var(--unit) * 1.5);
+    background: rgba(239, 228, 206, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: var(--rule-weight) solid var(--ink);
   }
   .stage {
     border-right: 0;
@@ -423,5 +488,17 @@
   }
   .layer-illo {
     grid-template-columns: 1fr;
+  }
+  /* Full bleed: cancel the section side padding so these boards span the
+     viewport, and drop the side borders that would hug the screen edge. */
+  .cli-frame-img,
+  .arch-diagram,
+  .cli-table {
+    margin-inline: calc(var(--unit) * -4);
+    border-inline: 0;
+  }
+  .frame-term {
+    /* 80% of the desktop terminal size (0.88rem). */
+    font-size: 0.71rem;
   }
 }

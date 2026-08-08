@@ -453,13 +453,21 @@
     opacity: 0.7;
   }
 
-  .product-logo--stilyagi .product-logo__stilyagi-mark {
+  .product-logo--stilyagi .product-logo__stilyagi-rule,
+  .product-logo--stilyagi .product-logo__stilyagi-caret {
     transform-origin: 50% 50%;
   }
 
-  .group:hover .product-logo--stilyagi .product-logo__stilyagi-mark,
-  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-mark {
-    animation: stilyagiScan 1.8s ease-in-out infinite;
+  /* The rule tips anticlockwise, lifting its right end clear of the caret.
+     Both halves share one duration so the line and the mark breathe together. */
+  .group:hover .product-logo--stilyagi .product-logo__stilyagi-rule,
+  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-rule {
+    animation: stilyagiMakeWay 2.6s ease-in-out infinite;
+  }
+
+  .group:hover .product-logo--stilyagi .product-logo__stilyagi-caret,
+  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-caret {
+    animation: stilyagiInsert 2.6s ease-in-out infinite;
   }
 
   .group:hover .product-logo--episodic .product-logo__episodic-track,
@@ -807,15 +815,26 @@
   }
 }
 
-/* The lint mark sweeps the line it flags. */
-@keyframes stilyagiScan {
+/* The rule lifts its right end as the caret rises into the space. */
+@keyframes stilyagiMakeWay {
   0%,
   100% {
-    transform: translateX(0);
+    transform: rotate(0deg);
   }
 
   50% {
-    transform: translateX(5px);
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes stilyagiInsert {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
   }
 }
 
@@ -833,8 +852,10 @@
   .group:focus-visible .product-logo--mxd .product-logo__mxd-center,
   .group:hover .product-logo--episodic .product-logo__episodic-track,
   .group:focus-visible .product-logo--episodic .product-logo__episodic-track,
-  .group:hover .product-logo--stilyagi .product-logo__stilyagi-mark,
-  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-mark {
+  .group:hover .product-logo--stilyagi .product-logo__stilyagi-rule,
+  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-rule,
+  .group:hover .product-logo--stilyagi .product-logo__stilyagi-caret,
+  .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-caret {
     animation: none;
     transform: none;
   }

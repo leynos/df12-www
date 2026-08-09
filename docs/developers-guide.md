@@ -253,6 +253,24 @@ This means `bun run build` (or at least `bun run build:static`) must have run
 before `bun test tests/js` (`make test-js`) sees a source change; the gate runs
 `build` first for exactly this reason.
 
+Nothing here is bundled, transpiled, or module-loaded: `scripts/copy-static.ts`
+copies these files verbatim. There are no ES modules, no classes, and no custom
+elements anywhere on the site at the time of writing. Encapsulation is the IIFE
+and nothing else, with the DOM contract expressed through `data-*` attributes
+so that restyling cannot break a selector, and an early return when the root
+element is absent so one `defer` script can be loaded on pages that do not use
+it — `doc-search.js` is included on thirteen pages this way.
+
+The convention's limits are worth naming, because they decide when to leave it.
+A module is a file plus a `data-` prefix, so nothing enforces one instance per
+root, nothing provides a lifecycle beyond first run, and nothing tells CSS that
+a script has upgraded the markup — `config-keys.js` has to add an `is-enhanced`
+class by hand for that. When a behaviour outgrows those limits, the next step is
+a custom element in the light DOM, which supplies all three: one instance per
+root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
+section of [AGENTS.md](../AGENTS.md); a custom element is its last rung, and
+the site does not use a front-end framework at all.
+
 ### 5.1. The config-keys component
 
 `config-keys.js` drives the "config keys" browser on the configuration docs page

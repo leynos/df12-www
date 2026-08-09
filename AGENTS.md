@@ -202,10 +202,27 @@ understand and more to maintain than the one above it.
    list and its matching sections, a card grid and a filter, a table of
    contents and the headings it points at. Two hand-maintained copies of the
    same list will drift; a loop over one list cannot.
-5. **A React component**, only as a last resort, to encapsulate complex
-   behaviour that genuinely has to happen in the browser. Nothing on the site
-   uses React today, and adding it to a page is a decision to justify in the
-   pull request, not a default.
+5. **A plain script module** — an IIFE under the sub-site's `assets/js/`,
+   loaded with `defer`, addressing its markup through `data-*` attributes and
+   returning early when its root is absent. This is how every existing
+   behaviour on the site is written; see section 5 of the
+   [Developer's Guide](docs/developers-guide.md).
+6. **A custom element**, as a last resort, where behaviour is complex enough
+   that a script module's conventions stop carrying it — where a page needs
+   several independent instances, or a real lifecycle, or state that must not
+   leak between them. A custom element formalizes what rung 5 only implies: one
+   instance per root, `connectedCallback` as the entry point, and `:defined` as
+   a standard signal that the element has upgraded, in place of the ad-hoc
+   enhanced-marker class a script module has to add for itself.
+
+   Prefer the light DOM. The sub-sites' stylesheets style their markup
+   directly, and a shadow root would cut an element off from them for no gain
+   the site currently needs. Nothing uses custom elements today, so the first
+   one sets the pattern: justify it in the pull request.
+
+Do not reach for a front-end framework. The site is statically generated and
+ships no client-side framework; introducing one is an architectural decision,
+not a component-level one.
 
 A class and a macro are not alternatives. The kicker pill wanted both: the
 class so the utilities live in one place, the macro so a call site says what
@@ -221,7 +238,9 @@ express as much of the rest as possible in CSS — `:hover`, `:has()`, `:target`
 only for what neither can express. Where script is unavoidable, keep the page
 usable without it: see the config-keys component in the
 [Developer's Guide](docs/developers-guide.md) for the enhancement pattern this
-implies.
+implies. That pattern is the reason rung 6 sits where it does — a custom
+element is server-rendered markup that upgrades itself, so it degrades the same
+way a script module does, which a framework-rendered component would not.
 
 ### Tailwind v4 notes
 

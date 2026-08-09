@@ -344,6 +344,7 @@ a.sidebar-link--sub.active {
   /* A subgrid overrides the parent's gutters with its own, so both
      columns must name the same row gap or their rows drift apart. */
   --hm-config-keys-row-gap: 0.75rem;
+
   display: grid;
   gap: var(--hm-config-keys-row-gap);
 }
@@ -500,6 +501,7 @@ button.hm-config-keys__label {
     /* The extracts abut into one slab, so the rows carry no gap and the
        captions space themselves instead. */
     --hm-config-keys-row-gap: 0;
+
     column-gap: 1.5rem;
     /* Column one carries a paragraph, not just a name, so it needs a
        readable measure rather than the width of the longest label. */

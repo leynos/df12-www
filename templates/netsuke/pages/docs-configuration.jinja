@@ -139,34 +139,20 @@
                     </div>
                 </div>
 
-                <div class="bg-boxwood-pale border border-stone rounded-xl overflow-hidden mb-8">
-                    <div class="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-stone">
-                        <div class="md:col-span-4 p-6 bg-white/50">
-                            <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Config Keys</h3>
-                            <ul class="space-y-2 text-sm">
-                                <li>
-                                    <a href="#build-section" class="flex items-center justify-between group p-2 rounded hover:bg-white transition-colors">
-                                        <span class="font-mono text-indigo font-medium">Build</span>
-                                        <span class="iconify text-xs text-stone group-hover:text-indigo" data-icon="carbon:chevron-right" aria-hidden="true"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#output-section" class="flex items-center justify-between group p-2 rounded hover:bg-white transition-colors">
-                                        <span class="font-mono text-indigo font-medium">Output</span>
-                                        <span class="iconify text-xs text-stone group-hover:text-indigo" data-icon="carbon:chevron-right" aria-hidden="true"></span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#network-section" class="flex items-center justify-between group p-2 rounded hover:bg-white transition-colors">
-                                        <span class="font-mono text-indigo font-medium">Network</span>
-                                        <span class="iconify text-xs text-stone group-hover:text-indigo" data-icon="carbon:chevron-right" aria-hidden="true"></span>
-                                    </a>
-                                </li>
-                            </ul>
+                <!-- Each key group's label is paired with its extract. Without
+                     JavaScript every extract is shown, labelled by its heading;
+                     config-keys.js turns the labels into tabs on narrow screens
+                     and into emphasis toggles on wide ones. -->
+                <div class="hm-config-keys mb-8" data-config-keys>
+                    <h3 class="hm-config-keys__title" id="config-keys-title">Config keys</h3>
+                    <div class="hm-config-keys__layout">
+                        <div class="hm-config-keys__labels" data-config-keys-labels aria-labelledby="config-keys-title">
+                            <span class="hm-config-keys__label" id="config-keys-label-build" data-config-keys-label="build">Build</span>
+                            <span class="hm-config-keys__label" id="config-keys-label-output" data-config-keys-label="output">Output</span>
+                            <span class="hm-config-keys__label" id="config-keys-label-network" data-config-keys-label="network">Network</span>
                         </div>
-                        <div class="md:col-span-8 p-0">
-                            <div class="bg-charcoal p-6 overflow-x-auto h-full min-h-[300px] space-y-6">
-                                <div id="build-section" class="hm-example-code-block">
+                        <div class="hm-config-keys__panels">
+                            <div class="hm-config-keys__panel" id="config-keys-panel-build" data-config-keys-panel="build" role="group" aria-labelledby="config-keys-label-build" tabindex="0">
 {% endraw %}{% highlight 'toml' %}{% raw %}
 # Keys are flat; this mirrors docs/sample-netsuke.toml
 # Manifest path override
@@ -176,8 +162,8 @@ jobs = 8
 # Default build targets when the CLI names none
 default_targets = ["fmt", "lint", "test"]
 {% endraw %}{% endhighlight %}{% raw %}
-                                </div>
-                                <div id="output-section" class="hm-example-code-block">
+                            </div>
+                            <div class="hm-config-keys__panel" id="config-keys-panel-output" data-config-keys-panel="output" role="group" aria-labelledby="config-keys-label-output" tabindex="0">
 {% endraw %}{% highlight 'toml' %}{% raw %}
 # Output policies
 progress = "auto"       # auto | always | never
@@ -186,15 +172,14 @@ emoji = "auto"          # auto | always | never
 color = "auto"          # auto | always | never
 locale = "en-US"
 {% endraw %}{% endhighlight %}{% raw %}
-                                </div>
-                                <div id="network-section" class="hm-example-code-block">
+                            </div>
+                            <div class="hm-config-keys__panel" id="config-keys-panel-network" data-config-keys-panel="network" role="group" aria-labelledby="config-keys-label-network" tabindex="0">
 {% endraw %}{% highlight 'toml' %}{% raw %}
 # Network policy for the fetch() helper
 fetch_default_deny = false
 fetch_allow_host = ["*.example.com"]
 fetch_block_host = ["metadata.internal"]
 {% endraw %}{% endhighlight %}{% raw %}
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -209,5 +194,6 @@ fetch_block_host = ["metadata.internal"]
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
+    <script defer src="/netsuke/assets/js/config-keys.js"></script>
 {% endraw %}
 {% endblock %}

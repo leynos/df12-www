@@ -288,6 +288,195 @@ a.sidebar-link--sub.active {
   transform: translateY(-3px);
 }
 
+/* ── Config-keys browser ─────────────────────────────────────────── */
+
+/* Pairs each key group's label with its extract. Wide, the two sit in
+   adjacent grid columns, row-aligned through subgrid, and hovering or
+   focusing either half marks the pair. Narrow, the labels become a tab
+   strip above a single extract. config-keys.js supplies the interaction
+   and swaps the ARIA between the two readings; the layout below is what
+   the page looks like with no script at all. */
+
+.hm-config-keys {
+  background: var(--netsuke-boxwood-pale);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.hm-config-keys__title {
+  color: var(--netsuke-charcoal);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.hm-config-keys__layout {
+  /* A subgrid overrides the parent's gutters with its own, so both
+     columns must name the same row gap or their rows drift apart. */
+  --hm-config-keys-row-gap: 0.75rem;
+  display: grid;
+  gap: var(--hm-config-keys-row-gap);
+}
+
+.hm-config-keys__labels {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.hm-config-keys__label {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--netsuke-charcoal-mid);
+  cursor: default;
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+/* Only the scripted labels are operable; the static ones are captions. */
+button.hm-config-keys__label {
+  cursor: pointer;
+}
+
+.hm-config-keys__label:focus-visible {
+  border-radius: 0.375rem;
+  outline: 2px solid var(--netsuke-indigo);
+  outline-offset: 2px;
+}
+
+.hm-config-keys__panels {
+  display: grid;
+  gap: var(--hm-config-keys-row-gap);
+  /* Long TOML lines must not widen the page on narrow viewports. */
+  min-width: 0;
+}
+
+.hm-config-keys__panel {
+  background: var(--netsuke-charcoal);
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  min-width: 0;
+  /* The panel, not the pre inside it, is the horizontal scroller: it is
+     the element carrying tabindex and a name, and a scrollable region
+     must be keyboard reachable. `contain: inline-size` on .hm-syntax
+     would otherwise pin its width and push the overflow down onto the
+     unfocusable pre. */
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.hm-config-keys__panel:focus-visible {
+  outline: 2px solid var(--netsuke-indigo-light);
+  outline-offset: 2px;
+}
+
+.hm-config-keys__panel .hm-syntax {
+  background: transparent;
+  border-radius: 0;
+  contain: none;
+  /* Paint nothing of its own and stretch to the widest line, so the
+     panel's ground covers the full scroll extent. */
+  min-width: 100%;
+  overflow-x: visible;
+  width: max-content;
+}
+
+.hm-config-keys__panel .hm-syntax pre {
+  overflow-x: visible;
+  padding: 0;
+}
+
+@media (max-width: 767.98px) {
+  /* Tab strip: one row of labels above the selected extract. Labels stay
+     side by side and shrink rather than wrapping, so which one is
+     selected reads at a glance. */
+  .hm-config-keys__labels {
+    border-bottom: 1px solid var(--netsuke-stone);
+    gap: 0;
+  }
+
+  .hm-config-keys__label {
+    flex: 1;
+    text-align: center;
+  }
+
+  .hm-config-keys__label.is-active {
+    border-bottom-color: var(--netsuke-vermillion);
+    color: var(--netsuke-vermillion);
+    font-weight: 600;
+  }
+
+  .hm-config-keys__panel:focus-visible {
+    outline: 2px solid var(--netsuke-indigo-light);
+    outline-offset: 2px;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Two columns, one row per key group. Both columns are subgrids of the
+     same rows, so a label always sits level with the top of its own
+     extract however tall the neighbouring ones grow. */
+  .hm-config-keys__layout {
+    column-gap: 1.5rem;
+    grid-template-columns: minmax(7rem, 1fr) 4fr;
+    grid-template-rows: repeat(3, auto);
+  }
+
+  .hm-config-keys__labels,
+  .hm-config-keys__panels {
+    display: grid;
+    grid-row: 1 / -1;
+    grid-template-rows: subgrid;
+    row-gap: var(--hm-config-keys-row-gap);
+  }
+
+  .hm-config-keys__labels {
+    grid-column: 1;
+  }
+
+  .hm-config-keys__panels {
+    grid-column: 2;
+  }
+
+  .hm-config-keys__label {
+    align-self: start;
+    border-bottom: 0;
+    border-left: 2px solid transparent;
+    border-radius: 0 0.375rem 0.375rem 0;
+  }
+
+  /* is-preview follows the pointer or keyboard focus; is-active is the
+     mark the reader pressed for. Both read the same, so a previewed pair
+     and a pressed pair are not two competing highlights. */
+  .hm-config-keys__label.is-preview,
+  .hm-config-keys__label.is-active {
+    background: var(--netsuke-white);
+    border-left-color: var(--netsuke-indigo);
+    color: var(--netsuke-indigo);
+    font-weight: 600;
+  }
+
+  .hm-config-keys__panel.is-preview,
+  .hm-config-keys__panel.is-active {
+    border-color: var(--netsuke-indigo-light);
+    box-shadow: var(--netsuke-paper-shadow-lg);
+  }
+}
+
 .hm-filter-shell {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(209, 199, 184, 0.85);
@@ -928,6 +1117,13 @@ a.sidebar-link--sub.active {
     box-shadow: none;
     font-size: 0.7rem;
     margin-inline: -1rem;
+  }
+
+  /* Faux windows nested inside a p-6 card bleed out through the card's own
+     1.5rem padding instead of the section's 1rem, so their edges meet the
+     inside of the card border. */
+  section .hm-faux-window--card-bleed.hm-faux-window--card-bleed {
+    margin-inline: -1.5rem;
   }
 
   section .hm-faux-window__titlebar {

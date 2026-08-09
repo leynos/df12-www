@@ -419,17 +419,35 @@ button.hm-config-keys__label {
   /* Tab strip: one row of labels above the selected extract. Labels stay
      side by side and shrink rather than wrapping, so which one is
      selected reads at a glance. */
+  /* No script: the key groups stack, so each caption reads with its own
+     paragraph beneath it. */
   .hm-config-keys__labels {
+    display: block;
+  }
+
+  .hm-config-keys__key + .hm-config-keys__key {
+    margin-top: 1rem;
+  }
+
+  /* The tab strip is gated on the script having run, because it is the
+     script that moves each paragraph out of its key group and above the
+     extract. Ungated, three untouched groups would be squeezed abreast
+     and the strip would wreck the very fallback it means to leave
+     alone. The gating class outranks the stacked rules above. */
+  .hm-config-keys.is-enhanced .hm-config-keys__labels {
     border-bottom: 1px solid var(--netsuke-stone);
+    display: flex;
     gap: 0;
   }
 
-  .hm-config-keys__key {
+  .hm-config-keys.is-enhanced .hm-config-keys__key {
     display: flex;
     flex: 1;
+    margin-top: 0;
+    min-width: 0;
   }
 
-  .hm-config-keys__label {
+  .hm-config-keys.is-enhanced .hm-config-keys__label {
     flex: 1;
     text-align: center;
   }
@@ -445,10 +463,6 @@ button.hm-config-keys__label {
     margin-bottom: 0.25rem;
   }
 
-  .hm-config-keys__panel:focus-visible {
-    outline: 2px solid var(--netsuke-indigo-light);
-    outline-offset: 2px;
-  }
 }
 
 @media (min-width: 768px) {
@@ -463,6 +477,9 @@ button.hm-config-keys__label {
     /* Column one carries a paragraph, not just a name, so it needs a
        readable measure rather than the width of the longest label. */
     grid-template-columns: minmax(11rem, 2fr) 5fr;
+    /* The count must match the number of .hm-config-keys__key groups in
+       templates/netsuke/pages/docs-configuration.jinja: both columns are
+       subgrids of these rows. */
     grid-template-rows: repeat(3, auto);
   }
 
@@ -1413,23 +1430,18 @@ button.hm-config-keys__label {
   padding: 0;
 }
 
-/* Small mobile: shrink terminal text so long lines fit without
-   horizontal scrolling as often. Placed after the base rule above so
-   equal specificity resolves in this rule's favour. */
+/* Small mobile: shrink the text and reclaim the gutter, so long
+   lines fit without horizontal scrolling as often. Where a block
+   sits in its own padded chrome the inset is applied twice, and the
+   second helping costs characters the line can ill afford once the
+   type has shrunk; only the pre's own padding goes, because the
+   chrome's gutter is what holds the code off the dark ground's
+   edge. The trailing inset stays so a scrolled line does not end
+   flush. Placed after the base rule above so equal specificity
+   resolves in this rule's favour. */
 @media (max-width: 459.98px) {
   .hm-syntax pre {
     font-size: 0.7rem;
-  }
-}
-
-/* Reclaim the gutter at the narrowest widths: where a block sits in
-   its own padded chrome the inset is applied twice, and the second
-   helping costs characters the line can ill afford once the type has
-   shrunk. Only the pre's own padding goes — the chrome keeps its
-   gutter, which is what holds the code off the dark ground's edge.
-   The trailing inset stays so a scrolled line does not end flush. */
-@media (max-width: 460px) {
-  .hm-syntax pre {
     padding-block: 0;
     padding-left: 0;
   }
@@ -1467,7 +1479,7 @@ button.hm-config-keys__label {
 .hm-syntax .cm,
 .hm-syntax .cpf,
 .hm-syntax .cs { color: var(--netsuke-syntax-comment); font-style: italic; }
-.hm-syntax .cp { color: var(--netsuke-syntax-comment-preproc); }
+.hm-syntax .cp { color: var(--netsuke-syntax-comment-preproc); font-style: italic; }
 .hm-syntax .k,
 .hm-syntax .kc,
 .hm-syntax .kd,

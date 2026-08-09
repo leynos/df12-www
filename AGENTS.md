@@ -17,6 +17,9 @@ The deployment entrypoint is `deploy.tofu`. Reusable modules live under
 directory. Additional documentation is provided in `docs/`, including:
 
 - [Repository Layout](docs/repository-layout.md) – where everything lives.
+- [Developer's Guide](docs/developers-guide.md) – build and serve workflow,
+  the Pygments CSS generators, browser-side component conventions, and
+  accessibility checks.
 - [df12 Pages App Design](docs/df12-pages-app-design.md) – the generator's
   architecture and extension points.
 - [daisyUI v5 Guide](docs/daisyui-v5-guide.md) – theme structure and component

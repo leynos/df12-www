@@ -8,7 +8,9 @@ import pytest
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
+from pygments.token import Comment, Punctuation
 
+from df12_pages.highlighting import HimotoshiStyle
 from scripts.generate_himotoshi_pygments_css import (
     BEGIN,
     END,
@@ -58,12 +60,37 @@ POWERSHELL_SOURCE = (
 )
 
 #: Every lexer the sub-site's templates name in a ``{% highlight %}`` tag.
-SAMPLES = [
+SAMPLES = (
     ("netsuke", NETSUKEFILE_SOURCE),
     ("netsuke-console", CONSOLE_SOURCE),
     ("toml", TOML_SOURCE),
     ("powershell", POWERSHELL_SOURCE),
-]
+)
+
+#: A whole ``class`` attribute value. Pygments writes a space-separated
+#: ancestor chain for token types it has no single standard class for, such
+#: as ``class="p p-Indicator"``, so matching the attribute wholesale and
+#: splitting afterwards is the only way to see those names at all.
+CLASS_ATTRIBUTE = re.compile(r'class="([^"]*)"')
+
+#: A ``.hm-syntax`` descendant selector's class chain. Compound selectors
+#: such as ``.hm-syntax .p.p-Indicator`` carry more than one name.
+STYLED_SELECTOR = re.compile(r"\.hm-syntax \.([\w.-]+)")
+
+
+def _emitted_class_attributes(lexer_name: str, source: str) -> list[str]:
+    """Return each token span's whole ``class`` value from highlighted markup."""
+    markup = highlight(
+        source,
+        get_lexer_by_name(lexer_name),
+        HtmlFormatter(cssclass="hm-syntax", wrapcode=True),
+    )
+    return [value for value in CLASS_ATTRIBUTE.findall(markup) if value != "hm-syntax"]
+
+
+def _styled_class_names(css: str) -> set[str]:
+    """Return every class name the generated block styles."""
+    return {name for chain in STYLED_SELECTOR.findall(css) for name in chain.split(".")}
 
 
 class TestHimotoshiPygmentsCss:
@@ -83,20 +110,21 @@ class TestHimotoshiPygmentsCss:
         generator that emitted a rule per declared token would leave most of
         the markup's classes unstyled, which is invisible until someone reads
         the page.
-        """
-        markup = highlight(
-            source,
-            get_lexer_by_name(lexer_name),
-            HtmlFormatter(cssclass="hm-syntax", wrapcode=True),
-        )
-        emitted = set(re.findall(r'class="([a-z0-9]+)"', markup))
-        emitted.discard("hm-syntax")
-        styled = set(re.findall(r"\.hm-syntax \.([a-z0-9]+)[ ,.{]", build_css()))
 
-        assert emitted, f"the {lexer_name} sample should produce token classes"
-        assert not emitted - styled, (
-            f"classes emitted but unstyled: {sorted(emitted - styled)}"
-        )
+        The question asked is whether each span picks up a colour, not
+        whether every name in its class attribute is mentioned in the CSS.
+        For a token type Pygments has no standard class for it writes an
+        ancestor chain — ``class="l l-Scalar l-Scalar-Plain"`` for a plain
+        YAML scalar — and the span is coloured by the ``l`` in that chain.
+        Demanding a rule for every name would fail on those without any
+        token rendering wrongly.
+        """
+        attributes = _emitted_class_attributes(lexer_name, source)
+        styled = _styled_class_names(build_css())
+        unstyled = [value for value in attributes if not set(value.split()) & styled]
+
+        assert attributes, f"the {lexer_name} sample should produce token classes"
+        assert not unstyled, f"spans emitted with no styled class: {sorted(unstyled)}"
 
     def test_samples_still_exercise_the_regressed_subtype_classes(self) -> None:
         """The samples keep reaching the classes that were left unstyled.
@@ -105,14 +133,12 @@ class TestHimotoshiPygmentsCss:
         colour. Editing a sample could quietly stop producing those classes
         and leave the coverage assertion above passing vacuously.
         """
-        emitted: set[str] = set()
-        for lexer_name, source in SAMPLES:
-            markup = highlight(
-                source,
-                get_lexer_by_name(lexer_name),
-                HtmlFormatter(cssclass="hm-syntax", wrapcode=True),
-            )
-            emitted |= set(re.findall(r'class="([a-z0-9]+)"', markup))
+        emitted = {
+            name
+            for lexer_name, source in SAMPLES
+            for value in _emitted_class_attributes(lexer_name, source)
+            for name in value.split()
+        }
 
         # Comment.Single, String.Double, String.Single, Number.Integer,
         # Keyword.Constant, Name, Name.Constant, Text.Whitespace.
@@ -144,17 +170,64 @@ class TestHimotoshiPygmentsCss:
         The wrapper chrome keeps its padding: that gutter is what holds the
         code off the dark ground's edge, and stripping it too left the text
         flush against the block border.
+
+        This shares the type scale's breakpoint above. The two were once
+        0.02px apart, which meant a hair's width of viewport where the
+        padding had gone but the type had not shrunk.
         """
         css = build_css()
 
-        assert "@media (max-width: 460px) {" in css, (
-            "the generated block should carry the narrow-viewport media query"
+        assert "@media (max-width: 459.98px) {" in css, (
+            "the padding rule should share the small-mobile breakpoint"
+        )
+        assert "@media (max-width: 460px) {" not in css, (
+            "the near-duplicate 460px breakpoint should be gone"
         )
         assert "padding-block: 0;" in css, (
             "the narrow-viewport rule should drop the pre's block padding"
         )
         assert "padding-left: 0;" in css, (
             "the narrow-viewport rule should drop the pre's left padding"
+        )
+
+    def test_declared_subtypes_keep_the_extras_they_inherit(self) -> None:
+        """A subtype that restates only its colour keeps its parent's italic.
+
+        Pygments resolves a token by copying its parent's flags and then
+        applying whatever the child restates, so ``Comment.Preproc`` — the
+        Jinja ``{% ... %}`` markers, declared as a bare colour — is italic
+        because ``Comment`` is. Reading the raw spec strings instead of the
+        formatter's resolved style dropped that, and the markers rendered
+        upright while every other comment class did not.
+        """
+        css = build_css()
+        preproc = next(
+            line for line in css.splitlines() if line.startswith(".hm-syntax .cp ")
+        )
+
+        assert "font-style: italic;" in preproc, (
+            f"Comment.Preproc should inherit Comment's italic: {preproc}"
+        )
+
+    def test_the_private_token_class_api_still_behaves(self) -> None:
+        """Pin the one private Pygments API the generator depends on.
+
+        ``HtmlFormatter._get_css_classes`` has no public equivalent:
+        ``get_style_defs`` emits one class per styled token, not the
+        space-separated ancestor chain the grouping in
+        ``scripts.pygments_css`` needs. Pygments carries no upper bound
+        here, so assert the contract directly rather than inferring a
+        break from whichever downstream assertion happens to fail first.
+        """
+        formatter = HtmlFormatter(style=HimotoshiStyle, cssclass="hm-syntax")
+        class_for = formatter._get_css_classes
+
+        plain = class_for(Comment.Single)
+        compound = class_for(Punctuation.Indicator)
+
+        assert plain == "c1", f"expected the leaf class alone, got {plain!r}"
+        assert compound.split() == ["p", "p-Indicator"], (
+            f"expected a space-separated ancestor chain, got {compound!r}"
         )
 
     def test_committed_stylesheet_matches_the_generator(self) -> None:

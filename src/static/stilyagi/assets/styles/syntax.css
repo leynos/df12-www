@@ -83,7 +83,7 @@
 .stilyagi-syntax .cm,
 .stilyagi-syntax .cpf,
 .stilyagi-syntax .cs { color: var(--stilyagi-syntax-comment); font-style: italic; }
-.stilyagi-syntax .cp { color: var(--stilyagi-syntax-comment-preproc); }
+.stilyagi-syntax .cp { color: var(--stilyagi-syntax-comment-preproc); font-style: italic; }
 .stilyagi-syntax .k,
 .stilyagi-syntax .kc,
 .stilyagi-syntax .kd,

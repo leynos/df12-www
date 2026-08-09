@@ -228,6 +228,11 @@
             wide.addListener(applyMode);
         }
         applyMode();
+        // Marks the component as enhanced only once the DOM has actually
+        // been rearranged. The narrow tab strip is gated on this class: it
+        // assumes the paragraphs have moved out of the key groups, which
+        // is something only applyMode can have done.
+        root.classList.add("is-enhanced");
     }
 
     function init() {

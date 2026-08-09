@@ -66,6 +66,7 @@ def _relative_luminance(colour: str) -> float:
     """Return the WCAG relative luminance of a ``#rrggbb`` colour."""
 
     def channel(value: int) -> float:
+        """Return one 0-255 channel linearized per the sRGB transfer function."""
         fraction = value / 255
         if fraction <= _SRGB_LINEAR_CUTOFF:
             return fraction / 12.92
@@ -125,20 +126,34 @@ class TestStilyagiHighlighting:
         declares broad categories and lets subtypes inherit. A generator that
         emitted a rule per declared token would leave most of the markup's
         classes unstyled, which is invisible until someone reads the page.
+
+        For a token type Pygments has no standard class for it writes an
+        ancestor chain rather than one name — ``class="p p-Indicator"`` —
+        so the attribute is matched whole and split afterwards. Matching
+        only lowercase single names would skip such an attribute
+        entirely rather than partially. The Python sample happens to
+        produce none today, but the extraction should not be what
+        decides that.
         """
         markup = highlight(
             SAMPLE_SOURCE,
             get_lexer_by_name("python"),
             HtmlFormatter(cssclass="stilyagi-syntax", wrapcode=True),
         )
-        emitted = set(re.findall(r'class="([a-z0-9]+)"', markup))
-        emitted.discard("stilyagi-syntax")
-        styled = set(re.findall(r"\.stilyagi-syntax \.([a-z0-9]+)[ ,{]", build_css()))
+        attributes = [
+            value
+            for value in re.findall(r'class="([^"]*)"', markup)
+            if value != "stilyagi-syntax"
+        ]
+        styled = {
+            name
+            for chain in re.findall(r"\.stilyagi-syntax \.([\w.-]+)", build_css())
+            for name in chain.split(".")
+        }
+        unstyled = [value for value in attributes if not set(value.split()) & styled]
 
-        assert emitted, "the sample should produce token classes"
-        assert not emitted - styled, (
-            f"classes emitted but unstyled: {sorted(emitted - styled)}"
-        )
+        assert attributes, "the sample should produce token classes"
+        assert not unstyled, f"spans emitted with no styled class: {sorted(unstyled)}"
 
     def test_committed_stylesheet_matches_the_generator(self) -> None:
         """The checked-in block is regenerated, never hand-edited.

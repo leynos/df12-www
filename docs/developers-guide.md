@@ -458,19 +458,23 @@ restyled by it.
 
 ## 7. Styling and the cascade
 
-The Netsuke sub-site's pages (`templates/netsuke/*.jinja`) still load the
+The Netsuke and Weaver sub-sites still load the
 [Tailwind Play CDN](https://tailwindcss.com) script
 (`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
-stylesheet. This differs from the main site and the mxd sub-site, which compile
+stylesheet, and use its utilities in their markup alongside their own
+hand-crafted stylesheets. Netsuke additionally extends the default theme
+through `/netsuke/assets/js/tailwind-config.js`; Weaver takes the defaults. Of
+the three hand-styled sub-sites, only Stilyagi uses neither Tailwind nor
+daisyUI. This differs from the main site and the mxd sub-site, which compile
 Tailwind v4 ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md)
 for that path.
 
 The Play CDN script scans the rendered document for utility classes in use and
 injects the utilities it finds into a `<style>` element it appends to
-`<head>` — after the hand-written stylesheet `<link>`, regardless of where the
+`<head>` — after the handwritten stylesheet `<link>`, regardless of where the
 `<script>` tag itself sits in the markup. Because that injected `<style>` is
 unlayered, and Tailwind's Play build carries no `@layer` boundaries the way the
-compiled entrypoints do, an unlayered hand-written rule of _equal_ specificity
+compiled entrypoints do, an unlayered handwritten rule of _equal_ specificity
 loses: CSS resolves a tie in specificity by source order, and the CDN's
 injected block comes later.
 
@@ -491,7 +495,7 @@ specificity above a single utility class without touching source order:
 ```
 
 (`src/static/netsuke/assets/css/himotoshi.css`). The same idiom recurs wherever
-a hand-written rule must outrank a Tailwind utility of the same class count on
+a handwritten rule must outrank a Tailwind utility of the same class count on
 this sub-site, for example
 `section .hm-faux-window--card-bleed.hm-faux-window--card-bleed` a little
 further down the same file. Prefer raising specificity by doubling the class

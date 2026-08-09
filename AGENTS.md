@@ -134,7 +134,7 @@ Weaver load the **Tailwind Play CDN** at runtime and use its utilities freely
 in their markup; Netsuke also extends the default theme through
 `/netsuke/assets/js/tailwind-config.js`. Only Stilyagi uses neither. The Play
 CDN is not the compiled build: it injects its utilities into a `<style>` tag
-after the stylesheet link, which is why hand-written rules on those two
+after the stylesheet link, which is why handwritten rules on those two
 sub-sites sometimes need the doubled selector described below. Their colour
 tokens live in their own stylesheets, and the accessibility rules below apply
 to all of them just the same.
@@ -143,7 +143,7 @@ Code blocks on the Netsuke and Stilyagi sub-sites are highlighted at build time
 by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which runs Pygments
 and emits token classes. The colours come from a Pygments `Style`
 (`HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is generated, not
-hand-written — rerun `scripts/generate_himotoshi_pygments_css.py` or
+handwritten — rerun `scripts/generate_himotoshi_pygments_css.py` or
 `scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
 edit the marked block by hand.
 
@@ -197,8 +197,12 @@ stop at the first rung that carries the requirement. Each rung costs more to
 understand and more to maintain than the one above it.
 
 1. **A daisyUI component**, where the sub-site uses daisyUI and one fits. It is
-   already themed, already accessible, and already someone else's problem to
-   maintain.
+   already themed and already someone else's problem to maintain. It is not
+   automatically accessible: daisyUI styles the element it is given, so the
+   result is only as good as the native HTML underneath it and the labels,
+   roles, and states the content needs. Follow the
+   [daisyUI v5 guide](docs/daisyui-v5-guide.md) for what each component
+   expects, and check the result rather than assuming it.
 2. **A semantic CSS class** in the sub-site's stylesheet. Name the role, not the
    appearance, and put the modifiers on the same base.
 3. **A shared Jinja macro** for a repeated HTML structure, in the sub-site's

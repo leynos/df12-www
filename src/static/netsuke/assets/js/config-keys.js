@@ -57,8 +57,8 @@
         return Array.prototype.slice.call(root.querySelectorAll(selector));
     }
 
-    function makeButton(span) {
-        var button = document.createElement("button");
+    function makeButton(doc, span) {
+        var button = doc.createElement("button");
         button.type = "button";
         button.id = span.id;
         button.className = span.className;
@@ -73,23 +73,37 @@
         return button;
     }
 
-    function initGroup(root) {
+    /* Wire one config-keys group and return its controller, or null when
+       the markup does not satisfy the contract.
+       `deps` supplies `document` and `matchMedia` so tests can drive the
+       component with fakes; the browser wiring at the bottom passes the
+       real ones. Every precondition is checked before anything is
+       mutated: a half-upgraded group is worse than an unupgraded one,
+       and a key without its label span used to throw part-way through. */
+    function createConfigKeys(root, deps) {
+        var doc = deps.document;
         var labelList = root.querySelector("[data-config-keys-labels]");
         var panelList = root.querySelector("[data-config-keys-panels]");
         var keys = list(root, "[data-config-keys-key]");
         var panels = list(root, "[data-config-keys-panel]");
         if (!labelList || !panelList || !keys.length || keys.length !== panels.length) {
-            return;
+            return null;
         }
 
-        var wide = window.matchMedia(WIDE);
+        var spans = keys.map(function (key) {
+            return key.querySelector("[data-config-keys-label]");
+        });
+        if (spans.indexOf(null) !== -1) {
+            return null;
+        }
+
+        var wide = deps.matchMedia(WIDE);
         var selected = 0;
         var pairs = keys.map(function (key, index) {
-            var span = key.querySelector("[data-config-keys-label]");
             return {
                 key: key,
-                span: span,
-                button: makeButton(span),
+                span: spans[index],
+                button: makeButton(doc, spans[index]),
                 note: key.querySelector("[data-config-keys-note]"),
                 panel: panels[index]
             };
@@ -233,12 +247,24 @@
         // assumes the paragraphs have moved out of the key groups, which
         // is something only applyMode can have done.
         root.classList.add("is-enhanced");
+
+        // Exposed so tests can drive a breakpoint crossing without
+        // synthesising a MediaQueryList change event.
+        return { applyMode: applyMode, select: select };
     }
 
     function init() {
+        var deps = {
+            document: document,
+            matchMedia: function (query) {
+                return window.matchMedia(query);
+            }
+        };
         Array.prototype.forEach.call(
             document.querySelectorAll("[data-config-keys]"),
-            initGroup
+            function (root) {
+                createConfigKeys(root, deps);
+            }
         );
     }
 
@@ -251,6 +277,9 @@
     }
 
     if (typeof module !== "undefined" && module.exports) {
-        module.exports = { nextTabIndex: nextTabIndex };
+        module.exports = {
+            createConfigKeys: createConfigKeys,
+            nextTabIndex: nextTabIndex
+        };
     }
 })();

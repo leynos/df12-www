@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
 {% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Examples Hub - Netsuke Build System{% endblock %}
@@ -9,9 +10,7 @@
 
         <!-- Header Section -->
         <header class="text-center max-w-3xl mx-auto mb-16">
-            <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone mb-6">
-                Community &amp; Official
-            </div>
+            {% endraw %}{{ ui.kicker('Community &amp; Official', 'mb-6') }}{% raw %}
             <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Examples Hub</h1>
             <p class="text-xl text-charcoal-mid font-light leading-relaxed">
                 Explore small, concrete Netsuke manifests. Each example shows one part of the language clearly enough to steal without regret.

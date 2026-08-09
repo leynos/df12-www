@@ -1,0 +1,35 @@
+{#
+  Shared Netsuke page components.
+
+  Import as `ui` and call from inside a page's `{% raw %}` block by
+  stepping out of it first:
+
+      {% import "components.jinja" as ui %}
+      ...
+      {% endraw %}{{ ui.kicker('Reference') }}{% raw %}
+
+  The presentation lives in `.hm-kicker` and its modifiers in
+  `src/static/netsuke/assets/css/himotoshi.css`, not in the class strings
+  here: a macro that merely relocated a utility soup would leave the same
+  duplication one indirection further away. See the "Styling" section of
+  AGENTS.md.
+#}
+
+{#
+  The pill-shaped eyebrow above a page or section heading.
+
+  label       text of the pill; already-escaped markup must be passed
+              through `| safe` by the caller
+  extra       additional utility classes, typically a margin such as `mb-6`
+  accent      use the docs-hub colouring rather than the default boxwood
+  icon        an Iconify icon name, e.g. `carbon:download`
+  icon_class  utility classes for the icon, typically a colour
+  dot         a background utility for a leading status dot, e.g. `bg-amber`
+#}
+{% macro kicker(label, extra='', accent=false, icon='', icon_class='', dot='') -%}
+<div class="hm-kicker hm-kicker--section{% if accent %} hm-kicker--accent{% endif %}{% if extra %} {{ extra }}{% endif %}">
+    {%- if dot %}<span class="hm-kicker__dot {{ dot }}"></span>{% endif %}
+    {%- if icon %}<span class="iconify {{ icon_class }}" data-icon="{{ icon }}" aria-hidden="true"></span>{% endif %}
+    {{ label }}
+</div>
+{%- endmacro %}

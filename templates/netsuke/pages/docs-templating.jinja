@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Templating - Netsuke Build System{% endblock %}
@@ -99,9 +100,7 @@
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
                 <div class="flex items-center mb-4">
-                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
-                        Core Concepts
-                    </div>
+                    {% endraw %}{{ ui.kicker('Core Concepts') }}{% raw %}
                 </div>
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Templating</h1>
                 <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">

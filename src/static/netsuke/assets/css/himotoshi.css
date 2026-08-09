@@ -246,10 +246,37 @@ a.sidebar-link--sub.active {
   }
 }
 
+/* The hero pill: mono, widely tracked, on the photographic ground. It
+   carries the type treatment rather than the base, because the section
+   pill below sets the page in the body face instead. */
 .hm-kicker--hero {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.9);
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.12em;
+  padding: 0.375rem 0.875rem;
+}
+
+/* The eyebrow above a page or section heading. */
+.hm-kicker--section {
+  background: var(--netsuke-boxwood);
+  color: var(--netsuke-charcoal-mid);
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.75rem;
+}
+
+/* Pairs with --section on the docs hub, where the eyebrow labels the
+   page's own subject rather than its category. */
+.hm-kicker--accent {
+  background: var(--netsuke-boxwood-light);
+  color: var(--netsuke-indigo);
+}
+
+.hm-kicker__dot {
+  border-radius: 999px;
+  height: 0.5rem;
+  width: 0.5rem;
 }
 
 .hm-proof-list {
@@ -571,17 +598,17 @@ button.hm-config-keys__label {
   box-shadow: var(--netsuke-paper-shadow);
 }
 
+/* The pill-shaped eyebrow above a heading. The base holds only what every
+   pill shares; the type treatment and inset belong to the modifiers,
+   which differ enough that neither is a sensible default. */
 .hm-kicker {
   align-items: center;
   border: 1px solid var(--netsuke-stone);
   border-radius: 999px;
   display: inline-flex;
-  font-family: "JetBrains Mono", monospace;
   font-size: 0.75rem;
   font-weight: 600;
   gap: 0.5rem;
-  letter-spacing: 0.12em;
-  padding: 0.375rem 0.875rem;
   text-transform: uppercase;
 }
 

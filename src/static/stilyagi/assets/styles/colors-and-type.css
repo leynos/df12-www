@@ -111,6 +111,9 @@
   --jazz-magenta-text: #a3175b; /* 4.53:1 */
   --signal-sage-text: #545836; /* 4.53:1 */
   --signal-rust-text: #864322; /* 4.51:1 */
+  /* --rule-faint is the graph-paper line, and it is a rule colour: as type
+     on paper it manages 2.52:1.  Muted type takes this instead. */
+  --fg-muted-text: #5b5447; /* 4.57:1 */
   /* Magenta type on the ink ground.  The paper-ground magenta manages only
      4.00:1 there, so ink panels take this instead. */
   --jazz-magenta-on-ink: #dc3788; /* 4.51:1 */
@@ -128,7 +131,9 @@
   /* Semantic aliases */
   --fg1: var(--ink);
   --fg2: var(--ink-soft);
-  --fg-muted: var(--rule-faint);
+  /* The alias for muted *type*.  It points at the type-safe grey, not the
+     rule colour, because everything that reads it is text. */
+  --fg-muted: var(--fg-muted-text);
   --fg-link: var(--press-red-ink);
   --fg-link-hover: var(--press-red);
   --bg: var(--paper);

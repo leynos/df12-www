@@ -181,6 +181,20 @@ a.sidebar-link--sub.active {
   transform: translateY(-4px);
 }
 
+/* On narrow viewports the vertically centred hero content rides up under the
+   fixed navbar. Floor the hero's top padding so the kicker never sits closer
+   than 92.2px to the top of the viewport. Above 500px the natural centred
+   position already clears that, so the rule stops there. The selector is
+   doubled to outrank the hero's `py-16` utility, which the Tailwind Play CDN
+   injects into a later <style> block at equal specificity. */
+@media (max-width: 499.98px) {
+  .hm-hero.hm-hero {
+    /* 92.25px, not 92.2px: Blink snaps layout to 1/64px, and 92.2px lands on
+       92.1875px — a hair under the floor. */
+    padding-top: 92.25px;
+  }
+}
+
 .hm-hero-panel {
   background: linear-gradient(
     155deg,
@@ -304,6 +318,14 @@ a.sidebar-link--sub.active {
   letter-spacing: 0.12em;
   padding: 0.375rem 0.875rem;
   text-transform: uppercase;
+}
+
+/* Below 460px the hero kicker wraps onto a second line; drop the lede and
+   keep just the version. */
+@media (max-width: 459.98px) {
+  .hm-kicker__lede {
+    display: none;
+  }
 }
 
 .hm-example-code-block {

@@ -338,9 +338,10 @@
 }
 /* The block scrolls, so it is keyboard reachable and needs a visible ring.
    It runs edge to edge in its column, so the ring is drawn inside it rather
-   than out on the page — which is also why the ink-ground block re-points
-   the ring to paper for it: 15.21:1 on the block's own ground. */
+   than out on the page — and being drawn over the block's own ink ground,
+   it is paper: 15.21:1 there. */
 .config-grid pre:focus-visible {
+  --focus-ring-color: var(--paper);
   outline-offset: -3px;
 }
 .config-grid pre .k {

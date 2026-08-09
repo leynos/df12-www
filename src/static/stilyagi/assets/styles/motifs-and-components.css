@@ -227,10 +227,26 @@ section.chapter > .chapter-label {
   text-transform: uppercase;
   transform: rotate(-8deg);
   background:
-    radial-gradient(circle at 10% 30%, rgba(255, 255, 255, 0.25) 0 2px, transparent 3px),
-    radial-gradient(circle at 60% 70%, rgba(255, 255, 255, 0.25) 0 1.5px, transparent 3px),
-    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.25) 0 2px, transparent 3px),
-    radial-gradient(circle at 35% 85%, rgba(255, 255, 255, 0.25) 0 1px, transparent 3px);
+    radial-gradient(
+      circle at 10% 30%,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 60% 70%,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 1.5px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 35% 85%,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 1px,
+      transparent 3px
+    );
   mix-blend-mode: multiply;
   filter: contrast(1.05);
 }
@@ -380,9 +396,10 @@ pre.code .tok-nm {
 
 /* .code-scroll itself is declared in the generated Pygments block, which
    cannot be hand-edited; the wrapper is a scroller, so it is in the tab
-   order and needs a ring.  Drawn inside, over the block's own ink ground,
-   which is why the ink-ground list re-points the ring to paper for it. */
+   order and needs a ring.  The ring is drawn inside, over the block's own
+   ink ground, so it is paper: 15.21:1 there. */
 .code-scroll:focus-visible {
+  --focus-ring-color: var(--paper);
   outline-offset: -3px;
 }
 

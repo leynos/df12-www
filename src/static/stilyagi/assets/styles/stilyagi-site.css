@@ -248,7 +248,11 @@
   padding: calc(var(--unit) * 8) 0 calc(var(--unit) * 6);
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--press-red) 10%, transparent), transparent 26%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0));
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper-highlight) 24%, transparent),
+      transparent
+    );
 }
 .page-intro::before {
   content: "";
@@ -377,7 +381,12 @@
   margin-top: calc(var(--unit) * 8);
   border-top: var(--rule-weight-3) solid var(--ink);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0)), var(--paper-shade);
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper-highlight) 24%, transparent),
+      transparent
+    ),
+    var(--paper-shade);
 }
 .colophon-footer .wrap {
   max-width: 1320px;

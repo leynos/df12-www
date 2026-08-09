@@ -61,6 +61,19 @@
   --paper-shade: #e4d7b9; /* recessed panel */
   --paper-deep: #d8c9a4; /* samizdat ground */
 
+  /* Light on paper, not a surface of its own.  Every framed box on the site
+     carries a wash of it down from the top edge, which is what stops the
+     three paper greys reading as flat fills; the alpha varies by how much
+     lift the box wants, so call sites mix it and this names only the hue.
+     It is never a colour anything is set in — it exists to be nearly
+     transparent, and at full strength it would be the clinical white the
+     surface tokens above are defined against. */
+  --paper-highlight: #ffffff;
+  /* The unprinted flecks in a rubber stamp, where the ink did not take.
+     Same hue, different job: these are specks in a mark, not a wash over a
+     surface, and they would not follow the wash if it were retuned. */
+  --stamp-fleck: #ffffff;
+
   /* Ink */
   --ink: #0f0f0f; /* lamp-black; display + body */
   --ink-soft: #2a2a2a; /* rules, secondary type */
@@ -387,10 +400,14 @@ hr.scholar {
    the 4.5:1 body-text floor against --ink, so every dark panel switches
    them here rather than at each call site.
 
-   The focus ring goes with them, but only matters for the three scrollers
-   in the list.  Everywhere else the ring sits outside the control, on the
-   paper page, where the ink default is right however dark the fill is; a
-   scroller draws its ring inside itself instead, over its own ink ground.
+   The focus ring is deliberately not in this list.  These tokens follow the
+   ground an element's *contents* sit on; a ring follows the ground it is
+   painted on, and at the shared positive offset that is the page outside
+   the control, not the fill inside it.  A focusable element with an ink
+   fill — the active RsDoc chip, a hovered ghost button — still needs the
+   ink ring, because its ring lands on the paper around it.  The three
+   scrollers that draw their ring inside themselves set the paper ring in
+   their own rules, beside the offset that makes it necessary.
    ================================================================= */
 .ink-panel,
 .agitprop,
@@ -413,5 +430,4 @@ pre.code,
   --signal-rust-text: var(--signal-rust-on-ink);
   --jazz-magenta: var(--jazz-magenta-on-ink);
   --jazz-magenta-text: var(--jazz-magenta-on-ink);
-  --focus-ring-color: var(--paper);
 }

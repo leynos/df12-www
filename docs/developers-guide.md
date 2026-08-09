@@ -227,6 +227,13 @@ long as the style declares parents before children.
 - A test asserts the committed marked block matches what the generator would
   produce (`test_committed_stylesheet_matches_the_generator` in each test
   module below). A stale stylesheet fails the commit gates.
+- Both generated stylesheets are excluded from the Biome formatter, in the
+  `**/*.css` overrides in `biome.jsonc`. `token_rules` emits one rule per line,
+  which the formatter would expand; the next generator run would collapse it
+  again, and the two would undo each other on alternate runs — with the test
+  above failing on whichever ran last. Formatting is the generator's output
+  shape, so if it needs to change, change `scripts/pygments_css.py` and
+  regenerate. Do not remove the exclusion to tidy a diff.
 
 ### 4.5. Regenerating and verifying
 
@@ -234,10 +241,18 @@ long as the style declares parents before children.
 uv run python scripts/generate_himotoshi_pygments_css.py
 uv run python scripts/generate_stilyagi_pygments_css.py
 uv run pytest tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py
+bunx biome check src/static/netsuke/assets/css src/static/stilyagi/assets/styles
 ```
 
 Each script is idempotent: rerunning it without changing the corresponding
 style leaves the stylesheet untouched, and it reports whether it wrote a change.
+The Biome check confirms the hand-written stylesheets beside each generated one
+are still formatted, and that the exclusion is holding: it should report the
+generated files as unchanged rather than reformatting them.
+
+Regenerating is also how to recover a generated stylesheet that has been
+reformatted or otherwise edited by mistake — the script rewrites the marked
+block outright, so a run restores it without needing the previous content.
 
 ### 4.6. Per-site mapping
 

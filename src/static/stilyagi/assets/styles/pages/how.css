@@ -460,9 +460,10 @@
   flex-direction: column-reverse;
 }
 /* The overlay is a scroller inside the artwork, so its ring is drawn inside
-   it: outside, it would ring a window drawn on a poster.  --focus-ring-color
-   is already paper here, because .term is an ink ground. */
+   it: outside, it would ring a window drawn on a poster.  Over the tinted
+   ink ground it takes the paper ring, at 16.65:1. */
 .frame-term:focus-visible {
+  --focus-ring-color: var(--paper);
   outline-offset: -3px;
 }
 .frame-term .transcript {

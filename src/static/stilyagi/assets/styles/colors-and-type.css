@@ -3,7 +3,15 @@
    Agitprop rigour · jazz-age swagger · university-press authority
    ================================================================= */
 
-/* Big Shoulders — local variable font (brand-supplied) */
+/* Every face is served from this origin.  Nothing here reaches a third party,
+   so loading a Stilyagi page discloses no address to anyone but us.
+
+   All five are the upstream variable fonts, converted to woff2 with fonttools
+   and shipped beside their SIL Open Font Licence text in ../fonts/.  Big
+   Shoulders and the EB Garamond roman are brand-supplied; the other three come
+   from google/fonts (ofl/ebgaramond, ofl/ibmplexsans, ofl/jetbrainsmono). */
+
+/* Big Shoulders — display */
 @font-face {
   font-family: "Big Shoulders Display";
   src: url("../fonts/BigShoulders-VariableFont_opsz_wght.woff2")
@@ -12,7 +20,7 @@
   font-style: normal;
   font-display: swap;
 }
-/* EB Garamond — local roman, Google Fonts for italic fallback */
+/* EB Garamond — editorial roman */
 @font-face {
   font-family: "EB Garamond";
   src: url("../fonts/EBGaramond-VariableFont_wght.woff2")
@@ -21,8 +29,35 @@
   font-style: normal;
   font-display: swap;
 }
-/* Italic + sans + mono via Google Fonts */
-@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+/* EB Garamond — editorial italic.  The pull-quotes, the dek, and every
+   inline <em> in the prose are set in it, so it is not optional. */
+@font-face {
+  font-family: "EB Garamond";
+  src: url("../fonts/EBGaramond-Italic-VariableFont_wght.woff2")
+    format("woff2-variations");
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+}
+/* IBM Plex Sans — labels, captions, and every uppercase rule.  The upstream
+   file also carries a width axis; the default 100 is the only width used. */
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("../fonts/IBMPlexSans-VariableFont_wdth-wght.woff2")
+    format("woff2-variations");
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* JetBrains Mono — code, terminals, and machine text */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../fonts/JetBrainsMono-VariableFont_wght.woff2")
+    format("woff2-variations");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* ---------- COLOR ------------------------------------------------ */

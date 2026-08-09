@@ -182,6 +182,47 @@ Repeated multi-class patterns should become a component class in the sub-site's
 stylesheet rather than being copied between templates. Prefer a daisyUI
 component where one fits.
 
+### Reach for the cheapest layer that works
+
+When something repeats, or when a page needs behaviour, work down this list and
+stop at the first rung that carries the requirement. Each rung costs more to
+understand and more to maintain than the one above it.
+
+1. **A daisyUI component**, where the sub-site uses daisyUI and one fits. It is
+   already themed, already accessible, and already someone else's problem to
+   maintain.
+2. **A semantic CSS class** in the sub-site's stylesheet. Name the role, not the
+   appearance, and put the modifiers on the same base.
+3. **A shared Jinja macro** for a repeated HTML structure, in the sub-site's
+   `components.jinja` or a sibling. A macro is the right tool once the *shape*
+   repeats, not merely the class list.
+4. **Data-driven Jinja** — a list in the page's data and a loop in the template
+   — in preference to repeated inline HTML. This is the right answer whenever
+   more than one page feature has to be driven by the same facts: a navigation
+   list and its matching sections, a card grid and a filter, a table of
+   contents and the headings it points at. Two hand-maintained copies of the
+   same list will drift; a loop over one list cannot.
+5. **A React component**, only as a last resort, to encapsulate complex
+   behaviour that genuinely has to happen in the browser. Nothing on the site
+   uses React today, and adding it to a page is a decision to justify in the
+   pull request, not a default.
+
+A class and a macro are not alternatives. The kicker pill wanted both: the
+class so the utilities live in one place, the macro so a call site says what
+the pill *is* rather than how it is drawn. A macro that only relocates a class
+string has moved the duplication, not removed it.
+
+The ordering follows the site's grain. Work done at build time is done once and
+served as static output; work handed to the browser's CSS engine is declarative
+and cheap; work handed to JavaScript runs on every visit, on every device, and
+fails differently on each. So compute as much as possible in Python and Jinja,
+express as much of the rest as possible in CSS — `:hover`, `:has()`, `:target`,
+`details`/`summary`, `popover` cover more than they used to — and write script
+only for what neither can express. Where script is unavoidable, keep the page
+usable without it: see the config-keys component in the
+[Developer's Guide](docs/developers-guide.md) for the enhancement pattern this
+implies.
+
 ### Tailwind v4 notes
 
 - The oxide scanner does not discover `.jinja` files on its own. Each

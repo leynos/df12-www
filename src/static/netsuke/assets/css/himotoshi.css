@@ -444,9 +444,6 @@ button.hm-config-keys__label {
 }
 
 @media (max-width: 767.98px) {
-  /* Tab strip: one row of labels above the selected extract. Labels stay
-     side by side and shrink rather than wrapping, so which one is
-     selected reads at a glance. */
   /* No script: the key groups stack, so each caption reads with its own
      paragraph beneath it. */
   .hm-config-keys__labels {
@@ -457,11 +454,13 @@ button.hm-config-keys__label {
     margin-top: 1rem;
   }
 
-  /* The tab strip is gated on the script having run, because it is the
-     script that moves each paragraph out of its key group and above the
-     extract. Ungated, three untouched groups would be squeezed abreast
-     and the strip would wreck the very fallback it means to leave
-     alone. The gating class outranks the stacked rules above. */
+  /* The tab strip: one row of labels above the selected extract, staying
+     side by side and shrinking rather than wrapping, so which one is
+     selected reads at a glance. It is gated on the script having run,
+     because it is the script that moves each paragraph out of its key
+     group and above the extract. Ungated, three untouched groups would be
+     squeezed abreast and the strip would wreck the very fallback it means
+     to leave alone. The gating class outranks the stacked rules above. */
   .hm-config-keys.is-enhanced .hm-config-keys__labels {
     border-bottom: 1px solid var(--netsuke-stone);
     display: flex;

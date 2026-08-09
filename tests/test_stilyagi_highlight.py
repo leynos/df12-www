@@ -161,6 +161,25 @@ class TestStilyagiHighlighting:
             f"{STYLESHEET} is stale; rerun scripts/generate_stilyagi_pygments_css.py"
         )
 
+    def test_generator_writes_to_the_tracked_stylesheet(self) -> None:
+        """The target is the tracked source, not the git-ignored build output.
+
+        ``public/`` is rebuilt from ``src/static/``, so regenerating into
+        ``public/`` would lose the new rules on the next clean build. The
+        Netsuke generator did exactly that for months; this asserts the
+        sister generator cannot drift the same way. The comparison reaches
+        back to ``src`` because the published tree mirrors the source
+        layout, and only that segment tells the two apart.
+        """
+        assert STYLESHEET.parts[-6:] == (
+            "src",
+            "static",
+            "stilyagi",
+            "assets",
+            "styles",
+            "syntax.css",
+        ), f"unexpected stylesheet target: {STYLESHEET}"
+
     def test_highlight_tag_honours_a_named_wrapper_class(
         self,
         tmp_path: Path,

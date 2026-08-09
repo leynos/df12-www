@@ -126,10 +126,18 @@ clean rebuild is the check that everything really is sourced from `src/`.
 The site uses **Tailwind CSS v4** with **daisyUI v5**. Two entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode) and `src/styles/mxd.css` for the mxd sub-site (the
-`mxd` theme). The Netsuke, Weaver, and Stilyagi sub-sites are styled by their
-own hand-crafted stylesheets, which use neither Tailwind nor daisyUI. Their
-colour tokens live in those stylesheets, and the accessibility rules below
-apply to them just the same.
+`mxd` theme).
+
+The other three sub-sites each carry a hand-crafted stylesheet, and none of
+them uses daisyUI, but they do not all stand outside Tailwind. Netsuke and
+Weaver load the **Tailwind Play CDN** at runtime and use its utilities freely
+in their markup; Netsuke also extends the default theme through
+`/netsuke/assets/js/tailwind-config.js`. Only Stilyagi uses neither. The Play
+CDN is not the compiled build: it injects its utilities into a `<style>` tag
+after the stylesheet link, which is why hand-written rules on those two
+sub-sites sometimes need the doubled selector described below. Their colour
+tokens live in their own stylesheets, and the accessibility rules below apply
+to all of them just the same.
 
 Code blocks on the Netsuke and Stilyagi sub-sites are highlighted at build time
 by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which runs Pygments

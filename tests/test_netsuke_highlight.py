@@ -256,8 +256,13 @@ class TestHimotoshiPygmentsCss:
 
         ``public/`` is rebuilt from ``src/static/``, so regenerating into
         ``public/`` would lose the new rules on the next clean build.
+
+        The comparison has to reach back as far as ``src``: the published
+        tree mirrors the source layout, so every component below it matches
+        either way and only that segment tells the two apart.
         """
-        assert STYLESHEET.parts[-5:] == (
+        assert STYLESHEET.parts[-6:] == (
+            "src",
             "static",
             "netsuke",
             "assets",

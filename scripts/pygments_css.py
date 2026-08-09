@@ -32,6 +32,22 @@ def variable_name(token: object, prefix: str) -> str:
     """Derive a CSS variable name from a Pygments token type.
 
     The bare ``Token`` type has no dotted tail, so it becomes ``text``.
+
+    Parameters
+    ----------
+    token:
+        A Pygments token type. Its dotted path supplies the name:
+        ``Literal.String.Escape`` becomes ``literal-string-escape``, and
+        underscores are rewritten as hyphens.
+    prefix:
+        The custom-property prefix the site uses, including its leading
+        double hyphen and trailing hyphen, such as ``--netsuke-syntax-``.
+
+    Returns
+    -------
+    str
+        The full custom-property name, for example
+        ``--netsuke-syntax-literal-string-escape``.
     """
     joined = "-".join(str(token).split(".")[1:]).lower() or "text"
     return f"{prefix}{joined.replace('_', '-')}"

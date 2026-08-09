@@ -181,6 +181,20 @@ a.sidebar-link--sub.active {
   transform: translateY(-4px);
 }
 
+/* On narrow viewports the vertically centred hero content rides up under the
+   fixed navbar. Floor the hero's top padding so the kicker never sits closer
+   than 92.2px to the top of the viewport. Above 500px the natural centred
+   position already clears that, so the rule stops there. The selector is
+   doubled to outrank the hero's `py-16` utility, which the Tailwind Play CDN
+   injects into a later <style> block at equal specificity. */
+@media (max-width: 499.98px) {
+  .hm-hero.hm-hero {
+    /* 92.25px, not 92.2px: Blink snaps layout to 1/64px, and 92.2px lands on
+       92.1875px — a hair under the floor. */
+    padding-top: 92.25px;
+  }
+}
+
 .hm-hero-panel {
   background: linear-gradient(
     155deg,
@@ -232,10 +246,37 @@ a.sidebar-link--sub.active {
   }
 }
 
+/* The hero pill: mono, widely tracked, on the photographic ground. It
+   carries the type treatment rather than the base, because the section
+   pill below sets the page in the body face instead. */
 .hm-kicker--hero {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.9);
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.12em;
+  padding: 0.375rem 0.875rem;
+}
+
+/* The eyebrow above a page or section heading. */
+.hm-kicker--section {
+  background: var(--netsuke-boxwood);
+  color: var(--netsuke-charcoal-mid);
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.75rem;
+}
+
+/* Pairs with --section on the docs hub, where the eyebrow labels the
+   page's own subject rather than its category. */
+.hm-kicker--accent {
+  background: var(--netsuke-boxwood-light);
+  color: var(--netsuke-indigo);
+}
+
+.hm-kicker__dot {
+  border-radius: 999px;
+  height: 0.5rem;
+  width: 0.5rem;
 }
 
 .hm-proof-list {
@@ -274,6 +315,272 @@ a.sidebar-link--sub.active {
   transform: translateY(-3px);
 }
 
+/* ── Config-keys browser ─────────────────────────────────────────── */
+
+/* Pairs each key group's label with its extract. Wide, the two sit in
+   adjacent grid columns, row-aligned through subgrid, and hovering or
+   focusing either half marks the pair. Narrow, the labels become a tab
+   strip above a single extract. config-keys.js supplies the interaction
+   and swaps the ARIA between the two readings; the layout below is what
+   the page looks like with no script at all. */
+
+.hm-config-keys {
+  background: var(--netsuke-boxwood-pale);
+  border: 1px solid var(--netsuke-stone);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.hm-config-keys__title {
+  color: var(--netsuke-charcoal);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.hm-config-keys__layout {
+  /* A subgrid overrides the parent's gutters with its own, so both
+     columns must name the same row gap or their rows drift apart. */
+  --hm-config-keys-row-gap: 0.75rem;
+
+  display: grid;
+  gap: var(--hm-config-keys-row-gap);
+}
+
+.hm-config-keys__labels {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.hm-config-keys__key {
+  min-width: 0;
+}
+
+.hm-config-keys__note {
+  color: var(--netsuke-charcoal-mid);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.hm-config-keys__note code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+}
+
+.hm-config-keys__label {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--netsuke-charcoal-mid);
+  cursor: default;
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+/* Only the scripted labels are operable; the static ones are captions. */
+button.hm-config-keys__label {
+  cursor: pointer;
+}
+
+.hm-config-keys__label:focus-visible {
+  border-radius: 0.375rem;
+  outline: 2px solid var(--netsuke-indigo);
+  outline-offset: 2px;
+}
+
+.hm-config-keys__panels {
+  display: grid;
+  gap: var(--hm-config-keys-row-gap);
+  /* Long TOML lines must not widen the page on narrow viewports. */
+  min-width: 0;
+}
+
+.hm-config-keys__panel {
+  background: var(--netsuke-charcoal);
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  min-width: 0;
+  /* The panel, not the pre inside it, is the horizontal scroller: it is
+     the element carrying tabindex and a name, and a scrollable region
+     must be keyboard reachable. `contain: inline-size` on .hm-syntax
+     would otherwise pin its width and push the overflow down onto the
+     unfocusable pre. */
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.hm-config-keys__panel:focus-visible {
+  outline: 2px solid var(--netsuke-indigo-light);
+  outline-offset: 2px;
+}
+
+.hm-config-keys__panel .hm-syntax {
+  background: transparent;
+  border-radius: 0;
+  contain: none;
+  /* Paint nothing of its own and stretch to the widest line, so the
+     panel's ground covers the full scroll extent. */
+  min-width: 100%;
+  overflow-x: visible;
+  width: max-content;
+}
+
+.hm-config-keys__panel .hm-syntax pre {
+  overflow-x: visible;
+  padding: 0;
+}
+
+@media (max-width: 767.98px) {
+  /* No script: the key groups stack, so each caption reads with its own
+     paragraph beneath it. */
+  .hm-config-keys__labels {
+    display: block;
+  }
+
+  .hm-config-keys__key + .hm-config-keys__key {
+    margin-top: 1rem;
+  }
+
+  /* The tab strip: one row of labels above the selected extract, staying
+     side by side and shrinking rather than wrapping, so which one is
+     selected reads at a glance. It is gated on the script having run,
+     because it is the script that moves each paragraph out of its key
+     group and above the extract. Ungated, three untouched groups would be
+     squeezed abreast and the strip would wreck the very fallback it means
+     to leave alone. The gating class outranks the stacked rules above. */
+  .hm-config-keys.is-enhanced .hm-config-keys__labels {
+    border-bottom: 1px solid var(--netsuke-stone);
+    display: flex;
+    gap: 0;
+  }
+
+  .hm-config-keys.is-enhanced .hm-config-keys__key {
+    display: flex;
+    flex: 1;
+    margin-top: 0;
+    min-width: 0;
+  }
+
+  .hm-config-keys.is-enhanced .hm-config-keys__label {
+    flex: 1;
+    text-align: center;
+  }
+
+  .hm-config-keys__label.is-active {
+    border-bottom-color: var(--netsuke-vermillion);
+    color: var(--netsuke-vermillion);
+    font-weight: 600;
+  }
+
+  /* The selected group's paragraph moves here, above its extract. */
+  .hm-config-keys__panels > .hm-config-keys__note {
+    margin-bottom: 0.25rem;
+  }
+
+}
+
+@media (min-width: 768px) {
+  /* Two columns, one row per key group. Both columns are subgrids of the
+     same rows, so a label always sits level with the top of its own
+     extract however tall the neighbouring ones grow. */
+  .hm-config-keys__layout {
+    /* The extracts abut into one slab, so the rows carry no gap and the
+       captions space themselves instead. */
+    --hm-config-keys-row-gap: 0;
+
+    column-gap: 1.5rem;
+    /* Column one carries a paragraph, not just a name, so it needs a
+       readable measure rather than the width of the longest label. */
+    grid-template-columns: minmax(11rem, 2fr) 5fr;
+    /* The count must match the number of .hm-config-keys__key groups in
+       templates/netsuke/pages/docs-configuration.jinja: both columns are
+       subgrids of these rows. */
+    grid-template-rows: repeat(3, auto);
+  }
+
+  .hm-config-keys__labels,
+  .hm-config-keys__panels {
+    display: grid;
+    grid-row: 1 / -1;
+    grid-template-rows: subgrid;
+    row-gap: var(--hm-config-keys-row-gap);
+  }
+
+  .hm-config-keys__labels {
+    grid-column: 1;
+  }
+
+  .hm-config-keys__panels {
+    grid-column: 2;
+  }
+
+  /* The label and its paragraph share one marked block, so the whole
+     caption lights with the extract rather than just its first line. */
+  .hm-config-keys__key {
+    align-self: start;
+    border-left: 2px solid transparent;
+    border-radius: 0 0.375rem 0.375rem 0;
+    /* Stands in for the row gap the extracts gave up. */
+    padding-bottom: 1.5rem;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .hm-config-keys__label {
+    border-bottom: 0;
+  }
+
+  .hm-config-keys__note {
+    padding-inline: 0.75rem;
+  }
+
+  .hm-config-keys__key.is-preview {
+    background: var(--netsuke-white);
+    border-left-color: var(--netsuke-indigo);
+  }
+
+  .hm-config-keys__key.is-preview .hm-config-keys__label {
+    color: var(--netsuke-indigo);
+    font-weight: 600;
+  }
+
+  /* The three extracts read as one slab of configuration, so only the
+     outer corners are rounded and the joins between them are square. */
+  .hm-config-keys__panel {
+    border-radius: 0;
+  }
+
+  .hm-config-keys__panels > .hm-config-keys__panel:first-child {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  .hm-config-keys__panels > .hm-config-keys__panel:last-child {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+
+  /* A ring rather than a lift: a raised shadow on a middle band would
+     fall across its neighbours now that they touch. */
+  .hm-config-keys__panel.is-preview {
+    border-color: var(--netsuke-indigo-light);
+  }
+}
+
 .hm-filter-shell {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(209, 199, 184, 0.85);
@@ -292,18 +599,26 @@ a.sidebar-link--sub.active {
   box-shadow: var(--netsuke-paper-shadow);
 }
 
+/* The pill-shaped eyebrow above a heading. The base holds only what every
+   pill shares; the type treatment and inset belong to the modifiers,
+   which differ enough that neither is a sensible default. */
 .hm-kicker {
   align-items: center;
   border: 1px solid var(--netsuke-stone);
   border-radius: 999px;
   display: inline-flex;
-  font-family: "JetBrains Mono", monospace;
   font-size: 0.75rem;
   font-weight: 600;
   gap: 0.5rem;
-  letter-spacing: 0.12em;
-  padding: 0.375rem 0.875rem;
   text-transform: uppercase;
+}
+
+/* Below 460px the hero kicker wraps onto a second line; drop the lede and
+   keep just the version. */
+@media (max-width: 459.98px) {
+  .hm-kicker__lede {
+    display: none;
+  }
 }
 
 .hm-example-code-block {
@@ -908,6 +1223,13 @@ a.sidebar-link--sub.active {
     margin-inline: -1rem;
   }
 
+  /* Faux windows nested inside a p-6 card bleed out through the card's own
+     1.5rem padding instead of the section's 1rem, so their edges meet the
+     inside of the card border. */
+  section .hm-faux-window--card-bleed.hm-faux-window--card-bleed {
+    margin-inline: -1.5rem;
+  }
+
   section .hm-faux-window__titlebar {
     border-radius: 0;
   }
@@ -1136,29 +1458,99 @@ a.sidebar-link--sub.active {
   padding: 0;
 }
 
-/* Small mobile: shrink terminal text so long lines fit without
-   horizontal scrolling as often. Placed after the base rule above so
-   equal specificity resolves in this rule's favour. */
+/* Small mobile: shrink the text and reclaim the gutter, so long
+   lines fit without horizontal scrolling as often. Where a block
+   sits in its own padded chrome the inset is applied twice, and the
+   second helping costs characters the line can ill afford once the
+   type has shrunk; only the pre's own padding goes, because the
+   chrome's gutter is what holds the code off the dark ground's
+   edge. The trailing inset stays so a scrolled line does not end
+   flush. Placed after the base rule above so equal specificity
+   resolves in this rule's favour. */
 @media (max-width: 459.98px) {
   .hm-syntax pre {
     font-size: 0.7rem;
+    padding-block: 0;
+    padding-left: 0;
   }
 }
 
 .hm-syntax { color: var(--netsuke-syntax-text); }
-.hm-syntax .c { color: var(--netsuke-syntax-comment); font-style: italic; }
-.hm-syntax .cp { color: var(--netsuke-syntax-comment-preproc); }
-.hm-syntax .k { color: var(--netsuke-syntax-keyword); }
-.hm-syntax .o { color: var(--netsuke-syntax-operator); }
-.hm-syntax .p { color: var(--netsuke-syntax-punctuation); }
+.hm-syntax .esc,
+.hm-syntax .g,
+.hm-syntax .gd,
+.hm-syntax .ge,
+.hm-syntax .ges,
+.hm-syntax .gh,
+.hm-syntax .gi,
+.hm-syntax .gs,
+.hm-syntax .gt,
+.hm-syntax .gu,
+.hm-syntax .l,
+.hm-syntax .ld,
+.hm-syntax .n,
+.hm-syntax .na,
+.hm-syntax .nc,
+.hm-syntax .nd,
+.hm-syntax .ne,
+.hm-syntax .ni,
+.hm-syntax .nl,
+.hm-syntax .nn,
+.hm-syntax .no,
+.hm-syntax .nx,
+.hm-syntax .py,
+.hm-syntax .w,
+.hm-syntax .x { color: var(--netsuke-syntax-text); }
+.hm-syntax .c,
+.hm-syntax .c1,
+.hm-syntax .ch,
+.hm-syntax .cm,
+.hm-syntax .cpf,
+.hm-syntax .cs { color: var(--netsuke-syntax-comment); font-style: italic; }
+.hm-syntax .cp { color: var(--netsuke-syntax-comment-preproc); font-style: italic; }
+.hm-syntax .k,
+.hm-syntax .kc,
+.hm-syntax .kd,
+.hm-syntax .kn,
+.hm-syntax .kp,
+.hm-syntax .kr,
+.hm-syntax .kt { color: var(--netsuke-syntax-keyword); }
+.hm-syntax .o,
+.hm-syntax .ow { color: var(--netsuke-syntax-operator); }
+.hm-syntax .p,
+.hm-syntax .pm { color: var(--netsuke-syntax-punctuation); }
 .hm-syntax .p.p-Indicator { color: var(--netsuke-syntax-punctuation-indicator); }
 .hm-syntax .nt { color: var(--netsuke-syntax-name-tag); }
-.hm-syntax .nv { color: var(--netsuke-syntax-name-variable); }
+.hm-syntax .nv,
+.hm-syntax .vc,
+.hm-syntax .vg,
+.hm-syntax .vi,
+.hm-syntax .vm { color: var(--netsuke-syntax-name-variable); }
+.hm-syntax .fm,
 .hm-syntax .nf { color: var(--netsuke-syntax-name-function); }
+.hm-syntax .bp,
 .hm-syntax .nb { color: var(--netsuke-syntax-name-builtin); }
-.hm-syntax .s { color: var(--netsuke-syntax-literal-string); }
+.hm-syntax .dl,
+.hm-syntax .s,
+.hm-syntax .s1,
+.hm-syntax .s2,
+.hm-syntax .sa,
+.hm-syntax .sb,
+.hm-syntax .sc,
+.hm-syntax .sd,
+.hm-syntax .sh,
+.hm-syntax .si,
+.hm-syntax .sr,
+.hm-syntax .ss,
+.hm-syntax .sx { color: var(--netsuke-syntax-literal-string); }
 .hm-syntax .se { color: var(--netsuke-syntax-literal-string-escape); }
-.hm-syntax .m { color: var(--netsuke-syntax-literal-number); }
+.hm-syntax .il,
+.hm-syntax .m,
+.hm-syntax .mb,
+.hm-syntax .mf,
+.hm-syntax .mh,
+.hm-syntax .mi,
+.hm-syntax .mo { color: var(--netsuke-syntax-literal-number); }
 .hm-syntax .gp { color: var(--netsuke-syntax-generic-prompt); font-weight: 600; }
 .hm-syntax .go { color: var(--netsuke-syntax-generic-output); }
 .hm-syntax .gr { color: var(--netsuke-syntax-generic-error); }

@@ -17,6 +17,9 @@ The deployment entrypoint is `deploy.tofu`. Reusable modules live under
 directory. Additional documentation is provided in `docs/`, including:
 
 - [Repository Layout](docs/repository-layout.md) – where everything lives.
+- [Developer's Guide](docs/developers-guide.md) – build and serve workflow,
+  the Pygments CSS generators, browser-side component conventions, and
+  accessibility checks.
 - [df12 Pages App Design](docs/df12-pages-app-design.md) – the generator's
   architecture and extension points.
 - [daisyUI v5 Guide](docs/daisyui-v5-guide.md) – theme structure and component
@@ -123,16 +126,24 @@ clean rebuild is the check that everything really is sourced from `src/`.
 The site uses **Tailwind CSS v4** with **daisyUI v5**. Two entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode) and `src/styles/mxd.css` for the mxd sub-site (the
-`mxd` theme). The Netsuke, Weaver, and Stilyagi sub-sites are styled by their
-own hand-crafted stylesheets, which use neither Tailwind nor daisyUI. Their
-colour tokens live in those stylesheets, and the accessibility rules below
-apply to them just the same.
+`mxd` theme).
+
+The other three sub-sites each carry a hand-crafted stylesheet, and none of
+them uses daisyUI, but they do not all stand outside Tailwind. Netsuke and
+Weaver load the **Tailwind Play CDN** at runtime and use its utilities freely
+in their markup; Netsuke also extends the default theme through
+`/netsuke/assets/js/tailwind-config.js`. Only Stilyagi uses neither. The Play
+CDN is not the compiled build: it injects its utilities into a `<style>` tag
+after the stylesheet link, which is why handwritten rules on those two
+sub-sites sometimes need the doubled selector described below. Their colour
+tokens live in their own stylesheets, and the accessibility rules below apply
+to all of them just the same.
 
 Code blocks on the Netsuke and Stilyagi sub-sites are highlighted at build time
 by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which runs Pygments
 and emits token classes. The colours come from a Pygments `Style`
 (`HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is generated, not
-hand-written — rerun `scripts/generate_himotoshi_pygments_css.py` or
+handwritten — rerun `scripts/generate_himotoshi_pygments_css.py` or
 `scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
 edit the marked block by hand.
 
@@ -178,6 +189,72 @@ such as a contrast floor.
 Repeated multi-class patterns should become a component class in the sub-site's
 stylesheet rather than being copied between templates. Prefer a daisyUI
 component where one fits.
+
+### Reach for the cheapest layer that works
+
+When something repeats, or when a page needs behaviour, work down this list and
+stop at the first rung that carries the requirement. Each rung costs more to
+understand and more to maintain than the one above it.
+
+1. **A daisyUI component**, where the sub-site uses daisyUI and one fits. It is
+   already themed and already someone else's problem to maintain. It is not
+   automatically accessible: daisyUI styles the element it is given, so the
+   result is only as good as the native HTML underneath it and the labels,
+   roles, and states the content needs. Follow the
+   [daisyUI v5 guide](docs/daisyui-v5-guide.md) for what each component
+   expects, and check the result rather than assuming it.
+2. **A semantic CSS class** in the sub-site's stylesheet. Name the role, not the
+   appearance, and put the modifiers on the same base.
+3. **A shared Jinja macro** for a repeated HTML structure, in the sub-site's
+   `components.jinja` or a sibling. A macro is the right tool once the *shape*
+   repeats, not merely the class list. See section 5 of the
+   [Developer's Guide](docs/developers-guide.md) for the existing macros and
+   how they pair with their component classes.
+4. **Data-driven Jinja** — a list in the page's data and a loop in the template
+   — in preference to repeated inline HTML. This is the right answer whenever
+   more than one page feature has to be driven by the same facts: a navigation
+   list and its matching sections, a card grid and a filter, a table of
+   contents and the headings it points at. Two hand-maintained copies of the
+   same list will drift; a loop over one list cannot.
+5. **A plain script module** — an IIFE under the sub-site's `assets/js/`,
+   loaded with `defer`, addressing its markup through `data-*` attributes and
+   returning early when its root is absent. This is how every existing
+   behaviour on the site is written; see section 6 of the
+   [Developer's Guide](docs/developers-guide.md).
+6. **A custom element**, as a last resort, where behaviour is complex enough
+   that a script module's conventions stop carrying it — where a page needs
+   several independent instances, or a real lifecycle, or state that must not
+   leak between them. A custom element formalizes what rung 5 only implies: one
+   instance per root, `connectedCallback` as the entry point, and `:defined` as
+   a standard signal that the element has upgraded, in place of the ad-hoc
+   enhanced-marker class a script module has to add for itself.
+
+   Prefer the light DOM. The sub-sites' stylesheets style their markup
+   directly, and a shadow root would cut an element off from them for no gain
+   the site currently needs. Nothing uses custom elements today, so the first
+   one sets the pattern: justify it in the pull request.
+
+Do not reach for a front-end framework. The site is statically generated and
+ships no client-side framework; introducing one is an architectural decision,
+not a component-level one.
+
+A class and a macro are not alternatives. The kicker pill wanted both: the
+class so the utilities live in one place, the macro so a call site says what
+the pill *is* rather than how it is drawn. A macro that only relocates a class
+string has moved the duplication, not removed it.
+
+The ordering follows the site's grain. Work done at build time is done once and
+served as static output; work handed to the browser's CSS engine is declarative
+and cheap; work handed to JavaScript runs on every visit, on every device, and
+fails differently on each. So compute as much as possible in Python and Jinja,
+express as much of the rest as possible in CSS — `:hover`, `:has()`, `:target`,
+`details`/`summary`, `popover` cover more than they used to — and write script
+only for what neither can express. Where script is unavoidable, keep the page
+usable without it: see the config-keys component in the
+[Developer's Guide](docs/developers-guide.md) for the enhancement pattern this
+implies. That pattern is the reason rung 6 sits where it does — a custom
+element is server-rendered markup that upgrades itself, so it degrades the same
+way a script module does, which a framework-rendered component would not.
 
 ### Tailwind v4 notes
 

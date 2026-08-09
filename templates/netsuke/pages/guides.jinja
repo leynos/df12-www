@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Guides Hub - Netsuke Build System{% endblock %}
 {% block content %}
@@ -7,9 +8,7 @@
 
         <!-- Hero Section -->
         <header id="guides-hero" class="mb-16 text-center max-w-3xl mx-auto">
-            <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone mb-6">
-                Concepts & Contribution
-            </div>
+            {% endraw %}{{ ui.kicker('Concepts & Contribution', 'mb-6') }}{% raw %}
             <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Guides & Deep Dives</h1>
             <p class="text-xl text-charcoal-mid font-light leading-relaxed">
                 Understand the compiler model behind Netsuke, learn where the sharp edges are, and use the same language the manifests use.

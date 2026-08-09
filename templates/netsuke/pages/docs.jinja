@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Documentation Hub - Netsuke Build System{% endblock %}
@@ -80,9 +81,7 @@
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood-light text-indigo text-xs font-semibold uppercase tracking-wider border border-stone mb-4">
-                    Documentation
-                </div>
+                {% endraw %}{{ ui.kicker('Documentation', 'mb-4', accent=true) }}{% raw %}
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Documentation Hub</h1>
                 <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
                     Welcome to the Netsuke documentation. Start with the YAML manifest, learn how Jinja expands it, then follow the path through validation and Ninja execution.

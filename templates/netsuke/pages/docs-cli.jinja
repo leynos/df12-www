@@ -1,43 +1,8 @@
 {% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'docs' %}
 {% block page_title %}CLI Commands - Netsuke Build System{% endblock %}
-{% block extra_head %}
-    <style>
-        /* Terminal Style */
-        .terminal-window {
-            background-color: #2E2A25;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .terminal-header {
-            background-color: #3d3832;
-            padding: 0.5rem 1rem;
-            display: flex;
-            align-items: center;
-        }
-        .terminal-dot {
-            width: 0.75rem;
-            height: 0.75rem;
-            border-radius: 50%;
-            margin-right: 0.5rem;
-        }
-        .terminal-body {
-            padding: 1rem;
-            color: #E5DDD0;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-        .prompt { color: #4A7C59; }
-        .cmd { color: #E8D5B5; }
-        .flag { color: #D1C7B8; }
-        .output { color: #8A8279; }
-        .success { color: #4A7C59; }
-        .error { color: #C23B22; }
-    </style>
-{% endblock %}
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
@@ -121,9 +86,7 @@
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
                 <div class="flex items-center mb-4">
-                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone">
-                        Reference
-                    </div>
+                    {% endraw %}{{ ui.kicker('Reference') }}{% raw %}
                 </div>
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">CLI Commands</h1>
                 <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
@@ -239,15 +202,18 @@
                     </div>
 
                     <!-- Right: Terminal Preview -->
-                    <div class="space-y-6 sticky top-24">
-                        <div class="terminal-window">
-                            <div class="terminal-header">
-                                <div class="terminal-dot bg-vermillion"></div>
-                                <div class="terminal-dot bg-amber"></div>
-                                <div class="terminal-dot bg-matcha"></div>
-                                <div class="ml-4 text-xs text-stone-light opacity-50">user@dev:~/netsuke-project</div>
+                    <div class="space-y-6 sticky top-24 self-start">
+                        <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
+                            <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
+                                <div class="flex space-x-2">
+                                    <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                                    <div class="w-3 h-3 rounded-full bg-amber"></div>
+                                    <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                                </div>
+                                <span class="text-xs font-mono text-stone-light">user@dev:~/netsuke-project</span>
+                                <div class="w-12"></div>
                             </div>
-                            <div class="terminal-body">
+                            <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
 {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ netsuke --verbose build app
 Parsed Netsukefile and expanded 3 targets
@@ -315,8 +281,17 @@ digraph netsuke {
                     </div>
                 </div>
 
-                <div class="bg-charcoal rounded-xl overflow-hidden mb-6">
-                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Shell examples</div>
+                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-6">
+                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber"></div>
+                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                        </div>
+                        <span class="text-xs font-mono text-stone-light">Shell examples</span>
+                        <div class="w-12"></div>
+                    </div>
+                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
                     {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 # Capture build graph without status noise
 $ netsuke graph > build.dot
@@ -330,6 +305,7 @@ $ netsuke --progress never build
 # Inspect generated Ninja file inline
 $ netsuke generate | grep 'rule '
 {% endraw %}{% endhighlight %}{% raw %}
+                    </div>
                 </div>
 
                 <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
@@ -397,8 +373,17 @@ $ netsuke generate | grep 'rule '
                     In accessible mode each pipeline stage and each build task produces a labelled line on stderr.
                     No spinners, no cursor movement &mdash; just plain, ordered text a screen reader can follow.
                 </p>
-                <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
-                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">stderr with accessible mode enabled</div>
+                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-8">
+                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber"></div>
+                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                        </div>
+                        <span class="text-xs font-mono text-stone-light">stderr, accessible mode</span>
+                        <div class="w-12"></div>
+                    </div>
+                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
                     {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 Stage 1/6: Reading manifest file
 Stage 2/6: Parsing YAML document
@@ -410,6 +395,7 @@ Task 1/2: cc -c src/a.c
 Task 2/2: cc -c src/b.c
 Success: Build complete.
 {% endraw %}{% endhighlight %}{% raw %}
+                    </div>
                 </div>
 
                 <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
@@ -503,15 +489,25 @@ Success: Build complete.
                         Fluent messages handle pluralisation and variable interpolation natively.
                         A translator only needs to edit the <code>.ftl</code> file for their locale &mdash; no code changes required.
                     </p>
-                    <div class="bg-charcoal rounded-lg p-4 overflow-x-auto [contain:inline-size]">
-                        <pre class="font-mono text-xs text-stone-light"><code><span class="text-charcoal-light"># en-US.ftl</span>
-progress-target-count = Building { $count -&gt;
+                    <div class="hm-faux-window hm-faux-window--card-bleed bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
+                        <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber"></div>
+                                <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                            </div>
+                            <span class="text-xs font-mono text-stone-light">en-US.ftl</span>
+                            <div class="w-12"></div>
+                        </div>
+                        <div class="hm-faux-window__body p-6 font-mono text-xs overflow-x-auto [contain:inline-size]">
+                        <pre class="font-mono text-xs text-stone-light"><code>progress-target-count = Building { $count -&gt;
     [one] { $count } target...
    *[other] { $count } targets...
 }
 
 error-file-not-found = Error: File "{ $path }" was not found.
     .hint = Check that the path exists and is readable.</code></pre>
+                        </div>
                     </div>
                     <p class="text-xs text-charcoal-light mt-3">
                         See the <a href="/netsuke/guides/contributing/" class="text-indigo hover:underline">Contributing guide</a> for translation workflow details.

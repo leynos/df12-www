@@ -3,8 +3,8 @@
 Reads the token colours from
 :class:`df12_pages.highlighting.HimotoshiStyle`, exposes each as a
 ``--netsuke-syntax-*`` CSS variable, and rewrites the marked block in
-``public/netsuke/assets/css/himotoshi.css``. The stylesheet path is resolved
-relative to this script, so it may be run from any directory:
+``src/static/netsuke/assets/css/himotoshi.css``. The stylesheet path is
+resolved relative to this script, so it may be run from any directory:
 
     uv run python scripts/generate_himotoshi_pygments_css.py
 
@@ -21,10 +21,12 @@ from pathlib import Path
 from pygments.formatters.html import HtmlFormatter
 
 from df12_pages.highlighting import HimotoshiStyle
+from scripts.pygments_css import token_rules
 
 STYLESHEET = (
     Path(__file__).resolve().parent.parent
-    / "public"
+    / "src"
+    / "static"
     / "netsuke"
     / "assets"
     / "css"
@@ -35,49 +37,22 @@ BEGIN = (
     " (scripts/generate_himotoshi_pygments_css.py) */"
 )
 END = "/* END generated himotoshi-pygments */"
-
-
-def _variable_name(token: object) -> str:
-    """Derive a CSS variable name from a Pygments token type."""
-    joined = "-".join(str(token).split(".")[1:]).lower() or "text"
-    return f"--netsuke-syntax-{joined.replace('_', '-')}"
+CSS_CLASS = "hm-syntax"
+VARIABLE_PREFIX = "--netsuke-syntax-"
+#: Netsuke's mono face reads heavy, so bold stops at semibold.
+BOLD_WEIGHT = "600"
 
 
 def build_css() -> str:
     """Build the generated CSS block from the Himotoshi style."""
-    formatter = HtmlFormatter(style=HimotoshiStyle, cssclass="hm-syntax")
-    # Pygments has no public token-to-class API.
-    class_for = formatter._get_css_classes
-
-    variables: list[str] = []
-    rules: list[str] = []
-    for token, spec in HimotoshiStyle.styles.items():
-        css_class = class_for(token).strip()
-        var = _variable_name(token)
-        colour = ""
-        extras: list[str] = []
-        for word in spec.split():
-            if word.startswith("#"):
-                colour = word
-            elif word == "italic":
-                extras.append("font-style: italic;")
-            elif word == "bold":
-                extras.append("font-weight: 600;")
-        if not colour:
-            continue
-        variables.append(f"  {var}: {colour};")
-        if css_class:
-            extra = " ".join(extras)
-            # Compound tokens yield space-separated classes (e.g. "p p-Indicator")
-            # which must chain into one compound selector.
-            selector = "." + ".".join(css_class.split())
-            rules.append(
-                f".hm-syntax {selector} {{ color: var({var});"
-                f"{' ' + extra if extra else ''} }}"
-            )
-        else:
-            # The bare Token type styles the block's default text colour.
-            rules.append(f".hm-syntax {{ color: var({var}); }}")
+    formatter = HtmlFormatter(style=HimotoshiStyle, cssclass=CSS_CLASS)
+    variables, rules = token_rules(
+        formatter,
+        HimotoshiStyle,
+        CSS_CLASS,
+        VARIABLE_PREFIX,
+        BOLD_WEIGHT,
+    )
 
     lines = [
         BEGIN,
@@ -86,7 +61,7 @@ def build_css() -> str:
         *variables,
         "}",
         "",
-        ".hm-syntax {",
+        f".{CSS_CLASS} {{",
         "  background: var(--netsuke-charcoal);",
         "  border-radius: 0.5rem;",
         "  /* Stop long code lines propagating min-content width up the",
@@ -95,7 +70,7 @@ def build_css() -> str:
         "  overflow-x: auto;",
         "}",
         "",
-        ".hm-syntax pre {",
+        f".{CSS_CLASS} pre {{",
         "  margin: 0;",
         "  padding: 1.25rem 1.5rem;",
         '  font-family: "JetBrains Mono", monospace;',
@@ -104,17 +79,34 @@ def build_css() -> str:
         "}",
         "",
         "/* Inside faux-window chrome the container already pads and colours. */",
-        ".hm-faux-window__body .hm-syntax,",
-        ".hm-example-code-block .hm-syntax,",
-        ".hm-example-terminal__body .hm-syntax {",
+        f".hm-faux-window__body .{CSS_CLASS},",
+        f".hm-example-code-block .{CSS_CLASS},",
+        f".hm-example-terminal__body .{CSS_CLASS} {{",
         "  background: transparent;",
         "  border-radius: 0;",
         "}",
         "",
-        ".hm-faux-window__body .hm-syntax pre,",
-        ".hm-example-code-block .hm-syntax pre,",
-        ".hm-example-terminal__body .hm-syntax pre {",
+        f".hm-faux-window__body .{CSS_CLASS} pre,",
+        f".hm-example-code-block .{CSS_CLASS} pre,",
+        f".hm-example-terminal__body .{CSS_CLASS} pre {{",
         "  padding: 0;",
+        "}",
+        "",
+        "/* Small mobile: shrink the text and reclaim the gutter, so long",
+        "   lines fit without horizontal scrolling as often. Where a block",
+        "   sits in its own padded chrome the inset is applied twice, and the",
+        "   second helping costs characters the line can ill afford once the",
+        "   type has shrunk; only the pre's own padding goes, because the",
+        "   chrome's gutter is what holds the code off the dark ground's",
+        "   edge. The trailing inset stays so a scrolled line does not end",
+        "   flush. Placed after the base rule above so equal specificity",
+        "   resolves in this rule's favour. */",
+        "@media (max-width: 459.98px) {",
+        f"  .{CSS_CLASS} pre {{",
+        "    font-size: 0.7rem;",
+        "    padding-block: 0;",
+        "    padding-left: 0;",
+        "  }",
         "}",
         "",
         *rules,

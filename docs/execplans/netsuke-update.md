@@ -354,6 +354,33 @@ The generated `.hm-syntax` CSS block lives in
 `tests/test_subsite_homepage.py` (homepage builder highlight regression), run
 via `make test`. Before/after screenshots were not retained.
 
+## Addendum: what changed after this plan was executed
+
+This plan is a historical record and the body above is left as it was written.
+Two things have since moved on, and are noted here so a reader arriving at the
+plan is not sent to the wrong place.
+
+**The stylesheet moved.** Every reference above to
+`public/netsuke/assets/css/himotoshi.css` was correct at the time: that file
+was the tracked source when this plan was written and executed. It became build
+output later, when the published tree began to be sourced entirely from `src/`
+(#46), and it is now git-ignored. The tracked stylesheet is
+`src/static/netsuke/assets/css/himotoshi.css`. The generator kept writing to
+the old path for some months afterwards, so regenerated rules did not survive a
+clean build; it now writes to the tracked source, and
+`tests/test_netsuke_highlight.py` asserts the target so the two cannot drift
+apart again.
+
+**The generated rules were incomplete.** As executed, the generator emitted one
+rule per token that `HimotoshiStyle` declares. Pygments emits the most specific
+class it holds for a token, and a style declares broad categories and lets the
+subtypes inherit, so the stylesheet never named the classes that appear in the
+markup. Comments, strings, numbers, and keyword constants rendered at the
+block's default colour across twenty-one pages until this was found. Tokens are
+now grouped under the nearest declared ancestor by `scripts/pygments_css.py`,
+which this generator and the Stilyagi one share. See section 4 of the
+[developer's guide](../developers-guide.md) for how the two are arranged.
+
 ## Interfaces and dependencies
 
 No new external dependencies. Pygments (already a `df12_pages` dependency via

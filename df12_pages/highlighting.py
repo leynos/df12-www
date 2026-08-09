@@ -14,7 +14,7 @@ Both render through :class:`HimotoshiStyle`, whose colours are accessible
 tints (WCAG AA, at least 4.5:1 against the charcoal block background) of
 the Himotoshi design-language palette. The style's values are mirrored by
 the generated ``.hm-syntax`` rules in
-``public/netsuke/assets/css/himotoshi.css``; regenerate those with
+``src/static/netsuke/assets/css/himotoshi.css``; regenerate those with
 ``scripts/generate_himotoshi_pygments_css.py`` after changing this module.
 
 The lexers and style are registered with Pygments through the

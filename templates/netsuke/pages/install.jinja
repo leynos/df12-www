@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
 {% set active_nav = 'install' %}
 {% block page_title %}Install Netsuke - Build System{% endblock %}
 {% block extra_head %}
@@ -31,9 +32,7 @@
 
         <!-- Hero Section -->
         <header id="install-hero" class="mb-16 text-center max-w-3xl mx-auto">
-            <div class="inline-flex items-center px-3 py-1 rounded-full bg-boxwood text-charcoal-mid text-xs font-semibold uppercase tracking-wider border border-stone mb-6">
-                <span  class="iconify mr-2 text-indigo" data-icon="carbon:download" aria-hidden="true"></span> Get Started &middot; v{% endraw %}{{ netsuke_version }}{% raw %}
-            </div>
+            {% endraw %}{{ ui.kicker('Get Started &middot; v' ~ netsuke_version, 'mb-6', icon='carbon:download', icon_class='text-indigo') }}{% raw %}
             <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Install Netsuke</h1>
             <p class="text-xl text-charcoal-mid font-light leading-relaxed mb-8">
                 Install the CLI, make sure <code>ninja</code> is available, and start with a small <code>Netsukefile</code>. Netsuke works best when the first build is boring.

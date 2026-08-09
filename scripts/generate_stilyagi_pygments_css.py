@@ -22,6 +22,7 @@ from pathlib import Path
 from pygments.formatters.html import HtmlFormatter
 
 from df12_pages.stilyagi_highlighting import StilyagiStyle
+from scripts.pygments_css import token_rules
 
 STYLESHEET = (
     Path(__file__).resolve().parent.parent
@@ -37,119 +38,22 @@ BEGIN = (
     " (scripts/generate_stilyagi_pygments_css.py) */"
 )
 END = "/* END generated stilyagi-pygments */"
-
-
-def _variable_name(token: object) -> str:
-    """Derive a CSS variable name from a Pygments token type."""
-    joined = "-".join(str(token).split(".")[1:]).lower() or "text"
-    return f"--stilyagi-syntax-{joined.replace('_', '-')}"
-
-
-def _nearest_declared(token: object, declared: dict[object, str]) -> object | None:
-    """Return the closest ancestor of *token* the style declares, if any.
-
-    Pygments token types are not publicly typed, so the parent chain is
-    walked with ``getattr``; the root ``Token`` has no parent, which ends
-    the walk.
-    """
-    node: object | None = token
-    while node is not None:
-        if node in declared:
-            return node
-        node = getattr(node, "parent", None)
-    return None
-
-
-def _declared_colours() -> tuple[dict[object, str], list[str], dict[object, str]]:
-    """Parse the style's specs into variables, keyed by declared token.
-
-    Returns
-    -------
-    tuple
-        The variable name per declared token, the ``:root`` declarations in
-        declaration order, and the non-colour extras (italic, bold) per token.
-        Tokens whose spec carries no colour are skipped: they contribute no
-        variable and inherit from their nearest declared ancestor.
-    """
-    declared: dict[object, str] = {}
-    variables: list[str] = []
-    extras_for: dict[object, str] = {}
-    for token, spec in StilyagiStyle.styles.items():
-        colour = ""
-        extras: list[str] = []
-        for word in spec.split():
-            if word.startswith("#"):
-                colour = word
-            elif word == "italic":
-                extras.append("font-style: italic;")
-            elif word == "bold":
-                extras.append("font-weight: 700;")
-        if not colour:
-            continue
-        var = _variable_name(token)
-        declared[token] = var
-        extras_for[token] = " ".join(extras)
-        variables.append(f"  {var}: {colour};")
-    return declared, variables, extras_for
-
-
-def _selectors_by_owner(
-    formatter: HtmlFormatter,
-    declared: dict[object, str],
-) -> tuple[dict[object, list[str]], str]:
-    """Group every token in the style under the ancestor it inherits from.
-
-    Returns
-    -------
-    tuple
-        The selectors owned by each declared token, and the rule for the
-        block's default text colour, which the bare ``Token`` type carries
-        and which has no class of its own.
-    """
-    # Pygments has no public token-to-class API.
-    class_for = formatter._get_css_classes
-    selectors: dict[object, list[str]] = {token: [] for token in declared}
-    root_rule = ""
-    for token, _ndef in formatter.style:
-        owner = _nearest_declared(token, declared)
-        if owner is None:
-            continue
-        css_class = class_for(token).strip()
-        if not css_class:
-            # The bare Token type styles the block's default text colour.
-            root_rule = f".stilyagi-syntax {{ color: var({declared[owner]}); }}"
-            continue
-        # Compound tokens yield space-separated classes (e.g. "s s-Doc")
-        # which must chain into one compound selector.
-        selectors[owner].append(".stilyagi-syntax ." + ".".join(css_class.split()))
-    return selectors, root_rule
+CSS_CLASS = "stilyagi-syntax"
+VARIABLE_PREFIX = "--stilyagi-syntax-"
+#: Stilyagi's mono face is lighter, so bold goes the whole way.
+BOLD_WEIGHT = "700"
 
 
 def build_css() -> str:
-    """Build the generated CSS block from the Stilyagi style.
-
-    Pygments emits the most specific token class it has — ``c1`` for a
-    single-line comment, ``kn`` for an import keyword — while a style
-    declares broad categories such as ``Comment`` and ``Keyword`` and lets
-    the subtypes inherit. Emitting a rule only for each declared token would
-    therefore leave most of the classes that actually appear in the markup
-    unstyled, so each declared colour is emitted for its whole subtree.
-    """
-    formatter = HtmlFormatter(style=StilyagiStyle, cssclass="stilyagi-syntax")
-    declared, variables, extras_for = _declared_colours()
-    # Declaration order is preserved throughout so the output stays stable.
-    selectors, root_rule = _selectors_by_owner(formatter, declared)
-
-    rules: list[str] = []
-    if root_rule:
-        rules.append(root_rule)
-    for token, var in declared.items():
-        group = selectors[token]
-        if not group:
-            continue
-        extra = extras_for[token]
-        body = f"color: var({var});" + (f" {extra}" if extra else "")
-        rules.append(",\n".join(sorted(group)) + f" {{ {body} }}")
+    """Build the generated CSS block from the Stilyagi style."""
+    formatter = HtmlFormatter(style=StilyagiStyle, cssclass=CSS_CLASS)
+    variables, rules = token_rules(
+        formatter,
+        StilyagiStyle,
+        CSS_CLASS,
+        VARIABLE_PREFIX,
+        BOLD_WEIGHT,
+    )
 
     lines = [
         BEGIN,
@@ -177,7 +81,7 @@ def build_css() -> str:
         "   the press-red rule down the left edge. The width pair keeps the",
         "   ground painted across the full scroll extent, not just the",
         "   visible width. */",
-        ".stilyagi-syntax {",
+        f".{CSS_CLASS} {{",
         "  flex: 1;",
         "  background: var(--ink);",
         "  border-left: var(--rule-weight-3) solid var(--press-red);",
@@ -186,7 +90,7 @@ def build_css() -> str:
         "  box-sizing: border-box;",
         "}",
         "",
-        ".stilyagi-syntax pre {",
+        f".{CSS_CLASS} pre {{",
         "  margin: 0;",
         "  padding: calc(var(--unit) * 2.5) calc(var(--unit) * 3);",
         "  font-family: var(--font-mono);",

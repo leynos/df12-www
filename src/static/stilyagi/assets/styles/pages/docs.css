@@ -23,7 +23,7 @@
   text-transform: uppercase;
   color: var(--ink-soft);
   padding: 6px 0;
-  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   text-decoration: none;
 }
 .side-toc a:hover {
@@ -82,7 +82,7 @@
   top: clamp(73px, 61px + 1.6vw, 89px);
   z-index: 5;
   padding: 20px 0 18px;
-  background: rgba(239, 228, 206, 0.96);
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: var(--rule-weight) solid var(--ink);
   align-items: center;
@@ -195,7 +195,7 @@
   font-size: 1rem;
   line-height: 1.45;
   padding: 12px 10px;
-  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   vertical-align: top;
 }
 .rules-table tr:hover td {
@@ -271,7 +271,9 @@
   font-weight: 600;
 }
 .fix.safe {
-  color: var(--signal-sage);
+  /* The sage fill manages 4.09:1 on paper and less on the row's hover
+     ground, so the label takes the type-safe hue. */
+  color: var(--signal-sage-text);
 }
 .fix.unsafe {
   color: var(--accent-text);
@@ -322,7 +324,8 @@
   color: var(--signal-sage);
 }
 .config-grid pre .c {
-  color: #9d9d9d;
+  /* --fg2-on-ink already names secondary type on this ground. */
+  color: var(--fg2-on-ink);
   font-style: italic;
 }
 .config-grid pre .n {
@@ -439,7 +442,7 @@
   position: absolute;
   inset: 0;
   background-image: radial-gradient(
-    rgba(239, 228, 206, 0.85) 1px,
+    color-mix(in srgb, var(--paper) 85%, transparent) 1px,
     transparent 1.4px
   );
   background-size: 9px 9px;
@@ -486,7 +489,7 @@
 }
 .credits .row {
   padding: 10px 0;
-  border-bottom: 1px dashed rgba(248, 243, 230, 0.25);
+  border-bottom: 1px dashed color-mix(in srgb, var(--paper) 25%, transparent);
   font-family: var(--font-sans);
   font-size: 0.8rem;
   letter-spacing: 0.1em;
@@ -570,7 +573,7 @@
     grid-template-columns: auto auto 1fr;
     gap: 4px 12px;
     padding: 12px 0;
-    border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+    border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   }
   /* A grid display would otherwise beat the UA rule that hides filtered-out
      rows, so restate it at matching specificity. */

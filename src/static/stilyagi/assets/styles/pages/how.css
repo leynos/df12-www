@@ -3,8 +3,7 @@
 .arch {
   max-width: 1240px;
   margin: 0 auto;
-  padding: calc(var(--unit) * 6) calc(var(--unit) * 4)
-    calc(var(--unit) * 4);
+  padding: calc(var(--unit) * 6) calc(var(--unit) * 4) calc(var(--unit) * 4);
 }
 .arch-diagram {
   border: var(--rule-weight-2) solid var(--ink);
@@ -125,7 +124,7 @@
 }
 .boundary .layer-card.rust ul li {
   color: var(--paper);
-  border-bottom-color: rgba(239, 228, 206, 0.25);
+  border-bottom-color: color-mix(in srgb, var(--paper) 25%, transparent);
 }
 .boundary .layer-card.rust ul li::before {
   color: var(--press-red-on-ink);
@@ -156,7 +155,7 @@
 }
 .boundary .layer-card li {
   padding: 8px 0 8px 1.6em;
-  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   position: relative;
   font-family: var(--font-editorial);
   font-size: 1rem;
@@ -247,7 +246,7 @@
   color: var(--paper);
 }
 .term .dim {
-  color: rgba(239, 228, 206, 0.55);
+  color: color-mix(in srgb, var(--paper) 55%, transparent);
 }
 .term .err {
   color: var(--press-red-on-ink);
@@ -428,7 +427,7 @@
   width: 59.3%;
   height: 57%;
   /* Tinted rather than solid ink so the halftone art ghosts through. */
-  background: rgba(15, 15, 15, 0.88);
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
   padding: 1.4em 1.6em;
   font-size: clamp(0.55rem, 1.2cqw, 0.92rem);
   overflow-y: auto;
@@ -467,9 +466,8 @@
        underneath it. */
     top: 74px;
     margin-inline: calc(var(--unit) * -2);
-    padding: calc(var(--unit) * 3) calc(var(--unit) * 2)
-      calc(var(--unit) * 1.5);
-    background: rgba(239, 228, 206, 0.92);
+    padding: calc(var(--unit) * 3) calc(var(--unit) * 2) calc(var(--unit) * 1.5);
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
     backdrop-filter: blur(8px);
     border-bottom: var(--rule-weight) solid var(--ink);
   }

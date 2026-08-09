@@ -334,6 +334,24 @@
   max-width: 48ch;
 }
 
+/* Four columns is too many below about 1180px — the camp headings start
+   breaking mid-word — but one is too few while there is still room for two.
+   This step catches the gap the 900px rule below used to leave. */
+@media (max-width: 1180px) {
+  .camps,
+  .valueset {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Stacked two-up, the third and fourth camps need the rule between rows
+     that the single-row layout got from the side borders alone. */
+  .camps .camp:nth-child(-n + 2) {
+    border-bottom: var(--rule-weight) solid var(--ink);
+  }
+  .camps .camp:nth-child(2n) {
+    border-right: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .camps,
   .valueset,

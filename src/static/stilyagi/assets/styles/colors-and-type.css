@@ -162,10 +162,13 @@
   --focus-ring-offset: 2px;
 
   /* ---------- TYPE ------------------------------------------------- */
-  --font-display: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
-  --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;
-  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  /* Every family name is quoted and every generic keyword is not, so the two
+     are told apart at a glance; unquoted names are valid CSS but read as
+     keywords, which is what Stylelint's value-keyword-case objects to. */
+  --font-display: "Big Shoulders Display", "Impact", "Arial Narrow", sans-serif;
+  --font-editorial: "EB Garamond", "Georgia", "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans", -apple-system, "BlinkMacSystemFont", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, "Menlo", monospace;
 
   /* Modular scale — double-stranded */
   --t-caption: 0.78rem;

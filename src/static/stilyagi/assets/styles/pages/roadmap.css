@@ -16,6 +16,21 @@
 .phase:hover:not(.open) {
   background: var(--paper-shade);
 }
+/* A phase head is a button that fills its row, and until now the keyboard
+   got only whatever ring the browser drew by default.  It takes the same
+   recessed ground the pointer gets, so the row that would open reads the
+   same either way, and the shared ring on top of it so focus is still
+   telling the reader something hover is not.
+
+   The ring is drawn inside the row: outside, it would cross the rule
+   between this phase and the next.  Ink on either ground the row can have
+   is 15.21:1 on paper and 13.44:1 on the recessed shade. */
+.phase:not(.open):has(.ph-head:focus-visible) {
+  background: var(--paper-shade);
+}
+.phase .ph-head:focus-visible {
+  outline-offset: -4px;
+}
 .phase .ph-head {
   display: grid;
   grid-template-columns: 120px 1fr 200px 60px;

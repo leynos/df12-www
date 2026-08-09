@@ -378,6 +378,14 @@ pre.code .tok-nm {
   color: var(--jazz-magenta);
 }
 
+/* .code-scroll itself is declared in the generated Pygments block, which
+   cannot be hand-edited; the wrapper is a scroller, so it is in the tab
+   order and needs a ring.  Drawn inside, over the block's own ink ground,
+   which is why the ink-ground list re-points the ring to paper for it. */
+.code-scroll:focus-visible {
+  outline-offset: -3px;
+}
+
 kbd {
   background: var(--paper-shade);
   border: 1px solid var(--ink);
@@ -569,16 +577,26 @@ table.scholar tbody tr:last-child td {
   background: var(--paper);
   color: var(--ink);
   border-radius: 0;
-  outline: 0;
   transition:
     border-color var(--tempo-fast) var(--ease),
     box-shadow var(--tempo-fast) var(--ease);
 }
+/* The pressed-print cue: the rule around the field turns red and throws a
+   hard shadow down and to the right. */
 .field > input:focus,
 .field > textarea:focus,
 .field > select:focus {
   border-color: var(--press-red);
   box-shadow: 3px 3px 0 var(--press-red);
+}
+/* The cue above is a colour change on an existing 2px rule, which is a weak
+   thing to navigate by; the shared ring says plainly which field has the
+   caret.  The shadow falls down and to the right, so the ring is pulled in
+   tight against the border rather than sitting out in it. */
+.field > input:focus-visible,
+.field > textarea:focus-visible,
+.field > select:focus-visible {
+  outline-offset: 1px;
 }
 
 /* Form mini-help */

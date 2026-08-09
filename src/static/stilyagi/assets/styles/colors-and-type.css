@@ -146,6 +146,21 @@
   --selection-bg: var(--press-red);
   --selection-fg: var(--paper);
 
+  /* ---------- FOCUS ------------------------------------------------ */
+  /* One ring for every control the keyboard can reach, so a walkthrough
+     reads the same from the masthead to the roadmap.
+
+     It is deliberately not the hover cue: hover moves the ground under a
+     control, focus draws a rule around it, and a control that is both shows
+     both.  Ink is the ring because the offset puts it outside the control,
+     on the page rather than on the fill — 15.21:1 on --paper, 13.44:1 on
+     --paper-shade, 11.69:1 on --paper-deep, all far past the 3:1 that WCAG
+     2.2 asks of a non-text indicator.  Dark panels re-point it to paper
+     below, for the few rings that are drawn inside a control instead. */
+  --focus-ring-width: 3px;
+  --focus-ring-color: var(--ink);
+  --focus-ring-offset: 2px;
+
   /* ---------- TYPE ------------------------------------------------- */
   --font-display: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
   --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;
@@ -192,6 +207,20 @@
 *::after {
   box-sizing: border-box;
 }
+
+/* The focus treatment, declared once for everything focusable rather than
+   control by control — a component that forgets to opt in cannot exist.
+   :focus-visible is the browser's own judgement about whether the reader is
+   navigating by keyboard, so a pointer user sees none of this.
+
+   Individual controls override the offset where an outward ring would be
+   clipped by a scroller or overlap a neighbouring row; they do not override
+   the width or the colour. */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -349,6 +378,11 @@ hr.scholar {
    Red, magenta, sage, and secondary greys tuned for paper all fall below
    the 4.5:1 body-text floor against --ink, so every dark panel switches
    them here rather than at each call site.
+
+   The focus ring goes with them, but only matters for the three scrollers
+   in the list.  Everywhere else the ring sits outside the control, on the
+   paper page, where the ink default is right however dark the fill is; a
+   scroller draws its ring inside itself instead, over its own ink ground.
    ================================================================= */
 .ink-panel,
 .agitprop,
@@ -357,6 +391,7 @@ pre.code,
 .term,
 .layer-rust,
 .boundary .layer-card.rust,
+.code-scroll,
 .config-grid pre,
 .colophon-sec,
 .ns-rsdoc,
@@ -370,4 +405,5 @@ pre.code,
   --signal-rust-text: var(--signal-rust-on-ink);
   --jazz-magenta: var(--jazz-magenta-on-ink);
   --jazz-magenta-text: var(--jazz-magenta-on-ink);
+  --focus-ring-color: var(--paper);
 }

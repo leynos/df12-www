@@ -175,6 +175,15 @@
 .tree-node:hover {
   background: color-mix(in srgb, var(--press-red) 8%, transparent);
 }
+/* The nodes are stacked with no gap between them, so the shared ring is
+   drawn inside the row rather than around it — outside, consecutive rows
+   would overlap each other's rings.  Ink holds on both grounds a node can
+   have: 15.21:1 on the tree's paper, 3.31:1 on the press-red of an active
+   node, past the 3:1 an indicator needs.  Hovering tints the row, focusing
+   rules it, so the two never read as the same state. */
+.tree-node:focus-visible {
+  outline-offset: -3px;
+}
 .tree-node.active {
   background: var(--press-red);
   color: var(--paper);
@@ -308,6 +317,15 @@
 }
 .rule-toggle:last-child {
   border-bottom: 0;
+}
+/* Same treatment as the tree node opposite, and for the same reason: the
+   switches are a stack of rows that meet at a dashed rule, so the ring goes
+   inside the row.  It runs edge to edge across the column, which is what
+   makes the whole row read as the control rather than the checkbox alone.
+   Nothing else marks a switch as focused — there is no hover cue here for
+   it to be mistaken for. */
+.rule-toggle:focus-visible {
+  outline-offset: -3px;
 }
 .rule-toggle .check {
   width: 18px;

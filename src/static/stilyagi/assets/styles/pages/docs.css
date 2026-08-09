@@ -157,10 +157,9 @@
   color: var(--ink);
   cursor: pointer;
 }
-.filter-select:focus-visible {
-  outline: 2px solid var(--press-red);
-  outline-offset: 1px;
-}
+/* The select, the chips beside it, and the search box below all take the
+   shared ring from colors-and-type.css; each carried its own red 2px rule
+   before, which was a fourth spelling of the same idea. */
 .search-box {
   margin-left: auto;
   min-width: 240px;
@@ -169,10 +168,6 @@
   background: var(--paper);
   font-family: var(--font-mono);
   font-size: 0.85rem;
-}
-.search-box:focus {
-  outline: 2px solid var(--press-red);
-  outline-offset: 1px;
 }
 
 .rules-table {
@@ -316,6 +311,13 @@
   line-height: 1.6;
   overflow: auto;
   border-left: 4px solid var(--press-red);
+}
+/* The block scrolls, so it is keyboard reachable and needs a visible ring.
+   It runs edge to edge in its column, so the ring is drawn inside it rather
+   than out on the page — which is also why the ink-ground block re-points
+   the ring to paper for it: 15.21:1 on the block's own ground. */
+.config-grid pre:focus-visible {
+  outline-offset: -3px;
 }
 .config-grid pre .k {
   color: var(--jazz-ochre);

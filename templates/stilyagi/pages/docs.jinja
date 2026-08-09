@@ -17,7 +17,7 @@
               glance. Configuration is a single TOML file. Suppressions live in the source. This page lays
               the whole operating surface out in one place.
             </p>
-            <div style="margin-top: 18px"><span class="stamp small">v0.4</span></div>
+            <div class="intro-stamp"><span class="stamp small">v0.4</span></div>
           </div>
         </div>
       </section>
@@ -121,10 +121,10 @@
             <table class="rules-table" role="table">
               <thead role="rowgroup">
                 <tr role="row">
-                  <th role="columnheader" style="width: 110px">Rule</th>
+                  <th role="columnheader" class="col-rule">Rule</th>
                   <th role="columnheader">Title &amp; description</th>
-                  <th role="columnheader" style="width: 100px">Severity</th>
-                  <th role="columnheader" style="width: 90px">Autofix</th>
+                  <th role="columnheader" class="col-sev">Severity</th>
+                  <th role="columnheader" class="col-fix">Autofix</th>
                 </tr>
               </thead>
               <tbody role="rowgroup">
@@ -137,7 +137,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD201</td>
                   <td role="cell">
-                    <b>Heading depth</b><br /><span style="color: var(--ink-soft)"
+                    <b>Heading depth</b><br /><span class="rule-desc"
                       >Headings must not skip levels (h2 → h4 is rejected).</span
                     >
                   </td>
@@ -150,7 +150,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD202</td>
                   <td role="cell">
-                    <b>ATX heading style</b><br /><span style="color: var(--ink-soft)"
+                    <b>ATX heading style</b><br /><span class="rule-desc"
                       >Prefer # over === / --- setext headings.</span
                     >
                   </td>
@@ -163,7 +163,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD203</td>
                   <td role="cell">
-                    <b>Trailing heading punctuation</b><br /><span style="color: var(--ink-soft)"
+                    <b>Trailing heading punctuation</b><br /><span class="rule-desc"
                       >No trailing punctuation on headings except question marks.</span
                     >
                   </td>
@@ -176,7 +176,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD210</td>
                   <td role="cell">
-                    <b>Unordered list marker</b><br /><span style="color: var(--ink-soft)"
+                    <b>Unordered list marker</b><br /><span class="rule-desc"
                       >Use - consistently across a document.</span
                     >
                   </td>
@@ -189,7 +189,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD211</td>
                   <td role="cell">
-                    <b>Ordered list prefix</b><br /><span style="color: var(--ink-soft)"
+                    <b>Ordered list prefix</b><br /><span class="rule-desc"
                       >Order list items sequentially from 1, not all as 1.</span
                     >
                   </td>
@@ -202,7 +202,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD220</td>
                   <td role="cell">
-                    <b>Hard line break</b><br /><span style="color: var(--ink-soft)"
+                    <b>Hard line break</b><br /><span class="rule-desc"
                       >No trailing double-space line breaks; use \ or a blank line.</span
                     >
                   </td>
@@ -215,7 +215,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD230</td>
                   <td role="cell">
-                    <b>Fenced code language</b><br /><span style="color: var(--ink-soft)"
+                    <b>Fenced code language</b><br /><span class="rule-desc"
                       >Fenced code blocks must declare a language.</span
                     >
                   </td>
@@ -225,7 +225,7 @@
                 <tr role="row" data-ns="md" data-search="md231 indented code prefer fenced code over indented code.">
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD231</td>
                   <td role="cell">
-                    <b>Indented code</b><br /><span style="color: var(--ink-soft)"
+                    <b>Indented code</b><br /><span class="rule-desc"
                       >Prefer fenced code over indented code.</span
                     >
                   </td>
@@ -238,7 +238,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD240</td>
                   <td role="cell">
-                    <b>Autolink bare URL</b><br /><span style="color: var(--ink-soft)"
+                    <b>Autolink bare URL</b><br /><span class="rule-desc"
                       >Wrap bare URLs in &lt;…&gt; or a link.</span
                     >
                   </td>
@@ -248,7 +248,7 @@
                 <tr role="row" data-ns="md" data-search="md241 link text empty links must have non-empty text.">
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD241</td>
                   <td role="cell">
-                    <b>Link text empty</b><br /><span style="color: var(--ink-soft)"
+                    <b>Link text empty</b><br /><span class="rule-desc"
                       >Links must have non-empty text.</span
                     >
                   </td>
@@ -258,7 +258,7 @@
                 <tr role="row" data-ns="md" data-search="md250 image alt text images must carry alt text.">
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD250</td>
                   <td role="cell">
-                    <b>Image alt text</b><br /><span style="color: var(--ink-soft)"
+                    <b>Image alt text</b><br /><span class="rule-desc"
                       >Images must carry alt text.</span
                     >
                   </td>
@@ -271,7 +271,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-md">MD</span><br />MD260</td>
                   <td role="cell">
-                    <b>Inline HTML</b><br /><span style="color: var(--ink-soft)"
+                    <b>Inline HTML</b><br /><span class="rule-desc"
                       >Inline HTML in Markdown flagged; can be allowlisted.</span
                     >
                   </td>
@@ -284,7 +284,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN101</td>
                   <td role="cell">
-                    <b>Double space after period</b><br /><span style="color: var(--ink-soft)"
+                    <b>Double space after period</b><br /><span class="rule-desc"
                       >Collapse double spaces after terminal punctuation.</span
                     >
                   </td>
@@ -297,7 +297,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN201</td>
                   <td role="cell">
-                    <b>Smart quotes</b><br /><span style="color: var(--ink-soft)"
+                    <b>Smart quotes</b><br /><span class="rule-desc"
                       >Curly quotes preferred over ASCII quotes in prose regions.</span
                     >
                   </td>
@@ -310,7 +310,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN202</td>
                   <td role="cell">
-                    <b>Em-dash spacing</b><br /><span style="color: var(--ink-soft)"
+                    <b>Em-dash spacing</b><br /><span class="rule-desc"
                       >Em-dashes must not be surrounded by spaces (house style).</span
                     >
                   </td>
@@ -323,7 +323,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN203</td>
                   <td role="cell">
-                    <b>Oxford comma</b><br /><span style="color: var(--ink-soft)"
+                    <b>Oxford comma</b><br /><span class="rule-desc"
                       >Final comma before the conjunction in a list of three or more.</span
                     >
                   </td>
@@ -336,7 +336,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pun">PUN</span><br />PUN204</td>
                   <td role="cell">
-                    <b>Ellipsis</b><br /><span style="color: var(--ink-soft)"
+                    <b>Ellipsis</b><br /><span class="rule-desc"
                       >Use the ellipsis character, not three periods.</span
                     >
                   </td>
@@ -349,7 +349,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC101</td>
                   <td role="cell">
-                    <b>Missing docstring</b><br /><span style="color: var(--ink-soft)"
+                    <b>Missing docstring</b><br /><span class="rule-desc"
                       >Public modules, classes, and functions require a docstring.</span
                     >
                   </td>
@@ -362,7 +362,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC102</td>
                   <td role="cell">
-                    <b>Summary line</b><br /><span style="color: var(--ink-soft)"
+                    <b>Summary line</b><br /><span class="rule-desc"
                       >First docstring line must be a complete imperative sentence.</span
                     >
                   </td>
@@ -375,7 +375,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC103</td>
                   <td role="cell">
-                    <b>Summary length</b><br /><span style="color: var(--ink-soft)"
+                    <b>Summary length</b><br /><span class="rule-desc"
                       >Summary line must be 80 characters or fewer.</span
                     >
                   </td>
@@ -388,7 +388,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC110</td>
                   <td role="cell">
-                    <b>Imperative mood</b><br /><span style="color: var(--ink-soft)"
+                    <b>Imperative mood</b><br /><span class="rule-desc"
                       >Summary should read "Compute…" not "Computes…".</span
                     >
                   </td>
@@ -401,7 +401,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC120</td>
                   <td role="cell">
-                    <b>Args alignment</b><br /><span style="color: var(--ink-soft)"
+                    <b>Args alignment</b><br /><span class="rule-desc"
                       >Every declared parameter must be documented; no phantoms.</span
                     >
                   </td>
@@ -414,7 +414,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC121</td>
                   <td role="cell">
-                    <b>Returns documented</b><br /><span style="color: var(--ink-soft)"
+                    <b>Returns documented</b><br /><span class="rule-desc"
                       >Functions with a return value require a Returns section.</span
                     >
                   </td>
@@ -427,7 +427,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-pydoc">PYDOC</span><br />PYDOC130</td>
                   <td role="cell">
-                    <b>Raises cited</b><br /><span style="color: var(--ink-soft)"
+                    <b>Raises cited</b><br /><span class="rule-desc"
                       >Documented exceptions must match actual raise statements.</span
                     >
                   </td>
@@ -440,7 +440,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC101</td>
                   <td role="cell">
-                    <b>Crate root docstring</b><br /><span style="color: var(--ink-soft)"
+                    <b>Crate root docstring</b><br /><span class="rule-desc"
                       >Every crate root must carry a //! documentation comment.</span
                     >
                   </td>
@@ -453,7 +453,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC110</td>
                   <td role="cell">
-                    <b>Public item doc</b><br /><span style="color: var(--ink-soft)"
+                    <b>Public item doc</b><br /><span class="rule-desc"
                       >Public items require /// documentation.</span
                     >
                   </td>
@@ -466,7 +466,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC120</td>
                   <td role="cell">
-                    <b>Code example</b><br /><span style="color: var(--ink-soft)"
+                    <b>Code example</b><br /><span class="rule-desc"
                       >Public API examples should compile under rustdoc.</span
                     >
                   </td>
@@ -479,7 +479,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-rsdoc">RSDOC</span><br />RSDOC130</td>
                   <td role="cell">
-                    <b>Intra-doc links</b><br /><span style="color: var(--ink-soft)"
+                    <b>Intra-doc links</b><br /><span class="rule-desc"
                       >Prefer intra-doc links over bare paths.</span
                     >
                   </td>
@@ -492,7 +492,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-gram">GRAM</span><br />GRAM201</td>
                   <td role="cell">
-                    <b>Passive voice</b><br /><span style="color: var(--ink-soft)"
+                    <b>Passive voice</b><br /><span class="rule-desc"
                       >Flag passive-voice sentences in prose regions.</span
                     >
                   </td>
@@ -505,7 +505,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-gram">GRAM</span><br />GRAM210</td>
                   <td role="cell">
-                    <b>Sentence length</b><br /><span style="color: var(--ink-soft)"
+                    <b>Sentence length</b><br /><span class="rule-desc"
                       >Flag sentences beyond the configured word ceiling.</span
                     >
                   </td>
@@ -518,7 +518,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-gram">GRAM</span><br />GRAM220</td>
                   <td role="cell">
-                    <b>Weasel words</b><br /><span style="color: var(--ink-soft)"
+                    <b>Weasel words</b><br /><span class="rule-desc"
                       >"Very", "quite", "rather" — flagged, not forbidden.</span
                     >
                   </td>
@@ -531,7 +531,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-spell">SPELL</span><br />SPELL101</td>
                   <td role="cell">
-                    <b>Unknown word</b><br /><span style="color: var(--ink-soft)"
+                    <b>Unknown word</b><br /><span class="rule-desc"
                       >Words absent from dictionary and allowlist.</span
                     >
                   </td>
@@ -544,7 +544,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-spell">SPELL</span><br />SPELL110</td>
                   <td role="cell">
-                    <b>Commonly misspelled</b><br /><span style="color: var(--ink-soft)"
+                    <b>Commonly misspelled</b><br /><span class="rule-desc"
                       >High-confidence corrections for common misspellings.</span
                     >
                   </td>
@@ -557,7 +557,7 @@
                 >
                   <td role="cell" class="id"><span class="ns ns-spell">SPELL</span><br />SPELL120</td>
                   <td role="cell">
-                    <b>Terminology consistency</b><br /><span style="color: var(--ink-soft)"
+                    <b>Terminology consistency</b><br /><span class="rule-desc"
                       >Enforce canonical spellings for project terms.</span
                     >
                   </td>
@@ -567,7 +567,7 @@
               </tbody>
             </table>
           </section>
-          <section id="config" style="margin-top: 80px; scroll-margin-top: 90px">
+          <section id="config" class="docs-section section-anchor">
             <div class="cat-head">
               <h2><span class="red">Configuration</span> · one file, no ceremony</h2>
               <div class="counts">stilyagi.toml<br />pyproject.toml [tool.stilyagi]</div>
@@ -611,7 +611,7 @@
 <span class="s">"**/CHANGELOG.md"</span> = { <span class="k">ignore</span> = [<span class="s">"MD201"</span>] }</pre>
             </div>
           </section>
-          <section id="suppress" class="suppress" style="margin-top: 80px; scroll-margin-top: 90px">
+          <section id="suppress" class="suppress docs-section section-anchor">
             <div class="cat-head">
               <h2><span class="red">Suppressions</span> · three scopes, no magic</h2>
               <div class="counts">line · next-line · block</div>
@@ -680,21 +680,13 @@ def compute_metrics(series, window=7):
         <span class="dim">instrumentation and compatibility.</span>
     <span class="dim">"""</span>
     ...</pre>
-            <p
-              style="
-                font-family: var(--font-editorial);
-                font-size: 1rem;
-                color: var(--ink-soft);
-                margin-top: 14px;
-                max-width: 72ch;
-              "
-            >
+            <p class="suppress-note">
               Suppressions live in the source, not in the config. They travel with the prose they protect.
               A suppression must name its rule — wildcards are refused — so a reader can always answer the
               question: <em>why is this line exempt?</em>
             </p>
           </section>
-          <section id="testing" class="sandbox" style="margin-top: 80px; scroll-margin-top: 90px">
+          <section id="testing" class="sandbox docs-section section-anchor">
             <div class="cat-head">
               <h2>The <span class="red">testing</span> sandbox</h2>
               <div class="counts">pytest fixture<br />hermetic by default</div>
@@ -753,7 +745,7 @@ def compute_metrics(series, window=7):
     )
     <span class="k">assert</span> diag.fix.applicability == <span class="s">"safe"</span></pre>
             </div>
-            <div class="config-grid" style="margin-top: 40px">
+            <div class="config-grid config-grid--stacked">
               <div>
                 <h3>Packs and <span class="red">extraction</span>, both testable</h3>
                 <p>
@@ -847,7 +839,7 @@ def compute_metrics(series, window=7):
             <div class="row"><b>License</b><span>ISC</span></div>
             <div class="row">
               <b>Status</b
-              ><span style="color: var(--accent-text); font-weight: 700">Draft · v0.4.0 in flight</span>
+              ><span class="row-accent">Draft · v0.4.0 in flight</span>
             </div>
             <div class="row">
               <b>Set in</b><span>Big Shoulders · EB Garamond · IBM Plex Sans · JetBrains Mono</span>

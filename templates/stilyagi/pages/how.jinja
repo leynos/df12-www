@@ -28,6 +28,7 @@
           </div>
         </div>
         <div class="arch-diagram">
+          <span class="fig-label">§ Fig. 01 · Pipeline</span>
           <div class="pipeline">
             <div class="stage">
               <div class="sidx">01</div>
@@ -79,7 +80,7 @@
           </div>
           <div class="boundary">
             <div class="layer-card rust">
-              <div class="sub" style="color: var(--accent-text)">§ Rust layer</div>
+              <div class="sub">§ Rust layer</div>
               <h3>Extraction only.</h3>
               <ul>
                 <li>Parses Markdown, MDX, reStructuredText, Python, and Rust source.</li>
@@ -204,7 +205,7 @@
           >Diagnostics are keyed by <code>(content_hash, ruleset_id, capability_set)</code>.
         </aside>
         <div class="body">
-          <h3>The IR is the <span style="color: var(--accent-text)">contract</span>.</h3>
+          <h3>The IR is the <span class="red">contract</span>.</h3>
           <p class="editorial">
             Rules never see raw source bytes directly, and never drive a parser. They receive a typed
             region — a <code>Heading</code>, a<code> Paragraph</code>, a <code>Docstring</code> — backed
@@ -306,10 +307,10 @@
             </div>
           </div>
         </div>
-        <div class="cli-table" style="margin-top: calc(var(--unit) * 4)">
+        <div class="cli-table">
           <div class="cli-row">
             <div class="cmd">
-              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              <span class="dim">stilyagi </span
               ><span class="accent">check</span>
             </div>
             <div class="sum">
@@ -326,7 +327,7 @@
           </div>
           <div class="cli-row">
             <div class="cmd">
-              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              <span class="dim">stilyagi </span
               ><span class="accent">fix</span>
             </div>
             <div class="sum">
@@ -341,7 +342,7 @@
           </div>
           <div class="cli-row">
             <div class="cmd">
-              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              <span class="dim">stilyagi </span
               ><span class="accent">rule</span>
             </div>
             <div class="sum">
@@ -357,7 +358,7 @@
           </div>
           <div class="cli-row">
             <div class="cmd">
-              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              <span class="dim">stilyagi </span
               ><span class="accent">dump-ir</span>
             </div>
             <div class="sum">
@@ -373,7 +374,7 @@
           </div>
           <div class="cli-row">
             <div class="cmd">
-              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              <span class="dim">stilyagi </span
               ><span class="accent">config</span>
             </div>
             <div class="sum">
@@ -389,7 +390,7 @@
           </div>
           <div class="cli-row">
             <div class="cmd">
-              <span class="dim" style="color: var(--ink-soft)">stilyagi </span
+              <span class="dim">stilyagi </span
               ><span class="accent">cache</span>
             </div>
             <div class="sum">
@@ -412,7 +413,7 @@
           what no enabled rule asked for.
         </aside>
         <div class="body">
-          <h3>The <span style="color: var(--accent-text)">capability planner</span>.</h3>
+          <h3>The <span class="red">capability planner</span>.</h3>
           <p class="editorial">
             Linguistic providers are expensive. A small lint run that only checks heading depth should not
             pay for spaCy model loading, a symspell dictionary, or a terminology index. The planner exists
@@ -432,71 +433,16 @@
           </p>
         </div>
       </section>
-      <section
-        style="
-          max-width: 1240px;
-          margin: 0px auto;
-          padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 10);
-          text-align: center;
-        "
-      >
-        <div class="pullquote" style="max-width: 36ch; margin: 0px auto; font-size: 2rem">
+      <section class="closing">
+        <div class="pullquote">
           "The IR is the contract. The rule is the policy. Everything else is scaffolding."<cite
             >— Maintainer's rubric, § 4</cite
           >
         </div>
-        <div
-          style="
-            margin-top: calc(var(--unit) * 4);
-            display: flex;
-            gap: 14px;
-            justify-content: center;
-            flex-wrap: wrap;
-          "
-        >
-          <a
-            href="/stilyagi/design/"
-            style="
-              font-family: var(--font-sans);
-              font-weight: 700;
-              font-size: 0.82rem;
-              letter-spacing: 0.14em;
-              text-transform: uppercase;
-              color: var(--ink);
-              text-decoration: none;
-              border-bottom: 2px solid var(--press-red);
-              padding-bottom: 2px;
-            "
-            >☞ Open the IR inspector</a
-          ><a
-            href="/stilyagi/roadmap/"
-            style="
-              font-family: var(--font-sans);
-              font-weight: 700;
-              font-size: 0.82rem;
-              letter-spacing: 0.14em;
-              text-transform: uppercase;
-              color: var(--ink);
-              text-decoration: none;
-              border-bottom: 2px solid var(--press-red);
-              padding-bottom: 2px;
-            "
-            >☞ Read the roadmap</a
-          ><a
-            href="/stilyagi/docs/"
-            style="
-              font-family: var(--font-sans);
-              font-weight: 700;
-              font-size: 0.82rem;
-              letter-spacing: 0.14em;
-              text-transform: uppercase;
-              color: var(--ink);
-              text-decoration: none;
-              border-bottom: 2px solid var(--press-red);
-              padding-bottom: 2px;
-            "
-            >☞ Rules &amp; config</a
-          >
+        <div class="next">
+          <a href="/stilyagi/design/">☞ Open the IR inspector</a
+          ><a href="/stilyagi/roadmap/">☞ Read the roadmap</a
+          ><a href="/stilyagi/docs/">☞ Rules &amp; config</a>
         </div>
       </section>
 {% endblock %}

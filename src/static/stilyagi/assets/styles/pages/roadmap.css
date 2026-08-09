@@ -251,6 +251,11 @@
   display: block;
   margin-bottom: 6px;
 }
+/* The note carries two headings; the second opens a fresh remark and needs
+   air above it that the first, sitting at the top of the aside, does not. */
+.margin-note .red:not(:first-child) {
+  margin-top: 12px;
+}
 .risks .body h3 {
   font-family: var(--font-display);
   font-size: 2rem;

@@ -340,6 +340,11 @@
   font-variant: small-caps;
   letter-spacing: 0.04em;
 }
+/* A rubber stamp filed under the lede — the docs page's version mark, the
+   roadmap's GROUNDED. */
+.page-intro .intro-stamp {
+  margin-top: 18px;
+}
 @media (max-width: 900px) {
   .page-intro .wrap {
     grid-template-columns: 1fr;
@@ -511,6 +516,45 @@
   text-transform: uppercase;
   color: var(--ink-soft);
   margin-top: 4px;
+}
+
+/* ---------- Closing section ---------------------------------------- */
+/* A pull-quote and a row of onward links: the last thing on why, how, and
+   design.  All three spelled it out in style attributes, which is how they
+   came to disagree about the measure without anyone deciding they should.
+   The pages that want a different measure now say so in their own
+   stylesheet, and say nothing else. */
+.closing {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 10);
+  text-align: center;
+}
+.closing .pullquote {
+  max-width: 38ch;
+  margin: 0 auto;
+  font-size: 2rem;
+}
+.closing .next {
+  margin-top: calc(var(--unit) * 4);
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.closing .next a {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 2px solid var(--press-red);
+  padding-bottom: 2px;
+}
+.closing .next a:hover {
+  color: var(--accent-text);
 }
 
 /* ---------- Manicule ornaments ------------------------------------- */

@@ -167,6 +167,12 @@
   color: var(--paper);
   width: 22%;
 }
+/* The section folio sits on the ink ground, where --accent-text is already
+   the on-ink red, so it needs only its spacing. */
+.personas .personas-folio {
+  margin-bottom: 18px;
+  color: var(--accent-text);
+}
 .personas table td.ignore {
   color: color-mix(in srgb, var(--paper) 55%, transparent);
   font-style: italic;
@@ -223,6 +229,31 @@
   gap: calc(var(--unit) * 4);
   align-items: start;
 }
+/* The left column of the rejected-alternatives band: a folio, a heading set
+   smaller than the page's h2 default, a lede, and the chip row naming what
+   was turned down. */
+.rejected-folio {
+  margin-bottom: 14px;
+}
+.rejected-head {
+  font-size: 2.4rem;
+  margin: 0;
+  line-height: 0.95;
+}
+.rejected-head .red {
+  color: var(--accent-text);
+}
+.rejected-lede {
+  margin-top: 18px;
+  font-size: 1.1rem;
+}
+.rejected-chips {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .weakness-panel {
   border: var(--rule-weight-2) solid var(--press-red);
   background: var(--paper-shade);
@@ -246,37 +277,16 @@
   margin-bottom: 10px;
 }
 
+/* The shared closing section lives in stilyagi-site.css.  This page's quote
+   is the shortest of the three and is set larger on a tighter measure, and
+   the panel above it supplies no gap underneath, so the section takes its
+   own top padding. */
 .closing {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: calc(var(--unit) * 4) calc(var(--unit) * 4) calc(var(--unit) * 10);
-  text-align: center;
+  padding-top: calc(var(--unit) * 4);
 }
 .closing .pullquote {
   max-width: 34ch;
-  margin: 0 auto;
   font-size: 2.2rem;
-}
-.closing .next {
-  margin-top: calc(var(--unit) * 4);
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.closing .next a {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom: 2px solid var(--press-red);
-  padding-bottom: 2px;
-}
-.closing .next a:hover {
-  color: var(--accent-text);
 }
 
 /* Style-hunter illustration */

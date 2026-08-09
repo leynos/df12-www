@@ -12,14 +12,20 @@
   position: relative;
   overflow: hidden;
 }
-.arch-diagram::before {
-  content: "§ FIG. 01 · PIPELINE";
+/* The label used to be a content string on ::before.  Generated text is not
+   reliably exposed to assistive technology, cannot be selected or
+   translated, and the repository's own spell checking cannot see it, so it
+   is a real element now and this rule only places it. */
+.fig-label {
   position: absolute;
   top: 12px;
   right: 16px;
   font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.2em;
+  /* The markup carries the label in sentence case, as prose; the caps are a
+     presentational choice, as they are for every other label on the site. */
+  text-transform: uppercase;
   color: var(--accent-text);
   font-weight: 700;
 }
@@ -136,9 +142,9 @@
   font-size: 1.4rem;
   margin: 0 0 10px;
 }
-.boundary .layer-card.rust .sub {
-  color: var(--press-red-on-ink);
-}
+/* --accent-text is already the ink-ground red inside the Rust card, so this
+   one rule serves both cards; the card no longer restates it, and neither
+   does the template. */
 .boundary .layer-card .sub {
   font-family: var(--font-sans);
   font-size: 0.7rem;
@@ -283,6 +289,8 @@
   padding: calc(var(--unit) * 6) calc(var(--unit) * 4);
 }
 .cli-table {
+  /* Clears the artwork above it, which the section stacks the table under. */
+  margin-top: calc(var(--unit) * 4);
   border: var(--rule-weight-2) solid var(--ink);
   background: var(--paper);
 }
@@ -305,6 +313,11 @@
 }
 .cli-row .cmd .accent {
   color: var(--accent-text);
+}
+/* The program name is the constant part of all six invocations, so it is set
+   back from the verb that distinguishes them. */
+.cli-row .cmd .dim {
+  color: var(--ink-soft);
 }
 .cli-row .sum {
   padding: calc(var(--unit) * 3);
@@ -362,6 +375,9 @@
 .flowtext .body h3:first-child {
   margin-top: 0;
 }
+.flowtext .body h3 .red {
+  color: var(--accent-text);
+}
 .flowtext .body p {
   font-family: var(--font-editorial);
   font-size: 1.1rem;
@@ -370,6 +386,13 @@
 }
 .flowtext .body p + p {
   text-indent: 1.8em;
+}
+
+/* The shared closing section lives in stilyagi-site.css; this page's quote
+   is one line longer than the design page's and takes a tighter measure so
+   it breaks where the sense does. */
+.closing .pullquote {
+  max-width: 36ch;
 }
 
 /* Layer illustrations */

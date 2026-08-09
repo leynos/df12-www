@@ -34,6 +34,14 @@
   font-weight: 700;
 }
 
+/* The catalogue is the first section and sits where the layout puts it; the
+   four reference sections below it take a gap of their own.  Each also
+   carries .section-anchor, which clears the sticky masthead on a jump from
+   the table of contents. */
+.docs-section {
+  margin-top: 80px;
+}
+
 .cat-head {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -196,6 +204,22 @@
 .rules-table tr:hover td {
   background: var(--paper-shade);
 }
+/* Every rule row carries a one-line description under its title, in the
+   secondary ink.  Thirty-four rows said so individually before this. */
+.rules-table .rule-desc {
+  color: var(--ink-soft);
+}
+/* The three narrow columns are sized to their content — an ID, a severity
+   badge, a fix class — so the title column takes the rest. */
+.rules-table .col-rule {
+  width: 110px;
+}
+.rules-table .col-sev {
+  width: 100px;
+}
+.rules-table .col-fix {
+  width: 90px;
+}
 .rules-table .id {
   font-family: var(--font-mono);
   font-size: 0.85rem;
@@ -334,9 +358,9 @@
   color: var(--jazz-cyan);
 }
 
-.suppress {
-  margin-top: calc(var(--unit) * 4);
-}
+/* .suppress set a 32px top margin of its own, which never took effect: the
+   section carried a larger one in a style attribute that beat it.  The gap
+   now comes from .docs-section, like every other section on the page. */
 .suppress h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -386,6 +410,14 @@
 .suppress pre .dim {
   color: var(--ink-soft);
 }
+/* The note under the two suppression specimens. */
+.suppress-note {
+  font-family: var(--font-editorial);
+  font-size: 1rem;
+  color: var(--ink-soft);
+  margin-top: 14px;
+  max-width: 72ch;
+}
 
 /* Testing sandbox — reuses the config section's two-column prose/code pairing,
    so it only needs the status line and the inline code treatment of its own. */
@@ -426,6 +458,10 @@
 .sandbox .config-grid pre code {
   background: transparent;
   padding: 0;
+}
+/* The sandbox runs two prose-and-code pairs; the second clears the first. */
+.config-grid--stacked {
+  margin-top: 40px;
 }
 
 /* Colophon */
@@ -501,6 +537,12 @@
   gap: 10px;
 }
 .credits .row b {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+/* One credit — the release status — is set in the accent rather than the
+   plain paper the rest of the values take. */
+.credits .row .row-accent {
   color: var(--accent-text);
   font-weight: 700;
 }

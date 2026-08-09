@@ -262,7 +262,30 @@
 .roadmap-illo .illo-frame {
   position: relative;
   border: var(--rule-weight-2) solid var(--ink);
-  margin-top: calc(var(--unit) * 3);
+  margin: calc(var(--unit) * 3) 0 0;
+}
+/* The plate boxes the artwork alone, so the call-out percentages below
+   measure the image and not the figure. Once the caption is filed beneath
+   the artwork on phones the two boxes differ by the height of the caption,
+   and labels anchored to the figure slide off the bottom of the image. */
+.illo-plate {
+  position: relative;
+}
+/* Set in the artwork's empty top-left corner rather than under the frame,
+   in the same sans caps as the pipeline caption on the home page. */
+.illo-caption {
+  position: absolute;
+  left: calc(var(--unit) * 2);
+  top: calc(var(--unit) * 2);
+  /* The caption runs to the frame's right edge; the pad keeps it off the
+     rule and matches the inset on its left. */
+  padding-right: calc(var(--unit) * 2);
+  font-family: var(--font-sans);
+  font-size: clamp(0.58rem, 1vw, 0.72rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--ink-soft);
 }
 .roadmap-illo img {
   width: 100%;
@@ -326,6 +349,24 @@
   .illo-label {
     letter-spacing: 0.06em;
     padding: 1px 4px;
+  }
+  /* There is no room to set the caption in the plate at this width — it
+     wraps across the 03 call-out — so it is filed beneath the artwork
+     instead, presented as Figure 01 is on the overview page. The frame's
+     bottom rule moves to the image so the caption falls below the rule
+     rather than inside it. */
+  .roadmap-illo .illo-frame {
+    border-block-end: 0;
+  }
+  .roadmap-illo img {
+    border-block-end: var(--rule-weight-2) solid var(--ink);
+  }
+  .illo-caption {
+    position: static;
+    margin-top: 10px;
+    padding-inline: calc(var(--unit) * 2);
+    font-size: 0.72rem;
+    line-height: normal;
   }
   /* At this scale two labels sit a shade off their lines: 00 drifts over
      01's leader and 03 crowds its dot. Counting spans, 1 is 00 and 4 is 03. */
@@ -415,6 +456,16 @@
 @media (max-width: 640px) {
   .pacing {
     grid-template-columns: 1fr;
+  }
+  /* The timeline runs edge to edge here, as the illustration above it does:
+     the wrap gives up its inline padding and the legend takes its own back,
+     so only the phase rows reach the screen edges. The rows carry padding
+     of their own, so no text ends up against the glass. */
+  .roadmap-wrap {
+    padding-inline: 0;
+  }
+  .legend-bar {
+    padding-inline: calc(var(--unit) * 4);
   }
 }
 

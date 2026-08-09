@@ -245,10 +245,10 @@ bunx biome check src/static/netsuke/assets/css src/static/stilyagi/assets/styles
 ```
 
 Each script is idempotent: rerunning it without changing the corresponding
-style leaves the stylesheet untouched, and it reports whether it wrote a change.
-The Biome check confirms the hand-written stylesheets beside each generated one
-are still formatted, and that the exclusion is holding: it should report the
-generated files as unchanged rather than reformatting them.
+style leaves the stylesheet untouched, and it reports whether it wrote a
+change. The Biome check confirms the hand-written stylesheets beside each
+generated one are still formatted, and that the exclusion is holding: it should
+report the generated files as unchanged rather than reformatting them.
 
 Regenerating is also how to recover a generated stylesheet that has been
 reformatted or otherwise edited by mistake — the script rewrites the marked
@@ -477,12 +477,11 @@ The Netsuke and Weaver sub-sites still load the
 [Tailwind Play CDN](https://tailwindcss.com) script
 (`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
 stylesheet, and use its utilities in their markup alongside their own
-hand-crafted stylesheets. Netsuke additionally extends the default theme
-through `/netsuke/assets/js/tailwind-config.js`; Weaver takes the defaults. Of
-the three hand-styled sub-sites, only Stilyagi uses neither Tailwind nor
-daisyUI. This differs from the main site and the mxd sub-site, which compile
-Tailwind v4 ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md)
-for that path.
+hand-crafted stylesheets. Netsuke additionally extends the default theme through
+`/netsuke/assets/js/tailwind-config.js`; Weaver takes the defaults. Of the
+three hand-styled sub-sites, only Stilyagi uses neither Tailwind nor daisyUI.
+This differs from the main site and the mxd sub-site, which compile Tailwind v4
+ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md) for that path.
 
 The Play CDN script scans the rendered document for utility classes in use and
 injects the utilities it finds into a `<style>` element it appends to
@@ -540,3 +539,31 @@ report, and none is checked into the repository. Before treating a new audit
 finding as a regression, check the change under review actually altered the
 colour or markup in question, since an audit run against a wider page surface
 than the change touched can surface pairings the change did not introduce.
+
+### 8.1. Focus indicators
+
+An audit tool will not catch a missing or invisible focus ring: it inspects the
+resting page, and a ring only exists while a control is focused by keyboard.
+Two things have removed one on this site, and neither showed up in an axe run.
+
+A control's colour tokens follow the ground its _contents_ sit on; a focus ring
+follows the ground it is _painted_ on, and the two are not the same surface.
+Stilyagi's ring sits at a positive `outline-offset`, so it is painted on the
+page around a control rather than on the control's own fill: an ink-filled chip
+on a paper bar still needs the ink ring, because that is what its ring lands
+on. Only a ring drawn at a negative offset, over the control's own dark ground,
+takes the paper colour — which is why the three scrollers that do so declare it
+beside the offset rather than inheriting it from the dark-surface block.
+
+`tests/test_stilyagi_focus.py` holds that rule as a test: any rule granting a
+paper ring must also draw it inside its control. It runs without a browser. The
+same module carries a Playwright check that measures the ring on the active
+RsDoc filter chip — the sharp case, an ink fill on a paper bar, above the
+1280px breakpoint where the chip row is the control. Playwright is not a
+dependency here, so that check skips unless it is installed:
+
+```bash
+bun add -d playwright
+bun x playwright install chromium
+uv run pytest tests/test_stilyagi_focus.py -v
+```

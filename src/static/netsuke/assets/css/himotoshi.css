@@ -326,6 +326,21 @@ a.sidebar-link--sub.active {
   gap: 0.25rem;
 }
 
+.hm-config-keys__key {
+  min-width: 0;
+}
+
+.hm-config-keys__note {
+  color: var(--netsuke-charcoal-mid);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.hm-config-keys__note code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+}
+
 .hm-config-keys__label {
   background: none;
   border: 0;
@@ -409,6 +424,11 @@ button.hm-config-keys__label {
     gap: 0;
   }
 
+  .hm-config-keys__key {
+    display: flex;
+    flex: 1;
+  }
+
   .hm-config-keys__label {
     flex: 1;
     text-align: center;
@@ -418,6 +438,11 @@ button.hm-config-keys__label {
     border-bottom-color: var(--netsuke-vermillion);
     color: var(--netsuke-vermillion);
     font-weight: 600;
+  }
+
+  /* The selected group's paragraph moves here, above its extract. */
+  .hm-config-keys__panels > .hm-config-keys__note {
+    margin-bottom: 0.25rem;
   }
 
   .hm-config-keys__panel:focus-visible {
@@ -431,8 +456,13 @@ button.hm-config-keys__label {
      same rows, so a label always sits level with the top of its own
      extract however tall the neighbouring ones grow. */
   .hm-config-keys__layout {
+    /* The extracts abut into one slab, so the rows carry no gap and the
+       captions space themselves instead. */
+    --hm-config-keys-row-gap: 0;
     column-gap: 1.5rem;
-    grid-template-columns: minmax(7rem, 1fr) 4fr;
+    /* Column one carries a paragraph, not just a name, so it needs a
+       readable measure rather than the width of the longest label. */
+    grid-template-columns: minmax(11rem, 2fr) 5fr;
     grid-template-rows: repeat(3, auto);
   }
 
@@ -452,28 +482,57 @@ button.hm-config-keys__label {
     grid-column: 2;
   }
 
-  .hm-config-keys__label {
+  /* The label and its paragraph share one marked block, so the whole
+     caption lights with the extract rather than just its first line. */
+  .hm-config-keys__key {
     align-self: start;
-    border-bottom: 0;
     border-left: 2px solid transparent;
     border-radius: 0 0.375rem 0.375rem 0;
+    /* Stands in for the row gap the extracts gave up. */
+    padding-bottom: 1.5rem;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
   }
 
-  /* is-preview follows the pointer or keyboard focus; is-active is the
-     mark the reader pressed for. Both read the same, so a previewed pair
-     and a pressed pair are not two competing highlights. */
-  .hm-config-keys__label.is-preview,
-  .hm-config-keys__label.is-active {
+  .hm-config-keys__label {
+    border-bottom: 0;
+  }
+
+  .hm-config-keys__note {
+    padding-inline: 0.75rem;
+  }
+
+  .hm-config-keys__key.is-preview {
     background: var(--netsuke-white);
     border-left-color: var(--netsuke-indigo);
+  }
+
+  .hm-config-keys__key.is-preview .hm-config-keys__label {
     color: var(--netsuke-indigo);
     font-weight: 600;
   }
 
-  .hm-config-keys__panel.is-preview,
-  .hm-config-keys__panel.is-active {
+  /* The three extracts read as one slab of configuration, so only the
+     outer corners are rounded and the joins between them are square. */
+  .hm-config-keys__panel {
+    border-radius: 0;
+  }
+
+  .hm-config-keys__panels > .hm-config-keys__panel:first-child {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  .hm-config-keys__panels > .hm-config-keys__panel:last-child {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+
+  /* A ring rather than a lift: a raised shadow on a middle band would
+     fall across its neighbours now that they touch. */
+  .hm-config-keys__panel.is-preview {
     border-color: var(--netsuke-indigo-light);
-    box-shadow: var(--netsuke-paper-shadow-lg);
   }
 }
 

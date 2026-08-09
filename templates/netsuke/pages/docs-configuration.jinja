@@ -147,11 +147,20 @@
                     <h3 class="hm-config-keys__title" id="config-keys-title">Config keys</h3>
                     <div class="hm-config-keys__layout">
                         <div class="hm-config-keys__labels" data-config-keys-labels aria-labelledby="config-keys-title">
-                            <span class="hm-config-keys__label" id="config-keys-label-build" data-config-keys-label="build">Build</span>
-                            <span class="hm-config-keys__label" id="config-keys-label-output" data-config-keys-label="output">Output</span>
-                            <span class="hm-config-keys__label" id="config-keys-label-network" data-config-keys-label="network">Network</span>
+                            <div class="hm-config-keys__key" data-config-keys-key="build">
+                                <span class="hm-config-keys__label" id="config-keys-label-build" data-config-keys-label="build">Build</span>
+                                <p class="hm-config-keys__note" id="config-keys-note-build" data-config-keys-note="build">Where the manifest lives and how hard Netsuke works: the path to the Netsukefile, how many jobs may run at once, and what a bare <code>netsuke build</code> should make.</p>
+                            </div>
+                            <div class="hm-config-keys__key" data-config-keys-key="output">
+                                <span class="hm-config-keys__label" id="config-keys-label-output" data-config-keys-label="output">Output</span>
+                                <p class="hm-config-keys__note" id="config-keys-note-output" data-config-keys-note="output">What Netsuke prints, and how. Progress, accessible mode, emoji, and colour each auto-detect the terminal; set one explicitly to override the guess. <code>locale</code> picks the language messages are written in.</p>
+                            </div>
+                            <div class="hm-config-keys__key" data-config-keys-key="network">
+                                <span class="hm-config-keys__label" id="config-keys-label-network" data-config-keys-label="network">Network</span>
+                                <p class="hm-config-keys__note" id="config-keys-note-network" data-config-keys-note="network">What the <code>fetch()</code> helper is allowed to reach. Choose whether unlisted hosts are denied by default, then name the hosts to allow or block.</p>
+                            </div>
                         </div>
-                        <div class="hm-config-keys__panels">
+                        <div class="hm-config-keys__panels" data-config-keys-panels>
                             <div class="hm-config-keys__panel" id="config-keys-panel-build" data-config-keys-panel="build" role="group" aria-labelledby="config-keys-label-build" tabindex="0">
 {% endraw %}{% highlight 'toml' %}{% raw %}
 # Keys are flat; this mirrors docs/sample-netsuke.toml

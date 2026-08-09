@@ -1,22 +1,24 @@
 /* Config-keys browser: pairs each key group's label with its extract.
  *
- * The component ships as plain text labels and always-visible extracts,
- * each extract a `role="group"` labelled by its heading. That is the
- * no-JavaScript reading: three labelled listings, nothing hidden.
+ * The component ships as plain text labels, each with a paragraph saying
+ * what the group is for, beside always-visible extracts. Every extract is
+ * a `role="group"` labelled by its heading. That is the no-JavaScript
+ * reading: three labelled, described listings, nothing hidden.
  *
- * With JavaScript the labels become buttons, and what those buttons mean
- * depends on how much room there is:
+ * What JavaScript adds depends on how much room there is:
  *
+ * - Wide, every extract is already on screen beside its label, so there
+ *   is nothing to reveal and nothing to operate. Pointing at either half
+ *   of a pair marks both, and that is all. The labels stay inert text.
  * - Narrow (< 768px) there is no room for three listings, so the labels
- *   are a tablist and only the selected extract is shown. Full tab
- *   semantics: arrow keys, Home/End, roving tabindex.
- * - Wide, every extract stays on screen beside its label, so a button
- *   cannot "reveal" anything. It emphasises instead: pressing one marks
- *   its pair, and `aria-pressed` says so. Pointer and keyboard focus
- *   preview the same emphasis without committing to it.
+ *   become buttons in a tablist and only the selected extract shows, with
+ *   that group's paragraph moved above it. Full tab semantics: arrow
+ *   keys, Home/End, roving tabindex.
  *
- * Roles are swapped on the breakpoint rather than declared once, because
- * a tab whose panel is always visible is a lie to a screen reader.
+ * The labels really are spans in one mode and buttons in the other. A
+ * control that does nothing is worse than no control, and a tab whose
+ * panel is always visible is a lie to a screen reader, so neither is
+ * declared unless the layout has made it true.
  */
 (function () {
     "use strict";
@@ -46,60 +48,69 @@
             return -1;
         }
         if (current < 0) {
-            // Nothing is marked — wide mode allows that — so step in from
-            // whichever end the reader is heading towards.
             return forward ? 0 : count - 1;
         }
         return (current + (forward ? 1 : -1) + count) % count;
     }
 
-    function toButton(label) {
+    function list(root, selector) {
+        return Array.prototype.slice.call(root.querySelectorAll(selector));
+    }
+
+    function makeButton(span) {
         var button = document.createElement("button");
         button.type = "button";
-        button.id = label.id;
-        button.className = label.className;
-        button.textContent = label.textContent;
+        button.id = span.id;
+        button.className = span.className;
+        button.textContent = span.textContent;
+        button.setAttribute("role", "tab");
+        // Keep the hook the span carried so the button is still findable
+        // by the same selector once it has taken the span's place.
         button.setAttribute(
             "data-config-keys-label",
-            label.getAttribute("data-config-keys-label")
+            span.getAttribute("data-config-keys-label")
         );
-        label.parentNode.replaceChild(button, label);
         return button;
     }
 
     function initGroup(root) {
         var labelList = root.querySelector("[data-config-keys-labels]");
-        var labels = Array.prototype.slice.call(
-            root.querySelectorAll("[data-config-keys-label]")
-        );
-        var panels = Array.prototype.slice.call(
-            root.querySelectorAll("[data-config-keys-panel]")
-        );
-        if (!labelList || labels.length === 0 || labels.length !== panels.length) {
+        var panelList = root.querySelector("[data-config-keys-panels]");
+        var keys = list(root, "[data-config-keys-key]");
+        var panels = list(root, "[data-config-keys-panel]");
+        if (!labelList || !panelList || !keys.length || keys.length !== panels.length) {
             return;
         }
 
-        var pairs = labels.map(function (label, index) {
-            return { button: toButton(label), panel: panels[index] };
-        });
         var wide = window.matchMedia(WIDE);
-        // Wide, every extract is already on screen, so nothing is marked
-        // until the reader asks for it. Narrow, a tablist must start with
-        // one tab selected.
-        var selected = wide.matches ? -1 : 0;
+        var selected = 0;
+        var pairs = keys.map(function (key, index) {
+            var span = key.querySelector("[data-config-keys-label]");
+            return {
+                key: key,
+                span: span,
+                button: makeButton(span),
+                note: key.querySelector("[data-config-keys-note]"),
+                panel: panels[index]
+            };
+        });
+
+        function label(pair) {
+            return wide.matches ? pair.span : pair.button;
+        }
 
         function mark(className, index) {
             pairs.forEach(function (pair, i) {
                 var on = i === index;
-                pair.button.classList.toggle(className, on);
+                label(pair).classList.toggle(className, on);
+                pair.key.classList.toggle(className, on);
                 pair.panel.classList.toggle(className, on);
             });
         }
 
         function renderNarrow() {
-            // A tablist always has exactly one selected tab, so an
-            // unmarked wide-mode state resolves to the first group.
-            if (selected < 0) {
+            // A tablist always has exactly one selected tab.
+            if (selected < 0 || selected >= pairs.length) {
                 selected = 0;
             }
             pairs.forEach(function (pair, index) {
@@ -107,21 +118,23 @@
                 pair.button.setAttribute("aria-selected", on ? "true" : "false");
                 pair.button.tabIndex = on ? 0 : -1;
                 pair.panel.hidden = !on;
+                if (pair.note) {
+                    pair.note.hidden = !on;
+                }
             });
             mark(ACTIVE, selected);
-            mark(PREVIEW, -1);
         }
 
         function renderWide() {
-            pairs.forEach(function (pair, index) {
-                pair.button.setAttribute(
-                    "aria-pressed",
-                    index === selected ? "true" : "false"
-                );
-                pair.button.tabIndex = 0;
+            pairs.forEach(function (pair) {
                 pair.panel.hidden = false;
+                if (pair.note) {
+                    pair.note.hidden = false;
+                }
             });
-            mark(ACTIVE, selected);
+            // Nothing is pressed wide, so nothing stays marked; the
+            // pointer supplies the only emphasis there is.
+            mark(ACTIVE, -1);
         }
 
         function render() {
@@ -140,46 +153,50 @@
             }
         }
 
+        function applyNarrow(pair) {
+            if (pair.button.parentNode !== pair.key) {
+                pair.key.replaceChild(pair.button, pair.span);
+            }
+            // The wrapper is transparent to assistive technology so the
+            // tablist owns the tabs directly, as `li` does in the APG's
+            // list-based tabs.
+            pair.key.setAttribute("role", "presentation");
+            pair.button.setAttribute("aria-controls", pair.panel.id);
+            pair.panel.setAttribute("role", "tabpanel");
+            if (pair.note) {
+                // The paragraph belongs with the extract once only one is
+                // on screen, and describes the panel it now sits above.
+                panelList.insertBefore(pair.note, pair.panel);
+                pair.panel.setAttribute("aria-describedby", pair.note.id);
+            }
+        }
+
+        function applyWide(pair) {
+            if (pair.span.parentNode !== pair.key) {
+                pair.key.replaceChild(pair.span, pair.button);
+            }
+            pair.key.removeAttribute("role");
+            pair.panel.setAttribute("role", "group");
+            pair.panel.removeAttribute("aria-describedby");
+            if (pair.note) {
+                pair.key.appendChild(pair.note);
+            }
+        }
+
         function applyMode() {
             var isWide = wide.matches;
             labelList.setAttribute("role", isWide ? "group" : "tablist");
-            pairs.forEach(function (pair) {
-                if (isWide) {
-                    pair.button.removeAttribute("role");
-                    pair.button.removeAttribute("aria-selected");
-                    pair.button.removeAttribute("aria-controls");
-                    pair.panel.setAttribute("role", "group");
-                } else {
-                    pair.button.setAttribute("role", "tab");
-                    pair.button.removeAttribute("aria-pressed");
-                    pair.button.setAttribute("aria-controls", pair.panel.id);
-                    pair.panel.setAttribute("role", "tabpanel");
-                }
-                // The panel keeps the tabindex the markup gave it in both
-                // modes: it is the scroll container, so it must stay
-                // reachable whether or not it is also a tabpanel.
-            });
+            pairs.forEach(isWide ? applyWide : applyNarrow);
             render();
         }
 
         pairs.forEach(function (pair, index) {
             pair.button.addEventListener("click", function () {
-                // Wide: pressing the marked pair again clears the mark, so
-                // the control is a genuine toggle rather than a one-way trap.
-                if (wide.matches && selected === index) {
-                    select(-1, false);
-                    return;
-                }
                 select(index, false);
-                if (wide.matches) {
-                    // Emphasis alone is no use to a reader who cannot see
-                    // it, so pressing also brings the extract into view.
-                    // 'nearest' is a no-op when it already is.
-                    pair.panel.scrollIntoView({ block: "nearest" });
-                }
             });
 
-            [pair.button, pair.panel].forEach(function (el) {
+            // The key wrapper covers the label and, wide, its paragraph.
+            [pair.key, pair.panel].forEach(function (el) {
                 el.addEventListener("pointerenter", function () {
                     if (wide.matches) {
                         mark(PREVIEW, index);
@@ -190,17 +207,6 @@
                         mark(PREVIEW, -1);
                     }
                 });
-            });
-
-            pair.button.addEventListener("focus", function () {
-                if (wide.matches) {
-                    mark(PREVIEW, index);
-                }
-            });
-            pair.button.addEventListener("blur", function () {
-                if (wide.matches) {
-                    mark(PREVIEW, -1);
-                }
             });
         });
 

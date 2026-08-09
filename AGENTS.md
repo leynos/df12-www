@@ -203,7 +203,9 @@ understand and more to maintain than the one above it.
    appearance, and put the modifiers on the same base.
 3. **A shared Jinja macro** for a repeated HTML structure, in the sub-site's
    `components.jinja` or a sibling. A macro is the right tool once the *shape*
-   repeats, not merely the class list.
+   repeats, not merely the class list. See section 5 of the
+   [Developer's Guide](docs/developers-guide.md) for the existing macros and
+   how they pair with their component classes.
 4. **Data-driven Jinja** — a list in the page's data and a loop in the template
    — in preference to repeated inline HTML. This is the right answer whenever
    more than one page feature has to be driven by the same facts: a navigation
@@ -213,7 +215,7 @@ understand and more to maintain than the one above it.
 5. **A plain script module** — an IIFE under the sub-site's `assets/js/`,
    loaded with `defer`, addressing its markup through `data-*` attributes and
    returning early when its root is absent. This is how every existing
-   behaviour on the site is written; see section 5 of the
+   behaviour on the site is written; see section 6 of the
    [Developer's Guide](docs/developers-guide.md).
 6. **A custom element**, as a last resort, where behaviour is complex enough
    that a script module's conventions stop carrying it — where a page needs

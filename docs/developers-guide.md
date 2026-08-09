@@ -4,11 +4,12 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Netsuke and Stilyagi sub-sites is generated, the convention used for
-browser-side components, the cascade quirks introduced by the Netsuke
-sub-site's use of the Tailwind Play content delivery network (CDN), and how
-accessibility is checked. It does not restate deployment or OpenTofu guidance,
-which lives in [`AGENTS.md`](../AGENTS.md).
+Netsuke and Stilyagi sub-sites is generated, the shared Jinja macros and the
+component classes they pair with, the convention used for browser-side
+components, the cascade quirks introduced by the Netsuke and Weaver sub-sites'
+use of the Tailwind Play content delivery network (CDN), and how accessibility
+is checked. It does not restate deployment or OpenTofu guidance, which lives in
+[`AGENTS.md`](../AGENTS.md).
 
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
@@ -151,6 +152,34 @@ backgrounds, padding, media queries, the surrounding wrapper markup — stays in
 each generator, since that is where the two sub-sites genuinely diverge; only
 the token-to-selector translation is shared.
 
+The module exports two functions. Everything else in it is private and may be
+reshaped freely.
+
+`token_rules(formatter, style, css_class, prefix, bold_weight)` returns a
+`(variables, rules)` pair: the `:root` custom-property declarations and the
+selector rules, both as lists of lines in the style's own declaration order.
+That order is load-bearing rather than cosmetic — a subtype's rule must follow
+its ancestor's to win at equal specificity, which holds as long as the style
+declares parents before children. The `formatter` must already be bound to
+`style`, because it supplies both the resolved token list and the
+token-to-class mapping.
+
+`variable_name(token, prefix)` derives one custom-property name from a Pygments
+token type: `Literal.String.Escape` with the prefix `--netsuke-syntax-` gives
+`--netsuke-syntax-literal-string-escape`. Underscores become hyphens, and the
+bare `Token` type, having no dotted tail, becomes `text`. `token_rules` calls
+it for every declared token, so a generator rarely needs it directly; it is
+exported for the case where one has to name a variable outside the generated
+block, and to keep the naming rule in one place rather than reimplemented at a
+call site.
+
+The three parameters that differ between the sub-sites are held as constants at
+the top of each generator — `CSS_CLASS`, `VARIABLE_PREFIX`, and `BOLD_WEIGHT` —
+and every selector the generator emits interpolates `CSS_CLASS` rather than
+spelling the wrapper class out. The chrome rules did spell it out until
+recently, which meant a renamed wrapper would have half-applied: the token
+rules would follow the constant and the chrome would not.
+
 ### 4.3. Why tokens are grouped under their nearest declared ancestor
 
 **Normative:** treat `token_rules` as the only correct way to turn a Pygments
@@ -227,7 +256,90 @@ unmodified. The bold weight differs because the two sub-sites' monospace faces
 read differently at the same weight: Netsuke's mono face reads heavy, so its
 bold stops at semibold, while Stilyagi's lighter face goes to full bold.
 
-## 5. Browser-side components
+## 5. Template components
+
+Repeated markup belongs in a Jinja macro, and the class list behind it belongs
+in the sub-site's stylesheet. These are not alternatives: a macro whose body is
+a long utility string has relocated the duplication rather than removed it, and
+a component class with no macro still leaves every call site restating the
+wrapper element. The "Reach for the cheapest layer that works" ladder in the
+"Styling" section of [AGENTS.md](../AGENTS.md) sets out when each is warranted.
+
+`templates/netsuke/components.jinja` holds the Netsuke sub-site's shared
+macros. Import it as `ui`:
+
+```jinja
+{% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
+```
+
+Page bodies are wrapped in `{% raw %}`, so a call has to step out of it and
+back in:
+
+```jinja
+{% endraw %}{{ ui.kicker('Reference') }}{% raw %}
+```
+
+That escaping is a wart of the current template shape rather than of the macro;
+narrowing the raw regions is tracked separately.
+
+### 5.1. `ui.kicker`
+
+The pill-shaped eyebrow above a page or section heading.
+
+```jinja
+{{ ui.kicker(label, extra='', accent=false, icon='', icon_class='', dot='') }}
+```
+
+| Parameter    | Purpose                                                                 |
+| ------------ | ----------------------------------------------------------------------- |
+| `label`      | The pill's text. Markup must be passed through `\| safe` by the caller. |
+| `extra`      | Additional utility classes, in practice a margin such as `mb-6`.        |
+| `accent`     | Selects the docs hub's indigo-on-boxwood-light colouring.               |
+| `icon`       | An Iconify icon name, such as `carbon:download`.                        |
+| `icon_class` | Utility classes for that icon, typically a colour.                      |
+| `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |
+
+_Table 3: the `kicker` macro's parameters._
+
+Three call sites show the range:
+
+```jinja
+{{ ui.kicker('Reference') }}
+{{ ui.kicker('Documentation', 'mb-4', accent=true) }}
+{{ ui.kicker('Current version v' ~ netsuke_version, 'mb-6', dot='bg-amber') }}
+```
+
+The presentation lives in `.hm-kicker` and its modifiers in
+`src/static/netsuke/assets/css/himotoshi.css`. The base carries only what every
+pill shares — `inline-flex`, centred items, the stone border, the pill radius,
+size, weight, gap, and uppercasing. The face, tracking, and inset sit on the
+modifiers, because the two variants differ enough that neither is a sensible
+default.
+
+| Class                 | Role                                                   |
+| --------------------- | ------------------------------------------------------ |
+| `.hm-kicker`          | The shared shape. Never used alone.                    |
+| `.hm-kicker--hero`    | JetBrains Mono, `0.12em` tracking, translucent ground. |
+| `.hm-kicker--section` | Body face, `0.05em` tracking, boxwood ground.          |
+| `.hm-kicker--accent`  | Pairs with `--section` for the docs hub's indigo.      |
+| `.hm-kicker__dot`     | The roadmap's leading status dot.                      |
+
+_Table 4: the kicker component class and its modifiers._
+
+**Normative:** a new variant is a new modifier on `.hm-kicker`, not a fresh
+class list at the call site and not a utility string passed through `extra`.
+`extra` is for layout that belongs to the surrounding page — a margin — not for
+the pill's own appearance.
+
+One trap to know about. `.hm-kicker--hero` sets a border colour of its own, but
+it appears earlier in the stylesheet than `.hm-kicker`, which sets the `border`
+shorthand. At equal specificity the later rule wins, so that declaration has
+never taken effect and the hero pill's border is stone. Moving the rule would
+change how the hero looks, so it has been left as it stands; do not assume the
+modifier order in that file is meaningful.
+
+## 6. Browser-side components
 
 Browser-side scripts under `src/static/netsuke/assets/js/` follow one
 convention: a plain immediately invoked function expression (IIFE) module,
@@ -265,13 +377,13 @@ The convention's limits are worth naming, because they decide when to leave it.
 A module is a file plus a `data-` prefix, so nothing enforces one instance per
 root, nothing provides a lifecycle beyond first run, and nothing tells CSS that
 a script has upgraded the markup — `config-keys.js` has to add an `is-enhanced`
-class by hand for that. When a behaviour outgrows those limits, the next step is
-a custom element in the light DOM, which supplies all three: one instance per
-root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
+class by hand for that. When a behaviour outgrows those limits, the next step
+is a custom element in the light DOM, which supplies all three: one instance
+per root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
 section of [AGENTS.md](../AGENTS.md); a custom element is its last rung, and
 the site does not use a front-end framework at all.
 
-### 5.1. The config-keys component
+### 6.1. The config-keys component
 
 `config-keys.js` drives the "config keys" browser on the configuration docs page
 (`templates/netsuke/pages/docs-configuration.jinja`), which pairs each key
@@ -301,10 +413,10 @@ nothing hidden — the safe degraded state the script only ever narrows from.
 container only after `applyMode` has rearranged the DOM. The narrow tab strip
 is the case in point. It lays the key groups out abreast, which is right only
 once the script has moved each note out of its group and above the panel;
-ungated, it applied on viewport width alone and squeezed three untouched
-groups — heading plus a full sentence of prose each — into one strip, wrecking
-the very fallback described above. A media query alone cannot know whether the
-DOM it is styling has been enhanced; the class is what tells it.
+ungated, it applied on viewport width alone and squeezed three untouched groups
+— heading plus a full sentence of prose each — into one strip, wrecking the
+very fallback described above. A media query alone cannot know whether the DOM
+it is styling has been enhanced; the class is what tells it.
 
 **Two modes and the breakpoint.** `config-keys.js` watches
 `window.matchMedia("(min-width: 768px)")` and switches behaviour on change:
@@ -344,7 +456,7 @@ branching logic worth testing directly, `module.exports` guarded for Bun, and a
 behaviour that genuinely differs by viewport width rather than merely being
 restyled by it.
 
-## 6. Styling and the cascade
+## 7. Styling and the cascade
 
 The Netsuke sub-site's pages (`templates/netsuke/*.jinja`) still load the
 [Tailwind Play CDN](https://tailwindcss.com) script
@@ -385,7 +497,7 @@ this sub-site, for example
 further down the same file. Prefer raising specificity by doubling the class
 over `!important`, which would also outrank a later, deliberate override.
 
-## 7. Accessibility checks
+## 8. Accessibility checks
 
 Colour choices must meet WCAG 2.2 AA — 4.5:1 for body text, 3:1 for large text
 and non-text elements such as icons and borders — per

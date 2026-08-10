@@ -81,7 +81,7 @@
       return tops.length - 1;
     }
     var active = -1;
-    for (var i = 0; i < tops.length; i += 1) {
+    for (let i = 0; i < tops.length; i += 1) {
       if (tops[i] <= offset) {
         active = i;
       }

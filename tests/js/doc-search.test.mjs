@@ -76,7 +76,7 @@ describe("createIndexCache", () => {
     } catch (caught) {
       error = caught;
     }
-    expect(error && error.message).toBe("network down");
+    expect(error?.message).toBe("network down");
     expect((await load("/a.json")).miniSearch).toBe("recovered");
     expect(calls).toBe(2);
   });

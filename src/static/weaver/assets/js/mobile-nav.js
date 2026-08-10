@@ -33,7 +33,7 @@
   /* ---- measure header height for fixed-nav offset ---- */
   function setHeaderHeight() {
     var h = header.getBoundingClientRect().height;
-    sidebar.style.setProperty("--mobile-header-height", h + "px");
+    sidebar.style.setProperty("--mobile-header-height", `${h}px`);
   }
 
   var previousBodyOverflow = "";
@@ -61,8 +61,13 @@
     /* Save focus and move it into the nav */
     savedFocus = document.activeElement;
     var focusables = getFocusableElements();
-    if (focusables.length) focusables[0].focus();
-    else nav.setAttribute("tabindex", "-1"), nav.focus();
+    if (focusables.length) {
+      focusables[0].focus();
+    } else {
+      /* Nothing focusable inside: make the nav itself a focus target. */
+      nav.setAttribute("tabindex", "-1");
+      nav.focus();
+    }
 
     /* Install focus trap */
     focusTrapHandler = (e) => {
@@ -122,8 +127,8 @@
 
   /* Close drawer when a nav link is clicked (same-page anchors, etc.) */
   var navLinks = nav.querySelectorAll("a");
-  for (var i = 0; i < navLinks.length; i++) {
-    navLinks[i].addEventListener("click", () => {
+  for (const navLink of navLinks) {
+    navLink.addEventListener("click", () => {
       if (isOpen()) close();
     });
   }

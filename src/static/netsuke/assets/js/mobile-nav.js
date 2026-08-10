@@ -76,7 +76,7 @@
     }
 
     function isSamePageAnchor(link) {
-      if (!link || !link.hash) return false;
+      if (!link?.hash) return false;
 
       return (
         link.origin === window.location.origin &&

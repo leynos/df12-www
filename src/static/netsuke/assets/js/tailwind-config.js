@@ -40,7 +40,8 @@ window.tailwind.config = {
       boxShadow: {
         paper: "0 4px 6px -1px rgba(46, 42, 37, 0.1), 0 2px 4px -1px rgba(46, 42, 37, 0.06)",
         "paper-lg": "0 10px 15px -3px rgba(46, 42, 37, 0.1), 0 4px 6px -2px rgba(46, 42, 37, 0.05)",
-        "paper-xl": "0 20px 25px -5px rgba(46, 42, 37, 0.1), 0 10px 10px -5px rgba(46, 42, 37, 0.04)",
+        "paper-xl":
+          "0 20px 25px -5px rgba(46, 42, 37, 0.1), 0 10px 10px -5px rgba(46, 42, 37, 0.04)",
       },
     },
   },

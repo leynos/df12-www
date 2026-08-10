@@ -46,14 +46,17 @@ async function needsUpdate(sourcePath: string, targetPath: string): Promise<bool
   }
 }
 
-async function generateVariant(sourcePath: string, format: typeof OUTPUT_FORMATS[number]) {
+async function generateVariant(sourcePath: string, format: (typeof OUTPUT_FORMATS)[number]) {
   const outputPath = sourcePath.replace(/\.png$/i, `.${format.format}`);
   if (!(await needsUpdate(sourcePath, outputPath))) {
     return;
   }
 
   await sharp(sourcePath)
-    .toFormat(format.format as "webp" | "avif", format.options as sharp.WebpOptions | sharp.AvifOptions)
+    .toFormat(
+      format.format as "webp" | "avif",
+      format.options as sharp.WebpOptions | sharp.AvifOptions,
+    )
     .toFile(outputPath);
 
   const rel = relative(process.cwd(), outputPath).split(sep).join("/");
@@ -75,7 +78,7 @@ async function main() {
   }
 
   const tasks = pngFiles.flatMap((filePath) =>
-    OUTPUT_FORMATS.map((format) => generateVariant(filePath, format))
+    OUTPUT_FORMATS.map((format) => generateVariant(filePath, format)),
   );
 
   const results = await Promise.allSettled(tasks);
@@ -85,7 +88,7 @@ async function main() {
   }
 
   console.log(
-    `Image variant generation completed (${pngFiles.length} files, ${OUTPUT_FORMATS.length} formats).`
+    `Image variant generation completed (${pngFiles.length} files, ${OUTPUT_FORMATS.length} formats).`,
   );
 }
 

@@ -10,9 +10,7 @@
   "use strict";
 
   document.addEventListener("DOMContentLoaded", function () {
-    var buttons = Array.from(
-      document.querySelectorAll("button[data-category]"),
-    );
+    var buttons = Array.from(document.querySelectorAll("button[data-category]"));
     var articles = Array.from(document.querySelectorAll("article[data-category]"));
 
     if (buttons.length === 0 || articles.length === 0) {
@@ -21,15 +19,11 @@
 
     function applyFilter(category) {
       buttons.forEach(function (btn) {
-        btn.setAttribute(
-          "aria-pressed",
-          btn.dataset.category === category ? "true" : "false",
-        );
+        btn.setAttribute("aria-pressed", btn.dataset.category === category ? "true" : "false");
       });
 
       articles.forEach(function (article) {
-        var visible =
-          category === "all" || article.dataset.category === category;
+        var visible = category === "all" || article.dataset.category === category;
         article.hidden = !visible;
       });
     }

@@ -4,7 +4,7 @@
   var SELECTORS = {
     toggle: "#navbar-mobile-toggle",
     menu: "#navbar-mobile-menu",
-    navbar: "#navbar"
+    navbar: "#navbar",
   };
 
   var CLASSES = { open: "is-open", hidden: "hidden" };
@@ -25,9 +25,7 @@
     }
 
     function getFocusableMenuItems() {
-      return menu.querySelectorAll(
-        'a[href], button, [tabindex]:not([tabindex="-1"])'
-      );
+      return menu.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
     }
 
     function isToggleVisible() {
@@ -70,14 +68,11 @@
         menu.classList.add(CLASSES.hidden);
         return;
       }
-      menu.addEventListener(
-        "transitionend",
-        function hide(e) {
-          if (e.propertyName !== "max-height") return;
-          if (!isOpen()) menu.classList.add(CLASSES.hidden);
-          menu.removeEventListener("transitionend", hide);
-        }
-      );
+      menu.addEventListener("transitionend", function hide(e) {
+        if (e.propertyName !== "max-height") return;
+        if (!isOpen()) menu.classList.add(CLASSES.hidden);
+        menu.removeEventListener("transitionend", hide);
+      });
     }
 
     function isSamePageAnchor(link) {
@@ -115,7 +110,7 @@
 
     // Close after selecting an in-page link from the mobile menu.
     menu.addEventListener("click", function (e) {
-      var link = e.target.closest('a[href]');
+      var link = e.target.closest("a[href]");
       if (!link || !menu.contains(link) || !isOpen()) return;
       if (isSamePageAnchor(link)) closeMenu();
     });

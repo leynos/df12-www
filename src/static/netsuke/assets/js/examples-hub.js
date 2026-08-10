@@ -30,12 +30,10 @@
         }
 
         for (const card of cards) {
-          const matches =
-            filter === "all" || card.getAttribute("data-category") === filter;
+          const matches = filter === "all" || card.getAttribute("data-category") === filter;
           card.classList.toggle("hidden", !matches);
         }
       });
     }
   }
-
 })();

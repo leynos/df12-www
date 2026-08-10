@@ -47,12 +47,7 @@
       const query = search ? search.value : "";
       let visible = 0;
       for (const row of rows) {
-        const show = matchesFilter(
-          row.dataset.ns,
-          row.dataset.search,
-          namespace,
-          query,
-        );
+        const show = matchesFilter(row.dataset.ns, row.dataset.search, namespace, query);
         row.hidden = !show;
         if (show) visible += 1;
       }
@@ -130,9 +125,7 @@
     });
 
     tablist.addEventListener("keydown", (event) => {
-      const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 }[
-        event.key
-      ];
+      const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 }[event.key];
       if (!step) return;
       const index = tabs.indexOf(document.activeElement);
       if (index === -1) return;
@@ -156,9 +149,7 @@
         link,
       ]),
     );
-    const sections = [...links.keys()]
-      .map((id) => document.getElementById(id))
-      .filter(Boolean);
+    const sections = [...links.keys()].map((id) => document.getElementById(id)).filter(Boolean);
     if (!sections.length) return;
 
     const observer = new IntersectionObserver(

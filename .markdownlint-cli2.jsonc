@@ -13,5 +13,13 @@
     },
     "MD036": false
   },
-  "ignores": ["**/.venv/**", "**/node_modules/**", "**/.terraform/**", "**/.terraform.lock.hcl", "./target/**", ".bun_tmp/**", ".uv-cache/**"]
+  "ignores": [
+    "**/.venv/**",
+    "**/node_modules/**",
+    "**/.terraform/**",
+    "**/.terraform.lock.hcl",
+    "./target/**",
+    ".bun_tmp/**",
+    ".uv-cache/**"
+  ]
 }

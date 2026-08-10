@@ -18,21 +18,11 @@ const DOCS_DIR = path.join(SITE_DIR, "docs");
 const EXAMPLES_DIR = path.join(SITE_DIR, "examples");
 const SEARCH_OUTPUT_DIR = path.join(SITE_DIR, "assets", "search");
 const SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "docs-search.json");
-const EXAMPLES_SEARCH_OUTPUT_PATH = path.join(
-  SEARCH_OUTPUT_DIR,
-  "examples-search.json",
-);
+const EXAMPLES_SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "examples-search.json");
 
 const INDEX_OPTIONS = {
   fields: ["title", "pageTitle", "sectionTitle", "headings", "body"],
-  storeFields: [
-    "title",
-    "sitePath",
-    "pageTitle",
-    "sectionTitle",
-    "excerpt",
-    "kind",
-  ],
+  storeFields: ["title", "sitePath", "pageTitle", "sectionTitle", "excerpt", "kind"],
   searchOptions: {
     boost: {
       title: 6,
@@ -105,8 +95,7 @@ async function buildIndex(files, outputPath) {
 
 function extractDocuments(filePath, html) {
   const sitePath = toSitePath(filePath);
-  const mainHtml =
-    matchFirst(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i) ?? html;
+  const mainHtml = matchFirst(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i) ?? html;
   const pageTitle =
     stripTags(matchFirst(mainHtml, /<h1\b[^>]*>([\s\S]*?)<\/h1>/i) ?? "") ||
     stripTags(matchFirst(html, /<title\b[^>]*>([\s\S]*?)<\/title>/i) ?? "") ||
@@ -133,9 +122,7 @@ function extractDocuments(filePath, html) {
   )) {
     const [, sectionId, sectionHtml] = match;
     const sectionTitle =
-      stripTags(
-        matchFirst(sectionHtml, /<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) ?? "",
-      ) || pageTitle;
+      stripTags(matchFirst(sectionHtml, /<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) ?? "") || pageTitle;
     const excerpt = firstMeaningfulParagraph(sectionHtml) || pageExcerpt;
     const body = normalizeText(sectionHtml);
 
@@ -160,9 +147,7 @@ function extractDocuments(filePath, html) {
 }
 
 function toSitePath(filePath) {
-  const relativePath = path
-    .relative(SITE_DIR, filePath)
-    .replace(/\\/g, "/");
+  const relativePath = path.relative(SITE_DIR, filePath).replace(/\\/g, "/");
   return relativePath.replace(/index\.html$/, "");
 }
 

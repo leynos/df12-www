@@ -65,8 +65,7 @@
     input.setAttribute("aria-expanded", "false");
 
     document.addEventListener("keydown", (event) => {
-      const wantsShortcut =
-        (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+      const wantsShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
 
       if (!wantsShortcut) {
         return;
@@ -266,7 +265,7 @@
             (error) => {
               cache.delete(path);
               throw error;
-            }
+            },
           );
         cache.set(path, pending);
       }

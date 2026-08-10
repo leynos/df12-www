@@ -203,7 +203,6 @@
     @apply font-mono text-base-content;
   }
 
-
   .doc-prose pre {
     @apply rounded-xl border border-neutral bg-neutral text-neutral-content p-5 shadow-lg shadow-neutral/40;
   }

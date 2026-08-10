@@ -15,7 +15,11 @@
       "!src/static/**/vendor",
       // Betamax writes these HTTP recordings; re-recording a cassette would
       // fail the format gate on output no human authored.
-      "!tests/cassettes"
+      "!tests/cassettes",
+      // Snapshots kept for reference, neither built nor shipped. Holding
+      // them to the house style would only churn files whose value is that
+      // they still read the way they did when they were written.
+      "!reference"
     ],
     "ignoreUnknown": true
   },

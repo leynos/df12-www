@@ -4,6 +4,9 @@ node_modules
 .bun_install
 *.tgz
 reference/
+# ...except the CRT-themed prototype homepage, which is kept deliberately
+# rather than dropped there as a scratch snapshot.
+!reference/index.html
 
 # Generated site output. The published tree is built entirely from src/,
 # config/, and templates/; nothing under public/ is tracked. Hand-crafted

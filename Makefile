@@ -1,7 +1,7 @@
 MDLINT ?= $(shell which markdownlint-cli2)
 NIXIE ?= $(shell which nixie)
 MDFORMAT_ALL ?= $(shell which mdformat-all)
-TOOLS = $(MDFORMAT_ALL) ruff ty $(MDLINT) $(NIXIE) uv
+TOOLS = $(MDFORMAT_ALL) ruff ty $(MDLINT) $(NIXIE) uv bun
 VENV_TOOLS = pytest
 UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
 SKIP_PLAYWRIGHT ?= 0
@@ -67,17 +67,21 @@ $(VENV_TOOLS): ## Verify required CLI tools in venv
 	$(call ensure_tool_venv,$@)
 endif
 
-fmt: ruff $(MDFORMAT_ALL) ## Format sources
+fmt: ruff bun $(MDFORMAT_ALL) ## Format sources
 	ruff format
 	ruff check --select I --fix
+	bun run lint:js:fix
 	$(MDFORMAT_ALL)
 
 check-fmt: ruff ## Verify formatting
 	ruff format --check
+	# Biome's formatting is checked by the lint target, which runs
+	# `biome check` — formatter, linter, and assists in one pass.
 	# mdformat-all doesn't currently do checking
 
-lint: ruff ## Run linters
+lint: ruff bun ## Run linters
 	ruff check
+	bun run lint:js
 
 typecheck: build ty ## Run typechecking
 	ty --version

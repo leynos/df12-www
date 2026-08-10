@@ -144,7 +144,7 @@
 .personas table td {
   padding: 14px 12px;
   vertical-align: top;
-  border-bottom: 1px solid rgba(239, 228, 206, 0.25);
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
   font-size: 1.02rem;
   line-height: 1.5;
 }
@@ -167,8 +167,14 @@
   color: var(--paper);
   width: 22%;
 }
+/* The section folio sits on the ink ground, where --accent-text is already
+   the on-ink red, so it needs only its spacing. */
+.personas .personas-folio {
+  margin-bottom: 18px;
+  color: var(--accent-text);
+}
 .personas table td.ignore {
-  color: rgba(239, 228, 206, 0.55);
+  color: color-mix(in srgb, var(--paper) 55%, transparent);
   font-style: italic;
   width: 28%;
 }
@@ -217,13 +223,37 @@
 .weaknesses {
   max-width: 1240px;
   margin: 0 auto;
-  padding: calc(var(--unit) * 6) calc(var(--unit) * 4)
-    calc(var(--unit) * 8);
+  padding: calc(var(--unit) * 6) calc(var(--unit) * 4) calc(var(--unit) * 8);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: calc(var(--unit) * 4);
   align-items: start;
 }
+/* The left column of the rejected-alternatives band: a folio, a heading set
+   smaller than the page's h2 default, a lede, and the chip row naming what
+   was turned down. */
+.rejected-folio {
+  margin-bottom: 14px;
+}
+.rejected-head {
+  font-size: 2.4rem;
+  margin: 0;
+  line-height: 0.95;
+}
+.rejected-head .red {
+  color: var(--accent-text);
+}
+.rejected-lede {
+  margin-top: 18px;
+  font-size: 1.1rem;
+}
+.rejected-chips {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .weakness-panel {
   border: var(--rule-weight-2) solid var(--press-red);
   background: var(--paper-shade);
@@ -247,38 +277,16 @@
   margin-bottom: 10px;
 }
 
+/* The shared closing section lives in stilyagi-site.css.  This page's quote
+   is the shortest of the three and is set larger on a tighter measure, and
+   the panel above it supplies no gap underneath, so the section takes its
+   own top padding. */
 .closing {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: calc(var(--unit) * 4) calc(var(--unit) * 4)
-    calc(var(--unit) * 10);
-  text-align: center;
+  padding-top: calc(var(--unit) * 4);
 }
 .closing .pullquote {
   max-width: 34ch;
-  margin: 0 auto;
   font-size: 2.2rem;
-}
-.closing .next {
-  margin-top: calc(var(--unit) * 4);
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.closing .next a {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom: 2px solid var(--press-red);
-  padding-bottom: 2px;
-}
-.closing .next a:hover {
-  color: var(--accent-text);
 }
 
 /* Style-hunter illustration */
@@ -326,6 +334,24 @@
   max-width: 48ch;
 }
 
+/* Four columns is too many below about 1180px — the camp headings start
+   breaking mid-word — but one is too few while there is still room for two.
+   This step catches the gap the 900px rule below used to leave. */
+@media (max-width: 1180px) {
+  .camps,
+  .valueset {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Stacked two-up, the third and fourth camps need the rule between rows
+     that the single-row layout got from the side borders alone. */
+  .camps .camp:nth-child(-n + 2) {
+    border-bottom: var(--rule-weight) solid var(--ink);
+  }
+  .camps .camp:nth-child(2n) {
+    border-right: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .camps,
   .valueset,
@@ -347,9 +373,8 @@
     top: 74px;
     z-index: 1;
     margin-inline: calc(var(--unit) * -2);
-    padding: calc(var(--unit) * 3) calc(var(--unit) * 2)
-      calc(var(--unit) * 1.5);
-    background: rgba(239, 228, 206, 0.92);
+    padding: calc(var(--unit) * 3) calc(var(--unit) * 2) calc(var(--unit) * 1.5);
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
     backdrop-filter: blur(8px);
     border-bottom: var(--rule-weight) solid var(--ink);
   }

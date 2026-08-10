@@ -26,6 +26,16 @@
   padding-top: calc(var(--unit) * 2);
   border-top: var(--rule-weight-2) solid var(--ink);
 }
+/* The page's opening H2 needs no rule above it: there is nothing above it
+   to divide from.  All three shapes have to tolerate a table of contents
+   ahead of them, which pages configured with `toc: true` emit.
+
+   The sectioned shape already does, as it happens — the TOC is a <nav> and
+   the sections are <section>, so :first-of-type counts past it — but the
+   flat shape did not, and :first-child would have stopped matching the
+   moment a TOC appeared, leaving the heading with a rule directly under the
+   TOC box's own border. */
+.legal-prose > .content-toc:first-child + h2,
 .legal-prose > h2:first-child,
 .legal-prose > .content-section:first-of-type h2 {
   margin-top: 0;
@@ -54,7 +64,12 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  columns: 2;
+  /* A minimum column width as well as a count, so a narrow content area
+     collapses to one column of its own accord instead of holding two very
+     short ones side by side.  14rem is set against the measure this list
+     actually gets — 70ch of prose, about 519px — where two columns and the
+     gap need 480px and still fit.  Below roughly that, one column. */
+  columns: 14rem 2;
   column-gap: calc(var(--unit) * 4);
 }
 .legal-prose .content-toc li {

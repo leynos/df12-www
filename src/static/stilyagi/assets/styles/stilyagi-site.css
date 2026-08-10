@@ -55,7 +55,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(239, 228, 206, 0.96);
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
   border-bottom: var(--rule-weight-2) solid var(--ink);
   backdrop-filter: blur(10px);
 }
@@ -85,11 +85,7 @@
   width: 42px;
   align-self: stretch;
   border-right: var(--rule-weight) solid var(--ink);
-  background: repeating-linear-gradient(
-    135deg,
-    var(--ink) 0 8px,
-    transparent 8px 14px
-  );
+  background: repeating-linear-gradient(135deg, var(--ink) 0 8px, transparent 8px 14px);
 }
 .brand-lockup .brand-word {
   font-family: var(--font-display);
@@ -128,18 +124,10 @@
   display: block;
   width: 22px;
   height: 13px;
-  background: repeating-linear-gradient(
-    180deg,
-    var(--ink) 0 3px,
-    transparent 3px 8px
-  );
+  background: repeating-linear-gradient(180deg, var(--ink) 0 3px, transparent 3px 8px);
 }
 .nav-toggle:hover .nav-toggle-bars {
-  background: repeating-linear-gradient(
-    180deg,
-    var(--press-red) 0 3px,
-    transparent 3px 8px
-  );
+  background: repeating-linear-gradient(180deg, var(--press-red) 0 3px, transparent 3px 8px);
 }
 .site-mast nav ol {
   list-style: none;
@@ -249,7 +237,7 @@
     border-bottom: var(--rule-weight) solid var(--ink-soft);
   }
   .site-mast nav ol::backdrop {
-    background: rgba(15, 15, 15, 0.25);
+    background: color-mix(in srgb, var(--ink) 25%, transparent);
   }
 }
 
@@ -259,8 +247,12 @@
   border-bottom: var(--rule-weight-2) solid var(--ink);
   padding: calc(var(--unit) * 8) 0 calc(var(--unit) * 6);
   background:
-    linear-gradient(135deg, rgba(194, 39, 46, 0.1), transparent 26%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0));
+    linear-gradient(135deg, color-mix(in srgb, var(--press-red) 10%, transparent), transparent 26%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper-highlight) 24%, transparent),
+      transparent
+    );
 }
 .page-intro::before {
   content: "";
@@ -269,11 +261,7 @@
   left: 0;
   width: min(18vw, 220px);
   height: 12px;
-  background: repeating-linear-gradient(
-    135deg,
-    var(--ink) 0 10px,
-    var(--press-red) 10px 20px
-  );
+  background: repeating-linear-gradient(135deg, var(--ink) 0 10px, var(--press-red) 10px 20px);
 }
 .page-intro .wrap {
   max-width: 1320px;
@@ -296,22 +284,22 @@
   background:
     radial-gradient(
       circle at 15% 24%,
-      rgba(216, 30, 121, 0.26) 0 8px,
+      color-mix(in srgb, var(--jazz-magenta) 26%, transparent) 0 8px,
       transparent 9px
     ),
     radial-gradient(
       circle at 82% 72%,
-      rgba(41, 180, 196, 0.3) 0 10px,
+      color-mix(in srgb, var(--jazz-cyan) 30%, transparent) 0 10px,
       transparent 11px
     ),
     radial-gradient(
       circle at 55% 15%,
-      rgba(214, 159, 46, 0.28) 0 12px,
+      color-mix(in srgb, var(--jazz-ochre) 28%, transparent) 0 12px,
       transparent 13px
     ),
     repeating-linear-gradient(
       135deg,
-      rgba(15, 15, 15, 0.12) 0 2px,
+      color-mix(in srgb, var(--ink) 12%, transparent) 0 2px,
       transparent 2px 9px
     );
   opacity: 0.55;
@@ -356,6 +344,11 @@
   font-variant: small-caps;
   letter-spacing: 0.04em;
 }
+/* A rubber stamp filed under the lede — the docs page's version mark, the
+   roadmap's GROUNDED. */
+.page-intro .intro-stamp {
+  margin-top: 18px;
+}
 @media (max-width: 900px) {
   .page-intro .wrap {
     grid-template-columns: 1fr;
@@ -388,7 +381,11 @@
   margin-top: calc(var(--unit) * 8);
   border-top: var(--rule-weight-3) solid var(--ink);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper-highlight) 24%, transparent),
+      transparent
+    ),
     var(--paper-shade);
 }
 .colophon-footer .wrap {
@@ -530,6 +527,45 @@
   margin-top: 4px;
 }
 
+/* ---------- Closing section ---------------------------------------- */
+/* A pull-quote and a row of onward links: the last thing on why, how, and
+   design.  All three spelled it out in style attributes, which is how they
+   came to disagree about the measure without anyone deciding they should.
+   The pages that want a different measure now say so in their own
+   stylesheet, and say nothing else. */
+.closing {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 10);
+  text-align: center;
+}
+.closing .pullquote {
+  max-width: 38ch;
+  margin: 0 auto;
+  font-size: 2rem;
+}
+.closing .next {
+  margin-top: calc(var(--unit) * 4);
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.closing .next a {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 2px solid var(--press-red);
+  padding-bottom: 2px;
+}
+.closing .next a:hover {
+  color: var(--accent-text);
+}
+
 /* ---------- Manicule ornaments ------------------------------------- */
 .bigpoint {
   font-family: var(--font-editorial);
@@ -581,11 +617,13 @@
 .verdict.ink {
   color: var(--ink);
 }
+/* The verdict is set in its colour and outlined in it, so both take the
+   type-safe hue: the fills manage 4.36:1 and 4.09:1 against paper. */
 .verdict.ochre {
-  color: var(--signal-rust);
+  color: var(--signal-rust-text);
 }
 .verdict.sage {
-  color: var(--signal-sage);
+  color: var(--signal-sage-text);
 }
 
 /* inline refs like [1] */

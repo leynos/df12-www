@@ -3,26 +3,56 @@
    Agitprop rigour · jazz-age swagger · university-press authority
    ================================================================= */
 
-/* Big Shoulders — local variable font (brand-supplied) */
+/* Every face is served from this origin.  Nothing here reaches a third party,
+   so loading a Stilyagi page discloses no address to anyone but us.
+
+   All five are the upstream variable fonts, converted to woff2 with fonttools
+   and shipped beside their SIL Open Font Licence text in ../fonts/.  Big
+   Shoulders and the EB Garamond roman are brand-supplied; the other three come
+   from google/fonts (ofl/ebgaramond, ofl/ibmplexsans, ofl/jetbrainsmono). */
+
+/* Big Shoulders — display */
 @font-face {
   font-family: "Big Shoulders Display";
-  src: url("../fonts/BigShoulders-VariableFont_opsz_wght.woff2")
-    format("woff2-variations");
+  src: url("../fonts/BigShoulders-VariableFont_opsz_wght.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
-/* EB Garamond — local roman, Google Fonts for italic fallback */
+/* EB Garamond — editorial roman */
 @font-face {
   font-family: "EB Garamond";
-  src: url("../fonts/EBGaramond-VariableFont_wght.woff2")
-    format("woff2-variations");
+  src: url("../fonts/EBGaramond-VariableFont_wght.woff2") format("woff2-variations");
   font-weight: 400 800;
   font-style: normal;
   font-display: swap;
 }
-/* Italic + sans + mono via Google Fonts */
-@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@1,400;1,500;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+/* EB Garamond — editorial italic.  The pull-quotes, the dek, and every
+   inline <em> in the prose are set in it, so it is not optional. */
+@font-face {
+  font-family: "EB Garamond";
+  src: url("../fonts/EBGaramond-Italic-VariableFont_wght.woff2") format("woff2-variations");
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+}
+/* IBM Plex Sans — labels, captions, and every uppercase rule.  The upstream
+   file also carries a width axis; the default 100 is the only width used. */
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("../fonts/IBMPlexSans-VariableFont_wdth-wght.woff2") format("woff2-variations");
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* JetBrains Mono — code, terminals, and machine text */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../fonts/JetBrainsMono-VariableFont_wght.woff2") format("woff2-variations");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* ---------- COLOR ------------------------------------------------ */
@@ -30,6 +60,19 @@
   --paper: #efe4ce; /* primary surface */
   --paper-shade: #e4d7b9; /* recessed panel */
   --paper-deep: #d8c9a4; /* samizdat ground */
+
+  /* Light on paper, not a surface of its own.  Every framed box on the site
+     carries a wash of it down from the top edge, which is what stops the
+     three paper greys reading as flat fills; the alpha varies by how much
+     lift the box wants, so call sites mix it and this names only the hue.
+     It is never a colour anything is set in — it exists to be nearly
+     transparent, and at full strength it would be the clinical white the
+     surface tokens above are defined against. */
+  --paper-highlight: #ffffff;
+  /* The unprinted flecks in a rubber stamp, where the ink did not take.
+     Same hue, different job: these are specks in a mark, not a wash over a
+     surface, and they would not follow the wash if it were retuned. */
+  --stamp-fleck: #ffffff;
 
   /* Ink */
   --ink: #0f0f0f; /* lamp-black; display + body */
@@ -47,21 +90,46 @@
   --press-red-text: #a42127; /* red type on paper — 4.5:1 to paper-deep */
   --press-red-on-ink: #da474e; /* red type on the ink ground — 4.5:1 */
 
-  /* Jazz — sparingly, as splashes on covers + posters */
+  /* Jazz — sparingly, as splashes on covers + posters.
+     The base hues are fills. Each has a -text counterpart below, because none
+     of them carries type on paper: cyan manages 1.98:1 and ochre 1.88:1. */
   --jazz-magenta: #d81e79;
-  --jazz-magenta-solid: #c31b6d; /* magenta behind paper type — 4.5:1 */
+  --jazz-magenta-solid: #c31b6d; /* paper type on magenta — 4.50:1 */
   --jazz-cyan: #29b4c4;
   --jazz-ochre: #d69f2e;
+  /* The legend's fifth hue. The IR inspector tints link regions in a blue
+     that appears nowhere else in the palette, so it is named here rather
+     than restated at each call site. A tint and a swatch are non-text, and
+     3.70:1 on --paper clears that 3:1 floor. */
+  --jazz-blue: #2e7ca0;
 
   /* Signal */
   --signal-sage: #6b7145; /* quiet affirmation */
-  --signal-sage-solid: #646940; /* sage behind paper type — 4.5:1 */
+  --signal-sage-solid: #646940; /* paper type on sage — 4.58:1 */
   --signal-sage-on-ink: #787f4e; /* sage type on the ink ground — 4.5:1 */
   --signal-rust: #a4522a; /* warning, subordinate to press-red */
+  --signal-rust-on-ink: #b06946; /* rust type on the ink ground — 4.52:1 */
   /* The source site referenced --rust-patina for the PYDOC namespace badge
      but never defined it, leaving paper type on a transparent ground.  It is
      the signal rust, darkened to carry paper type at 4.5:1. */
   --rust-patina: #93491f;
+
+  /* Type-safe counterparts to the fill colours above.  Each is its fill
+     darkened until it clears 4.5:1 against --paper-deep, the darkest paper
+     surface, so one token holds on every paper ground the site has — the
+     same rule --press-red-text follows.  Ratios against --paper-deep;
+     against plain --paper each is roughly 5.9:1. */
+  --jazz-cyan-text: #165e67; /* 4.53:1 */
+  --jazz-ochre-text: #6d5118; /* 4.51:1 */
+  --jazz-magenta-text: #a3175b; /* 4.53:1 */
+  --signal-sage-text: #545836; /* 4.53:1 */
+  --signal-rust-text: #864322; /* 4.51:1 */
+  /* --rule-faint is the graph-paper line, and it is a rule colour: as type
+     on paper it manages 2.52:1.  Muted type takes this instead. */
+  --fg-muted-text: #5b5447; /* 4.57:1 */
+  /* Magenta type on the ink ground.  The paper-ground magenta manages only
+     4.00:1 there, so ink panels take this instead. */
+  --jazz-magenta-on-ink: #dc3788; /* 4.51:1 */
 
   /* Secondary type on the ink ground.  --ink-soft is a rule colour and is
      invisible as type against --ink (1.3:1), so dark panels use this. */
@@ -76,7 +144,9 @@
   /* Semantic aliases */
   --fg1: var(--ink);
   --fg2: var(--ink-soft);
-  --fg-muted: var(--rule-faint);
+  /* The alias for muted *type*.  It points at the type-safe grey, not the
+     rule colour, because everything that reads it is text. */
+  --fg-muted: var(--fg-muted-text);
   --fg-link: var(--press-red-ink);
   --fg-link-hover: var(--press-red);
   --bg: var(--paper);
@@ -90,16 +160,33 @@
      descendant — including elements carrying an inline colour — follows. */
   --accent-text: var(--press-red-text);
   --border: var(--ink);
-  --border-soft: rgba(15, 15, 15, 0.25);
+  --border-soft: color-mix(in srgb, var(--ink) 25%, transparent);
   --selection-bg: var(--press-red);
   --selection-fg: var(--paper);
 
+  /* ---------- FOCUS ------------------------------------------------ */
+  /* One ring for every control the keyboard can reach, so a walkthrough
+     reads the same from the masthead to the roadmap.
+
+     It is deliberately not the hover cue: hover moves the ground under a
+     control, focus draws a rule around it, and a control that is both shows
+     both.  Ink is the ring because the offset puts it outside the control,
+     on the page rather than on the fill — 15.21:1 on --paper, 13.44:1 on
+     --paper-shade, 11.69:1 on --paper-deep, all far past the 3:1 that WCAG
+     2.2 asks of a non-text indicator.  Dark panels re-point it to paper
+     below, for the few rings that are drawn inside a control instead. */
+  --focus-ring-width: 3px;
+  --focus-ring-color: var(--ink);
+  --focus-ring-offset: 2px;
+
   /* ---------- TYPE ------------------------------------------------- */
-  --font-display: "Big Shoulders Display", Impact, "Arial Narrow", sans-serif;
-  --font-editorial: "EB Garamond", Georgia, "Times New Roman", serif;
-  --font-sans:
-    "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  /* Every family name is quoted and every generic keyword is not, so the two
+     are told apart at a glance; unquoted names are valid CSS but read as
+     keywords, which is what Stylelint's value-keyword-case objects to. */
+  --font-display: "Big Shoulders Display", "Impact", "Arial Narrow", sans-serif;
+  --font-editorial: "EB Garamond", "Georgia", "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans", -apple-system, "BlinkMacSystemFont", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, "Menlo", monospace;
 
   /* Modular scale — double-stranded */
   --t-caption: 0.78rem;
@@ -141,6 +228,20 @@
 *::after {
   box-sizing: border-box;
 }
+
+/* The focus treatment, declared once for everything focusable rather than
+   control by control — a component that forgets to opt in cannot exist.
+   :focus-visible is the browser's own judgement about whether the reader is
+   navigating by keyboard, so a pointer user sees none of this.
+
+   Individual controls override the offset where an outward ring would be
+   clipped by a scroller or overlap a neighbouring row; they do not override
+   the width or the colour. */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -163,8 +264,16 @@ body {
 
   /* The ruled-paper signature. Never remove. */
   background-image:
-    linear-gradient(to right, rgba(155, 143, 121, 0.22) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(155, 143, 121, 0.22) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--rule-faint) 22%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--rule-faint) 22%, transparent) 1px,
+      transparent 1px
+    );
   background-size: var(--grid-pitch) var(--grid-pitch);
 }
 ::selection {
@@ -287,9 +396,18 @@ hr.scholar {
 
 /* =================================================================
    Ink grounds — re-point the inheriting type tokens
-   Red, sage, and secondary greys tuned for paper all fall below the
-   4.5:1 body-text floor against --ink, so every dark panel switches
+   Red, magenta, sage, and secondary greys tuned for paper all fall below
+   the 4.5:1 body-text floor against --ink, so every dark panel switches
    them here rather than at each call site.
+
+   The focus ring is deliberately not in this list.  These tokens follow the
+   ground an element's *contents* sit on; a ring follows the ground it is
+   painted on, and at the shared positive offset that is the page outside
+   the control, not the fill inside it.  A focusable element with an ink
+   fill — the active RsDoc chip, a hovered ghost button — still needs the
+   ink ring, because its ring lands on the paper around it.  The three
+   scrollers that draw their ring inside themselves set the paper ring in
+   their own rules, beside the offset that makes it necessary.
    ================================================================= */
 .ink-panel,
 .agitprop,
@@ -298,6 +416,7 @@ pre.code,
 .term,
 .layer-rust,
 .boundary .layer-card.rust,
+.code-scroll,
 .config-grid pre,
 .colophon-sec,
 .ns-rsdoc,
@@ -307,4 +426,8 @@ pre.code,
   --accent-text: var(--press-red-on-ink);
   --fg2: var(--fg2-on-ink);
   --signal-sage: var(--signal-sage-on-ink);
+  --signal-sage-text: var(--signal-sage-on-ink);
+  --signal-rust-text: var(--signal-rust-on-ink);
+  --jazz-magenta: var(--jazz-magenta-on-ink);
+  --jazz-magenta-text: var(--jazz-magenta-on-ink);
 }

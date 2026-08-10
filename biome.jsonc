@@ -65,6 +65,17 @@
       "linter": { "enabled": false }
     },
     {
+      // The Pygments blocks in these two stylesheets are written by
+      // scripts/generate_*_pygments_css.py, which emits one rule per line.
+      // Formatting them here would put the formatter and the generator in a
+      // loop, each undoing the other on the next run.
+      "includes": [
+        "src/static/stilyagi/assets/styles/syntax.css",
+        "src/static/netsuke/assets/css/himotoshi.css"
+      ],
+      "formatter": { "enabled": false }
+    },
+    {
       // Standalone .svg assets are referenced from CSS as images. The a11y
       // rules that fire on them (noSvgWithoutTitle) are written for inline
       // JSX, where the <svg> is part of a document's accessibility tree.

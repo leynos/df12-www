@@ -3,8 +3,7 @@
 .roadmap-wrap {
   max-width: 1240px;
   margin: 0 auto;
-  padding: calc(var(--unit) * 4) calc(var(--unit) * 4)
-    calc(var(--unit) * 6);
+  padding: calc(var(--unit) * 4) calc(var(--unit) * 4) calc(var(--unit) * 6);
 }
 .timeline {
   border-top: var(--rule-weight-2) solid var(--ink);
@@ -16,6 +15,21 @@
 }
 .phase:hover:not(.open) {
   background: var(--paper-shade);
+}
+/* A phase head is a button that fills its row, and until now the keyboard
+   got only whatever ring the browser drew by default.  It takes the same
+   recessed ground the pointer gets, so the row that would open reads the
+   same either way, and the shared ring on top of it so focus is still
+   telling the reader something hover is not.
+
+   The ring is drawn inside the row: outside, it would cross the rule
+   between this phase and the next.  Ink on either ground the row can have
+   is 15.21:1 on paper and 13.44:1 on the recessed shade. */
+.phase:not(.open):has(.ph-head:focus-visible) {
+  background: var(--paper-shade);
+}
+.phase .ph-head:focus-visible {
+  outline-offset: -4px;
 }
 .phase .ph-head {
   display: grid;
@@ -159,7 +173,7 @@
 .deliverables li {
   padding: 8px 0 8px 1.8em;
   position: relative;
-  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   font-family: var(--font-editorial);
   font-size: 1rem;
   line-height: 1.45;
@@ -236,6 +250,11 @@
   font-weight: 700;
   display: block;
   margin-bottom: 6px;
+}
+/* The note carries two headings; the second opens a fresh remark and needs
+   air above it that the first, sitting at the top of the aside, does not. */
+.margin-note .red:not(:first-child) {
+  margin-top: 12px;
 }
 .risks .body h3 {
   font-family: var(--font-display);
@@ -443,9 +462,8 @@
        underneath it. */
     top: 74px;
     margin-inline: calc(var(--unit) * -2);
-    padding: calc(var(--unit) * 3) calc(var(--unit) * 2)
-      calc(var(--unit) * 1.5);
-    background: rgba(239, 228, 206, 0.92);
+    padding: calc(var(--unit) * 3) calc(var(--unit) * 2) calc(var(--unit) * 1.5);
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
     backdrop-filter: blur(8px);
     border-bottom: var(--rule-weight) solid var(--ink);
   }

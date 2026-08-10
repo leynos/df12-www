@@ -88,7 +88,7 @@ section.chapter > .chapter-label {
 .manicule-list > li {
   position: relative;
   padding: 0.15em 0 0.8em 2.2em;
-  border-bottom: 1px solid rgba(15, 15, 15, 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
 }
 .manicule-list > li:last-child {
   border-bottom: 0;
@@ -106,14 +106,16 @@ section.chapter > .chapter-label {
 .manicule-list.red > li::before {
   color: var(--accent-text);
 }
+/* The manicule is a glyph, so it takes the type-safe hues rather than the
+   fills: cyan and ochre manage under 2:1 against paper, magenta 3.80:1. */
 .manicule-list.magenta > li::before {
-  color: var(--jazz-magenta);
+  color: var(--jazz-magenta-text);
 }
 .manicule-list.cyan > li::before {
-  color: var(--jazz-cyan);
+  color: var(--jazz-cyan-text);
 }
 .manicule-list.ochre > li::before {
-  color: var(--jazz-ochre);
+  color: var(--jazz-ochre-text);
 }
 
 /* ----------------------------------------------------------------
@@ -121,35 +123,35 @@ section.chapter > .chapter-label {
    ---------------------------------------------------------------- */
 .halftone {
   background-image: radial-gradient(
-    rgba(15, 15, 15, 0.85) 1px,
+    color-mix(in srgb, var(--ink) 85%, transparent) 1px,
     transparent 1.4px
   );
   background-size: 6px 6px;
 }
 .halftone-red {
   background-image: radial-gradient(
-    rgba(194, 39, 46, 0.85) 1px,
+    color-mix(in srgb, var(--press-red) 85%, transparent) 1px,
     transparent 1.4px
   );
   background-size: 6px 6px;
 }
 .halftone-cyan {
   background-image: radial-gradient(
-    rgba(41, 180, 196, 0.85) 1px,
+    color-mix(in srgb, var(--jazz-cyan) 85%, transparent) 1px,
     transparent 1.4px
   );
   background-size: 6px 6px;
 }
 .halftone-ochre {
   background-image: radial-gradient(
-    rgba(214, 159, 46, 0.85) 1px,
+    color-mix(in srgb, var(--jazz-ochre) 85%, transparent) 1px,
     transparent 1.4px
   );
   background-size: 6px 6px;
 }
 .halftone-magenta {
   background-image: radial-gradient(
-    rgba(216, 30, 121, 0.85) 1px,
+    color-mix(in srgb, var(--jazz-magenta) 85%, transparent) 1px,
     transparent 1.4px
   );
   background-size: 6px 6px;
@@ -161,14 +163,14 @@ section.chapter > .chapter-label {
 .hatch {
   background-image: repeating-linear-gradient(
     135deg,
-    rgba(15, 15, 15, 0.65) 0 1px,
+    color-mix(in srgb, var(--ink) 65%, transparent) 0 1px,
     transparent 1px 5px
   );
 }
 .hatch-red {
   background-image: repeating-linear-gradient(
     135deg,
-    rgba(194, 39, 46, 0.75) 0 1px,
+    color-mix(in srgb, var(--press-red) 75%, transparent) 0 1px,
     transparent 1px 5px
   );
 }
@@ -180,11 +182,7 @@ section.chapter > .chapter-label {
   position: absolute;
   width: 60px;
   height: 60px;
-  background: repeating-linear-gradient(
-    135deg,
-    var(--ink) 0 10px,
-    var(--press-red) 10px 20px
-  );
+  background: repeating-linear-gradient(135deg, var(--ink) 0 10px, var(--press-red) 10px 20px);
 }
 .hazard-corner.tl {
   top: 0;
@@ -209,11 +207,7 @@ section.chapter > .chapter-label {
 
 .hazard-rule {
   height: 14px;
-  background: repeating-linear-gradient(
-    135deg,
-    var(--ink) 0 10px,
-    var(--press-red) 10px 20px
-  );
+  background: repeating-linear-gradient(135deg, var(--ink) 0 10px, var(--press-red) 10px 20px);
 }
 
 /* ----------------------------------------------------------------
@@ -235,22 +229,22 @@ section.chapter > .chapter-label {
   background:
     radial-gradient(
       circle at 10% 30%,
-      rgba(255, 255, 255, 0.25) 0 2px,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 2px,
       transparent 3px
     ),
     radial-gradient(
       circle at 60% 70%,
-      rgba(255, 255, 255, 0.25) 0 1.5px,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 1.5px,
       transparent 3px
     ),
     radial-gradient(
       circle at 85% 20%,
-      rgba(255, 255, 255, 0.25) 0 2px,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 2px,
       transparent 3px
     ),
     radial-gradient(
       circle at 35% 85%,
-      rgba(255, 255, 255, 0.25) 0 1px,
+      color-mix(in srgb, var(--stamp-fleck) 25%, transparent) 0 1px,
       transparent 3px
     );
   mix-blend-mode: multiply;
@@ -275,41 +269,13 @@ section.chapter > .chapter-label {
   inset: 0;
   opacity: 0.9;
   background-image:
-    radial-gradient(
-      ellipse 90px 40px at 12% 18%,
-      var(--jazz-magenta) 0 55%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 60px 25px at 10% 28%,
-      var(--jazz-magenta) 0 55%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 80px 35px at 88% 22%,
-      var(--jazz-ochre) 0 55%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 50px 20px at 92% 31%,
-      var(--jazz-ochre) 0 55%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 100px 42px at 82% 78%,
-      var(--jazz-cyan) 0 55%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 55px 22px at 75% 84%,
-      var(--jazz-cyan) 0 55%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 70px 30px at 18% 82%,
-      var(--jazz-magenta) 0 55%,
-      transparent 70%
-    );
+    radial-gradient(ellipse 90px 40px at 12% 18%, var(--jazz-magenta) 0 55%, transparent 70%),
+    radial-gradient(ellipse 60px 25px at 10% 28%, var(--jazz-magenta) 0 55%, transparent 70%),
+    radial-gradient(ellipse 80px 35px at 88% 22%, var(--jazz-ochre) 0 55%, transparent 70%),
+    radial-gradient(ellipse 50px 20px at 92% 31%, var(--jazz-ochre) 0 55%, transparent 70%),
+    radial-gradient(ellipse 100px 42px at 82% 78%, var(--jazz-cyan) 0 55%, transparent 70%),
+    radial-gradient(ellipse 55px 22px at 75% 84%, var(--jazz-cyan) 0 55%, transparent 70%),
+    radial-gradient(ellipse 70px 30px at 18% 82%, var(--jazz-magenta) 0 55%, transparent 70%);
   filter: blur(0.4px);
   mask-image: radial-gradient(circle at center, black 40%, transparent 78%);
 }
@@ -417,11 +383,24 @@ pre.code .tok-str {
   color: var(--jazz-ochre);
 }
 pre.code .tok-com {
-  color: #7a7464;
+  /* The one-off grey here managed 4.12:1 on the ink ground; --fg2-on-ink is
+     the token that already names secondary type there, at 7.62:1. */
+  color: var(--fg2-on-ink);
   font-style: italic;
 }
+/* The ink-ground block in colors-and-type.css re-points --jazz-magenta for
+   pre.code, so this resolves to --jazz-magenta-on-ink. */
 pre.code .tok-nm {
   color: var(--jazz-magenta);
+}
+
+/* .code-scroll itself is declared in the generated Pygments block, which
+   cannot be hand-edited; the wrapper is a scroller, so it is in the tab
+   order and needs a ring.  The ring is drawn inside, over the block's own
+   ink ground, so it is paper: 15.21:1 there. */
+.code-scroll:focus-visible {
+  --focus-ring-color: var(--paper);
+  outline-offset: -3px;
 }
 
 kbd {
@@ -615,16 +594,26 @@ table.scholar tbody tr:last-child td {
   background: var(--paper);
   color: var(--ink);
   border-radius: 0;
-  outline: 0;
   transition:
     border-color var(--tempo-fast) var(--ease),
     box-shadow var(--tempo-fast) var(--ease);
 }
+/* The pressed-print cue: the rule around the field turns red and throws a
+   hard shadow down and to the right. */
 .field > input:focus,
 .field > textarea:focus,
 .field > select:focus {
   border-color: var(--press-red);
   box-shadow: 3px 3px 0 var(--press-red);
+}
+/* The cue above is a colour change on an existing 2px rule, which is a weak
+   thing to navigate by; the shared ring says plainly which field has the
+   caret.  The shadow falls down and to the right, so the ring is pulled in
+   tight against the border rather than sitting out in it. */
+.field > input:focus-visible,
+.field > textarea:focus-visible,
+.field > select:focus-visible {
+  outline-offset: 1px;
 }
 
 /* Form mini-help */

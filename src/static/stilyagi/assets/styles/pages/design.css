@@ -3,8 +3,7 @@
 .ir-inspector {
   max-width: 1240px;
   margin: 0 auto;
-  padding: calc(var(--unit) * 4) calc(var(--unit) * 4)
-    calc(var(--unit) * 6);
+  padding: calc(var(--unit) * 4) calc(var(--unit) * 4) calc(var(--unit) * 6);
 }
 /* Prose above the inspector: what the IR is and why the byte ranges matter.
    Two columns so the explanation fills the frame's width rather than leaving
@@ -118,28 +117,32 @@
 /* :not(.active) lifts the specificity above the per-type tints below, so
    hover feedback shows on tinted regions without disturbing an active one. */
 .region:not(.active):hover {
-  background: rgba(198, 40, 40, 0.12);
+  background: color-mix(in srgb, var(--press-red) 12%, transparent);
 }
 .region.active {
   background: var(--press-red);
   color: var(--paper);
   outline: 1px solid var(--ink);
 }
+/* One tint per region kind, each a wash of the palette hue the legend below
+   pairs it with.  They are decoration over ink-on-paper type — the kind is
+   also spelled out in the tree opposite — so they carry no contrast floor of
+   their own; the swatches that key them do, and clear it. */
 .region.type-heading {
-  background: rgba(212, 160, 23, 0.18);
+  background: color-mix(in srgb, var(--jazz-ochre) 18%, transparent);
 }
 .region.type-paragraph {
   background: transparent;
 }
 .region.type-code {
-  background: rgba(15, 15, 15, 0.08);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 .region.type-link {
-  background: rgba(46, 124, 160, 0.18);
+  background: color-mix(in srgb, var(--jazz-blue) 18%, transparent);
   color: var(--ink);
 }
 .region.type-list-item {
-  background: rgba(91, 123, 97, 0.15);
+  background: color-mix(in srgb, var(--signal-sage) 15%, transparent);
 }
 /* The per-type tints above share specificity with .region.active but follow
    it in source order, so without these rules an active region keeps its pale
@@ -170,7 +173,16 @@
   color: var(--ink);
 }
 .tree-node:hover {
-  background: rgba(198, 40, 40, 0.08);
+  background: color-mix(in srgb, var(--press-red) 8%, transparent);
+}
+/* The nodes are stacked with no gap between them, so the shared ring is
+   drawn inside the row rather than around it — outside, consecutive rows
+   would overlap each other's rings.  Ink holds on both grounds a node can
+   have: 15.21:1 on the tree's paper, 3.31:1 on the press-red of an active
+   node, past the 3:1 an indicator needs.  Hovering tints the row, focusing
+   rules it, so the two never read as the same state. */
+.tree-node:focus-visible {
+  outline-offset: -3px;
 }
 .tree-node.active {
   background: var(--press-red);
@@ -257,13 +269,13 @@
   background: var(--paper);
 }
 .sw-code {
-  background: rgba(15, 15, 15, 0.15);
+  background: color-mix(in srgb, var(--ink) 15%, transparent);
 }
 .sw-link {
-  background: rgba(46, 124, 160, 0.28);
+  background: color-mix(in srgb, var(--jazz-blue) 28%, transparent);
 }
 .sw-list {
-  background: rgba(91, 123, 97, 0.22);
+  background: color-mix(in srgb, var(--signal-sage) 22%, transparent);
 }
 
 .planner {
@@ -297,7 +309,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   font-family: var(--font-sans);
   font-size: 0.85rem;
   cursor: pointer;
@@ -305,6 +317,15 @@
 }
 .rule-toggle:last-child {
   border-bottom: 0;
+}
+/* Same treatment as the tree node opposite, and for the same reason: the
+   switches are a stack of rows that meet at a dashed rule, so the ring goes
+   inside the row.  It runs edge to edge across the column, which is what
+   makes the whole row read as the control rather than the checkbox alone.
+   Nothing else marks a switch as focused — there is no hover cue here for
+   it to be mistaken for. */
+.rule-toggle:focus-visible {
+  outline-offset: -3px;
 }
 .rule-toggle .check {
   width: 18px;
@@ -393,6 +414,8 @@
   font-weight: 700;
   padding: 3px 8px 2px;
 }
+/* Paper on press-red is 4.60:1, so the loaded card carries body-weight type
+   at the AA floor without a variant of its own. */
 .provider.loaded {
   background: var(--press-red);
   color: var(--paper);

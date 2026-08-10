@@ -23,7 +23,7 @@
   text-transform: uppercase;
   color: var(--ink-soft);
   padding: 6px 0;
-  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   text-decoration: none;
 }
 .side-toc a:hover {
@@ -32,6 +32,14 @@
 .side-toc a.active {
   color: var(--accent-text);
   font-weight: 700;
+}
+
+/* The catalogue is the first section and sits where the layout puts it; the
+   four reference sections below it take a gap of their own.  Each also
+   carries .section-anchor, which clears the sticky masthead on a jump from
+   the table of contents. */
+.docs-section {
+  margin-top: 80px;
 }
 
 .cat-head {
@@ -82,7 +90,7 @@
   top: clamp(73px, 61px + 1.6vw, 89px);
   z-index: 5;
   padding: 20px 0 18px;
-  background: rgba(239, 228, 206, 0.96);
+  background: color-mix(in srgb, var(--paper) 96%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: var(--rule-weight) solid var(--ink);
   align-items: center;
@@ -157,10 +165,9 @@
   color: var(--ink);
   cursor: pointer;
 }
-.filter-select:focus-visible {
-  outline: 2px solid var(--press-red);
-  outline-offset: 1px;
-}
+/* The select, the chips beside it, and the search box below all take the
+   shared ring from colors-and-type.css; each carried its own red 2px rule
+   before, which was a fourth spelling of the same idea. */
 .search-box {
   margin-left: auto;
   min-width: 240px;
@@ -169,10 +176,6 @@
   background: var(--paper);
   font-family: var(--font-mono);
   font-size: 0.85rem;
-}
-.search-box:focus {
-  outline: 2px solid var(--press-red);
-  outline-offset: 1px;
 }
 
 .rules-table {
@@ -195,11 +198,27 @@
   font-size: 1rem;
   line-height: 1.45;
   padding: 12px 10px;
-  border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   vertical-align: top;
 }
 .rules-table tr:hover td {
   background: var(--paper-shade);
+}
+/* Every rule row carries a one-line description under its title, in the
+   secondary ink.  Thirty-four rows said so individually before this. */
+.rules-table .rule-desc {
+  color: var(--ink-soft);
+}
+/* The three narrow columns are sized to their content — an ID, a severity
+   badge, a fix class — so the title column takes the rest. */
+.rules-table .col-rule {
+  width: 110px;
+}
+.rules-table .col-sev {
+  width: 100px;
+}
+.rules-table .col-fix {
+  width: 90px;
 }
 .rules-table .id {
   font-family: var(--font-mono);
@@ -271,7 +290,9 @@
   font-weight: 600;
 }
 .fix.safe {
-  color: var(--signal-sage);
+  /* The sage fill manages 4.09:1 on paper and less on the row's hover
+     ground, so the label takes the type-safe hue. */
+  color: var(--signal-sage-text);
 }
 .fix.unsafe {
   color: var(--accent-text);
@@ -315,6 +336,14 @@
   overflow: auto;
   border-left: 4px solid var(--press-red);
 }
+/* The block scrolls, so it is keyboard reachable and needs a visible ring.
+   It runs edge to edge in its column, so the ring is drawn inside it rather
+   than out on the page — and being drawn over the block's own ink ground,
+   it is paper: 15.21:1 there. */
+.config-grid pre:focus-visible {
+  --focus-ring-color: var(--paper);
+  outline-offset: -3px;
+}
 .config-grid pre .k {
   color: var(--jazz-ochre);
 }
@@ -322,16 +351,17 @@
   color: var(--signal-sage);
 }
 .config-grid pre .c {
-  color: #9d9d9d;
+  /* --fg2-on-ink already names secondary type on this ground. */
+  color: var(--fg2-on-ink);
   font-style: italic;
 }
 .config-grid pre .n {
   color: var(--jazz-cyan);
 }
 
-.suppress {
-  margin-top: calc(var(--unit) * 4);
-}
+/* .suppress set a 32px top margin of its own, which never took effect: the
+   section carried a larger one in a style attribute that beat it.  The gap
+   now comes from .docs-section, like every other section on the page. */
 .suppress h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -381,6 +411,14 @@
 .suppress pre .dim {
   color: var(--ink-soft);
 }
+/* The note under the two suppression specimens. */
+.suppress-note {
+  font-family: var(--font-editorial);
+  font-size: 1rem;
+  color: var(--ink-soft);
+  margin-top: 14px;
+  max-width: 72ch;
+}
 
 /* Testing sandbox — reuses the config section's two-column prose/code pairing,
    so it only needs the status line and the inline code treatment of its own. */
@@ -422,6 +460,10 @@
   background: transparent;
   padding: 0;
 }
+/* The sandbox runs two prose-and-code pairs; the second clears the first. */
+.config-grid--stacked {
+  margin-top: 40px;
+}
 
 /* Colophon */
 .colophon-sec {
@@ -439,7 +481,7 @@
   position: absolute;
   inset: 0;
   background-image: radial-gradient(
-    rgba(239, 228, 206, 0.85) 1px,
+    color-mix(in srgb, var(--paper) 85%, transparent) 1px,
     transparent 1.4px
   );
   background-size: 9px 9px;
@@ -486,7 +528,7 @@
 }
 .credits .row {
   padding: 10px 0;
-  border-bottom: 1px dashed rgba(248, 243, 230, 0.25);
+  border-bottom: 1px dashed color-mix(in srgb, var(--paper) 25%, transparent);
   font-family: var(--font-sans);
   font-size: 0.8rem;
   letter-spacing: 0.1em;
@@ -496,6 +538,12 @@
   gap: 10px;
 }
 .credits .row b {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+/* One credit — the release status — is set in the accent rather than the
+   plain paper the rest of the values take. */
+.credits .row .row-accent {
   color: var(--accent-text);
   font-weight: 700;
 }
@@ -570,7 +618,7 @@
     grid-template-columns: auto auto 1fr;
     gap: 4px 12px;
     padding: 12px 0;
-    border-bottom: 1px dashed rgba(15, 15, 15, 0.2);
+    border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   }
   /* A grid display would otherwise beat the UA rule that hides filtered-out
      rows, so restate it at matching specificity. */

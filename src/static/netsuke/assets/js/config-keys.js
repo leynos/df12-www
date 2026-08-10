@@ -20,7 +20,7 @@
  * panel is always visible is a lie to a screen reader, so neither is
  * declared unless the layout has made it true.
  */
-(function () {
+(() => {
   "use strict";
 
   var WIDE = "(min-width: 768px)";
@@ -87,31 +87,27 @@
       return null;
     }
 
-    var spans = keys.map(function (key) {
-      return key.querySelector("[data-config-keys-label]");
-    });
+    var spans = keys.map((key) => key.querySelector("[data-config-keys-label]"));
     if (spans.indexOf(null) !== -1) {
       return null;
     }
 
     var wide = deps.matchMedia(WIDE);
     var selected = 0;
-    var pairs = keys.map(function (key, index) {
-      return {
-        key: key,
-        span: spans[index],
-        button: makeButton(doc, spans[index]),
-        note: key.querySelector("[data-config-keys-note]"),
-        panel: panels[index],
-      };
-    });
+    var pairs = keys.map((key, index) => ({
+      key: key,
+      span: spans[index],
+      button: makeButton(doc, spans[index]),
+      note: key.querySelector("[data-config-keys-note]"),
+      panel: panels[index],
+    }));
 
     function label(pair) {
       return wide.matches ? pair.span : pair.button;
     }
 
     function mark(className, index) {
-      pairs.forEach(function (pair, i) {
+      pairs.forEach((pair, i) => {
         var on = i === index;
         label(pair).classList.toggle(className, on);
         pair.key.classList.toggle(className, on);
@@ -124,7 +120,7 @@
       if (selected < 0 || selected >= pairs.length) {
         selected = 0;
       }
-      pairs.forEach(function (pair, index) {
+      pairs.forEach((pair, index) => {
         var on = index === selected;
         pair.button.setAttribute("aria-selected", on ? "true" : "false");
         pair.button.tabIndex = on ? 0 : -1;
@@ -137,7 +133,7 @@
     }
 
     function renderWide() {
-      pairs.forEach(function (pair) {
+      pairs.forEach((pair) => {
         pair.panel.hidden = false;
         if (pair.note) {
           pair.note.hidden = false;
@@ -201,19 +197,19 @@
       render();
     }
 
-    pairs.forEach(function (pair, index) {
-      pair.button.addEventListener("click", function () {
+    pairs.forEach((pair, index) => {
+      pair.button.addEventListener("click", () => {
         select(index, false);
       });
 
       // The key wrapper covers the label and, wide, its paragraph.
-      [pair.key, pair.panel].forEach(function (el) {
-        el.addEventListener("pointerenter", function () {
+      [pair.key, pair.panel].forEach((el) => {
+        el.addEventListener("pointerenter", () => {
           if (wide.matches) {
             mark(PREVIEW, index);
           }
         });
-        el.addEventListener("pointerleave", function () {
+        el.addEventListener("pointerleave", () => {
           if (wide.matches) {
             mark(PREVIEW, -1);
           }
@@ -221,7 +217,7 @@
       });
     });
 
-    labelList.addEventListener("keydown", function (e) {
+    labelList.addEventListener("keydown", (e) => {
       if (wide.matches) {
         return;
       }
@@ -253,11 +249,9 @@
   function init() {
     var deps = {
       document: document,
-      matchMedia: function (query) {
-        return window.matchMedia(query);
-      },
+      matchMedia: (query) => window.matchMedia(query),
     };
-    Array.prototype.forEach.call(document.querySelectorAll("[data-config-keys]"), function (root) {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-config-keys]"), (root) => {
       createConfigKeys(root, deps);
     });
   }

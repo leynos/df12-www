@@ -9,7 +9,7 @@
  * markup contract lives in the sidebar blocks of the docs page
  * templates and in templates/netsuke/docs_nav.jinja.
  */
-(function () {
+(() => {
   const SEARCH_MIN_LENGTH = 2;
   const RESULT_LIMIT = 6;
 

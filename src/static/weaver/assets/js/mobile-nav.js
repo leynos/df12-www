@@ -1,5 +1,5 @@
 /* mobile-nav.js — hamburger toggle for sidebar navigation (<1024px) */
-(function () {
+(() => {
   "use strict";
 
   var sidebar = document.getElementById("sidebar");
@@ -65,7 +65,7 @@
     else nav.setAttribute("tabindex", "-1"), nav.focus();
 
     /* Install focus trap */
-    focusTrapHandler = function (e) {
+    focusTrapHandler = (e) => {
       if (e.key !== "Tab") return;
       var els = getFocusableElements();
       if (!els.length) return;
@@ -113,7 +113,7 @@
   }
 
   /* ---- event listeners ---- */
-  btn.addEventListener("click", function () {
+  btn.addEventListener("click", () => {
     if (isOpen()) close();
     else open();
   });
@@ -123,12 +123,12 @@
   /* Close drawer when a nav link is clicked (same-page anchors, etc.) */
   var navLinks = nav.querySelectorAll("a");
   for (var i = 0; i < navLinks.length; i++) {
-    navLinks[i].addEventListener("click", function () {
+    navLinks[i].addEventListener("click", () => {
       if (isOpen()) close();
     });
   }
 
-  document.addEventListener("keydown", function (e) {
+  document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && isOpen()) close();
   });
 

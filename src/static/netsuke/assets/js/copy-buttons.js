@@ -17,7 +17,7 @@
  * arguments so tests can drive them with fakes; the browser wiring at
  * the bottom supplies the real ones.
  */
-(function () {
+(() => {
   "use strict";
 
   var TOAST_LINGER_MS = 2000;
@@ -61,15 +61,15 @@
       // silent. The region is off-screen, so the gap costs nothing
       // visually.
       announcer.textContent = "";
-      announceTimer = clock.setTimeout(function () {
+      announceTimer = clock.setTimeout(() => {
         announcer.textContent = message;
       }, ANNOUNCE_DELAY_MS);
 
-      lingerTimer = clock.setTimeout(function () {
+      lingerTimer = clock.setTimeout(() => {
         element.classList.remove("hm-toast--visible");
         // Wait for the fade to finish before emptying the toast,
         // so the text does not vanish mid-transition.
-        clearTimer = clock.setTimeout(function () {
+        clearTimer = clock.setTimeout(() => {
           element.textContent = "";
           announcer.textContent = "";
         }, TOAST_FADE_MS);
@@ -95,12 +95,12 @@
       }
 
       return clipboard.writeText(text).then(
-        function () {
+        () => {
           if (id === attempt) {
             toast.show("Copied to clipboard", false);
           }
         },
-        function () {
+        () => {
           if (id === attempt) {
             toast.show("Copy failed", true);
           }
@@ -123,13 +123,11 @@
         setTimeout: window.setTimeout.bind(window),
         clearTimeout: window.clearTimeout.bind(window),
       },
-      getClipboard: function () {
-        return navigator.clipboard;
-      },
+      getClipboard: () => navigator.clipboard,
     });
 
-    buttons.forEach(function (button) {
-      button.addEventListener("click", function () {
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
         controller.handleCopy(button.getAttribute("data-copy-text"));
       });
     });

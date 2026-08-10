@@ -6,7 +6,7 @@
  * `active` class the stylesheet already uses (red left border). Pages
  * without sub-links are left alone.
  */
-(function () {
+(() => {
   "use strict";
 
   var OFFSET = 96; // sticky navbar (4rem) plus breathing room
@@ -16,7 +16,7 @@
       document.querySelectorAll('#sidebar a.sidebar-link--sub[href*="#"]'),
     );
     var targets = links
-      .map(function (link) {
+      .map((link) => {
         // Sub-links may use bare fragments or absolute same-page
         // URLs such as /netsuke/docs/getting-started/#installation.
         var url = new URL(link.getAttribute("href"), window.location.href);
@@ -51,9 +51,7 @@
     function update() {
       var atBottom =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-      var tops = targets.map(function (target) {
-        return target.el.getBoundingClientRect().top;
-      });
+      var tops = targets.map((target) => target.el.getBoundingClientRect().top);
       var index = pickActiveIndex(tops, OFFSET, atBottom);
       setActive(index >= 0 ? targets[index] : null);
     }
@@ -62,7 +60,7 @@
     function onScroll() {
       if (!ticking) {
         ticking = true;
-        window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(() => {
           ticking = false;
           update();
         });

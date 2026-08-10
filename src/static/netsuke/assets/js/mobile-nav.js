@@ -1,4 +1,4 @@
-(function () {
+(() => {
   "use strict";
 
   var SELECTORS = {
@@ -89,27 +89,27 @@
     closeMenu({ hideImmediately: true });
 
     // Toggle on click
-    toggle.addEventListener("click", function () {
+    toggle.addEventListener("click", () => {
       if (isOpen()) closeMenu({ restoreFocus: true });
       else openMenu();
     });
 
     // Close on Escape
-    document.addEventListener("keydown", function (e) {
+    document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && isOpen()) {
         closeMenu({ restoreFocus: true });
       }
     });
 
     // Close on click outside both the navbar shell and the mobile menu pane.
-    document.addEventListener("click", function (e) {
+    document.addEventListener("click", (e) => {
       if (isOpen() && !navbar.contains(e.target) && !menu.contains(e.target)) {
         closeMenu();
       }
     });
 
     // Close after selecting an in-page link from the mobile menu.
-    menu.addEventListener("click", function (e) {
+    menu.addEventListener("click", (e) => {
       var link = e.target.closest("a[href]");
       if (!link || !menu.contains(link) || !isOpen()) return;
       if (isSamePageAnchor(link)) closeMenu();
@@ -125,7 +125,7 @@
 
     // Focus trap: Tab cycles through the toggle and menu items in both
     // directions while the menu is open.
-    menu.addEventListener("keydown", function (e) {
+    menu.addEventListener("keydown", (e) => {
       if (e.key !== "Tab" || !isOpen()) return;
       var focusable = getFocusableMenuItems();
       if (!focusable.length) return;
@@ -141,7 +141,7 @@
     });
 
     // When focus leaves toggle while menu is open, wrap to the matching edge.
-    toggle.addEventListener("keydown", function (e) {
+    toggle.addEventListener("keydown", (e) => {
       if (e.key !== "Tab" || !isOpen()) return;
       var focusable = getFocusableMenuItems();
       if (focusable.length) {

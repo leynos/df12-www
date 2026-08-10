@@ -6,10 +6,10 @@
  * `data-category` matches (or all articles when "all" is selected).
  * `aria-pressed` is kept in sync with the active filter.
  */
-(function () {
+(() => {
   "use strict";
 
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", () => {
     var buttons = Array.from(document.querySelectorAll("button[data-category]"));
     var articles = Array.from(document.querySelectorAll("article[data-category]"));
 
@@ -18,18 +18,18 @@
     }
 
     function applyFilter(category) {
-      buttons.forEach(function (btn) {
+      buttons.forEach((btn) => {
         btn.setAttribute("aria-pressed", btn.dataset.category === category ? "true" : "false");
       });
 
-      articles.forEach(function (article) {
+      articles.forEach((article) => {
         var visible = category === "all" || article.dataset.category === category;
         article.hidden = !visible;
       });
     }
 
-    buttons.forEach(function (btn) {
-      btn.addEventListener("click", function () {
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
         applyFilter(btn.dataset.category);
       });
     });

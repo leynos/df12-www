@@ -1,5 +1,5 @@
 import { access, readdir, stat } from "node:fs/promises";
-import { extname, join, dirname, relative, sep } from "node:path";
+import { dirname, extname, join, relative, sep } from "node:path";
 import sharp from "sharp";
 
 const IMAGE_ROOT = join(process.cwd(), "public", "images");

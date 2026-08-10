@@ -6,7 +6,7 @@
  * each card's `data-category`. Copy-to-clipboard behaviour for the
  * cards lives in copy-buttons.js.
  */
-(function () {
+(() => {
   document.addEventListener("DOMContentLoaded", () => {
     initFilters();
   });

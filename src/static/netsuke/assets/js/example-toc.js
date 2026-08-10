@@ -1,4 +1,4 @@
-(function () {
+(() => {
   const HEADER_OFFSET = 120;
 
   document.addEventListener("DOMContentLoaded", () => {

@@ -307,10 +307,10 @@ site.
 
 `make lint` runs Ruff over the Python and Biome over everything else —
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked
-as `biome check .`, which is formatter, linter, and import assists in one pass,
-so a misformatted script fails the lint gate rather than `check-fmt`. Run
-`make fmt` to apply what Biome can fix on its own; what survives that wants
-reading, because the tool declined to make the change unattended.
+as `biome check .`, which provides formatting, linting, and import assists in
+one pass, so a misformatted script fails the lint gate rather than `check-fmt`.
+Run `make fmt` to apply what Biome can fix on its own; what survives that
+wants reading, because the tool declined to make the change unattended.
 
 Where a Biome rule genuinely should not apply, suppress it at the line with a
 stated reason — `// biome-ignore lint/<group>/<rule>: why` — and never by

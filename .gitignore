@@ -3,9 +3,12 @@ node_modules
 .bun_tmp
 .bun_install
 *.tgz
-reference/
-# ...except the CRT-themed prototype homepage, which is kept deliberately
-# rather than dropped there as a scratch snapshot.
+# Scratch HTML snapshots. Ignore the directory's contents rather than the
+# directory itself: an ignored directory is never descended into, so a
+# negation for a file inside one would never be reached.
+reference/*
+# ...and the prototype homepage is the exception, kept deliberately rather
+# than dropped here as a scratch snapshot.
 !reference/index.html
 
 # Generated site output. The published tree is built entirely from src/,

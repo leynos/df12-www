@@ -8,6 +8,7 @@ SKIP_PLAYWRIGHT ?= 0
 PYTEST_FILTER ?=
 TYPOS_VERSION ?= 1.48.0
 TYPOS := uv tool run typos@$(TYPOS_VERSION)
+NODE_MODULES_STAMP := node_modules/.install-stamp
 
 ifeq ($(strip $(SKIP_PLAYWRIGHT)),1)
 PYTEST_FILTER += -m 'not playwright'
@@ -31,9 +32,16 @@ build: uv .venv ## Build virtual-env and install deps
 # target that shells out to bun has to depend on this. `bun` is order-only:
 # it is a phony tool check, and a normal prerequisite would reinstall on
 # every run rather than only when the manifest or lockfile moves.
-node_modules: package.json bun.lockb | bun ## Install locked JS dependencies
+#
+# The target is a stamp file rather than the node_modules directory itself.
+# A failed install still leaves a directory behind, with an mtime newer than
+# the manifest that triggered it, so make would call it up to date and every
+# later run would skip the install and fail in the recipe instead. The stamp
+# is written only when bun exits cleanly, so a failure is retried. It lives
+# inside node_modules, so removing the tree removes the stamp with it.
+$(NODE_MODULES_STAMP): package.json bun.lockb | bun ## Install locked JS dependencies
 	bun install --frozen-lockfile
-	@touch node_modules
+	@touch $@
 
 build-release: ## Build artefacts (sdist & wheel)
 	python -m build --sdist --wheel
@@ -45,7 +53,7 @@ clean: ## Remove build artifacts
 	rm -f .typos-oxendict-base.json .typos-oxendict-base.toml
 	find . -type d -name '__pycache__' -print0 | xargs -0 -r rm -rf
 
-dev: node_modules ## Run the dev server
+dev: $(NODE_MODULES_STAMP) ## Run the dev server
 	$(MAKE) build
 	bun run dev
 
@@ -75,7 +83,7 @@ $(VENV_TOOLS): ## Verify required CLI tools in venv
 	$(call ensure_tool_venv,$@)
 endif
 
-fmt: ruff node_modules $(MDFORMAT_ALL) ## Format sources
+fmt: ruff $(NODE_MODULES_STAMP) $(MDFORMAT_ALL) ## Format sources
 	ruff format
 	ruff check --select I --fix
 	bun run lint:js:fix
@@ -87,7 +95,7 @@ check-fmt: ruff ## Verify formatting
 	# `biome check` — formatter, linter, and assists in one pass.
 	# mdformat-all doesn't currently do checking
 
-lint: ruff node_modules ## Run linters
+lint: ruff $(NODE_MODULES_STAMP) ## Run linters
 	ruff check
 	bun run lint:js
 
@@ -110,7 +118,7 @@ nixie: $(NIXIE) ## Validate Mermaid diagrams
 test: build uv $(VENV_TOOLS) ## Run tests
 	$(UV_ENV) uv run pytest -v $(PYTEST_FILTER)
 
-test-js: node_modules ## Run JavaScript unit tests
+test-js: $(NODE_MODULES_STAMP) ## Run JavaScript unit tests
 	bun run test:js
 
 help: ## Show available targets

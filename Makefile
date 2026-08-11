@@ -119,6 +119,9 @@ test: build uv $(VENV_TOOLS) ## Run tests
 	$(UV_ENV) uv run pytest -v $(PYTEST_FILTER)
 
 test-js: $(NODE_MODULES_STAMP) ## Run JavaScript unit tests
+	# The suite loads the built copies under public/, so the copy step has to
+	# run first or a source change is tested in its previous form.
+	bun run build:static
 	bun run test:js
 
 help: ## Show available targets

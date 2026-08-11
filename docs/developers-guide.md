@@ -113,10 +113,9 @@ consequence worth remembering: **a misformatted script fails `make lint`, not
 `make check-fmt`.** The target names do not imply that, so `check-fmt` carries
 a comment saying where Biome's formatting is actually checked.
 
-What Biome can fix on its own, `make fmt` will fix. What survives that is worth
-reading rather than re-running, because the tool declined to make the change
-unattended — usually because it would alter what the code says rather than how
-it is laid out.
+Run `make fmt` to apply what Biome can fix on its own, then review the findings
+it leaves behind: Biome declines to make those changes unattended because they
+alter what the code says rather than how it is laid out.
 
 Where a rule genuinely should not apply, suppress it at the line with a stated
 reason — `// biome-ignore lint/<group>/<rule>: why` — rather than loosening the
@@ -141,6 +140,9 @@ carries its reasoning in the file:
 | `src/static/netsuke/assets/css/himotoshi.css`, `src/static/stilyagi/assets/styles/syntax.css` | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `**/*.svg`                                                                                    | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
 | `**/*.css` (linter only)                                                                      | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
+
+_Table 1: The trees `biome.jsonc` holds out of scope, and why each is written
+by something other than a person._
 
 Two parser settings matter as much as the exclusions.
 `css.parser.tailwindDirectives` is enabled, because the Tailwind v4 entrypoints
@@ -167,7 +169,7 @@ Every published file has a source elsewhere in the repository:
 | `netsuke/assets/search/*.json`               | `scripts/build-netsuke-search-index.mjs`              |
 | everything else                              | `src/static/`, copied by `scripts/copy-static.ts`     |
 
-_Table 1: Published paths under `public/` and the source that generates them._
+_Table 2: Published paths under `public/` and the source that generates them._
 
 In summary: hand-crafted assets — stylesheets, scripts, images, fonts, and
 favicons — live under `src/static/`, whose layout mirrors the published tree
@@ -333,7 +335,7 @@ block outright, so a run restores it without needing the previous content.
 | Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/static/netsuke/assets/css/himotoshi.css`  |
 | Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
 
-_Table 2: Pygments styles, the lexers each sub-site's templates actually name
+_Table 3: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
@@ -387,7 +389,7 @@ The pill-shaped eyebrow above a page or section heading.
 | `icon_class` | Utility classes for that icon, typically a colour.                      |
 | `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |
 
-_Table 3: the `kicker` macro's parameters._
+_Table 4: the `kicker` macro's parameters._
 
 Three call sites show the range:
 
@@ -412,7 +414,7 @@ default.
 | `.hm-kicker--accent`  | Pairs with `--section` for the docs hub's indigo.      |
 | `.hm-kicker__dot`     | The roadmap's leading status dot.                      |
 
-_Table 4: the kicker component class and its modifiers._
+_Table 5: the kicker component class and its modifiers._
 
 **Normative:** a new variant is a new modifier on `.hm-kicker`, not a fresh
 class list at the call site and not a utility string passed through `extra`.
@@ -458,9 +460,11 @@ Bun tests under `tests/js/` cover these pure functions, and they `require` the
 const { nextTabIndex } = require("../../public/netsuke/assets/js/config-keys.js");
 ```
 
-This means `bun run build` (or at least `bun run build:static`) must have run
-before `bun test tests/js` (`make test-js`) sees a source change; the gate runs
-`build` first for exactly this reason.
+This means the copy step must have run before the suite sees a source change, so
+`make test-js` runs `bun run build:static` before `bun run test:js`. Driving
+`bun test tests/js` directly skips that, and will quietly test the previous
+form of anything edited since the last build. (`make build` does not cover it:
+that target builds the Python virtual environment, not the site.)
 
 Nothing here is bundled, transpiled, or module-loaded: `scripts/copy-static.ts`
 copies these files verbatim. There are no ES modules, no classes, and no custom

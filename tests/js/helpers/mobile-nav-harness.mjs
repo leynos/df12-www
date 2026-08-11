@@ -2,11 +2,12 @@
  *
  * Both modules are classic scripts: an IIFE that reads the document at load
  * time, wires listeners, and exports nothing. There is no factory to call and
- * no pure function to isolate, which is why section 6 of the developers'
- * guide records them as untested. The decision each one gets wrong is not a
- * calculation but an interaction — which element holds focus after a keypress
- * — so a fake DOM with hand-written focus bookkeeping would largely be
- * testing itself.
+ * no pure function to isolate, so the fake DOM that drives `config-keys` and
+ * `copy-buttons` has nothing to take hold of. Section 6 of the developers'
+ * guide documents this harness and records both `mobile-nav.js` modules as
+ * covered by it. The decision each one gets wrong is not a calculation but an
+ * interaction — which element holds focus after a keypress — so a fake DOM
+ * with hand-written focus bookkeeping would largely be testing itself.
  *
  * happy-dom supplies the real thing: genuine event dispatch and bubbling,
  * a real `activeElement`, and `closest`/`contains`/`getComputedStyle`. The

@@ -8,7 +8,7 @@ import { describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { matchesFilter } = require("../../src/static/stilyagi/assets/js/docs.js");
+const { matchesFilter } = require("../../public/stilyagi/assets/js/docs.js");
 
 const HAYSTACK = "md201 heading depth headings must not skip levels";
 

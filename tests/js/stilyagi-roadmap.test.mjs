@@ -7,7 +7,7 @@ import { describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { nextOpenIndex } = require("../../src/static/stilyagi/assets/js/roadmap.js");
+const { nextOpenIndex } = require("../../public/stilyagi/assets/js/roadmap.js");
 
 describe("nextOpenIndex", () => {
   test("activating a closed phase opens it", () => {

@@ -8,10 +8,7 @@ import { describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const {
-  requiredCapabilities,
-  coldStartFor,
-} = require("../../src/static/stilyagi/assets/js/design.js");
+const { requiredCapabilities, coldStartFor } = require("../../public/stilyagi/assets/js/design.js");
 
 describe("requiredCapabilities", () => {
   test("the core extractor loads even with no rules enabled", () => {

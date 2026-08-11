@@ -145,7 +145,7 @@ _Table 1: The trees `biome.jsonc` holds out of scope, and why each is written
 by something other than a person._
 
 Two parser settings matter as much as the exclusions.
-`css.parser.tailwindDirectives` is enabled, because the Tailwind v4 entrypoints
+`css.parser.tailwindDirectives` is enabled because the Tailwind v4 entrypoints
 under `src/styles/` open with `@source`, `@plugin`, and `@theme`, which Biome's
 CSS parser otherwise rejects as unknown at-rules — leaving both entrypoints
 unparsed and silently skipped by the formatter. And `vcs.useIgnoreFile` is on,

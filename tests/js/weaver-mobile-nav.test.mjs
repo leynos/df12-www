@@ -176,6 +176,13 @@ describe("focus trap with a populated nav", () => {
     expect(dom.document.activeElement).toBe(last);
   });
 
+  test("Tab from the toggle enters the nav at the first item", () => {
+    dom.toggle.focus();
+    const event = pressKey(dom.window, dom.toggle, "Tab");
+    expect(event.defaultPrevented).toBe(true);
+    expect(dom.document.activeElement).toBe(first);
+  });
+
   test("Shift+Tab from the toggle wraps back to the last item", () => {
     dom.toggle.focus();
     const event = pressKey(dom.window, dom.toggle, "Tab", { shiftKey: true });

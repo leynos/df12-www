@@ -107,11 +107,15 @@
           e.preventDefault();
           last.focus();
         }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          btn.focus();
-        }
+      } else if (document.activeElement === last) {
+        e.preventDefault();
+        btn.focus();
+      } else if (document.activeElement === btn) {
+        /* Document order already sends Tab from the toggle into the nav,
+           since the header precedes it. Say so explicitly so the cycle does
+           not depend on the templates keeping that order. */
+        e.preventDefault();
+        first.focus();
       }
     };
     document.addEventListener("keydown", focusTrapHandler);

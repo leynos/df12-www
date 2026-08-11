@@ -14,7 +14,7 @@
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -88,18 +88,70 @@ describe("the lint target", () => {
   });
 });
 
-describe("the Biome configuration", () => {
-  const config = readFileSync(join(REPO_ROOT, "biome.jsonc"), "utf8");
+/* The excluded trees, and a file each one would reject if it were in scope.
+   Asserting the strings in biome.jsonc would only prove the file says what it
+   says; putting a misformatted fixture inside each tree proves Biome agrees. */
+const EXCLUSIONS = [
+  {
+    tree: "tests/cassettes",
+    fixture: join("tests", "cassettes", "exclusion-probe.json"),
+    contents: '{"recorded":    true,\n     "by": "betamax"}\n',
+  },
+  {
+    tree: "reference",
+    fixture: join("reference", "exclusion-probe.html"),
+    contents: "<!DOCTYPE html>\n<html><body><p   >kept as written</p></body></html>\n",
+  },
+  {
+    tree: "src/static/**/vendor",
+    fixture: join("src", "static", "netsuke", "assets", "js", "vendor", "exclusion-probe.js"),
+    contents: "const   vendored   =   1;\nexport { vendored };\n",
+  },
+];
 
-  test("keeps generated and vendored trees out of scope", () => {
-    for (const excluded of ["!tests/cassettes", "!reference", "!src/static/**/vendor"]) {
-      expect(config).toContain(excluded);
-    }
+describe("the Biome configuration", () => {
+  const written = [];
+  const created = [];
+
+  afterEach(() => {
+    while (written.length) rmSync(written.pop(), { force: true });
+    /* Directories the fixtures had to invent go too, so a run leaves the tree
+       exactly as it found it. Only ever empty ones, and only ones this file
+       created. */
+    while (created.length) rmdirSync(created.pop());
+  });
+
+  for (const { tree, fixture, contents } of EXCLUSIONS) {
+    test(`keeps ${tree} out of scope, so the gate ignores what is written there`, () => {
+      const path = join(REPO_ROOT, fixture);
+      if (!existsSync(dirname(path))) {
+        mkdirSync(dirname(path), { recursive: true });
+        created.push(dirname(path));
+      }
+      written.push(path);
+      writeFileSync(path, contents);
+
+      /* The same content inside a scanned tree fails the gate, so a pass here
+         is the exclusion doing the work rather than the fixture being clean. */
+      expect(make("lint").status).toBe(0);
+    });
+  }
+
+  test("a misformatted file in a scanned tree does fail, so the probes mean something", () => {
+    const path = join(REPO_ROOT, "src", "static", "netsuke", "assets", "js", "scope-probe.js");
+    written.push(path);
+    writeFileSync(path, "const   scoped   =   1;\nexport { scoped };\n");
+    expect(make("lint").status).not.toBe(0);
   });
 
   test("parses the Tailwind directives the entrypoints use", () => {
-    expect(config).toContain("tailwindDirectives");
-    const { status } = spawnSync("bun", ["run", "lint:js"], { cwd: REPO_ROOT, encoding: "utf8" });
+    /* Both entrypoints open with `@source`; without the parser option Biome
+       reports them as parse errors rather than checking them. */
+    const { status, stdout } = spawnSync("bunx", ["biome", "check", "src/styles"], {
+      cwd: REPO_ROOT,
+      encoding: "utf8",
+    });
+    expect(stdout).not.toContain("Tailwind-specific syntax is disabled");
     expect(status).toBe(0);
   });
 });

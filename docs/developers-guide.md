@@ -79,6 +79,78 @@ For Markdown changes, run `make markdownlint` and `make nixie`. Rebuild and
 inspect the rendered result as well — the gates do not render the site, so a
 template change that passes every gate can still produce a broken page.
 
+### 2.1. Bun is required
+
+Bun is not optional tooling for this repository. It runs the build, the
+JavaScript tests, and Biome, so `make lint`, `make fmt`, `make test-js`, and
+`make dev` all fail without it. Install it from [bun.sh](https://bun.sh); the
+Makefile checks for it by name and says so plainly when it is missing.
+
+Those same targets depend on a `node_modules` stamp that runs
+`bun install --frozen-lockfile`, so a fresh clone needs no separate install
+step. The install is skipped unless `package.json` or `bun.lockb` has moved,
+and the stamp is written only when bun exits cleanly, so a failed install is
+retried rather than mistaken for a finished one.
+
+### 2.2. Biome
+
+Biome is the linter and formatter for everything that is not Python or
+Markdown: JavaScript, TypeScript, JSON and JSONC, HTML, and the hand-crafted
+CSS. It is pinned to an exact version in `devDependencies`, so every
+contributor and every gate run agrees on what the rules are.
+
+```bash
+bun run lint:js       # biome check .  — formatter, linter, and import assists
+bun run lint:js:fix   # biome check --write .  — apply what Biome can fix alone
+```
+
+`make lint` runs `ruff check` and then `bun run lint:js`. `make fmt` runs
+`ruff format`, `ruff check --select I --fix`, `bun run lint:js:fix`, and
+`mdformat-all`.
+
+`biome check` is formatter, linter, and assists in a single pass, which has one
+consequence worth remembering: **a misformatted script fails `make lint`, not
+`make check-fmt`.** The target names do not imply that, so `check-fmt` carries
+a comment saying where Biome's formatting is actually checked.
+
+What Biome can fix on its own, `make fmt` will fix. What survives that is worth
+reading rather than re-running, because the tool declined to make the change
+unattended — usually because it would alter what the code says rather than how
+it is laid out.
+
+Where a rule genuinely should not apply, suppress it at the line with a stated
+reason — `// biome-ignore lint/<group>/<rule>: why` — rather than loosening the
+rule in `biome.jsonc`, which turns one considered exception into a silent
+blanket. Biome rejects a reasonless suppression, and reports a suppression that
+matches nothing, so a stale one will not sit there unnoticed.
+
+`style/useForOf` is raised to an error above the recommended preset. That is
+deliberate policy for this repository, not an inherited default.
+
+#### Configuration boundaries
+
+`biome.jsonc` carves several trees out of scope. Each exclusion is there
+because the files are written by something other than a person, and every one
+carries its reasoning in the file:
+
+| Excluded                                                                                      | Why                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/cassettes/`                                                                            | Betamax writes these HTTP recordings. A format gate over them would fail the moment anyone re-recorded a cassette.                                                                                                                          |
+| `reference/`                                                                                  | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
+| `src/static/**/vendor`, `public/netsuke/assets/vendor`                                        | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
+| `src/static/netsuke/assets/css/himotoshi.css`, `src/static/stilyagi/assets/styles/syntax.css` | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `**/*.svg`                                                                                    | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
+| `**/*.css` (linter only)                                                                      | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
+
+Two parser settings matter as much as the exclusions.
+`css.parser.tailwindDirectives` is enabled, because the Tailwind v4 entrypoints
+under `src/styles/` open with `@source`, `@plugin`, and `@theme`, which Biome's
+CSS parser otherwise rejects as unknown at-rules — leaving both entrypoints
+unparsed and silently skipped by the formatter. And `vcs.useIgnoreFile` is on,
+so `.gitignore` is honoured; that is why `reference/` needs an explicit
+exclusion despite being ignored, as the file kept inside it is negated back
+into tracking.
+
 ## 3. Generated versus hand-crafted files
 
 Everything under `public/` is build output and is git-ignored in its entirety.
@@ -368,6 +440,16 @@ plain browser script. `docs-scrollspy.js` exports `pickActiveIndex` (which
 heading is currently being read); `config-keys.js` exports `nextTabIndex`
 (which tab an arrow/Home/End keypress should move to). `mobile-nav.js` has no
 such function — its logic is DOM interaction throughout — and exports nothing.
+
+Where a module has no pure decision to extract, it is tested against a real DOM
+instead. `tests/js/helpers/mobile-nav-harness.mjs` builds a happy-dom window,
+injects the markup the templates render, and evaluates the shipped script into
+it, so the tests drive genuine event dispatch and a genuine `activeElement`.
+Both `mobile-nav.js` modules are covered this way. The choice is deliberate:
+what those modules can get wrong is which element holds focus after a keypress,
+and a fake DOM with hand-written focus bookkeeping would largely be testing
+itself. Prefer the fake DOM used by `config-keys.test.mjs` when the behaviour
+under test is a decision; reach for the harness when it is an interaction.
 
 Bun tests under `tests/js/` cover these pure functions, and they `require` the
 **built** copy from `public/`, not the source under `src/static/`:

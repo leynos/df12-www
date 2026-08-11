@@ -309,12 +309,12 @@ site.
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked
 as `biome check .`, which provides formatting, linting, and import assists in
 one pass, so a misformatted script fails the lint gate rather than `check-fmt`.
-Run `make fmt` to apply what Biome can fix on its own; what survives that
-wants reading because the tool declined to make the change unattended.
+Run `make fmt` to apply what Biome can fix on its own; what survives that wants
+reading because the tool declined to make the change unattended.
 
 Biome lives in `node_modules`, so `lint`, `fmt`, `test-js`, and `dev` all
-depend on a `node_modules` target that runs `bun install --frozen-lockfile`.
-A clean checkout therefore needs no manual install step, and the install is
+depend on a `node_modules` target that runs `bun install --frozen-lockfile`. A
+clean checkout therefore needs no manual install step, and the install is
 skipped unless `package.json` or `bun.lockb` has moved.
 
 Where a Biome rule genuinely should not apply, suppress it at the line with a

@@ -1,3 +1,17 @@
+/**
+ * generate-image-variants.ts — the `build:images` step of the site build.
+ *
+ * Walks the PNGs already copied into `public/images/` and writes a WebP and
+ * an AVIF beside each one, so templates can offer modern formats through
+ * `<picture>` without anyone hand-exporting them. Sharp does the encoding.
+ *
+ * Ordering matters: this runs after `build:static`, because it reads the
+ * source images that step places, and it writes into `public/`, which is
+ * build output in its entirety and tracked nowhere. A variant is skipped
+ * when it is already newer than its source, so repeated builds stay cheap;
+ * nothing is pruned, because this step cannot tell a deleted asset from
+ * another step's output. Remove `public/` and rebuild to clear stale files.
+ */
 import { access, readdir, stat } from "node:fs/promises";
 import { extname, join, relative, sep } from "node:path";
 import sharp from "sharp";

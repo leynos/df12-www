@@ -1,3 +1,13 @@
+/* example-toc.js — scroll behaviour for the Netsuke example pages' contents list.
+ *
+ * A plain script module in the shape described in section 6 of the
+ * developers' guide: an IIFE loaded with `<script defer>` that addresses its
+ * markup through a `data-` attribute and returns early when that markup is
+ * absent, so the one script may be included on pages that have no contents
+ * list. The list itself is rendered by `templates/netsuke/`; this file only
+ * adds the smooth scrolling and the offset that keeps a target heading clear
+ * of the fixed page header.
+ */
 (() => {
   const HEADER_OFFSET = 120;
 

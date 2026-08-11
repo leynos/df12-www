@@ -6,7 +6,7 @@
 }
 
 ::selection {
-  background: var(--weaver-vermilion);
+  background: var(--weaver-dark);
   color: #ffffff;
 }
 
@@ -96,7 +96,7 @@ body {
 }
 
 .status-pill-planned {
-  color: rgba(25, 60, 110, 0.72);
+  color: var(--weaver-indigo);
   background: rgba(25, 60, 110, 0.1);
   border: 1px solid rgba(25, 60, 110, 0.16);
 }
@@ -221,7 +221,7 @@ pre code {
 }
 
 #sidebar nav :is(a[href="/install"], a[href$="/install/"]):not(.bg-weaver-indigo) {
-  color: var(--weaver-vermilion);
+  color: var(--weaver-dark);
   font-family: "IBM Plex Mono", monospace;
 }
 
@@ -358,7 +358,7 @@ pre code {
 
 .content-card--accent .content-card__badge {
   background: rgb(232 80 43 / 0.12);
-  color: var(--weaver-vermilion);
+  color: var(--weaver-dark);
 }
 
 .content-card__body {

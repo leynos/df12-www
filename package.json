@@ -25,6 +25,7 @@
     "chokidar-cli": "^3.0.0",
     "concurrently": "^10.0.3",
     "daisyui": "^5.3.7",
+    "happy-dom": "20.11.2",
     "http-server": "^14.1.1",
     "minisearch": "7.2.0",
     "sharp": "^0.35.3",

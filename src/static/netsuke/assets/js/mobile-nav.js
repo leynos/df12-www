@@ -26,6 +26,8 @@
 
   var CLASSES = { open: "is-open", hidden: "hidden" };
 
+  /* Find the navbar, toggle, and menu pane, returning early when any is
+     absent, then reveal the toggle and wire the menu's behaviour. */
   function init() {
     var toggle = document.querySelector(SELECTORS.toggle);
     var menu = document.querySelector(SELECTORS.menu);
@@ -153,6 +155,8 @@
 
     // Close when viewport crosses md breakpoint
     var mql = window.matchMedia("(min-width: 768px)");
+    /* Collapse the menu once the viewport is wide enough for the full navbar,
+       so a hidden toggle cannot leave an open menu behind it. */
     function onBreakpoint() {
       if (mql.matches && isOpen()) closeMenu({ hideImmediately: true });
     }

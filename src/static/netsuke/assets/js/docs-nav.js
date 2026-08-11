@@ -8,6 +8,8 @@
 (() => {
   "use strict";
 
+  /* Wire every docs `<select>` on the page to navigate on change, skipping a
+     selection that names the path already open. */
   function init() {
     var selects = document.querySelectorAll("[data-docs-nav-select]");
     selects.forEach((select) => {

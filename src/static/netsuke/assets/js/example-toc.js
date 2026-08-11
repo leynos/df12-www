@@ -33,12 +33,18 @@
 
     let ticking = false;
 
+    /* Mark `current` as the active link and clear the mark from the rest. */
     function activate(current) {
       for (const { link } of targets) {
         link.classList.toggle("is-active", link === current);
       }
     }
 
+    /* Pick the section being read and highlight its link.
+       That is the last section whose heading has passed the header offset,
+       or the final section once the page is scrolled to the bottom, so a
+       short closing section can still activate. Reads layout, so it runs
+       inside an animation frame rather than directly on scroll. */
     function update() {
       ticking = false;
       const threshold = HEADER_OFFSET;
@@ -59,6 +65,8 @@
       activate(current.link);
     }
 
+    /* Schedule `update` for the next animation frame, coalescing the bursts
+       of scroll and resize events into one layout read per frame. */
     function requestUpdate() {
       if (!ticking) {
         ticking = true;

@@ -108,6 +108,9 @@ function el(tag, attrs = {}) {
   return node;
 }
 
+/* A document stand-in exposing only what the component reaches for:
+   element creation, a body to append the live region to, and query methods
+   over the mounted tree. */
 function fakeDocument() {
   return { createElement: (tag) => el(tag) };
 }
@@ -153,6 +156,8 @@ function buildRoot({ omitLabelFor = null, panels = KEYS } = {}) {
   return { root, labels, panelList };
 }
 
+/* Build the markup the component expects and hand back the root plus the
+   handles a test needs to assert on it. */
 function mount(matches, options) {
   const { root, labels, panelList } = buildRoot(options);
   const media = fakeMedia(matches);

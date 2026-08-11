@@ -46,6 +46,9 @@
     var clearTimer = 0;
     var announceTimer = 0;
 
+    /* Show `message` in the toast and announce it, styling it as an error when
+       `isError` is set. Cancels any pending timers first, so a rapid second
+       copy replaces the first rather than racing it. */
     function show(message, isError) {
       clock.clearTimeout(lingerTimer);
       clock.clearTimeout(clearTimer);
@@ -79,6 +82,9 @@
     return { show: show, element: element, announcer: announcer };
   }
 
+  /* The component proper. Takes its `document`, `clock`, and clipboard getter
+     as injected dependencies so tests can drive it with fakes. Returns the
+     copy handler and the toast it owns. */
   function createCopyController(deps) {
     var toast = createToast(deps.document, deps.clock);
     var attempt = 0;
@@ -111,6 +117,8 @@
     return { handleCopy: handleCopy, toast: toast };
   }
 
+  /* Wire every element carrying `data-copy-text` on the page, returning early
+     when there are none. Supplies the real document, timers, and clipboard. */
   function init() {
     var buttons = document.querySelectorAll("[data-copy-text]");
     if (buttons.length === 0) {

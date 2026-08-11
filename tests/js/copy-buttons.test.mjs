@@ -16,6 +16,8 @@ const {
   ANNOUNCE_DELAY_MS,
 } = require("../../public/netsuke/assets/js/copy-buttons.js");
 
+/* A DOM node with just enough behaviour for this component: classes,
+   text, attributes, and listeners a test can fire directly. */
 function fakeElement() {
   const classes = new Set();
   const attrs = new Map();
@@ -49,6 +51,8 @@ function fakeElement() {
   };
 }
 
+/* A document stand-in over `fakeElement`, supplying element creation and
+   the body the toast's live region is appended to. */
 function fakeDocument() {
   return {
     body: {
@@ -63,6 +67,8 @@ function fakeDocument() {
   };
 }
 
+/* A controllable stand-in for setTimeout/clearTimeout, so the toast's
+   timings can be advanced deliberately rather than waited out. */
 function fakeClock() {
   let now = 0;
   let nextId = 1;
@@ -90,6 +96,8 @@ function fakeClock() {
   };
 }
 
+/* A promise with its resolve and reject exposed, for driving a clipboard
+   write to either outcome at the moment a test chooses. */
 function deferred() {
   let resolve;
   let reject;
@@ -100,6 +108,8 @@ function deferred() {
   return { promise, resolve, reject };
 }
 
+/* Assemble the controller over the fakes above and return it with the
+   pieces a test asserts on. */
 function harness({ clipboardQueue = [], hasClipboard = true } = {}) {
   const clock = fakeClock();
   const writes = [];

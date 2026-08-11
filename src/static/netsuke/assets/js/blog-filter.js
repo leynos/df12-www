@@ -17,6 +17,9 @@
       return;
     }
 
+    /* Show only the articles in `category`, and press the matching button.
+       Both the ARIA state and the visibility come from the same call, so the
+       control and the list cannot disagree. */
     function applyFilter(category) {
       buttons.forEach((btn) => {
         btn.setAttribute("aria-pressed", btn.dataset.category === category ? "true" : "false");

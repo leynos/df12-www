@@ -11,6 +11,9 @@
 
   var OFFSET = 96; // sticky navbar (4rem) plus breathing room
 
+  /* Wire the sidebar sub-links to the headings they point at, returning early
+     when none of them target a heading on this page. Sub-links may carry a
+     bare fragment or a full same-page URL, so both are resolved. */
   function init() {
     var links = Array.prototype.slice.call(
       document.querySelectorAll('#sidebar a.sidebar-link--sub[href*="#"]'),
@@ -33,6 +36,9 @@
 
     var current = null;
 
+    /* Move the active marker to `entry`, or clear it when passed null. Does
+       nothing when the entry is already current, so scrolling within one
+       section touches no attributes. */
     function setActive(entry) {
       if (entry === current) {
         return;
@@ -48,6 +54,8 @@
       current = entry;
     }
 
+    /* Recompute which heading is being read and mark its link. Reads layout,
+       so it is called from an animation frame rather than directly. */
     function update() {
       var atBottom =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
@@ -57,6 +65,8 @@
     }
 
     var ticking = false;
+    /* Coalesce a burst of scroll or resize events into one layout read per
+       animation frame. */
     function onScroll() {
       if (!ticking) {
         ticking = true;

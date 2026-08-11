@@ -11,6 +11,9 @@
     initFilters();
   });
 
+  /* Wire the example-card filter chips, returning early when the page has no
+     chips or no cards. Each chip presses itself, unpresses its siblings, and
+     shows the cards matching its filter. */
   function initFilters() {
     const buttons = [...document.querySelectorAll("[data-example-filter]")];
     const cards = [...document.querySelectorAll("[data-example-card]")];

@@ -37,6 +37,12 @@ const OUTPUT_FORMATS = [
   },
 ] as const;
 
+/**
+ * Collect every PNG beneath `dir`, recursing into subdirectories.
+ *
+ * `results` is the accumulator the recursion threads through; callers pass
+ * nothing. Returns absolute paths. Reads the filesystem but writes nothing.
+ */
 async function findPngs(dir: string, results: string[] = []): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
@@ -50,6 +56,13 @@ async function findPngs(dir: string, results: string[] = []): Promise<string[]> 
   return results;
 }
 
+/**
+ * Whether `targetPath` is stale with respect to `sourcePath`.
+ *
+ * True when the source is the newer of the two, and true when the target
+ * cannot be stat'd at all, since a variant that does not exist yet has to be
+ * generated. This is what keeps a repeated build cheap.
+ */
 async function needsUpdate(sourcePath: string, targetPath: string): Promise<boolean> {
   try {
     const [sourceStats, targetStats] = await Promise.all([stat(sourcePath), stat(targetPath)]);
@@ -60,6 +73,12 @@ async function needsUpdate(sourcePath: string, targetPath: string): Promise<bool
   }
 }
 
+/**
+ * Encode one variant of `sourcePath` in `format`, beside the original.
+ *
+ * Returns early when the existing variant is already newer than its source.
+ * Otherwise writes the file and logs the repository-relative path it wrote.
+ */
 async function generateVariant(sourcePath: string, format: (typeof OUTPUT_FORMATS)[number]) {
   const outputPath = sourcePath.replace(/\.png$/i, `.${format.format}`);
   if (!(await needsUpdate(sourcePath, outputPath))) {
@@ -77,6 +96,15 @@ async function generateVariant(sourcePath: string, format: (typeof OUTPUT_FORMAT
   console.log(`Generated ${rel}`);
 }
 
+/**
+ * Run the build step: find the PNGs under `public/images` and encode every
+ * configured variant of each.
+ *
+ * Returns quietly when the directory is absent or holds no PNGs, so the step
+ * is safe to run before the first build. Variants are encoded concurrently;
+ * a failure in any one is collected rather than aborting the rest, and the
+ * process exits non-zero once they have all settled.
+ */
 async function main() {
   try {
     await access(IMAGE_ROOT);

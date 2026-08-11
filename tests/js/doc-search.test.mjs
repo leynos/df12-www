@@ -15,6 +15,8 @@ const {
   siteRootFromIndexPath,
 } = require("../../public/netsuke/assets/js/doc-search.js");
 
+/* A promise with its resolve and reject exposed, so a test can settle a
+   pending index fetch at the point it wants to. */
 function deferred() {
   let resolve;
   let reject;

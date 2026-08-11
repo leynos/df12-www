@@ -53,10 +53,13 @@
     return (current + (forward ? 1 : -1) + count) % count;
   }
 
+  /* `querySelectorAll` as a real array, so the result can be mapped. */
   function list(root, selector) {
     return Array.prototype.slice.call(root.querySelectorAll(selector));
   }
 
+  /* The narrow-viewport tab that stands in for a label `span`, carrying over
+     its id, classes, text, and data hook so the same selectors still find it. */
   function makeButton(doc, span) {
     var button = doc.createElement("button");
     button.type = "button";
@@ -102,10 +105,14 @@
       panel: panels[index],
     }));
 
+    /* Whichever of the pair's two label elements is currently mounted: the
+       span when wide, the tab button when narrow. */
     function label(pair) {
       return wide.matches ? pair.span : pair.button;
     }
 
+    /* Put `className` on the key, panel, and label at `index`, and take it off
+       every other one. Pass -1 to clear it everywhere. */
     function mark(className, index) {
       pairs.forEach((pair, i) => {
         var on = i === index;
@@ -115,6 +122,8 @@
       });
     }
 
+    /* Draw the tablist state: exactly one tab selected, only its panel and
+       note on screen, and the roving tabindex on the selected tab. */
     function renderNarrow() {
       // A tablist always has exactly one selected tab.
       if (selected < 0 || selected >= pairs.length) {
@@ -132,6 +141,8 @@
       mark(ACTIVE, selected);
     }
 
+    /* Draw the wide state: every panel and note visible, and nothing marked,
+       since there is no selection to indicate when all of it is on screen. */
     function renderWide() {
       pairs.forEach((pair) => {
         pair.panel.hidden = false;
@@ -144,6 +155,7 @@
       mark(ACTIVE, -1);
     }
 
+    /* Draw whichever state the current breakpoint calls for. */
     function render() {
       if (wide.matches) {
         renderWide();
@@ -152,6 +164,8 @@
       }
     }
 
+    /* Select the tab at `index` and redraw, moving focus to it when `focus`
+       is set — which distinguishes a keyboard move from a programmatic one. */
     function select(index, focus) {
       selected = index;
       render();
@@ -160,6 +174,9 @@
       }
     }
 
+    /* Convert one pair to its tablist form: swap the span for the button,
+       make the wrapper presentational so the tablist owns the tab directly,
+       wire the ARIA relationships, and move the note above its panel. */
     function applyNarrow(pair) {
       if (pair.button.parentNode !== pair.key) {
         pair.key.replaceChild(pair.button, pair.span);
@@ -178,6 +195,8 @@
       }
     }
 
+    /* Convert one pair back to its wide form: restore the span, drop the tab
+       ARIA, and return the note to the key it belongs with. */
     function applyWide(pair) {
       if (pair.span.parentNode !== pair.key) {
         pair.key.replaceChild(pair.span, pair.button);
@@ -190,6 +209,8 @@
       }
     }
 
+    /* Move the whole component to the current breakpoint's form and redraw.
+       Idempotent, so a repeated breakpoint event costs nothing. */
     function applyMode() {
       var isWide = wide.matches;
       labelList.setAttribute("role", isWide ? "group" : "tablist");
@@ -246,6 +267,8 @@
     return { applyMode: applyMode, select: select };
   }
 
+  /* Mount every config-keys root on the page, injecting the real `document`
+     and `matchMedia` that the tests replace with fakes. */
   function init() {
     var deps = {
       document: document,

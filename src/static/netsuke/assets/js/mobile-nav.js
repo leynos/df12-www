@@ -1,3 +1,20 @@
+/* mobile-nav.js — the Netsuke navbar's narrow-viewport menu.
+ *
+ * A plain script module in the shape described in section 6 of the
+ * developers' guide: an IIFE loaded with `<script defer>` that finds its
+ * markup by id, returns early when that markup is absent, and enhances what
+ * the server already rendered. `templates/netsuke/` emits the toggle button
+ * and the menu pane; this file supplies the behaviour and nothing else, so a
+ * page that fails to load it still renders a usable navbar.
+ *
+ * The menu is a dropdown rather than a modal: it does not dim the page or
+ * lock scrolling, and a click outside it closes it. Focus is still cycled
+ * between the toggle and the menu's items while it is open, because a menu
+ * that has taken focus should give it back predictably.
+ *
+ * The toggle starts hidden and is revealed here, so a viewport wide enough
+ * for the full navbar never shows a control that does nothing.
+ */
 (() => {
   "use strict";
 
@@ -20,14 +37,18 @@
     var openIcon = toggle.querySelector(".hm-hamburger__open");
     var closeIcon = toggle.querySelector(".hm-hamburger__close");
 
+    /* Whether the menu pane is currently expanded. */
     function isOpen() {
       return menu.classList.contains(CLASSES.open);
     }
 
+    /* The menu's tab stops, in document order. */
     function getFocusableMenuItems() {
       return menu.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
     }
 
+    /* Whether the toggle is on screen. Focus is only restored to it when it
+       is, since a breakpoint change can hide it while the menu is open. */
     function isToggleVisible() {
       var style = window.getComputedStyle(toggle);
       var rect = toggle.getBoundingClientRect();
@@ -40,6 +61,7 @@
       );
     }
 
+    /* Expand the menu and move focus to its first item. */
     function openMenu() {
       menu.classList.remove(CLASSES.hidden);
       // Force a reflow so the transition triggers from max-height:0
@@ -50,9 +72,21 @@
       if (openIcon) openIcon.style.display = "none";
       if (closeIcon) closeIcon.style.display = "";
       var first = menu.querySelector("a, button");
-      if (first) first.focus();
+      if (first) {
+        first.focus();
+      } else {
+        /* An empty menu still has to take focus, or the Tab handling below
+           has no anchor to cycle from and focus stays outside a pane the
+           user has just opened. */
+        menu.setAttribute("tabindex", "-1");
+        menu.focus();
+      }
     }
 
+    /* Collapse the menu. `restoreFocus` returns focus to the toggle when the
+       toggle is still on screen; `hideImmediately` skips the transition and
+       hides the pane at once, which is what the initial no-JS collapse and a
+       breakpoint change both want. */
     function closeMenu(options) {
       var opts = options || {};
       var restoreFocus = !!opts.restoreFocus;
@@ -75,6 +109,8 @@
       });
     }
 
+    /* Whether a link targets a fragment of the page already on screen, which
+       navigates nothing and so needs the menu closed by hand. */
     function isSamePageAnchor(link) {
       if (!link?.hash) return false;
 
@@ -128,7 +164,13 @@
     menu.addEventListener("keydown", (e) => {
       if (e.key !== "Tab" || !isOpen()) return;
       var focusable = getFocusableMenuItems();
-      if (!focusable.length) return;
+      if (!focusable.length) {
+        /* Nothing to cycle through, so hand focus back to the toggle rather
+           than letting Tab walk out of a menu that is still open. */
+        e.preventDefault();
+        toggle.focus();
+        return;
+      }
       var first = focusable[0];
       var last = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) {
@@ -148,6 +190,11 @@
         e.preventDefault();
         if (e.shiftKey) focusable[focusable.length - 1].focus();
         else focusable[0].focus();
+      } else {
+        /* Empty menu: the pane itself took focus when it opened, so send
+           Tab there instead of out of the open menu entirely. */
+        e.preventDefault();
+        menu.focus();
       }
     });
   }

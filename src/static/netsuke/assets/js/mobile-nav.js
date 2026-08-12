@@ -31,14 +31,10 @@
 
   var CLASSES = { open: "is-open", hidden: "hidden" };
 
-  /* Find the navbar root and the toggle and menu pane within it, returning
-     early when any is absent, then reveal the toggle and wire the menu's
-     behaviour. Scoping the children to the root means a second navbar on a
-     page could not cross-wire itself to the first one's menu. */
-  function init() {
-    var navbar = document.querySelector(SELECTORS.root);
-    if (!navbar) return;
-
+  /* Resolve the toggle and menu pane within one navbar root, returning early
+     when either is absent, then reveal the toggle and wire the menu's
+     behaviour. Each root owns its state and listeners independently. */
+  function initNavbar(navbar) {
     var toggle = navbar.querySelector(SELECTORS.toggle);
     var menu = navbar.querySelector(SELECTORS.menu);
     if (!toggle || !menu) return;
@@ -210,6 +206,13 @@
         menu.focus();
       }
     });
+  }
+
+  /* Enhance every navbar root on the page. */
+  function init() {
+    for (var navbar of document.querySelectorAll(SELECTORS.root)) {
+      initNavbar(navbar);
+    }
   }
 
   if (document.readyState === "loading") {

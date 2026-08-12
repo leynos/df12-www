@@ -359,11 +359,7 @@ describe("the markup contract", () => {
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
   });
 
-  test("takes the first root only, and finds its toggle and menu inside it", () => {
-    /* The site renders one navbar per page, and `init` enhances the first
-       root it finds rather than looping. What matters is that the toggle and
-       menu are resolved within that root: a second navbar is left inert
-       rather than being driven by the first one's toggle. */
+  test("initializes every root and keeps each toggle scoped to its own menu", () => {
     const window = new Window({ url: PAGE });
     window.document.body.innerHTML = `
       <nav data-mobile-nav id="first">
@@ -380,15 +376,22 @@ describe("the markup contract", () => {
 
     const first = window.document.getElementById("first");
     const second = window.document.getElementById("second");
-    click(window, first.querySelector("[data-mobile-nav-toggle]"));
-    expect(first.querySelector("[data-mobile-nav-menu]").classList.contains("is-open")).toBe(true);
-    expect(second.querySelector("[data-mobile-nav-menu]").classList.contains("is-open")).toBe(
-      false,
-    );
-    /* Untouched, not merely unopened: the second root was never enhanced. */
-    expect(second.querySelector("[data-mobile-nav-toggle]").classList.contains("hidden")).toBe(
-      true,
-    );
+    const firstToggle = first.querySelector("[data-mobile-nav-toggle]");
+    const secondToggle = second.querySelector("[data-mobile-nav-toggle]");
+    const firstMenu = first.querySelector("[data-mobile-nav-menu]");
+    const secondMenu = second.querySelector("[data-mobile-nav-menu]");
+
+    expect(firstToggle.classList.contains("hidden")).toBe(false);
+    expect(secondToggle.classList.contains("hidden")).toBe(false);
+
+    click(window, firstToggle);
+    expect(firstMenu.classList.contains("is-open")).toBe(true);
+    expect(secondMenu.classList.contains("is-open")).toBe(false);
+
+    click(window, firstToggle);
+    click(window, secondToggle);
+    expect(firstMenu.classList.contains("is-open")).toBe(false);
+    expect(secondMenu.classList.contains("is-open")).toBe(true);
   });
 });
 

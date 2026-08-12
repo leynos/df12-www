@@ -1,11 +1,16 @@
 /* mobile-nav.js — the Netsuke navbar's narrow-viewport menu.
  *
  * A plain script module in the shape described in section 6 of the
- * developers' guide: an IIFE loaded with `<script defer>` that finds its
- * markup by id, returns early when that markup is absent, and enhances what
- * the server already rendered. `templates/netsuke/` emits the toggle button
- * and the menu pane; this file supplies the behaviour and nothing else, so a
- * page that fails to load it still renders a usable navbar.
+ * developers' guide: an IIFE loaded with `<script defer>` that addresses its
+ * markup through `data-*` attributes, returns early when that markup is
+ * absent, and enhances what the server already rendered.
+ * `templates/netsuke/` emits the toggle button and the menu pane; this file
+ * supplies the behaviour and nothing else, so a page that fails to load it
+ * still renders a usable navbar.
+ *
+ * The elements keep their ids, because the stylesheet and the toggle's
+ * `aria-controls` both depend on them. The behavioural contract is the data
+ * attributes alone, so restyling cannot break a selector here.
  *
  * The menu is a dropdown rather than a modal: it does not dim the page or
  * lock scrolling, and a click outside it closes it. Focus is still cycled
@@ -19,20 +24,24 @@
   "use strict";
 
   var SELECTORS = {
-    toggle: "#navbar-mobile-toggle",
-    menu: "#navbar-mobile-menu",
-    navbar: "#navbar",
+    root: "[data-mobile-nav]",
+    toggle: "[data-mobile-nav-toggle]",
+    menu: "[data-mobile-nav-menu]",
   };
 
   var CLASSES = { open: "is-open", hidden: "hidden" };
 
-  /* Find the navbar, toggle, and menu pane, returning early when any is
-     absent, then reveal the toggle and wire the menu's behaviour. */
+  /* Find the navbar root and the toggle and menu pane within it, returning
+     early when any is absent, then reveal the toggle and wire the menu's
+     behaviour. Scoping the children to the root means a second navbar on a
+     page could not cross-wire itself to the first one's menu. */
   function init() {
-    var toggle = document.querySelector(SELECTORS.toggle);
-    var menu = document.querySelector(SELECTORS.menu);
-    var navbar = document.querySelector(SELECTORS.navbar);
-    if (!toggle || !menu || !navbar) return;
+    var navbar = document.querySelector(SELECTORS.root);
+    if (!navbar) return;
+
+    var toggle = navbar.querySelector(SELECTORS.toggle);
+    var menu = navbar.querySelector(SELECTORS.menu);
+    if (!toggle || !menu) return;
 
     toggle.classList.remove(CLASSES.hidden);
 

@@ -508,6 +508,15 @@ so that restyling cannot break a selector, and an early return when the root
 element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
+An element may still carry an id for the stylesheet or for an ARIA
+relationship; what the convention rules out is _script_ depending on one. The
+Netsuke navbar is the worked example: `#navbar` and `#navbar-mobile-menu` are
+load-bearing for `himotoshi.css` and for the toggle's `aria-controls`, so they
+stay, while `mobile-nav.js` addresses the same elements as `[data-mobile-nav]`,
+`[data-mobile-nav-toggle]`, and `[data-mobile-nav-menu]`. The toggle and menu
+are resolved within the root rather than from the document, so the root is the
+only thing a page has to get right.
+
 The convention's limits are worth naming, because they decide when to leave it.
 A module is a file plus a `data-` prefix, so nothing enforces one instance per
 root, nothing provides a lifecycle beyond first run, and nothing tells CSS that

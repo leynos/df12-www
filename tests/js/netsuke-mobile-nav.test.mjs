@@ -28,24 +28,31 @@ function setUp({
   const { document } = window;
   document.body.innerHTML = `
     <a href="/elsewhere" id="outside">Outside</a>
-    <header id="navbar">
-      <button id="navbar-mobile-toggle" class="hidden" aria-expanded="false" aria-label="Open menu">
+    <nav id="navbar" data-mobile-nav>
+      <button
+        id="navbar-mobile-toggle"
+        data-mobile-nav-toggle
+        class="hidden"
+        aria-expanded="false"
+        aria-controls="navbar-mobile-menu"
+        aria-label="Open menu"
+      >
         <span class="hm-hamburger__open"></span>
         <span class="hm-hamburger__close"></span>
       </button>
-    </header>
-    <div id="navbar-mobile-menu">${items.join("")}</div>`;
+      <div id="navbar-mobile-menu" data-mobile-nav-menu>${items.join("")}</div>
+    </nav>`;
   stubLayout(window);
   const media = installMatchMedia(window);
   evaluateScript(window, SCRIPT);
 
-  const menu = document.getElementById("navbar-mobile-menu");
+  const menu = document.querySelector("[data-mobile-nav-menu]");
   return {
     window,
     document,
     media,
     menu,
-    toggle: document.getElementById("navbar-mobile-toggle"),
+    toggle: document.querySelector("[data-mobile-nav-toggle]"),
     isOpen: () => menu.classList.contains("is-open"),
   };
 }
@@ -241,16 +248,69 @@ describe("focus trap with nothing focusable in the menu", () => {
   });
 });
 
+describe("the markup contract", () => {
+  test("is the data attributes alone, so markup carrying no ids still works", () => {
+    const window = new Window({ url: PAGE });
+    window.document.body.innerHTML = `
+      <nav data-mobile-nav>
+        <button data-mobile-nav-toggle class="hidden" aria-expanded="false" aria-label="Open menu"></button>
+        <div data-mobile-nav-menu><a href="/docs/">Docs</a></div>
+      </nav>`;
+    stubLayout(window);
+    installMatchMedia(window);
+    evaluateScript(window, SCRIPT);
+
+    const toggle = window.document.querySelector("[data-mobile-nav-toggle]");
+    const menu = window.document.querySelector("[data-mobile-nav-menu]");
+    expect(toggle.classList.contains("hidden")).toBe(false);
+    click(window, toggle);
+    expect(menu.classList.contains("is-open")).toBe(true);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  test("takes the first root only, and finds its toggle and menu inside it", () => {
+    /* The site renders one navbar per page, and `init` enhances the first
+       root it finds rather than looping. What matters is that the toggle and
+       menu are resolved within that root: a second navbar is left inert
+       rather than being driven by the first one's toggle. */
+    const window = new Window({ url: PAGE });
+    window.document.body.innerHTML = `
+      <nav data-mobile-nav id="first">
+        <button data-mobile-nav-toggle class="hidden"></button>
+        <div data-mobile-nav-menu><a href="/a/">A</a></div>
+      </nav>
+      <nav data-mobile-nav id="second">
+        <button data-mobile-nav-toggle class="hidden"></button>
+        <div data-mobile-nav-menu><a href="/b/">B</a></div>
+      </nav>`;
+    stubLayout(window);
+    installMatchMedia(window);
+    evaluateScript(window, SCRIPT);
+
+    const first = window.document.getElementById("first");
+    const second = window.document.getElementById("second");
+    click(window, first.querySelector("[data-mobile-nav-toggle]"));
+    expect(first.querySelector("[data-mobile-nav-menu]").classList.contains("is-open")).toBe(true);
+    expect(second.querySelector("[data-mobile-nav-menu]").classList.contains("is-open")).toBe(
+      false,
+    );
+    /* Untouched, not merely unopened: the second root was never enhanced. */
+    expect(second.querySelector("[data-mobile-nav-toggle]").classList.contains("hidden")).toBe(
+      true,
+    );
+  });
+});
+
 describe("markup the menu declines to enhance", () => {
   test("a page missing the menu pane is left untouched", () => {
     const window = new Window({ url: PAGE });
     window.document.body.innerHTML =
-      '<header id="navbar"><button id="navbar-mobile-toggle" class="hidden"></button></header>';
+      '<nav id="navbar" data-mobile-nav><button data-mobile-nav-toggle class="hidden"></button></nav>';
     stubLayout(window);
     installMatchMedia(window);
     evaluateScript(window, SCRIPT);
     expect(
-      window.document.getElementById("navbar-mobile-toggle").classList.contains("hidden"),
+      window.document.querySelector("[data-mobile-nav-toggle]").classList.contains("hidden"),
     ).toBe(true);
   });
 });

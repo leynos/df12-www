@@ -6,7 +6,11 @@
  * most of these assertions are about. See `helpers/mobile-nav-harness.mjs`
  * for why they run against a real DOM.
  */
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeAll, beforeEach, describe, expect, test } from "bun:test";
+import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Window } from "happy-dom";
 import {
   click,
@@ -18,6 +22,20 @@ import {
 
 const SCRIPT = "public/netsuke/assets/js/mobile-nav.js";
 const PAGE = "https://netsuke.example/docs/";
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const RENDERED_PAGES = [
+  ["homepage", "public/netsuke/index.html"],
+  ["documentation page", "public/netsuke/docs/index.html"],
+];
+
+beforeAll(() => {
+  const result = spawnSync("uv", ["run", "pages", "generate", "--site", "netsuke"], {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+  });
+  expect(`${result.stdout ?? ""}${result.stderr ?? ""}`).not.toContain("Traceback");
+  expect(result.status).toBe(0);
+});
 
 /* Build a page with the navbar markup `templates/netsuke/` renders, load the
    menu into it, and hand back the parts a test needs to drive. */
@@ -249,6 +267,30 @@ describe("focus trap with nothing focusable in the menu", () => {
 });
 
 describe("the markup contract", () => {
+  for (const [name, relativePath] of RENDERED_PAGES) {
+    test(`the real ${name} renders every data hook the shipped script needs`, () => {
+      const window = new Window({ url: PAGE });
+      window.document.documentElement.innerHTML = readFileSync(
+        join(REPO_ROOT, relativePath),
+        "utf8",
+      );
+      const root = window.document.querySelector("[data-mobile-nav]");
+      const toggle = root?.querySelector("[data-mobile-nav-toggle]");
+      const menu = root?.querySelector("[data-mobile-nav-menu]");
+
+      expect(root).not.toBeNull();
+      expect(toggle).not.toBeNull();
+      expect(menu).not.toBeNull();
+
+      stubLayout(window);
+      installMatchMedia(window);
+      evaluateScript(window, SCRIPT);
+      expect(toggle.classList.contains("hidden")).toBe(false);
+      click(window, toggle);
+      expect(menu.classList.contains("is-open")).toBe(true);
+    });
+  }
+
   test("is the data attributes alone, so markup carrying no ids still works", () => {
     const window = new Window({ url: PAGE });
     window.document.body.innerHTML = `

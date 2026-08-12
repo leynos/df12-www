@@ -62,16 +62,16 @@ async function findPngs(dir: string, results: string[] = []): Promise<string[]> 
 /**
  * Whether `targetPath` is stale with respect to `sourcePath`.
  *
- * True when the source is the newer of the two, and true when the target
- * cannot be stat'd at all, since a variant that does not exist yet has to be
- * generated. This is what keeps a repeated build cheap.
+ * True when the source is newer, or when either stat operation fails. A
+ * missing target therefore triggers generation, while repeated builds remain
+ * cheap when both paths can be compared.
  */
 async function needsUpdate(sourcePath: string, targetPath: string): Promise<boolean> {
   try {
     const [sourceStats, targetStats] = await Promise.all([stat(sourcePath), stat(targetPath)]);
     return sourceStats.mtimeMs > targetStats.mtimeMs;
   } catch {
-    // If the derived file does not exist yet, we need to generate it.
+    // Either stat can fail; in particular, a missing target needs generation.
     return true;
   }
 }

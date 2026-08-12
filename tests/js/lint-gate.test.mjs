@@ -147,11 +147,12 @@ describe("the Biome configuration", () => {
   test("parses the Tailwind directives the entrypoints use", () => {
     /* Both entrypoints open with `@source`; without the parser option Biome
        reports them as parse errors rather than checking them. */
-    const { status, stdout } = spawnSync("bunx", ["biome", "check", "src/styles"], {
+    const { status, stdout, stderr } = spawnSync("bunx", ["biome", "check", "src/styles"], {
       cwd: REPO_ROOT,
       encoding: "utf8",
     });
-    expect(stdout).not.toContain("Tailwind-specific syntax is disabled");
+    const output = `${stdout ?? ""}${stderr ?? ""}`;
     expect(status).toBe(0);
+    expect(output).not.toContain("Tailwind-specific syntax is disabled");
   });
 });

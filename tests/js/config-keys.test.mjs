@@ -109,7 +109,7 @@ function el(tag, attrs = {}) {
 }
 
 /* A document stand-in exposing only what the component reaches for:
-   element creation, a body to append the live region to, and query methods
+   element creation, a body to mount the component in, and query methods
    over the mounted tree. */
 function fakeDocument() {
   return { createElement: (tag) => el(tag) };

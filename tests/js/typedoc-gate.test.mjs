@@ -140,7 +140,7 @@ export function greet(): string {
 
 describe("the repository's own configuration", () => {
   test("passes, so `make docs-check` gates rather than merely reports", () => {
-    const result = spawnSync("bun", ["run", "docs:check"], {
+    const result = spawnSync("make", ["docs-check"], {
       cwd: REPO_ROOT,
       encoding: "utf8",
     });

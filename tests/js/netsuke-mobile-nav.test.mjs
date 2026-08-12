@@ -15,8 +15,10 @@ import { Window } from "happy-dom";
 import {
   click,
   evaluateScript,
+  generatedTransitionSequences,
   installMatchMedia,
   pressKey,
+  pressTab,
   stubLayout,
 } from "./helpers/mobile-nav-harness.mjs";
 
@@ -264,6 +266,53 @@ describe("focus trap with nothing focusable in the menu", () => {
       expect(dom.document.activeElement).not.toBe(outside);
     }
   });
+});
+
+describe("bounded navigation state machine", () => {
+  const menuSizes = [0, 1, 3, 6];
+  const sequences = generatedTransitionSequences(1201);
+
+  for (const menuSize of menuSizes) {
+    test(`preserves state and focus invariants with ${menuSize} menu items`, () => {
+      const items = Array.from(
+        { length: menuSize },
+        (_, index) => `<a href="/item-${index}/">Item ${index}</a>`,
+      );
+
+      for (const sequence of sequences) {
+        const dom = setUp({ items });
+        const outside = dom.document.getElementById("outside");
+        const menuItems = [...dom.menu.querySelectorAll("a[href]")];
+        const focusCycle = [outside, dom.toggle, ...menuItems];
+        const trappedFocus = new Set([dom.toggle, ...(menuItems.length ? menuItems : [dom.menu])]);
+        let expectedOpen = false;
+
+        for (const transition of sequence) {
+          if (transition === "toggle") {
+            click(dom.window, dom.toggle);
+            expectedOpen = !expectedOpen;
+          } else if (transition === "tab" || transition === "shift-tab") {
+            pressTab(dom.window, focusCycle, { shiftKey: transition === "shift-tab" });
+          } else if (transition === "escape") {
+            pressKey(dom.window, dom.document.activeElement, "Escape");
+            expectedOpen = false;
+          } else if (transition === "wide") {
+            dom.media.cross(true);
+            expectedOpen = false;
+          } else {
+            dom.media.cross(false);
+          }
+
+          expect(dom.isOpen()).toBe(expectedOpen);
+          expect(dom.toggle.getAttribute("aria-expanded")).toBe(String(expectedOpen));
+          expect(dom.toggle.getAttribute("aria-label")).toBe(
+            expectedOpen ? "Close menu" : "Open menu",
+          );
+          if (expectedOpen) expect(trappedFocus.has(dom.document.activeElement)).toBe(true);
+        }
+      }
+    });
+  }
 });
 
 describe("the markup contract", () => {

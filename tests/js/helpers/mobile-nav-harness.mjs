@@ -49,6 +49,40 @@ export function pressKey(window, target, key, { shiftKey = false } = {}) {
   return event;
 }
 
+/* Build a bounded, repeatable corpus of transition traces without depending
+   on a property-testing package. The fixed prefix proves every transition is
+   represented; the seeded suffix mixes them into less obvious orders. */
+export function generatedTransitionSequences(seed, { count = 18, length = 8 } = {}) {
+  const transitions = ["toggle", "tab", "shift-tab", "escape", "wide", "narrow"];
+  const sequences = transitions.map((transition) => ["toggle", transition]);
+  let state = seed;
+
+  for (let sequenceIndex = sequences.length; sequenceIndex < count; sequenceIndex += 1) {
+    const sequence = ["toggle"];
+    for (let eventIndex = 1; eventIndex < length; eventIndex += 1) {
+      state = (state * 48271) % 2147483647;
+      sequence.push(transitions[state % transitions.length]);
+    }
+    sequences.push(sequence);
+  }
+  return sequences;
+}
+
+/* Dispatch Tab, then emulate the browser's default focus movement when the
+   script under test did not prevent it. happy-dom dispatches the event but
+   deliberately does not implement keyboard navigation. */
+export function pressTab(window, orderedStops, { shiftKey = false } = {}) {
+  const { document } = window;
+  const event = pressKey(window, document.activeElement, "Tab", { shiftKey });
+  if (event.defaultPrevented) return event;
+
+  const currentIndex = orderedStops.indexOf(document.activeElement);
+  const direction = shiftKey ? -1 : 1;
+  const nextIndex = (currentIndex + direction + orderedStops.length) % orderedStops.length;
+  orderedStops[nextIndex].focus();
+  return event;
+}
+
 /* Click `target`, bubbling so document-level handlers see it. */
 export function click(window, target) {
   target.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));

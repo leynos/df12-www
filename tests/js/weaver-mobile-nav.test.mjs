@@ -11,8 +11,10 @@ import { Window } from "happy-dom";
 import {
   click,
   evaluateScript,
+  generatedTransitionSequences,
   installMatchMedia,
   pressKey,
+  pressTab,
   stubLayout,
 } from "./helpers/mobile-nav-harness.mjs";
 
@@ -242,6 +244,50 @@ describe("focus trap with nothing focusable in the nav", () => {
       expect(dom.document.activeElement).not.toBe(outside);
     }
   });
+});
+
+describe("bounded navigation state machine", () => {
+  const menuSizes = [0, 1, 3, 6];
+  const sequences = generatedTransitionSequences(1217);
+
+  for (const menuSize of menuSizes) {
+    test(`preserves state and focus invariants with ${menuSize} nav items`, () => {
+      const links = Array.from({ length: menuSize }, (_, index) => `/item-${index}`);
+
+      for (const sequence of sequences) {
+        const dom = setUp({ links });
+        const outside = dom.document.getElementById("outside");
+        const navItems = [...dom.nav.querySelectorAll("a[href]")];
+        const focusCycle = [outside, dom.toggle, ...navItems];
+        const trappedFocus = new Set([dom.toggle, ...(navItems.length ? navItems : [dom.nav])]);
+        let expectedOpen = false;
+
+        for (const transition of sequence) {
+          if (transition === "toggle") {
+            click(dom.window, dom.toggle);
+            expectedOpen = !expectedOpen;
+          } else if (transition === "tab" || transition === "shift-tab") {
+            pressTab(dom.window, focusCycle, { shiftKey: transition === "shift-tab" });
+          } else if (transition === "escape") {
+            pressKey(dom.window, dom.document.activeElement, "Escape");
+            expectedOpen = false;
+          } else if (transition === "wide") {
+            dom.media.cross(true);
+            expectedOpen = false;
+          } else {
+            dom.media.cross(false);
+          }
+
+          expect(dom.isOpen()).toBe(expectedOpen);
+          expect(dom.toggle.getAttribute("aria-expanded")).toBe(String(expectedOpen));
+          expect(dom.toggle.getAttribute("aria-label")).toBe(
+            expectedOpen ? "Close navigation menu" : "Open navigation menu",
+          );
+          if (expectedOpen) expect(trappedFocus.has(dom.document.activeElement)).toBe(true);
+        }
+      }
+    });
+  }
 });
 
 describe("markup the drawer declines to enhance", () => {

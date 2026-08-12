@@ -16,12 +16,14 @@ resolved style under the nearest ancestor the style declares, and
 emitting that ancestor's colour for the whole group. What differs between
 the two sub-sites is only naming and weight, so those are parameters; the
 surrounding chrome — backgrounds, padding, media queries — stays in each
-generator, which is where the sites genuinely diverge.
+site's hand-written CSS or generator, where the sites genuinely diverge.
 """
 
 from __future__ import annotations
 
 import typing as typ
+
+from pygments.token import STANDARD_TYPES
 
 if typ.TYPE_CHECKING:
     from pygments.formatters.html import HtmlFormatter
@@ -66,6 +68,37 @@ def _nearest_declared(token: object, declared: dict[object, str]) -> object | No
             return node
         node = getattr(node, "parent", None)
     return None
+
+
+def _token_class(token: object) -> str:
+    """Resolve one token's standard class and non-standard alias suffix."""
+    class_name = STANDARD_TYPES.get(token)
+    if class_name:
+        return class_name
+
+    suffix = ""
+    node = token
+    while class_name is None:
+        segment = typ.cast("tuple[str, ...]", node)[-1]
+        suffix = f"-{segment}{suffix}"
+        node = getattr(node, "parent", None)
+        class_name = STANDARD_TYPES.get(node)
+    return class_name + suffix
+
+
+def _token_classes(formatter: HtmlFormatter, token: object) -> str:
+    """Return the formatter-prefixed class chain for one token."""
+
+    def prefixed(node: object) -> str:
+        token_class = _token_class(node)
+        return f"{formatter.classprefix}{token_class}" if token_class else ""
+
+    node = token
+    classes = prefixed(node)
+    while node not in STANDARD_TYPES:
+        node = getattr(node, "parent", None)
+        classes = f"{prefixed(node)} {classes}"
+    return classes
 
 
 def _declared_colours(
@@ -136,15 +169,14 @@ def _selectors_by_owner(
         block's default text colour, which the bare ``Token`` type carries
         and which has no class of its own.
     """
-    # Pygments has no public token-to-class API.
-    class_for = formatter._get_css_classes
+    # Mirror Pygments' class algorithm through the public STANDARD_TYPES map.
     selectors: dict[object, list[str]] = {token: [] for token in declared}
     root_rule = ""
     for token, _ndef in formatter.style:
         owner = _nearest_declared(token, declared)
         if owner is None:
             continue
-        token_class = class_for(token).strip()
+        token_class = _token_classes(formatter, token).strip()
         if not token_class:
             # The bare Token type styles the block's default text colour.
             root_rule = f".{css_class} {{ color: var({declared[owner]}); }}"

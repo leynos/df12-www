@@ -17,6 +17,7 @@ from scripts.generate_himotoshi_pygments_css import (
     STYLESHEET,
     build_css,
 )
+from scripts.pygments_css import _token_classes
 
 #: A Netsukefile exercising comments, YAML keys, Jinja expressions, quoted
 #: and plain scalars, and the block scalars the examples use for commands.
@@ -209,21 +210,17 @@ class TestHimotoshiPygmentsCss:
             f"Comment.Preproc should inherit Comment's italic: {preproc}"
         )
 
-    def test_the_private_token_class_api_still_behaves(self) -> None:
-        """Pin the one private Pygments API the generator depends on.
+    def test_the_local_token_class_algorithm_still_behaves(self) -> None:
+        """Pin the token-class contract owned by the shared local helper.
 
-        ``HtmlFormatter._get_css_classes`` has no public equivalent:
-        ``get_style_defs`` emits one class per styled token, not the
-        space-separated ancestor chain the grouping in
-        ``scripts.pygments_css`` needs. Pygments carries no upper bound
-        here, so assert the contract directly rather than inferring a
-        break from whichever downstream assertion happens to fail first.
+        The helper mirrors Pygments' class algorithm through the public
+        ``STANDARD_TYPES`` mapping, including the space-separated ancestor
+        chain that the grouping in ``scripts.pygments_css`` needs.
         """
         formatter = HtmlFormatter(style=HimotoshiStyle, cssclass="hm-syntax")
-        class_for = formatter._get_css_classes
 
-        plain = class_for(Comment.Single)
-        compound = class_for(Punctuation.Indicator)
+        plain = _token_classes(formatter, Comment.Single)
+        compound = _token_classes(formatter, Punctuation.Indicator)
 
         assert plain == "c1", f"expected the leaf class alone, got {plain!r}"
         assert compound.split() == ["p", "p-Indicator"], (

@@ -227,6 +227,25 @@ class TestHimotoshiPygmentsCss:
             f"expected a space-separated ancestor chain, got {compound!r}"
         )
 
+        prefixed_formatter = HtmlFormatter(
+            style=HimotoshiStyle,
+            cssclass="hm-syntax",
+            classprefix="tok-",
+        )
+        prefixed_plain = _token_classes(prefixed_formatter, Comment.Single)
+        prefixed_compound = _token_classes(
+            prefixed_formatter,
+            Punctuation.Indicator,
+        )
+
+        assert prefixed_plain == "tok-c1", (
+            f"expected the prefixed leaf class, got {prefixed_plain!r}"
+        )
+        assert prefixed_compound.split() == ["tok-p", "tok-p-Indicator"], (
+            "expected every class in the ancestor chain to carry the prefix, "
+            f"got {prefixed_compound!r}"
+        )
+
     def test_committed_stylesheet_matches_the_generator(self) -> None:
         """The checked-in block is regenerated, never hand-edited.
 

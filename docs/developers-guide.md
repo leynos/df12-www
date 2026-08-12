@@ -255,10 +255,10 @@ anywhere in the pipeline without an explicit import.
 `token_rules(formatter, style, css_class, prefix, bold_weight)`, the single
 translation from a Pygments `Style` to CSS rules, shared by
 `scripts/generate_himotoshi_pygments_css.py` and
-`scripts/generate_stilyagi_pygments_css.py`. Only the token-to-selector
-translation is shared. Himotoshi's site-specific chrome remains in its
-generator; Stilyagi's layout rules for `.code-scroll`, `.stilyagi-syntax`, and
-`.stilyagi-syntax pre` are hand-written above the `BEGIN` marker in
+`scripts/generate_stilyagi_pygments_css.py`. The generated `:root` variables
+and token rules are shared output. Himotoshi's site-specific chrome remains in
+its generator; Stilyagi's layout rules for `.code-scroll`, `.stilyagi-syntax`,
+and `.stilyagi-syntax pre` are hand-written above the `BEGIN` marker in
 `syntax.css`.
 
 The module exports two functions. Everything else in it is private and may be
@@ -270,7 +270,7 @@ selector rules, both as lists of lines in the style's own declaration order.
 That order is load-bearing rather than cosmetic — a subtype's rule must follow
 its ancestor's to win at equal specificity, which holds as long as the style
 declares parents before children. The `formatter` must already be bound to
-`style`, because it supplies the resolved token list and class prefix. The
+`style` because it supplies the resolved token list and class prefix. The
 shared helper resolves token classes without a private Pygments method: it
 walks each token's parent chain and uses the public `STANDARD_TYPES` mapping,
 preserving Pygments' class strings.

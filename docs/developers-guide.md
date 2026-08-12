@@ -64,7 +64,7 @@ served output until `bun run build` (or `uv run pages generate`) is rerun by
 hand. This is the usual reason a change appears not to have taken effect.
 
 Run the commit gates with `make all`, which composes
-`build check-fmt lint test test-js typecheck spelling` and runs them
+`build check-fmt lint test test-js typecheck docs-check spelling` and runs them
 sequentially rather than in parallel, since the build cache rewards sequential
 runs. For a narrower check while iterating on the generator, templates, or
 stylesheets:

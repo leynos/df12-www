@@ -6,36 +6,33 @@
  * `data-category` matches (or all articles when "all" is selected).
  * `aria-pressed` is kept in sync with the active filter.
  */
-(function () {
+(() => {
   "use strict";
 
-  document.addEventListener("DOMContentLoaded", function () {
-    var buttons = Array.from(
-      document.querySelectorAll("button[data-category]"),
-    );
+  document.addEventListener("DOMContentLoaded", () => {
+    var buttons = Array.from(document.querySelectorAll("button[data-category]"));
     var articles = Array.from(document.querySelectorAll("article[data-category]"));
 
     if (buttons.length === 0 || articles.length === 0) {
       return;
     }
 
+    /* Show only the articles in `category`, and press the matching button.
+       Both the ARIA state and the visibility come from the same call, so the
+       control and the list cannot disagree. */
     function applyFilter(category) {
-      buttons.forEach(function (btn) {
-        btn.setAttribute(
-          "aria-pressed",
-          btn.dataset.category === category ? "true" : "false",
-        );
+      buttons.forEach((btn) => {
+        btn.setAttribute("aria-pressed", btn.dataset.category === category ? "true" : "false");
       });
 
-      articles.forEach(function (article) {
-        var visible =
-          category === "all" || article.dataset.category === category;
+      articles.forEach((article) => {
+        var visible = category === "all" || article.dataset.category === category;
         article.hidden = !visible;
       });
     }
 
-    buttons.forEach(function (btn) {
-      btn.addEventListener("click", function () {
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
         applyFilter(btn.dataset.category);
       });
     });

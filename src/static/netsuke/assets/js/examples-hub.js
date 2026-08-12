@@ -6,11 +6,14 @@
  * each card's `data-category`. Copy-to-clipboard behaviour for the
  * cards lives in copy-buttons.js.
  */
-(function () {
+(() => {
   document.addEventListener("DOMContentLoaded", () => {
     initFilters();
   });
 
+  /* Wire the example-card filter chips, returning early when the page has no
+     chips or no cards. Each chip presses itself, unpresses its siblings, and
+     shows the cards matching its filter. */
   function initFilters() {
     const buttons = [...document.querySelectorAll("[data-example-filter]")];
     const cards = [...document.querySelectorAll("[data-example-card]")];
@@ -30,12 +33,10 @@
         }
 
         for (const card of cards) {
-          const matches =
-            filter === "all" || card.getAttribute("data-category") === filter;
+          const matches = filter === "all" || card.getAttribute("data-category") === filter;
           card.classList.toggle("hidden", !matches);
         }
       });
     }
   }
-
 })();

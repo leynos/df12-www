@@ -64,7 +64,7 @@ served output until `bun run build` (or `uv run pages generate`) is rerun by
 hand. This is the usual reason a change appears not to have taken effect.
 
 Run the commit gates with `make all`, which composes
-`build check-fmt lint test test-js typecheck spelling` and runs them
+`build check-fmt lint test test-js typecheck docs-check spelling` and runs them
 sequentially rather than in parallel, since the build cache rewards sequential
 runs. For a narrower check while iterating on the generator, templates, or
 stylesheets:
@@ -78,6 +78,114 @@ make test-js       # JavaScript suite
 For Markdown changes, run `make markdownlint` and `make nixie`. Rebuild and
 inspect the rendered result as well — the gates do not render the site, so a
 template change that passes every gate can still produce a broken page.
+
+### 2.1. Bun is required
+
+Bun is not optional tooling for this repository. It runs the build, the
+JavaScript tests, and Biome, so `make lint`, `make fmt`, `make test-js`, and
+`make dev` all fail without it. Install it from [bun.sh](https://bun.sh); the
+Makefile checks for it by name and says so plainly when it is missing.
+
+Those same targets depend on a `node_modules` stamp that runs
+`bun install --frozen-lockfile`, so a fresh clone needs no separate install
+step. The install is skipped unless `package.json` or `bun.lockb` has moved,
+and the stamp is written only when bun exits cleanly, so a failed install is
+retried rather than mistaken for a finished one.
+
+### 2.2. Biome
+
+Biome is the linter and formatter for everything that is not Python or
+Markdown: JavaScript, TypeScript, JSON and JSONC, HTML, and the hand-crafted
+CSS. It is pinned to an exact version in `devDependencies`, so every
+contributor and every gate run agrees on what the rules are.
+
+```bash
+bun run lint:js       # biome check .  — formatter, linter, and import assists
+bun run lint:js:fix   # biome check --write .  — apply what Biome can fix alone
+```
+
+`make lint` runs `ruff check` and then `bun run lint:js`. `make fmt` runs
+`ruff format`, `ruff check --select I --fix`, `bun run lint:js:fix`, and
+`mdformat-all`.
+
+`biome check` is formatter, linter, and assists in a single pass, which has one
+consequence worth remembering: **a misformatted script fails `make lint`, not
+`make check-fmt`.** The target names do not imply that, so `check-fmt` carries
+a comment saying where Biome's formatting is actually checked.
+
+Run `make fmt` to apply what Biome can fix on its own, then review the findings
+it leaves behind: Biome declines to make those changes unattended because they
+alter what the code says rather than how it is laid out.
+
+Where a rule genuinely should not apply, suppress it at the line with a stated
+reason — `// biome-ignore lint/<group>/<rule>: why` — rather than loosening the
+rule in `biome.jsonc`, which turns one considered exception into a silent
+blanket. Biome rejects a reasonless suppression, and reports a suppression that
+matches nothing, so a stale one will not sit there unnoticed.
+
+`style/useForOf` is raised to an error above the recommended preset. That is
+deliberate policy for this repository, not an inherited default.
+
+### 2.3. TypeDoc
+
+TypeDoc is the canonical documentation validator for TypeScript and ES modules
+across df12 repositories. Here it runs in validation mode only — `emit` is
+`none`, so it produces no site — and fails when anything it is asked to cover
+lacks documentation.
+
+```bash
+bun run docs:check   # typedoc --options typedoc.json
+make docs-check      # the same, in the gate; also part of `make all`
+```
+
+Two settings in `typedoc.json` do the work together, and neither is any use
+alone. `validation.notDocumented` finds undocumented API;
+`treatValidationWarningsAsErrors` turns that finding into a non-zero exit.
+Without the second, TypeDoc reports the problem and exits zero, so the gate
+looks configured and enforces nothing. `tests/js/typedoc-gate.test.mjs` pins
+that behaviour against temporary fixtures.
+
+`commentStyle` is `jsdoc`, so only `/** … */` counts as documentation; a plain
+`/* … */` block is a comment. A module comment additionally needs an `@module`
+tag, or TypeDoc attaches it to whatever declaration follows it and reports the
+module as undocumented.
+
+The entry points are the build-time module tree: `scripts/` and
+`src/styles/plugins/`. The browser scripts under `src/static/` are outside it
+deliberately. They are classic scripts — an IIFE assigning to a guarded
+`module.exports` — so TypeDoc resolves the export object as an anonymous type
+and asks for documentation on each synthetic member, down to names like
+`export=.__type.createCopyController.__type.__type.toast.__type.announcer`.
+Satisfying that would mean writing comments addressed to the type checker
+rather than to a reader. Those modules are commented in the house style and
+reviewed; see section 6.
+
+#### Configuration boundaries
+
+`biome.jsonc` carves several trees out of scope. Each exclusion is there
+because the files are written by something other than a person, and every one
+carries its reasoning in the file:
+
+| Excluded                                                                                      | Why                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/cassettes/`                                                                            | Betamax writes these HTTP recordings. A format gate over them would fail the moment anyone re-recorded a cassette.                                                                                                                          |
+| `reference/`                                                                                  | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
+| `src/static/**/vendor`, `public/netsuke/assets/vendor`                                        | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
+| `src/static/netsuke/assets/css/himotoshi.css`, `src/static/stilyagi/assets/styles/syntax.css` | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `**/*.svg`                                                                                    | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
+| `**/*.css` (linter only)                                                                      | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
+
+_Table 1: The trees `biome.jsonc` holds out of scope, and why each is written
+by something other than a person._
+
+Two parser settings matter as much as the exclusions.
+`css.parser.tailwindDirectives` is enabled because the Tailwind v4 entrypoints
+under `src/styles/` open with `@source`, `@plugin`, and `@theme`, which Biome's
+CSS parser otherwise rejects as unknown at-rules — leaving both entrypoints
+unparsed and silently skipped by the formatter. And `vcs.useIgnoreFile` is on,
+so `.gitignore` is honoured; that is why `reference/` needs an explicit
+exclusion despite being ignored, as the file kept inside it is negated back
+into tracking.
 
 ## 3. Generated versus hand-crafted files
 
@@ -95,7 +203,7 @@ Every published file has a source elsewhere in the repository:
 | `netsuke/assets/search/*.json`               | `scripts/build-netsuke-search-index.mjs`              |
 | everything else                              | `src/static/`, copied by `scripts/copy-static.ts`     |
 
-_Table 1: Published paths under `public/` and the source that generates them._
+_Table 2: Published paths under `public/` and the source that generates them._
 
 In summary: hand-crafted assets — stylesheets, scripts, images, fonts, and
 favicons — live under `src/static/`, whose layout mirrors the published tree
@@ -261,7 +369,7 @@ block outright, so a run restores it without needing the previous content.
 | Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/static/netsuke/assets/css/himotoshi.css`  |
 | Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
 
-_Table 2: Pygments styles, the lexers each sub-site's templates actually name
+_Table 3: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
@@ -315,7 +423,7 @@ The pill-shaped eyebrow above a page or section heading.
 | `icon_class` | Utility classes for that icon, typically a colour.                      |
 | `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |
 
-_Table 3: the `kicker` macro's parameters._
+_Table 4: the `kicker` macro's parameters._
 
 Three call sites show the range:
 
@@ -340,7 +448,7 @@ default.
 | `.hm-kicker--accent`  | Pairs with `--section` for the docs hub's indigo.      |
 | `.hm-kicker__dot`     | The roadmap's leading status dot.                      |
 
-_Table 4: the kicker component class and its modifiers._
+_Table 5: the kicker component class and its modifiers._
 
 **Normative:** a new variant is a new modifier on `.hm-kicker`, not a fresh
 class list at the call site and not a utility string passed through `extra`.
@@ -369,6 +477,16 @@ heading is currently being read); `config-keys.js` exports `nextTabIndex`
 (which tab an arrow/Home/End keypress should move to). `mobile-nav.js` has no
 such function — its logic is DOM interaction throughout — and exports nothing.
 
+Where a module has no pure decision to extract, it is tested against a real DOM
+instead. `tests/js/helpers/mobile-nav-harness.mjs` builds a happy-dom window,
+injects the markup the templates render, and evaluates the shipped script into
+it, so the tests drive genuine event dispatch and a genuine `activeElement`.
+Both `mobile-nav.js` modules are covered this way. The choice is deliberate:
+what those modules can get wrong is which element holds focus after a keypress,
+and a fake DOM with hand-written focus bookkeeping would largely be testing
+itself. Prefer the fake DOM used by `config-keys.test.mjs` when the behaviour
+under test is a decision; reach for the harness when it is an interaction.
+
 Bun tests under `tests/js/` cover these pure functions, and they `require` the
 **built** copy from `public/`, not the source under `src/static/`:
 
@@ -376,9 +494,11 @@ Bun tests under `tests/js/` cover these pure functions, and they `require` the
 const { nextTabIndex } = require("../../public/netsuke/assets/js/config-keys.js");
 ```
 
-This means `bun run build` (or at least `bun run build:static`) must have run
-before `bun test tests/js` (`make test-js`) sees a source change; the gate runs
-`build` first for exactly this reason.
+This means the copy step must have run before the suite sees a source change, so
+`make test-js` runs `bun run build:static` before `bun run test:js`. Driving
+`bun test tests/js` directly skips that, and will quietly test the previous
+form of anything edited since the last build. (`make build` does not cover it:
+that target builds the Python virtual environment, not the site.)
 
 Nothing here is bundled, transpiled, or module-loaded: `scripts/copy-static.ts`
 copies these files verbatim. There are no ES modules, no classes, and no custom
@@ -387,6 +507,15 @@ and nothing else, with the DOM contract expressed through `data-*` attributes
 so that restyling cannot break a selector, and an early return when the root
 element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
+
+An element may still carry an id for the stylesheet or for an ARIA
+relationship; what the convention rules out is _script_ depending on one. The
+Netsuke navbar is the worked example: `#navbar` and `#navbar-mobile-menu` are
+load-bearing for `himotoshi.css` and for the toggle's `aria-controls`, so they
+stay, while `mobile-nav.js` addresses the same elements as `[data-mobile-nav]`,
+`[data-mobile-nav-toggle]`, and `[data-mobile-nav-menu]`. The toggle and menu
+are resolved within the root rather than from the document, so the root is the
+only thing a page has to get right.
 
 The convention's limits are worth naming, because they decide when to leave it.
 A module is a file plus a `data-` prefix, so nothing enforces one instance per

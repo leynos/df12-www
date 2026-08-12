@@ -92,7 +92,17 @@ doc pages, and shared content pages. This directory is the deployment root.
 ### `reference/`
 
 Reference HTML snapshots and screenshots used for visual regression or
-documentation illustration.
+documentation illustration. `.gitignore` ignores the directory's _contents_
+(`reference/*`) rather than the directory itself, so anything dropped here is
+scratch by default while `index.html` can still be exempted — an ignored
+directory is never descended into, so a negation for a file inside one would
+never be reached. That one file is kept deliberately: a prototype homepage
+themed after a cathode-ray tube (CRT) terminal, predating the generator, which
+nothing in the build references.
+
+Nothing under `reference/` is built, shipped, or linted: `biome.jsonc` excludes
+the directory so that a snapshot keeps reading the way it did when it was
+written rather than being churned into the house style.
 
 ### `scripts/`
 

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+
+  // The build-time module tree: the scripts the pipeline runs and the Tailwind
+  // plugin it loads. These are real ES modules with real exports, which is what
+  // TypeDoc validates.
+  //
+  // The browser scripts under src/static/ are deliberately outside this. They
+  // are classic scripts — an IIFE assigning to a guarded `module.exports` — so
+  // TypeDoc resolves their export object as an anonymous type and asks for
+  // documentation on each synthetic member, down to
+  // `export=.__type.createCopyController.__type.__type.toast.__type.announcer`.
+  // Satisfying that would mean writing comments addressed to the type
+  // checker rather than to a reader. Their module and function comments are
+  // reviewed instead; see section 6 of the developers' guide.
+  "entryPoints": ["scripts", "src/styles/plugins"],
+  "entryPointStrategy": "expand",
+
+  "exclude": ["**/*.d.ts", "**/vendor/**"],
+
+  "emit": "none",
+  "commentStyle": "jsdoc",
+
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+
+  "validation": {
+    "notDocumented": true,
+    "notExported": false,
+    "invalidLink": false,
+    "invalidPath": false,
+    "rewrittenLink": false,
+    "unusedMergeModuleWith": false
+  },
+
+  "requiredToBeDocumented": [
+    "Module",
+    "Enum",
+    "EnumMember",
+    "Variable",
+    "Function",
+    "Class",
+    "Interface",
+    "Property",
+    "Method",
+    "Accessor",
+    "TypeAlias"
+  ],
+
+  "treatValidationWarningsAsErrors": true
+}

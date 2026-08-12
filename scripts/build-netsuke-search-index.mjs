@@ -6,6 +6,8 @@
  * public/netsuke/assets/search/docs-search.json.
  *
  * Adapted from netsuke-www/scripts/build-site.mjs.
+ *
+ * @module
  */
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -18,21 +20,11 @@ const DOCS_DIR = path.join(SITE_DIR, "docs");
 const EXAMPLES_DIR = path.join(SITE_DIR, "examples");
 const SEARCH_OUTPUT_DIR = path.join(SITE_DIR, "assets", "search");
 const SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "docs-search.json");
-const EXAMPLES_SEARCH_OUTPUT_PATH = path.join(
-  SEARCH_OUTPUT_DIR,
-  "examples-search.json",
-);
+const EXAMPLES_SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "examples-search.json");
 
 const INDEX_OPTIONS = {
   fields: ["title", "pageTitle", "sectionTitle", "headings", "body"],
-  storeFields: [
-    "title",
-    "sitePath",
-    "pageTitle",
-    "sectionTitle",
-    "excerpt",
-    "kind",
-  ],
+  storeFields: ["title", "sitePath", "pageTitle", "sectionTitle", "excerpt", "kind"],
   searchOptions: {
     boost: {
       title: 6,
@@ -45,6 +37,9 @@ const INDEX_OPTIONS = {
   },
 };
 
+/* Build both Netsuke search indices: the documentation set and the examples
+   set. The page lists are explicit rather than globbed, so a page joins the
+   index only when someone means it to. */
 async function main() {
   const docFiles = [
     path.join(DOCS_DIR, "index.html"),
@@ -71,6 +66,9 @@ async function main() {
   await buildIndex(exampleFiles, EXAMPLES_SEARCH_OUTPUT_PATH);
 }
 
+/* Read each HTML file, index every document extracted from it with
+   MiniSearch, and write the serialized index to `outputPath`, creating its
+   directory if need be. Logs how many documents it indexed. */
 async function buildIndex(files, outputPath) {
   const documents = [];
 
@@ -103,10 +101,14 @@ async function buildIndex(files, outputPath) {
   console.log(`wrote ${outputPath} (${documents.length} documents indexed)`);
 }
 
+/* Turn one built page into the documents the index stores: one for the page
+   as a whole, then one per `<section>` that carries an id and some text, so a
+   search result can land on the section rather than the top of the page.
+   Reads only inside `<main>` where present, to keep site chrome out of the
+   index. Returns an array; sections with no body text are dropped. */
 function extractDocuments(filePath, html) {
   const sitePath = toSitePath(filePath);
-  const mainHtml =
-    matchFirst(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i) ?? html;
+  const mainHtml = matchFirst(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i) ?? html;
   const pageTitle =
     stripTags(matchFirst(mainHtml, /<h1\b[^>]*>([\s\S]*?)<\/h1>/i) ?? "") ||
     stripTags(matchFirst(html, /<title\b[^>]*>([\s\S]*?)<\/title>/i) ?? "") ||
@@ -133,9 +135,7 @@ function extractDocuments(filePath, html) {
   )) {
     const [, sectionId, sectionHtml] = match;
     const sectionTitle =
-      stripTags(
-        matchFirst(sectionHtml, /<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) ?? "",
-      ) || pageTitle;
+      stripTags(matchFirst(sectionHtml, /<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) ?? "") || pageTitle;
     const excerpt = firstMeaningfulParagraph(sectionHtml) || pageExcerpt;
     const body = normalizeText(sectionHtml);
 
@@ -159,19 +159,24 @@ function extractDocuments(filePath, html) {
   return docs;
 }
 
+/* The URL path a built file is served at: relative to the site root, with
+   separators normalized and a trailing `index.html` removed. */
 function toSitePath(filePath) {
-  const relativePath = path
-    .relative(SITE_DIR, filePath)
-    .replace(/\\/g, "/");
+  const relativePath = path.relative(SITE_DIR, filePath).replace(/\\/g, "/");
   return relativePath.replace(/index\.html$/, "");
 }
 
+/* Every h1-h4's text, in document order, with empty ones dropped. These are
+   indexed as their own field so a heading match outranks a body match. */
 function extractHeadings(html) {
   return [...html.matchAll(/<h[1-4]\b[^>]*>([\s\S]*?)<\/h[1-4]>/gi)]
     .map((match) => stripTags(match[1]))
     .filter(Boolean);
 }
 
+/* The first paragraph long enough to serve as a result excerpt — at least 40
+   characters, so a one-word lede or a stray caption is skipped — truncated to
+   180. Empty string when nothing qualifies. */
 function firstMeaningfulParagraph(html) {
   for (const match of html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)) {
     const text = stripTags(match[1]);
@@ -183,10 +188,15 @@ function firstMeaningfulParagraph(html) {
   return "";
 }
 
+/* An HTML fragment as indexable plain text: tags stripped, whitespace
+   collapsed, and capped at 4000 characters to bound the index size. */
 function normalizeText(html) {
   return truncate(stripTags(html).replace(/\s+/g, " ").trim(), 4000);
 }
 
+/* Plain text from an HTML fragment. Drops `<script>` and `<style>` contents
+   outright rather than merely unwrapping them, so code and CSS never reach
+   the index, then removes remaining tags and decodes entities. */
 function stripTags(html) {
   return decodeEntities(
     html
@@ -198,6 +208,8 @@ function stripTags(html) {
   );
 }
 
+/* Decode the handful of named entities the templates actually emit. Not a
+   general decoder: anything outside this set passes through unchanged. */
 function decodeEntities(text) {
   return text
     .replace(/&nbsp;/g, " ")
@@ -209,6 +221,8 @@ function decodeEntities(text) {
     .replace(/&copy;/g, "©");
 }
 
+/* Cap `text` at `maxLength`, ending with an ellipsis when it had to cut.
+   Returns the input untouched when it already fits. */
 function truncate(text, maxLength) {
   if (text.length <= maxLength) {
     return text;
@@ -217,6 +231,8 @@ function truncate(text, maxLength) {
   return `${text.slice(0, maxLength - 1).trimEnd()}…`;
 }
 
+/* The first capture group of `pattern` in `text`, or null when it does not
+   match. */
 function matchFirst(text, pattern) {
   const match = pattern.exec(text);
   return match?.[1] ?? null;

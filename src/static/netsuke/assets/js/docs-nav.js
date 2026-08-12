@@ -5,23 +5,29 @@
  * the current page pre-selected. This module navigates to the chosen
  * page's URL on change, skipping no-op selections of the current path.
  */
-(function () {
-    "use strict";
+(() => {
+  "use strict";
 
-    function init() {
-        var selects = document.querySelectorAll("[data-docs-nav-select]");
-        selects.forEach(function (select) {
-            select.addEventListener("change", function () {
-                if (select.value && select.value !== window.location.pathname) {
-                    window.location.assign(select.value);
-                }
-            });
-        });
+  /* Wire every docs `<select>` on the page to navigate on change, skipping a
+     selection that names the path already open. Returns early on a page with
+     no docs bar, in the shape every other script module here uses. */
+  function init() {
+    var selects = document.querySelectorAll("[data-docs-nav-select]");
+    if (selects.length === 0) {
+      return;
     }
+    selects.forEach((select) => {
+      select.addEventListener("change", () => {
+        if (select.value && select.value !== window.location.pathname) {
+          window.location.assign(select.value);
+        }
+      });
+    });
+  }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-    } else {
-        init();
-    }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();

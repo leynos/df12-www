@@ -9,7 +9,7 @@
  * markup contract lives in the sidebar blocks of the docs page
  * templates and in templates/netsuke/docs_nav.jinja.
  */
-(function () {
+(() => {
   const SEARCH_MIN_LENGTH = 2;
   const RESULT_LIMIT = 6;
 
@@ -25,6 +25,9 @@
     });
   }
 
+  /* Wire one search root: its input, results panel, and list. Loads the index
+     lazily through the shared cache, so a page carrying several roots for the
+     same index fetches it once. */
   async function initializeDocSearch(root) {
     const input = root.querySelector("[data-doc-search-input]");
     const panel = root.querySelector("[data-doc-search-panel]");
@@ -65,8 +68,7 @@
     input.setAttribute("aria-expanded", "false");
 
     document.addEventListener("keydown", (event) => {
-      const wantsShortcut =
-        (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+      const wantsShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
 
       if (!wantsShortcut) {
         return;
@@ -144,6 +146,9 @@
     });
   }
 
+  /* Run `rawQuery` against the index and return at most RESULT_LIMIT results,
+     or nothing at all for a query below the minimum length. Results are merged
+     so a page and its sections do not both appear for the same match. */
   function search(miniSearch, searchOptions, rawQuery) {
     const query = rawQuery.trim();
     if (query.length < SEARCH_MIN_LENGTH) {
@@ -166,6 +171,9 @@
     return [...merged.values()].slice(0, RESULT_LIMIT);
   }
 
+  /* Draw the results list and its count, then show the panel and mark the
+     active option. Takes its collaborators as one options object because the
+     list, meta, input, and panel all have to move together. */
   function renderResults({
     activeIndex,
     activeResults,
@@ -222,6 +230,8 @@
     updateActiveResult(resultsList, activeIndex);
   }
 
+  /* Move the highlight to the option at `activeIndex`, clearing it from the
+     rest. Pass an index no option holds to clear it entirely. */
   function updateActiveResult(resultsList, activeIndex) {
     const options = resultsList.querySelectorAll("[data-doc-search-option]");
 
@@ -234,11 +244,13 @@
     }
   }
 
+  /* Reveal the results panel and record it as expanded on the combobox. */
   function showPanel(panel, input) {
     panel.classList.remove("hidden");
     input.setAttribute("aria-expanded", "true");
   }
 
+  /* Hide the results panel and record it as collapsed on the combobox. */
   function hidePanel(panel, input) {
     panel.classList.add("hidden");
     input.setAttribute("aria-expanded", "false");
@@ -266,7 +278,7 @@
             (error) => {
               cache.delete(path);
               throw error;
-            }
+            },
           );
         cache.set(path, pending);
       }
@@ -274,6 +286,9 @@
     };
   }
 
+  /* Fetch and deserialize one MiniSearch index, returning the index and the
+     search options it was built with, or null when the request fails — a
+     search box that cannot load its index simply stays inert. */
   async function fetchSearchIndex(searchIndexPath) {
     const response = await fetch(searchIndexPath);
     if (!response.ok) {
@@ -288,6 +303,8 @@
 
   const loadSearchIndex = createIndexCache(fetchSearchIndex);
 
+  /* The sub-site root a set of results belongs to, recovered from the index
+     path. Falls back to "/" when the expected marker is absent. */
   function siteRootFromIndexPath(indexPath) {
     // Index files live at "<siteRoot>assets/search/<name>.json", so the
     // prefix before that marker is the sub-site root the results belong to.
@@ -296,11 +313,15 @@
     return markerIndex >= 0 ? indexPath.slice(0, markerIndex) : "/";
   }
 
+  /* Join a site root and an indexed path into an absolute same-origin href,
+     preserving the fragment that takes the reader to the right section. */
   function toAbsoluteSiteHref(siteRoot, sitePath) {
     const url = new URL(siteRoot + sitePath, window.location.origin);
     return `${url.pathname}${url.hash}`;
   }
 
+  /* Escape `text` for interpolation into result markup. Indexed content is
+     built from the site's own pages, but it still reaches innerHTML. */
   function escapeHtml(text) {
     return text
       .replaceAll("&", "&amp;")

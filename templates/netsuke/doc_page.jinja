@@ -18,7 +18,7 @@
 </head>
 <body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white flex flex-col min-h-screen {% block body_class %}{% endblock %}">
     <!-- Navigation -->
-    <nav id="navbar" class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
+    <nav id="navbar" data-mobile-nav class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
         <div class="site-container">
             <div class="flex justify-between h-16 items-center">
                 <a href="/netsuke/" class="flex items-center space-x-3" aria-label="Home">
@@ -46,14 +46,14 @@
                     {% block navbar_action %}<a href="/netsuke/install/" class="hm-button hm-button--primary hm-navbar-action hidden md:inline-flex items-center px-4 py-1.5 text-sm"{% if active_nav == 'install' %} aria-current="page"{% endif %}>
                         <span class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span><span class="hm-navbar-action__label">Install</span>
                     </a>{% endblock %}
-                    <button id="navbar-mobile-toggle" type="button" class="hm-hamburger md:hidden" aria-expanded="false" aria-controls="navbar-mobile-menu" aria-label="Open menu">
+                    <button id="navbar-mobile-toggle" data-mobile-nav-toggle type="button" class="hm-hamburger md:hidden" aria-expanded="false" aria-controls="navbar-mobile-menu" aria-label="Open menu">
                         <span class="iconify hm-hamburger__open" data-icon="carbon:menu" aria-hidden="true"></span>
                         <span class="iconify hm-hamburger__close" data-icon="carbon:close" aria-hidden="true" style="display:none"></span>
                     </button>
                 </div>
             </div>
         </div>
-        <nav id="navbar-mobile-menu" class="hm-mobile-menu hidden md:hidden" aria-label="Mobile navigation">
+        <nav id="navbar-mobile-menu" data-mobile-nav-menu class="hm-mobile-menu hidden md:hidden" aria-label="Mobile navigation">
             <ul class="list-none py-3 px-4 space-y-1">
                 {% if parent_link %}
                 <li><a href="{{ parent_link.href }}" class="hm-mobile-menu__link text-vermillion">{{ parent_link.label }}</a></li>

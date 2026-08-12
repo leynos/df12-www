@@ -65,8 +65,7 @@
     // The region the reader actually chose, as opposed to the one currently
     // under the pointer.  The markup ships with one node pressed.
     let pressed =
-      nodes.find((node) => node.getAttribute("aria-pressed") === "true")
-        ?.dataset.region ?? null;
+      nodes.find((node) => node.getAttribute("aria-pressed") === "true")?.dataset.region ?? null;
 
     const select = (id, { press = false } = {}) => {
       if (press) pressed = id;
@@ -132,12 +131,8 @@
     if (!toggles.length || !providers.length) return;
 
     const update = () => {
-      const active = toggles.filter(
-        (toggle) => toggle.getAttribute("aria-checked") === "true",
-      );
-      const capabilities = requiredCapabilities(
-        active.map((toggle) => toggle.dataset.caps),
-      );
+      const active = toggles.filter((toggle) => toggle.getAttribute("aria-checked") === "true");
+      const capabilities = requiredCapabilities(active.map((toggle) => toggle.dataset.caps));
       const enabled = active.length;
 
       for (const provider of providers) {

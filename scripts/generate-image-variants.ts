@@ -1,5 +1,22 @@
+/**
+ * generate-image-variants.ts — the `build:images` step of the site build.
+ *
+ * Walks the PNGs already copied into `public/images/` and writes a WebP and
+ * an AVIF beside each one, so templates can offer modern formats through
+ * `<picture>` without anyone hand-exporting them. Sharp does the encoding.
+ *
+ * Ordering matters: this runs after `build:static`, because it reads the
+ * source images that step places, and it writes into `public/`, which is
+ * build output in its entirety and tracked nowhere. A variant is skipped
+ * when it is already newer than its source, so repeated builds stay cheap;
+ * nothing is pruned, because this step cannot tell a deleted asset from
+ * another step's output. Remove `public/` and rebuild to clear stale files.
+ *
+ * @module
+ */
 import { access, readdir, stat } from "node:fs/promises";
-import { extname, join, dirname, relative, sep } from "node:path";
+import { extname, join, relative, sep } from "node:path";
+import type { AvifOptions, WebpOptions } from "sharp";
 import sharp from "sharp";
 
 const IMAGE_ROOT = join(process.cwd(), "public", "images");
@@ -23,6 +40,12 @@ const OUTPUT_FORMATS = [
   },
 ] as const;
 
+/**
+ * Collect every PNG beneath `dir`, recursing into subdirectories.
+ *
+ * `results` is the accumulator the recursion threads through; callers pass
+ * nothing. Returns absolute paths. Reads the filesystem but writes nothing.
+ */
 async function findPngs(dir: string, results: string[] = []): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
@@ -36,30 +59,52 @@ async function findPngs(dir: string, results: string[] = []): Promise<string[]> 
   return results;
 }
 
+/**
+ * Whether `targetPath` is stale with respect to `sourcePath`.
+ *
+ * True when the source is newer, or when either stat operation fails. A
+ * missing target therefore triggers generation, while repeated builds remain
+ * cheap when both paths can be compared.
+ */
 async function needsUpdate(sourcePath: string, targetPath: string): Promise<boolean> {
   try {
     const [sourceStats, targetStats] = await Promise.all([stat(sourcePath), stat(targetPath)]);
     return sourceStats.mtimeMs > targetStats.mtimeMs;
   } catch {
-    // If the derived file does not exist yet, we need to generate it.
+    // Either stat can fail; in particular, a missing target needs generation.
     return true;
   }
 }
 
-async function generateVariant(sourcePath: string, format: typeof OUTPUT_FORMATS[number]) {
+/**
+ * Encode one variant of `sourcePath` in `format`, beside the original.
+ *
+ * Returns early when the existing variant is already newer than its source.
+ * Otherwise writes the file and logs the repository-relative path it wrote.
+ */
+async function generateVariant(sourcePath: string, format: (typeof OUTPUT_FORMATS)[number]) {
   const outputPath = sourcePath.replace(/\.png$/i, `.${format.format}`);
   if (!(await needsUpdate(sourcePath, outputPath))) {
     return;
   }
 
   await sharp(sourcePath)
-    .toFormat(format.format as "webp" | "avif", format.options as sharp.WebpOptions | sharp.AvifOptions)
+    .toFormat(format.format as "webp" | "avif", format.options as WebpOptions | AvifOptions)
     .toFile(outputPath);
 
   const rel = relative(process.cwd(), outputPath).split(sep).join("/");
   console.log(`Generated ${rel}`);
 }
 
+/**
+ * Run the build step: find the PNGs under `public/images` and encode every
+ * configured variant of each.
+ *
+ * Returns quietly when the directory is absent or holds no PNGs, so the step
+ * is safe to run before the first build. Variants are encoded concurrently;
+ * a failure in any one is collected rather than aborting the rest, and the
+ * process exits non-zero once they have all settled.
+ */
 async function main() {
   try {
     await access(IMAGE_ROOT);
@@ -75,7 +120,7 @@ async function main() {
   }
 
   const tasks = pngFiles.flatMap((filePath) =>
-    OUTPUT_FORMATS.map((format) => generateVariant(filePath, format))
+    OUTPUT_FORMATS.map((format) => generateVariant(filePath, format)),
   );
 
   const results = await Promise.allSettled(tasks);
@@ -85,7 +130,7 @@ async function main() {
   }
 
   console.log(
-    `Image variant generation completed (${pngFiles.length} files, ${OUTPUT_FORMATS.length} formats).`
+    `Image variant generation completed (${pngFiles.length} files, ${OUTPUT_FORMATS.length} formats).`,
   );
 }
 

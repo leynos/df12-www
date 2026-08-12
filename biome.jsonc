@@ -12,9 +12,21 @@
       "!.act-stubs",
       "!public/assets",
       "!public/netsuke/assets/vendor",
-      "!src/static/**/vendor"
+      "!src/static/**/vendor",
+      // Betamax writes these HTTP recordings; re-recording a cassette would
+      // fail the format gate on output no human authored.
+      "!tests/cassettes",
+      // Snapshots kept for reference, neither built nor shipped. Holding
+      // them to the house style would only churn files whose value is that
+      // they still read the way they did when they were written.
+      "!reference"
     ],
     "ignoreUnknown": true
+  },
+  "css": {
+    // The Tailwind v4 entrypoints in src/styles/ use @source, @plugin, and
+    // @theme, which the CSS parser rejects as unknown at-rules otherwise.
+    "parser": { "tailwindDirectives": true }
   },
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "formatter": {

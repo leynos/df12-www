@@ -305,6 +305,25 @@ Rebuild and inspect the rendered result as well. A template change that passes
 every gate can still produce a broken page, because the gates do not render the
 site.
 
+`make lint` runs Ruff over the Python and Biome over everything else —
+JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked
+as `biome check .`, which provides formatting, linting, and import assists in
+one pass, so a misformatted script fails the lint gate rather than `check-fmt`.
+Run `make fmt` to apply what Biome can fix on its own, then review the findings
+it leaves behind: Biome declines to make those changes unattended because they
+alter what the code says rather than how it is laid out.
+
+Biome lives in `node_modules`, so `lint`, `fmt`, `test-js`, and `dev` all
+depend on a `node_modules` target that runs `bun install --frozen-lockfile`. A
+clean checkout therefore needs no manual install step, and the install is
+skipped unless `package.json` or `bun.lockb` has moved.
+
+Where a Biome rule genuinely should not apply, suppress it at the line with a
+stated reason — `// biome-ignore lint/<group>/<rule>: why` — and never by
+loosening the rule in `biome.jsonc`, which turns one considered exception into
+a silent blanket. `style/useForOf` is raised to an error above the recommended
+preset and is deliberate policy, not an inherited default.
+
 For Markdown changes, run `make markdownlint` and `make nixie`. The Markdown
 gate refreshes the shared en-GB-oxendict base, regenerates `typos.toml`, and
 checks maintained prose with the pinned `typos` release. Put narrow

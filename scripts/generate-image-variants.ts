@@ -11,9 +11,12 @@
  * when it is already newer than its source, so repeated builds stay cheap;
  * nothing is pruned, because this step cannot tell a deleted asset from
  * another step's output. Remove `public/` and rebuild to clear stale files.
+ *
+ * @module
  */
 import { access, readdir, stat } from "node:fs/promises";
 import { extname, join, relative, sep } from "node:path";
+import type { AvifOptions, WebpOptions } from "sharp";
 import sharp from "sharp";
 
 const IMAGE_ROOT = join(process.cwd(), "public", "images");
@@ -86,10 +89,7 @@ async function generateVariant(sourcePath: string, format: (typeof OUTPUT_FORMAT
   }
 
   await sharp(sourcePath)
-    .toFormat(
-      format.format as "webp" | "avif",
-      format.options as sharp.WebpOptions | sharp.AvifOptions,
-    )
+    .toFormat(format.format as "webp" | "avif", format.options as WebpOptions | AvifOptions)
     .toFile(outputPath);
 
   const rel = relative(process.cwd(), outputPath).split(sep).join("/");

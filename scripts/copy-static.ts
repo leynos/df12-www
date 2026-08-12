@@ -11,6 +11,8 @@
  * generator and the image variant step also write into public/, and this
  * script cannot distinguish their output from an asset that has since been
  * deleted. Remove public/ and rebuild for a clean tree.
+ *
+ * @module
  */
 
 import { copyFile, mkdir, readdir, stat } from "node:fs/promises";

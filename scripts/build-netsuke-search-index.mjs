@@ -6,6 +6,8 @@
  * public/netsuke/assets/search/docs-search.json.
  *
  * Adapted from netsuke-www/scripts/build-site.mjs.
+ *
+ * @module
  */
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";

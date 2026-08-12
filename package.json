@@ -13,6 +13,7 @@
     "build:pages": "uv run pages generate --all-sites",
     "serve": "bun run build && bunx http-server public -p ${DF12_PORT:-8080}",
     "lint:js": "biome check .",
+    "docs:check": "typedoc --options typedoc.json",
     "lint:js:fix": "biome check --write .",
     "test:js": "bun test tests/js",
     "bump": "uv run pages bump"
@@ -29,6 +30,8 @@
     "http-server": "^14.1.1",
     "minisearch": "7.2.0",
     "sharp": "^0.35.3",
-    "tailwindcss": "^4.1.15"
+    "tailwindcss": "^4.1.15",
+    "typedoc": "0.28.20",
+    "typescript": "6"
   }
 }

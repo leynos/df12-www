@@ -126,6 +126,40 @@ matches nothing, so a stale one will not sit there unnoticed.
 `style/useForOf` is raised to an error above the recommended preset. That is
 deliberate policy for this repository, not an inherited default.
 
+### 2.3. TypeDoc
+
+TypeDoc is the canonical documentation validator for TypeScript and ES modules
+across df12 repositories. Here it runs in validation mode only — `emit` is
+`none`, so it produces no site — and fails when anything it is asked to cover
+lacks documentation.
+
+```bash
+bun run docs:check   # typedoc --options typedoc.json
+make docs-check      # the same, in the gate; also part of `make all`
+```
+
+Two settings in `typedoc.json` do the work together, and neither is any use
+alone. `validation.notDocumented` finds undocumented API;
+`treatValidationWarningsAsErrors` turns that finding into a non-zero exit.
+Without the second, TypeDoc reports the problem and exits zero, so the gate
+looks configured and enforces nothing. `tests/js/typedoc-gate.test.mjs` pins
+that behaviour against temporary fixtures.
+
+`commentStyle` is `jsdoc`, so only `/** … */` counts as documentation; a plain
+`/* … */` block is a comment. A module comment additionally needs an `@module`
+tag, or TypeDoc attaches it to whatever declaration follows it and reports the
+module as undocumented.
+
+The entry points are the build-time module tree: `scripts/` and
+`src/styles/plugins/`. The browser scripts under `src/static/` are outside it
+deliberately. They are classic scripts — an IIFE assigning to a guarded
+`module.exports` — so TypeDoc resolves the export object as an anonymous type
+and asks for documentation on each synthetic member, down to names like
+`export=.__type.createCopyController.__type.__type.toast.__type.announcer`.
+Satisfying that would mean writing comments addressed to the type checker
+rather than to a reader. Those modules are commented in the house style and
+reviewed; see section 6.
+
 #### Configuration boundaries
 
 `biome.jsonc` carves several trees out of scope. Each exclusion is there

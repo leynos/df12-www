@@ -14,13 +14,13 @@ ifeq ($(strip $(SKIP_PLAYWRIGHT)),1)
 PYTEST_FILTER += -m 'not playwright'
 endif
 
-.PHONY: help all clean build build-release lint fmt check-fmt \
+.PHONY: help all clean build build-release lint fmt check-fmt docs-check \
         markdownlint nixie spelling test typecheck $(TOOLS) $(VENV_TOOLS) \
 	dev
 
 .DEFAULT_GOAL := all
 
-all: build check-fmt lint test test-js typecheck spelling
+all: build check-fmt lint test test-js typecheck docs-check spelling
 
 .venv: pyproject.toml
 	$(UV_ENV) uv venv --clear
@@ -117,6 +117,9 @@ nixie: $(NIXIE) ## Validate Mermaid diagrams
 
 test: build uv $(VENV_TOOLS) ## Run tests
 	$(UV_ENV) uv run pytest -v $(PYTEST_FILTER)
+
+docs-check: $(NODE_MODULES_STAMP) ## Validate TypeScript documentation with TypeDoc
+	bun run docs:check
 
 test-js: $(NODE_MODULES_STAMP) ## Run JavaScript unit tests
 	# The suite loads the built copies under public/, so the copy step has to

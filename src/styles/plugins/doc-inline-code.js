@@ -11,6 +11,17 @@
  *
  * It is a component rather than a utility so that the typography plugin's own
  * rules, which are components too, do not win on ordering alone.
+ *
+ * @module
+ */
+/**
+ * Register the `.doc-prose` inline-code component.
+ *
+ * @param {object} api - The plugin API Tailwind supplies.
+ * @param {Function} api.addComponents - Registers rules in the components
+ *   layer, so the typography plugin's own component rules cannot win on
+ *   ordering alone.
+ * @returns {void}
  */
 export default function docInlineCodePlugin({ addComponents }) {
   addComponents({

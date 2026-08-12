@@ -9,9 +9,13 @@
   "use strict";
 
   /* Wire every docs `<select>` on the page to navigate on change, skipping a
-     selection that names the path already open. */
+     selection that names the path already open. Returns early on a page with
+     no docs bar, in the shape every other script module here uses. */
   function init() {
     var selects = document.querySelectorAll("[data-docs-nav-select]");
+    if (selects.length === 0) {
+      return;
+    }
     selects.forEach((select) => {
       select.addEventListener("change", () => {
         if (select.value && select.value !== window.location.pathname) {

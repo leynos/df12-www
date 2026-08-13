@@ -1,0 +1,355 @@
+/* Page shell: containers, breadcrumbs, the hero, and section rhythm.
+ * Notices, photography, and shared policy prose live in content.css.
+ *
+ * Shell width, the reading measure, panel construction, bare lists, and hit
+ * target floors come from motifs.css. Breakpoints sit with the component they
+ * modify.
+ */
+
+.site-main {
+  display: block;
+  padding-bottom: var(--space-6);
+}
+
+.content-shell--legal {
+  max-width: 52rem;
+}
+
+/* Breadcrumbs ------------------------------------------------------------- */
+
+.breadcrumbs {
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+
+.breadcrumbs ol {
+  gap: 0 var(--space-2);
+}
+
+.breadcrumbs li {
+  display: flex;
+  align-items: center;
+  color: var(--color-ink-3);
+  font-size: var(--label-note);
+  letter-spacing: var(--track-3);
+  text-transform: uppercase;
+}
+
+.breadcrumbs li + li::before {
+  margin-right: var(--space-2);
+  color: var(--color-ornament);
+  content: "/";
+}
+
+.breadcrumbs a {
+  min-height: 1.6rem;
+  padding-block: 0.1rem;
+  color: var(--color-ink-2);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: var(--color-base-content);
+  text-decoration: underline;
+}
+
+.breadcrumbs [aria-current="page"] {
+  color: var(--color-base-content);
+}
+
+/* Hero -------------------------------------------------------------------- */
+
+/* The proposition leads. No wordmark, no atmospheric image, no gradient
+ * headline: the first thing on the page is the sentence that explains it. */
+/* One column until there is room for two. The signal field takes close to
+ * half the hero, which only works once the sentence still sets in two lines
+ * beside it: below 80rem the text column drops under about 640px, the
+ * headline goes to three lines, and the actions leave the first viewport.
+ * The ornament is what gives way, not the call to action. */
+.hero {
+  display: grid;
+  padding-block: var(--space-6) var(--space-5);
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.hero__eyebrow {
+  margin-bottom: var(--space-3);
+  color: var(--color-signal-amber);
+  font-size: var(--label-eyebrow);
+  letter-spacing: var(--track-1);
+  text-transform: uppercase;
+}
+
+/* Two lines at 1280x720, which is what puts the actions inside the first
+ * viewport. Three lines of display type and the buttons fall off the bottom,
+ * so the cap and the ceiling are set together and measured together.
+ *
+ * The ceiling came down from 3rem when the signal field took half the hero:
+ * the sentence lost 420px of column and went to three lines, which put the
+ * actions 34px below the fold. 2.6rem is the largest step that still sets it
+ * in two. Retune by measuring the actions against the viewport, not by
+ * eye. */
+.hero__title {
+  max-width: 30ch;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.08;
+}
+
+.hero__lede {
+  margin-top: var(--space-4);
+  color: var(--color-ink-2);
+  font-size: 1.16rem;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+  gap: var(--space-3);
+
+  --flow-measure: none;
+}
+
+/* The decorative waveform carries no information, so it never costs a narrow
+   screen any height. It is drawn only where the two-column hero holds. */
+.hero__signal {
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .hero {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 7fr);
+  }
+
+  .hero__signal {
+    display: flex;
+    align-items: center;
+    padding-left: var(--space-4);
+  }
+}
+
+@media (max-width: 40rem) {
+  .hero__actions .button {
+    flex: 1 1 100%;
+  }
+}
+
+/* Page intro -------------------------------------------------------------- */
+
+.page-intro {
+  padding-block: var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+
+.page-intro__eyebrow {
+  margin-bottom: var(--space-3);
+  color: var(--color-signal-amber);
+  font-size: var(--label-eyebrow);
+  letter-spacing: var(--track-1);
+  text-transform: uppercase;
+}
+
+.page-intro__title {
+  max-width: 24ch;
+  font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.page-intro__lede {
+  margin-top: var(--space-4);
+  color: var(--color-ink-2);
+  font-size: 1.12rem;
+}
+
+/* On-page contents -------------------------------------------------------- */
+
+.page-contents {
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+
+.page-contents__heading {
+  margin-bottom: var(--space-3);
+  color: var(--color-ink-4);
+  font-size: var(--label-key);
+  letter-spacing: var(--track-1);
+  text-transform: uppercase;
+}
+
+.page-contents ol {
+  gap: var(--space-2) var(--space-5);
+}
+
+.page-contents a {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--color-ink-2);
+  text-decoration: none;
+}
+
+.page-contents a:hover {
+  color: var(--color-base-content);
+  text-decoration: underline;
+}
+
+.page-contents__index {
+  color: var(--color-signal-amber);
+  font-size: var(--label-eyebrow);
+}
+
+/* Sections ---------------------------------------------------------------- */
+
+/* One column below the breakpoint; a heading rail beside the body above it.
+ * The rail is where the width goes that a capped reading measure leaves
+ * empty, and a section's own heading is the most useful thing to put there. */
+.section {
+  display: grid;
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--color-edge-soft);
+  gap: var(--space-3) var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.section:last-of-type {
+  border-bottom: 0;
+}
+
+.section__marker {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ornament);
+  font-size: 0.8rem;
+  letter-spacing: var(--track-3);
+}
+
+.section__title {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 400;
+}
+
+.section__lede {
+  margin-top: var(--space-3);
+  color: var(--color-ink-2);
+  font-size: 1.06rem;
+}
+
+@media (min-width: 76rem) {
+  .section {
+    padding-block: var(--space-6);
+    grid-template-columns: minmax(0, 19rem) minmax(0, 1fr);
+  }
+
+  .section__aside {
+    position: sticky;
+    /* Clears the pinned header, which would otherwise cover the rail. */
+    top: calc(var(--header-height) + var(--space-3));
+    align-self: start;
+    /* Never taller than the space below the header, or a long lede would pin
+       the rail and stop it sticking at all. */
+    max-height: calc(100vh - var(--header-height) - var(--space-5));
+    overflow: hidden;
+  }
+
+  .section__lede {
+    font-size: 1rem;
+  }
+}
+
+/* Sticky positioning fights a reader who has asked for less movement, and it
+ * fights a short viewport, so it is opt-in on both counts. */
+@media (prefers-reduced-motion: reduce), (max-height: 34rem) {
+  .section__aside {
+    position: static;
+  }
+}
+
+/* A section whose content is genuinely wide - a process sequence, a phase
+ * matrix, a paired composition - runs its heading across the top instead of
+ * beside the body. The rail is a good use of the width a reading measure
+ * leaves empty, but here there is no width left over: the rail would squeeze
+ * the very thing the section exists to show.
+ *
+ * This sits after the breakpoint that introduces the rail, because it matches
+ * that rule's specificity exactly and wins on source order. Moving it above
+ * the media block silently restores the rail at desktop. */
+.section--wide {
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.section--wide .section__aside {
+  position: static;
+  overflow: visible;
+  max-height: none;
+}
+
+.section__body > * + .catalogue,
+.section__body > * + .stage-sequence,
+.section__body > * + .table-scroll,
+.section__body > * + .code-block {
+  margin-top: var(--space-4);
+}
+
+.section__more,
+.section__note {
+  margin-top: var(--space-4);
+  color: var(--color-ink-3);
+  font-size: 0.95rem;
+}
+
+.section__more .text-link + .text-link {
+  margin-left: var(--space-2);
+}
+
+/* Paired sections ----------------------------------------------------------
+ *
+ * A section set beside a companion plate: three doors and the room they lead
+ * into. The plate spans both rows of the section, so it shares a top edge
+ * with the heading rather than starting below the body - a photograph that
+ * begins halfway down reads as an afterthought rather than as half of a
+ * composition.
+ *
+ * The split is deliberately uneven. The routes are the actionable half and
+ * take the larger share; the photograph is the argument the rest of the page
+ * has been making rather than an equal partner to it.
+ *
+ * The companion is last in the document and first in the eye: reading order
+ * stays heading, routes, room, and grid placement does the rest. Below the
+ * breakpoint that source order is also the visual order, so the plate never
+ * pushes the routes down the page. */
+.section--paired {
+  gap: var(--space-4);
+}
+
+@media (min-width: 62rem) {
+  .section--paired {
+    column-gap: var(--space-5);
+    grid-template-areas:
+      "head room"
+      "body room";
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .section--paired .section__aside {
+    position: static;
+    overflow: visible;
+    max-height: none;
+    grid-area: head;
+  }
+
+  .section--paired .section__body {
+    grid-area: body;
+  }
+
+  .section--paired .section__companion {
+    align-self: start;
+    grid-area: room;
+  }
+}

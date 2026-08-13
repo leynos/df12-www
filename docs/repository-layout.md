@@ -19,6 +19,7 @@ df12-www/
 ├── modules/
 ├── public/
 │   ├── mxd/
+│   ├── episodic/
 │   ├── netsuke/
 │   ├── stilyagi/
 │   └── weaver/
@@ -29,6 +30,7 @@ df12-www/
 │   └── styles/
 ├── templates/
 │   ├── mxd/
+│   ├── episodic/
 │   ├── netsuke/
 │   ├── stilyagi/
 │   └── weaver/
@@ -85,9 +87,10 @@ Scaleway-specific variants, and deployment configuration).
 ### `public/`
 
 Generated output directory. The main df12 site pages live at the top level.
-Sub-site output lands under path-prefixed subdirectories (`mxd/`, `netsuke/`,
-`weaver/`, `stilyagi/`), each containing the full static site including assets,
-doc pages, and shared content pages. This directory is the deployment root.
+Sub-site output lands under path-prefixed subdirectories (`mxd/`, `episodic/`,
+`netsuke/`, `weaver/`, `stilyagi/`), each containing the full static site
+including assets, doc pages, and shared content pages. This directory is the
+deployment root.
 
 ### `reference/`
 
@@ -114,9 +117,9 @@ Build-time scripts outside the Python package:
 
 ### `src/`
 
-Frontend source files. `styles/` contains the Tailwind CSS entry point (
-`site.css`) and any plugins. The compiled output is written to
-`public/assets/site.css`.
+Frontend source files. `styles/` contains the Tailwind CSS entrypoints for the
+main site, mxd, and Episodic, plus their supporting partials and plugins. The
+compiled outputs are written beneath `public/` by `build:css`.
 
 `static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
 and favicons — that are copied verbatim into the published tree. Its layout
@@ -127,12 +130,12 @@ build output and are overwritten on the next build.
 
 ### `templates/`
 
-Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `netsuke/`,
-`weaver/`, `stilyagi/`) holds the template wrapper for that sub-site's design
-system, including `shared_content_page.jinja` and a `partials/` directory for
-shared macros and components. Stilyagi instead centralizes its chrome in a
-`_layout.jinja` that every page extends. These are distinct from the main-site
-templates in `df12_pages/templates/`.
+Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `episodic/`,
+`netsuke/`, `weaver/`, `stilyagi/`) holds the template wrapper for that
+sub-site's design system, including `shared_content_page.jinja` and a
+`partials/` directory for shared macros and components. Stilyagi instead
+centralizes its chrome in a `_layout.jinja` that every page extends. These are
+distinct from the main-site templates in `df12_pages/templates/`.
 
 ### `tests/`
 

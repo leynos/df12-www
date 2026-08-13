@@ -1,0 +1,327 @@
+/* Motifs: the marks the system makes more than once.
+ *
+ * Each pattern is stated once here and joined by name from a component sheet.
+ * A member overrides only the custom property that makes its case different;
+ * it never restates the pattern.
+ *
+ * What is deliberately *not* here: colour, letter-spacing, and casing on the
+ * machine labels. Those look repeated and are not - across the twenty label
+ * sites they take five inks and eleven tracking values, because they encode
+ * different roles. Hoisting them would buy one shared rule and twenty
+ * overrides, which is repetition moved rather than removed.
+ *
+ * Ordering contract: episodic.css imports this sheet before every component
+ * partial, so a component rule of equal specificity always wins over the
+ * motif default it refines.
+ */
+
+/* The shell ---------------------------------------------------------------- */
+
+/* One measured column, centred, with a gutter that survives to 320px. Every
+ * full-width band is this shape and none of them re-derives it. */
+.shell,
+.content-shell,
+.breadcrumbs-shell,
+.hero,
+.site-header__inner,
+.status-rail,
+.site-footer__grid {
+  width: min(100% - 2rem, var(--max-width));
+  margin-inline: auto;
+}
+
+/* The reading measure ------------------------------------------------------ */
+
+/* `max-width` does not inherit, so the reading cap used to be restated on
+ * fifteen selectors and then undone with `max-width: none` on seven more
+ * wherever a two-column arrangement made it wrong.
+ *
+ * A custom property does inherit. Setting `--flow-measure` on a container is
+ * now enough to retune or release everything flowing inside it - the same
+ * reason Stilyagi carries `--accent-text` on a container rather than at each
+ * call site.
+ */
+:root {
+  --flow-measure: var(--measure);
+}
+
+p,
+.flow-measured,
+.hero__lede,
+.page-intro__lede,
+.section__lede,
+.catalogue__detail dd,
+.stage__contract dd,
+.stage__summary,
+.phase__summary,
+.step__summary,
+.claim-list li,
+.sequence,
+.failure-list dd,
+.command-list dd,
+.doc-category__blurb,
+.doc-list__summary,
+.doc-featured span,
+.local-nav__detail,
+.prose {
+  max-width: var(--flow-measure);
+}
+
+/* Short records run two-up once their column is wide enough to hold two
+ * without either dropping under a comfortable measure. Grid keeps source
+ * order reading left to right, row by row, so nothing a screen reader or a
+ * keyboard follows changes. Prose never does this: a paragraph in two columns
+ * is harder to read, not easier.
+ *
+ * Those arrangements live with their components rather than here, because the
+ * breakpoint is the interesting part and it differs per record type. What
+ * they no longer carry is a list of descendants to uncap: setting
+ * `--flow-measure: none` on the grid releases everything inside it, which is
+ * seven `max-width: none` overrides that used to be maintained by hand.
+ */
+
+/* Machine labels ----------------------------------------------------------- */
+
+/* Operational metadata is set in the mono face wherever it appears. Size is a
+ * role token rather than a literal, so the scale is legible as a scale and
+ * retuning a role is one edit instead of a search across five sheets.
+ */
+.machine-label,
+.skip-link,
+.brand__descriptor,
+.hero__eyebrow,
+.page-intro__eyebrow,
+.page-contents__heading,
+.page-contents__index,
+.breadcrumbs li,
+.status-rail,
+.status,
+.evidence,
+.button,
+.text-link,
+.notice__heading,
+.notice__link,
+.nav-toggle,
+.primary-nav a,
+.site-footer h2,
+.ledger-row__index,
+.section__marker,
+.catalogue__detail dt,
+.stage__contract dt,
+.stage__number,
+.stage-summary__number,
+.record-table caption,
+.record-table thead th,
+.method,
+.claim-list__meta,
+.sequence li::before,
+.code-block__bar,
+.phase-preview__number,
+.phase-preview__tally,
+.phase-matrix__number,
+.phase-matrix__tally,
+.phase__number,
+.phase__tally,
+.step__id,
+.step__tally,
+.task__id,
+.task__requires,
+.task__note,
+.doc-category__meta,
+.category-jump a,
+.endpoint-group__count,
+.search__label,
+.search__input,
+.search-result__kind,
+.search-result__context,
+.search__meta {
+  font-family: var(--font-mono);
+}
+
+/* Panels ------------------------------------------------------------------- */
+
+/* A ruled block set off from the flow. The accent on the leading edge is what
+ * distinguishes a notice from a callout from a rule, so it is the only thing
+ * a member declares. */
+.panel,
+.notice,
+.callout,
+.content-card {
+  max-width: var(--flow-measure);
+  padding: var(--space-4);
+  border: 1px solid var(--color-edge);
+  border-left: 3px solid var(--panel-accent, var(--color-edge-strong));
+  border-radius: var(--radius-field);
+  background: var(--color-base-200);
+}
+
+/* Bare lists --------------------------------------------------------------- */
+
+/* Semantic list markup carrying a non-list presentation. The element stays an
+ * `ol`, `ul`, or `dl` because the structure is the meaning; only the marker
+ * and the user-agent indent go. */
+.bare-list,
+.breadcrumbs ol,
+.page-contents ol,
+.primary-nav__list,
+.site-footer ul,
+.stage-sequence,
+.stage-summary,
+.claim-list,
+.sequence,
+.phase-preview,
+.phase-matrix,
+.task-list,
+.doc-featured,
+.doc-list,
+.category-jump ul,
+.local-nav ul,
+.command-list,
+.search__results,
+.content-toc ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* Record rows -------------------------------------------------------------- */
+
+/* Successive records are separated by a rule, never boxed one by one. The
+ * rule belongs to the row it precedes, so a list closes on its own boundary
+ * rather than on its last record's. Padding stays local: it is the one axis
+ * that genuinely differs between a task line and a ledger row. */
+.record-row,
+.ledger-row,
+.stage,
+.phase-preview__item,
+.phase-matrix__cell,
+.step,
+.task,
+.failure-list__item,
+.doc-featured li,
+.doc-list li,
+.command-list__item,
+.local-nav li {
+  border-top: 1px solid var(--color-edge-soft);
+}
+
+/* Record heads ------------------------------------------------------------- */
+
+/* A title, its status, and its tally on one line, wrapping when the line will
+ * not hold them. Alignment stays local: heads pairing type with type sit on
+ * the baseline, heads pairing type with a control centre on it. */
+.record-head,
+.ledger-row__head,
+.stage__head,
+.phase__head,
+.phase-matrix__head,
+.endpoint-group__title,
+.command-group h3,
+.failure-list dt,
+.code-block__bar,
+.breadcrumbs ol,
+.page-contents ol,
+.doc-category__meta,
+.category-jump ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+/* Hit targets -------------------------------------------------------------- */
+
+/* WCAG 2.2 AA 2.5.8 exempts a link inside a sentence. A link in a list, a row,
+ * or a nav is not that, so it takes the floor - stated once here rather than
+ * being rediscovered per component. */
+.breadcrumbs a,
+.doc-featured a,
+.doc-list a,
+.site-footer a,
+.content-toc a,
+.prose li > a:only-child {
+  display: inline-block;
+  min-height: 1.5rem;
+}
+
+/* Disclosure --------------------------------------------------------------- */
+
+/* A flex summary drops the user-agent triangle, so the marker is drawn back
+ * explicitly - without it there is no affordance saying these open. Shared by
+ * the roadmap steps and the long documentation categories, which are the two
+ * places on the site where content is folded away.
+ */
+.step > summary,
+.doc-disclosure > summary {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 2.75rem;
+  padding: var(--space-2) 0;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  cursor: pointer;
+  list-style: none;
+}
+
+.step > summary::-webkit-details-marker,
+.doc-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosure-marker {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 1.5px solid var(--color-ink-3);
+  border-bottom: 1.5px solid var(--color-ink-3);
+  rotate: -45deg;
+  translate: 0 -0.1rem;
+  transition: rotate 120ms ease;
+}
+
+[open] > summary .disclosure-marker {
+  rotate: 45deg;
+  translate: 0 -0.2rem;
+}
+
+summary:hover .disclosure-marker {
+  border-color: var(--color-signal-amber);
+}
+
+/* Interactive surfaces ----------------------------------------------------- */
+
+/* Everything that answers a pointer settles over the same interval, so the
+ * site has one reaction time rather than seven. */
+.button,
+.primary-nav a,
+.stage-summary__card,
+.category-jump a {
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+/* A target that takes a press moves under it. One pixel, deliberately not
+ * transitioned: a real control goes down when it is struck and comes back up
+ * when it is released, and easing that turns an acknowledgement into an
+ * animation. It costs no layout - `translate` is a compositor transform, so
+ * nothing around it reflows.
+ *
+ * This is additive to the focus ring rather than a substitute for it: :active
+ * says a pointer is on the control now, :focus-visible says the keyboard is
+ * there. The two are answering different questions and both still apply. It
+ * also survives forced colours, which discard the hover and active
+ * backgrounds that would otherwise be the only acknowledgement, because
+ * geometry is not a colour.
+ *
+ * The current-page lamp is positioned against its link, so it inherits the
+ * press and travels with the label rather than staying put beneath it.
+ */
+.pressable:active,
+.button:active,
+.nav-toggle:active,
+.primary-nav a:active,
+.category-jump a:active,
+.stage-summary__card:active,
+.local-nav a:active {
+  translate: 0 1px;
+}

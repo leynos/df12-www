@@ -1,0 +1,462 @@
+{#
+  GENERATED FILE - do not edit by hand.
+
+  Projected from the upstream Episodic documentation catalogue.
+  Regenerate with `make site-data`; `make check` fails when it drifts.
+
+  Source: leynos/episodic docs/contents.md
+#}
+{% set doc_categories = [
+  {
+    "key": "orientation",
+    "label": "Orientation",
+    "type": "Guide",
+    "audience": "Everyone",
+    "blurb": "Start here. What the project is, how it is laid out, and where delivery stands.",
+    "documents": [
+      {
+        "title": "Repository layout",
+        "path": "docs/repository-layout.md",
+        "summary": "explains the repository tree, ownership boundaries, and path conventions."
+      },
+      {
+        "title": "Documentation style guide",
+        "path": "docs/documentation-style-guide.md",
+        "summary": "defines the writing, formatting, and document-type conventions for project documentation."
+      },
+      {
+        "title": "Users' guide",
+        "path": "docs/users-guide.md",
+        "summary": "describes supported user-facing behaviour and externally visible workflows."
+      },
+      {
+        "title": "Developers' guide",
+        "path": "docs/developers-guide.md",
+        "summary": "gives maintainer-facing build, test, lint, extension, and contribution guidance."
+      },
+      {
+        "title": "Roadmap",
+        "path": "docs/roadmap.md",
+        "summary": "tracks phased delivery work, dependencies, and acceptance criteria."
+      }
+    ]
+  },
+  {
+    "key": "design",
+    "label": "Product and system design",
+    "type": "Design",
+    "audience": "Technical evaluator",
+    "blurb": "The platform model, its interface contracts, and its operational shape.",
+    "documents": [
+      {
+        "title": "Episodic podcast generation system design",
+        "path": "docs/episodic-podcast-generation-system-design.md",
+        "summary": "primary product and architecture design for the podcast generation system."
+      },
+      {
+        "title": "Episodic TUI API design",
+        "path": "docs/episodic-tui-api-design.md",
+        "summary": "design notes for the terminal user interface and API interaction model."
+      },
+      {
+        "title": "Infrastructure design",
+        "path": "docs/infrastructure-design.md",
+        "summary": "Kubernetes, GitOps, observability, and operational infrastructure design."
+      },
+      {
+        "title": "Reference binding resolution",
+        "path": "docs/reference-binding-resolution.md",
+        "summary": "reference binding model and resolution behaviour."
+      },
+      {
+        "title": "LangGraph and Celery in hexagonal architecture",
+        "path": "docs/langgraph-and-celery-in-hexagonal-architecture.md",
+        "summary": "integration guidance for orchestration and worker boundaries."
+      }
+    ]
+  },
+  {
+    "key": "guides",
+    "label": "User and integration guides",
+    "type": "Guide",
+    "audience": "Developer",
+    "blurb": "Working guidance for the dependencies and testing surfaces the platform integrates.",
+    "documents": [
+      {
+        "title": "Femtologging users' guide",
+        "path": "docs/femtologging-users-guide.md",
+        "summary": "integration guidance for the femtologging dependency."
+      },
+      {
+        "title": "TEI Rapporteur users' guide",
+        "path": "docs/tei-rapporteur-users-guide.md",
+        "summary": "integration guidance for Text Encoding Initiative (TEI) payload handling."
+      },
+      {
+        "title": "Async SQLAlchemy with PostgreSQL and Falcon",
+        "path": "docs/async-sqlalchemy-with-pg-and-falcon.md",
+        "summary": "reference for asynchronous persistence and HTTP service integration."
+      },
+      {
+        "title": "Testing async Falcon endpoints",
+        "path": "docs/testing-async-falcon-endpoints.md",
+        "summary": "practical guidance for endpoint tests."
+      },
+      {
+        "title": "Testing SQLAlchemy with pytest and py-pglite",
+        "path": "docs/testing-sqlalchemy-with-pytest-and-py-pglite.md",
+        "summary": "persistence testing guidance."
+      },
+      {
+        "title": "Local validation of GitHub Actions with act and pytest",
+        "path": "docs/local-validation-of-github-actions-with-act-and-pytest.md",
+        "summary": "local continuous integration validation workflow."
+      },
+      {
+        "title": "Scripting standards",
+        "path": "docs/scripting-standards.md",
+        "summary": "conventions for helper scripts and command execution."
+      }
+    ]
+  },
+  {
+    "key": "reference",
+    "label": "Architecture and engineering references",
+    "type": "Reference",
+    "audience": "Maintainer",
+    "blurb": "Background material behind recurring engineering decisions.",
+    "documents": [
+      {
+        "title": "Agentic systems with LangGraph and Celery",
+        "path": "docs/agentic-systems-with-langgraph-and-celery.md",
+        "summary": "background reference for agentic workflow orchestration."
+      },
+      {
+        "title": "Cost management in LangGraph agentic systems",
+        "path": "docs/cost-management-in-langgraph-agentic-systems.md",
+        "summary": "cost-control patterns for agentic workflows."
+      },
+      {
+        "title": "Complexity antipatterns and refactoring strategies",
+        "path": "docs/complexity-antipatterns-and-refactoring-strategies.md",
+        "summary": "maintainability guidance for refactoring decisions."
+      },
+      {
+        "title": "Reliable testing in Rust via dependency injection",
+        "path": "docs/reliable-testing-in-rust-via-dependency-injection.md",
+        "summary": "reference material for Rust dependency-injection testing."
+      },
+      {
+        "title": "Rust doctest dry guide",
+        "path": "docs/rust-doctest-dry-guide.md",
+        "summary": "Rust documentation-test maintenance guidance."
+      },
+      {
+        "title": "Rust testing with rstest fixtures",
+        "path": "docs/rust-testing-with-rstest-fixtures.md",
+        "summary": "Rust fixture-based testing guidance."
+      }
+    ]
+  },
+  {
+    "key": "adr",
+    "label": "Decision records",
+    "type": "Decision record",
+    "audience": "Maintainer",
+    "blurb": "Accepted decisions, each with the context that forced it.",
+    "documents": [
+      {
+        "title": "ADR 001: Pedante evaluator contract",
+        "path": "docs/adr-001-pedante-evaluator-contract.md",
+        "summary": "evaluator contract decision retained at the historical top-level ADR path."
+      },
+      {
+        "title": "ADR 001: Reference binding resolution algorithm",
+        "path": "docs/adr/adr-001-reference-binding-resolution-algorithm.md",
+        "summary": "accepted reference binding resolution algorithm."
+      },
+      {
+        "title": "ADR 002: HTTP service composition root",
+        "path": "docs/adr/adr-002-http-service-composition-root.md",
+        "summary": "HTTP service composition boundary."
+      },
+      {
+        "title": "ADR 003: Celery worker scaffold",
+        "path": "docs/adr/adr-003-celery-worker-scaffold.md",
+        "summary": "worker process scaffold decision."
+      },
+      {
+        "title": "ADR 004: Show notes TEI representation",
+        "path": "docs/adr/adr-004-show-notes-tei-representation.md",
+        "summary": "show notes representation in TEI."
+      },
+      {
+        "title": "ADR 005: Structured planning and tool execution",
+        "path": "docs/adr/adr-005-structured-planning-and-tool-execution.md",
+        "summary": "structured planning and tool execution model."
+      },
+      {
+        "title": "ADR 006: Chrono spoken text semantics",
+        "path": "docs/adr/adr-006-chrono-spoken-text-semantics.md",
+        "summary": "spoken-text runtime estimation semantics."
+      },
+      {
+        "title": "ADR 007: Durable generation checkpoints",
+        "path": "docs/adr/adr-007-durable-generation-checkpoints.md",
+        "summary": "durable checkpointing model for generation workflows."
+      },
+      {
+        "title": "ADR 008: Chapter marker TEI representation",
+        "path": "docs/adr/adr-008-chapter-marker-tei-representation.md",
+        "summary": "chapter marker representation in TEI."
+      },
+      {
+        "title": "ADR 009: Source-to-script REST vertical slice",
+        "path": "docs/adr/adr-009-source-to-script-rest-vertical-slice.md",
+        "summary": "REST vertical slice scope for source-to-script work."
+      },
+      {
+        "title": "ADR 010: Guest bios TEI representation",
+        "path": "docs/adr/adr-010-guest-bios-tei-representation.md",
+        "summary": "guest biography representation in TEI."
+      },
+      {
+        "title": "ADR 011: TTS capability negotiation",
+        "path": "docs/adr/adr-011-tts-capability-negotiation.md",
+        "summary": "text-to-speech capability negotiation model."
+      },
+      {
+        "title": "ADR 012: Pronunciation repository",
+        "path": "docs/adr/adr-012-pronunciation-repository.md",
+        "summary": "pronunciation repository decision."
+      },
+      {
+        "title": "ADR 013: Speech synthesis adapters",
+        "path": "docs/adr/adr-013-speech-synthesis-adapters.md",
+        "summary": "speech synthesis adapter boundaries."
+      },
+      {
+        "title": "ADR 014: Hexagonal architecture enforcement",
+        "path": "docs/adr/adr-014-hexagonal-architecture-enforcement.md",
+        "summary": "import-boundary enforcement model."
+      },
+      {
+        "title": "ADR 015: Upload and idempotency ports",
+        "path": "docs/adr/adr-015-upload-and-idempotency-ports.md",
+        "summary": "source-intake upload storage and idempotency port decisions."
+      }
+    ]
+  },
+  {
+    "key": "execplan",
+    "label": "Execution plans",
+    "type": "Execution plan",
+    "audience": "Maintainer",
+    "blurb": "Implementation plans for individual roadmap tasks. Historical once the task lands.",
+    "documents": [
+      {
+        "title": "Reference binding resolution",
+        "path": "docs/execplans/1-4-3-reference-binding-resolution.md",
+        "summary": "implementation plan for roadmap task 1.4.3."
+      },
+      {
+        "title": "Scaffold Falcon HTTP services on Granian",
+        "path": "docs/execplans/1-5-1-scaffold-falcon-http-services-on-granian.md",
+        "summary": "implementation plan for roadmap task 1.5.1."
+      },
+      {
+        "title": "Scaffold Celery workers with RabbitMQ integration",
+        "path": "docs/execplans/1-5-2-scaffold-celery-workers-with-rabbit-mq-integration.md",
+        "summary": "implementation plan for roadmap task 1.5.2."
+      },
+      {
+        "title": "Architectural enforcement for hexagonal boundaries",
+        "path": "docs/execplans/1-5-4-architectural-enforcement-for-hexagonal-boundaries.md",
+        "summary": "implementation plan for roadmap task 1.5.4."
+      },
+      {
+        "title": "Pedante factuality and accuracy evaluator",
+        "path": "docs/execplans/2-2-1-pedante-factuality-and-accuracy-evaluator.md",
+        "summary": "evaluator implementation plan."
+      },
+      {
+        "title": "Relational schema design",
+        "path": "docs/execplans/2-2-1-relational-schema-design.md",
+        "summary": "storage schema implementation plan."
+      },
+      {
+        "title": "Migration tooling with Alembic",
+        "path": "docs/execplans/2-2-2-migration-tooling-with-alembic.md",
+        "summary": "migration tooling plan."
+      },
+      {
+        "title": "Repository and unit of work layers",
+        "path": "docs/execplans/2-2-3-repository-and-unit-of-work-layers.md",
+        "summary": "persistence boundary implementation plan."
+      },
+      {
+        "title": "Multi-source ingestion service",
+        "path": "docs/execplans/2-2-4-multi-source-ingestion-service.md",
+        "summary": "ingestion service implementation plan."
+      },
+      {
+        "title": "Capture provenance metadata",
+        "path": "docs/execplans/2-2-5-capture-provenance-metadata.md",
+        "summary": "provenance implementation plan."
+      },
+      {
+        "title": "Chrono runtime estimator",
+        "path": "docs/execplans/2-2-6-chrono-runtime-estimator.md",
+        "summary": "runtime estimation implementation plan."
+      },
+      {
+        "title": "Define reusable reference document model",
+        "path": "docs/execplans/2-2-6-define-reusable-reference-document-model.md",
+        "summary": "reference document model plan."
+      },
+      {
+        "title": "Reusable reference document repository docs",
+        "path": "docs/execplans/2-2-6-reusable-reference-document-repository-docs.md",
+        "summary": "reference repository documentation plan."
+      },
+      {
+        "title": "Series profile and episode template models",
+        "path": "docs/execplans/2-2-6-series-profile-and-episode-template-models.md",
+        "summary": "profile and template model plan."
+      },
+      {
+        "title": "REST endpoints for reference documents",
+        "path": "docs/execplans/2-2-7-rest-endpoints-for-reference-documents.md",
+        "summary": "reference document API plan."
+      },
+      {
+        "title": "Generate show notes from template expansions",
+        "path": "docs/execplans/2-3-1-generate-show-notes-from-template-expansions.md",
+        "summary": "show notes generation plan."
+      },
+      {
+        "title": "Generate chapter markers aligned to script segments",
+        "path": "docs/execplans/2-3-2-generate-chapter-markers-aligned-to-script-segments.md",
+        "summary": "chapter marker generation plan."
+      },
+      {
+        "title": "Generate guest bios from reference document bindings",
+        "path": "docs/execplans/2-3-3-generate-guest-bios-from-reference-document-bindings.md",
+        "summary": "guest biography generation plan."
+      },
+      {
+        "title": "Structured output planning and tool-calling execution",
+        "path": "docs/execplans/2-4-1-structured-output-planning-and-tool-calling-execution.md",
+        "summary": "planning and tool execution implementation plan."
+      },
+      {
+        "title": "Add LangGraph suspend and resume orchestration",
+        "path": "docs/execplans/2-4-2-add-lang-graph-suspend-and-resume-orchestration.md",
+        "summary": "orchestration checkpoint plan."
+      },
+      {
+        "title": "Configure Celery queue routing",
+        "path": "docs/execplans/2-4-3-configure-celery-queue-routing.md",
+        "summary": "worker routing plan."
+      },
+      {
+        "title": "LLM port adapter",
+        "path": "docs/execplans/3-2-1-llm-port-adapter.md",
+        "summary": "large language model adapter plan."
+      },
+      {
+        "title": "Introduce v1 target API prefix",
+        "path": "docs/execplans/4-1-1-introduce-v1-target-api-prefix.md",
+        "summary": "REST API versioning plan."
+      },
+      {
+        "title": "Finalize REST surfaces",
+        "path": "docs/execplans/4-1-2-finalize-rest-surfaces.md",
+        "summary": "REST surface hardening plan."
+      },
+      {
+        "title": "Adopt Hecate",
+        "path": "docs/execplans/adopt-hecate.md",
+        "summary": "architecture enforcement adoption plan."
+      },
+      {
+        "title": "Femtologging April 2026 migration",
+        "path": "docs/execplans/femtologging-april-2026-migration.md",
+        "summary": "femtologging migration plan."
+      },
+      {
+        "title": "LangGraph design enhancements",
+        "path": "docs/execplans/langgraph-design-enhancements.md",
+        "summary": "orchestration design enhancement plan."
+      },
+      {
+        "title": "Roadmap normalization",
+        "path": "docs/execplans/roadmap-normalization.md",
+        "summary": "roadmap structure normalization plan."
+      },
+      {
+        "title": "Update to TEI Rapporteur with type hints",
+        "path": "docs/execplans/update-to-tei-rapporteur-with-type-hints.md",
+        "summary": "dependency update plan."
+      },
+      {
+        "title": "Upgrade Python to 3.14: compression zstd",
+        "path": "docs/execplans/upgrade-python-to-3-14-adopt-compression-zstd.md",
+        "summary": "Python 3.14 compression adoption plan."
+      },
+      {
+        "title": "Upgrade Python to 3.14: concurrent interpreters",
+        "path": "docs/execplans/upgrade-python-to-3-14-adopt-concurrent-interpreters.md",
+        "summary": "Python 3.14 concurrent interpreter adoption plan."
+      },
+      {
+        "title": "Upgrade Python to 3.14: custom task factory support",
+        "path": "docs/execplans/upgrade-python-to-3-14-adopt-custom-task-factory-support.md",
+        "summary": "Python 3.14 task-factory adoption plan."
+      },
+      {
+        "title": "Upgrade Python to 3.14: lazy annotations",
+        "path": "docs/execplans/upgrade-python-to-3-14-lazy-annotations.md",
+        "summary": "Python 3.14 lazy annotation adoption plan."
+      },
+      {
+        "title": "Upgrade Python to 3.14: template strings in prompts",
+        "path": "docs/execplans/upgrade-python-to-3-14-template-strings-in-prompts.md",
+        "summary": "Python 3.14 template string adoption plan."
+      },
+      {
+        "title": "Upgrade Python to 3.14: type guards in OpenAI client",
+        "path": "docs/execplans/upgrade-python-to-3-14-type-guards-in-openai-client.md",
+        "summary": "Python 3.14 type guard adoption plan."
+      },
+      {
+        "title": "Upgrade Python to 3.14: UUID7 for storage IDs",
+        "path": "docs/execplans/upgrade-python-to-3-14-uuid7-for-storage-ids.md",
+        "summary": "Python 3.14 UUID7 adoption plan."
+      }
+    ]
+  }
+] %}
+{% set doc_featured = [
+  {
+    "title": "Users' guide",
+    "path": "docs/users-guide.md",
+    "summary": "describes supported user-facing behaviour and externally visible workflows."
+  },
+  {
+    "title": "Roadmap",
+    "path": "docs/roadmap.md",
+    "summary": "tracks phased delivery work, dependencies, and acceptance criteria."
+  },
+  {
+    "title": "Episodic podcast generation system design",
+    "path": "docs/episodic-podcast-generation-system-design.md",
+    "summary": "primary product and architecture design for the podcast generation system."
+  },
+  {
+    "title": "Developers' guide",
+    "path": "docs/developers-guide.md",
+    "summary": "gives maintainer-facing build, test, lint, extension, and contribution guidance."
+  }
+] %}
+{% set doc_total = 75 %}

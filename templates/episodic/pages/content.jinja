@@ -1,0 +1,158 @@
+{% set page_eyebrow = "Canonical content" %}
+{% set page_title = "Know what went into the episode, and what happened to it" %}
+{% set page_lede = "Sources arrive in whatever shape they were written. They leave as one canonical document that still knows where every part of it came from." %}
+{% set page_trail = [
+  {"label": "Workflow", "href": "/episodic/workflow/"},
+  {"label": "Content and provenance"}
+] %}
+{% set page_sections = [
+  {"id": "canonical", "title": "One document, many sources"},
+  {"id": "sources", "title": "What can be ingested"},
+  {"id": "weighting", "title": "Weighting and conflict"},
+  {"id": "provenance", "title": "What the provenance record holds"},
+  {"id": "reference", "title": "Reusable reference documents"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/capabilities.jinja" import capabilities %}
+
+{% set source_types = [
+  ["Transcripts", "Recorded interviews and prior episodes."],
+  ["Briefs", "Editorial direction for the episode or series."],
+  ["RSS feeds", "Syndicated items, pulled as an ongoing source."],
+  ["Press releases", "Announcements, treated as interested sources."],
+  ["Research notes", "Working material assembled by the production team."]
+] %}
+
+{% block sections %}
+  {{ ui.section_open(1, "canonical", "One document, many sources",
+     "The canonical document is a content and provenance model before it is a file format.") }}
+    <p>
+      Ingestion produces a single document that holds the episode's content
+      and, alongside it, the record of where that content came from. Both live
+      in the same structure, so a claim and the source that produced it cannot
+      drift apart in the way they do when provenance is kept in a separate
+      log.
+    </p>
+    <p>
+      That structure is TEI - the Text Encoding Initiative's P5 vocabulary, a
+      long-standing standard for marking up documents with scholarly apparatus.
+      Episodic uses its header for provenance and its body for the script.
+      Serialization is handled by
+      <a href="https://github.com/leynos/tei-rapporteur">tei-rapporteur</a>,
+      a TEI P5 library maintained alongside the platform.
+    </p>
+    <p>
+      Where a prompt needs JSON, that JSON is a projection of the same
+      TEI-backed content model. It is not a second canonical schema competing
+      with the first.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "sources", "What can be ingested",
+     "Five source classes today, each classified and scored on arrival.") }}
+    {{ ui.table_open("Supported source types", "source-types") }}
+    <thead>
+      <tr><th scope="col">Source type</th><th scope="col">Typically carries</th></tr>
+    </thead>
+    <tbody>
+      {% for name, detail in source_types %}
+      <tr><th scope="row">{{ name }}</th><td>{{ detail }}</td></tr>
+      {% endfor %}
+    </tbody>
+    {{ ui.table_close() }}
+    <p>
+      A source reaches the system as an upload or a remote URI attached to an
+      ingestion job. Document classifiers assign a type and a quality score;
+      neither is a judgement about whether the content is correct.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "weighting", "Weighting and conflict",
+     "When two sources disagree, one of them wins. The rule that decides is written down.") }}
+    <p>
+      Weighting heuristics compute a priority score from quality, freshness,
+      and reliability. Where sources conflict, the weighting matrix resolves
+      which normalizes into the canonical body. Coefficients are configurable
+      per series profile, so a team that trusts its own transcripts over a
+      press release can say so once rather than per episode.
+    </p>
+    <aside class="callout" aria-labelledby="weighting-caution">
+      <h3 id="weighting-caution">A higher score does not mean true</h3>
+      <p>
+        Priority is a documented selection rule. It records which source the
+        system preferred and why that rule preferred it. It carries no claim
+        that the preferred source is accurate, and a rejected source is not
+        thereby wrong.
+      </p>
+    </aside>
+    <p>
+      Every source is retained regardless of the outcome. Rejected material
+      stays queryable against the ingestion job, because the decision is only
+      auditable if the discarded side of it still exists.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "provenance", "What the provenance record holds",
+     "Recorded automatically in the canonical header. The example below is synthetic.") }}
+    {% call ui.code_block(
+      "Synthetic provenance fragment from a canonical TEI header",
+      "Illustrative shape, not a live payload") %}
+      {% highlight 'xml', 'episodic-syntax' %}
+      <sourceDesc>
+        <listBibl>
+          <bibl xml:id="src-transcript-01" n="1">
+            <title>Interview transcript, second pass</title>
+            <note type="priority">0.82</note>
+            <note type="classifier">transcript</note>
+            <date type="ingested">2026-05-14T09:31:07Z</date>
+            <respStmt><resp>reviewed by</resp><name>editor-14</name></respStmt>
+            <note type="outcome">preferred</note>
+          </bibl>
+          <bibl xml:id="src-release-04" n="2">
+            <title>Partner press release</title>
+            <note type="priority">0.31</note>
+            <note type="classifier">press-release</note>
+            <date type="ingested">2026-05-14T09:31:09Z</date>
+            <note type="outcome">retained, not preferred</note>
+          </bibl>
+        </listBibl>
+      </sourceDesc>
+      {% endhighlight %}
+    {% endcall %}
+    <p>
+      Identifiers generated during canonical ingestion are time-ordered UUIDv7
+      values, so records sort chronologically without a separate timestamp
+      index. Large TEI payloads are compressed with Zstandard in storage;
+      the API and domain read paths return plain text and never expose that.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "reference", "Reusable reference documents",
+     "Material that outlives one episode: style guides, research briefs, and the people on the show.") }}
+    <p>
+      A reference document is versioned content bound to a series, template, or
+      episode by a pinned revision. Because the binding names a revision rather
+      than a document, an episode generated last month keeps the style guide
+      that was current when it ran.
+    </p>
+    <p>
+      Hosts and guests are series-aligned reference documents rather than
+      properties of an episode. A host can be absent from an episode and a
+      guest can recur across several; binding rules control applicability, and
+      a revision can carry an <code>effective_from_episode_id</code> so a
+      change applies from a chosen episode onwards.
+    </p>
+    <div class="catalogue">
+      {% for item in capabilities if item.key in ["canonical-tei", "source-weighting", "reference-bindings"] %}
+      {% call ui.ledger_row("%02d" | format(loop.index), item.name, item.status, item.evidence, "content-" ~ item.key) %}
+        <p>{{ item.detail }}</p>
+      {% endcall %}
+      {% endfor %}
+    </div>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/docs/api/">See the reference-document endpoints</a>
+      ·
+      <a class="text-link" href="/episodic/workflow/quality/">Follow the draft into review</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

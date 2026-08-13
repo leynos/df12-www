@@ -1,0 +1,100 @@
+{% set page_eyebrow = "Editorial position" %}
+{% set page_title = "Automation is only useful here if it can be audited" %}
+{% set page_lede = "Episodic is built for production teams who remain answerable for what they publish. That answerability sets every constraint below." %}
+{% set page_trail = [{"label": "Why Episodic"}] %}
+{% set page_sections = [
+  {"id": "problem", "title": "The problem with a black box"},
+  {"id": "principles", "title": "Design principles"},
+  {"id": "boundary", "title": "What the system decides"},
+  {"id": "honest", "title": "What this does not claim"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/principles.jinja" import principles %}
+{% from "data/quality.jinja" import decision_boundary %}
+
+{% block sections %}
+  {{ ui.section_open(1, "problem", "The problem with a black box",
+     "Generated copy fails in ways that are cheap to produce and expensive to catch.") }}
+    <p>
+      A model will assert a date it never read, attribute a quotation to the
+      wrong speaker, or resolve two contradictory sources by averaging them
+      into something neither said. None of these look like errors. They look
+      like fluent prose, which is precisely the problem: the failure mode is
+      confident and well formed.
+    </p>
+    <p>
+      Editorial teams already have a process for this. Sources get weighed,
+      claims get checked against them, and someone signs off. What breaks when
+      software joins the process is not the judgement - it is the evidence. If
+      a draft arrives with no record of which sources it drew on, which it
+      discarded, and why, the checking has to start from nothing.
+    </p>
+    <p>
+      Episodic treats that record as the primary artefact. The canonical
+      document carries its own provenance, so a claim can be traced to the
+      source that produced it without reconstructing the run.
+    </p>
+    {{ ui.photo(
+      "controlroom",
+      "A small podcast control room at night, lit by a desk lamp and the amber backlight of a worn mixing console.",
+      "The room this is built for. Small, unglamorous, and answerable for what leaves it.") }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "principles", "Design principles",
+     "Commitments about how the platform is built. Each says where it is already load bearing, and where it is still a design.") }}
+    <div class="catalogue">
+      {% for principle in principles %}
+      {% call ui.ledger_row("%02d" | format(loop.index), principle.name, principle.status, principle.evidence, "principle-" ~ principle.key) %}
+        <p>{{ principle.statement }}</p>
+        <dl class="catalogue__detail">
+          <div><dt>Where it bites</dt><dd>{{ principle.enforced }}</dd></div>
+        </dl>
+      {% endcall %}
+      {% endfor %}
+    </div>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "boundary", "What the system decides",
+     "The division of labour, stated as a matrix rather than a reassurance.") }}
+    {{ rec.boundary_matrix(decision_boundary, "why-boundary") }}
+    <p>
+      The last row is the one that matters. Approval has no automated path -
+      not a threshold, not a confidence score, not a quiet default after a
+      timeout. A run that reaches the checkpoint waits there.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/workflow/quality/">See how findings reach an editor</a>
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "honest", "What this does not claim",
+     "Four things the platform is not, said plainly so the rest can be believed.") }}
+    <ul class="claim-list">
+      <li>
+        <strong>Not a replacement for a production team.</strong>
+        It removes transcription, collation, and first-draft assembly. It does
+        not remove the judgement about what is worth saying.
+      </li>
+      <li>
+        <strong>Not a fact checker.</strong>
+        Pedante reports claims it cannot tie to a cited source. Deciding
+        whether an unsupported claim is wrong, or merely uncited, is editorial
+        work.
+      </li>
+      <li>
+        <strong>Not compliance or legal advice.</strong>
+        Brand-guideline checks lint vocabulary and tone against descriptors a
+        team supplies. They carry no view on whether publishing something is
+        lawful.
+      </li>
+      <li>
+        <strong>Not a finished product.</strong>
+        Phase 1 of 6 is complete. The audio pipeline, the approval surface, and
+        every client beyond the REST API remain designs.
+      </li>
+    </ul>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/roadmap/">Read the delivery roadmap</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

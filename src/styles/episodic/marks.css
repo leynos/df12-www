@@ -1,0 +1,355 @@
+/* The recurring marks of the system: the status gauge and its evidence
+ * line, buttons and text links, the signal graphics, and the footer.
+ * Chrome — the header, navigation, and status rail — lives in chrome.css.
+ */
+
+/* Status and evidence: the signature pair --------------------------------- */
+
+.status {
+  display: inline-flex;
+  min-height: 1.7rem;
+  padding: 0 0.5rem;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--color-edge);
+  border-radius: 999px;
+  background: var(--color-base-300);
+  color: var(--color-ink-2);
+  font-size: var(--label-micro);
+  letter-spacing: var(--track-3);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* A gauge, drawn rather than typed: full, half, or empty inside a constant
+ * ring. The silhouette stays the same across the three states and the fill is
+ * what differs, which is the distinction that survives at this size.
+ *
+ * The word beside it carries the meaning, so the badge still reads correctly
+ * in greyscale, in forced colours, and to a screen reader.
+ */
+.status__mark {
+  width: 0.85em;
+  height: 0.85em;
+  flex: none;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+}
+
+.status[data-status="available"] .status__mark {
+  background: currentcolor;
+  color: var(--status-available);
+}
+
+.status[data-status="in-progress"] .status__mark {
+  /* Half full. The hard edge reads at eight pixels where a gradient or a
+     part-filled glyph does not. */
+  background: linear-gradient(90deg, currentcolor 50%, transparent 50%);
+  color: var(--status-in-progress);
+}
+
+.status[data-status="planned"] .status__mark {
+  background: transparent;
+  color: var(--status-planned);
+}
+
+/* Forced colours discard the fill, so the ring is all that survives. The
+ * label is unaffected and remains the carrier of record. */
+@media (forced-colors: active) {
+  .status__mark {
+    border-color: CanvasText;
+  }
+}
+
+.evidence {
+  display: inline-flex;
+  min-height: 1.9rem;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--color-ink-3);
+  font-size: var(--label-note);
+  text-decoration: none;
+}
+
+.evidence__key {
+  color: var(--color-signal-amber);
+  letter-spacing: var(--track-1);
+  text-transform: uppercase;
+}
+
+.evidence__key::before {
+  margin-right: 0.35rem;
+  content: "\251C";
+}
+
+.evidence__label {
+  border-bottom: 1px solid var(--color-edge-strong);
+}
+
+.evidence:hover .evidence__label {
+  border-bottom-color: var(--color-signal-amber);
+  color: var(--color-base-content);
+}
+
+/* Buttons and links ------------------------------------------------------- */
+
+.button {
+  display: inline-flex;
+  min-height: 3rem;
+  padding: 0 var(--space-4);
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-field);
+  color: var(--color-base-content);
+  font-size: var(--label-action);
+  font-weight: 500;
+  letter-spacing: var(--track-4);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.button:hover {
+  background: var(--color-base-300);
+}
+
+.button--primary {
+  border-color: var(--color-signal-amber);
+  background: var(--color-signal-amber);
+  color: var(--color-base-100);
+  font-weight: 600;
+}
+
+.button--primary:hover {
+  background: var(--color-base-content);
+  border-color: var(--color-base-content);
+  color: var(--color-base-100);
+}
+
+.text-link {
+  display: inline-flex;
+  min-height: 1.8rem;
+  align-items: baseline;
+  color: var(--color-base-content);
+  font-size: var(--label-nav);
+  text-decoration-color: var(--color-edge-strong);
+}
+
+.text-link::after {
+  margin-left: var(--space-2);
+  color: var(--color-signal-amber);
+  content: "\2192";
+}
+
+/* Signal graphics --------------------------------------------------------- */
+
+/* Decorative only, and static by design: the site map forbids a waveform that
+ * animates on its own or implies real production data. Centred so it reads as
+ * an audio waveform rather than a bar chart - a chart would imply
+ * measurements, and this is ornament. */
+.signal-field {
+  display: flex;
+  height: 4rem;
+  align-items: center;
+  gap: 2px;
+  overflow: hidden;
+  opacity: 0.4;
+}
+
+.signal-field span {
+  width: 100%;
+  min-width: 1px;
+  /* A fixed pseudo-random envelope: the same shape on every load, because a
+     reference that reshuffles between visits is noise.
+     Every term is a property, so a variant retunes the shape rather than
+     restating the formula. The rates matter most at short lengths: the
+     default pair repeats about every thirteen bars, which is invisible across
+     seventy-two and unmissable across twenty-six. */
+  height: calc(
+    var(--signal-floor, 14%) +
+    var(--signal-swing, 56%) *
+    (
+      0.5 +
+      0.5 *
+      sin(var(--n) * var(--signal-rate, 0.7rad)) *
+      cos(var(--n) * var(--signal-drift, 0.23rad) + 1rad)
+    )
+  );
+  background: linear-gradient(
+    transparent,
+    var(--color-timber) 18%,
+    var(--color-signal-amber) 50%,
+    var(--color-timber) 82%,
+    transparent
+  );
+}
+
+.signal-field--hero {
+  width: 100%;
+  height: 12rem;
+  opacity: 0.65;
+}
+
+/* The burst at the head of a boundary mark. Twenty-six bars is too few to
+   hide a slow envelope - at the default rates it drew the same cluster twice
+   and read as a pattern rather than as signal - so this variant runs a faster,
+   less commensurate pair. Measured over its own twenty-six samples: peak
+   autocorrelation falls from 0.94 to 0.05.
+
+   It also runs the full dynamic range, because at this height a narrow band
+   reads as a row of ticks, and it drops the amber for a neutral ink: this is
+   a divider, and the accent is spent on things a reader can act on. */
+.signal-field--rule {
+  width: 7rem;
+  height: var(--signal-rule-height);
+  flex: none;
+  opacity: 0.85;
+
+  --signal-floor: 6%;
+  --signal-swing: 94%;
+  --signal-rate: 1.56rad;
+  --signal-drift: 1.19rad;
+}
+
+.signal-field--rule span {
+  border-radius: 1px;
+  background: var(--color-ink-3);
+}
+
+/* Rule, signal, rule. A short lead-in, the burst, then the hairline out to the
+   edge: the mark reads as one boundary at any width rather than as a graphic
+   sitting next to a line. Full width rather than the shell, because a boundary
+   that stops short of the edge is a underline, not a division. */
+.signal-rule {
+  display: flex;
+  padding-block: var(--space-4);
+  align-items: center;
+  gap: var(--space-3);
+
+  --signal-rule-height: 1.5rem;
+
+  /* How far down this box the hairline sits: its own padding plus half the
+     field. Anything pulling the rule onto a boundary needs it, so it is
+     stated here rather than recomputed at the call site. */
+  --signal-rule-centre: calc(var(--space-4) + var(--signal-rule-height) / 2);
+}
+
+.signal-rule__line {
+  height: 1px;
+  flex: 1;
+  background: var(--color-edge);
+}
+
+/* The lead-in is a proportion rather than a length, so the burst keeps its
+   place in the composition as the viewport changes instead of drifting toward
+   the left edge. */
+.signal-rule__line--lead {
+  flex: 0 0 10%;
+}
+
+/* Footer ------------------------------------------------------------------ */
+
+/* No border here: the signal rule is the boundary. A border as well put two
+   hairlines within a few pixels of each other, which read as a seam rather
+   than as a division. The surface change carries the rest.
+
+   The padding is load bearing beyond the space it makes. Without it the
+   rule's negative margin collapses through this element and moves the whole
+   footer up, instead of lifting the rule inside it. */
+.site-footer {
+  margin-top: var(--space-7);
+  padding-top: var(--space-4);
+  background: var(--color-base-200);
+}
+
+/* The mark straddles the join: the hairline lands on the footer's top edge and
+   the waveform rises half above it, into the body. So the rule climbs back out
+   of the footer's padding and then up by its own centre offset. Whatever the
+   padding above is, the rule's lower half is all the height it ends up
+   costing. */
+.site-footer > .signal-rule {
+  margin-top: calc(-1 * (var(--space-4) + var(--signal-rule-centre)));
+}
+
+.site-footer__grid {
+  display: grid;
+  padding-block: var(--space-6);
+  gap: var(--space-5);
+  grid-template-columns: minmax(15rem, 1.6fr) repeat(2, minmax(11rem, 1fr));
+}
+
+.site-footer h2 {
+  margin: 0 0 var(--space-3);
+  color: var(--color-ink-4);
+  font-size: var(--label-key);
+  letter-spacing: var(--track-1);
+  text-transform: uppercase;
+}
+
+/* Scoped to the stacked link columns. Applied to every footer list it also
+ * hit the legal row, which is horizontal and already spaced by its own gap:
+ * the margin pushed the second and third links down and left the first
+ * sitting proud of them. */
+.site-footer__column li + li {
+  margin-top: var(--space-2);
+}
+
+.site-footer a {
+  min-height: 1.6rem;
+  color: var(--color-ink-2);
+  font-size: 0.94rem;
+}
+
+.site-footer__statement p {
+  max-width: 26rem;
+  color: var(--color-ink-3);
+}
+
+.site-footer__meta,
+.site-footer__signoff {
+  color: var(--color-ink-4);
+  font-size: 0.86rem;
+}
+
+/* The legal row sets its own top margin and no bottom one, so the sign-off
+   has to open the gap that closes the colophon. */
+.site-footer__signoff {
+  margin-top: var(--space-3);
+}
+
+/* The one word the house style marks. Colour alone carries nothing here: the
+   sign-off reads the same without it. */
+.site-footer__signoff .accent {
+  color: var(--color-signal-amber);
+}
+
+/* Legal, beside the colophon rather than in a column of its own. Inline and
+ * wrapping, because three destinations do not need a quarter of the grid. */
+/* One row of links, so they sit on one baseline. Stretch would align them
+ * only while all three happen to be the same height. */
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: var(--space-3) 0 0;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  list-style: none;
+}
+
+.site-footer__legal a {
+  color: var(--color-ink-3);
+  font-size: 0.86rem;
+}
+
+@media (max-width: 68rem) {
+  .site-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .site-footer__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,124 @@
+{% set page_eyebrow = "Audio production" %}
+{% set page_title = "From approved script to mastered episode" %}
+{% set page_lede = "The intended route from approved segments through speech, mixing, loudness, and export. Almost none of it is built, and this page says so before it describes any of it." %}
+{% set page_trail = [
+  {"label": "Workflow", "href": "/episodic/workflow/"},
+  {"label": "Audio production"}
+] %}
+{% set page_sections = [
+  {"id": "stages", "title": "The synthesis stages"},
+  {"id": "speech", "title": "Speech and provider boundaries"},
+  {"id": "pronunciation", "title": "Pronunciation control"},
+  {"id": "mastering", "title": "Mixing and loudness"},
+  {"id": "delivery", "title": "Preview, metadata, and export"}
+] %}
+{% extends "pages/_page.jinja" %}
+
+{% set synthesis_stages = [
+  ["01", "Segment resolution", "Approved script segments are resolved with their pronunciation guidance and voice assignment."],
+  ["02", "Speech synthesis", "Each segment renders through a provider adapter negotiated against the required capabilities."],
+  ["03", "Bed and effect placement", "Music beds and effects are placed against segment boundaries."],
+  ["04", "Mixing", "Ducking and transitions are applied across the assembled timeline."],
+  ["05", "Loudness normalization", "The mix is normalized to the target programme loudness."],
+  ["06", "Metadata and chapters", "Canonical chapter markers and episode metadata are embedded."],
+  ["07", "Preview and export", "An editor previews the result before delivery formats are written."]
+] %}
+
+{% block sections %}
+  {{ ui.maturity_notice(
+    "Phase 3 of the roadmap covers audio synthesis and delivery. Zero of its 24 tasks are complete. "
+    ~ "Nothing on this page describes running code: it describes the design that phase will implement. "
+    ~ "The one exception is Chrono's runtime estimation, which is built and is documented under quality.",
+    "/episodic/roadmap/#phase-3",
+    "See phase 3 in the roadmap"
+  ) }}
+
+  {{ ui.section_open(1, "stages", "The synthesis stages",
+     "Seven steps between an approved script and a delivered file.") }}
+    <ol class="stage-sequence stage-sequence--plain">
+      {% for number, label, detail in synthesis_stages %}
+      <li class="stage">
+        <div class="stage__head">
+          <span class="stage__number" aria-hidden="true">{{ number }}</span>
+          <h3 class="stage__title">{{ label }}</h3>
+          {{ ui.status_badge("planned") }}
+        </div>
+        <p class="stage__summary">{{ detail }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "speech", "Speech and provider boundaries",
+     "Text-to-speech providers differ in what they accept. The adapter boundary is where that difference is absorbed.") }}
+    <p>
+      Providers vary in the markup they support, the voices they expose, the
+      length of text they accept in one request, and whether they can render
+      a fragment deterministically twice. Rather than assume a lowest common
+      denominator, the design negotiates capabilities: a request declares what
+      it needs, and an adapter either satisfies it or declines.
+    </p>
+    <p>
+      Speech synthesis sits behind a port like every other external service, so
+      a provider change is an adapter change and does not reach the domain.
+    </p>
+    {{ ui.evidence({"label": "ADR 011: TTS capability negotiation", "path": "docs/adr/adr-011-tts-capability-negotiation.md"}) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "pronunciation", "Pronunciation control",
+     "A shared repository of how words should be said, rather than corrections scattered through scripts.") }}
+    <p>
+      Names, domain jargon, and internal terminology are the recurring problem:
+      a synthesizer will say them confidently and wrongly, the same way every
+      episode. The pronunciation repository holds guidance once, and speech
+      markup applies it at render time.
+    </p>
+    <p>
+      Chiltern reads the same repository when deciding whether a term in a
+      draft still lacks guidance, which is why the check and the fix share one
+      source rather than drifting apart.
+    </p>
+    {{ ui.evidence({"label": "ADR 012: Pronunciation repository", "path": "docs/adr/adr-012-pronunciation-repository.md"}) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "mastering", "Mixing and loudness",
+     "Ducking, transitions, and a single programme loudness target.") }}
+    <p>
+      The mixing engine places beds and effects against segment boundaries,
+      ducks them under speech, and handles transitions between segments. The
+      output target is -16 LUFS integrated programme loudness, which is the
+      conventional level for spoken-word podcast delivery.
+    </p>
+    <aside class="callout callout--status" aria-labelledby="lufs-status">
+      <h3 id="lufs-status">Treat -16 LUFS as a target {{ ui.status_badge("planned") }}</h3>
+      <p>
+        It is the value the mixing engine is specified to normalize to. It is
+        not a measured property of any output the platform currently produces,
+        because the platform does not currently produce audio output. The
+        roadmap records the mixing work as outstanding.
+      </p>
+    </aside>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "delivery", "Preview, metadata, and export",
+     "The last stage before an episode leaves the system.") }}
+    <p>
+      Chapter markers generated against the script carry integer-only ISO
+      8601-style start times in <code>PT#H#M#S</code> form and are validated
+      against the segment transitions they claim to mark. Because the canonical
+      document already holds them, audio publishing projects them into whatever
+      chapter format a player expects rather than regenerating them.
+    </p>
+    <p>
+      Preview and export jobs are roadmap step 3.6. When audio samples exist
+      and belong to the project, they will appear here with a transcript,
+      duration, format, and a descriptive label - under explicit controls, and
+      never playing on their own.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/workflow/quality/">Back to quality and review</a>
+      ·
+      <a class="text-link" href="/episodic/roadmap/#phase-3">Audio tasks in the roadmap</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

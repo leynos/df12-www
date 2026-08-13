@@ -1,0 +1,149 @@
+/* Syntax highlighting for build-time Pygments output.
+ *
+ * GENERATED FILE - do not edit by hand. Regenerate with
+ * `uv run python scripts/generate_episodic_pygments_css.py` after changing
+ * df12_pages/episodic_highlighting.py.
+ *
+ * Colours come from the Episodic signal palette and are checked at a minimum
+ * 4.5:1 against the code ground. Markup comes from the parent generator's
+ * `{% highlight %}` tag, which emits token classes and no attributes, so the
+ * scroll region and its label are supplied by the template wrapper.
+ */
+
+:root {
+  --episodic-syntax-text: #e6e7e9;
+  --episodic-syntax-comment: #8f959c;
+  --episodic-syntax-comment-preproc: #3bc8ef;
+  --episodic-syntax-keyword: #3bc8ef;
+  --episodic-syntax-operator: #b8bbc0;
+  --episodic-syntax-punctuation: #b8bbc0;
+  --episodic-syntax-name: #e6e7e9;
+  --episodic-syntax-name-class: #b77aff;
+  --episodic-syntax-name-function: #b77aff;
+  --episodic-syntax-name-decorator: #b77aff;
+  --episodic-syntax-name-tag: #3bc8ef;
+  --episodic-syntax-name-attribute: #3ad07a;
+  --episodic-syntax-name-builtin: #3ad07a;
+  --episodic-syntax-name-builtin-pseudo: #3ad07a;
+  --episodic-syntax-literal: #ffb520;
+  --episodic-syntax-literal-string: #ffb520;
+  --episodic-syntax-literal-string-doc: #8f959c;
+  --episodic-syntax-literal-string-escape: #ff5148;
+  --episodic-syntax-literal-number: #ffb520;
+  --episodic-syntax-generic-prompt: #3ad07a;
+  --episodic-syntax-generic-output: #b8bbc0;
+  --episodic-syntax-generic-error: #ff5148;
+  --episodic-syntax-generic-traceback: #ff5148;
+  --episodic-syntax-error: #ff5148;
+}
+
+/* Pygments emits no attributes, so the keyboard-reachable scroll
+   region is the wrapper the code_block macro supplies. */
+.code-scroll {
+  /* Stop long lines propagating min-content width up the grid and
+     widening the page on narrow viewports. */
+  contain: inline-size;
+  overflow-x: auto;
+}
+
+.episodic-syntax {
+  /* The ground is painted across the full scroll extent rather than
+     the visible width, so a scrolled block has no bare edge. */
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-inset);
+}
+
+.episodic-syntax pre {
+  margin: 0;
+  padding: var(--space-4);
+  font-family: var(--font-machine);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.episodic-syntax code {
+  font-size: inherit;
+  word-break: normal;
+}
+
+.episodic-syntax { color: var(--episodic-syntax-text); }
+.episodic-syntax .esc,
+.episodic-syntax .g,
+.episodic-syntax .gd,
+.episodic-syntax .ge,
+.episodic-syntax .ges,
+.episodic-syntax .gh,
+.episodic-syntax .gi,
+.episodic-syntax .gs,
+.episodic-syntax .gu,
+.episodic-syntax .w,
+.episodic-syntax .x { color: var(--episodic-syntax-text); }
+.episodic-syntax .c,
+.episodic-syntax .c1,
+.episodic-syntax .ch,
+.episodic-syntax .cm,
+.episodic-syntax .cpf,
+.episodic-syntax .cs { color: var(--episodic-syntax-comment); font-style: italic; }
+.episodic-syntax .cp { color: var(--episodic-syntax-comment-preproc); font-style: italic; }
+.episodic-syntax .k,
+.episodic-syntax .kc,
+.episodic-syntax .kd,
+.episodic-syntax .kn,
+.episodic-syntax .kp,
+.episodic-syntax .kr,
+.episodic-syntax .kt { color: var(--episodic-syntax-keyword); }
+.episodic-syntax .o,
+.episodic-syntax .ow { color: var(--episodic-syntax-operator); }
+.episodic-syntax .p,
+.episodic-syntax .pm { color: var(--episodic-syntax-punctuation); }
+.episodic-syntax .n,
+.episodic-syntax .ne,
+.episodic-syntax .ni,
+.episodic-syntax .nl,
+.episodic-syntax .nn,
+.episodic-syntax .no,
+.episodic-syntax .nv,
+.episodic-syntax .nx,
+.episodic-syntax .py,
+.episodic-syntax .vc,
+.episodic-syntax .vg,
+.episodic-syntax .vi,
+.episodic-syntax .vm { color: var(--episodic-syntax-name); }
+.episodic-syntax .nc { color: var(--episodic-syntax-name-class); }
+.episodic-syntax .fm,
+.episodic-syntax .nf { color: var(--episodic-syntax-name-function); }
+.episodic-syntax .nd { color: var(--episodic-syntax-name-decorator); }
+.episodic-syntax .nt { color: var(--episodic-syntax-name-tag); }
+.episodic-syntax .na { color: var(--episodic-syntax-name-attribute); }
+.episodic-syntax .nb { color: var(--episodic-syntax-name-builtin); }
+.episodic-syntax .bp { color: var(--episodic-syntax-name-builtin-pseudo); }
+.episodic-syntax .l,
+.episodic-syntax .ld { color: var(--episodic-syntax-literal); }
+.episodic-syntax .dl,
+.episodic-syntax .s,
+.episodic-syntax .s1,
+.episodic-syntax .s2,
+.episodic-syntax .sa,
+.episodic-syntax .sb,
+.episodic-syntax .sc,
+.episodic-syntax .sh,
+.episodic-syntax .si,
+.episodic-syntax .sr,
+.episodic-syntax .ss,
+.episodic-syntax .sx { color: var(--episodic-syntax-literal-string); }
+.episodic-syntax .sd { color: var(--episodic-syntax-literal-string-doc); font-style: italic; }
+.episodic-syntax .se { color: var(--episodic-syntax-literal-string-escape); }
+.episodic-syntax .il,
+.episodic-syntax .m,
+.episodic-syntax .mb,
+.episodic-syntax .mf,
+.episodic-syntax .mh,
+.episodic-syntax .mi,
+.episodic-syntax .mo { color: var(--episodic-syntax-literal-number); }
+.episodic-syntax .gp { color: var(--episodic-syntax-generic-prompt); font-weight: 600; }
+.episodic-syntax .go { color: var(--episodic-syntax-generic-output); }
+.episodic-syntax .gr { color: var(--episodic-syntax-generic-error); }
+.episodic-syntax .gt { color: var(--episodic-syntax-generic-traceback); }
+.episodic-syntax .err { color: var(--episodic-syntax-error); }

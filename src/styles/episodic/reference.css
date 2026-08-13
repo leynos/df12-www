@@ -1,0 +1,279 @@
+/* Reference surfaces: code blocks and the roadmap. The documentation index,
+ * local navigation, and command listings live in docs.css.
+ *
+ * Separating rules, bare list markup, the reading measure, and hit target
+ * floors come from motifs.css. Breakpoints sit with their component.
+ */
+
+/* Code -------------------------------------------------------------------- */
+
+.code-block {
+  margin: 0 0 var(--space-4);
+  border: 1px solid var(--color-edge-soft);
+  border-radius: var(--radius-field);
+  overflow: hidden;
+}
+
+.code-block__bar {
+  padding: var(--space-2) var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-edge-soft);
+  background: var(--color-base-200);
+  color: var(--color-ink-3);
+  font-size: var(--label-key);
+  letter-spacing: var(--track-2);
+  text-transform: uppercase;
+}
+
+.code-block__caption {
+  color: var(--color-ink-4);
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.code-block pre {
+  overflow-x: auto;
+  padding: var(--space-4);
+  margin: 0;
+  background: var(--color-surface-inset);
+  color: var(--color-base-content);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* Roadmap ----------------------------------------------------------------- */
+
+.phase-preview {
+  margin-bottom: var(--space-4);
+}
+
+.phase-preview__item {
+  display: flex;
+  flex-wrap: wrap;
+  padding: var(--space-3) 0;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+}
+
+.phase-preview__number {
+  color: var(--color-ornament);
+  font-size: var(--label-nav);
+}
+
+.phase-preview__title {
+  flex: 1 1 14rem;
+  color: var(--color-base-content);
+  font-size: 1.05rem;
+}
+
+.phase-preview__tally {
+  color: var(--color-ink-3);
+  font-size: var(--label-eyebrow);
+}
+
+/* Delivery state as a matrix rather than a stack.
+ *
+ * Six phases in a column is six scrolls of the same row shape; in a grid the
+ * whole delivery position is one glance. The bar is a second reading of the
+ * two numbers already printed beside it, which is why it is hidden from
+ * assistive technology and why it carries no status colour: it says how much,
+ * and the word beside it says what kind. Amber stays the interaction accent
+ * rather than becoming a progress colour. */
+.phase-matrix {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 44rem) {
+  .phase-matrix {
+    column-gap: var(--space-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 68rem) {
+  .phase-matrix {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.phase-matrix__cell {
+  display: grid;
+  padding-block: var(--space-3);
+  align-content: start;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+/* The index hangs at the left and the title wraps beside it, rather than the
+ * flex line wrapping and dropping the title beneath its own number. Six
+ * titles ranging from two words to eight have to start on the same x for the
+ * matrix to be readable as a matrix. */
+.phase-matrix__head {
+  flex-wrap: nowrap;
+  margin: 0;
+  align-items: baseline;
+  justify-self: stretch;
+}
+
+.phase-matrix__number {
+  color: var(--color-ornament);
+  font-size: var(--label-index);
+}
+
+.phase-matrix__title {
+  min-width: 0;
+  color: var(--color-base-content);
+  font-size: 1.02rem;
+  line-height: 1.3;
+}
+
+.phase-matrix__tally {
+  margin: 0;
+  color: var(--color-ink-3);
+  font-size: var(--label-note);
+}
+
+.phase-matrix__bar {
+  overflow: hidden;
+  height: 3px;
+  justify-self: stretch;
+  border-radius: 1px;
+  background: var(--color-surface-raised);
+}
+
+.phase-matrix__bar::before {
+  display: block;
+  width: var(--done);
+  height: 100%;
+  background: var(--color-ink-2);
+  content: "";
+}
+
+.phase {
+  max-width: 72rem;
+  padding-block: var(--space-4);
+  border-top: 1px solid var(--color-edge);
+}
+
+.phase__head {
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.phase__title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 1.35rem;
+}
+
+.phase__number {
+  color: var(--color-signal-amber);
+  font-size: 0.85rem;
+}
+
+.phase__count {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.phase__tally {
+  color: var(--color-ink-3);
+  font-size: var(--label-eyebrow);
+}
+
+.phase__summary {
+  margin-top: var(--space-2);
+  color: var(--color-ink-3);
+  font-size: 0.97rem;
+}
+
+.step {
+  border-top: 1px solid var(--color-edge-soft);
+}
+
+.step summary:hover {
+  color: var(--color-base-content);
+}
+
+.step__id {
+  min-width: 2.5rem;
+  color: var(--color-signal-amber);
+  font-size: var(--label-index);
+}
+
+.step__title {
+  flex: 1 1 12rem;
+  color: var(--color-ink-2);
+}
+
+.step__tally {
+  color: var(--color-ink-3);
+  font-size: var(--label-eyebrow);
+}
+
+.step__summary {
+  padding-left: var(--space-5);
+  color: var(--color-ink-3);
+  font-size: 0.95rem;
+}
+
+.task-list {
+  padding: 0 0 var(--space-3) var(--space-5);
+}
+
+.task {
+  display: grid;
+  padding: var(--space-2) 0;
+  gap: 0.1rem var(--space-3);
+  grid-template-columns: 1.4rem 3.4rem minmax(0, 1fr);
+}
+
+.task__mark {
+  color: var(--color-ink-3);
+}
+
+.task[data-done="yes"] .task__mark {
+  color: var(--color-signal-green);
+}
+
+.task__id {
+  color: var(--color-ornament);
+  font-size: var(--label-index);
+}
+
+.task__title {
+  color: var(--color-ink-2);
+}
+
+.task__requires,
+.task__note {
+  grid-column: 3;
+  color: var(--color-ink-4);
+  font-size: var(--label-note);
+}
+
+@media (max-width: 52rem) {
+  .task {
+    grid-template-columns: 1.4rem minmax(0, 1fr);
+  }
+
+  .task__id,
+  .task__title,
+  .task__requires,
+  .task__note {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 40rem) {
+  .step__summary,
+  .task-list {
+    padding-left: var(--space-3);
+  }
+}

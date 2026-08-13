@@ -1,0 +1,93 @@
+{% set page_eyebrow = "Interfaces" %}
+{% set page_title = "Which interface supports which task today" %}
+{% set page_lede = "Seven surfaces are designed. Three exist. This page pairs each with what it cannot do, because that is the part that decides whether it is usable." %}
+{% set page_trail = [{"label": "Interfaces"}] %}
+{% set page_sections = [
+  {"id": "catalogue", "title": "The interface catalogue"},
+  {"id": "contracts", "title": "Cross-cutting request behaviour"},
+  {"id": "tasks", "title": "Task to interface"},
+  {"id": "planned", "title": "Planned surfaces"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/interfaces.jinja" import interface_catalogue, request_contracts %}
+
+{% set task_routing = [
+  ["Store show configuration and editorial guardrails", "REST API", "available"],
+  ["Bind reusable style guides and presenter profiles", "REST API", "available"],
+  ["Submit source material and track its ingestion", "REST API", "available"],
+  ["Retrieve a structured brief for a downstream generator", "REST API", "available"],
+  ["Check a deployment is live and ready", "Health surface", "available"],
+  ["Run work off the request path", "Worker runtime", "available"],
+  ["Retrieve evaluator findings for an episode", "None yet", "planned"],
+  ["Approve or reject an episode", "None yet", "planned"],
+  ["Watch a generation run in real time", "None yet", "planned"],
+  ["Import the package and call it from Python", "None supported", "planned"]
+] %}
+
+{% block sections %}
+  {{ ui.section_open(1, "catalogue", "The interface catalogue",
+     "Each surface, what it supports, and what it does not.") }}
+    {{ rec.interface_catalogue(interface_catalogue) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "contracts", "Cross-cutting request behaviour",
+     "Only what the application defines. Where a contract is undefined, this page says so rather than assuming a convention.") }}
+    <div class="catalogue catalogue--compact">
+      {% for contract in request_contracts %}
+      {% call ui.ledger_row("%02d" | format(loop.index), contract.name, contract.status, none, "contract-" ~ loop.index) %}
+        <p>{{ contract.detail }}</p>
+      {% endcall %}
+      {% endfor %}
+    </div>
+    <aside class="callout" aria-labelledby="secrets-note">
+      <h3 id="secrets-note">Credentials in examples</h3>
+      <p>
+        Every example on this site uses an unmistakable placeholder in place of
+        a credential. No example is copied from a working environment.
+      </p>
+    </aside>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "tasks", "Task to interface",
+     "Read down the left column for the job, across for whether anything serves it.") }}
+    {{ ui.table_open("Which interface serves which task", "interface-tasks") }}
+    <thead>
+      <tr>
+        <th scope="col">Task</th>
+        <th scope="col">Interface</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task, surface, state in task_routing %}
+      <tr>
+        <th scope="row">{{ task }}</th>
+        <td>{{ surface }}</td>
+        <td>{{ ui.status_badge(state) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    {{ ui.table_close() }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "planned", "Planned surfaces",
+     "Kept separate from the live catalogue on purpose.") }}
+    <p>
+      A terminal client, a web console, and WebSocket event streaming are all
+      specified in the interface design notes. None of them ships. The design
+      documents are worth reading as design documents and should not be read as
+      documentation for something installable.
+    </p>
+    <p>
+      The Python module surface is the case most likely to mislead. The package
+      imports and the modules are there, but nothing in them carries a
+      compatibility promise. Treat it as internal until a supported API is
+      documented.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/docs/api/">The endpoints that exist today</a>
+      ·
+      <a class="text-link" href="/episodic/roadmap/#phase-4">Client work in the roadmap</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

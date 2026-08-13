@@ -1,0 +1,286 @@
+/* Element defaults and the non-colour scales.
+ *
+ * Colour, typefaces, and radii live in the Tailwind entry (episodic.css):
+ * the palette as the daisyUI "episodic" theme, the brand tokens under
+ * @theme. What remains here is everything a colour token cannot carry -
+ * the label and tracking scales, the spacing ramp, the reading measure,
+ * and the element-level defaults the subsite was written against.
+ *
+ * Tailwind's preflight is deliberately not imported: these defaults are the
+ * reset this site was designed on, and preflight would strip the list
+ * markers and heading rhythm the content pages rely on.
+ */
+
+@font-face {
+  font-family: "Economica";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/episodic/assets/fonts/economica-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Anek Latin";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("/episodic/assets/fonts/anek-latin-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/episodic/assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/episodic/assets/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/episodic/assets/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2");
+}
+
+:root {
+  color-scheme: dark;
+
+  /* Status roles. Planned deliberately has no signal colour: there is
+     nothing to signal about work that has not started. */
+  --status-available: var(--color-signal-green);
+  --status-in-progress: var(--color-signal-amber);
+  --status-planned: var(--color-ink-3);
+
+  /* The pinned header's height. Anchor scrolling, the sticky section rails,
+     and the mobile menu all offset by it, so it is declared once here and
+     restated per breakpoint rather than guessed at each site. */
+  --header-height: 8rem;
+
+  /* Operational type.
+   *
+   * Three steps, floored at 11.2px. These were eleven arbitrary values between
+   * 9.6px and 12px, which is a scale with no steps in it: the smallest carried
+   * the status word and the header rail, the two pieces of operational metadata
+   * on every page, at sizes that were legible without being scannable. Nothing
+   * public-facing now sits below the floor.
+   */
+  --label-1: 0.7rem; /* 11.2px */
+  --label-2: 0.75rem; /* 12px   */
+  --label-3: 0.8rem; /* 12.8px */
+
+  /* Roles, mapped onto the scale. A component asks for the role it serves and
+     never for a size, so retuning a step moves everything that shares it. */
+  --label-micro: var(--label-1); /* status chip                    */
+  --label-rail: var(--label-1); /* status rail, method chip        */
+  --label-key: var(--label-1); /* dt keys, captions, column heads  */
+  --label-note: var(--label-2); /* breadcrumbs, evidence, counts   */
+  --label-eyebrow: var(--label-2); /* eyebrows, notice heading     */
+  --label-index: var(--label-2); /* step, task, sequence indices   */
+  --label-nav: var(--label-3); /* navigation, text links           */
+  --label-action: var(--label-3); /* buttons                       */
+
+  /* Tracking, on the same principle: four steps rather than the eleven values
+     these replaced. Every step is a little tighter than what it supersedes,
+     because the type above it grew and wide tracking at a larger size reads
+     as a gap between letters rather than as a machined label. */
+  --track-1: 0.13em; /* eyebrows, headings, keys       (was 0.16-0.13) */
+  --track-2: 0.1em; /* captions, column heads, meta    (was 0.12-0.10) */
+  --track-3: 0.07em; /* rails, chips, breadcrumbs      (was 0.09-0.07) */
+  --track-4: 0.05em; /* navigation, buttons, indices   (was 0.06-0.05) */
+
+  /* The reading measure, in characters actually rendered rather than in `ch`.
+     `ch` is the width of "0", and Anek Latin's average glyph is far narrower
+     than its figures - a 68ch column measured 96 to 104 characters a line,
+     well outside the 45-75 band. Measured on the architecture page: 46ch is a
+     median of 64 and a maximum of 72. Retune by measuring, not by arithmetic. */
+  --measure: 46ch;
+  --max-width: 84rem;
+
+  --space-1: 0.35rem;
+  --space-2: 0.65rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.25rem;
+  --space-6: 3.5rem;
+  --space-7: 5.5rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-base-100);
+  scroll-behavior: smooth;
+  /* Anchors must land below the pinned header, not behind it. */
+  scroll-padding-top: calc(var(--header-height) + var(--space-3));
+}
+
+@media (min-width: 48rem) {
+  :root {
+    /* The status rail stops wrapping, so the header loses a line. */
+    --header-height: 6.5rem;
+  }
+}
+
+/* Wide viewports get a reading column that stops growing, so line length stays
+ * in the 45-75 character band the site map asks for. */
+@media (min-width: 100rem) {
+  :root {
+    --max-width: 92rem;
+  }
+}
+
+body {
+  min-width: 20rem;
+  margin: 0;
+  /* A fine grid, at the threshold of visibility: the ruled paper the
+     original specification sheet was drawn on. */
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px), var(--color-base-100);
+  background-size: 3rem 3rem;
+  color: var(--color-base-content);
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* The reading cap is not set here: motifs.css carries it as an inheritable
+   --flow-measure so a container can retune or release everything inside it. */
+p {
+  margin: 0 0 var(--space-3);
+}
+
+ul,
+ol {
+  margin: 0 0 var(--space-3);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--color-signal-amber);
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.22em;
+}
+
+a:hover {
+  text-decoration-color: var(--color-base-content);
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-mono);
+}
+
+code {
+  font-size: 0.88em;
+  word-break: break-word;
+}
+
+button {
+  color: inherit;
+  font: inherit;
+}
+
+/* One focus treatment across the whole site: 2px minimum, offset so it reads
+ * against both light and dark surfaces, and never dependent on colour alone
+ * because the ring itself is the cue.
+ */
+:focus-visible {
+  outline: 0.19rem solid var(--color-signal-cyan);
+  outline-offset: 0.22rem;
+  border-radius: 0.1rem;
+}
+
+::selection {
+  background: var(--color-signal-amber);
+  color: var(--color-base-100);
+}
+
+.visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
+    transition-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
+    scroll-behavior: auto !important;
+  }
+}
+
+/* In forced-colours mode the palette is replaced wholesale. Borders become
+ * system colours so structure survives, and the decorative signal graphics
+ * stop drawing entirely rather than rendering as solid blocks.
+ */
+@media (forced-colors: active) {
+  :root {
+    --color-edge-soft: CanvasText;
+    --color-edge: CanvasText;
+    --color-edge-strong: CanvasText;
+  }
+
+  .signal-field {
+    display: none;
+  }
+
+  .status,
+  .button,
+  .ledger-row,
+  .catalogue > * {
+    border: 1px solid CanvasText;
+  }
+
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}

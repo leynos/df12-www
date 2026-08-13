@@ -1,0 +1,132 @@
+{% extends "_layout.jinja" %}
+{% import "records.jinja" as rec %}
+{% from "data/workflow.jinja" import workflow_summary %}
+{% from "data/capabilities.jinja" import capabilities %}
+{% from "data/roadmap.jinja" import roadmap_phases, roadmap_totals %}
+{% from "data/status.jinja" import source_base %}
+
+{% block title %}Episodic — source material to reviewable podcast audio{% endblock %}
+{% block description %}Episodic turns heterogeneous source material into podcast audio through automated drafting and checks, with the editorial decision reserved for a person. In early development.{% endblock %}
+
+{% block content %}
+  {#
+    The site map forbids leading with the wordmark or an atmospheric image.
+    The proposition is the first thing in the document, and the maturity
+    notice sits above the first product claim rather than below the fold.
+  #}
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero__body">
+      <p class="hero__eyebrow">Agentic podcast production</p>
+      <h1 class="hero__title" id="hero-heading">
+        Episodic turns source documents into podcast audio. A person approves it.
+      </h1>
+      <p class="hero__lede">
+        Briefs, transcripts, feeds, and research notes normalize into one
+        canonical document with its provenance intact. Software drafts against
+        it and checks its own work; an editor approves what reaches an audience.
+      </p>
+
+      {#
+        The maturity count lives in the status rail at the top of every page,
+        so the notice no longer repeats it. What is left is the part the rail
+        cannot carry: what specifically does not exist yet.
+      #}
+      {{ ui.maturity_notice(
+        "There is no hosted studio, no installer, and no stable public API. "
+        ~ "Every capability below carries its delivery state and a link to the evidence for it."
+      ) }}
+
+      <p class="hero__actions">
+        <a class="button button--primary" href="/episodic/workflow/">See the production workflow</a>
+        <a class="button" href="/episodic/roadmap/">Check what is actually built</a>
+      </p>
+    </div>
+
+    {#
+      Decorative only. Static, hidden from assistive technology, and carrying
+      no claim about real production data.
+    #}
+    <div class="hero__signal">{{ ui.signal_field('signal-field--hero', 72) }}</div>
+  </section>
+
+  <div class="content-shell">
+    {#
+      Five sections, four compositions. The numbered rail is the
+      reference-page form and is not used here: on a landing page it made
+      every topic read as one more procedural step, which is the opposite of
+      what a reader choosing a direction needs. The ledger sections keep the
+      rail because their lists are long enough to lose your place in; the
+      others run wide, because a sequence, a matrix, and a paired route
+      composition are all wider than a reading measure.
+    #}
+    {{ ui.section_open(none, "path", "The path from source to episode",
+       "Four movements. Two of them work today, and the site says which.",
+       "section--wide") }}
+      {{ rec.stage_summary(workflow_summary, "stage-summary--path") }}
+      <p class="section__more">
+        <a class="text-link" href="/episodic/workflow/">Read the full seven-stage workflow</a>
+      </p>
+    {{ ui.section_close() }}
+
+    {{ ui.section_open(none, "built", "What is built",
+       "Capabilities reachable in the current checkout, each with the upstream evidence behind it.") }}
+      <div class="catalogue catalogue--compact">
+        {% for item in capabilities if item.status == "available" %}
+        {% call ui.ledger_row("%02d" | format(loop.index), item.name, item.status, item.evidence, "capability-" ~ item.key) %}
+          <p>{{ item.detail }}</p>
+          <p><a class="text-link" href="{{ item.href }}">{{ item.link_label }}</a></p>
+        {% endcall %}
+        {% endfor %}
+      </div>
+    {{ ui.section_close() }}
+
+    {{ ui.section_open(none, "unbuilt", "What is not built",
+       "Stated as plainly as the rest. A design commitment is not a shipped feature.") }}
+      <div class="catalogue catalogue--compact">
+        {% for item in capabilities if item.status != "available" %}
+        {% call ui.ledger_row("%02d" | format(loop.index), item.name, item.status, item.evidence, "gap-" ~ item.key) %}
+          <p>{{ item.detail }}</p>
+        {% endcall %}
+        {% endfor %}
+      </div>
+    {{ ui.section_close() }}
+
+    {{ ui.section_open(none, "delivery", "Delivery state",
+       "Phase completion counted from the upstream roadmap, which is the only authority for it.",
+       "section--wide") }}
+      {{ rec.phase_matrix(roadmap_phases) }}
+      <p class="section__more">
+        <a class="text-link" href="/episodic/roadmap/">Open the roadmap, task by task</a>
+        ·
+        <a class="text-link" href="{{ source_base }}docs/roadmap.md">Read the upstream roadmap</a>
+      </p>
+    {{ ui.section_close() }}
+
+    {#
+      The one photograph on this page, and it is last in the document. The
+      site map forbids opening on an atmospheric image; nothing forbids
+      closing on one, and the room is the argument the whole site is making -
+      a small operation that stays answerable for what leaves it.
+
+      It is passed as the section's companion so it rises beside the heading
+      instead of starting below the routes, which left it sitting low and
+      unpaired with anything.
+    #}
+    {{ ui.section_open(none, "next", "Where to go next",
+       "Three routes through the site, by what brought you here.",
+       "section--paired") }}
+      {{ ui.local_nav("Routes into the detail", [
+        {"href": "/episodic/why/", "label": "Assessing editorial control",
+         "detail": "Why provenance, checks, and human approval are the design, not a reassurance."},
+        {"href": "/episodic/architecture/", "label": "Evaluating the platform",
+         "detail": "Hexagonal boundaries, the component catalogue, and the hosting contract."},
+        {"href": "/episodic/docs/getting-started/", "label": "Running the code",
+         "detail": "What can be checked out, started, and verified today."}
+      ]) }}
+    {{ ui.section_close(ui.photo(
+      "controlroom",
+      "A small podcast control room at night, lit by a desk lamp and the amber backlight of a worn mixing console.",
+      "One room, one operator, and a record of every decision that left it.",
+      "photo--route")) }}
+  </div>
+{% endblock %}

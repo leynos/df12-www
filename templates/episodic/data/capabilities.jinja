@@ -1,0 +1,142 @@
+{#
+  The capability register.
+
+  Every capability the site claims, its maturity, and the evidence for it.
+  The overview shows the available ones; the workflow and interface pages
+  reference the same records by key. Nothing here may claim a state the
+  roadmap projection contradicts.
+#}
+{% set capabilities = [
+  {
+    "key": "canonical-tei",
+    "name": "Canonical TEI with provenance",
+    "status": "available",
+    "detail": "Transcripts, briefs, feeds, press releases, and research notes normalize into canonical TEI. The header records source priorities, ingestion timestamps, and reviewer identities.",
+    "href": "/episodic/workflow/content/",
+    "link_label": "Content and provenance",
+    "evidence": {
+      "label": "Roadmap step 1.2, multi-source ingestion",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "key": "source-weighting",
+    "name": "Source weighting and conflict resolution",
+    "status": "available",
+    "detail": "Priority scores are computed from quality, freshness, and reliability, with coefficients configurable per series profile. Every source is retained for audit, preferred or rejected.",
+    "href": "/episodic/workflow/content/",
+    "link_label": "Content and provenance",
+    "evidence": {
+      "label": "Users' guide, content creation",
+      "path": "docs/users-guide.md"
+    }
+  },
+  {
+    "key": "reference-bindings",
+    "name": "Reusable reference documents and pinned bindings",
+    "status": "available",
+    "detail": "Style guides, research briefs, and host and guest profiles are versioned documents bound to a series, template, or episode by pinned revision.",
+    "href": "/episodic/workflow/content/",
+    "link_label": "Content and provenance",
+    "evidence": {
+      "label": "Reference binding resolution",
+      "path": "docs/reference-binding-resolution.md"
+    }
+  },
+  {
+    "key": "profiles",
+    "name": "Series profiles and episode templates",
+    "status": "available",
+    "detail": "Tone descriptors, segment ordering, audio preferences, and editorial guardrails persist with change history and optimistic locking.",
+    "href": "/episodic/docs/api/",
+    "link_label": "API reference",
+    "evidence": {
+      "label": "Series profile and template service",
+      "path": "docs/episodic-podcast-generation-system-design.md"
+    }
+  },
+  {
+    "key": "intake-slice",
+    "name": "Source-to-script intake over REST",
+    "status": "available",
+    "detail": "An integration client can upload a source, create an ingestion job, attach sources, bind presenter profiles, and poll until the source context is ready. Side-effecting requests require an idempotency key.",
+    "href": "/episodic/docs/api/",
+    "link_label": "API reference",
+    "evidence": {
+      "label": "ADR 009: Source-to-script REST vertical slice",
+      "path": "docs/adr/adr-009-source-to-script-rest-vertical-slice.md"
+    }
+  },
+  {
+    "key": "evaluators",
+    "name": "Accuracy and runtime evaluation",
+    "status": "in-progress",
+    "detail": "Pedante returns per-claim accuracy findings and Chrono estimates spoken runtime deterministically. Four further evaluators are specified but not built.",
+    "href": "/episodic/workflow/quality/",
+    "link_label": "Quality and human review",
+    "evidence": {
+      "label": "Roadmap step 2.2, QA evaluators",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "key": "enrichment",
+    "name": "Show notes, chapter markers, and guest bios",
+    "status": "in-progress",
+    "detail": "Enrichment services write structured entries back into the canonical TEI body. Chapter starts are validated against segment transitions and rejected when the timing does not line up.",
+    "href": "/episodic/workflow/",
+    "link_label": "The production workflow",
+    "evidence": {
+      "label": "ADR 008: Chapter-marker TEI representation",
+      "path": "docs/adr/adr-008-chapter-marker-tei-representation.md"
+    }
+  },
+  {
+    "key": "hosting",
+    "name": "Deployable hosting contract",
+    "status": "available",
+    "detail": "A non-root container image, a Granian entrypoint on port 8080, liveness and readiness endpoints, and a Helm chart that renders against the Nile Valley platform conventions.",
+    "href": "/episodic/hosting/",
+    "link_label": "Hosting contract",
+    "evidence": {
+      "label": "Local k3d preview and Nile Valley integration design",
+      "path": "docs/local-k3d-preview-design.md"
+    }
+  },
+  {
+    "key": "budgets",
+    "name": "Cost metering and per-episode budgets",
+    "status": "in-progress",
+    "detail": "Normalized usage is recorded per call against pinned pricing snapshots. Budget reservation semantics wrap billable calls: reserve, then commit or release.",
+    "href": "/episodic/architecture/",
+    "link_label": "Platform architecture",
+    "evidence": {
+      "label": "Roadmap step 2.5, pricing catalogue and budget enforcement",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "key": "approval",
+    "name": "Editorial approval workflow",
+    "status": "planned",
+    "detail": "Configurable approval stages, service-level timers, and an audit trail for every transition. No approval endpoint is registered.",
+    "href": "/episodic/workflow/quality/",
+    "link_label": "Quality and human review",
+    "evidence": {
+      "label": "Roadmap step 4.2, approval workflow endpoints",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "key": "speech",
+    "name": "Speech synthesis and mastering",
+    "status": "planned",
+    "detail": "Provider capability negotiation, a pronunciation repository, mixing with ducking and transitions, and loudness normalization to a broadcast target.",
+    "href": "/episodic/workflow/audio/",
+    "link_label": "Audio production",
+    "evidence": {
+      "label": "Roadmap phase 3, audio synthesis and delivery",
+      "path": "docs/roadmap.md"
+    }
+  }
+] %}

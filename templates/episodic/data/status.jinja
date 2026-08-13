@@ -1,0 +1,36 @@
+{#
+  Status vocabulary.
+
+  Every capability, stage, evaluator, component, and interface on this site
+  carries one of these three states and a link to the evidence for it.
+
+  The mark beside the label is drawn in CSS as a gauge that is full, half, or
+  empty, rather than set as a text glyph. Typed marks were rendering at under
+  seven pixels, at which a filled disc and a half-filled one are the same
+  dot - so the shape channel carried nothing and the word did all the work.
+  Drawing it removes the font dependency and holds the distinction at size.
+
+  Status must survive greyscale, forced-colours mode, and a screen reader
+  reading only the label, so the word remains the carrier of record.
+#}
+{% set status_vocabulary = {
+  "available": {
+    "label": "Available",
+    "definition": "Implemented and reachable in the current checkout. Evidence links to the code, route table, or users' guide section that demonstrates it."
+  },
+  "in-progress": {
+    "label": "In progress",
+    "definition": "Partly delivered. Some tasks in the roadmap step are complete and some are not; the capability should not be relied upon."
+  },
+  "planned": {
+    "label": "Planned",
+    "definition": "Designed but not built. Evidence links to the design document or roadmap task that specifies it."
+  }
+} %}
+
+{#
+  Upstream evidence bases. Every citation on the site resolves through one of
+  these, so a repository move is a one-line change.
+#}
+{% set source_base = "https://github.com/leynos/episodic/blob/main/" %}
+{% set docs_base = source_base ~ "docs/" %}

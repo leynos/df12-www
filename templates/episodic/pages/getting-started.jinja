@@ -1,0 +1,108 @@
+{% set page_eyebrow = "Getting started" %}
+{% set page_title = "What can be checked out, started, and verified today" %}
+{% set page_lede = "An honest path through the currently supported surfaces. There is no installer and no released package; this is a development checkout." %}
+{% set page_trail = [
+  {"label": "Documentation", "href": "/episodic/docs/"},
+  {"label": "Getting started"}
+] %}
+{% set page_sections = [
+  {"id": "expect", "title": "What to expect"},
+  {"id": "prerequisites", "title": "Prerequisites"},
+  {"id": "commands", "title": "Commands"},
+  {"id": "health", "title": "Confirming the service runs"},
+  {"id": "next", "title": "Where this stops"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/interfaces.jinja" import command_groups %}
+{% from "data/status.jinja" import source_base %}
+
+{% block sections %}
+  {{ ui.maturity_notice(
+    "Episodic has no published release. `pip install episodic` installs something else. "
+    ~ "The steps below prepare a development checkout and start the HTTP service against a database you supply; "
+    ~ "they do not produce a podcast, because the generation and audio paths are not complete."
+  ) }}
+
+  {{ ui.section_open(1, "expect", "What to expect",
+     "Three outcomes are reachable. Everything else on this site is still a design.") }}
+    <ul class="claim-list">
+      <li><strong>A validated checkout.</strong> Tests, linters, type checks, and the migration drift check all run.</li>
+      <li><strong>A running HTTP service.</strong> Granian serves the Falcon application with the canonical REST surface and health endpoints.</li>
+      <li><strong>A local Kubernetes preview.</strong> The same image and chart the hosting contract describes, running in k3d.</li>
+    </ul>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "prerequisites", "Prerequisites",
+     "Four, and the Python version is not negotiable.") }}
+    {{ ui.table_open("Prerequisites", "prerequisites-table") }}
+    <thead>
+      <tr><th scope="col">Requirement</th><th scope="col">Why</th></tr>
+    </thead>
+    <tbody>
+      <tr><th scope="row">Python 3.14 or later</th><td>The package uses language features from 3.14 and declares that floor.</td></tr>
+      <tr><th scope="row">uv</th><td>Resolves and installs the locked dependency set.</td></tr>
+      <tr><th scope="row">Make</th><td>Every gate is a Make target; running the underlying commands directly skips setup steps.</td></tr>
+      <tr><th scope="row">Docker</th><td>Needed for the container and local Kubernetes work. Container smoke tests are opt-in.</td></tr>
+    </tbody>
+    {{ ui.table_close() }}
+    <p>
+      A reachable PostgreSQL instance is also required before the service will
+      pass its readiness check, since readiness is a database check.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "commands", "Commands",
+     "Grouped by what they exercise. All are Make targets from the Episodic repository.") }}
+    {{ rec.command_groups_list(command_groups) }}
+    <p class="section__note">
+      Container smoke tests are skipped unless
+      <code>EPISODIC_RUN_DOCKER_TESTS=1</code> is set, because an agent or CI
+      environment may have no Docker daemon.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "health", "Confirming the service runs",
+     "Two endpoints, and they mean different things.") }}
+    {% call ui.code_block("Expected health responses") %}
+      {% highlight 'console', 'episodic-syntax' %}
+      $ curl -i localhost:8080/health/live
+      HTTP/1.1 200 OK
+
+      $ curl -i localhost:8080/health/ready
+      HTTP/1.1 200 OK
+
+      $ # With no reachable database:
+      $ curl -i localhost:8080/health/ready
+      HTTP/1.1 503 Service Unavailable
+      {% endhighlight %}
+    {% endcall %}
+    <p>
+      Liveness reports only that the process booted. Readiness reports whether
+      the infrastructure it depends on is reachable, which is why a 503 there
+      is the expected answer rather than a fault - it tells an orchestrator to
+      withhold traffic instead of restarting the container.
+    </p>
+    <p>
+      Confusing the two is the usual cause of a restart loop: a liveness probe
+      pointed at the readiness endpoint will kill a healthy process every time
+      its database blips.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "next", "Where this stops",
+     "The boundary between a running service and a usable product.") }}
+    <p>
+      With the service running, the implemented REST surface is available:
+      series profiles, episode templates, reference documents and bindings, and
+      source intake. Generation can be driven for a draft without quality
+      assurance. Nothing renders audio, and nothing offers an approval step.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/docs/api/">See the endpoints available</a>
+      ·
+      <a class="text-link" href="/episodic/hosting/">Exercise the hosting contract</a>
+      ·
+      <a class="text-link" href="{{ source_base }}docs/developers-guide.md">Read the developers' guide</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

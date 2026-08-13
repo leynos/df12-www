@@ -1,0 +1,150 @@
+{#
+  The evaluator catalogue, guardrail lifecycle, and reviewer actions.
+
+  Evaluator status follows the roadmap tasks in step 2.2 rather than a separate
+  judgement. Five evaluators run as structured LLM calls inside LangGraph;
+  Chrono is a local estimator and makes no model call at all. None of them
+  approves anything.
+#}
+{% set evaluators = [
+  {
+    "name": "Pedante",
+    "status": "available",
+    "task": "2.2.1",
+    "purpose": "Factual accuracy and claim support.",
+    "mechanism": "Structured LLM call over the canonical TEI script plus cited source packets.",
+    "output": "Per-claim findings recording claim identifier, claim kind, cited source identifiers, support level, severity, and remediation guidance.",
+    "evidence": {
+      "label": "ADR 001: Pedante evaluator contract",
+      "path": "docs/adr-001-pedante-evaluator-contract.md"
+    }
+  },
+  {
+    "name": "Chrono",
+    "status": "available",
+    "task": "2.2.6",
+    "purpose": "Spoken runtime estimation.",
+    "mechanism": "Local deterministic heuristic. TEI parsing and spoken-text extraction delegate to tei-rapporteur, then word tokens are counted at 150 words per minute and rounded up to whole seconds.",
+    "output": "Runtime estimate with estimator name, estimator version, input character count, spoken word count, and the words-per-minute setting, so later estimators stay comparable.",
+    "evidence": {
+      "label": "ADR 006: Chrono spoken text semantics",
+      "path": "docs/adr/adr-006-chrono-spoken-text-semantics.md"
+    }
+  },
+  {
+    "name": "Bromide",
+    "status": "planned",
+    "task": "2.2.2",
+    "purpose": "Overused tropes, cliches, and snowclones.",
+    "mechanism": "Structured LLM call over the draft script.",
+    "output": "Findings identifying formulaic phrasing and repeated narrative patterns, with suggested rewrites.",
+    "evidence": {
+      "label": "Roadmap task 2.2.2",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "name": "Chiltern",
+    "status": "planned",
+    "task": "2.2.3",
+    "purpose": "Pronunciation gaps.",
+    "mechanism": "Structured LLM call, reading the pronunciation repository to decide whether a term already has guidance attached.",
+    "output": "Findings naming terms that lack pronunciation guidance, covering domain-specific and internal vocabulary as well as public names.",
+    "evidence": {
+      "label": "ADR 012: Pronunciation repository",
+      "path": "docs/adr/adr-012-pronunciation-repository.md"
+    }
+  },
+  {
+    "name": "Anthem",
+    "status": "planned",
+    "task": "2.2.4",
+    "purpose": "Brand-guideline compliance.",
+    "mechanism": "Structured LLM call linting vocabulary and forbidden topics, and validating tone against the series brand tone descriptors.",
+    "output": "Pass or fail outcomes linked to the canonical episode.",
+    "evidence": {
+      "label": "Roadmap task 2.2.4",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "name": "Caesura",
+    "status": "planned",
+    "task": "2.2.5",
+    "purpose": "False endings.",
+    "mechanism": "Structured LLM call over the draft, informed by Chrono's runtime estimate.",
+    "output": "Findings identifying the suspected false-ending boundary, where an episode appears to wrap up but continues for another four minutes or more.",
+    "evidence": {
+      "label": "Roadmap task 2.2.5",
+      "path": "docs/roadmap.md"
+    }
+  }
+] %}
+
+{#
+  What the system may decide on its own, and what it must hand to a person.
+  This matrix is the page's thesis; keep the boundary literal.
+#}
+{% set decision_boundary = [
+  {
+    "activity": "Weighting and selecting between conflicting sources",
+    "system": "Computes priority scores from quality, freshness, and reliability, and applies the weighting matrix.",
+    "human": "Sets the weighting coefficients per series profile, and can inspect every rejected source.",
+    "status": "available"
+  },
+  {
+    "activity": "Estimating episode runtime",
+    "system": "Produces a deterministic estimate and records the estimator metadata behind it.",
+    "human": "Decides whether the estimate is close enough to commission the recording.",
+    "status": "available"
+  },
+  {
+    "activity": "Scoring a draft for accuracy",
+    "system": "Returns per-claim findings with severity and remediation guidance.",
+    "human": "Decides whether a finding is correct and what to do about it. A score is not a verdict.",
+    "status": "in-progress"
+  },
+  {
+    "activity": "Spending money on model calls",
+    "system": "Reserves budget before a billable call, commits on success, and releases on failure.",
+    "human": "Sets the per-episode budget and the tier of model each task may use.",
+    "status": "in-progress"
+  },
+  {
+    "activity": "Approving an episode for an audience",
+    "system": "Surfaces findings, suspends the graph, and preserves state while the decision is pending.",
+    "human": "Approves, requests changes, or redirects the run. This decision has no automated path.",
+    "status": "planned"
+  }
+] %}
+
+{#
+  Failure behaviour. Fail-fast is a design commitment, so state what stops.
+#}
+{% set failure_modes = [
+  {
+    "trigger": "Malformed structured output from a model",
+    "behaviour": "The run stops. Nothing partially parsed reaches the canonical episode.",
+    "status": "available"
+  },
+  {
+    "trigger": "Chapter-marker timing that does not match segment transitions",
+    "behaviour": "Validation rejects the payload. Starts must be ordered, integer-only, and in PT#H#M#S form.",
+    "status": "available"
+  },
+  {
+    "trigger": "Optimistic-locking conflict on a profile or template",
+    "behaviour": "The write is refused so a concurrent edit is never silently overwritten.",
+    "status": "available"
+  },
+  {
+    "trigger": "Repeated request with a matching idempotency key",
+    "behaviour": "The stored response replays. The same key with a different canonical body returns 409 Conflict.",
+    "status": "available"
+  },
+  {
+    "trigger": "Per-episode budget exhausted",
+    "behaviour": "The reservation is refused before the billable call is made.",
+    "status": "in-progress"
+  }
+] %}

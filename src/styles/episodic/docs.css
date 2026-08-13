@@ -1,0 +1,209 @@
+/* The documentation index, local navigation, command listings, and endpoint
+ * groups. Code blocks and the roadmap live in reference.css.
+ */
+
+/* Documentation ----------------------------------------------------------- */
+
+.doc-featured li {
+  padding: var(--space-3) 0;
+}
+
+/* Full-width rather than inline-block: a featured document's whole row is the
+ * target, not just the length of its title. */
+.doc-featured a {
+  display: block;
+  color: var(--color-base-content);
+  font-size: 1.1rem;
+}
+
+.doc-featured span,
+.doc-list__summary {
+  display: block;
+  color: var(--color-ink-3);
+  font-size: 0.95rem;
+}
+
+.category-jump ul {
+  margin-bottom: var(--space-5);
+  gap: var(--space-2);
+}
+
+.category-jump a {
+  display: inline-flex;
+  min-height: 2.2rem;
+  padding: 0 var(--space-3);
+  align-items: center;
+  border: 1px solid var(--color-edge);
+  border-radius: var(--radius-field);
+  color: var(--color-ink-2);
+  font-size: var(--label-eyebrow);
+  text-decoration: none;
+}
+
+.category-jump a:hover {
+  border-color: var(--color-edge-strong);
+  background: var(--color-base-300);
+  color: var(--color-base-content);
+}
+
+.category-jump span {
+  margin-left: 0.35rem;
+  color: var(--color-ink-4);
+}
+
+.doc-category {
+  padding-block: var(--space-4);
+  border-top: 1px solid var(--color-edge);
+}
+
+.doc-category h3 {
+  font-size: 1.25rem;
+}
+
+.doc-category__meta {
+  margin: var(--space-2) 0;
+  gap: var(--space-3);
+  color: var(--color-ink-4);
+  font-size: var(--label-key);
+  letter-spacing: var(--track-2);
+  text-transform: uppercase;
+}
+
+.doc-category__blurb {
+  color: var(--color-ink-3);
+}
+
+.doc-list li {
+  padding: var(--space-2) 0;
+}
+
+.doc-list a {
+  color: var(--color-base-content);
+}
+
+/* A long category is disclosed rather than printed. The heading, counts, and
+ * blurb stay outside it, so the reader knows what is behind the control
+ * before deciding to open it. */
+.doc-disclosure {
+  border-top: 1px solid var(--color-edge-soft);
+}
+
+.doc-disclosure__label {
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--label-note);
+  letter-spacing: var(--track-3);
+  text-transform: uppercase;
+}
+
+.doc-disclosure > summary:hover .doc-disclosure__label {
+  color: var(--color-base-content);
+}
+
+@media (min-width: 76rem) {
+  .doc-list,
+  .doc-featured {
+    display: grid;
+    column-gap: var(--space-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    --flow-measure: none;
+  }
+}
+
+/* Local navigation and commands ------------------------------------------- */
+
+/* The group closes on its own rule rather than on the last item's. With two
+ * columns and an odd number of routes only one column would close, which read
+ * as a rendering fault rather than a boundary. */
+.local-nav ul {
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+
+.local-nav a {
+  display: grid;
+  padding: var(--space-3) 0;
+  gap: 0.15rem;
+  text-decoration: none;
+}
+
+/* These are the routes out of a landing page, so they must read as links at
+ * rest. They were the only unmarked links on the site, at the exact point
+ * where a reader has to choose a door. */
+.local-nav__label {
+  color: var(--color-base-content);
+  font-size: 1.1rem;
+  text-decoration: underline;
+  text-decoration-color: var(--color-signal-amber);
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.22em;
+}
+
+.local-nav a:hover .local-nav__label {
+  text-decoration-color: var(--color-base-content);
+}
+
+.local-nav__detail {
+  color: var(--color-ink-3);
+  font-size: 0.97rem;
+}
+
+.command-group {
+  margin-bottom: var(--space-5);
+}
+
+.command-group h3 {
+  align-items: center;
+  margin-bottom: var(--space-3);
+  font-size: 1.1rem;
+}
+
+.command-list__item {
+  padding: var(--space-3) 0;
+}
+
+.command-list dt code {
+  display: inline-block;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-edge-soft);
+  border-radius: var(--radius-field);
+  background: var(--color-surface-inset);
+  color: var(--color-base-content);
+  font-size: 0.84rem;
+}
+
+.command-list dd {
+  margin: var(--space-2) 0 0;
+  color: var(--color-ink-2);
+}
+
+@media (min-width: 90rem) {
+  .command-list {
+    display: grid;
+    column-gap: var(--space-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    --flow-measure: none;
+  }
+}
+
+.endpoint-group {
+  margin-bottom: var(--space-5);
+}
+
+.endpoint-group__title {
+  align-items: baseline;
+  margin-bottom: var(--space-3);
+  padding-top: var(--space-2);
+  font-size: 1.2rem;
+}
+
+/* What the caption used to say twice, said once and beside the heading. */
+.endpoint-group__count {
+  color: var(--color-ink-4);
+  font-size: var(--label-note);
+  letter-spacing: var(--track-2);
+  text-transform: uppercase;
+}

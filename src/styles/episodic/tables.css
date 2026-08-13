@@ -1,0 +1,217 @@
+/* Tabular records and list treatments: the scroll region, the endpoint
+ * tables, failure lists, claim lists, and sequences. The ledger, catalogues,
+ * and stages live in records.css.
+ */
+
+/* Tables ------------------------------------------------------------------ */
+
+/* Wide tables keep their table semantics and gain a labelled scroll region.
+ * Reflowing rows into blocks would break the row and column relationships
+ * assistive technology relies on.
+ *
+ * The edge fades while there is more table to reach and resolves as the reader
+ * scrolls to the end. Without it a clipped table reads as broken rather than
+ * scrollable, which is how it looked at 375px. The shadow is painted by the
+ * scroll container, so it needs no script. */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-edge-soft);
+  border-radius: var(--radius-field);
+  margin-bottom: var(--space-4);
+  background:
+    linear-gradient(to right, var(--color-base-100) 30%, transparent) 0 0 / 2rem 100% no-repeat
+    local,
+    linear-gradient(to left, var(--color-base-100) 30%, transparent) 100% 0 / 2rem 100% no-repeat
+    local,
+    radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / 45%), transparent) 0 0 / 1rem 100% no-repeat
+    scroll,
+    radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 45%), transparent) 100% 0 / 1rem 100%
+    no-repeat scroll;
+}
+
+@media (forced-colors: active) {
+  .table-scroll {
+    background: none;
+  }
+}
+
+/* One geometry across all six endpoint tables. Auto layout sized each
+ * independently, so tables scrolled past in sequence put PATH in a different
+ * place every time and read as unrelated artefacts rather than one surface. */
+.record-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.96rem;
+}
+
+.record-table:has(.col-methods) {
+  table-layout: fixed;
+  min-width: 40rem;
+}
+
+.col-methods {
+  width: 18%;
+}
+
+.col-path {
+  width: 34%;
+}
+
+.col-purpose {
+  width: 52%;
+}
+
+.record-table caption {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-edge-soft);
+  background: var(--color-base-200);
+  color: var(--color-ink-4);
+  font-size: var(--label-key);
+  letter-spacing: var(--track-2);
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.record-table th,
+.record-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-edge-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.record-table thead th {
+  background: var(--color-base-200);
+  color: var(--color-ink-3);
+  font-size: var(--label-key);
+  font-weight: 500;
+  letter-spacing: var(--track-2);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.record-table tbody th {
+  color: var(--color-base-content);
+  font-weight: 500;
+}
+
+.record-table td {
+  color: var(--color-ink-2);
+}
+
+.record-table tr:last-child th,
+.record-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Chips wrap rather than run past their cell. Under fixed layout this column
+ * is a fixed share of the table, and two chips held on one line overflowed it
+ * and printed on top of the route path beside them. */
+.record-table__methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+/* The global code rule breaks anywhere, which splits a route path mid-word
+ * ("/health/read" + "y"). Restoring normal breaking lets a path wrap at its
+ * slashes instead, and the scroll region absorbs anything still too wide. */
+.record-table code {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.method {
+  display: inline-block;
+  min-width: 3.1rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--color-edge);
+  border-radius: var(--radius-field);
+  color: var(--color-base-content);
+  font-size: var(--label-rail);
+  letter-spacing: var(--track-4);
+  text-align: center;
+}
+
+/* Failure list ------------------------------------------------------------ */
+
+.failure-list {
+  margin: 0;
+}
+
+.failure-list__item {
+  padding: var(--space-3) 0;
+}
+
+.failure-list dt {
+  align-items: center;
+}
+
+.failure-list__trigger {
+  color: var(--color-base-content);
+  font-weight: 500;
+}
+
+.failure-list dd {
+  margin: var(--space-1) 0 0;
+  color: var(--color-ink-2);
+}
+
+/* Lists ------------------------------------------------------------------- */
+
+.claim-list li {
+  padding: var(--space-3) 0 var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-edge-soft);
+  border-left: 1px solid var(--color-edge);
+  color: var(--color-ink-2);
+}
+
+.claim-list strong {
+  display: block;
+  color: var(--color-base-content);
+  font-weight: 500;
+}
+
+.claim-list__meta {
+  display: block;
+  color: var(--color-ink-4);
+  font-size: var(--label-note);
+  letter-spacing: var(--track-3);
+  text-transform: uppercase;
+}
+
+.sequence {
+  counter-reset: sequence;
+}
+
+.sequence li {
+  position: relative;
+  padding: var(--space-2) 0 var(--space-2) var(--space-5);
+  border-left: 1px solid var(--color-edge);
+  color: var(--color-ink-2);
+  counter-increment: sequence;
+}
+
+.sequence li::before {
+  position: absolute;
+  left: 0;
+  width: var(--space-5);
+  color: var(--color-signal-amber);
+  content: counter(sequence, decimal-leading-zero);
+  font-size: var(--label-index);
+  text-align: center;
+  translate: -0.5px 0.3rem;
+}
+
+/* Short records run two-up once the body column is wide enough to hold two
+ * without either dropping under a comfortable measure. */
+@media (min-width: 76rem) {
+  .claim-list,
+  .failure-list {
+    display: grid;
+    column-gap: var(--space-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    --flow-measure: none;
+  }
+}

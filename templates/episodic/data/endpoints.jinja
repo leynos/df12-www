@@ -1,0 +1,205 @@
+{#
+  GENERATED FILE - do not edit by hand.
+
+  Paths and methods are read from the Episodic Falcon composition root.
+  Purpose text is curated in endpoint_notes.jinja. Regenerate with
+  `make site-data`; `make check` fails when this file drifts.
+
+  Source: leynos/episodic episodic/api/app.py
+#}
+{% set endpoint_groups = [
+  {
+    "key": "health",
+    "label": "Health and readiness",
+    "routes": [
+      {
+        "path": "/health/live",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Reports that the process has booted. Used as the container liveness probe."
+      },
+      {
+        "path": "/health/ready",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Reports infrastructure readiness, including database connectivity. Returns 503 when the check fails so the platform withholds traffic."
+      }
+    ]
+  },
+  {
+    "key": "reference-documents",
+    "label": "Reference documents and revisions",
+    "routes": [
+      {
+        "path": "/v1/reference-document-revisions/{revision_id}",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Read a pinned reference-document revision by identifier."
+      },
+      {
+        "path": "/v1/series-profiles/{profile_id}/reference-documents",
+        "methods": [
+          "GET",
+          "POST"
+        ],
+        "purpose": "List reusable reference documents for a series, or create one. Host and guest profiles are series-aligned reference documents."
+      },
+      {
+        "path": "/v1/series-profiles/{profile_id}/reference-documents/{document_id}",
+        "methods": [
+          "GET",
+          "PATCH"
+        ],
+        "purpose": "Read or update a single reference document."
+      },
+      {
+        "path": "/v1/series-profiles/{profile_id}/reference-documents/{document_id}/revisions",
+        "methods": [
+          "GET",
+          "POST"
+        ],
+        "purpose": "List revisions of a reference document, or add one."
+      }
+    ]
+  },
+  {
+    "key": "reference-bindings",
+    "label": "Reference bindings",
+    "routes": [
+      {
+        "path": "/v1/reference-bindings",
+        "methods": [
+          "GET",
+          "POST"
+        ],
+        "purpose": "List reference bindings, or bind a pinned revision to a series, template, or episode scope."
+      },
+      {
+        "path": "/v1/reference-bindings/{binding_id}",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Read a single reference binding, including its `effective_from_episode_id` scope."
+      }
+    ]
+  },
+  {
+    "key": "episode-templates",
+    "label": "Episode templates",
+    "routes": [
+      {
+        "path": "/v1/episode-templates",
+        "methods": [
+          "GET",
+          "POST"
+        ],
+        "purpose": "List episode templates, or create one linked to a series profile."
+      },
+      {
+        "path": "/v1/episode-templates/{template_id}",
+        "methods": [
+          "GET",
+          "PATCH"
+        ],
+        "purpose": "Read an episode template, or update it under optimistic locking."
+      },
+      {
+        "path": "/v1/episode-templates/{template_id}/history",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Retrieve the change history for an episode template."
+      }
+    ]
+  },
+  {
+    "key": "series-profiles",
+    "label": "Series profiles",
+    "routes": [
+      {
+        "path": "/v1/series-profiles",
+        "methods": [
+          "GET",
+          "POST"
+        ],
+        "purpose": "List series profiles, or create one carrying tone descriptors, segment ordering, audio preferences, and guardrails."
+      },
+      {
+        "path": "/v1/series-profiles/{profile_id}",
+        "methods": [
+          "GET",
+          "PATCH"
+        ],
+        "purpose": "Read a series profile, or update it under optimistic locking with `expected_revision`."
+      },
+      {
+        "path": "/v1/series-profiles/{profile_id}/brief",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Fetch the structured brief payload that downstream generators consume."
+      },
+      {
+        "path": "/v1/series-profiles/{profile_id}/history",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Retrieve the change history for a series profile."
+      },
+      {
+        "path": "/v1/series-profiles/{profile_id}/resolved-bindings",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Resolve the exact reference-document revisions that apply to a target episode."
+      }
+    ]
+  },
+  {
+    "key": "source-intake",
+    "label": "Source intake",
+    "routes": [
+      {
+        "path": "/v1/ingestion-jobs",
+        "methods": [
+          "GET",
+          "POST"
+        ],
+        "purpose": "List ingestion jobs, or create one. Requires an `Idempotency-Key`."
+      },
+      {
+        "path": "/v1/ingestion-jobs/{job_id}",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Poll an ingestion job until its source context is ready for draft generation."
+      },
+      {
+        "path": "/v1/ingestion-jobs/{job_id}/sources",
+        "methods": [
+          "GET",
+          "POST"
+        ],
+        "purpose": "List the sources attached to an ingestion job, or attach an upload or remote source URI."
+      },
+      {
+        "path": "/v1/uploads",
+        "methods": [
+          "POST"
+        ],
+        "purpose": "Upload one source document. Requires an `Idempotency-Key`."
+      },
+      {
+        "path": "/v1/uploads/{upload_id}",
+        "methods": [
+          "GET"
+        ],
+        "purpose": "Read the stored metadata for an uploaded source document."
+      }
+    ]
+  }
+] %}
+{% set endpoint_total = 21 %}

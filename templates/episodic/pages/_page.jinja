@@ -1,0 +1,27 @@
+{#
+  The shared shape for every non-home route.
+
+  A page sets `page_eyebrow`, `page_title`, `page_lede`, `page_trail`, and
+  optionally `page_sections`, then fills the `sections` block. The intro is
+  fixed because the site map requires every page to state its job in one
+  sentence before anything else.
+#}
+{% extends "_layout.jinja" %}
+{% import "records.jinja" as rec %}
+
+{% block title %}{{ page_title }} · Episodic{% endblock %}
+{% block description %}{{ page_lede }}{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs-shell">{{ ui.breadcrumbs(page_trail) }}</div>
+{% endblock %}
+
+{% block content %}
+  <div class="content-shell">
+    {{ ui.page_intro(page_eyebrow, page_title, page_lede) }}
+    {% if page_sections and page_sections | length > 2 %}
+      {{ ui.page_contents(page_sections) }}
+    {% endif %}
+    {% block sections %}{% endblock %}
+  </div>
+{% endblock %}

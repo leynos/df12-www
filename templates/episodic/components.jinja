@@ -1,0 +1,311 @@
+{#
+  Page chrome and the recurring marks of the system.
+
+  The signature device is the evidence ledger: a status word and a citation
+  travel together wherever the site makes a claim. Status is never carried by
+  colour alone - the glyph is decorative, the word is the meaning.
+#}
+{% from "data/status.jinja" import status_vocabulary, source_base %}
+
+{#
+  Render data-sourced prose, promoting backtick spans to `<code>`.
+
+  Identifiers travel through the record sets as Markdown code spans, both from
+  the curated data and from the upstream roadmap. Printing them raw leaves
+  literal backticks on the page, so every macro that renders prose from a
+  record passes it through here.
+#}
+{% macro rich(text) -%}
+  {%- for part in (text | string).split('`') -%}
+    {%- if loop.index0 is odd %}<code>{{ part }}</code>{% else %}{{ part }}{% endif -%}
+  {%- endfor -%}
+{%- endmacro %}
+
+{% macro status_badge(status) -%}
+  {%- set record = status_vocabulary.get(status, status_vocabulary["planned"]) -%}
+  <span class="status" data-status="{{ status }}">
+    <span class="status__mark" aria-hidden="true"></span>
+    <span class="status__label">{{ record.label }}</span>
+  </span>
+{%- endmacro %}
+
+{#
+  A citation back to the upstream source that substantiates a claim. `record`
+  carries `label` and a repository-relative `path`.
+#}
+{% macro evidence(record) -%}
+  {%- if record -%}
+  <a class="evidence" href="{{ source_base }}{{ record.path }}">
+    <span class="evidence__key" aria-hidden="true">Evidence</span>
+    <span class="evidence__label">{{ record.label }}</span>
+    <span class="visually-hidden">(opens the Episodic repository)</span>
+  </a>
+  {%- endif -%}
+{%- endmacro %}
+
+{#
+  One ledger row: an index, a claim, its status, and the evidence for it.
+  `caller()` supplies the body so callers can vary what sits under the title.
+#}
+{% macro ledger_row(index, title, status=none, record=none, id=none) -%}
+  <article class="ledger-row"{% if id %} id="{{ id }}"{% endif %}>
+    <div class="ledger-row__index" aria-hidden="true">{{ index }}</div>
+    <div class="ledger-row__body">
+      <div class="ledger-row__head">
+        <h3 class="ledger-row__title">{{ title }}</h3>
+        {% if status %}{{ status_badge(status) }}{% endif %}
+      </div>
+      {{ caller() }}
+      {% if record %}{{ evidence(record) }}{% endif %}
+    </div>
+  </article>
+{%- endmacro %}
+
+{#
+  A page section. The index is decorative; the heading carries the document
+  outline.
+
+  By default the heading block sits in its own column and sticks while the
+  body scrolls, which fills the width a capped reading measure would otherwise
+  waste and keeps the reader's place in a long section. Below the breakpoint
+  the column collapses and the heading returns above its body, in the same DOM
+  order.
+
+  `variant` takes `section--wide`, which drops the rail and runs the heading
+  across the full width above its body. That is for a section whose content is
+  itself wide - a process sequence, a matrix, a paired composition - where a
+  rail would squeeze the thing the section exists to show.
+
+  `index` is optional. The numbered rail is the reference-page form: it earns
+  its keep where a reader is deep in a long document and needs to know which
+  of nine sections they are in. On a landing page it makes every topic read as
+  a procedural step of equal weight, so those pages number their claims rather
+  than their sections.
+#}
+{% macro section_open(index, id, title, lede=none, variant='') -%}
+  <section class="section {{ variant }}" id="{{ id }}" aria-labelledby="{{ id }}-heading">
+    <div class="section__aside">
+      {% if index %}<p class="section__marker" aria-hidden="true">{{ "%02d" | format(index) }}</p>{% endif %}
+      <h2 class="section__title" id="{{ id }}-heading">{{ title }}</h2>
+      {% if lede %}<p class="section__lede">{{ lede }}</p>{% endif %}
+    </div>
+    <div class="section__body">
+{%- endmacro %}
+
+{#
+  `companion` takes rendered markup to set beside the section rather than
+  inside it - a photograph, a plate, a figure the body should not push down
+  the page. It closes the section in DOM order, so reading order stays
+  heading, body, companion; `section--paired` then places it in a second
+  column spanning both rows, where it shares a top edge with the heading.
+#}
+{% macro section_close(companion=none) -%}
+    </div>
+    {% if companion %}<div class="section__companion">{{ companion }}</div>{% endif %}
+  </section>
+{%- endmacro %}
+
+{#
+  Breadcrumbs. `trail` is a list of {label, href}; the final entry is the
+  current page and carries no link.
+#}
+{% macro breadcrumbs(trail) -%}
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/episodic/">Episodic</a></li>
+      {% for crumb in trail %}
+      <li>
+        {% if crumb.href and not loop.last %}<a href="{{ crumb.href }}">{{ crumb.label }}</a>
+        {%- else %}<span aria-current="page">{{ crumb.label }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+  </nav>
+{%- endmacro %}
+
+{#
+  Page intro. The lede states the page's job in one sentence; the site map
+  requires a literal proposition rather than an atmospheric opening.
+#}
+{% macro page_intro(eyebrow, title, lede, status=none) -%}
+  <header class="page-intro">
+    <p class="page-intro__eyebrow">{{ eyebrow }}</p>
+    <h1 class="page-intro__title">{{ title }}</h1>
+    <p class="page-intro__lede">{{ lede }}</p>
+    {% if status %}<p class="page-intro__status">{{ status_badge(status) }}</p>{% endif %}
+  </header>
+{%- endmacro %}
+
+{#
+  On-page contents. Present on every page with more than three sections, so a
+  reader can see the shape before scrolling it.
+#}
+{% macro page_contents(sections) -%}
+  <nav class="page-contents" aria-labelledby="page-contents-heading">
+    <h2 class="page-contents__heading" id="page-contents-heading">On this page</h2>
+    <ol>
+      {% for entry in sections %}
+      <li>
+        <a href="#{{ entry.id }}">
+          <span class="page-contents__index" aria-hidden="true">{{ "%02d" | format(loop.index) }}</span>
+          <span>{{ entry.title }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </nav>
+{%- endmacro %}
+
+{#
+  Local navigation for a branch landing page. The primary navigation stays
+  scannable; depth is reached through these lists and contextual links.
+#}
+{#
+  The heading is the navigation's accessible name and is not repeated as a
+  visible heading: this macro is always called inside a section that already
+  has one, and a second `h2` made a screen reader announce the label and then
+  an identical heading.
+#}
+{% macro local_nav(heading, links) -%}
+  <nav class="local-nav" aria-label="{{ heading }}">
+    <ul>
+      {% for link in links %}
+      <li>
+        <a href="{{ link.href }}">
+          <span class="local-nav__label">{{ link.label }}</span>
+          <span class="local-nav__detail">{{ link.detail }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </nav>
+{%- endmacro %}
+
+{#
+  A labelled, keyboard-scrollable code block.
+
+  Called with the body supplying a `{% highlight %}` tag, so the parent
+  generator's Pygments extension does the colouring:
+
+      {% call ui.code_block("Health responses", "Expected output") %}
+        {% highlight 'console', 'episodic-syntax' %}
+        $ curl -i localhost:8080/health/live
+        {% endhighlight %}
+      {% endcall %}
+
+  Pygments emits no attributes, so the scroll region and its label live on
+  this wrapper. The label names what the block is, because "Terminal" alone
+  tells a screen-reader user nothing.
+
+  Jinja lexes the tag body before the extension sees it, so any code
+  containing `{{` or `{%` must be wrapped in `{% raw %}` inside the tag.
+#}
+{% macro code_block(label, caption=none) -%}
+  <figure class="code-block">
+    <figcaption class="code-block__bar">
+      <span class="code-block__label">{{ label }}</span>
+      {% if caption %}<span class="code-block__caption">{{ caption }}</span>{% endif %}
+    </figcaption>
+    <div class="code-scroll" tabindex="0" role="region" aria-label="{{ label }}">
+      {{ caller() }}
+    </div>
+  </figure>
+{%- endmacro %}
+
+{#
+  A wide table that keeps its table semantics and gains a labelled scroll
+  region rather than being reflowed into blocks, which would break the row and
+  column relationships assistive technology depends on.
+#}
+{#
+  `caption_class` accepts `visually-hidden` where the caption would only
+  repeat a heading beside it. The element itself always stays: it is the
+  scroll region's accessible name, and a focusable region without one is
+  announced as nothing in particular.
+#}
+{% macro table_open(caption, id, caption_class='') -%}
+  <div class="table-scroll" tabindex="0" role="region" aria-labelledby="{{ id }}-caption">
+    <table class="record-table" id="{{ id }}">
+      <caption id="{{ id }}-caption" class="{{ caption_class }}">{{ caption }}</caption>
+{%- endmacro %}
+
+{% macro table_close() -%}
+    </table>
+  </div>
+{%- endmacro %}
+
+{#
+  Decorative signal graphic. It carries no information, never animates on load,
+  and is hidden from assistive technology. Any meaning it appears to hold must
+  also be stated in text nearby.
+#}
+{% macro signal_field(variant='', bars=48) -%}
+  <div class="signal-field {{ variant }}" aria-hidden="true">
+    {% for step in range(bars) %}<span style="--n:{{ step }}"></span>{% endfor %}
+  </div>
+{%- endmacro %}
+
+{#
+  A boundary mark: a short burst of signal closing into a hairline that runs
+  out to the edge of the column. Same contract as the field it is built from -
+  decorative, static, hidden from assistive technology, and carrying no claim.
+#}
+{% macro signal_rule(bars=26) -%}
+  <div class="signal-rule" aria-hidden="true">
+    <span class="signal-rule__line signal-rule__line--lead"></span>
+    {{ signal_field('signal-field--rule', bars) }}
+    <span class="signal-rule__line"></span>
+  </div>
+{%- endmacro %}
+
+{#
+  A photograph with a purpose-appropriate alternative text and a caption. The
+  overlay keeps the image from competing with adjacent text.
+#}
+{#
+  The caption sits inset over the foot of the image on a shaded, blurred
+  panel, so the pair read as one plate rather than a picture with a label
+  under it. The panel carries its own rule, and its backdrop keeps the text
+  legible over whatever tone the photograph happens to have there.
+#}
+{% macro photo(name, alt, caption=none, variant='') -%}
+  <figure class="photo {{ variant }}">
+    <img src="/episodic/assets/images/{{ name }}.webp" alt="{{ alt }}"
+         loading="lazy" decoding="async" width="1400" height="933" />
+    {% if caption %}<figcaption class="photo__caption">{{ caption }}</figcaption>{% endif %}
+  </figure>
+{%- endmacro %}
+
+{#
+  Search, as progressive enhancement.
+
+  The root ships `hidden`. site-search.js removes that only once MiniSearch
+  has loaded, so a reader without JavaScript never meets an input that does
+  nothing, and every destination stays reachable through the category listing
+  that follows. Nothing here is required to find a document.
+#}
+{% macro search_box(label, placeholder) -%}
+  <div class="search" data-search-root
+       data-search-index="/episodic/assets/search/episodic-search.json" hidden>
+    <label class="search__label" for="site-search-input">{{ label }}</label>
+    <input class="search__input" id="site-search-input" type="search"
+           placeholder="{{ placeholder }}" data-search-input />
+    <div class="search__panel" data-search-panel hidden>
+      <ul class="search__results" id="site-search-results" role="listbox"
+          aria-label="Search results" data-search-results></ul>
+      <p class="search__meta" role="status" aria-live="polite" data-search-meta></p>
+    </div>
+  </div>
+{%- endmacro %}
+
+{#
+  The maturity notice. The site map requires this above the first product
+  claim on the overview, and above the feature narrative on the audio page.
+#}
+{% macro maturity_notice(body, href='/episodic/roadmap/', label='Read the delivery roadmap') -%}
+  <aside class="notice" aria-labelledby="maturity-notice-heading">
+    <h2 class="notice__heading" id="maturity-notice-heading">Early development</h2>
+    <p>{{ body }}</p>
+    <a class="notice__link" href="{{ href }}">{{ label }}</a>
+  </aside>
+{%- endmacro %}

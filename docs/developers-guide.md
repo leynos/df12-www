@@ -14,7 +14,7 @@ is checked. It does not restate deployment or OpenTofu guidance, which lives in
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
 [df12 Pages App Design](df12-pages-app-design.md). For Tailwind and daisyUI
-conventions used by the main site and the mxd sub-site, see the
+conventions used by the main site and the mxd and Episodic sub-sites, see the
 [Tailwind v4 guide](tailwind-v4-guide.md) and the
 [daisyUI v5 guide](daisyui-v5-guide.md). Documentation formatting itself
 follows the [documentation style guide](documentation-style-guide.md).
@@ -36,7 +36,7 @@ depends on the last:
 ```bash
 bun run build         # build:static, build:css, build:images, build:pages, build:search
 bun run build:static  # copy src/static/ verbatim (scripts/copy-static.ts)
-bun run build:css     # compile src/styles/site.css and src/styles/mxd.css with Tailwind
+bun run build:css     # compile the main, mxd, and Episodic Tailwind entrypoints
 bun run build:images  # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages   # uv run pages generate --all-sites
 bun run build:search  # build the Netsuke search index (scripts/build-netsuke-search-index.mjs)
@@ -166,14 +166,15 @@ reviewed; see section 6.
 because the files are written by something other than a person, and every one
 carries its reasoning in the file:
 
-| Excluded                                                                                      | Why                                                                                                                                                                                                                                         |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/cassettes/`                                                                            | Betamax writes these HTTP recordings. A format gate over them would fail the moment anyone re-recorded a cassette.                                                                                                                          |
-| `reference/`                                                                                  | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
-| `src/static/**/vendor`, `public/netsuke/assets/vendor`                                        | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
-| `src/static/netsuke/assets/css/himotoshi.css`, `src/static/stilyagi/assets/styles/syntax.css` | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
-| `**/*.svg`                                                                                    | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
-| `**/*.css` (linter only)                                                                      | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
+| Excluded                                                 | Why                                                                                                                                                                                                                                         |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/cassettes/`                                       | Betamax writes these HTTP recordings. A format gate over them would fail the moment anyone re-recorded a cassette.                                                                                                                          |
+| `reference/`                                             | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
+| `src/static/**/vendor`, `public/netsuke/assets/vendor`   | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
+| `src/static/{episodic,netsuke,stilyagi}/**/*syntax*.css` | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/episodic/assets/search/episodic-search.json` | Episodic's MiniSearch builder owns the serialized index. Reformatting it would make the committed projection differ from its generator.                                                                                                     |
+| `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
+| `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
 
 _Table 1: The trees `biome.jsonc` holds out of scope, and why each is written
 by something other than a person._
@@ -195,13 +196,13 @@ anyone rebuilds from a clean tree.
 
 Every published file has a source elsewhere in the repository:
 
-| Published under `public/`                    | Comes from                                            |
-| -------------------------------------------- | ----------------------------------------------------- |
-| `**/*.html`                                  | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`, `mxd/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`             | `scripts/generate-image-variants.ts`                  |
-| `netsuke/assets/search/*.json`               | `scripts/build-netsuke-search-index.mjs`              |
-| everything else                              | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`                  | Comes from                                            |
+| ------------------------------------------ | ----------------------------------------------------- |
+| `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`, `*/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
+| `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
+| everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 _Table 2: Published paths under `public/` and the source that generates them._
 
@@ -220,7 +221,7 @@ local or in CI — discards it silently.
 ## 4. The Pygments CSS generators
 
 This is the source of truth for how build-time syntax highlighting is wired
-together on the Netsuke and Stilyagi sub-sites, referenced from the
+together on the Episodic, Netsuke, and Stilyagi sub-sites, referenced from the
 [Netsuke update execution plan](execplans/netsuke-update.md).
 
 ### 4.1. Styles, lexers, and the highlight tag

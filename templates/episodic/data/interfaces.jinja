@@ -1,0 +1,173 @@
+{#
+  The interface catalogue.
+
+  What supports which task today, and where the contract for it lives. A
+  designed interface is not a live one; the status field carries that
+  distinction and nothing else on the site may contradict it.
+#}
+{% set interface_catalogue = [
+  {
+    "key": "rest",
+    "name": "REST API",
+    "status": "in-progress",
+    "supports": "Series profiles, episode templates, reference documents and bindings, and source intake.",
+    "limits": "Episode lifecycle, approval, QA retrieval, audio, and export surfaces are not implemented. Routes are versioned under /v1.",
+    "href": "/episodic/docs/api/",
+    "evidence": {
+      "label": "Falcon composition root",
+      "path": "episodic/api/app.py"
+    }
+  },
+  {
+    "key": "health",
+    "name": "Operator health surface",
+    "status": "available",
+    "supports": "Liveness and readiness checks for deployment and container orchestration.",
+    "limits": "Two endpoints, no authentication, and no diagnostic detail beyond the readiness verdict.",
+    "href": "/episodic/hosting/",
+    "evidence": {
+      "label": "Local k3d preview and Nile Valley integration design",
+      "path": "docs/local-k3d-preview-design.md"
+    }
+  },
+  {
+    "key": "worker",
+    "name": "Worker runtime",
+    "status": "available",
+    "supports": "Off-request execution through Celery queues bound to RabbitMQ.",
+    "limits": "Queue routing is scaffolded; the generation and audio tasks that will use it are not complete.",
+    "href": "/episodic/architecture/",
+    "evidence": {
+      "label": "ADR 003: Celery worker scaffold",
+      "path": "docs/adr/adr-003-celery-worker-scaffold.md"
+    }
+  },
+  {
+    "key": "module",
+    "name": "Python module surface",
+    "status": "planned",
+    "supports": "Nothing that carries a compatibility promise.",
+    "limits": "The package exposes no stable public API. Treat the module surface as internal until a supported API is documented.",
+    "href": "/episodic/docs/getting-started/",
+    "evidence": {
+      "label": "Project README",
+      "path": "README.md"
+    }
+  },
+  {
+    "key": "tui",
+    "name": "Terminal user interface",
+    "status": "planned",
+    "supports": "Designed for editorial review and run inspection from a terminal.",
+    "limits": "Design notes only. No terminal client ships in the current checkout.",
+    "href": "/episodic/roadmap/",
+    "evidence": {
+      "label": "Episodic TUI API design",
+      "path": "docs/episodic-tui-api-design.md"
+    }
+  },
+  {
+    "key": "streaming",
+    "name": "WebSocket event streaming",
+    "status": "planned",
+    "supports": "Designed to deliver real-time run events with backpressure control.",
+    "limits": "Roadmap step 4.5. No streaming endpoint is registered.",
+    "href": "/episodic/roadmap/",
+    "evidence": {
+      "label": "Roadmap step 4.5",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "key": "console",
+    "name": "CLI and web console",
+    "status": "planned",
+    "supports": "Designed for approval workflows and run management.",
+    "limits": "Roadmap step 4.6. Neither client exists.",
+    "href": "/episodic/roadmap/",
+    "evidence": {
+      "label": "Roadmap step 4.6",
+      "path": "docs/roadmap.md"
+    }
+  }
+] %}
+
+{#
+  Cross-cutting request behaviour. Only what the source actually defines: the
+  site must not invent pagination, rate limits, or scopes the code does not
+  implement.
+#}
+{% set request_contracts = [
+  {
+    "name": "Authorization",
+    "status": "in-progress",
+    "detail": "Authorization middleware runs ahead of every resource and supplies the authenticated principal. Role-based access control and tenancy isolation are roadmap phase 5."
+  },
+  {
+    "name": "Idempotency",
+    "status": "available",
+    "detail": "Side-effecting POST requests to the intake surface require an Idempotency-Key. The key is scoped to the authenticated principal. A repeat with the same canonical body replays the stored response; the same key with a different body returns 409 Conflict."
+  },
+  {
+    "name": "Optimistic locking",
+    "status": "available",
+    "detail": "Profile and template updates carry expected_revision. A stale revision is refused rather than overwriting a concurrent edit."
+  },
+  {
+    "name": "Errors",
+    "status": "available",
+    "detail": "A single error serializer produces a consistent error body across every resource."
+  },
+  {
+    "name": "Pagination and rate limits",
+    "status": "planned",
+    "detail": "Pagination, filtering, and role enforcement are roadmap task 4.1.2. No rate-limit contract is defined; do not assume one."
+  }
+] %}
+
+{#
+  Commands, grouped by the surface they exercise. Every one comes from the
+  upstream Makefile or the local preview design.
+#}
+{% set command_groups = [
+  {
+    "label": "Prepare the checkout",
+    "status": "available",
+    "commands": [
+      {"command": "uv sync", "detail": "Install dependencies. Requires Python 3.14 or later."},
+      {"command": "make build", "detail": "Build the virtual environment and install dependencies."}
+    ]
+  },
+  {
+    "label": "Validate the checkout",
+    "status": "available",
+    "commands": [
+      {"command": "make test", "detail": "Run the pytest suite, including behavioural scenarios and CrossHair contract checks."},
+      {"command": "make lint", "detail": "Run linters, including the hexagonal import-boundary check."},
+      {"command": "make typecheck", "detail": "Type-check the package."},
+      {"command": "make check-migrations", "detail": "Detect schema drift between the models and the Alembic migrations."}
+    ]
+  },
+  {
+    "label": "Run the service",
+    "status": "available",
+    "commands": [
+      {
+        "command": "granian episodic.api.runtime:create_app_from_env --interface asgi --factory --host 0.0.0.0 --port 8080",
+        "detail": "Start the HTTP service. DATABASE_URL must be set."
+      },
+      {"command": "curl -s localhost:8080/health/live", "detail": "Confirm the process has booted."},
+      {"command": "curl -s localhost:8080/health/ready", "detail": "Confirm infrastructure readiness. Returns 503 when the database check fails."}
+    ]
+  },
+  {
+    "label": "Exercise the hosting contract locally",
+    "status": "available",
+    "commands": [
+      {"command": "make local-k8s-up", "detail": "Create or update the local k3d preview."},
+      {"command": "make local-k8s-status", "detail": "Inspect the local preview."},
+      {"command": "make local-k8s-logs", "detail": "Show logs from the local preview."},
+      {"command": "make local-k8s-down", "detail": "Tear the local preview down."}
+    ]
+  }
+] %}

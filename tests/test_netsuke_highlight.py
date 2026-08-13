@@ -8,16 +8,18 @@ import pytest
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
-from pygments.token import Comment, Punctuation
 
 from df12_pages.highlighting import HimotoshiStyle
 from scripts.generate_himotoshi_pygments_css import (
     BEGIN,
+    BOLD_WEIGHT,
+    CSS_CLASS,
     END,
     STYLESHEET,
+    VARIABLE_PREFIX,
     build_css,
 )
-from scripts.pygments_css import _token_classes
+from scripts.pygments_css import token_rules
 
 #: A Netsukefile exercising comments, YAML keys, Jinja expressions, quoted
 #: and plain scalars, and the block scalars the examples use for commands.
@@ -210,41 +212,26 @@ class TestHimotoshiPygmentsCss:
             f"Comment.Preproc should inherit Comment's italic: {preproc}"
         )
 
-    def test_the_local_token_class_algorithm_still_behaves(self) -> None:
-        """Pin the token-class contract owned by the shared local helper.
-
-        The helper mirrors Pygments' class algorithm through the public
-        ``STANDARD_TYPES`` mapping, including the space-separated ancestor
-        chain that the grouping in ``scripts.pygments_css`` needs.
-        """
-        formatter = HtmlFormatter(style=HimotoshiStyle, cssclass="hm-syntax")
-
-        plain = _token_classes(formatter, Comment.Single)
-        compound = _token_classes(formatter, Punctuation.Indicator)
-
-        assert plain == "c1", f"expected the leaf class alone, got {plain!r}"
-        assert compound.split() == ["p", "p-Indicator"], (
-            f"expected a space-separated ancestor chain, got {compound!r}"
-        )
-
-        prefixed_formatter = HtmlFormatter(
+    def test_token_rules_honour_the_formatter_class_prefix(self) -> None:
+        """Token rules prefix leaf classes and non-standard alias chains."""
+        formatter = HtmlFormatter(
             style=HimotoshiStyle,
-            cssclass="hm-syntax",
+            cssclass=CSS_CLASS,
             classprefix="tok-",
         )
-        prefixed_plain = _token_classes(prefixed_formatter, Comment.Single)
-        prefixed_compound = _token_classes(
-            prefixed_formatter,
-            Punctuation.Indicator,
+        _variables, rules = token_rules(
+            formatter,
+            HimotoshiStyle,
+            CSS_CLASS,
+            VARIABLE_PREFIX,
+            BOLD_WEIGHT,
         )
+        css = "\n".join(rules)
 
-        assert prefixed_plain == "tok-c1", (
-            f"expected the prefixed leaf class, got {prefixed_plain!r}"
-        )
-        assert prefixed_compound.split() == ["tok-p", "tok-p-Indicator"], (
-            "expected every class in the ancestor chain to carry the prefix, "
-            f"got {prefixed_compound!r}"
-        )
+        assert f".{CSS_CLASS} .tok-c1" in css
+        assert f".{CSS_CLASS} .tok-p.tok-p-Indicator" in css
+        assert f".{CSS_CLASS} .c1" not in css
+        assert f".{CSS_CLASS} .p.p-Indicator" not in css
 
     def test_committed_stylesheet_matches_the_generator(self) -> None:
         """The checked-in block is regenerated, never hand-edited.

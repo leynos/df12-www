@@ -193,6 +193,16 @@ class TestStilyagiHighlighting:
             )
             assert rule not in generated, f"{rule!r} should not be generated"
 
+        built = build_css()
+        assert built.startswith(f"{BEGIN}\n\n:root {{")
+        assert built.endswith(f"\n\n{END}")
+        assert "--stilyagi-syntax-" in built
+        assert ".stilyagi-syntax { color:" in built
+        assert ".stilyagi-syntax ." in built
+        assert ".code-scroll" not in built
+        assert ".stilyagi-syntax {\n  flex: 1;" not in built
+        assert ".stilyagi-syntax pre" not in built
+
     def test_generator_writes_to_the_tracked_stylesheet(self) -> None:
         """The target is the tracked source, not the git-ignored build output.
 

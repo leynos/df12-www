@@ -44,7 +44,7 @@
                     </div>
 
                         <p class="text-base-content/80 mb-10 leading-relaxed max-w-3xl">
-                            Every <code class="font-mono text-sm bg-primary/10 px-1 text-accent-ink">act</code> command passes through a two-phase verification harness before any file is written to disk. For files with a recognised parser and language-server path, edits are applied to <strong>in-memory copies</strong>, checked syntactically, then checked semantically. Unsupported file types are preserved in the transaction, but they do not receive the full parser-plus-diagnostics lock sequence.
+                            Every change command passes through a two-phase verification harness before any file is written to disk. For files with a recognised parser and language-server path, edits are applied to <strong>in-memory copies</strong>, checked syntactically, then checked semantically. Unsupported file types are preserved in the transaction, but they do not receive the full parser-plus-diagnostics lock sequence.
                         </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
@@ -109,6 +109,28 @@
                         <p class="text-sm text-base-content/80 leading-relaxed">
                             The harness returns a structured error identifying the lock phase (syntactic or semantic), the affected files, optional line/column locations, and human-readable messages. Agents can use this to diagnose problems and regenerate corrected edits. The filesystem is never left in a partially written state.
                         </p>
+                    </div>
+
+                    <!-- Mutation engine guarantees -->
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-base-100 border border-base-content/15 p-6 rounded-xs">
+                            <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Stale sources refused, twice</h4>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                Selector digests are checked before planning, and expected base digests again immediately before commit. <code class="text-xs bg-primary/10 px-1">--force</code> cannot erase the precondition; an override must name the specific newly accepted source version.
+                            </p>
+                        </div>
+                        <div class="bg-base-100 border border-base-content/15 p-6 rounded-xs">
+                            <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Formatting stays staged</h4>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                Formatters run on staged shadow files before verification and commit. A formatter crash, hang, or bad rewrite cannot touch the live workspace.
+                            </p>
+                        </div>
+                        <div class="bg-base-100 border border-base-content/15 p-6 rounded-xs">
+                            <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Rollback is recorded</h4>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                Every committed mutation records its transaction identifier, base and final digests, and a rollback reference &ndash; reversal is bookkeeping, not archaeology.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -233,6 +255,13 @@
                                         <p class="text-xs text-base-100/70">Dependency lockfiles are verified against policies to prevent adding malicious crates or packages.</p>
                                     </div>
                                 </div>
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center shrink-0 text-white font-bold text-xs">04</div>
+                                    <div>
+                                        <h4 class="font-bold font-mono text-sm mb-1 text-white">Quiet Telemetry</h4>
+                                        <p class="text-xs text-base-100/70">The daemon is local and single-user: no network endpoint, no remote authentication. Logs and metrics carry bounded opaque workspace identifiers &mdash; never raw paths, source contents, or patch bodies.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -244,7 +273,7 @@
                                 <div>
                                     <h4 class="font-mono text-xs text-status-ok font-bold mb-3 uppercase tracking-wider">Do</h4>
                                     <ul class="space-y-2 text-xs text-base-100/80">
-                                        <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-status-ok') }} Run verify often</li>
+                                        <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-status-ok') }} Dry-run mutations first</li>
                                         <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-status-ok') }} Audit policy files</li>
                                         <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-status-ok') }} Use specific mounts</li>
                                         <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-status-ok') }} Review diffs manually</li>

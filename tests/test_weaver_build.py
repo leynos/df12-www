@@ -31,6 +31,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_WEAVER = REPO_ROOT / "public" / "weaver"
 WEAVER_TEMPLATES = REPO_ROOT / "templates" / "weaver"
 WEAVER_STYLES = REPO_ROOT / "src" / "styles"
+WEAVER_STATIC = REPO_ROOT / "src" / "static" / "weaver"
 COMPILED_STYLESHEET = PUBLIC_WEAVER / "assets" / "styles" / "weaver.css"
 
 # An attribute that makes the browser fetch from another origin. `href` counts
@@ -179,15 +180,30 @@ def test_generated_icon_macro_matches_its_source() -> None:
 
 
 def test_no_font_awesome_markup_remains() -> None:
-    """Every Font Awesome glyph should have become an inline SVG."""
-    offenders = {
-        str(path.relative_to(REPO_ROOT))
+    """Every Font Awesome glyph should have become an inline SVG.
+
+    The scripts and stylesheets are scanned as well as the templates. While
+    this covered templates alone it passed with `mobile-nav.js` still writing
+    ``<i class="fa-solid fa-bars">`` into the drawer's toggle at runtime — a
+    Font Awesome glyph with no Font Awesome behind it, which rendered as an
+    empty box on every page below 1024px. Scanning the built HTML would not
+    have caught it either: that markup does not exist until the script runs.
+    """
+    sources = [
+        path
         for path in WEAVER_TEMPLATES.rglob("*.jinja")
         # The generated macro is the one file allowed to name the old classes:
         # its documentation shows the markup it replaces.
         if path.name != "_icons.jinja"
-        and re.search(
-            r"\bfa-(solid|regular|brands)\b", path.read_text(encoding="utf-8")
+    ]
+    sources += sorted(WEAVER_STATIC.rglob("*.js"))
+    sources += sorted(WEAVER_STATIC.rglob("*.css"))
+
+    offenders = {
+        str(path.relative_to(REPO_ROOT))
+        for path in sources
+        if re.search(
+            r"\bfa-(solid|regular|brands|fw)\b", path.read_text(encoding="utf-8")
         )
     }
     assert not offenders, f"Font Awesome classes remain in: {offenders}"

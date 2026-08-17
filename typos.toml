@@ -33,6 +33,7 @@ extend-ignore-re = [
     "(?:carousel|dropdown|footer|indicator|navbar|toast)-center",
     "(?s)```.*?```",
     "--(?:tw-)?color-[a-z0-9*-]+",
+    "--color",
     "--my-brand-color",
     "--netsuke-vermillion",
     "[a-z][a-z0-9*]*(?:-[a-z0-9*]+)*-color\\b",

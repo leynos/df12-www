@@ -37,6 +37,8 @@ ignore = [
   # them the American way, so quoting one in prose is a citation, not a
   # lapse. The leading segment is required, so bare "color" stays caught.
   '[a-z][a-z0-9*]*(?:-[a-z0-9*]+)*-color\b',
+  # Weaver CLI flag name (upstream contract, ADR 007).
+  '--color',
   # daisyUI placement modifiers.
   '(?:carousel|dropdown|footer|indicator|navbar|toast)-center',
   # Netsuke design token, spelled with the double-l variant in the stylesheet.

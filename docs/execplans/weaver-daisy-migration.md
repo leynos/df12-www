@@ -168,7 +168,10 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       Zero nodes moved or resized: the vendored faces render identically to
       Google's. Two of the five textures turned out to have been 404ing all
       along and were dropped rather than vendored.
-- [ ] Milestone 4 — Consolidate the page chrome; introduce the nav macro.
+- [x] (2026-08-17 19:40Z) Milestone 4 — Consolidate the page chrome;
+      introduce the nav macro. Four copies of the layout became one plus
+      three sets of overrides; no page's total height changed. The legal
+      pages gained a working mobile drawer, verified by clicking it.
 - [ ] Milestone 5 — Replace Font Awesome with inline Carbon SVG.
 - [ ] Milestone 6 — Semantic-class sweep across the 16 templates.
 - [ ] Milestone 7 — Fold `weaver-site.css` into layered partials.
@@ -281,6 +284,25 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   the letter of the document. Worth reconciling one way or the other, but not
   as part of this migration.
   Date/Author: 2026-08-17, Milestone 0.
+- **Decision:** leave `pages/design-language.jinja` standalone rather than
+  extending the shared layout, and share only its vocabulary.
+  Rationale: its sidebar is a table of contents for the document itself, not
+  the site navigation, so extending the layout would mean overriding the one
+  part of it that matters. It now calls the same `nav_link` macro, so its
+  current item picks up the same treatment as everywhere else, and it already
+  carried the mobile-drawer hooks. This is the plan's stated fallback for that
+  page, taken deliberately rather than as a failure.
+  Date/Author: 2026-08-17, Milestone 4.
+- **Decision:** keep the utility strings inside the `nav_link` macro rather
+  than replacing them with semantic classes now.
+  Rationale: the macro's immediate job is to break the coupling between the
+  stylesheet and the utilities — `#sidebar nav a.bg-weaver-indigo.text-weaver-cream`
+  found the current link by the colours it happened to carry and would have
+  stopped matching the moment the sweep renamed them. A marker class on the
+  element fixes that today at zero visual risk, and writing the utilities once
+  instead of eleven times means the sweep has one place to change. Structure
+  in this milestone, vocabulary in the next.
+  Date/Author: 2026-08-17, Milestone 4.
 - **Decision:** where Tailwind v4 newly honours a declaration that v3
   suppressed, pin the source to the value the page has always rendered rather
   than letting the declaration take effect.

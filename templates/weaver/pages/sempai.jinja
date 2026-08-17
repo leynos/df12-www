@@ -149,7 +149,7 @@
                                     That matters more in Weaver than it does in a standalone matcher. Sempai is not just finding text. It is selecting code objects for downstream action. The front door has to be expressive enough for structure, readable enough for humans, and stable enough for agents to generate without turning every query into a grammar seminar.
                                 </p>
                             </div>
-                            <div class="xl:col-span-7 overflow-x-auto bg-white/75 border border-base-content/10 rounded-xs paper-panel">
+                            <div class="xl:col-span-7 min-w-0 overflow-x-auto bg-white/75 border border-base-content/10 rounded-xs paper-panel">
                                 <table class="min-w-full text-sm spec-table">
                                     <thead>
                                         <tr class="text-left bg-primary text-base-100">
@@ -351,7 +351,7 @@
                             <div class="space-y-6">
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Selector Stream (--json)</p>
-<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">{"schema":"weaver.selector.v1","stream":{"id":"st_9d2f","seq":0},"selector_id":"sel_01","uri":"file:///repo/app.py","language":"python","span":{"start":12,"end":42},"focus":null,"captures":{"C":{"text":"MyClass","kind":"identifier","span":{"start":18,"end":26}}},"source":{"digest":"sha256:41ab..."},"query":{"kind":"expr","digest":"sha256:77c0..."}}
+<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap break-all leading-relaxed">{"schema":"weaver.selector.v1","stream":{"id":"st_9d2f","seq":0},"selector_id":"sel_01","uri":"file:///repo/app.py","language":"python","span":{"start":12,"end":42},"focus":null,"captures":{"C":{"text":"MyClass","kind":"identifier","span":{"start":18,"end":26}}},"source":{"digest":"sha256:41ab..."},"query":{"kind":"expr","digest":"sha256:77c0..."}}
 {"schema":"weaver.selector-stream-end.v1","stream":{"id":"st_9d2f"},"matches":1,"complete":true}</pre>
                                 </div>
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">

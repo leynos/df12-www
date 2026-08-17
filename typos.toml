@@ -40,7 +40,9 @@ extend-ignore-re = [
     "\\{color\\}",
     "`color`",
     "background_color",
+    "check_color_contrast",
     "color-mix\\(\\)",
+    "color:\\s*var\\(",
     "currentColor",
     "var\\.iamge_id",
 ]

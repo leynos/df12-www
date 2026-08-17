@@ -8,8 +8,8 @@
 
 {% block nav_subitems_how %}
                     <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
-                        <a href="#fusion" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors"># Semantic Fusion</a>
-                        <a href="#daemon" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors"># Client-Daemon</a>
+                        <a href="#fusion" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors"># Semantic Fusion</a>
+                        <a href="#daemon" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors"># Client-Daemon</a>
                     </div>
 {% endblock %}
 
@@ -24,7 +24,7 @@
 
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-8">
                         The Loom of <br>
-                        <span class="text-accent italic font-light">Structured</span> Intelligence.
+                        <span class="text-accent-ink italic font-light">Structured</span> Intelligence.
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-2xl font-light">
@@ -60,7 +60,7 @@
 
                         <!-- ASCII / CSS Diagram -->
                         <div class="bg-neutral p-4 rounded-xs shadow-xl overflow-hidden border border-base-content/50 relative group figure-fullbleed">
-                            <div class="absolute top-2 right-2 text-3xs text-accent opacity-50 figure-fullbleed-label">FIG 3.0</div>
+                            <div class="absolute top-2 right-2 text-3xs text-accent-ink opacity-50 figure-fullbleed-label">FIG 3.0</div>
                             <img
                                 src="/weaver/assets/how-it-works/how-it-works-system-topology.png"
                                 alt="System-topology illustration showing the Weaver CLI shell, daemon, semantic fusion core, JSONL output, and analysis engines."
@@ -97,7 +97,7 @@
                                     </div>
                                     <div>
                                         <h3 class="font-serif text-xl text-base-content mb-2">Multi-Source Ingestion</h3>
-                                        <p class="text-sm text-base-content/70">Combines static analysis (Tree-sitter) with dynamic runtime data (LSP) to resolve references that static analysis misses.</p>
+                                        <p class="text-sm text-base-content/88">Combines static analysis (Tree-sitter) with dynamic runtime data (LSP) to resolve references that static analysis misses.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-4">
@@ -106,7 +106,7 @@
                                     </div>
                                     <div>
                                         <h3 class="font-serif text-xl text-base-content mb-2">Provenance Tagging</h3>
-                                        <p class="text-sm text-base-content/70">Every piece of data carries a provenance trail. We know exactly <em>why</em> the AI thinks a function is relevant.</p>
+                                        <p class="text-sm text-base-content/88">Every piece of data carries a provenance trail. We know exactly <em>why</em> the AI thinks a function is relevant.</p>
                                     </div>
                                 </div>
                             </div>
@@ -118,39 +118,39 @@
                                 <div class="bg-base-100 border border-base-content/20 p-6">
                                     <div class="flex justify-between items-center mb-4 border-b border-base-content/10 pb-2">
                                         <span class="font-mono text-xs font-bold text-base-content">INTERNAL TELEMETRY: FUSION_OUTPUT</span>
-                                        <span class="font-mono text-3xs text-accent animate-pulse">● LIVE</span>
+                                        <span class="font-mono text-3xs text-accent-ink animate-pulse">● LIVE</span>
                                     </div>
 
                                     <div class="font-mono text-xs space-y-4 overflow-x-auto">
                                         <!-- Code Block 1 -->
                                         <div class="opacity-50 hover:opacity-100 transition-opacity">
-                                            <span class="text-code-dim">{"timestamp": "2026-03-15T10:00:01Z", "type": "scan_start", "target": "src/"}</span>
+                                            <span class="text-code-ink">{"timestamp": "2026-03-15T10:00:01Z", "type": "scan_start", "target": "src/"}</span>
                                         </div>
 
                                         <!-- Code Block 2 (Highlighted) -->
                                         <div class="bg-primary/5 p-2 -mx-2 rounded-sm border-l-2 border-accent">
                                             <span class="text-base-content">{</span><br>
-                                            <span class="text-accent ml-4">"type"</span>: <span class="text-code-literal">"semantic_node"</span>,<br>
-                                            <span class="text-accent ml-4">"id"</span>: <span class="text-code-ref">"fn::process_data"</span>,<br>
-                                            <span class="text-accent ml-4">"provenance"</span>: {<br>
+                                            <span class="text-accent-ink ml-4">"type"</span>: <span class="text-code-literal">"semantic_node"</span>,<br>
+                                            <span class="text-accent-ink ml-4">"id"</span>: <span class="text-code-ref">"fn::process_data"</span>,<br>
+                                            <span class="text-accent-ink ml-4">"provenance"</span>: {<br>
                                             <span class="text-base-content ml-8">"source"</span>: "tree-sitter-rust",<br>
                                             <span class="text-base-content ml-8">"confidence"</span>: 0.98<br>
-                                            <span class="text-accent ml-4">}</span>,<br>
-                                            <span class="text-accent ml-4">"relationships"</span>: [<br>
+                                            <span class="text-accent-ink ml-4">}</span>,<br>
+                                            <span class="text-accent-ink ml-4">"relationships"</span>: [<br>
                                             <span class="text-base-content ml-8">"calls::validate_input"</span>,<br>
                                             <span class="text-base-content ml-8">"uses::DataStruct"</span><br>
-                                            <span class="text-accent ml-4">]</span><br>
+                                            <span class="text-accent-ink ml-4">]</span><br>
                                             <span class="text-base-content">}</span>
                                         </div>
 
                                         <!-- Code Block 3 -->
                                         <div class="opacity-50 hover:opacity-100 transition-opacity">
-                                            <span class="text-code-dim">{"timestamp": "2026-03-15T10:00:02Z", "type": "scan_complete", "nodes": 142}</span>
+                                            <span class="text-code-ink">{"timestamp": "2026-03-15T10:00:02Z", "type": "scan_complete", "nodes": 142}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                                    <p class="text-center font-mono text-xs text-base-content/50 mt-4">Figure 3.1: Internal fusion telemetry, not the public CLI and daemon JSONL envelope.</p>
+                                    <p class="text-center font-mono text-xs text-base-content/78 mt-4">Figure 3.1: Internal fusion telemetry, not the public CLI and daemon JSONL envelope.</p>
                         </div>
                     </div>
                 </div>
@@ -160,7 +160,7 @@
             <section id="daemon" class="py-20 px-8 lg:px-16 border-b border-base-content/20 bg-primary text-base-100">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center mb-16">
-                        <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
+                        <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
                         <h2 class="font-serif text-4xl text-white mb-4">Client–Daemon Model</h2>
                         <p class="text-base-100/70 max-w-2xl mx-auto">
                             Decoupling the user interface from the intelligence engine allows for persistent context and faster CLI response times.
@@ -175,23 +175,23 @@
                             </div>
 
                             <h3 class="font-serif text-2xl text-white mb-2">The Daemon</h3>
-                            <div class="font-mono text-xs text-accent mb-4">weaver daemon</div>
+                            <div class="font-mono text-xs text-accent-ink mb-4">weaver daemon</div>
 
                             <ul class="space-y-3 text-sm text-base-100/80 font-light">
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'mt-1 text-accent text-xs') }}
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Hosts LSP child processes (rust-analyzer, pyrefly lsp, etc.).</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'mt-1 text-accent text-xs') }}
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Dispatches JSONL requests from the CLI and streams responses.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'mt-1 text-accent text-xs') }}
-                                    <span>Listens on Unix Domain Socket (or TCP via <code class="text-xs text-base-100/50">--daemon-socket</code>).</span>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
+                                    <span>Listens on Unix Domain Socket (or TCP via <code class="text-xs text-base-100/70">--daemon-socket</code>).</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'mt-1 text-accent text-xs') }}
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Auto-starts when a domain command is issued — no manual launch needed.</span>
                                 </li>
                             </ul>
@@ -209,20 +209,20 @@
                             </div>
 
                             <h3 class="font-serif text-2xl text-white mb-2">The Client</h3>
-                            <div class="font-mono text-xs text-accent mb-4">weaver &lt;domain&gt; &lt;operation&gt;</div>
+                            <div class="font-mono text-xs text-accent-ink mb-4">weaver &lt;domain&gt; &lt;operation&gt;</div>
 
                             <ul class="space-y-3 text-sm text-base-100/80 font-light">
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'mt-1 text-accent text-xs') }}
-                                    <span>Parses config (<code class="text-xs text-base-100/50">--config-path</code>, XDG, env vars) and CLI flags.</span>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
+                                    <span>Parses config (<code class="text-xs text-base-100/70">--config-path</code>, XDG, env vars) and CLI flags.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'mt-1 text-accent text-xs') }}
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Sends JSONL requests to the daemon, streams the response.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'mt-1 text-accent text-xs') }}
-                                    <span>Renders human-readable output when stdout is a TTY (<code class="text-xs text-base-100/50">--output auto</code>).</span>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
+                                    <span>Renders human-readable output when stdout is a TTY (<code class="text-xs text-base-100/70">--output auto</code>).</span>
                                 </li>
                             </ul>
 
@@ -256,7 +256,7 @@
                                 <div class="hidden md:flex shrink-0 w-16 h-16 bg-base-100 border-2 border-base-content rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-base-content shadow-lg">01</div>
                                 <div class="flex-1 bg-white border border-base-content/20 p-6 rounded-xs shadow-xs">
                                     <h3 class="font-serif font-bold text-base-content text-lg mb-2">Ingestion & Parsing</h3>
-                                    <p class="text-sm text-base-content/70 mb-3">
+                                    <p class="text-sm text-base-content/88 mb-3">
                                         When a file is observed, the Daemon invokes Tree-sitter to generate a Concrete Syntax Tree (CST).
                                     </p>
                                     <div class="inline-flex items-center gap-2 px-2 py-1 bg-primary/5 rounded-sm text-xs font-mono text-base-content">
@@ -272,8 +272,8 @@
                                 <div class="hidden md:flex shrink-0 w-16 h-16 bg-base-100 border-2 border-base-content rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-base-content shadow-lg">02</div>
                                 <div class="flex-1 bg-white border border-base-content/20 p-6 rounded-xs shadow-xs">
                                     <h3 class="font-serif font-bold text-base-content text-lg mb-2">Sempai Pattern Matching</h3>
-                                    <p class="text-sm text-base-content/70 mb-3">
-                                        The <a href="/weaver/sempai/" class="text-accent hover:underline">Sempai Engine</a> runs structural queries against the CST to identify high-level constructs (functions, classes, API endpoints).
+                                    <p class="text-sm text-base-content/88 mb-3">
+                                        The <a href="/weaver/sempai/" class="text-accent-ink hover:underline">Sempai Engine</a> runs structural queries against the CST to identify high-level constructs (functions, classes, API endpoints).
                                     </p>
                                 </div>
                             </div>
@@ -283,7 +283,7 @@
                                 <div class="hidden md:flex shrink-0 w-16 h-16 bg-base-100 border-2 border-base-content rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-base-content shadow-lg">03</div>
                                 <div class="flex-1 bg-white border border-base-content/20 p-6 rounded-xs shadow-xs">
                                     <h3 class="font-serif font-bold text-base-content text-lg mb-2">LSP Enrichment</h3>
-                                    <p class="text-sm text-base-content/70 mb-3">
+                                    <p class="text-sm text-base-content/88 mb-3">
                                         If available, the Language Server is queried for type definitions, references, and documentation, enriching the static nodes with semantic context.
                                     </p>
                                 </div>
@@ -291,16 +291,16 @@
 
                             <!-- Step 4 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-accent border-2 border-accent rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-white shadow-lg">04</div>
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-accent-deep border-2 border-accent rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-white shadow-lg">04</div>
                                 <div class="flex-1 bg-white border-2 border-accent p-6 rounded-xs shadow-md">
                                     <h3 class="font-serif font-bold text-base-content text-lg mb-2">Graph Fusion</h3>
-                                    <p class="text-sm text-base-content/70 mb-3">
+                                    <p class="text-sm text-base-content/88 mb-3">
                                         All data points are merged into the Semantic Graph. Nodes are tagged with confidence scores based on their source (e.g., LSP > Regex).
                                     </p>
                                     <div class="w-full h-2 bg-status-idle-soft rounded-full overflow-hidden mt-2">
                                         <div class="h-full bg-accent w-3/4"></div>
                                     </div>
-                                    <div class="flex justify-between text-3xs font-mono text-code-muted mt-1">
+                                    <div class="flex justify-between text-3xs font-mono text-base-content/82 mt-1">
                                         <span>Graph Integrity</span>
                                         <span>75% Confirmed</span>
                                     </div>
@@ -319,7 +319,7 @@
 
                 <div class="max-w-2xl mx-auto relative z-10">
                     <h2 class="font-serif text-3xl text-base-content mb-6">Explore the Toolkit</h2>
-                    <p class="font-sans text-base-content/70 mb-8">
+                    <p class="font-sans text-base-content/88 mb-8">
                         Now that you understand the architecture, see how to wield it.
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-4">

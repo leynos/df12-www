@@ -9,9 +9,9 @@
 {% block nav_subitems_commands %}
                     <!-- Sub-navigation for Commands -->
                     <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
-                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors">/observe</a>
-                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors">/act</a>
-                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono font-bold text-accent bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/verify</a>
+                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/observe</a>
+                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/act</a>
+                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono font-bold text-accent-ink bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/verify</a>
                     </div>
 {% endblock %}
 
@@ -22,15 +22,15 @@
                 <div class="masthead-frame mx-auto">
                     <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
                         <div class="masthead-eyebrow self-start">
-                            <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-base-content/60 hover:text-accent transition-colors">COMMANDS</a>
-                            <span class="text-base-content/40">/</span>
+                            <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-base-content/82 hover:text-accent-ink transition-colors">COMMANDS</a>
+                            <span class="text-base-content/75">/</span>
                             <span class="font-mono text-xs tracking-widest uppercase text-base-content font-bold">VERIFY</span>
                         </div>
                     </div>
 
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
                         Trust through <br>
-                        <span class="text-accent italic font-light">Proof</span>.
+                        <span class="text-accent-ink italic font-light">Proof</span>.
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-3xl font-light">
@@ -56,18 +56,18 @@
                         <!-- Left: Synopsis -->
                         <div class="lg:col-span-1">
                             <h2 class="font-serif text-2xl text-base-content mb-4">Synopsis</h2>
-                            <p class="text-sm text-base-content/70 mb-6 leading-relaxed">
+                            <p class="text-sm text-base-content/88 mb-6 leading-relaxed">
                                 Each <code class="text-xs bg-primary/10 px-1">verify</code> operation checks a facet of code health via the daemon. Currently only <code class="text-xs bg-primary/10 px-1">diagnostics</code> is implemented.
                             </p>
 
                             <div class="bg-base-100 border border-base-content p-4 relative mb-6">
-                                <div class="absolute -top-3 left-4 bg-base-100 px-2 text-xs font-mono text-accent font-bold">SYNTAX</div>
+                                <div class="absolute -top-3 left-4 bg-base-100 px-2 text-xs font-mono text-accent-ink font-bold">SYNTAX</div>
                                 <code class="font-mono text-sm text-base-content block break-all">
                                     weaver verify &lt;OPERATION&gt; [ARG ...]
                                 </code>
                             </div>
 
-                            <div class="flex items-center gap-2 text-xs font-mono text-base-content/60">
+                            <div class="flex items-center gap-2 text-xs font-mono text-base-content/82">
                                 {{ icon('circle-info') }}
                                 <span>Language inferred from file extension</span>
                             </div>
@@ -87,19 +87,19 @@
                                     </thead>
                                     <tbody class="divide-y divide-base-content/10">
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent border-r border-base-content/10">diagnostics</td>
-                                            <td class="p-3 font-mono text-xs text-base-content/60 border-r border-base-content/10">LSP</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">diagnostics</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
                                             <td class="p-3 text-sm text-base-content/80">Pull compiler warnings and language-server errors for a file. Requires <code class="text-xs bg-primary/10 px-1">--uri</code>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors opacity-60">
-                                            <td class="p-3 font-mono text-xs font-bold text-base-content/60 border-r border-base-content/10">policy <span class="status-pill status-pill-planned ml-1">Planned</span></td>
-                                            <td class="p-3 font-mono text-xs text-base-content/60 border-r border-base-content/10">Sempai</td>
-                                            <td class="p-3 text-sm text-base-content/60">Enforce architectural constraints and forbidden patterns via Sempai queries.</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-base-content/82 border-r border-base-content/10">policy <span class="status-pill status-pill-planned ml-1">Planned</span></td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Sempai</td>
+                                            <td class="p-3 text-sm text-base-content/82">Enforce architectural constraints and forbidden patterns via Sempai queries.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors opacity-60">
-                                            <td class="p-3 font-mono text-xs font-bold text-base-content/60 border-r border-base-content/10">tests <span class="status-pill status-pill-planned ml-1">Planned</span></td>
-                                            <td class="p-3 font-mono text-xs text-base-content/60 border-r border-base-content/10">Runner</td>
-                                            <td class="p-3 text-sm text-base-content/60">Orchestrate test suites and report results as structured JSONL.</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-base-content/82 border-r border-base-content/10">tests <span class="status-pill status-pill-planned ml-1">Planned</span></td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Runner</td>
+                                            <td class="p-3 text-sm text-base-content/82">Orchestrate test suites and report results as structured JSONL.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -116,9 +116,9 @@
                 <div class="max-w-6xl mx-auto relative z-10">
                     <div class="flex flex-col md:flex-row justify-between items-end mb-12">
                         <div>
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
                             <h2 class="font-serif text-3xl text-base-content">The Verification Stack</h2>
-                            <p class="text-base-content/70 mt-2 max-w-xl">
+                            <p class="text-base-content/88 mt-2 max-w-xl">
                                 Today, <code class="text-xs bg-primary/10 px-1">diagnostics</code> is the working layer. Policy enforcement and test orchestration are planned follow-on layers.
                             </p>
                         </div>
@@ -137,10 +137,10 @@
                         <div class="bg-white border-2 border-base-content p-6 shadow-panel-sm group hover:-translate-y-1 transition-transform">
                             <div class="flex items-center justify-between mb-4 pb-4 border-b border-base-content/10">
                                 <span class="font-mono text-xs font-bold text-white bg-primary px-2 py-1">CURRENT</span>
-                                {{ icon('stethoscope', 'text-accent text-xl') }}
+                                {{ icon('stethoscope', 'text-accent-ink text-xl') }}
                             </div>
                             <h3 class="font-serif text-xl text-base-content mb-2">Diagnostics</h3>
-                            <p class="text-xs text-base-content/70 mb-4 h-10">Pulls compiler warnings and LSP errors for any file with a supported language server.</p>
+                            <p class="text-xs text-base-content/88 mb-4 h-10">Pulls compiler warnings and LSP errors for any file with a supported language server.</p>
                             <div class="bg-neutral p-3 rounded-xs font-mono text-3xs text-code-text">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-code-warn">!</span> unused variable `x`
@@ -154,12 +154,12 @@
                         <!-- Planned: Policy -->
                         <div class="bg-white/60 border-2 border-dashed border-base-content/40 p-6 group hover:-translate-y-1 transition-transform relative">
                             <div class="flex items-center justify-between mb-4 pb-4 border-b border-base-content/10">
-                                <span class="font-mono text-xs font-bold text-base-content/50 bg-primary/10 px-2 py-1">PLANNED</span>
-                                {{ icon('scale-balanced', 'text-base-content/30 text-xl') }}
+                                <span class="font-mono text-xs font-bold text-base-content/78 bg-primary/10 px-2 py-1">PLANNED</span>
+                                {{ icon('scale-balanced', 'text-base-content/75 text-xl') }}
                             </div>
-                            <h3 class="font-serif text-xl text-base-content/60 mb-2">Policy Enforcement</h3>
-                            <p class="text-xs text-base-content/50 mb-4 h-10">Architectural constraints and forbidden-pattern detection via Sempai queries.</p>
-                            <div class="bg-neutral/60 p-3 rounded-xs font-mono text-3xs text-code-text">
+                            <h3 class="font-serif text-xl text-base-content/82 mb-2">Policy Enforcement</h3>
+                            <p class="text-xs text-base-content/78 mb-4 h-10">Architectural constraints and forbidden-pattern detection via Sempai queries.</p>
+                            <div class="bg-neutral/90 p-3 rounded-xs font-mono text-3xs text-code-text">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-code-pass">✓</span> no_unsafe_blocks
                                 </div>
@@ -172,12 +172,12 @@
                         <!-- Planned: Test Orchestration -->
                         <div class="bg-white/60 border-2 border-dashed border-base-content/40 p-6 group hover:-translate-y-1 transition-transform relative">
                             <div class="flex items-center justify-between mb-4 pb-4 border-b border-base-content/10">
-                                <span class="font-mono text-xs font-bold text-base-content/50 bg-primary/10 px-2 py-1">PLANNED</span>
-                                {{ icon('flask-vial', 'text-base-content/30 text-xl') }}
+                                <span class="font-mono text-xs font-bold text-base-content/78 bg-primary/10 px-2 py-1">PLANNED</span>
+                                {{ icon('flask-vial', 'text-base-content/75 text-xl') }}
                             </div>
-                            <h3 class="font-serif text-xl text-base-content/60 mb-2">Test Orchestration</h3>
-                            <p class="text-xs text-base-content/50 mb-4 h-10">Run test suites and report results as structured JSONL for CI gating.</p>
-                            <div class="bg-neutral/60 p-3 rounded-xs font-mono text-3xs text-code-text">
+                            <h3 class="font-serif text-xl text-base-content/82 mb-2">Test Orchestration</h3>
+                            <p class="text-xs text-base-content/78 mb-4 h-10">Run test suites and report results as structured JSONL for CI gating.</p>
+                            <div class="bg-neutral/90 p-3 rounded-xs font-mono text-3xs text-code-text">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-code-pass">✓</span> cargo test
                                 </div>
@@ -200,21 +200,21 @@
                             <h2 class="font-serif text-3xl text-base-content mb-2">Planned: Policy Rules</h2>
                             <span class="status-pill status-pill-planned">Planned</span>
                             <p class="text-base-content/80 mb-6 mt-4 leading-relaxed">
-                                Future <code class="text-xs bg-primary/10 px-1">verify policy</code> operations will combine standard linters with custom <a href="/weaver/sempai/" class="text-accent underline decoration-1 underline-offset-2">Sempai</a> queries to enforce architectural constraints. The schema below is illustrative.
+                                Future <code class="text-xs bg-primary/10 px-1">verify policy</code> operations will combine standard linters with custom <a href="/weaver/sempai/" class="text-accent-ink underline decoration-1 underline-offset-2">Sempai</a> queries to enforce architectural constraints. The schema below is illustrative.
                             </p>
 
                             <ul class="space-y-4 mb-8">
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'text-base-content/40 mt-1 text-sm') }}
-                                    <span class="text-sm text-base-content/60">Block dangerous functions or imports</span>
+                                    {{ icon('check', 'text-base-content/75 mt-1 text-sm') }}
+                                    <span class="text-sm text-base-content/82">Block dangerous functions or imports</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'text-base-content/40 mt-1 text-sm') }}
-                                    <span class="text-sm text-base-content/60">Enforce type hints and documentation standards</span>
+                                    {{ icon('check', 'text-base-content/75 mt-1 text-sm') }}
+                                    <span class="text-sm text-base-content/82">Enforce type hints and documentation standards</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    {{ icon('check', 'text-base-content/40 mt-1 text-sm') }}
-                                    <span class="text-sm text-base-content/60">Require specific test coverage thresholds</span>
+                                    {{ icon('check', 'text-base-content/75 mt-1 text-sm') }}
+                                    <span class="text-sm text-base-content/82">Require specific test coverage thresholds</span>
                                 </li>
                             </ul>
 
@@ -229,7 +229,7 @@
                         <div class="bg-neutral rounded-xs p-1 shadow-lg border border-dashed border-base-content/30 opacity-80">
                             <div class="bg-code-surface p-4 rounded-xs overflow-x-auto">
                                 <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                                    <span class="text-xs font-mono text-base-100/50">weaver.policy.yaml (illustrative)</span>
+                                    <span class="text-xs font-mono text-base-100/70">weaver.policy.yaml (illustrative)</span>
                                     <div class="flex gap-1">
                                         <div class="w-2 h-2 rounded-full bg-status-error"></div>
                                         <div class="w-2 h-2 rounded-full bg-status-warn"></div>
@@ -272,7 +272,7 @@
                             </div>
                             <div class="flex-1">
                                 <h3 class="font-serif text-xl text-base-content mb-2">CLI Output Modes</h3>
-                                <p class="text-sm text-base-content/70 mb-4">
+                                <p class="text-sm text-base-content/88 mb-4">
                                     The daemon uses a <code class="text-xs bg-primary/10 px-1">kind</code>-based JSONL envelope on the wire, but the CLI strips that wrapper before printing. In JSON mode it forwards the inner payload verbatim; in human mode it renders recognised diagnostics with source context.
                                 </p>
                                 <div class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
@@ -288,12 +288,12 @@
 
                         <!-- Step 2: Example invocation -->
                         <div class="flex flex-col md:flex-row gap-6 relative z-10">
-                            <div class="w-16 h-16 bg-accent text-white flex items-center justify-center rounded-xs font-bold font-mono text-xl shrink-0 border-4 border-base-100 shadow-xs z-10">
+                            <div class="w-16 h-16 bg-accent-deep text-white flex items-center justify-center rounded-xs font-bold font-mono text-xl shrink-0 border-4 border-base-100 shadow-xs z-10">
                                 02
                             </div>
                             <div class="flex-1">
                                 <h3 class="font-serif text-xl text-base-content mb-2">Human Mode</h3>
-                                <p class="text-sm text-base-content/70 mb-4">
+                                <p class="text-sm text-base-content/88 mb-4">
                                     Point at a file URI to pull every diagnostic the language server reports. Human-readable output is the default when stdout is a TTY, so recognised diagnostics render with source context instead of raw JSON.
                                 </p>
                                 <div class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
@@ -319,7 +319,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-primary/5 border border-base-content/10 rounded-xs">
                         <div>
                             <h3 class="font-serif text-xl text-base-content mb-2">Ready to secure your agents?</h3>
-                            <p class="text-sm text-base-content/70">Learn how the sandbox keeps execution safe.</p>
+                            <p class="text-sm text-base-content/88">Learn how the sandbox keeps execution safe.</p>
                         </div>
                         <a href="/weaver/safety/" class="group flex items-center gap-3 px-6 py-3 bg-primary text-base-100 font-mono text-xs font-bold uppercase tracking-wider hover:bg-accent transition-colors shadow-md">
                             Next: Safety Model

@@ -37,12 +37,13 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
 - **Do not edit `templates/weaver/`, `src/static/weaver/`, or
   `config/pages.yaml`'s weaver block yet.** A migration of the Weaver
   sub-site from the Tailwind Play CDN to compiled Tailwind v4 + daisyUI is in
-  progress (see `docs/execplans/incorporate-sub-sites.md` Phase 7, not yet
-  executed; branches `weaver-daisy-migration` and `update-weaver` exist but
-  are empty placeholders). Editing the same templates now would create
-  conflicts. Content execution starts only after the migration lands on
-  `main` (or the user directs otherwise), at which point this plan is rebased
-  onto the migrated template structure.
+  progress on branch `weaver-daisy-migration` (semantic markup vocabulary,
+  split stylesheets and tokens, contrast fixes, vendored images and icons; as
+  of 2026-08-17 this branch is rebased onto it). Editing the same templates
+  while the migration is still moving would create conflicts. Content
+  execution starts only after the migration lands on `main` (or the user
+  directs otherwise), at which point Stage B reconciles this plan with the
+  final migrated template structure.
 - Nothing under `public/` is tracked; never edit generated output. All
   content changes go into `templates/weaver/pages/*.jinja`, the weaver chrome
   templates, and `config/pages.yaml`.
@@ -116,8 +117,11 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   templates, static assets, `config/pages.yaml` lines 1371–1456, migration
   status (Play CDN, no `src/styles/weaver.css`, migration unexecuted).
 - [x] (2026-08-17 00:00Z) Authored this ExecPlan (Stage A deliverable).
-- [ ] Await daisyUI/Tailwind migration of the Weaver sub-site (external
-  dependency; unblocks Stages B–E).
+- [x] (2026-08-17) Rebased this branch onto `weaver-daisy-migration`, which
+  now carries the real migration work (union-merged the `typos.local.toml`
+  exemption blocks; gates pass).
+- [ ] Await the migration landing on `main` (external dependency; unblocks
+  Stages B–E).
 - [ ] Stage B: re-survey Weaver branches; reconcile this plan with the
   migrated template structure; get approval to execute.
 - [ ] Stage C: rewrite page copy per the briefs below.

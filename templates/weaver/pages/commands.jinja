@@ -25,13 +25,13 @@
                         <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">CLI Reference</span>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-8">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-none mb-8">
                         The Vocabulary of <br>
                         <span class="text-weaver-vermilion italic font-light">Action</span>.
                     </h1>
 
                     <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
-                        Every command follows the same shape: <code class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded">weaver &lt;domain&gt; &lt;operation&gt; [ARG ...]</code>. Three domains — Observe, Act, and Verify — cover perception, mutation, and validation respectively.
+                        Every command follows the same shape: <code class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded-sm">weaver &lt;domain&gt; &lt;operation&gt; [ARG ...]</code>. Three domains — Observe, Act, and Verify — cover perception, mutation, and validation respectively.
                     </p>
                 </div>
             </section>
@@ -41,7 +41,7 @@
                 <div class="max-w-6xl mx-auto">
                     <h2 class="font-serif text-3xl text-weaver-indigo mb-8">Core Capabilities</h2>
 
-                    <div class="overflow-hidden border border-weaver-indigo/20 rounded-sm shadow-sm bg-weaver-cream">
+                    <div class="overflow-hidden border border-weaver-indigo/20 rounded-xs shadow-xs bg-weaver-cream">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-weaver-indigo text-weaver-cream font-mono text-xs uppercase tracking-wider">
@@ -120,7 +120,7 @@
                         <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[80px]">
                             The agent's eyes. Queries code structure via LSP and Tree-sitter — definitions, references, call hierarchies, structural grep.
                         </p>
-                        <div class="bg-weaver-dark p-3 rounded-sm mb-4 border border-weaver-indigo/20">
+                        <div class="bg-weaver-dark p-3 rounded-xs mb-4 border border-weaver-indigo/20">
                             <code class="font-mono text-xs text-green-400 block">$ weaver observe get-definition \<br>&nbsp;&nbsp;--uri file:///src/main.rs --position 10:5</code>
                         </div>
                         <a href="/weaver/commands/observe/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
@@ -138,7 +138,7 @@
                         <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[80px]">
                             The agent's hands. Applies patches and rewrites through Double-Lock validation — every edit passes syntactic and semantic checks before it touches disk.
                         </p>
-                        <div class="bg-weaver-dark p-3 rounded-sm mb-4 border border-weaver-indigo/20">
+                        <div class="bg-weaver-dark p-3 rounded-xs mb-4 border border-weaver-indigo/20">
                             <code class="font-mono text-xs text-green-400 block">$ weaver act apply-patch &lt; fix.diff</code>
                         </div>
                         <a href="/weaver/commands/act/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
@@ -156,7 +156,7 @@
                         <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[80px]">
                             The agent's conscience. Currently pulls LSP diagnostics for any file with a supported language server. Policy and test orchestration are planned, not implemented yet.
                         </p>
-                        <div class="bg-weaver-dark p-3 rounded-sm mb-4 border border-weaver-indigo/20">
+                        <div class="bg-weaver-dark p-3 rounded-xs mb-4 border border-weaver-indigo/20">
                             <code class="font-mono text-xs text-green-400 block">$ weaver verify diagnostics \<br>&nbsp;&nbsp;--uri file:///src/lib.rs</code>
                         </div>
                         <a href="/weaver/commands/verify/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
@@ -190,7 +190,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white border-2 border-weaver-indigo p-4 rounded-sm shadow-[8px_8px_0px_0px_rgba(25,60,110,0.08)] mb-8 figure-fullbleed">
+                    <div class="bg-white border-2 border-weaver-indigo p-4 rounded-xs shadow-[8px_8px_0px_0px_rgba(25,60,110,0.08)] mb-8 figure-fullbleed">
                         <img
                             src="/weaver/assets/commands/commands-end-to-end-pipeline.png"
                             alt="Illustration of the Observe, Act, and Verify command pipeline for an AI-assisted coding workflow."
@@ -202,22 +202,22 @@
                     <div class="space-y-4">
 
                         <!-- Step 1: Observe -->
-                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm relative overflow-hidden">
+                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-xs shadow-xs relative overflow-hidden">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-weaver-indigo"></div>
                             <div class="flex flex-col lg:flex-row gap-6">
                                 <div class="lg:w-1/3 flex flex-col justify-center">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="font-mono text-xs font-bold bg-weaver-indigo text-weaver-cream px-2 py-0.5 rounded-sm">01</span>
+                                        <span class="font-mono text-xs font-bold bg-weaver-indigo text-weaver-cream px-2 py-0.5 rounded-xs">01</span>
                                         <h3 class="font-serif text-xl text-weaver-indigo">Observe Context</h3>
                                     </div>
                                     <p class="text-sm text-weaver-indigo/70 mb-4">Agent jumps to the definition of <code class="text-xs bg-weaver-indigo/10 px-1">process_data</code> to understand it before editing.</p>
-                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
+                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded-sm">
                                         <span class="text-weaver-vermilion">$</span> weaver observe get-definition \<br>
                                         &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/main.rs --position 10:5
                                     </div>
                                 </div>
-                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
+                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-xs font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
 <pre>
 <span class="text-gray-500">// CLI JSON output (--output json)</span>
 [{"uri":"file:///src/lib.rs","line":42,"column":17}]
@@ -232,20 +232,20 @@
                         </div>
 
                         <!-- Step 2: Act -->
-                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm relative overflow-hidden">
+                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-xs shadow-xs relative overflow-hidden">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-weaver-vermilion"></div>
                             <div class="flex flex-col lg:flex-row gap-6">
                                 <div class="lg:w-1/3 flex flex-col justify-center">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="font-mono text-xs font-bold bg-weaver-vermilion text-white px-2 py-0.5 rounded-sm">02</span>
+                                        <span class="font-mono text-xs font-bold bg-weaver-vermilion text-white px-2 py-0.5 rounded-xs">02</span>
                                         <h3 class="font-serif text-xl text-weaver-indigo">Apply Patch</h3>
                                     </div>
                                     <p class="text-sm text-weaver-indigo/70 mb-4">Agent pipes a diff through Double-Lock validation and onto disk.</p>
-                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
+                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded-sm">
                                         <span class="text-weaver-vermilion">$</span> weaver act apply-patch --output json &lt; refactor.diff
                                     </div>
                                 </div>
-                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
+                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-xs font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
 <pre>
 <span class="text-gray-500">// CLI JSON output (--output json)</span>
 {"applied":true,"files":["src/lib.rs"]}
@@ -260,22 +260,22 @@
                         </div>
 
                         <!-- Step 3: Verify -->
-                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm relative overflow-hidden">
+                        <div class="bg-white border border-weaver-indigo/20 p-6 rounded-xs shadow-xs relative overflow-hidden">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-600"></div>
                             <div class="flex flex-col lg:flex-row gap-6">
                                 <div class="lg:w-1/3 flex flex-col justify-center">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="font-mono text-xs font-bold bg-green-600 text-white px-2 py-0.5 rounded-sm">03</span>
+                                        <span class="font-mono text-xs font-bold bg-green-600 text-white px-2 py-0.5 rounded-xs">03</span>
                                         <h3 class="font-serif text-xl text-weaver-indigo">Verify Diagnostics</h3>
                                     </div>
                                     <p class="text-sm text-weaver-indigo/70 mb-4">Agent confirms the edited file has no compiler warnings or errors.</p>
-                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded">
+                                    <div class="font-mono text-xs text-weaver-indigo/50 bg-weaver-cream p-2 border border-weaver-indigo/10 rounded-sm">
                                         <span class="text-weaver-vermilion">$</span> weaver verify diagnostics \<br>
                                         &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/lib.rs
                                     </div>
                                 </div>
-                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-sm font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
+                                <div class="lg:w-2/3 bg-weaver-dark p-4 rounded-xs font-mono text-xs text-gray-300 overflow-x-auto border border-weaver-indigo/10 shadow-inner">
 <pre>
 <span class="text-gray-500">// CLI JSON output (--output json; no diagnostics, clean file)</span>
 {"diagnostics":[]}
@@ -309,7 +309,7 @@
                                 <a href="/weaver/docs/#capability-overrides" class="text-weaver-vermilion hover:underline">Capability overrides</a>
                             </div>
                         </div>
-                        <div class="bg-weaver-cream border border-weaver-indigo/20 rounded-sm overflow-hidden">
+                        <div class="bg-weaver-cream border border-weaver-indigo/20 rounded-xs overflow-hidden">
                             <table class="w-full text-left">
                                 <tbody class="divide-y divide-weaver-indigo/10">
                                     <tr>
@@ -344,7 +344,7 @@
                     <!-- Exit Codes -->
                     <div>
                         <h3 class="font-serif text-2xl text-weaver-indigo mb-6">Exit Codes</h3>
-                        <div class="bg-weaver-cream border border-weaver-indigo/20 rounded-sm overflow-hidden">
+                        <div class="bg-weaver-cream border border-weaver-indigo/20 rounded-xs overflow-hidden">
                             <table class="w-full text-left">
                                 <tbody class="divide-y divide-weaver-indigo/10">
                                     <tr>
@@ -391,19 +391,19 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-xs">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Capability probe</h3>
                             <p class="text-sm text-weaver-indigo/75 leading-relaxed">
                                 Run <code>weaver --capabilities</code> to inspect the negotiated capability surface. The full output shape and override syntax are documented in the docs hub.
                             </p>
                         </div>
-                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-xs">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Output modes</h3>
                             <p class="text-sm text-weaver-indigo/75 leading-relaxed">
                                 <code>--output auto</code> stays the default. Use <code>human</code> for operator context and <code>json</code> for piping. The exact JSONL envelope is maintained in the docs hub.
                             </p>
                         </div>
-                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-xs">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Failure shape</h3>
                             <p class="text-sm text-weaver-indigo/75 leading-relaxed">
                                 Capability mismatches still return structured failures with actionable hints. Keep the exact wire contract centralized so command docs can focus on operator intent.
@@ -416,7 +416,7 @@
             <!-- CLI Help Discoverability (PLANNED) -->
             <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
                 <div class="max-w-6xl mx-auto">
-                    <div class="border-2 border-dashed border-weaver-indigo/40 rounded-sm p-8 opacity-80">
+                    <div class="border-2 border-dashed border-weaver-indigo/40 rounded-xs p-8 opacity-80">
                         <div class="flex items-center gap-3 mb-6">
                             <h2 class="font-serif text-3xl text-weaver-indigo">CLI Help &amp; Discoverability</h2>
                             <span class="status-pill status-pill-planned">Planned</span>
@@ -426,7 +426,7 @@
                             Upcoming help surfaces will make the CLI self-documenting without requiring external runbooks or source inspection.
                         </p>
 
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-6">
+                        <div class="border border-weaver-indigo/20 rounded-xs bg-white overflow-hidden mb-6">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-weaver-indigo/80 text-white font-mono text-xs uppercase">
                                     <tr>

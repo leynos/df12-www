@@ -4,36 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} — Weaver</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'weaver-cream': '#F3EFD9',
-                        'weaver-indigo': '#193C6E',
-                        'weaver-vermilion': '#E8502B',
-                        'weaver-dark': '#0F2440',
-                        'weaver-faded': '#4A6FA5',
-                    },
-                    fontFamily: {
-                        'serif': ['"Playfair Display"', 'serif'],
-                        'sans': ['"IBM Plex Sans"', 'sans-serif'],
-                        'mono': ['"IBM Plex Mono"', 'monospace'],
-                    },
-                }
-            }
-        }
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../{{ stylesheet or 'assets/styles/weaver-site.css' }}">
+    <link rel="stylesheet" href="{{ stylesheet or '/weaver/assets/styles/weaver.css' }}">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
 
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
 
         <!-- Sidebar Navigation -->
-        <aside class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
+        <aside class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
             <div>
                 <div class="p-8 border-b-2 border-weaver-indigo/20">
                     <a href="../" class="block">

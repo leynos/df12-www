@@ -6,34 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weaver Design Language</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme:
-        {
-          extend:
-          {
-            colors:
-            {
-              'weaver-cream': '#F3EFD9',
-              'weaver-indigo': '#193C6E',
-              'weaver-vermilion': '#E8502B',
-              'weaver-dark': '#0F2440',
-            },
-            fontFamily:
-            {
-              'serif': ['"Playfair Display"', 'serif'],
-              'sans': ['"IBM Plex Sans"', 'sans-serif'],
-              'mono': ['"IBM Plex Mono"', 'monospace'],
-            },
-            backgroundImage:
-            {
-              'washi': "url('https://www.transparenttextures.com/patterns/cream-paper.png')",
-            }
-          }
-        }
-      }
-    </script>
     <script>
       window.FontAwesomeConfig = {
         autoReplaceSvg: 'nest'
@@ -119,7 +91,7 @@
         --tw-shadow-colored: 0 0 #0000;
       }
     </style>
-    <link rel="stylesheet" href="/weaver/assets/styles/weaver-site.css">
+    <link rel="stylesheet" href="/weaver/assets/styles/weaver.css">
 </head>
 
   <body class="bg-weaver-cream relative overflow-x-hidden">
@@ -128,7 +100,7 @@
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
       <!-- Sidebar Navigation -->
       <aside id="sidebar"
-        class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-30">
+        class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 shrink-0 lg:fixed h-auto lg:h-full z-30">
         <div class="p-8 border-b-2 border-weaver-indigo/20" data-mobile-nav-header>
           <h1
             class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">
@@ -137,7 +109,7 @@
           </p>
         </div>
         <nav class="p-6 space-y-2"><a href="#overview"
-            class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-sm border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]"><span
+            class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]"><span
               class="mr-2 font-mono text-xs">01</span> Overview
           </a><a href="#foundations"
             class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent"><span
@@ -174,7 +146,7 @@
                   class="font-serif text-5xl lg:text-7xl text-weaver-indigo mb-6 leading-tight">
                 </h2>
                 <h1 id="ihkga" draggable="false"
-                  class="font-serif text-6xl md:text-7xl lg:text-8xl font-bold leading-tight text-weaver-indigo gjs-selected">
+                  class="font-serif text-6xl md:text-7xl lg:text-8xl font-bold leading-none text-weaver-indigo gjs-selected">
                   Techno<br id="imh53" draggable="true"><span id="ipbse"
                     draggable="true"
                     class="italic text-weaver-vermilion font-light">Artisanal</span><br
@@ -209,7 +181,7 @@
                     class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-weaver-indigo">
                   </div><!-- Hanko Stamp -->
                   <div
-                    class="absolute bottom-4 right-4 w-12 h-12 border-2 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate opacity-90">
+                    class="absolute bottom-4 right-4 w-12 h-12 border-2 border-weaver-vermilion rounded-xs flex items-center justify-center stamp-rotate opacity-90">
                     <span
                       class="text-weaver-vermilion font-serif font-bold text-xs writing-vertical-rl">WEAVER</span>
                   </div>
@@ -264,7 +236,7 @@
               <!-- Primary Indigo -->
               <div class="group">
                 <div
-                  class="h-40 bg-weaver-indigo w-full rounded-sm shadow-sm relative overflow-hidden group-hover:shadow-md transition-all">
+                  class="h-40 bg-weaver-indigo w-full rounded-xs shadow-xs relative overflow-hidden group-hover:shadow-md transition-all">
                   <div
                     class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/subtle-paper.png')]">
                   </div>
@@ -283,7 +255,7 @@
               </div><!-- Sumi Ink -->
               <div class="group">
                 <div
-                  class="h-40 bg-[#0F172A] w-full rounded-sm shadow-sm relative overflow-hidden group-hover:shadow-md transition-all">
+                  class="h-40 bg-[#0F172A] w-full rounded-xs shadow-xs relative overflow-hidden group-hover:shadow-md transition-all">
                   <div
                     class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/subtle-paper.png')]">
                   </div>
@@ -303,7 +275,7 @@
               </div><!-- Vermilion -->
               <div class="group">
                 <div
-                  class="h-40 bg-weaver-vermilion w-full rounded-sm shadow-sm relative overflow-hidden group-hover:shadow-md transition-all">
+                  class="h-40 bg-weaver-vermilion w-full rounded-xs shadow-xs relative overflow-hidden group-hover:shadow-md transition-all">
                   <div
                     class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/subtle-paper.png')]">
                   </div>
@@ -322,7 +294,7 @@
               </div><!-- Washi Cream -->
               <div class="group">
                 <div
-                  class="h-40 bg-[#F3EFD9] border border-weaver-indigo/20 w-full rounded-sm shadow-sm relative overflow-hidden group-hover:shadow-md transition-all">
+                  class="h-40 bg-[#F3EFD9] border border-weaver-indigo/20 w-full rounded-xs shadow-xs relative overflow-hidden group-hover:shadow-md transition-all">
                   <div
                     class="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]">
                   </div>
@@ -346,7 +318,7 @@
               <!-- Secondary Blue -->
               <div class="group">
                 <div
-                  class="h-40 bg-[#4A6FA5] w-full rounded-sm shadow-sm relative overflow-hidden group-hover:shadow-md transition-all">
+                  class="h-40 bg-[#4A6FA5] w-full rounded-xs shadow-xs relative overflow-hidden group-hover:shadow-md transition-all">
                   <div
                     class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/subtle-paper.png')]">
                   </div>
@@ -369,7 +341,7 @@
                 class="font-mono text-xs text-weaver-indigo/60 mb-2 uppercase tracking-wide">
                 Usage Ratio</p>
               <div
-                class="h-4 w-full flex rounded-sm overflow-hidden border border-weaver-indigo/20">
+                class="h-4 w-full flex rounded-xs overflow-hidden border border-weaver-indigo/20">
                 <div class="w-[55%] bg-[#F3EFD9]"></div>
                 <div class="w-[25%] bg-[#193C6E]"></div>
                 <div class="w-[10%] bg-[#0F172A]"></div>
@@ -437,7 +409,7 @@
                       class="font-mono text-xs text-weaver-indigo/50 block mb-1">Code
                       / Mono / 14px</span>
                     <p
-                      class="font-mono text-sm text-weaver-indigo bg-weaver-indigo/5 p-2 rounded">
+                      class="font-mono text-sm text-weaver-indigo bg-weaver-indigo/5 p-2 rounded-sm">
                       function weave(thread) { return pattern; }</p>
                   </div>
                 </div>
@@ -526,7 +498,7 @@
                   <div class="w-full max-w-2xl relative">
                     <!-- Diagram -->
                     <div
-                      class="bg-white/80 border border-weaver-indigo p-6 shadow-sm backdrop-blur-sm relative mb-8">
+                      class="bg-white/80 border border-weaver-indigo p-6 shadow-xs backdrop-blur-sm relative mb-8">
                       <div
                         class="flex justify-between items-center border-b border-weaver-indigo/20 pb-2 mb-4">
                         <span
@@ -610,7 +582,7 @@
                   <div class="h-2 w-px bg-weaver-indigo"></div>
                 </div><!-- Hanko -->
                 <div
-                  class="absolute bottom-4 right-4 w-16 h-16 border-2 border-weaver-vermilion rounded-sm flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/10">
+                  class="absolute bottom-4 right-4 w-16 h-16 border-2 border-weaver-vermilion rounded-xs flex items-center justify-center stamp-rotate mix-blend-multiply bg-weaver-vermilion/10">
                   <div class="text-center leading-none"><span
                       class="text-weaver-vermilion font-serif font-bold text-xs block">APPROVED</span><span
                       class="text-weaver-vermilion font-mono text-[8px] block mt-1">2024</span>
@@ -693,7 +665,7 @@
           <div
             class="absolute bottom-8 right-8 opacity-20 pointer-events-none hidden lg:block">
             <div
-              class="w-24 h-24 border-4 border-weaver-indigo rounded-sm flex items-center justify-center stamp-rotate">
+              class="w-24 h-24 border-4 border-weaver-indigo rounded-xs flex items-center justify-center stamp-rotate">
               <div class="text-center"><span
                   class="text-weaver-indigo font-serif font-bold text-xl block">DESIGN</span><span
                   class="text-weaver-indigo font-serif font-bold text-xl block">SYSTEM</span>

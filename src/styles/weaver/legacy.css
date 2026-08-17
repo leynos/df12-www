@@ -10,6 +10,15 @@
   color: #ffffff;
 }
 
+/* daisyUI paints the root scrollbar with `scrollbar-color`. Chromium honours
+   the standard property in preference to the -webkit- pseudo-elements below,
+   so leaving it set would quietly replace this sub-site's cream-and-indigo
+   scrollbar with daisyUI's. Returning it to its initial value hands control
+   back to the rules that follow. */
+:root {
+  scrollbar-color: auto;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -189,9 +198,15 @@ body {
   vertical-align: top;
 }
 
+/* No font-size here. This rule used to ask for 0.92em and never got it:
+   Tailwind's preflight sets `code { font-size: 1em }` at the same specificity
+   and, unlayered, won on source order. Now that the preflight sits in the
+   base layer and this file in components, the declaration would finally take
+   effect and shrink every inline code span on the site by eight per cent.
+   That is a typographic decision, not a migration, so the declaration goes
+   rather than silently landing. */
 code {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.92em;
   background: rgba(25, 60, 110, 0.08);
   padding: 0.12rem 0.32rem;
   border-radius: 0.2rem;
@@ -218,15 +233,6 @@ pre code {
 #sidebar nav a.bg-weaver-indigo.text-weaver-cream {
   font-family: "IBM Plex Mono", monospace;
   box-shadow: 2px 2px 0 rgba(25, 60, 110, 1);
-}
-
-#sidebar nav :is(a[href="/install"], a[href$="/install/"]):not(.bg-weaver-indigo) {
-  color: var(--weaver-dark);
-  font-family: "IBM Plex Mono", monospace;
-}
-
-#sidebar nav :is(a[href="/install"], a[href$="/install/"]):not(.bg-weaver-indigo):hover {
-  background: rgba(232, 80, 43, 0.05);
 }
 
 /* ---- Mobile hamburger navigation ---- */
@@ -321,8 +327,16 @@ pre code {
   padding: 0;
 }
 
+/* 1.5rem, not the 2rem this rule used to claim.
+   These sections are children of an `article.space-y-6`, and Tailwind v3's
+   `space-y-*` set `margin-top` on every child but the first with a selector
+   specific enough to win here — so every section actually rendered at the
+   article's 1.5rem rhythm and the 2rem never applied. Tailwind v4 sets
+   `margin-bottom` on every child but the *last* instead, which left the last
+   section as the only one this rule could reach, and it alone jumped 8px.
+   Declaring the rhythm the page has always had settles it. */
 .content-section {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 
 .content-section--divider {

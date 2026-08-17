@@ -230,7 +230,11 @@ pre code {
   max-height: calc(100vh - 200px);
 }
 
-#sidebar nav a.bg-weaver-indigo.text-weaver-cream {
+/* Was `#sidebar nav a.bg-weaver-indigo.text-weaver-cream`, which found the
+   current link by the colour utilities it happened to carry and would have
+   stopped matching the moment those were renamed. The macro in
+   templates/weaver/_chrome.jinja now marks the link by its role. */
+.weaver-nav-link--current {
   font-family: "IBM Plex Mono", monospace;
   box-shadow: 2px 2px 0 rgba(25, 60, 110, 1);
 }

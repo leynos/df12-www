@@ -1,4 +1,15 @@
-<html lang="en">
+{#
+  The Weaver design-system reference.
+
+  This page keeps its own shell rather than extending doc_page.jinja, and
+  that is deliberate: its sidebar is a table of contents for the document
+  itself, not the site navigation, so sharing the layout would mean
+  overriding the one part of it that matters. It shares the vocabulary
+  instead - the same nav-link macro, so the current item picks up the same
+  treatment as everywhere else - and it carries the same mobile-drawer
+  hooks.
+#}
+{% import '_chrome.jinja' as chrome %}<html lang="en">
 
   <head>
     <link rel="stylesheet"
@@ -109,26 +120,15 @@
           <p class="font-mono text-xs mt-2 text-weaver-indigo/70">DESIGN SYSTEM
           </p>
         </div>
-        <nav class="p-6 space-y-2"><a href="#overview"
-            class="block px-4 py-2 text-sm font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]"><span
-              class="mr-2 font-mono text-xs">01</span> Overview
-          </a><a href="#foundations"
-            class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent"><span
-              class="mr-2 font-mono text-xs opacity-60">02</span> Foundations
-          </a><a href="#typography"
-            class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent"><span
-              class="mr-2 font-mono text-xs opacity-60">03</span> Typography
-          </a><a href="#motifs"
-            class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent"><span
-              class="mr-2 font-mono text-xs opacity-60">04</span> Motifs &amp;
-            Symbols
-          </a><a href="#illustrations"
-            class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent"><span
-              class="mr-2 font-mono text-xs opacity-60">05</span> Illustrations
-          </a><a href="#components"
-            class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent"><span
-              class="mr-2 font-mono text-xs opacity-60">06</span> Components
-          </a></nav>
+        <nav class="p-6 space-y-2">
+          {%- set here = '#overview' -%}
+          {{ chrome.nav_link('#overview', '01', 'Overview', here) }}
+          {{ chrome.nav_link('#foundations', '02', 'Foundations', here) }}
+          {{ chrome.nav_link('#typography', '03', 'Typography', here) }}
+          {{ chrome.nav_link('#motifs', '04', 'Motifs &amp; Symbols', here) }}
+          {{ chrome.nav_link('#illustrations', '05', 'Illustrations', here) }}
+          {{ chrome.nav_link('#components', '06', 'Components', here) }}
+        </nav>
       </aside><!-- Main Content Area -->
       <main class="flex-1 lg:ml-64 grid-bg min-h-screen">
         <!-- Hero Section -->

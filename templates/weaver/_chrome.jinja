@@ -1,0 +1,52 @@
+{#
+  Shared furniture for the Weaver sub-site.
+
+  `nav_link` exists because the sidebar used to spell out a 230-character
+  conditional class expression once per link, eleven times over, and the
+  stylesheet then reached back into those utilities to find the active item:
+
+      #sidebar nav a.bg-weaver-indigo.text-weaver-cream { ... }
+
+  That selector could not survive the classes being renamed, which the
+  semantic sweep is about to do. Every link now carries `weaver-nav-link`,
+  and the current one `weaver-nav-link--current`, so the stylesheet has a name
+  to hold on to that describes the role rather than the appearance.
+
+  The utility strings stay in the macro for now. They are written once here
+  instead of eleven times in the layout, which is the point of this pass; the
+  semantic sweep replaces their vocabulary in this one place.
+#}
+
+{%- set _nav_base = "weaver-nav-link block px-4 py-2 text-sm" -%}
+{%- set _nav_current = "weaver-nav-link--current font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]" -%}
+{%- set _nav_rest = "font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent" -%}
+{%- set _nav_install = "font-medium text-weaver-dark hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono" -%}
+
+{#
+  Render one sidebar link.
+
+  href      the link target, matched against `current_href` to decide state
+  index     the two-digit section number shown before the label, or '' for the
+            resource links at the foot of the nav, which are not numbered
+  label     the link text
+  current_href  the href of the page being rendered
+  variant   'install' for the call-to-action link, which is monospaced and
+            takes the ink colour rather than the indigo of its neighbours
+#}
+{%- macro nav_link(href, index, label, current_href, variant='') -%}
+{%- set is_current = (href == current_href) -%}
+{%- set rest = _nav_install if variant == 'install' else _nav_rest -%}
+<a href="{{ href }}" class="{{ _nav_base }} {{ _nav_current if is_current else rest }}"{% if is_current %} aria-current="page"{% endif %}>
+{%- if index %}<span class="mr-2 font-mono text-xs{% if not is_current %} opacity-60{% endif %}">{{ index }}</span> {% elif variant == 'install' and not is_current %}&gt; {% endif -%}
+{{ label }}
+</a>
+{%- endmacro -%}
+
+{#
+  The href of the page being rendered, taken from whichever nav link the page
+  generator marked current. Empty on pages that are not in the nav, which
+  simply means no link is highlighted.
+#}
+{%- macro current_href(nav_links) -%}
+{{- (nav_links | selectattr('current') | map(attribute='href') | first) or '' -}}
+{%- endmacro -%}

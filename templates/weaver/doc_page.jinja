@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% import '_chrome.jinja' as chrome %}<!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,8 +18,7 @@
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
 
-    <!-- Texture Overlay -->
-    <div class="texture-overlay"></div>
+    {% block texture_overlay %}<div class="texture-overlay"></div>{% endblock %}
 
     <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
 
@@ -31,62 +30,27 @@
                     <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
                 </div>
                 <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    {%- set ns = namespace(home_active=false, why_active=false, how_active=false, cmd_active=false, safety_active=false, sempai_active=false, jacquard_active=false, install_active=false, docs_active=false, roadmap_active=false) -%}
-                    {%- for link in nav_links -%}
-                        {%- if link.current -%}
-                            {%- if link.href == '/weaver/' -%}{%- set ns.home_active = true -%}
-                            {%- elif link.href == '/weaver/why-weaver/' -%}{%- set ns.why_active = true -%}
-                            {%- elif link.href == '/weaver/how-it-works/' -%}{%- set ns.how_active = true -%}
-                            {%- elif link.href == '/weaver/commands/' -%}{%- set ns.cmd_active = true -%}
-                            {%- elif link.href == '/weaver/safety/' -%}{%- set ns.safety_active = true -%}
-                            {%- elif link.href == '/weaver/sempai/' -%}{%- set ns.sempai_active = true -%}
-                            {%- elif link.href == '/weaver/jacquard/' -%}{%- set ns.jacquard_active = true -%}
-                            {%- elif link.href == '/weaver/install/' -%}{%- set ns.install_active = true -%}
-                            {%- elif link.href == '/weaver/docs/' -%}{%- set ns.docs_active = true -%}
-                            {%- elif link.href == '/weaver/roadmap/' -%}{%- set ns.roadmap_active = true -%}
-                            {%- endif -%}
-                        {%- endif -%}
-                    {%- endfor -%}
-                    <a href="/weaver/" class="block px-4 py-2 text-sm {% if ns.home_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.home_active %} aria-current="page"{% endif %}>
-                        <span class="mr-2 font-mono text-xs {% if not ns.home_active %}opacity-60{% endif %}">00</span> Home
-                    </a>
-                    <a href="/weaver/why-weaver/" class="block px-4 py-2 text-sm {% if ns.why_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.why_active %} aria-current="page"{% endif %}>
-                        <span class="mr-2 font-mono text-xs {% if not ns.why_active %}opacity-60{% endif %}">01</span> Philosophy
-                    </a>
-                    <a href="/weaver/how-it-works/" class="block px-4 py-2 text-sm {% if ns.how_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.how_active %} aria-current="page"{% endif %}>
-                        <span class="mr-2 font-mono text-xs {% if not ns.how_active %}opacity-60{% endif %}">02</span> Architecture
-                    </a>
+                    {%- set here = chrome.current_href(nav_links) -%}
+                    {{ chrome.nav_link('/weaver/', '00', 'Home', here) }}
+                    {{ chrome.nav_link('/weaver/why-weaver/', '01', 'Philosophy', here) }}
+                    {{ chrome.nav_link('/weaver/how-it-works/', '02', 'Architecture', here) }}
                     {% block nav_subitems_how %}{% endblock %}
-                    <a href="/weaver/commands/" class="block px-4 py-2 text-sm {% if ns.cmd_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.cmd_active %} aria-current="page"{% endif %}>
-                        <span class="mr-2 font-mono text-xs {% if not ns.cmd_active %}opacity-60{% endif %}">03</span> Commands
-                    </a>
+                    {{ chrome.nav_link('/weaver/commands/', '03', 'Commands', here) }}
                     {% block nav_subitems_commands %}{% endblock %}
-                    <a href="/weaver/safety/" class="block px-4 py-2 text-sm {% if ns.safety_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.safety_active %} aria-current="page"{% endif %}>
-                        <span class="mr-2 font-mono text-xs {% if not ns.safety_active %}opacity-60{% endif %}">04</span> Safety
-                    </a>
-                    <a href="/weaver/sempai/" class="block px-4 py-2 text-sm {% if ns.sempai_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.sempai_active %} aria-current="page"{% endif %}>
-                        <span class="mr-2 font-mono text-xs {% if not ns.sempai_active %}opacity-60{% endif %}">05</span> Sempai Engine
-                    </a>
+                    {{ chrome.nav_link('/weaver/safety/', '04', 'Safety', here) }}
+                    {{ chrome.nav_link('/weaver/sempai/', '05', 'Sempai Engine', here) }}
                     {% block nav_subitems_sempai %}{% endblock %}
-                    <a href="/weaver/jacquard/" class="block px-4 py-2 text-sm {% if ns.jacquard_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.jacquard_active %} aria-current="page"{% endif %}>
-                        <span class="mr-2 font-mono text-xs {% if not ns.jacquard_active %}opacity-60{% endif %}">06</span> Jacquard
-                    </a>
+                    {{ chrome.nav_link('/weaver/jacquard/', '06', 'Jacquard', here) }}
                     {% block nav_subitems_jacquard %}{% endblock %}
                     <div class="pt-4 mt-2 border-t border-weaver-indigo/10">
-                        <a href="/weaver/install/" class="block px-4 py-2 text-sm {% if ns.install_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-dark hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono{% endif %}"{% if ns.install_active %} aria-current="page"{% endif %}>
-                            {% if not ns.install_active %}&gt; {% endif %}Install
-                        </a>
-                        <a href="/weaver/docs/" class="block px-4 py-2 text-sm {% if ns.docs_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.docs_active %} aria-current="page"{% endif %}>
-                            Docs
-                        </a>
-                        <a href="/weaver/roadmap/" class="block px-4 py-2 text-sm {% if ns.roadmap_active %}font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]{% else %}font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent{% endif %}"{% if ns.roadmap_active %} aria-current="page"{% endif %}>
-                            Roadmap
-                        </a>
+                        {{ chrome.nav_link('/weaver/install/', '', 'Install', here, variant='install') }}
+                        {{ chrome.nav_link('/weaver/docs/', '', 'Docs', here) }}
+                        {{ chrome.nav_link('/weaver/roadmap/', '', 'Roadmap', here) }}
                     </div>
                 </nav>
             </div>
 
-            <!-- Version/Status Footer in Sidebar -->
+            {% block sidebar_footer %}
             <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
                 <a href="/" class="font-mono text-xs text-weaver-vermilion hover:text-weaver-indigo transition-colors block mb-3">&larr; Back to df12 Productions</a>
                 <div class="flex items-center gap-2 mb-2">
@@ -95,10 +59,11 @@
                 </div>
                 <p class="font-mono text-[10px] text-weaver-indigo/40">v0.1.0</p>
             </div>
+            {% endblock %}
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 lg:ml-64 grid-bg min-h-screen relative{% block main_extra_class %}{% endblock %}">
+        <main class="{% block main_class %}flex-1 lg:ml-64 grid-bg min-h-screen relative{% block main_extra_class %}{% endblock %}{% endblock %}">
 
 {% block content %}{% endblock %}
 
@@ -106,6 +71,7 @@
     </div>
 
     <!-- Footer -->
+    {% block page_footer %}
     <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative lg:ml-64">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
             <div class="mb-6 md:mb-0">
@@ -143,6 +109,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     <script>
         // Smooth scroll for anchor links

@@ -5,8 +5,9 @@ This ExecPlan (execution plan) is a living document. The sections
 `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
 proceeds.
 
-Status: DRAFT (content execution BLOCKED pending the Weaver daisyUI/Tailwind
-migration — see `Constraints`)
+Status: COMPLETE (content refresh executed 2026-08-17 on top of
+`weaver-daisy-migration` at the user's direction; follow-on illustration
+regeneration remains open — see `Outcomes & retrospective`)
 
 ## Purpose / big picture
 
@@ -120,16 +121,40 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
 - [x] (2026-08-17) Rebased this branch onto `weaver-daisy-migration`, which
   now carries the real migration work (union-merged the `typos.local.toml`
   exemption blocks; gates pass).
-- [ ] Await the migration landing on `main` (external dependency; unblocks
-  Stages B–E).
-- [ ] Stage B: re-survey Weaver branches; reconcile this plan with the
-  migrated template structure; get approval to execute.
-- [ ] Stage C: rewrite page copy per the briefs below.
-- [ ] Stage D: config and cross-link updates (`pages.yaml` taglines, nav,
-  orphan page, docs links).
-- [ ] Stage E: consistency sweep, gates, and visual check.
+- [x] (2026-08-17) The user directed execution on top of the migration
+  branch, waiving the wait for it to land on `main`.
+- [x] (2026-08-17) Stage B: surveyed the migrated template structure
+  (`_chrome.jinja`, `_icons.jinja`, compiled `src/styles/weaver.css`).
+- [x] (2026-08-17) Stage C: rewrote all thirteen content pages per the
+  briefs (home, philosophy, architecture, commands index, read/change/
+  verification sub-pages, safety, Sempai, Jacquard, install, docs hub,
+  roadmap), committing per page group with gates.
+- [x] (2026-08-17) Stage D: updated `config/pages.yaml` (homepage card,
+  reference-library entry, command sub-page labels) and the chrome version
+  string. The `design-language` page stays out of `nav_links` (unchanged;
+  a nav decision remains open for the user).
+- [x] (2026-08-17) Stage E: grep sweep clean of retired grammar; full
+  gates pass (`check-fmt lint typecheck`, `test-js`, `make test`);
+  browser-validated every page with agent-browser (desktop screenshots,
+  console clean) and a css-view/JS probe at a 390px viewport.
 
 ## Surprises & discoveries
+
+- Observation: the commands-page end-to-end pipeline illustration is
+  lettered OBSERVE / ACT / VERIFY and could not be captioned around.
+  Evidence: full-page screenshot during Stage E validation.
+  Impact: withdrawn (commented out) per the illustration tolerance;
+  regeneration for the selector pipeline is a follow-on task, alongside a
+  review of the other fifteen plates (the verify stack and hero outlines
+  read as generic and were kept).
+- Observation: mobile validation at 390px found genuine horizontal
+  scrolling on the Sempai and Jacquard pages — unbroken JSON tokens in
+  `whitespace-pre-wrap` panels, and spec tables in `overflow-x-auto`
+  wrappers inside grid columns lacking `min-w-0`.
+  Evidence: `document.documentElement.scrollWidth` of 798px and 416px
+  against a 390px viewport; element bisection via agent-browser eval.
+  Impact: fixed with `break-all` and `min-w-0`; one instance predated
+  this refresh, so the same probe is worth running on other sub-sites.
 
 - Observation: the Weaver branches are documentation-only; no code
   implements the new surface yet ("`Engine::compile_dsl` and
@@ -195,10 +220,38 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   only their CLI-surface framing (`observe query`, JSONL op names) is stale.
   Date/Author: 2026-08-17, Claude.
 
+- Decision: execute Stages B–E on top of `weaver-daisy-migration` rather
+  than waiting for it to land on `main`.
+  Rationale: explicit user direction ("Please proceed with your refresh of
+  the weaver site"), which the blocking constraint anticipated ("or the
+  user directs otherwise").
+  Date/Author: 2026-08-17, user.
+- Decision: withdraw (comment out) the commands-page pipeline
+  illustration instead of shipping or silently keeping it.
+  Rationale: the plate is lettered OBSERVE / ACT / VERIFY — exactly the
+  grammar the page retires — and the illustration tolerance forbids
+  shipping a centrally contradictory image; regeneration is queued as
+  follow-on work.
+  Date/Author: 2026-08-17, Claude.
+
 ## Outcomes & retrospective
 
-To be completed at execution milestones. As of 2026-08-17 the planning stage
-is complete and execution is blocked on the styling migration.
+Executed 2026-08-17. All thirteen weaver pages now document the planned
+0.1.0 surface: the ADR 007 noun-verb grammar with `--json` as the single
+machine switch, the RFC 0003 selector pipeline (three query front doors,
+versioned selector streams, typed `--selectors` handoff), the RFC 0002
+multi-workspace daemon, and the shared mutation engine with its
+Double-Lock, stale-refusal, and idempotency guarantees. Site-internal
+contradictions (Discord, language support, hardcoded version) are
+resolved, and the retired grammar survives only in explicit
+"superseded" framing. Gates and browser validation pass on every page.
+
+Remaining follow-ons: regenerate the withdrawn commands pipeline
+illustration (and audit the other plates) for the selector-pipeline
+story; decide whether `design-language` joins the nav; re-run Stage B's
+upstream drift check when the Weaver RFCs move from Proposed to
+Accepted; and rebase/merge once `weaver-daisy-migration` lands on
+`main`.
 
 ## Context and orientation
 

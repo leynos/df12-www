@@ -172,9 +172,12 @@
                                     </table>
                                 </div>
 
-                                <!-- Complete card JSON example -->
-                                <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Card JSON (full)</p>
+
+                            </div>
+                        </div>
+                        <!-- Complete card JSON example (full-bleed on desktop) -->
+                        <div class="mt-10 xl:mx-[5%] bg-neutral text-base-100 rounded-xs p-6 paper-panel">
+                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Card JSON (full)</p>
 <pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap break-all leading-relaxed">{
   "card_version": 1,
   "symbol": {
@@ -207,14 +210,13 @@
   "provenance": { "extracted_at": "2026-03-03T12:34:56Z", "sources": ["tree_sitter","lsp"] },
   "etag": "etag_..."
 }</pre>
-                                </div>
-                            </div>
                         </div>
+
                     </section>
 
                     <section id="slices" class="mb-20">
                         <div class="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
-                            <div class="xl:col-span-7">
+                            <div class="xl:col-span-7 xl:sticky xl:top-8">
                                 <figure class="bg-white/75 border border-base-content/10 p-4 rounded-xs figure-frame figure-fullbleed">
                                     <img src="/weaver/assets/jacquard/jacquard-whitepaper-card-slice.png" alt="Illustrated diagram of a Jacquard symbol card at the center of a bounded slice with typed call, import, and config edges and explicit card, edge, and token budgets." class="w-full rounded-xs border border-base-content/10">
                                     <figcaption class="mt-4 text-sm text-base-content/75 leading-relaxed">
@@ -368,8 +370,23 @@
                                 </div>
 
                                 <!-- Match output and scoring -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                    <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
+                                    <div class="mt-6 bg-white/70 border border-base-content/10 rounded-xs p-6">
+                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Weighted Scoring</p>
+                                        <p class="text-sm text-base-content/80 leading-relaxed mb-3">
+                                            Phases 4 and 5 use a combined similarity function mapped to calibrated probability via logistic transform:
+                                        </p>
+                                        <div class="bg-primary/5 p-3 rounded-xs font-mono text-xs text-base-content/80 leading-relaxed">
+                                            S = w<sub>1</sub>&middot;S<sub>name</sub> + w<sub>2</sub>&middot;S<sub>sig</sub> + w<sub>3</sub>&middot;S<sub>ast</sub> + w<sub>4</sub>&middot;S<sub>text</sub> + w<sub>5</sub>&middot;S<sub>ngb</sub> + b<br>
+                                            p = 1 / (1 + exp(&minus;S))
+                                        </div>
+                                        <p class="text-xs text-base-content/82 mt-3">Weights are heuristic initially, then tuned on labelled refactors.</p>
+                                    </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Debug match output (full-bleed on desktop) -->
+                        <div class="mt-10 xl:mx-[5%] bg-neutral text-base-100 rounded-xs p-6 paper-panel">
                                         <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Debug Match Output</p>
 <pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">{
   "best_match": { "symbol_id": "sym_...", "p": 0.91 },
@@ -383,20 +400,7 @@
                                             This example shows the extra fields emitted with <code>--debug-matching</code>, including reason codes such as <code>name_tokens</code>, <code>signature</code>, <code>ast_shape</code>, and <code>neighbourhood_overlap</code>.
                                         </p>
                                     </div>
-                                    <div class="bg-white/70 border border-base-content/10 rounded-xs p-6">
-                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Weighted Scoring</p>
-                                        <p class="text-sm text-base-content/80 leading-relaxed mb-3">
-                                            Phases 4 and 5 use a combined similarity function mapped to calibrated probability via logistic transform:
-                                        </p>
-                                        <div class="bg-primary/5 p-3 rounded-xs font-mono text-xs text-base-content/80 leading-relaxed">
-                                            S = w<sub>1</sub>&middot;S<sub>name</sub> + w<sub>2</sub>&middot;S<sub>sig</sub> + w<sub>3</sub>&middot;S<sub>ast</sub> + w<sub>4</sub>&middot;S<sub>text</sub> + w<sub>5</sub>&middot;S<sub>ngb</sub> + b<br>
-                                            p = 1 / (1 + exp(&minus;S))
-                                        </div>
-                                        <p class="text-xs text-base-content/82 mt-3">Weights are heuristic initially, then tuned on labelled refactors.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </section>
 
                     <section id="commands" class="mb-20">

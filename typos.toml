@@ -33,9 +33,10 @@ extend-ignore-re = [
     "(?:carousel|dropdown|footer|indicator|navbar|toast)-center",
     "(?s)```.*?```",
     "--(?:tw-)?color-[a-z0-9*-]+",
+    "--color",
     "--my-brand-color",
     "--netsuke-vermillion",
-    "\\b-?(?:accent|background|border(?:-(?:block|inline)(?:-(?:start|end))?|-(?:top|right|bottom|left)|-\\*)?|caret|column-rule|flood|lighting|outline|scrollbar|stop|text-decoration|text-emphasis|webkit-text-fill|webkit-text-stroke)-color\\b",
+    "[a-z][a-z0-9*]*(?:-[a-z0-9*]+)*-color\\b",
     "\\brust-analyzer\\b",
     "\\{color\\}",
     "`color`",
@@ -44,7 +45,6 @@ extend-ignore-re = [
     "color-mix\\(\\)",
     "color:\\s*var\\(",
     "currentColor",
-    "initialise(?:All)?EpisodicSearch",
     "var\\.iamge_id",
 ]
 

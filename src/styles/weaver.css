@@ -14,31 +14,39 @@
 
 @import "tailwindcss";
 
-/* The sub-site's hand-written stylesheet, imported into the components layer
- * rather than left unlayered as it was when it stood alone.
- *
- * That placement is the whole point. Under the Play CDN both this sheet and
- * the utilities were unlayered, so a tie went to the utilities on source
- * order — the CDN injected its <style> after this file's <link>. Compiled
- * Tailwind puts its utilities in @layer utilities, and per CSS Cascade Level
- * 5 an unlayered declaration beats every layered one regardless of
- * specificity or order. Left unlayered, this sheet would silently start
- * winning arguments it used to lose. In the components layer the old
- * relationship holds: a utility in the markup still wins.
- *
- * It is a single file for now, carrying the same rules and the same colour
- * literals it always had. A later commit splits it by concern and replaces
- * those literals with theme tokens. */
 /* @font-face rules belong to no layer: an unlayered at-rule that declares a
  * font rather than styling an element cannot lose a cascade argument, and
  * putting it in `base` would be a claim about precedence it does not need. */
 @import "./weaver/fonts.css";
 
+/* The sub-site's own rules, split by concern and placed in layers.
+ *
+ * The layering is load-bearing. When this stylesheet stood alone beside the
+ * Play CDN, both it and the utilities were unlayered, so ties went to the
+ * utilities on source order — the CDN injected its <style> after this file's
+ * <link>. Compiled Tailwind puts utilities in @layer utilities, and per CSS
+ * Cascade Level 5 an unlayered declaration beats every layered one regardless
+ * of specificity. Left unlayered, these rules would start winning arguments
+ * they used to lose. In the components layer the old relationship holds: a
+ * utility in the markup still wins.
+ *
+ * Element defaults go a layer lower, beside the preflight, for the same
+ * reason in reverse: they describe an element before any class touches it.
+ *
+ * Order within the layer matters only where two rules could meet on the same
+ * element, which here means `chrome` before `content`: a legal page's
+ * sidebar and its prose both live under the same shell. */
+@import "./weaver/site-base.css" layer(base);
+
+@import "./weaver/chrome.css" layer(components);
+@import "./weaver/panels.css" layer(components);
+@import "./weaver/callouts.css" layer(components);
+@import "./weaver/figures.css" layer(components);
 @import "./weaver/code.css" layer(components);
-@import "./weaver/pages.css" layer(components);
-@import "./weaver/design-language.css" layer(components);
 @import "./weaver/motion.css" layer(components);
-@import "./weaver/legacy.css" layer(components);
+@import "./weaver/pages.css" layer(components);
+@import "./weaver/content.css" layer(components);
+@import "./weaver/design-language.css" layer(components);
 
 @source "../../templates/weaver/**/*.jinja";
 @source "../static/weaver/assets/js/mobile-nav.js";

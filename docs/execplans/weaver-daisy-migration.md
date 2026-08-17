@@ -179,7 +179,10 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       templates. About 2,900 substitutions; not one node moved and not one
       colour changed. The seven inline `<style>` blocks the templates
       carried moved into partials on the way past.
-- [ ] Milestone 7 — Fold `weaver-site.css` into layered partials.
+- [x] (2026-08-17 22:10Z) Milestone 7 — Fold `weaver-site.css` into layered
+      partials. Six concern files plus the five lifted from templates, and
+      the last colour literal gone: all three invariant tests now pass on
+      their own.
 - [ ] Milestone 8 — Accessibility audit and contrast fixes.
 - [ ] Milestone 9 — Documentation and cleanup.
 

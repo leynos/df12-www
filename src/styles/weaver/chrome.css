@@ -1,0 +1,145 @@
+/* The page furniture: the paper ground, the sidebar, and its drawer.
+ *
+ * The drawer is the one piece of this stylesheet with real behaviour.
+ * `mobile-nav.js` adds `has-mobile-nav` to the root element once it is
+ * running, which is the signal that lets these rules hide the nav in the
+ * knowledge that something can reopen it; without script the nav stays
+ * visible.
+ */
+
+/* daisyUI paints the root scrollbar with `scrollbar-color`, and Chromium
+   honours the standard property in preference to the `::-webkit-scrollbar`
+   pseudo-elements this sub-site has always used. Returning it to its initial
+   value hands control back to those rules.
+
+   This sits in the components layer rather than beside them in `base`,
+   because daisyUI's declaration is itself in `base` and lands after this
+   file's imports; a later layer is the only way to reach past it. */
+:root {
+  scrollbar-color: auto;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-primary) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-primary) 5%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 40px 40px;
+}
+
+.texture-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url("/weaver/assets/textures/cream-paper.png");
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 50;
+}
+
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#sidebar nav {
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+/* Was `#sidebar nav a.bg-weaver-indigo.text-weaver-cream`, which found the
+   current link by the colour utilities it happened to carry and would have
+   stopped matching the moment those were renamed. The macro in
+   templates/weaver/_chrome.jinja now marks the link by its role. */
+.weaver-nav-link--current {
+  font-family: "IBM Plex Mono", monospace;
+  box-shadow: 2px 2px 0 var(--color-primary);
+}
+
+/* ---- Mobile hamburger navigation ---- */
+
+/* Hide toggle button by default (visible only in mobile media query) */
+#mobile-nav-toggle {
+  display: none;
+}
+
+#mobile-nav-backdrop {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  #sidebar {
+    position: sticky;
+    top: 0;
+    height: auto;
+    z-index: 40;
+    border-right: none;
+  }
+
+  .has-mobile-nav #sidebar nav {
+    display: none;
+  }
+
+  #sidebar.mobile-nav-open nav {
+    display: block;
+    position: fixed;
+    top: var(--mobile-header-height, 5rem);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-base-100);
+    z-index: 41;
+    overflow-y: auto;
+    max-height: none;
+    padding: 1.5rem;
+    border-top: 2px solid color-mix(in oklab, var(--color-primary) 20%, transparent);
+  }
+
+  #mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    width: 2.5rem;
+    height: 2.5rem;
+    background: transparent;
+    border: 1px solid color-mix(in oklab, var(--color-primary) 20%, transparent);
+    border-radius: 0.125rem;
+    color: var(--color-primary);
+    font-size: 1.125rem;
+    cursor: pointer;
+    z-index: 42;
+  }
+
+  #mobile-nav-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  #mobile-nav-backdrop {
+    display: none;
+  }
+
+  #sidebar.mobile-nav-open ~ #mobile-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: color-mix(in oklab, var(--color-neutral) 30%, transparent);
+    z-index: 39;
+  }
+}
+
+/* Structured shared-content pages (legal pages: TOC, sections, badge cards) */

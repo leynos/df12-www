@@ -1,0 +1,197 @@
+# Font Awesome to Carbon icon mapping for the Weaver sub-site.
+#
+# Weaver used Font Awesome 6.4 from a CDN, loaded twice — once as a stylesheet
+# and once as the SVG-replacement script. This table replaces it: the icons
+# named here are extracted from the @iconify-json/carbon package at build time
+# by scripts/generate_weaver_icons.py and inlined into
+# templates/weaver/_icons.jinja, so the published pages carry the artwork and
+# fetch nothing.
+#
+# Carbon is not an arbitrary choice. The Netsuke sub-site already migrated off
+# Font Awesome to Carbon and documents its reasoning and its mapping at
+# templates/netsuke/pages/icon-replacements.jinja; twenty-five of the glyphs
+# below are that table's, reused so the two sub-sites do not disagree about
+# what a shield or a terminal looks like. Netsuke renders them through the
+# Iconify CDN, which is why this file exists rather than the same approach:
+# the point here is to stop calling out to anyone.
+#
+# `match` records how close the substitution is, and is the field to read when
+# an icon looks wrong:
+#
+#   exact     the same metaphor, drawn in Carbon's style
+#   near      the same idea, a different object - `fa-book-open` becomes a
+#             closed book, `fa-server` a bare-metal server
+#   creative  no Carbon equivalent exists and this is a deliberate
+#             reinterpretation - `fa-rust` becomes a development mark,
+#             `fa-stamp` a certificate
+#
+# Adding an icon: add a row here, run the generator, commit both. The test in
+# tests/test_weaver_build.py fails if the committed file drifts from what the
+# generator produces.
+
+icons:
+  # Inherited from the Netsuke mapping
+  fa-arrow-right:
+    carbon: carbon:arrow-right
+    match: exact
+  fa-bolt:
+    carbon: carbon:flash
+    match: exact
+  fa-book:
+    carbon: carbon:book
+    match: exact
+  fa-book-open:
+    carbon: carbon:book
+    match: near
+  fa-check:
+    carbon: carbon:checkmark
+    match: exact
+  fa-circle-info:
+    carbon: carbon:information-filled
+    match: exact
+  fa-code:
+    carbon: carbon:code
+    match: exact
+  fa-copy:
+    carbon: carbon:copy
+    match: exact
+  fa-diagram-project:
+    carbon: carbon:chart-relationship
+    match: near
+  fa-discord:
+    carbon: carbon:logo-discord
+    match: exact
+  fa-download:
+    carbon: carbon:download
+    match: exact
+  fa-file-code:
+    carbon: carbon:code-reference
+    match: near
+  fa-file-lines:
+    carbon: carbon:notebook
+    match: near
+  fa-github:
+    carbon: carbon:logo-github
+    match: exact
+  fa-layer-group:
+    carbon: carbon:layers
+    match: exact
+  fa-link:
+    carbon: carbon:link
+    match: exact
+  fa-linux:
+    carbon: carbon:linux
+    match: exact
+  fa-magnifying-glass:
+    carbon: carbon:search
+    match: exact
+  fa-pen-ruler:
+    carbon: carbon:rule
+    match: creative
+  fa-rust:
+    carbon: carbon:development
+    match: creative
+  fa-shield-halved:
+    carbon: carbon:security
+    match: exact
+  fa-tag:
+    carbon: carbon:tag
+    match: exact
+  fa-terminal:
+    carbon: carbon:terminal
+    match: exact
+  fa-triangle-exclamation:
+    carbon: carbon:warning-alt-filled
+    match: exact
+  fa-xmark:
+    carbon: carbon:close
+    match: exact
+
+  # New to Weaver
+  fa-arrow-down:
+    carbon: carbon:arrow-down
+    match: exact
+  fa-arrow-right-long:
+    carbon: carbon:arrow-right
+    match: near
+  fa-ban:
+    carbon: carbon:error
+    match: near
+  fa-circle:
+    carbon: carbon:circle-solid
+    match: exact
+  fa-clock-rotate-left:
+    carbon: carbon:recently-viewed
+    match: exact
+  fa-cubes-stacked:
+    carbon: carbon:layers
+    match: near
+  fa-eye:
+    carbon: carbon:view
+    match: exact
+  fa-flask-vial:
+    carbon: carbon:chemistry
+    match: near
+  fa-font:
+    carbon: carbon:text-font
+    match: exact
+  fa-forward:
+    carbon: carbon:skip-forward
+    match: near
+  fa-hand-holding-hand:
+    carbon: carbon:partnership
+    match: creative
+  fa-info-circle:
+    carbon: carbon:information
+    match: exact
+  fa-lock:
+    carbon: carbon:locked
+    match: exact
+  fa-map-location-dot:
+    carbon: carbon:map
+    match: near
+  fa-microchip:
+    carbon: carbon:chip
+    match: exact
+  fa-microscope:
+    carbon: carbon:microscope
+    match: exact
+  fa-puzzle-piece:
+    carbon: carbon:plug
+    match: creative
+  fa-rotate-left:
+    carbon: carbon:undo
+    match: exact
+  fa-route:
+    carbon: carbon:flow-connection
+    match: creative
+  fa-scale-balanced:
+    carbon: carbon:scales
+    match: exact
+  fa-search:
+    carbon: carbon:search
+    match: exact
+  fa-server:
+    carbon: carbon:bare-metal-server
+    match: near
+  fa-shapes:
+    carbon: carbon:shape-intersect
+    match: near
+  fa-stamp:
+    carbon: carbon:certificate
+    match: creative
+  fa-stethoscope:
+    carbon: carbon:stethoscope
+    match: exact
+  fa-swatchbook:
+    carbon: carbon:color-palette
+    match: near
+  fa-tree:
+    carbon: carbon:tree-view
+    match: near
+  fa-user-check:
+    carbon: carbon:user-certification
+    match: near
+  fa-water:
+    carbon: carbon:wave-direction
+    match: creative

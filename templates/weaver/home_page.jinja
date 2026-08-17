@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}{{ homepage.title }}{% endblock %}
 
@@ -9,7 +10,7 @@
                 <!-- Background Decorative Elements -->
                 <div class="absolute top-0 right-0 w-1/3 h-full border-l border-weaver-indigo/10 bg-white/20 pointer-events-none hidden lg:block"></div>
                 <div class="absolute bottom-0 right-0 w-64 h-64 opacity-10 pointer-events-none">
-                    <i class="fa-solid fa-layer-group text-9xl text-weaver-indigo"></i>
+                    {{ icon('layer-group', 'text-9xl text-weaver-indigo') }}
                 </div>
 
                 <div class="masthead-frame mx-auto relative z-10">
@@ -37,12 +38,12 @@
                                         <span class="text-weaver-vermilion mr-3">$</span>
                                         <span class="mr-8">cargo install weaver</span>
                                         <button class="text-weaver-indigo/60 hover:text-white transition-colors" title="Copy to clipboard">
-                                            <i class="fa-regular fa-copy"></i>
+                                            {{ icon('copy') }}
                                         </button>
                                     </div>
                                 </div>
                                 <a href="/weaver/install/" class="px-6 py-4 font-mono text-sm font-bold text-weaver-indigo border border-weaver-indigo hover:bg-weaver-indigo hover:text-weaver-cream transition-all uppercase tracking-wide">
-                                    Quick Start <i class="fa-solid fa-arrow-right ml-2"></i>
+                                    Quick Start {{ icon('arrow-right', 'ml-2') }}
                                 </a>
                             </div>
                         </div>
@@ -77,17 +78,17 @@
                         <!-- Prop 1: Composable -->
                         <div class="group relative p-8 border border-weaver-indigo/20 bg-weaver-cream hover:border-weaver-indigo transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                             <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <i class="fa-solid fa-puzzle-piece text-6xl text-weaver-indigo"></i>
+                                {{ icon('puzzle-piece', 'text-6xl text-weaver-indigo') }}
                             </div>
                             <div class="w-12 h-12 bg-weaver-indigo text-weaver-cream flex items-center justify-center mb-6 text-xl rounded-xs">
-                                <i class="fa-solid fa-cubes-stacked"></i>
+                                {{ icon('cubes-stacked') }}
                             </div>
                             <h3 class="font-serif text-2xl text-weaver-indigo mb-3 group-hover:text-weaver-vermilion transition-colors">Composable</h3>
                             <p class="font-sans text-weaver-indigo/70 leading-relaxed mb-6">
                                 Use one surface for structural queries, patch application, and diagnostics. The daemon streams JSONL to the CLI, which then forwards raw payloads or human-readable output as needed.
                             </p>
                             <a href="/weaver/how-it-works/#fusion" class="inline-flex items-center font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider group-hover:underline decoration-weaver-vermilion underline-offset-4">
-                                Explore Fusion <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                                Explore Fusion {{ icon('arrow-right', 'ml-2 text-[10px]') }}
                             </a>
                             <!-- Corner Accent -->
                             <div class="absolute bottom-0 start-0 w-0 h-0 border-b-[20px] border-r-[20px] border-b-weaver-vermilion border-r-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -96,17 +97,17 @@
                         <!-- Prop 2: Safe -->
                         <div class="group relative p-8 border border-weaver-indigo/20 bg-weaver-cream hover:border-weaver-indigo transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                             <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <i class="fa-solid fa-shield-halved text-6xl text-weaver-indigo"></i>
+                                {{ icon('shield-halved', 'text-6xl text-weaver-indigo') }}
                             </div>
                             <div class="w-12 h-12 bg-weaver-indigo text-weaver-cream flex items-center justify-center mb-6 text-xl rounded-xs">
-                                <i class="fa-solid fa-lock"></i>
+                                {{ icon('lock') }}
                             </div>
                             <h3 class="font-serif text-2xl text-weaver-indigo mb-3 group-hover:text-weaver-vermilion transition-colors">Safe</h3>
                             <p class="font-sans text-weaver-indigo/70 leading-relaxed mb-6">
                                 Block bad edits before they land. Double-Lock checks the change; Birdcage isolates untrusted tooling with seccomp-bpf and namespaces.
                             </p>
                             <a href="/weaver/safety/" class="inline-flex items-center font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider group-hover:underline decoration-weaver-vermilion underline-offset-4">
-                                Security Model <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                                Security Model {{ icon('arrow-right', 'ml-2 text-[10px]') }}
                             </a>
                              <!-- Corner Accent -->
                              <div class="absolute bottom-0 start-0 w-0 h-0 border-b-[20px] border-r-[20px] border-b-weaver-vermilion border-r-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -115,17 +116,17 @@
                         <!-- Prop 3: Fast -->
                         <div class="group relative p-8 border border-weaver-indigo/20 bg-weaver-cream hover:border-weaver-indigo transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                             <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <i class="fa-solid fa-bolt text-6xl text-weaver-indigo"></i>
+                                {{ icon('bolt', 'text-6xl text-weaver-indigo') }}
                             </div>
                             <div class="w-12 h-12 bg-weaver-indigo text-weaver-cream flex items-center justify-center mb-6 text-xl rounded-xs">
-                                <i class="fa-solid fa-microchip"></i>
+                                {{ icon('microchip') }}
                             </div>
                             <h3 class="font-serif text-2xl text-weaver-indigo mb-3 group-hover:text-weaver-vermilion transition-colors">Fast</h3>
                             <p class="font-sans text-weaver-indigo/70 leading-relaxed mb-6">
                                 Keep state in a resident daemon instead of re-parsing on every call. Rust binaries stream JSONL over Unix domain sockets for low-friction automation.
                             </p>
                             <a href="/weaver/how-it-works/#daemon" class="inline-flex items-center font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider group-hover:underline decoration-weaver-vermilion underline-offset-4">
-                                Daemon Specs <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i>
+                                Daemon Specs {{ icon('arrow-right', 'ml-2 text-[10px]') }}
                             </a>
                              <!-- Corner Accent -->
                              <div class="absolute bottom-0 start-0 w-0 h-0 border-b-[20px] border-r-[20px] border-b-weaver-vermilion border-r-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -235,15 +236,15 @@
                             </p>
                             <ul class="space-y-4 mb-8">
                                 <li class="flex items-start">
-                                    <i class="fa-solid fa-check text-weaver-vermilion mt-1 mr-3 text-sm"></i>
+                                    {{ icon('check', 'text-weaver-vermilion mt-1 mr-3 text-sm') }}
                                     <span class="text-weaver-indigo/80 text-sm">Semgrep-compatible rules with a Tree-sitter backend</span>
                                 </li>
                                 <li class="flex items-start">
-                                    <i class="fa-solid fa-check text-weaver-vermilion mt-1 mr-3 text-sm"></i>
+                                    {{ icon('check', 'text-weaver-vermilion mt-1 mr-3 text-sm') }}
                                     <span class="text-weaver-indigo/80 text-sm">Rust, Python, and TypeScript support today; Go and HCL are planned</span>
                                 </li>
                                 <li class="flex items-start">
-                                    <i class="fa-solid fa-check text-weaver-vermilion mt-1 mr-3 text-sm"></i>
+                                    {{ icon('check', 'text-weaver-vermilion mt-1 mr-3 text-sm') }}
                                     <span class="text-weaver-indigo/80 text-sm">Designed to turn source structure into agent-ready context</span>
                                 </li>
                             </ul>

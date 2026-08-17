@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Installation & Quick Start - Weaver AI Codebase Tooling{% endblock %}
 
@@ -60,7 +61,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="flex items-start gap-4 p-4 border border-weaver-indigo/10 bg-weaver-cream/50">
                             <div class="w-6 h-6 rounded-full bg-weaver-indigo text-weaver-cream flex items-center justify-center shrink-0 mt-1">
-                                <i class="fa-brands fa-rust text-xs"></i>
+                                {{ icon('rust', 'text-xs') }}
                             </div>
                             <div>
                                 <h3 class="font-serif font-bold text-weaver-indigo text-sm">Rust Toolchain</h3>
@@ -69,7 +70,7 @@
                         </div>
                         <div class="flex items-start gap-4 p-4 border border-weaver-indigo/10 bg-weaver-cream/50">
                             <div class="w-6 h-6 rounded-full bg-weaver-indigo text-weaver-cream flex items-center justify-center shrink-0 mt-1">
-                                <i class="fa-brands fa-linux text-xs"></i>
+                                {{ icon('linux', 'text-xs') }}
                             </div>
                             <div>
                                 <h3 class="font-serif font-bold text-weaver-indigo text-sm">Linux Environment</h3>
@@ -78,7 +79,7 @@
                         </div>
                         <div class="flex items-start gap-4 p-4 border border-weaver-indigo/10 bg-weaver-cream/50">
                             <div class="w-6 h-6 rounded-full bg-weaver-indigo text-weaver-cream flex items-center justify-center shrink-0 mt-1">
-                                <i class="fa-solid fa-terminal text-xs"></i>
+                                {{ icon('terminal', 'text-xs') }}
                             </div>
                             <div>
                                 <h3 class="font-serif font-bold text-weaver-indigo text-sm">Shell Access</h3>
@@ -109,7 +110,7 @@
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-green-400">cargo install weaver</code>
                                 <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('cargo install weaver')">
-                                    <i class="fa-regular fa-copy mr-1"></i> Copy
+                                    {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>
                         </div>
@@ -127,7 +128,7 @@
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-green-400">weaver --capabilities</code>
                                 <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('weaver --capabilities')">
-                                    <i class="fa-regular fa-copy mr-1"></i> Copy
+                                    {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>
                             <div class="mt-2 text-xs text-gray-500 font-mono border-t border-white/10 pt-2">
@@ -138,7 +139,7 @@
 
                         <div class="reference-callout mt-4 max-w-2xl">
                             <div class="reference-callout-title">
-                                <i class="fa-solid fa-book-open"></i>
+                                {{ icon('book-open') }}
                                 Canonical reference
                             </div>
                             <p class="text-sm text-weaver-indigo/80 mb-3">
@@ -165,13 +166,13 @@
                                     <span class="text-green-400">weaver</span> observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1
                                 </code>
                                 <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('weaver observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1')">
-                                    <i class="fa-regular fa-copy mr-1"></i> Copy
+                                    {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>
                         </div>
 
                         <div class="mt-4 p-4 bg-weaver-indigo/5 border-l-4 border-weaver-indigo max-w-2xl">
-                            <h4 class="font-bold text-sm text-weaver-indigo mb-1"><i class="fa-solid fa-circle-info mr-2"></i>Manual Daemon Control</h4>
+                            <h4 class="font-bold text-sm text-weaver-indigo mb-1">{{ icon('circle-info', 'mr-2') }}Manual Daemon Control</h4>
                             <p class="text-xs text-weaver-indigo/80 font-mono">Use <code>weaver daemon start</code>, <code>weaver daemon stop</code>, or <code>weaver daemon status</code> if you need to manage the daemon explicitly.</p>
                         </div>
                     </div>
@@ -191,7 +192,7 @@
                             <p class="text-weaver-cream/70 mt-2 max-w-xl">Execute the standard Observe → Act → Verify loop on a sample project.</p>
                         </div>
                         <div class="hidden md:block">
-                            <i class="fa-solid fa-arrow-right-long text-4xl text-weaver-vermilion opacity-50"></i>
+                            {{ icon('arrow-right-long', 'text-4xl text-weaver-vermilion opacity-50') }}
                         </div>
                     </div>
 
@@ -247,7 +248,7 @@
                         <!-- Issue 1 -->
                         <div class="border border-weaver-indigo/20 bg-white p-6 rounded-xs">
                             <h3 class="font-serif text-xl text-weaver-indigo flex items-center gap-2">
-                                <i class="fa-solid fa-triangle-exclamation text-weaver-vermilion"></i>
+                                {{ icon('triangle-exclamation', 'text-weaver-vermilion') }}
                                 Unix Socket Permission Denied
                             </h3>
                             <p class="text-sm text-weaver-indigo/70 mt-2 mb-4">
@@ -262,7 +263,7 @@
                         <!-- Issue 2 -->
                         <div class="border border-weaver-indigo/20 bg-white p-6 rounded-xs">
                             <h3 class="font-serif text-xl text-weaver-indigo flex items-center gap-2">
-                                <i class="fa-solid fa-server text-weaver-faded"></i>
+                                {{ icon('server', 'text-weaver-faded') }}
                                 Non-Unix / Windows Mode
                             </h3>
                             <p class="text-sm text-weaver-indigo/70 mt-2 mb-4">

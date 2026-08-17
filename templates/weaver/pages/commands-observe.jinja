@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Command: Observe - Weaver AI Codebase Tooling{% endblock %}
 
@@ -77,7 +78,7 @@
                             </div>
 
                             <div class="flex items-center gap-2 text-xs font-mono text-weaver-indigo/60">
-                                <i class="fa-solid fa-info-circle"></i>
+                                {{ icon('info-circle') }}
                                 <span>Language inferred from file extension</span>
                             </div>
                         </div>
@@ -275,7 +276,7 @@
                         </div>
                         <a href="/weaver/commands/act/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
                             Next: Act Command
-                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            {{ icon('arrow-right', 'group-hover:translate-x-1 transition-transform') }}
                         </a>
                     </div>
                 </div>

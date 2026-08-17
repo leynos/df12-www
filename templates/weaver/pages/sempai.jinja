@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Sempai Query Engine White Paper - Weaver AI Codebase Tooling{% endblock %}
 
@@ -403,7 +404,7 @@
                     <!-- Observe Integration callout -->
                     <div id="observe-integration" class="mb-20 bg-weaver-indigo/5 border border-weaver-indigo/15 rounded-xs p-6">
                         <div class="flex items-center gap-3 mb-3">
-                            <i class="fa-solid fa-diagram-project text-weaver-vermilion"></i>
+                            {{ icon('diagram-project', 'text-weaver-vermilion') }}
                             <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion font-bold">Observe Integration</p>
                         </div>
                         <p class="text-sm text-weaver-indigo/80 leading-relaxed">
@@ -476,23 +477,23 @@
                                     <tbody class="text-weaver-indigo/85">
                                         <tr>
                                             <td class="px-4 py-3 font-mono text-xs">search</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-check text-green-600 text-[10px]"></i> Yes</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-check text-green-600 text-[10px]"></i> Full support</td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('check', 'text-green-600 text-[10px]') }} Yes</td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('check', 'text-green-600 text-[10px]') }} Full support</td>
                                         </tr>
                                         <tr>
                                             <td class="px-4 py-3 font-mono text-xs">extract</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-check text-green-600 text-[10px]"></i> Yes</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-xmark text-weaver-vermilion text-[10px]"></i> <code class="text-[10px]">UnsupportedMode</code></td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('check', 'text-green-600 text-[10px]') }} Yes</td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('xmark', 'text-weaver-vermilion text-[10px]') }} <code class="text-[10px]">UnsupportedMode</code></td>
                                         </tr>
                                         <tr>
                                             <td class="px-4 py-3 font-mono text-xs">taint</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-check text-green-600 text-[10px]"></i> Yes</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-xmark text-weaver-vermilion text-[10px]"></i> <code class="text-[10px]">UnsupportedMode</code></td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('check', 'text-green-600 text-[10px]') }} Yes</td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('xmark', 'text-weaver-vermilion text-[10px]') }} <code class="text-[10px]">UnsupportedMode</code></td>
                                         </tr>
                                         <tr>
                                             <td class="px-4 py-3 font-mono text-xs">join</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-check text-green-600 text-[10px]"></i> Yes</td>
-                                            <td class="px-4 py-3 text-xs"><i class="fa-solid fa-xmark text-weaver-vermilion text-[10px]"></i> <code class="text-[10px]">UnsupportedMode</code></td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('check', 'text-green-600 text-[10px]') }} Yes</td>
+                                            <td class="px-4 py-3 text-xs">{{ icon('xmark', 'text-weaver-vermilion text-[10px]') }} <code class="text-[10px]">UnsupportedMode</code></td>
                                         </tr>
                                     </tbody>
                                 </table>

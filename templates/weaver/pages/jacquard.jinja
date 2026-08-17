@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Jacquard Symbol Graph White Paper - Weaver AI Codebase Tooling{% endblock %}
 
@@ -497,14 +498,14 @@
                                     </p>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div class="flex items-start gap-3 bg-white/70 border border-weaver-indigo/10 p-4 rounded-xs">
-                                            <i class="fa-solid fa-triangle-exclamation text-weaver-vermilion/60 mt-0.5"></i>
+                                            {{ icon('triangle-exclamation', 'text-weaver-vermilion/60 mt-0.5') }}
                                             <div>
                                                 <span class="font-mono text-xs font-bold text-weaver-indigo">DependencyAlsoModified</span>
                                                 <p class="text-xs text-weaver-indigo/60 mt-1">Symbol A changed and it depends on symbol B that also changed.</p>
                                             </div>
                                         </div>
                                         <div class="flex items-start gap-3 bg-white/70 border border-weaver-indigo/10 p-4 rounded-xs">
-                                            <i class="fa-solid fa-triangle-exclamation text-weaver-vermilion/60 mt-0.5"></i>
+                                            {{ icon('triangle-exclamation', 'text-weaver-vermilion/60 mt-0.5') }}
                                             <div>
                                                 <span class="font-mono text-xs font-bold text-weaver-indigo">DependentAlsoModified</span>
                                                 <p class="text-xs text-weaver-indigo/60 mt-1">Symbol A changed and a dependent symbol changed too.</p>

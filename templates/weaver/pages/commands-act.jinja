@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Command: Act - Weaver AI Codebase Tooling{% endblock %}
 
@@ -85,7 +86,7 @@
                             </div>
 
                             <div class="flex items-center gap-2 text-xs font-mono text-weaver-indigo/60">
-                                <i class="fa-solid fa-shield-halved"></i>
+                                {{ icon('shield-halved') }}
                                 <span>All writes pass through the Double-Lock harness</span>
                             </div>
                         </div>
@@ -162,7 +163,7 @@
 
                         <!-- Safety Note Footer -->
                         <div class="mt-8 border-t border-weaver-indigo/10 pt-4 flex items-start gap-3 figure-fullbleed-footer">
-                            <i class="fa-solid fa-triangle-exclamation text-weaver-vermilion mt-1"></i>
+                            {{ icon('triangle-exclamation', 'text-weaver-vermilion mt-1') }}
                             <p class="text-sm text-weaver-indigo/70 font-mono">
                                 <strong class="text-weaver-indigo">Violation Policy:</strong> Any attempt to access unauthorized paths (e.g., <code class="text-xs">/etc/passwd</code>, <code class="text-xs">~/.ssh</code>) immediately kills the child process and logs a security event.
                             </p>
@@ -211,7 +212,7 @@
 
                         <!-- Connecting Arrow -->
                         <div class="flex justify-center -my-4 relative z-10">
-                            <i class="fa-solid fa-arrow-down text-weaver-indigo/20 text-2xl"></i>
+                            {{ icon('arrow-down', 'text-weaver-indigo/20 text-2xl') }}
                         </div>
 
                         <!-- Example 2: refactor (rename) -->
@@ -264,7 +265,7 @@
                             <div class="absolute top-0 left-0 w-1 h-full bg-weaver-vermilion"></div>
                             <div class="flex items-start justify-between mb-3">
                                 <span class="font-mono text-xs font-bold text-weaver-vermilion">ERR_SYNTACTIC_LOCK</span>
-                                <i class="fa-solid fa-code text-weaver-vermilion/40"></i>
+                                {{ icon('code', 'text-weaver-vermilion/40') }}
                             </div>
                             <p class="text-xs text-weaver-indigo/80 leading-relaxed mb-3">
                                 The modified file failed Tree-sitter parsing. Structural error (e.g. unbalanced braces, missing semicolons).
@@ -279,7 +280,7 @@
                             <div class="absolute top-0 left-0 w-1 h-full bg-weaver-vermilion"></div>
                             <div class="flex items-start justify-between mb-3">
                                 <span class="font-mono text-xs font-bold text-weaver-vermilion">ERR_SEMANTIC_LOCK</span>
-                                <i class="fa-solid fa-microscope text-weaver-vermilion/40"></i>
+                                {{ icon('microscope', 'text-weaver-vermilion/40') }}
                             </div>
                             <p class="text-xs text-weaver-indigo/80 leading-relaxed mb-3">
                                 New diagnostics detected after the edit. The language server found type errors or unresolved references that were not present before.
@@ -294,7 +295,7 @@
                             <div class="absolute top-0 left-0 w-1 h-full bg-weaver-indigo"></div>
                             <div class="flex items-start justify-between mb-3">
                                 <span class="font-mono text-xs font-bold text-weaver-indigo">ERR_SANDBOX_VIOLATION</span>
-                                <i class="fa-solid fa-ban text-weaver-indigo/40"></i>
+                                {{ icon('ban', 'text-weaver-indigo/40') }}
                             </div>
                             <p class="text-xs text-weaver-indigo/80 leading-relaxed mb-3">
                                 A plugin attempted to access a path outside the sandbox allowlist. The child process is killed immediately.
@@ -480,28 +481,28 @@
                             </p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
-                                    <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
+                                    {{ icon('xmark', 'text-weaver-vermilion/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Macro-generated items</span>
                                         <p class="text-xs text-weaver-indigo/60 mt-1">Items lacking stable editable source ranges cannot be moved safely.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
-                                    <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
+                                    {{ icon('xmark', 'text-weaver-vermilion/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Ambiguous imports</span>
                                         <p class="text-xs text-weaver-indigo/60 mt-1">Import repair without a unique semantic match is a hard error.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
-                                    <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
+                                    {{ icon('xmark', 'text-weaver-vermilion/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Unsupported visibility</span>
                                         <p class="text-xs text-weaver-indigo/60 mt-1">Non-preservable <code class="font-mono text-[10px]">pub(in ...)</code> constraints that cannot be maintained across modules.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
-                                    <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
+                                    {{ icon('xmark', 'text-weaver-vermilion/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Incomplete payloads</span>
                                         <p class="text-xs text-weaver-indigo/60 mt-1">File payload does not cover all files required for deterministic execution.</p>
@@ -524,7 +525,7 @@
                         </div>
                         <a href="/weaver/commands/verify/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
                             Next: Verify Command
-                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            {{ icon('arrow-right', 'group-hover:translate-x-1 transition-transform') }}
                         </a>
                     </div>
                 </div>

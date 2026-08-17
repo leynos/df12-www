@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Command Reference - Weaver AI Codebase Tooling{% endblock %}
 
@@ -55,7 +56,7 @@
                                 <tr class="group hover:bg-weaver-indigo/5 transition-colors">
                                     <td class="p-4 font-mono text-sm font-bold text-weaver-indigo border-r border-weaver-indigo/10">
                                         <a href="/weaver/commands/observe/" class="flex items-center gap-2 hover:text-weaver-vermilion">
-                                            observe <i class="fa-solid fa-arrow-right -rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                            observe {{ icon('arrow-right', '-rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity') }}
                                         </a>
                                     </td>
                                     <td class="p-4 text-sm text-weaver-indigo/80 border-r border-weaver-indigo/10">
@@ -71,7 +72,7 @@
                                 <tr class="group hover:bg-weaver-indigo/5 transition-colors">
                                     <td class="p-4 font-mono text-sm font-bold text-weaver-indigo border-r border-weaver-indigo/10">
                                         <a href="/weaver/commands/act/" class="flex items-center gap-2 hover:text-weaver-vermilion">
-                                            act <i class="fa-solid fa-arrow-right -rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                            act {{ icon('arrow-right', '-rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity') }}
                                         </a>
                                     </td>
                                     <td class="p-4 text-sm text-weaver-indigo/80 border-r border-weaver-indigo/10">
@@ -87,7 +88,7 @@
                                 <tr class="group hover:bg-weaver-indigo/5 transition-colors">
                                     <td class="p-4 font-mono text-sm font-bold text-weaver-indigo border-r border-weaver-indigo/10">
                                         <a href="/weaver/commands/verify/" class="flex items-center gap-2 hover:text-weaver-vermilion">
-                                            verify <i class="fa-solid fa-arrow-right -rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                            verify {{ icon('arrow-right', '-rotate-45 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity') }}
                                         </a>
                                     </td>
                                     <td class="p-4 text-sm text-weaver-indigo/80 border-r border-weaver-indigo/10">
@@ -113,7 +114,7 @@
                     <!-- Observe Card -->
                     <div id="observe-card" class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <i class="fa-solid fa-eye text-6xl text-weaver-indigo"></i>
+                            {{ icon('eye', 'text-6xl text-weaver-indigo') }}
                         </div>
                         <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Observe</h3>
                         <p class="text-sm font-mono text-weaver-indigo/50 mb-4">perception</p>
@@ -124,14 +125,14 @@
                             <code class="font-mono text-xs text-green-400 block">$ weaver observe get-definition \<br>&nbsp;&nbsp;--uri file:///src/main.rs --position 10:5</code>
                         </div>
                         <a href="/weaver/commands/observe/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
-                            Full Documentation <i class="fa-solid fa-arrow-right ml-2"></i>
+                            Full Documentation {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
 
                     <!-- Act Card -->
                     <div id="act-card" class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <i class="fa-solid fa-hand-holding-hand text-6xl text-weaver-indigo"></i>
+                            {{ icon('hand-holding-hand', 'text-6xl text-weaver-indigo') }}
                         </div>
                         <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Act</h3>
                         <p class="text-sm font-mono text-weaver-indigo/50 mb-4">mutation</p>
@@ -142,14 +143,14 @@
                             <code class="font-mono text-xs text-green-400 block">$ weaver act apply-patch &lt; fix.diff</code>
                         </div>
                         <a href="/weaver/commands/act/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
-                            Full Documentation <i class="fa-solid fa-arrow-right ml-2"></i>
+                            Full Documentation {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
 
                     <!-- Verify Card -->
                     <div id="verify-card" class="bg-white border-2 border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)]">
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <i class="fa-solid fa-scale-balanced text-6xl text-weaver-indigo"></i>
+                            {{ icon('scale-balanced', 'text-6xl text-weaver-indigo') }}
                         </div>
                         <h3 class="font-serif text-2xl text-weaver-indigo mb-2 group-hover:text-weaver-vermilion transition-colors">Verify</h3>
                         <p class="text-sm font-mono text-weaver-indigo/50 mb-4">validation</p>
@@ -160,7 +161,7 @@
                             <code class="font-mono text-xs text-green-400 block">$ weaver verify diagnostics \<br>&nbsp;&nbsp;--uri file:///src/lib.rs</code>
                         </div>
                         <a href="/weaver/commands/verify/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-weaver-vermilion hover:text-weaver-indigo transition-colors">
-                            Full Documentation <i class="fa-solid fa-arrow-right ml-2"></i>
+                            Full Documentation {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
 
@@ -297,7 +298,7 @@
                         <h3 class="font-serif text-2xl text-weaver-indigo mb-6">Global Flags</h3>
                         <div class="reference-callout mb-6">
                             <div class="reference-callout-title">
-                                <i class="fa-solid fa-book-open"></i>
+                                {{ icon('book-open') }}
                                 Canonical reference
                             </div>
                             <p class="text-sm text-weaver-indigo/80 mb-3">
@@ -377,7 +378,7 @@
                     <h2 class="font-serif text-3xl text-weaver-indigo mb-8">Capability Discovery &amp; Output</h2>
                     <div class="reference-callout mb-8">
                         <div class="reference-callout-title">
-                            <i class="fa-solid fa-book-open"></i>
+                            {{ icon('book-open') }}
                             Canonical reference
                         </div>
                         <p class="text-sm text-weaver-indigo/80 mb-3">

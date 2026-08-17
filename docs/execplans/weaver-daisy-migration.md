@@ -172,7 +172,9 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       introduce the nav macro. Four copies of the layout became one plus
       three sets of overrides; no page's total height changed. The legal
       pages gained a working mobile drawer, verified by clicking it.
-- [ ] Milestone 5 — Replace Font Awesome with inline Carbon SVG.
+- [x] (2026-08-17 20:20Z) Milestone 5 — Replace Font Awesome with inline
+      Carbon SVG. 146 tags across 14 templates; `test_weaver_pages_reach_no_third_party_hosts`
+      now passes, so the sub-site fetches nothing from anyone.
 - [ ] Milestone 6 — Semantic-class sweep across the 16 templates.
 - [ ] Milestone 7 — Fold `weaver-site.css` into layered partials.
 - [ ] Milestone 8 — Accessibility audit and contrast fixes.
@@ -284,6 +286,16 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   the letter of the document. Worth reconciling one way or the other, but not
   as part of this migration.
   Date/Author: 2026-08-17, Milestone 0.
+- **Decision:** accept Carbon's lighter stroke weight in place of Font
+  Awesome's solid glyphs.
+  Rationale: it is inherent to the substitution — Carbon is a line-drawn set
+  and Font Awesome's `fa-solid` is filled — and the Netsuke sub-site already
+  made the same trade, so the two now agree about what a shield or a terminal
+  looks like. The alternative would be finding a filled icon set that matches
+  Font Awesome's drawing, which is a design decision nobody asked for. The
+  substitution costs at most 0.45% of a page's height; screenshots of the
+  security cards and the terminal blocks show every icon in place and legible.
+  Date/Author: 2026-08-17, Milestone 5.
 - **Decision:** leave `pages/design-language.jinja` standalone rather than
   extending the shared layout, and share only its vocabulary.
   Rationale: its sidebar is a table of contents for the document itself, not

@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Documentation - Weaver AI Codebase Tooling{% endblock %}
 
@@ -20,7 +21,7 @@
             <aside class="w-full xl:w-72 bg-weaver-cream/80 backdrop-blur border-r border-weaver-indigo/10 p-8 hidden xl:block z-30 sticky top-0 h-screen overflow-y-auto">
                 <div class="mb-8">
                     <div class="relative">
-                        <i class="fa-solid fa-search absolute left-3 top-3 text-weaver-indigo/40 text-xs"></i>
+                        {{ icon('search', 'absolute left-3 top-3 text-weaver-indigo/40 text-xs') }}
                         <input type="text" placeholder="Search docs..." class="w-full pl-8 pr-3 py-2 bg-white border border-weaver-indigo/20 rounded-xs text-xs font-mono text-weaver-indigo search-input focus:ring-1 focus:ring-weaver-vermilion">
                         <div class="absolute right-2 top-2 px-1 border border-weaver-indigo/10 rounded-sm text-[10px] text-weaver-indigo/40 font-mono">⌘K</div>
                     </div>
@@ -70,7 +71,7 @@
                 <!-- Mobile Search & TOC Toggle (Visible only on small screens) -->
                 <div class="xl:hidden p-4 border-b border-weaver-indigo/10 bg-weaver-cream sticky top-0 z-30">
                     <div class="relative">
-                        <i class="fa-solid fa-search absolute left-3 top-3 text-weaver-indigo/40 text-xs"></i>
+                        {{ icon('search', 'absolute left-3 top-3 text-weaver-indigo/40 text-xs') }}
                         <input type="text" placeholder="Search documentation..." class="w-full pl-8 pr-3 py-2 bg-white border border-weaver-indigo/20 rounded-xs text-xs font-mono text-weaver-indigo">
                     </div>
                 </div>
@@ -97,69 +98,69 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <a href="https://github.com/leynos/weaver/blob/main/docs/weaver-design.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-xs relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-pen-ruler text-4xl text-weaver-indigo"></i>
+                                    {{ icon('pen-ruler', 'text-4xl text-weaver-indigo') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-weaver-indigo mb-2">Weaver Design Document</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">Architecture, Semantic Fusion Engine, Double-Lock harness, client-daemon model, and composable UNIX primitives.</p>
                                 <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
                                     <span class="font-mono">weaver-design.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
                             <a href="https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-xs relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-shield-halved text-4xl text-weaver-indigo"></i>
+                                    {{ icon('shield-halved', 'text-4xl text-weaver-indigo') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-weaver-indigo mb-2">ADR-001: Plugin Capability Model</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">Capability-first model for act operations, including <code>extricate-symbol</code> and provider resolution.</p>
                                 <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
                                     <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
                                     <span class="font-mono">adr-001</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
                             <a href="https://github.com/leynos/weaver/blob/main/docs/sempai-query-language-design.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-xs relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-magnifying-glass text-4xl text-weaver-indigo"></i>
+                                    {{ icon('magnifying-glass', 'text-4xl text-weaver-indigo') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-weaver-indigo mb-2">Sempai Query Language Design</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">Semgrep-compatible query engine backed by Tree-sitter for semantics-aware code pattern matching.</p>
                                 <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
                                     <span class="font-mono">sempai-query-language-design.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
                             <a href="https://github.com/leynos/weaver/blob/main/docs/jacquard-card-first-symbol-graph-design.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-xs relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-diagram-project text-4xl text-weaver-indigo"></i>
+                                    {{ icon('diagram-project', 'text-4xl text-weaver-indigo') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-weaver-indigo mb-2">Jacquard: Card-First Symbol Graph</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">Structured symbol cards, bounded graph slices, and time-travel diffs over recent commits.</p>
                                 <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
                                     <span class="font-mono">jacquard-card-first-symbol-graph-design.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
                             <a href="https://github.com/leynos/weaver/blob/main/docs/users-guide.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-xs relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-book text-4xl text-weaver-indigo"></i>
+                                    {{ icon('book', 'text-4xl text-weaver-indigo') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-weaver-indigo mb-2">User's Guide</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">CLI commands, domain operations, configuration, daemon lifecycle, and plugin system.</p>
                                 <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
                                     <span class="font-mono">users-guide.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
                             <a href="/weaver/roadmap/" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-xs relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-route text-4xl text-weaver-indigo"></i>
+                                    {{ icon('route', 'text-4xl text-weaver-indigo') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-weaver-indigo mb-2">Roadmap</h3>
                                 <p class="text-sm text-weaver-indigo/70 mb-4">Phased delivery plan from foundation through plugin ecosystem to long-term intelligence features.</p>
                                 <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
                                     <span class="font-mono">roadmap.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
                         </div>
@@ -176,7 +177,7 @@
                         </p>
                         <div class="reference-callout mb-8">
                             <div class="reference-callout-title">
-                                <i class="fa-solid fa-book-open"></i>
+                                {{ icon('book-open') }}
                                 Canonical reference
                             </div>
                             <p class="text-sm text-weaver-indigo/80 mb-3">
@@ -228,7 +229,7 @@
                         <div class="bg-weaver-dark p-6 rounded-xs shadow-lg overflow-x-auto border border-weaver-indigo/20 mb-8 paper-panel">
                             <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
                                 <span class="text-xs font-mono text-weaver-cream/60">weaver.toml</span>
-                                <button class="text-xs text-weaver-cream/40 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                                <button type="button" aria-label="Copy to clipboard" class="text-xs text-weaver-cream/40 hover:text-white">{{ icon('copy') }}</button>
                             </div>
 <pre class="font-mono text-sm text-gray-300 leading-relaxed">
 <span class="text-gray-500"># Top-level keys (no [section] headers)</span>
@@ -884,7 +885,7 @@ pattern:
                             <p class="text-weaver-cream/70 text-sm">Check out the plugin development guide for extending Weaver.</p>
                         </div>
                         <a href="#plugins" class="px-6 py-3 bg-weaver-vermilion text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-weaver-vermilion transition-colors border border-weaver-vermilion">
-                            Plugin Guide <i class="fa-solid fa-arrow-right ml-2"></i>
+                            Plugin Guide {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
 

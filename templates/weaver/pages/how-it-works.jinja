@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Architecture - Weaver AI Codebase Tooling{% endblock %}
 
@@ -99,7 +100,7 @@
                             <div class="space-y-8 mt-8">
                                 <div class="flex gap-4">
                                     <div class="shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-xs border border-weaver-indigo/20">
-                                        <i class="fa-solid fa-layer-group"></i>
+                                        {{ icon('layer-group') }}
                                     </div>
                                     <div>
                                         <h3 class="font-serif text-xl text-weaver-indigo mb-2">Multi-Source Ingestion</h3>
@@ -108,7 +109,7 @@
                                 </div>
                                 <div class="flex gap-4">
                                     <div class="shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-xs border border-weaver-indigo/20">
-                                        <i class="fa-solid fa-tag"></i>
+                                        {{ icon('tag') }}
                                     </div>
                                     <div>
                                         <h3 class="font-serif text-xl text-weaver-indigo mb-2">Provenance Tagging</h3>
@@ -177,7 +178,7 @@
                         <!-- Card 1: Daemon -->
                         <div class="bg-weaver-dark border border-weaver-cream/10 p-8 relative overflow-hidden group hover:border-weaver-vermilion/50 transition-colors">
                             <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <i class="fa-solid fa-server text-8xl text-white"></i>
+                                {{ icon('server', 'text-8xl text-white') }}
                             </div>
 
                             <h3 class="font-serif text-2xl text-white mb-2">The Daemon</h3>
@@ -185,19 +186,19 @@
 
                             <ul class="space-y-3 text-sm text-weaver-cream/80 font-light">
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-weaver-vermilion text-xs') }}
                                     <span>Hosts LSP child processes (rust-analyzer, pyrefly lsp, etc.).</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-weaver-vermilion text-xs') }}
                                     <span>Dispatches JSONL requests from the CLI and streams responses.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-weaver-vermilion text-xs') }}
                                     <span>Listens on Unix Domain Socket (or TCP via <code class="text-xs text-weaver-cream/50">--daemon-socket</code>).</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-weaver-vermilion text-xs') }}
                                     <span>Auto-starts when a domain command is issued — no manual launch needed.</span>
                                 </li>
                             </ul>
@@ -211,7 +212,7 @@
                         <!-- Card 2: Client -->
                         <div class="bg-weaver-dark border border-weaver-cream/10 p-8 relative overflow-hidden group hover:border-weaver-vermilion/50 transition-colors">
                             <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <i class="fa-solid fa-terminal text-8xl text-white"></i>
+                                {{ icon('terminal', 'text-8xl text-white') }}
                             </div>
 
                             <h3 class="font-serif text-2xl text-white mb-2">The Client</h3>
@@ -219,15 +220,15 @@
 
                             <ul class="space-y-3 text-sm text-weaver-cream/80 font-light">
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-weaver-vermilion text-xs') }}
                                     <span>Parses config (<code class="text-xs text-weaver-cream/50">--config-path</code>, XDG, env vars) and CLI flags.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-weaver-vermilion text-xs') }}
                                     <span>Sends JSONL requests to the daemon, streams the response.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-weaver-vermilion text-xs') }}
                                     <span>Renders human-readable output when stdout is a TTY (<code class="text-xs text-weaver-cream/50">--output auto</code>).</span>
                                 </li>
                             </ul>
@@ -266,9 +267,9 @@
                                         When a file is observed, the Daemon invokes Tree-sitter to generate a Concrete Syntax Tree (CST).
                                     </p>
                                     <div class="inline-flex items-center gap-2 px-2 py-1 bg-weaver-indigo/5 rounded-sm text-xs font-mono text-weaver-indigo">
-                                        <i class="fa-solid fa-file-code"></i> source.rs
-                                        <i class="fa-solid fa-arrow-right mx-1 text-xs"></i>
-                                        <i class="fa-solid fa-tree"></i> CST
+                                        {{ icon('file-code') }} source.rs
+                                        {{ icon('arrow-right', 'mx-1 text-xs') }}
+                                        {{ icon('tree') }} CST
                                     </div>
                                 </div>
                             </div>

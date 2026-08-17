@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Command: Verify - Weaver AI Codebase Tooling{% endblock %}
 
@@ -86,7 +87,7 @@
                             </div>
 
                             <div class="flex items-center gap-2 text-xs font-mono text-weaver-indigo/60">
-                                <i class="fa-solid fa-circle-info"></i>
+                                {{ icon('circle-info') }}
                                 <span>Language inferred from file extension</span>
                             </div>
                         </div>
@@ -155,7 +156,7 @@
                         <div class="bg-white border-2 border-weaver-indigo p-6 shadow-[4px_4px_0px_0px_rgba(25,60,110,0.1)] group hover:-translate-y-1 transition-transform">
                             <div class="flex items-center justify-between mb-4 pb-4 border-b border-weaver-indigo/10">
                                 <span class="font-mono text-xs font-bold text-white bg-weaver-indigo px-2 py-1">CURRENT</span>
-                                <i class="fa-solid fa-stethoscope text-weaver-vermilion text-xl"></i>
+                                {{ icon('stethoscope', 'text-weaver-vermilion text-xl') }}
                             </div>
                             <h3 class="font-serif text-xl text-weaver-indigo mb-2">Diagnostics</h3>
                             <p class="text-xs text-weaver-indigo/70 mb-4 h-10">Pulls compiler warnings and LSP errors for any file with a supported language server.</p>
@@ -173,7 +174,7 @@
                         <div class="bg-white/60 border-2 border-dashed border-weaver-indigo/40 p-6 group hover:-translate-y-1 transition-transform relative">
                             <div class="flex items-center justify-between mb-4 pb-4 border-b border-weaver-indigo/10">
                                 <span class="font-mono text-xs font-bold text-weaver-indigo/50 bg-weaver-indigo/10 px-2 py-1">PLANNED</span>
-                                <i class="fa-solid fa-scale-balanced text-weaver-indigo/30 text-xl"></i>
+                                {{ icon('scale-balanced', 'text-weaver-indigo/30 text-xl') }}
                             </div>
                             <h3 class="font-serif text-xl text-weaver-indigo/60 mb-2">Policy Enforcement</h3>
                             <p class="text-xs text-weaver-indigo/50 mb-4 h-10">Architectural constraints and forbidden-pattern detection via Sempai queries.</p>
@@ -191,7 +192,7 @@
                         <div class="bg-white/60 border-2 border-dashed border-weaver-indigo/40 p-6 group hover:-translate-y-1 transition-transform relative">
                             <div class="flex items-center justify-between mb-4 pb-4 border-b border-weaver-indigo/10">
                                 <span class="font-mono text-xs font-bold text-weaver-indigo/50 bg-weaver-indigo/10 px-2 py-1">PLANNED</span>
-                                <i class="fa-solid fa-flask-vial text-weaver-indigo/30 text-xl"></i>
+                                {{ icon('flask-vial', 'text-weaver-indigo/30 text-xl') }}
                             </div>
                             <h3 class="font-serif text-xl text-weaver-indigo/60 mb-2">Test Orchestration</h3>
                             <p class="text-xs text-weaver-indigo/50 mb-4 h-10">Run test suites and report results as structured JSONL for CI gating.</p>
@@ -223,15 +224,15 @@
 
                             <ul class="space-y-4 mb-8">
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check text-weaver-indigo/40 mt-1 text-sm"></i>
+                                    {{ icon('check', 'text-weaver-indigo/40 mt-1 text-sm') }}
                                     <span class="text-sm text-weaver-indigo/60">Block dangerous functions or imports</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check text-weaver-indigo/40 mt-1 text-sm"></i>
+                                    {{ icon('check', 'text-weaver-indigo/40 mt-1 text-sm') }}
                                     <span class="text-sm text-weaver-indigo/60">Enforce type hints and documentation standards</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check text-weaver-indigo/40 mt-1 text-sm"></i>
+                                    {{ icon('check', 'text-weaver-indigo/40 mt-1 text-sm') }}
                                     <span class="text-sm text-weaver-indigo/60">Require specific test coverage thresholds</span>
                                 </li>
                             </ul>
@@ -341,7 +342,7 @@
                         </div>
                         <a href="/weaver/safety/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
                             Next: Safety Model
-                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            {{ icon('arrow-right', 'group-hover:translate-x-1 transition-transform') }}
                         </a>
                     </div>
                 </div>

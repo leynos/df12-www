@@ -19,6 +19,7 @@ arrives would itself fail the suite, so neither can be forgotten.
 
 from __future__ import annotations
 
+import importlib.util
 import re
 import shutil
 import subprocess
@@ -103,11 +104,6 @@ def test_weaver_stylesheet_is_compiled(built_site: Path) -> None:
     assert built_site.is_dir()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Milestone 5 replaces Font Awesome and the remote textures; "
-    "Milestone 3 self-hosts the fonts",
-)
 @pytest.mark.timeout(300)
 def test_weaver_pages_reach_no_third_party_hosts(built_site: Path) -> None:
     """No published Weaver page should load anything from another origin."""
@@ -144,3 +140,45 @@ def test_weaver_sources_declare_no_colour_literals() -> None:
         "expected colour to be declared only in src/styles/weaver.css, but "
         f"found literals in: {offenders}"
     )
+
+
+def test_generated_icon_macro_matches_its_source() -> None:
+    """The committed icon macro should be what the generator produces.
+
+    ``templates/weaver/_icons.jinja`` is generated from
+    ``config/weaver-icons.yaml`` and the ``@iconify-json/carbon`` package. A
+    hand-edit there, or a mapping change without a regeneration, would survive
+    unnoticed otherwise.
+    """
+    spec = importlib.util.spec_from_file_location(
+        "generate_weaver_icons", REPO_ROOT / "scripts" / "generate_weaver_icons.py"
+    )
+    assert spec is not None
+    assert spec.loader is not None
+    generator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(generator)
+
+    if not generator.CARBON.is_file():  # pragma: no cover - environment guard
+        pytest.skip("@iconify-json/carbon is not installed; run 'bun install'")
+
+    expected = generator.build_macro()
+    actual = generator.OUTPUT.read_text(encoding="utf-8")
+    assert actual == expected, (
+        "templates/weaver/_icons.jinja is out of date; run "
+        "'uv run python scripts/generate_weaver_icons.py'"
+    )
+
+
+def test_no_font_awesome_markup_remains() -> None:
+    """Every Font Awesome glyph should have become an inline SVG."""
+    offenders = {
+        str(path.relative_to(REPO_ROOT))
+        for path in WEAVER_TEMPLATES.rglob("*.jinja")
+        # The generated macro is the one file allowed to name the old classes:
+        # its documentation shows the markup it replaces.
+        if path.name != "_icons.jinja"
+        and re.search(
+            r"\bfa-(solid|regular|brands)\b", path.read_text(encoding="utf-8")
+        )
+    }
+    assert not offenders, f"Font Awesome classes remain in: {offenders}"

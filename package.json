@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",
+    "@iconify-json/carbon": "^1.2.25",
     "@tailwindcss/cli": "^4.1.15",
     "@tailwindcss/typography": "^0.5.19",
     "@types/bun": "latest",

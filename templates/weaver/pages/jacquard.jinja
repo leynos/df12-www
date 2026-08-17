@@ -55,9 +55,9 @@
                     <div class="p-5 bg-white/70 border border-base-content/10 rounded-xs paper-panel">
                         <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">Design Facts</p>
                         <ul class="space-y-3 text-xs text-base-content/80 leading-relaxed">
-                            <li><code>observe get-card</code> defaults to <code>structure</code> detail.</li>
+                            <li><code>cards get</code> defaults to <code>structure</code> detail.</li>
                             <li>Baseline edges are <code>call</code>, <code>import</code>, and <code>config</code>.</li>
-                            <li><code>graph-slice</code> defaults: depth 2, both directions, 30 cards, 200 edges, 4000 estimated tokens.</li>
+                            <li><code>graph-slices get</code> defaults: depth 2, both directions, 30 cards, 200 edges, 4000 estimated tokens.</li>
                             <li><code>graph-history</code> defaults: 5 commits, threshold 0.6, 3 alternates, <code>max_duplicates</code> 8.</li>
                             <li>History starts with <code>snapshots_on_demand</code>. Ledger cache comes later.</li>
                         </ul>
@@ -102,7 +102,7 @@
                             <div class="bg-white/70 border border-base-content/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">Discipline</p>
                                 <p class="font-serif text-2xl text-base-content mb-2">Cheap by default.</p>
-                                <p class="text-sm text-base-content/75"><code>get-card</code> lands at <code>structure</code>. Deeper detail is an escalation, not a reflex. Civilisation survives by such rules.</p>
+                                <p class="text-sm text-base-content/75"><code>cards get</code> lands at <code>structure</code>. Deeper detail is an escalation, not a reflex. Civilisation survives by such rules.</p>
                             </div>
                         </div>
                     </header>
@@ -170,7 +170,7 @@
                                             <tr>
                                                 <td class="px-4 py-4 font-mono">structure</td>
                                                 <td class="px-4 py-4">Docs, attachments, locals, branches, basic metrics.</td>
-                                                <td class="px-4 py-4">Default for <code>get-card</code>. High utility without requiring live LSP.</td>
+                                                <td class="px-4 py-4">Default for <code>cards get</code>. High utility without requiring live LSP.</td>
                                             </tr>
                                             <tr>
                                                 <td class="px-4 py-4 font-mono">semantic</td>
@@ -423,22 +423,23 @@
                                 </p>
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel space-y-5">
                                     <div>
-                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">get-card</p>
-<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver observe get-card \
+                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">cards get</p>
+<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver cards get \
   --uri file:///repo/src/lib.py \
   --position 10:0 \
   --detail structure</pre>
                                     </div>
                                     <div>
-                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">graph-slice</p>
-<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver observe graph-slice \
+                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">graph-slices get</p>
+<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver graph-slices get \
   --uri file:///repo/src/lib.py \
   --position 10:0 \
   --depth 2 --max-cards 30</pre>
                                     </div>
                                     <div>
-                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">graph-history</p>
-<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver observe graph-history \
+                                        <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">graph history</p>
+<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed"># public spelling lands with phase 17
+graph-history \
   --uri file:///repo/src/lib.py \
   --position 10:0 \
   --commits 5 --match-threshold 0.6</pre>
@@ -456,12 +457,12 @@
                                     </thead>
                                     <tbody class="text-base-content/85">
                                         <tr>
-                                            <td class="px-4 py-4 font-mono">get-card</td>
+                                            <td class="px-4 py-4 font-mono">cards get</td>
                                             <td class="px-4 py-4">Return one <code>SymbolCard</code> by URI and position or by ID.</td>
                                             <td class="px-4 py-4"><code>structure</code> detail. High signal without depending on live LSP.</td>
                                         </tr>
                                         <tr>
-                                            <td class="px-4 py-4 font-mono">graph-slice</td>
+                                            <td class="px-4 py-4 font-mono">graph-slices get</td>
                                             <td class="px-4 py-4">Build a bounded slice around the entry symbol.</td>
                                             <td class="px-4 py-4">Depth 2, direction <code>both</code>, all baseline edges, budgeted output.</td>
                                         </tr>
@@ -485,7 +486,7 @@
                                     LSP may be absent. Fan-out may explode. History parsing may hit blob limits. Homonyms may crowd the match space. Jacquard handles each of these as an exposed quality issue, not a silent downgrade. That is the difference between a diagnostic tool and a confidence trick.
                                 </p>
                                 <p class="text-base text-base-content/75 leading-relaxed">
-                                    The rollout plan is equally disciplined: <code>get-card</code> first, <code>graph-slice</code> second, <code>graph-history</code> third, matching reason codes after that, and ledger cache only when the simpler mode proves its value. Start with the cheap truth. Add expensive convenience later.
+                                    The rollout plan is equally disciplined: <code>cards get</code> first, <code>graph-slices get</code> second, <code>graph-history</code> third, matching reason codes after that, and ledger cache only when the simpler mode proves its value. Start with the cheap truth. Add expensive convenience later.
                                 </p>
                             </div>
                             <div class="xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">

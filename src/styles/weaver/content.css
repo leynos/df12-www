@@ -1,0 +1,77 @@
+/* The generated legal pages: table of contents, sections, and cards.
+ *
+ * The markup for these comes from Markdown through the shared content
+ * generator, so the classes are the generator's vocabulary rather than
+ * this sub-site's.
+ */
+
+.content-toc {
+  border: 1px solid var(--color-primary);
+  border-radius: 0.5rem;
+  background: var(--color-base-100);
+  padding: 1.25rem 1.5rem;
+}
+
+.content-toc ul {
+  display: grid;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 1.5rem, not the 2rem this rule used to claim.
+   These sections are children of an `article.space-y-6`, and Tailwind v3's
+   `space-y-*` set `margin-top` on every child but the first with a selector
+   specific enough to win here — so every section actually rendered at the
+   article's 1.5rem rhythm and the 2rem never applied. Tailwind v4 sets
+   `margin-bottom` on every child but the *last* instead, which left the last
+   section as the only one this rule could reach, and it alone jumped 8px.
+   Declaring the rhythm the page has always had settles it. */
+.content-section {
+  margin-top: 1.5rem;
+}
+
+.content-section--divider {
+  border-top: 1px solid var(--color-primary);
+  padding-top: 1.5rem;
+}
+
+.content-card {
+  align-items: flex-start;
+  border: 1px solid var(--color-primary);
+  border-radius: 0.5rem;
+  background: var(--color-base-100);
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1.25rem 1.5rem;
+}
+
+.content-card__badge {
+  align-items: center;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  display: flex;
+  flex: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  height: 2.5rem;
+  justify-content: center;
+  margin-top: 0.25rem;
+  width: 2.5rem;
+}
+
+.content-card--accent .content-card__badge {
+  background: color-mix(in oklab, var(--color-accent) 12%, transparent);
+  color: var(--color-neutral);
+}
+
+.content-card__body {
+  min-width: 0;
+}
+
+.content-card__body > :first-child {
+  margin-top: 0;
+}

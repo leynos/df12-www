@@ -11,10 +11,10 @@ and each is asserted here so a later change cannot quietly undo one:
 3. Colour is declared once, in the theme, rather than restated as literals
    throughout the markup and the partials.
 
-The milestones land in that order, so tests 2 and 3 are expected to fail until
-theirs does. They carry a strict ``xfail`` marker in the meantime, which is
-removed as each turns green — a marker left in place after the behaviour
-arrives would itself fail the suite, so neither can be forgotten.
+Each was written failing, and each carried a strict ``xfail`` marker naming
+the milestone that would turn it green — a marker left in place after the
+behaviour arrived would itself fail the suite, so none could be forgotten. All
+three now pass on their own.
 """
 
 from __future__ import annotations
@@ -125,10 +125,6 @@ def test_weaver_pages_reach_no_third_party_hosts(built_site: Path) -> None:
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Milestone 7 tokenizes the partials lifted out of the templates",
-)
 def test_weaver_sources_declare_no_colour_literals() -> None:
     """Colour should live in the theme, not be restated across the sources."""
     offenders: dict[str, list[str]] = {}

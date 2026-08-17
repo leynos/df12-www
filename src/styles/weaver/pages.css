@@ -3,9 +3,9 @@
  * Each of these was a small `<style>` block inlined in the one template that
  * used it. That is a defensible shape for a one-off, but it kept colour
  * literals in the markup and put the rules out of reach of the stylesheet's
- * own tokens — `#193C6E` at 20% opacity for the roadmap's timeline rule, and
- * `rgba(25, 60, 110, 0.2)` for the install page's step connector, are the
- * same colour written two ways and neither knew about the theme.
+ * own tokens. The roadmap's timeline rule was a hex code at 20% opacity and
+ * the install page's step connector a long-form triple — the same colour,
+ * written two ways, neither of them aware the theme existed.
  *
  * They stay separate rules rather than being merged: a timeline and a step
  * connector are different things that happen to be thin indigo lines.

@@ -30,12 +30,12 @@
   --tw-scale-y: 1;
   --tw-scroll-snap-strictness: proximity;
   --tw-ring-offset-width: 0px;
-  --tw-ring-offset-color: #fff;
-  --tw-ring-color: rgb(59 130 246 / 0.5);
-  --tw-ring-offset-shadow: 0 0 #0000;
-  --tw-ring-shadow: 0 0 #0000;
-  --tw-shadow: 0 0 #0000;
-  --tw-shadow-colored: 0 0 #0000;
+  --tw-ring-offset-color: white;
+  --tw-ring-color: color-mix(in oklab, var(--color-note-info-line) 50%, transparent);
+  --tw-ring-offset-shadow: 0 0 transparent;
+  --tw-ring-shadow: 0 0 transparent;
+  --tw-shadow: 0 0 transparent;
+  --tw-shadow-colored: 0 0 transparent;
   margin-top: 32px;
   --tw-text-opacity: 1;
   color: var(--color-primary);
@@ -47,12 +47,12 @@
   --tw-scale-y: 1;
   --tw-scroll-snap-strictness: proximity;
   --tw-ring-offset-width: 0px;
-  --tw-ring-offset-color: #fff;
-  --tw-ring-color: rgb(59 130 246 / 0.5);
-  --tw-ring-offset-shadow: 0 0 #0000;
-  --tw-ring-shadow: 0 0 #0000;
-  --tw-shadow: 0 0 #0000;
-  --tw-shadow-colored: 0 0 #0000;
+  --tw-ring-offset-color: white;
+  --tw-ring-color: color-mix(in oklab, var(--color-note-info-line) 50%, transparent);
+  --tw-ring-offset-shadow: 0 0 transparent;
+  --tw-ring-shadow: 0 0 transparent;
+  --tw-shadow: 0 0 transparent;
+  --tw-shadow-colored: 0 0 transparent;
 }
 
 #ipbse {
@@ -60,14 +60,14 @@
   --tw-scale-y: 1;
   --tw-scroll-snap-strictness: proximity;
   --tw-ring-offset-width: 0px;
-  --tw-ring-offset-color: #fff;
-  --tw-ring-color: rgb(59 130 246 / 0.5);
-  --tw-ring-offset-shadow: 0 0 #0000;
-  --tw-ring-shadow: 0 0 #0000;
-  --tw-shadow: 0 0 #0000;
-  --tw-shadow-colored: 0 0 #0000;
+  --tw-ring-offset-color: white;
+  --tw-ring-color: color-mix(in oklab, var(--color-note-info-line) 50%, transparent);
+  --tw-ring-offset-shadow: 0 0 transparent;
+  --tw-ring-shadow: 0 0 transparent;
+  --tw-shadow: 0 0 transparent;
+  --tw-shadow-colored: 0 0 transparent;
   --tw-text-opacity: 1;
-  color: rgb(232, 80, 43);
+  color: var(--color-accent);
 }
 
 #ivx1g {
@@ -75,10 +75,10 @@
   --tw-scale-y: 1;
   --tw-scroll-snap-strictness: proximity;
   --tw-ring-offset-width: 0px;
-  --tw-ring-offset-color: #fff;
-  --tw-ring-color: rgb(59 130 246 / 0.5);
-  --tw-ring-offset-shadow: 0 0 #0000;
-  --tw-ring-shadow: 0 0 #0000;
-  --tw-shadow: 0 0 #0000;
-  --tw-shadow-colored: 0 0 #0000;
+  --tw-ring-offset-color: white;
+  --tw-ring-color: color-mix(in oklab, var(--color-note-info-line) 50%, transparent);
+  --tw-ring-offset-shadow: 0 0 transparent;
+  --tw-ring-shadow: 0 0 transparent;
+  --tw-shadow: 0 0 transparent;
+  --tw-shadow-colored: 0 0 transparent;
 }

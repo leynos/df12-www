@@ -7,20 +7,20 @@
 
       #sidebar nav a.bg-weaver-indigo.text-weaver-cream { ... }
 
-  That selector could not survive the classes being renamed, which the
-  semantic sweep is about to do. Every link now carries `weaver-nav-link`,
+  That selector could not have survived the classes being renamed, which
+  the semantic sweep then did. Every link carries `weaver-nav-link`,
   and the current one `weaver-nav-link--current`, so the stylesheet has a name
   to hold on to that describes the role rather than the appearance.
 
-  The utility strings stay in the macro for now. They are written once here
-  instead of eleven times in the layout, which is the point of this pass; the
-  semantic sweep replaces their vocabulary in this one place.
+  The utility strings live here rather than in the layout, written once
+  instead of eleven times, which is what let the semantic sweep restate
+  their vocabulary in a single place.
 #}
 
 {%- set _nav_base = "weaver-nav-link block px-4 py-2 text-sm" -%}
-{%- set _nav_current = "weaver-nav-link--current font-semibold bg-weaver-indigo text-weaver-cream rounded-xs border border-weaver-indigo shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]" -%}
-{%- set _nav_rest = "font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent" -%}
-{%- set _nav_install = "font-medium text-weaver-dark hover:bg-weaver-vermilion/5 transition-colors border border-transparent font-mono" -%}
+{%- set _nav_current = "weaver-nav-link--current font-semibold bg-primary text-base-100 rounded-xs border border-base-content shadow-block" -%}
+{%- set _nav_rest = "font-medium text-base-content hover:bg-primary/5 transition-colors border border-transparent" -%}
+{%- set _nav_install = "font-medium text-neutral hover:bg-accent/5 transition-colors border border-transparent font-mono" -%}
 
 {#
   Render one sidebar link.

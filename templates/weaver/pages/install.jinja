@@ -112,18 +112,18 @@
                         <div class="absolute left-0 top-0 w-8 h-8 bg-primary text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">02</div>
 
                         <h3 class="font-serif text-xl font-bold text-base-content mb-2">Verify Installation</h3>
-                        <p class="text-base-content/88 mb-4 max-w-2xl">No init ceremony required — Weaver discovers configuration through XDG paths, environment variables, and CLI flags, all with sensible defaults. Run the capability probe to confirm the binary is installed:</p>
+                        <p class="text-base-content/88 mb-4 max-w-2xl">No init ceremony required &ndash; Weaver discovers configuration through XDG paths, environment variables, saved profiles, and CLI flags, all with sensible defaults. Run the capability probe to confirm the binary is installed:</p>
 
                         <div class="bg-neutral rounded-xs p-4 shadow-lg border border-base-content/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
-                                <code class="font-mono text-sm text-code-string">weaver --capabilities</code>
-                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="df12WeaverCopy('weaver --capabilities')">
+                                <code class="font-mono text-sm text-code-string">weaver capabilities list --json</code>
+                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="df12WeaverCopy('weaver capabilities list --json')">
                                     {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>
                             <div class="mt-2 text-xs text-code-muted font-mono border-t border-white/10 pt-2">
-                                Prints the negotiated capability matrix as JSON.<br>
-                                No daemon required — this runs entirely in the CLI process.
+                                Reports runtime capability availability with the provider-selection rationale.<br>
+                                For the whole command contract as data, run <code>weaver context --json</code>.
                             </div>
                         </div>
 
@@ -148,14 +148,14 @@
                         <div class="absolute left-0 top-0 w-8 h-8 bg-primary text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">03</div>
 
                         <h3 class="font-serif text-xl font-bold text-base-content mb-2">Try a Command</h3>
-                        <p class="text-base-content/88 mb-4 max-w-2xl">The daemon auto-starts when you issue a domain command — no manual launch needed. Just run:</p>
+                        <p class="text-base-content/88 mb-4 max-w-2xl">The daemon auto-starts on the first routed command &ndash; no manual launch needed. Just run:</p>
 
                         <div class="bg-neutral rounded-xs p-4 shadow-lg border border-base-content/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-code-text">
-                                    <span class="text-code-string">weaver</span> observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1
+                                    <span class="text-code-string">weaver</span> definitions get --uri file:///path/to/project/src/main.rs --position 1:1
                                 </code>
-                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="df12WeaverCopy('weaver observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1')">
+                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="df12WeaverCopy('weaver definitions get --uri file:///path/to/project/src/main.rs --position 1:1')">
                                     {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>

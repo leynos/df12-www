@@ -51,7 +51,7 @@ body {
   right: 0;
   bottom: 0;
   left: 0;
-  background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+  background-image: url("/weaver/assets/textures/cream-paper.png");
   opacity: 0.6;
   pointer-events: none;
   z-index: 50;

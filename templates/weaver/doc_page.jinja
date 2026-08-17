@@ -9,7 +9,10 @@
         window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/playfair-display-latin-wght-normal.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/ibm-plex-sans-latin-wght-normal.woff2">
     {% block extra_head %}{% endblock %}
     <link rel="stylesheet" href="/weaver/assets/styles/weaver.css">
 </head>

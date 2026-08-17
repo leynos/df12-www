@@ -28,7 +28,7 @@
                         <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">System Design</span>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-8">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-none mb-8">
                         The Loom of <br>
                         <span class="text-weaver-vermilion italic font-light">Structured</span> Intelligence.
                     </h1>
@@ -65,7 +65,7 @@
                         </div>
 
                         <!-- ASCII / CSS Diagram -->
-                        <div class="bg-weaver-dark p-4 rounded-sm shadow-xl overflow-hidden border border-weaver-indigo/50 relative group figure-fullbleed">
+                        <div class="bg-weaver-dark p-4 rounded-xs shadow-xl overflow-hidden border border-weaver-indigo/50 relative group figure-fullbleed">
                             <div class="absolute top-2 right-2 text-[10px] text-weaver-vermilion opacity-50 figure-fullbleed-label">FIG 3.0</div>
                             <img
                                 src="/weaver/assets/how-it-works/how-it-works-system-topology.png"
@@ -98,7 +98,7 @@
 
                             <div class="space-y-8 mt-8">
                                 <div class="flex gap-4">
-                                    <div class="flex-shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-sm border border-weaver-indigo/20">
+                                    <div class="shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-xs border border-weaver-indigo/20">
                                         <i class="fa-solid fa-layer-group"></i>
                                     </div>
                                     <div>
@@ -107,7 +107,7 @@
                                     </div>
                                 </div>
                                 <div class="flex gap-4">
-                                    <div class="flex-shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-sm border border-weaver-indigo/20">
+                                    <div class="shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-xs border border-weaver-indigo/20">
                                         <i class="fa-solid fa-tag"></i>
                                     </div>
                                     <div>
@@ -134,7 +134,7 @@
                                         </div>
 
                                         <!-- Code Block 2 (Highlighted) -->
-                                        <div class="bg-weaver-indigo/5 p-2 -mx-2 rounded border-l-2 border-weaver-vermilion">
+                                        <div class="bg-weaver-indigo/5 p-2 -mx-2 rounded-sm border-l-2 border-weaver-vermilion">
                                             <span class="text-weaver-indigo">{</span><br>
                                             <span class="text-weaver-vermilion ml-4">"type"</span>: <span class="text-green-700">"semantic_node"</span>,<br>
                                             <span class="text-weaver-vermilion ml-4">"id"</span>: <span class="text-blue-700">"fn::process_data"</span>,<br>
@@ -204,7 +204,7 @@
 
                             <div class="mt-8 pt-6 border-t border-white/10">
                                 <div class="font-mono text-xs text-gray-400 mb-2">Manual lifecycle:</div>
-                                <code class="block bg-black/30 p-2 rounded text-xs font-mono text-green-400">$ weaver daemon start</code>
+                                <code class="block bg-black/30 p-2 rounded-sm text-xs font-mono text-green-400">$ weaver daemon start</code>
                             </div>
                         </div>
 
@@ -234,7 +234,7 @@
 
                             <div class="mt-8 pt-6 border-t border-white/10">
                                 <div class="font-mono text-xs text-gray-400 mb-2">Usage example:</div>
-                                <code class="block bg-black/30 p-2 rounded text-xs font-mono text-green-400">$ weaver observe get-definition --uri file:///src/main.rs --position 10:5</code>
+                                <code class="block bg-black/30 p-2 rounded-sm text-xs font-mono text-green-400">$ weaver observe get-definition --uri file:///src/main.rs --position 10:5</code>
                             </div>
                         </div>
                     </div>
@@ -259,13 +259,13 @@
                         <div class="space-y-12">
                             <!-- Step 1 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">01</div>
-                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm">
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">01</div>
+                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-xs shadow-xs">
                                     <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">Ingestion & Parsing</h3>
                                     <p class="text-sm text-weaver-indigo/70 mb-3">
                                         When a file is observed, the Daemon invokes Tree-sitter to generate a Concrete Syntax Tree (CST).
                                     </p>
-                                    <div class="inline-flex items-center gap-2 px-2 py-1 bg-weaver-indigo/5 rounded text-xs font-mono text-weaver-indigo">
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 bg-weaver-indigo/5 rounded-sm text-xs font-mono text-weaver-indigo">
                                         <i class="fa-solid fa-file-code"></i> source.rs
                                         <i class="fa-solid fa-arrow-right mx-1 text-xs"></i>
                                         <i class="fa-solid fa-tree"></i> CST
@@ -275,8 +275,8 @@
 
                             <!-- Step 2 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">02</div>
-                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm">
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">02</div>
+                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-xs shadow-xs">
                                     <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">Sempai Pattern Matching</h3>
                                     <p class="text-sm text-weaver-indigo/70 mb-3">
                                         The <a href="/weaver/sempai/" class="text-weaver-vermilion hover:underline">Sempai Engine</a> runs structural queries against the CST to identify high-level constructs (functions, classes, API endpoints).
@@ -286,8 +286,8 @@
 
                             <!-- Step 3 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">03</div>
-                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm">
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">03</div>
+                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-xs shadow-xs">
                                     <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">LSP Enrichment</h3>
                                     <p class="text-sm text-weaver-indigo/70 mb-3">
                                         If available, the Language Server is queried for type definitions, references, and documentation, enriching the static nodes with semantic context.
@@ -297,8 +297,8 @@
 
                             <!-- Step 4 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-vermilion border-2 border-weaver-vermilion rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-white shadow-lg">04</div>
-                                <div class="flex-1 bg-white border-2 border-weaver-vermilion p-6 rounded-sm shadow-md">
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-weaver-vermilion border-2 border-weaver-vermilion rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-white shadow-lg">04</div>
+                                <div class="flex-1 bg-white border-2 border-weaver-vermilion p-6 rounded-xs shadow-md">
                                     <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">Graph Fusion</h3>
                                     <p class="text-sm text-weaver-indigo/70 mb-3">
                                         All data points are merged into the Semantic Graph. Nodes are tagged with confidence scores based on their source (e.g., LSP > Regex).

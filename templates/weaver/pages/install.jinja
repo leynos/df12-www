@@ -24,7 +24,7 @@
                         <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Setup Guide</span>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-none mb-6">
                         Initialize the <br><span class="text-weaver-vermilion italic font-light">Loom</span>
                     </h1>
 
@@ -100,15 +100,15 @@
                     <!-- Step 1 -->
                     <div class="relative pl-12 pb-12">
                         <div class="step-line"></div>
-                        <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-vermilion text-white font-mono font-bold flex items-center justify-center rounded-sm shadow-sm z-10">01</div>
+                        <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-vermilion text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">01</div>
 
                         <h3 class="font-serif text-xl font-bold text-weaver-indigo mb-2">Install from Crates.io</h3>
                         <p class="text-weaver-indigo/70 mb-4 max-w-2xl">Download and compile the weaver binary. This includes both the client CLI and the daemon.</p>
 
-                        <div class="bg-weaver-dark rounded-sm p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
+                        <div class="bg-weaver-dark rounded-xs p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-green-400">cargo install weaver</code>
-                                <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded" onclick="navigator.clipboard.writeText('cargo install weaver')">
+                                <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('cargo install weaver')">
                                     <i class="fa-regular fa-copy mr-1"></i> Copy
                                 </button>
                             </div>
@@ -118,15 +118,15 @@
                     <!-- Step 2 -->
                     <div class="relative pl-12 pb-12">
                         <div class="step-line"></div>
-                        <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-indigo text-white font-mono font-bold flex items-center justify-center rounded-sm shadow-sm z-10">02</div>
+                        <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-indigo text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">02</div>
 
                         <h3 class="font-serif text-xl font-bold text-weaver-indigo mb-2">Verify Installation</h3>
                         <p class="text-weaver-indigo/70 mb-4 max-w-2xl">No init ceremony required — Weaver discovers configuration through XDG paths, environment variables, and CLI flags, all with sensible defaults. Run the capability probe to confirm the binary is installed:</p>
 
-                        <div class="bg-weaver-dark rounded-sm p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
+                        <div class="bg-weaver-dark rounded-xs p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-green-400">weaver --capabilities</code>
-                                <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded" onclick="navigator.clipboard.writeText('weaver --capabilities')">
+                                <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('weaver --capabilities')">
                                     <i class="fa-regular fa-copy mr-1"></i> Copy
                                 </button>
                             </div>
@@ -154,17 +154,17 @@
 
                     <!-- Step 3 -->
                     <div class="relative pl-12 last-step">
-                        <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-indigo text-white font-mono font-bold flex items-center justify-center rounded-sm shadow-sm z-10">03</div>
+                        <div class="absolute left-0 top-0 w-8 h-8 bg-weaver-indigo text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">03</div>
 
                         <h3 class="font-serif text-xl font-bold text-weaver-indigo mb-2">Try a Command</h3>
                         <p class="text-weaver-indigo/70 mb-4 max-w-2xl">The daemon auto-starts when you issue a domain command — no manual launch needed. Just run:</p>
 
-                        <div class="bg-weaver-dark rounded-sm p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
+                        <div class="bg-weaver-dark rounded-xs p-4 shadow-lg border border-weaver-indigo/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-gray-300">
                                     <span class="text-green-400">weaver</span> observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1
                                 </code>
-                                <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded" onclick="navigator.clipboard.writeText('weaver observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1')">
+                                <button class="copy-btn text-xs text-gray-400 hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('weaver observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1')">
                                     <i class="fa-regular fa-copy mr-1"></i> Copy
                                 </button>
                             </div>
@@ -197,13 +197,13 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <!-- Observe Card -->
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-sm hover:bg-white/10 transition-colors">
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-weaver-vermilion flex items-center justify-center text-white font-bold text-xs">1</div>
                                 <h3 class="font-mono font-bold text-white">OBSERVE</h3>
                             </div>
                             <p class="text-xs text-weaver-cream/60 mb-4 h-10">Jump to a symbol definition to understand the code before editing.</p>
-                            <div class="bg-black/30 p-3 rounded font-mono text-xs text-green-400 border border-white/5">
+                            <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-green-400 border border-white/5">
                                 $ weaver observe get-definition \<br>
                                 &nbsp;&nbsp;--uri file:///path/to/project/src/main.rs \<br>
                                 &nbsp;&nbsp;--position 10:5
@@ -211,25 +211,25 @@
                         </div>
 
                         <!-- Act Card -->
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-sm hover:bg-white/10 transition-colors">
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-weaver-vermilion flex items-center justify-center text-white font-bold text-xs">2</div>
                                 <h3 class="font-mono font-bold text-white">ACT</h3>
                             </div>
                             <p class="text-xs text-weaver-cream/60 mb-4 h-10">Apply a patch through Double-Lock validation.</p>
-                            <div class="bg-black/30 p-3 rounded font-mono text-xs text-green-400 border border-white/5">
+                            <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-green-400 border border-white/5">
                                 $ weaver act apply-patch &lt; fix.diff
                             </div>
                         </div>
 
                         <!-- Verify Card -->
-                        <div class="bg-white/5 border border-white/10 p-6 rounded-sm hover:bg-white/10 transition-colors">
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-weaver-vermilion flex items-center justify-center text-white font-bold text-xs">3</div>
                                 <h3 class="font-mono font-bold text-white">VERIFY</h3>
                             </div>
                             <p class="text-xs text-weaver-cream/60 mb-4 h-10">Pull diagnostics to confirm no regressions.</p>
-                            <div class="bg-black/30 p-3 rounded font-mono text-xs text-green-400 border border-white/5">
+                            <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-green-400 border border-white/5">
                                 $ weaver verify diagnostics \<br>
                                 &nbsp;&nbsp;--uri file:///path/to/project/src/main.rs
                             </div>
@@ -245,7 +245,7 @@
 
                     <div class="space-y-6">
                         <!-- Issue 1 -->
-                        <div class="border border-weaver-indigo/20 bg-white p-6 rounded-sm">
+                        <div class="border border-weaver-indigo/20 bg-white p-6 rounded-xs">
                             <h3 class="font-serif text-xl text-weaver-indigo flex items-center gap-2">
                                 <i class="fa-solid fa-triangle-exclamation text-weaver-vermilion"></i>
                                 Unix Socket Permission Denied
@@ -260,7 +260,7 @@
                         </div>
 
                         <!-- Issue 2 -->
-                        <div class="border border-weaver-indigo/20 bg-white p-6 rounded-sm">
+                        <div class="border border-weaver-indigo/20 bg-white p-6 rounded-xs">
                             <h3 class="font-serif text-xl text-weaver-indigo flex items-center gap-2">
                                 <i class="fa-solid fa-server text-weaver-faded"></i>
                                 Non-Unix / Windows Mode
@@ -268,7 +268,7 @@
                             <p class="text-sm text-weaver-indigo/70 mt-2 mb-4">
                                 Unix domain sockets are not supported on Windows. Switch to TCP mode in <code>weaver.toml</code>.
                             </p>
-                            <div class="bg-weaver-dark p-4 rounded-sm text-xs font-mono text-gray-300">
+                            <div class="bg-weaver-dark p-4 rounded-xs text-xs font-mono text-gray-300">
                                 <span class="text-weaver-indigo/50"># weaver.toml — switch to TCP transport</span><br>
                                 daemon_socket = { transport = <span class="text-green-400">"tcp"</span>, host = <span class="text-green-400">"127.0.0.1"</span>, port = <span class="text-yellow-400">9779</span> }
                             </div>

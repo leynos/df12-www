@@ -29,13 +29,13 @@
                         <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Security Architecture</span>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-none mb-6">
                         Safety <span class="text-weaver-vermilion italic font-light">&amp;</span><br>
                         Sandboxing
                     </h1>
 
                     <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
-                        Weaver assumes that AI agents are fundamentally untrusted actors. Two independent safety layers protect the codebase: the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Double-Lock</span> validation harness (syntactic + semantic checks on edits to supported files, with exemptions detailed below) and the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded font-bold">Birdcage</span> sandbox (kernel-level process isolation for all external tools). They operate independently — the Double-Lock guards code correctness; the sandbox guards system integrity.
+                        Weaver assumes that AI agents are fundamentally untrusted actors. Two independent safety layers protect the codebase: the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded-sm font-bold">Double-Lock</span> validation harness (syntactic + semantic checks on edits to supported files, with exemptions detailed below) and the <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded-sm font-bold">Birdcage</span> sandbox (kernel-level process isolation for all external tools). They operate independently — the Double-Lock guards code correctness; the sandbox guards system integrity.
                     </p>
                 </div>
 
@@ -84,7 +84,7 @@
                                 </li>
                             </ul>
                             <!-- Decorative padlock -->
-                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-indigo text-white flex items-center justify-center rounded-sm shadow-md z-10">
+                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-indigo text-white flex items-center justify-center rounded-xs shadow-md z-10">
                                 <i class="fa-solid fa-lock"></i>
                             </div>
                         </div>
@@ -111,14 +111,14 @@
                                 </li>
                             </ul>
                             <!-- Decorative padlock -->
-                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-vermilion text-white flex items-center justify-center rounded-sm shadow-md z-10">
+                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-vermilion text-white flex items-center justify-center rounded-xs shadow-md z-10">
                                 <i class="fa-solid fa-lock"></i>
                             </div>
                         </div>
                     </div>
 
                     <!-- Error reporting callout -->
-                    <div class="mt-12 bg-weaver-indigo/5 border border-weaver-indigo/10 p-6 rounded-sm">
+                    <div class="mt-12 bg-weaver-indigo/5 border border-weaver-indigo/10 p-6 rounded-xs">
                         <h4 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">When a lock fails</h4>
                         <p class="text-sm text-weaver-indigo/80 leading-relaxed">
                             The harness returns a structured error identifying the lock phase (syntactic or semantic), the affected files, optional line/column locations, and human-readable messages. Agents can use this to diagnose problems and regenerate corrected edits. The filesystem is never left in a partially written state.
@@ -151,7 +151,7 @@
                             <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[96px]">
                                 The agent sees a virtualized filesystem. It can only write to the specific project directory explicitly mounted for the task.
                             </p>
-                            <div class="bg-weaver-dark p-3 rounded-sm border border-weaver-indigo/20">
+                            <div class="bg-weaver-dark p-3 rounded-xs border border-weaver-indigo/20">
                                 <code class="font-mono text-xs text-green-400 block">/project (RW)</code>
                                 <code class="font-mono text-xs text-gray-300 block">/usr/lib (RO)</code>
                                 <code class="font-mono text-xs text-gray-500 block">/etc (Hidden)</code>
@@ -175,7 +175,7 @@
                             <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[96px]">
                                 By default, the network namespace is empty (loopback only). Access to package registries and APIs must be explicitly allowlisted via proxy.
                             </p>
-                            <div class="bg-weaver-dark p-3 rounded-sm border border-weaver-indigo/20">
+                            <div class="bg-weaver-dark p-3 rounded-xs border border-weaver-indigo/20">
                                 <code class="font-mono text-xs text-green-400 block">ALLOW api.uxpilot.ai:443</code>
                                 <code class="font-mono text-xs text-green-400 block">ALLOW crates.io:443</code>
                                 <code class="font-mono text-xs text-red-400 block">DENY *</code>
@@ -203,7 +203,7 @@
                             <p class="text-weaver-indigo/80 mb-6 text-sm leading-relaxed min-h-[96px]">
                                 cgroups limit CPU cycles, memory usage, and process counts to prevent fork bombs, runaway builds, or mining attempts by rogue agents.
                             </p>
-                            <div class="bg-weaver-dark p-3 rounded-sm border border-weaver-indigo/20">
+                            <div class="bg-weaver-dark p-3 rounded-xs border border-weaver-indigo/20">
                                 <code class="font-mono text-xs text-gray-300 block">CPU: 2 cores</code>
                                 <code class="font-mono text-xs text-gray-300 block">MEM: 4GB</code>
                                 <code class="font-mono text-xs text-gray-300 block">PIDS: 50 max</code>
@@ -251,7 +251,7 @@
                         </div>
 
                         <!-- Do's and Don'ts -->
-                        <div class="flex-1 bg-white/5 p-8 border border-white/10 rounded-sm w-full">
+                        <div class="flex-1 bg-white/5 p-8 border border-white/10 rounded-xs w-full">
                             <h3 class="font-serif text-xl mb-6 text-white">Operational Guidance</h3>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -306,19 +306,19 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-xs">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Defaults</h3>
                             <p class="text-sm text-weaver-indigo/75 leading-relaxed">
                                 Built-in logging defaults remain <code>info</code> for <code>log_filter</code> and <code>json</code> for <code>log_format</code>. Use <code>log_format = "compact"</code> only when overriding that default.
                             </p>
                         </div>
-                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-xs">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Config keys</h3>
                             <p class="text-sm text-weaver-indigo/75 leading-relaxed">
                                 The safety model depends on the same top-level config keys documented in the docs hub: <code>daemon_socket</code>, <code>log_filter</code>, <code>log_format</code>, and repeatable <code>[[capability_overrides]]</code>.
                             </p>
                         </div>
-                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-sm">
+                        <div class="bg-white border border-weaver-indigo/15 p-6 rounded-xs">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Wire format</h3>
                             <p class="text-sm text-weaver-indigo/75 leading-relaxed">
                                 Sandbox-protected tools still report through the daemon's normal JSONL envelope: <code>stream</code> frames during execution, then a final <code>exit</code> frame.
@@ -331,7 +331,7 @@
             <!-- Bottom CTA -->
             <section class="py-16 px-8 lg:px-16">
                 <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-xs">
                         <div>
                             <h3 class="font-serif text-xl text-weaver-indigo mb-2">Understand the Agent's Mind</h3>
                             <p class="text-sm text-weaver-indigo/70">Explore how Sempai queries the codebase structure.</p>

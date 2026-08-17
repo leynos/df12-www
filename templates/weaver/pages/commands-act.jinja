@@ -45,13 +45,13 @@
                         </div>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-none mb-6">
                         Controlled <br>
                         <span class="text-weaver-vermilion italic font-light">Intervention</span>.
                     </h1>
 
                     <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-3xl font-light">
-                        The <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded">act</span> domain groups all code-modification operations. Every edit is lock-guarded and transactional: changes are applied to in-memory copies, validated by the Double-Lock harness (syntactic + semantic checks), and only then atomically committed to disk. No proposal cycle, no human approval gate — the locks <em>are</em> the safety gate.
+                        The <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded-sm">act</span> domain groups all code-modification operations. Every edit is lock-guarded and transactional: changes are applied to in-memory copies, validated by the Double-Lock harness (syntactic + semantic checks), and only then atomically committed to disk. No proposal cycle, no human approval gate — the locks <em>are</em> the safety gate.
                     </p>
                 </div>
 
@@ -93,7 +93,7 @@
                         <!-- Right: Operations Table -->
                         <div class="lg:col-span-2">
                             <h2 class="font-serif text-2xl text-weaver-indigo mb-4">Operations</h2>
-                            <div class="overflow-hidden border border-weaver-indigo/20 rounded-sm shadow-sm bg-weaver-cream">
+                            <div class="overflow-hidden border border-weaver-indigo/20 rounded-xs shadow-xs bg-weaver-cream">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
                                         <tr class="bg-weaver-indigo text-weaver-cream font-mono text-xs uppercase tracking-wider">
@@ -182,7 +182,7 @@
                         <div class="relative group">
                             <div class="absolute -left-4 top-0 bottom-0 w-1 bg-weaver-indigo opacity-30 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-baseline gap-3 mb-4 pl-4">
-                                <span class="font-mono text-xs font-bold text-weaver-cream bg-weaver-indigo px-2 py-1 rounded-sm">EXAMPLE</span>
+                                <span class="font-mono text-xs font-bold text-weaver-cream bg-weaver-indigo px-2 py-1 rounded-xs">EXAMPLE</span>
                                 <h3 class="font-serif text-xl text-weaver-indigo">apply-patch</h3>
                             </div>
                             <p class="text-sm text-weaver-indigo/70 mb-4 pl-4 max-w-2xl">
@@ -190,7 +190,7 @@
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
-                                <div class="bg-weaver-dark rounded-sm p-4 border border-weaver-indigo/20">
+                                <div class="bg-weaver-dark rounded-xs p-4 border border-weaver-indigo/20">
                                     <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
                                         <span class="text-xs font-mono text-weaver-cream/50">TERMINAL</span>
                                     </div>
@@ -199,7 +199,7 @@
                                     </div>
                                 </div>
 
-                                <div class="bg-[#282A36] rounded-sm p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
+                                <div class="bg-[#282A36] rounded-xs p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
                                     <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">JSONL</div>
 <pre class="text-gray-300">
 {<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,<span class="token-key">"data"</span>:<span class="token-string">"{\"status\":\"ok\",\"files_written\":1,\"files_deleted\":0}"</span>}
@@ -218,7 +218,7 @@
                         <div class="relative group">
                             <div class="absolute -left-4 top-0 bottom-0 w-1 bg-weaver-vermilion opacity-30 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-baseline gap-3 mb-4 pl-4">
-                                <span class="font-mono text-xs font-bold text-white bg-weaver-vermilion px-2 py-1 rounded-sm">EXAMPLE</span>
+                                <span class="font-mono text-xs font-bold text-white bg-weaver-vermilion px-2 py-1 rounded-xs">EXAMPLE</span>
                                 <h3 class="font-serif text-xl text-weaver-indigo">refactor (rename via plugin)</h3>
                             </div>
                             <p class="text-sm text-weaver-indigo/70 mb-4 pl-4 max-w-2xl">
@@ -226,7 +226,7 @@
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
-                                <div class="bg-weaver-dark rounded-sm p-4 border border-weaver-indigo/20">
+                                <div class="bg-weaver-dark rounded-xs p-4 border border-weaver-indigo/20">
                                     <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
                                         <span class="text-xs font-mono text-weaver-cream/50">TERMINAL</span>
                                     </div>
@@ -239,7 +239,7 @@
                                     </div>
                                 </div>
 
-                                <div class="bg-[#282A36] rounded-sm p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
+                                <div class="bg-[#282A36] rounded-xs p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
                                     <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">JSONL</div>
 <pre class="text-gray-300">
 {<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,<span class="token-key">"data"</span>:<span class="token-string">"{\"status\":\"ok\",\"files_written\":1,\"files_deleted\":0}"</span>}
@@ -260,7 +260,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                         <!-- Error 1: Syntactic Lock -->
-                        <div class="bg-weaver-cream border border-weaver-vermilion/30 p-5 rounded-sm relative overflow-hidden">
+                        <div class="bg-weaver-cream border border-weaver-vermilion/30 p-5 rounded-xs relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-weaver-vermilion"></div>
                             <div class="flex items-start justify-between mb-3">
                                 <span class="font-mono text-xs font-bold text-weaver-vermilion">ERR_SYNTACTIC_LOCK</span>
@@ -269,13 +269,13 @@
                             <p class="text-xs text-weaver-indigo/80 leading-relaxed mb-3">
                                 The modified file failed Tree-sitter parsing. Structural error (e.g. unbalanced braces, missing semicolons).
                             </p>
-                            <code class="block bg-weaver-indigo/5 p-2 rounded text-[10px] font-mono text-weaver-indigo">
+                            <code class="block bg-weaver-indigo/5 p-2 rounded-sm text-[10px] font-mono text-weaver-indigo">
                                 syntactic lock failed: src/main.rs:42:5 syntax error
                             </code>
                         </div>
 
                         <!-- Error 2: Semantic Lock -->
-                        <div class="bg-weaver-cream border border-weaver-vermilion/30 p-5 rounded-sm relative overflow-hidden">
+                        <div class="bg-weaver-cream border border-weaver-vermilion/30 p-5 rounded-xs relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-weaver-vermilion"></div>
                             <div class="flex items-start justify-between mb-3">
                                 <span class="font-mono text-xs font-bold text-weaver-vermilion">ERR_SEMANTIC_LOCK</span>
@@ -284,13 +284,13 @@
                             <p class="text-xs text-weaver-indigo/80 leading-relaxed mb-3">
                                 New diagnostics detected after the edit. The language server found type errors or unresolved references that were not present before.
                             </p>
-                            <code class="block bg-weaver-indigo/5 p-2 rounded text-[10px] font-mono text-weaver-indigo">
+                            <code class="block bg-weaver-indigo/5 p-2 rounded-sm text-[10px] font-mono text-weaver-indigo">
                                 semantic lock failed: 2 new error(s)
                             </code>
                         </div>
 
                         <!-- Error 3: Sandbox Violation -->
-                        <div class="bg-weaver-cream border border-weaver-indigo/20 p-5 rounded-sm relative overflow-hidden">
+                        <div class="bg-weaver-cream border border-weaver-indigo/20 p-5 rounded-xs relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-weaver-indigo"></div>
                             <div class="flex items-start justify-between mb-3">
                                 <span class="font-mono text-xs font-bold text-weaver-indigo">ERR_SANDBOX_VIOLATION</span>
@@ -299,7 +299,7 @@
                             <p class="text-xs text-weaver-indigo/80 leading-relaxed mb-3">
                                 A plugin attempted to access a path outside the sandbox allowlist. The child process is killed immediately.
                             </p>
-                            <code class="block bg-weaver-indigo/5 p-2 rounded text-[10px] font-mono text-weaver-indigo">
+                            <code class="block bg-weaver-indigo/5 p-2 rounded-sm text-[10px] font-mono text-weaver-indigo">
                                 Access denied: /etc/hosts
                             </code>
                         </div>
@@ -311,20 +311,20 @@
             <!-- Act Extricate (PLANNED) -->
             <section id="extricate" class="py-16 px-8 lg:px-16 border-t border-weaver-indigo/10">
                 <div class="max-w-6xl mx-auto">
-                    <div class="border-2 border-dashed border-weaver-indigo/40 rounded-sm p-8 lg:p-12 opacity-80">
+                    <div class="border-2 border-dashed border-weaver-indigo/40 rounded-xs p-8 lg:p-12 opacity-80">
                         <div class="flex items-center gap-3 mb-8">
                             <h2 class="font-serif text-3xl font-bold text-weaver-indigo">act extricate</h2>
                             <span class="status-pill status-pill-planned">Planned</span>
                         </div>
 
                         <p class="text-sm text-weaver-indigo/80 leading-relaxed mb-8 max-w-3xl">
-                            Move a selected symbol into a different module while preserving behaviour. The detailed execution model documented here is Rust-specific: it covers <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded">impl</code> blocks, <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded">use</code> tree rewrites, and refusal cases such as non-preservable <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded">pub(in ...)</code>. Python remains a planned capability route, but its Rope-backed limits are not specified to the same depth yet.
+                            Move a selected symbol into a different module while preserving behaviour. The detailed execution model documented here is Rust-specific: it covers <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded-sm">impl</code> blocks, <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded-sm">use</code> tree rewrites, and refusal cases such as non-preservable <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded-sm">pub(in ...)</code>. Python remains a planned capability route, but its Rope-backed limits are not specified to the same depth yet.
                         </p>
 
                         <!-- Synopsis -->
                         <div class="mb-8">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Synopsis</h3>
-                            <div class="paper-panel bg-weaver-dark text-weaver-cream p-4 rounded-sm">
+                            <div class="paper-panel bg-weaver-dark text-weaver-cream p-4 rounded-xs">
                                 <code class="text-xs font-mono">weaver act extricate --uri &lt;file:///...&gt; --position &lt;line:col&gt; --to &lt;module&gt;</code>
                             </div>
                         </div>
@@ -333,7 +333,7 @@
                         <div class="mb-8">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Capability</h3>
                             <p class="text-sm text-weaver-indigo/80">
-                                Maps to capability ID <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded">extricate-symbol</code>. Providers declare this capability in their plugin manifest; the daemon resolves the correct provider for the source file's language.
+                                Maps to capability ID <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded-sm">extricate-symbol</code>. Providers declare this capability in their plugin manifest; the daemon resolves the correct provider for the source file's language.
                             </p>
                         </div>
 
@@ -361,7 +361,7 @@
                                             <td class="p-3 font-mono text-xs">Rust</td>
                                             <td class="p-3 font-mono text-xs">rust-analyzer</td>
                                             <td class="p-3 text-xs">RA LSP + overlay transaction engine</td>
-                                            <td class="p-3 text-xs">Detailed design exists. Handles definition and reference planning, <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded">impl</code> moves, <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded">use</code> rewrites, and Rust-specific refusal cases.</td>
+                                            <td class="p-3 text-xs">Detailed design exists. Handles definition and reference planning, <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded-sm">impl</code> moves, <code class="text-xs font-mono bg-weaver-indigo/5 px-1 py-0.5 rounded-sm">use</code> rewrites, and Rust-specific refusal cases.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -372,47 +372,47 @@
                         <div class="mb-8">
                             <h3 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">Orchestration Sequence</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-sm">1</span>
+                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-xs">1</span>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Resolve</span>
                                     </div>
                                     <p class="text-xs text-weaver-indigo/70">Validate arguments, resolve the selected definition, and collect pre-move references.</p>
                                 </div>
-                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-sm">2</span>
+                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-xs">2</span>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Overlay</span>
                                     </div>
                                     <p class="text-xs text-weaver-indigo/70">Start an in-memory overlay transaction. No filesystem writes until all checks pass.</p>
                                 </div>
-                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-sm">3</span>
+                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-xs">3</span>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Move</span>
                                     </div>
                                     <p class="text-xs text-weaver-indigo/70">Build move-set closure for the symbol and associated <code class="font-mono">impl</code> blocks. Apply edits to overlay.</p>
                                 </div>
-                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-sm">4</span>
+                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-xs">4</span>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Import Repair</span>
                                     </div>
                                     <p class="text-xs text-weaver-indigo/70">Rewrite external references and <code class="font-mono">use</code> trees. Disambiguate imports via definition-equivalence probes.</p>
                                 </div>
-                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-sm">5</span>
+                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-xs">5</span>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Verify</span>
                                     </div>
                                     <p class="text-xs text-weaver-indigo/70">Run semantic invariants: no new diagnostics, all reference probes resolve to the moved definition.</p>
                                 </div>
-                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-sm">6</span>
+                                        <span class="w-6 h-6 bg-weaver-indigo text-weaver-cream flex items-center justify-center font-mono text-xs font-bold rounded-xs">6</span>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Commit / Rollback</span>
                                     </div>
-                                    <p class="text-xs text-weaver-indigo/70">The provider returns a unified diff to the daemon on success. The daemon then commits the edit to disk and updates <code class="font-mono bg-weaver-indigo/5 px-1 rounded">files_written</code> only if both locks pass; on any failure it discards the overlay and returns diagnostics unchanged.</p>
+                                    <p class="text-xs text-weaver-indigo/70">The provider returns a unified diff to the daemon on success. The daemon then commits the edit to disk and updates <code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">files_written</code> only if both locks pass; on any failure it discards the overlay and returns diagnostics unchanged.</p>
                                 </div>
                             </div>
                         </div>
@@ -441,7 +441,7 @@
                                             <td class="p-3 font-mono text-xs">--position</td>
                                             <td class="p-3 font-mono text-xs">string</td>
                                             <td class="p-3 text-xs">Yes</td>
-                                            <td class="p-3 text-xs">Source position in <code class="font-mono bg-weaver-indigo/5 px-1 rounded">line:col</code> form (LSP coordinates).</td>
+                                            <td class="p-3 text-xs">Source position in <code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">line:col</code> form (LSP coordinates).</td>
                                         </tr>
                                         <tr class="border-b border-weaver-indigo/10">
                                             <td class="p-3 font-mono text-xs">--to</td>
@@ -453,13 +453,13 @@
                                             <td class="p-3 font-mono text-xs">--create-missing-modules / --no-create-missing-modules</td>
                                             <td class="p-3 font-mono text-xs">bool</td>
                                             <td class="p-3 text-xs">No</td>
-                                            <td class="p-3 text-xs">Create missing destination modules. Default <code class="font-mono bg-weaver-indigo/5 px-1 rounded">true</code>; to disable, pass <code class="font-mono bg-weaver-indigo/5 px-1 rounded">--no-create-missing-modules</code>.</td>
+                                            <td class="p-3 text-xs">Create missing destination modules. Default <code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">true</code>; to disable, pass <code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">--no-create-missing-modules</code>.</td>
                                         </tr>
                                         <tr class="border-b border-weaver-indigo/10">
                                             <td class="p-3 font-mono text-xs">--format</td>
                                             <td class="p-3 font-mono text-xs">string</td>
                                             <td class="p-3 text-xs">No</td>
-                                            <td class="p-3 text-xs"><code class="font-mono bg-weaver-indigo/5 px-1 rounded">auto</code>, <code class="font-mono bg-weaver-indigo/5 px-1 rounded">on</code>, or <code class="font-mono bg-weaver-indigo/5 px-1 rounded">off</code>. Default <code class="font-mono bg-weaver-indigo/5 px-1 rounded">auto</code>.</td>
+                                            <td class="p-3 text-xs"><code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">auto</code>, <code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">on</code>, or <code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">off</code>. Default <code class="font-mono bg-weaver-indigo/5 px-1 rounded-sm">auto</code>.</td>
                                         </tr>
                                         <tr>
                                             <td class="p-3 font-mono text-xs">--explain</td>
@@ -479,28 +479,28 @@
                                 The plugin refuses execution for non-deterministic or unsound cases. Each refusal returns precise diagnostics and leaves workspace content unchanged.
                             </p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Macro-generated items</span>
                                         <p class="text-xs text-weaver-indigo/60 mt-1">Items lacking stable editable source ranges cannot be moved safely.</p>
                                     </div>
                                 </div>
-                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Ambiguous imports</span>
                                         <p class="text-xs text-weaver-indigo/60 mt-1">Import repair without a unique semantic match is a hard error.</p>
                                     </div>
                                 </div>
-                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Unsupported visibility</span>
                                         <p class="text-xs text-weaver-indigo/60 mt-1">Non-preservable <code class="font-mono text-[10px]">pub(in ...)</code> constraints that cannot be maintained across modules.</p>
                                     </div>
                                 </div>
-                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-sm">
+                                <div class="flex items-start gap-3 bg-weaver-cream border border-weaver-indigo/20 p-4 rounded-xs">
                                     <i class="fa-solid fa-xmark text-weaver-vermilion/60 mt-0.5"></i>
                                     <div>
                                         <span class="font-mono text-xs font-bold text-weaver-indigo">Incomplete payloads</span>
@@ -517,7 +517,7 @@
             <!-- Bottom CTA Navigation -->
             <section class="py-16 px-8 lg:px-16">
                 <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-xs">
                         <div>
                             <h3 class="font-serif text-xl text-weaver-indigo mb-2">Trust, but Verify.</h3>
                             <p class="text-sm text-weaver-indigo/70">Ensure the actions taken produced the desired outcome.</p>

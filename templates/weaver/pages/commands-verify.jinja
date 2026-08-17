@@ -46,13 +46,13 @@
                         </div>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-none mb-6">
                         Trust through <br>
                         <span class="text-weaver-vermilion italic font-light">Proof</span>.
                     </h1>
 
                     <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-3xl font-light">
-                        The <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded">verify</span> domain currently provides <code class="text-xs bg-weaver-indigo/10 px-1 rounded">diagnostics</code> — pulling compiler warnings and language-server errors for a given file. Broader capabilities (policy checks, test orchestration, provenance) are planned, not implemented yet.
+                        The <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded-sm">verify</span> domain currently provides <code class="text-xs bg-weaver-indigo/10 px-1 rounded-sm">diagnostics</code> — pulling compiler warnings and language-server errors for a given file. Broader capabilities (policy checks, test orchestration, provenance) are planned, not implemented yet.
                     </p>
                 </div>
 
@@ -94,7 +94,7 @@
                         <!-- Right: Operations Table -->
                         <div class="lg:col-span-2">
                             <h2 class="font-serif text-2xl text-weaver-indigo mb-4">Operations</h2>
-                            <div class="overflow-hidden border border-weaver-indigo/20 rounded-sm shadow-sm bg-weaver-cream">
+                            <div class="overflow-hidden border border-weaver-indigo/20 rounded-xs shadow-xs bg-weaver-cream">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
                                         <tr class="bg-weaver-indigo text-weaver-cream font-mono text-xs uppercase tracking-wider">
@@ -142,7 +142,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white border-2 border-weaver-indigo p-4 rounded-sm shadow-[8px_8px_0px_0px_rgba(25,60,110,0.08)] mb-8 figure-fullbleed">
+                    <div class="bg-white border-2 border-weaver-indigo p-4 rounded-xs shadow-[8px_8px_0px_0px_rgba(25,60,110,0.08)] mb-8 figure-fullbleed">
                         <img
                             src="/weaver/assets/verify/verify-verification-stack.png"
                             alt="Illustration of Weaver's staged verification stack, with diagnostics active today and policy plus test layers planned for later phases."
@@ -159,7 +159,7 @@
                             </div>
                             <h3 class="font-serif text-xl text-weaver-indigo mb-2">Diagnostics</h3>
                             <p class="text-xs text-weaver-indigo/70 mb-4 h-10">Pulls compiler warnings and LSP errors for any file with a supported language server.</p>
-                            <div class="bg-weaver-dark p-3 rounded-sm font-mono text-[10px] text-gray-300">
+                            <div class="bg-weaver-dark p-3 rounded-xs font-mono text-[10px] text-gray-300">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-yellow-400">!</span> unused variable `x`
                                 </div>
@@ -177,7 +177,7 @@
                             </div>
                             <h3 class="font-serif text-xl text-weaver-indigo/60 mb-2">Policy Enforcement</h3>
                             <p class="text-xs text-weaver-indigo/50 mb-4 h-10">Architectural constraints and forbidden-pattern detection via Sempai queries.</p>
-                            <div class="bg-weaver-dark/60 p-3 rounded-sm font-mono text-[10px] text-gray-300">
+                            <div class="bg-weaver-dark/60 p-3 rounded-xs font-mono text-[10px] text-gray-300">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-green-300">✓</span> no_unsafe_blocks
                                 </div>
@@ -195,7 +195,7 @@
                             </div>
                             <h3 class="font-serif text-xl text-weaver-indigo/60 mb-2">Test Orchestration</h3>
                             <p class="text-xs text-weaver-indigo/50 mb-4 h-10">Run test suites and report results as structured JSONL for CI gating.</p>
-                            <div class="bg-weaver-dark/60 p-3 rounded-sm font-mono text-[10px] text-gray-300">
+                            <div class="bg-weaver-dark/60 p-3 rounded-xs font-mono text-[10px] text-gray-300">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-green-300">✓</span> cargo test
                                 </div>
@@ -244,8 +244,8 @@
                         </div>
 
                         <!-- Code Block -->
-                        <div class="bg-weaver-dark rounded-sm p-1 shadow-lg border border-dashed border-weaver-indigo/30 opacity-80">
-                            <div class="bg-[#282A36] p-4 rounded-sm overflow-x-auto">
+                        <div class="bg-weaver-dark rounded-xs p-1 shadow-lg border border-dashed border-weaver-indigo/30 opacity-80">
+                            <div class="bg-[#282A36] p-4 rounded-xs overflow-x-auto">
                                 <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
                                     <span class="text-xs font-mono text-weaver-cream/50">weaver.policy.yaml (illustrative)</span>
                                     <div class="flex gap-1">
@@ -285,7 +285,7 @@
 
                         <!-- Step 1: Running -->
                         <div class="flex flex-col md:flex-row gap-6 mb-12 relative z-10">
-                            <div class="w-16 h-16 bg-weaver-indigo text-weaver-cream flex items-center justify-center rounded-sm font-bold font-mono text-xl shrink-0 border-4 border-weaver-cream shadow-sm z-10">
+                            <div class="w-16 h-16 bg-weaver-indigo text-weaver-cream flex items-center justify-center rounded-xs font-bold font-mono text-xl shrink-0 border-4 border-weaver-cream shadow-xs z-10">
                                 01
                             </div>
                             <div class="flex-1">
@@ -293,7 +293,7 @@
                                 <p class="text-sm text-weaver-indigo/70 mb-4">
                                     The daemon uses a <code class="text-xs bg-weaver-indigo/10 px-1">kind</code>-based JSONL envelope on the wire, but the CLI strips that wrapper before printing. In JSON mode it forwards the inner payload verbatim; in human mode it renders recognised diagnostics with source context.
                                 </p>
-                                <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 font-mono text-xs overflow-x-auto">
+                                <div class="bg-weaver-dark p-4 rounded-xs border border-weaver-indigo/20 font-mono text-xs overflow-x-auto">
 <pre class="text-gray-300">
 <span class="token-cmd">$</span> <span class="token-arg">weaver verify diagnostics --output json --uri file:///src/lib.rs</span>
 
@@ -306,7 +306,7 @@
 
                         <!-- Step 2: Example invocation -->
                         <div class="flex flex-col md:flex-row gap-6 relative z-10">
-                            <div class="w-16 h-16 bg-weaver-vermilion text-white flex items-center justify-center rounded-sm font-bold font-mono text-xl shrink-0 border-4 border-weaver-cream shadow-sm z-10">
+                            <div class="w-16 h-16 bg-weaver-vermilion text-white flex items-center justify-center rounded-xs font-bold font-mono text-xl shrink-0 border-4 border-weaver-cream shadow-xs z-10">
                                 02
                             </div>
                             <div class="flex-1">
@@ -314,7 +314,7 @@
                                 <p class="text-sm text-weaver-indigo/70 mb-4">
                                     Point at a file URI to pull every diagnostic the language server reports. Human-readable output is the default when stdout is a TTY, so recognised diagnostics render with source context instead of raw JSON.
                                 </p>
-                                <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 font-mono text-xs overflow-x-auto">
+                                <div class="bg-weaver-dark p-4 rounded-xs border border-weaver-indigo/20 font-mono text-xs overflow-x-auto">
 <pre class="text-gray-300">
 <span class="token-cmd">$</span> <span class="token-arg">weaver verify diagnostics --uri file:///src/lib.rs</span>
 
@@ -334,7 +334,7 @@
             <!-- Bottom CTA Navigation -->
             <section class="py-16 px-8 lg:px-16">
                 <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-xs">
                         <div>
                             <h3 class="font-serif text-xl text-weaver-indigo mb-2">Ready to secure your agents?</h3>
                             <p class="text-sm text-weaver-indigo/70">Learn how the sandbox keeps execution safe.</p>

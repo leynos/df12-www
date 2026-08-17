@@ -1422,7 +1422,7 @@ sites:
   weaver:
     output_dir: public/weaver
     templates_dir: templates/weaver
-    stylesheet: assets/styles/weaver-site.css
+    stylesheet: /weaver/assets/styles/weaver.css
     base_path: /weaver/
     theme:
       site_name: Weaver

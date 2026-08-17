@@ -37,7 +37,7 @@
                             <li><a href="#references" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion -ml-[1px] py-1 transition-all">References</a></li>
                         </ul>
                     </div>
-                    <div class="p-5 bg-white/70 border border-weaver-indigo/10 rounded-sm paper-panel">
+                    <div class="p-5 bg-white/70 border border-weaver-indigo/10 rounded-xs paper-panel">
                         <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-2">Design Facts</p>
                         <ul class="space-y-3 text-xs text-weaver-indigo/80 leading-relaxed">
                             <li><code>observe get-card</code> defaults to <code>structure</code> detail.</li>
@@ -62,29 +62,29 @@
                             <span class="text-weaver-indigo/30">/</span>
                             <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Jacquard</span>
                         </div>
-                        <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.02] mb-6">
+                        <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-none mb-6">
                             Jacquard makes <span class="text-weaver-vermilion italic font-light">symbol context small enough to trust</span>.
                         </h1>
-                        <p class="text-xl lg:text-2xl text-weaver-indigo/80 leading-relaxed max-w-4xl mb-8 font-light">
+                        <p class="text-xl lg:text-2xl text-weaver-indigo/80 max-w-4xl mb-8 font-light">
                             Files are too big. Call graphs are too thin. Jacquard fixes that by putting a deterministic symbol card at the center, building bounded graph slices around it, and then tracing that slice across recent commits with probabilistic matching when names drift. Context without a budget is not context. It is hoarding.
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-sm paper-panel">
+                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-2">Unit</p>
                                 <p class="font-serif text-2xl text-weaver-indigo mb-2">The card comes first.</p>
                                 <p class="text-sm text-weaver-indigo/75">Identity, signature, docs, locals, branches, metrics, and provenance in one portable record.</p>
                             </div>
-                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-sm paper-panel">
+                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-2">Graph</p>
                                 <p class="font-serif text-2xl text-weaver-indigo mb-2">Edges stay typed.</p>
                                 <p class="text-sm text-weaver-indigo/75"><code>call</code>, <code>import</code>, and <code>config</code> are the initial spine. Enough to reason. Not enough to sprawl.</p>
                             </div>
-                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-sm paper-panel">
+                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-2">History</p>
                                 <p class="font-serif text-2xl text-weaver-indigo mb-2">Recent changes, not folklore.</p>
                                 <p class="text-sm text-weaver-indigo/75">The first implementation diffs the slice across the last five commits and exposes confidence instead of inventing certainty.</p>
                             </div>
-                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-sm paper-panel">
+                            <div class="bg-white/70 border border-weaver-indigo/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-2">Discipline</p>
                                 <p class="font-serif text-2xl text-weaver-indigo mb-2">Cheap by default.</p>
                                 <p class="text-sm text-weaver-indigo/75"><code>get-card</code> lands at <code>structure</code>. Deeper detail is an escalation, not a reflex. Civilisation survives by such rules.</p>
@@ -93,7 +93,7 @@
                     </header>
 
                     <!-- PLANNED status banner -->
-                    <div class="mb-12 border-2 border-dashed border-weaver-indigo/40 rounded-sm p-6 opacity-80">
+                    <div class="mb-12 border-2 border-dashed border-weaver-indigo/40 rounded-xs p-6 opacity-80">
                         <div class="flex items-center gap-3">
                             <span class="status-pill status-pill-planned">Planned</span>
                             <p class="text-sm text-weaver-indigo/80 leading-relaxed">
@@ -113,7 +113,7 @@
                                 <p class="text-base text-weaver-indigo/75 leading-relaxed mb-5">
                                     The design also treats interstitial regions as first-class records. Good. Imports, decorators, module headers, and config spans dominate diffs and dependency signals. If you ignore the space between entities, you miss half the story and most of the churn.
                                 </p>
-                                <div class="bg-weaver-indigo text-weaver-cream rounded-sm p-6 paper-panel">
+                                <div class="bg-weaver-indigo text-weaver-cream rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">What the card contains</p>
                                     <ul class="space-y-3 text-sm text-weaver-cream/85 leading-relaxed">
                                         <li>Identity: <code>uri</code>, range, language, kind, name, container, and hash-derived ID.</li>
@@ -124,15 +124,15 @@
                                 </div>
                             </div>
                             <div class="xl:col-span-8 space-y-8">
-                                <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-sm figure-frame figure-fullbleed">
-                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-entity-interstitial.png" alt="Illustrated diagram showing a source file split into entity regions and interstitial regions, with comments and decorators bundled into symbol cards and imports normalized into groups." class="w-full rounded-sm border border-weaver-indigo/10">
+                                <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-xs figure-frame figure-fullbleed">
+                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-entity-interstitial.png" alt="Illustrated diagram showing a source file split into entity regions and interstitial regions, with comments and decorators bundled into symbol cards and imports normalized into groups." class="w-full rounded-xs border border-weaver-indigo/10">
                                     <figcaption class="mt-4 text-sm text-weaver-indigo/75 leading-relaxed">
                                         <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mr-2">Figure 1</span>
                                         Entity regions become cards. Interstitial regions carry import, decorator, header, and config data. The bundling rule is deterministic because history turns to soup fast when attachments float around.
                                     </figcaption>
                                 </figure>
 
-                                <div class="overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-sm paper-panel">
+                                <div class="overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-xs paper-panel">
                                     <table class="min-w-full text-sm spec-table">
                                         <thead>
                                             <tr class="text-left bg-weaver-indigo text-weaver-cream">
@@ -172,7 +172,7 @@
                                 </div>
 
                                 <!-- Complete card JSON example -->
-                                <div class="bg-weaver-dark text-weaver-cream rounded-sm p-6 paper-panel">
+                                <div class="bg-weaver-dark text-weaver-cream rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Card JSON (full)</p>
 <pre class="font-mono text-xs text-weaver-cream/90 whitespace-pre-wrap leading-relaxed">{
   "card_version": 1,
@@ -214,8 +214,8 @@
                     <section id="slices" class="mb-20">
                         <div class="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
                             <div class="xl:col-span-7">
-                                <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-sm figure-frame figure-fullbleed">
-                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-card-slice.png" alt="Illustrated diagram of a Jacquard symbol card at the center of a bounded slice with typed call, import, and config edges and explicit card, edge, and token budgets." class="w-full rounded-sm border border-weaver-indigo/10">
+                                <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-xs figure-frame figure-fullbleed">
+                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-card-slice.png" alt="Illustrated diagram of a Jacquard symbol card at the center of a bounded slice with typed call, import, and config edges and explicit card, edge, and token budgets." class="w-full rounded-xs border border-weaver-indigo/10">
                                     <figcaption class="mt-4 text-sm text-weaver-indigo/75 leading-relaxed">
                                         <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mr-2">Figure 2</span>
                                         The slice builder is depth-limited, budget-aware, and confidence-weighted. Breadth-first search alone is too naive. Frontier scoring keeps the graph useful before it becomes a landfill.
@@ -231,7 +231,7 @@
                                 <p class="text-base text-weaver-indigo/75 leading-relaxed mb-5">
                                     The traversal algorithm uses depth as a hard limit and a priority score to decide which frontier expansions deserve budget. High-confidence edges beat hand-wavy ones. Nodes with higher fan-in or proximity to the entry symbol beat irrelevant detours. Novelty matters because five cards from the same file often tell one story five times.
                                 </p>
-                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-sm p-6 paper-panel">
+                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Slice rules worth keeping</p>
                                     <ul class="space-y-3 text-sm text-weaver-indigo/80 leading-relaxed">
                                         <li>LSP call hierarchy remains the high-confidence source for <code>call</code> edges.</li>
@@ -241,7 +241,7 @@
                                 </div>
 
                                 <!-- Spillover and frontier scoring -->
-                                <div class="bg-weaver-dark text-weaver-cream rounded-sm p-6 paper-panel mt-5">
+                                <div class="bg-weaver-dark text-weaver-cream rounded-xs p-6 paper-panel mt-5">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Spillover</p>
                                     <p class="text-sm text-weaver-cream/90 leading-relaxed mb-3">
                                         The slice response includes a <code>spillover</code> field that signals whether budget limits truncated the traversal and, if so, exposes the frontier candidates for optional pagination.
@@ -254,7 +254,7 @@
   ]
 }</pre>
                                 </div>
-                                <div class="bg-white/70 border border-weaver-indigo/10 rounded-sm p-5 mt-5">
+                                <div class="bg-white/70 border border-weaver-indigo/10 rounded-xs p-5 mt-5">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Frontier Scoring</p>
                                     <p class="text-sm text-weaver-indigo/80 leading-relaxed">
                                         Not all frontier expansions deserve budget. The priority score weights confidence (how trustworthy is the edge?), fan-in (how many other symbols depend on this one?), and proximity to the entry symbol. Novelty matters because five cards from the same file often tell one story five times. The score is deterministic — given the same graph state, the same nodes win.
@@ -275,7 +275,7 @@
                                 <p class="text-base text-weaver-indigo/75 leading-relaxed mb-5">
                                     Matching across commits is deliberately staged. Phase 1 tries stable identity. Phase 2 catches rename-friendly body hashes. Phase 3 leans on structural hashes. Phases 4 and 5 bring fuzzy similarity and neighbourhood overlap into play, then apply global assignment so two old symbols do not both marry the same new one. Monogamy remains underrated.
                                 </p>
-                                <div class="bg-weaver-indigo text-weaver-cream rounded-sm p-6 paper-panel">
+                                <div class="bg-weaver-indigo text-weaver-cream rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Guardrails</p>
                                     <ul class="space-y-3 text-sm text-weaver-cream/85 leading-relaxed">
                                         <li>Expose alternates and probabilities instead of pretending every match is obvious.</li>
@@ -285,15 +285,15 @@
                                 </div>
                             </div>
                             <div class="xl:col-span-8 space-y-8">
-                                <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-sm figure-frame figure-fullbleed">
-                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-history-matching.png" alt="Illustrated diagram of graph history across recent commits, showing exact matches, structural matches, alternates, confidence values, and a blast-radius view of downstream dependencies." class="w-full rounded-sm border border-weaver-indigo/10">
+                                <figure class="bg-white/75 border border-weaver-indigo/10 p-4 rounded-xs figure-frame figure-fullbleed">
+                                    <img src="/weaver/assets/jacquard/jacquard-whitepaper-history-matching.png" alt="Illustrated diagram of graph history across recent commits, showing exact matches, structural matches, alternates, confidence values, and a blast-radius view of downstream dependencies." class="w-full rounded-xs border border-weaver-indigo/10">
                                     <figcaption class="mt-4 text-sm text-weaver-indigo/75 leading-relaxed">
                                         <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mr-2">Figure 3</span>
                                         The history model is honest about ambiguity. A rename that keeps structure and neighbourhood should score well. A collision among homonyms should not be waved through because the UI wants closure.
                                     </figcaption>
                                 </figure>
 
-                                <div class="overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-sm paper-panel">
+                                <div class="overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-xs paper-panel">
                                     <table class="min-w-full text-sm spec-table">
                                         <thead>
                                             <tr class="text-left bg-weaver-indigo text-weaver-cream">
@@ -333,7 +333,7 @@
                                 </div>
 
                                 <!-- Feature categories -->
-                                <div class="overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-sm paper-panel mt-6">
+                                <div class="overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-xs paper-panel mt-6">
                                     <table class="min-w-full text-sm spec-table">
                                         <thead>
                                             <tr class="text-left bg-weaver-indigo text-weaver-cream">
@@ -368,7 +368,7 @@
 
                                 <!-- Match output and scoring -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                    <div class="bg-weaver-dark text-weaver-cream rounded-sm p-6 paper-panel">
+                                    <div class="bg-weaver-dark text-weaver-cream rounded-xs p-6 paper-panel">
                                         <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Debug Match Output</p>
 <pre class="font-mono text-xs text-weaver-cream/90 whitespace-pre-wrap leading-relaxed">{
   "best_match": { "symbol_id": "sym_...", "p": 0.91 },
@@ -382,12 +382,12 @@
                                             This example shows the extra fields emitted with <code>--debug-matching</code>, including reason codes such as <code>name_tokens</code>, <code>signature</code>, <code>ast_shape</code>, and <code>neighbourhood_overlap</code>.
                                         </p>
                                     </div>
-                                    <div class="bg-white/70 border border-weaver-indigo/10 rounded-sm p-6">
+                                    <div class="bg-white/70 border border-weaver-indigo/10 rounded-xs p-6">
                                         <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Weighted Scoring</p>
                                         <p class="text-sm text-weaver-indigo/80 leading-relaxed mb-3">
                                             Phases 4 and 5 use a combined similarity function mapped to calibrated probability via logistic transform:
                                         </p>
-                                        <div class="bg-weaver-indigo/5 p-3 rounded-sm font-mono text-xs text-weaver-indigo/80 leading-relaxed">
+                                        <div class="bg-weaver-indigo/5 p-3 rounded-xs font-mono text-xs text-weaver-indigo/80 leading-relaxed">
                                             S = w<sub>1</sub>&middot;S<sub>name</sub> + w<sub>2</sub>&middot;S<sub>sig</sub> + w<sub>3</sub>&middot;S<sub>ast</sub> + w<sub>4</sub>&middot;S<sub>text</sub> + w<sub>5</sub>&middot;S<sub>ngb</sub> + b<br>
                                             p = 1 / (1 + exp(&minus;S))
                                         </div>
@@ -406,7 +406,7 @@
                                 <p class="text-lg text-weaver-indigo/80 leading-relaxed mb-5">
                                     The protocol surface is compact because it should be. First ask for a card. Then ask for a slice. Then ask how that slice changed. Anything else at this stage is garnish pretending to be architecture.
                                 </p>
-                                <div class="bg-weaver-dark text-weaver-cream rounded-sm p-6 paper-panel space-y-5">
+                                <div class="bg-weaver-dark text-weaver-cream rounded-xs p-6 paper-panel space-y-5">
                                     <div>
                                         <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-2">get-card</p>
 <pre class="font-mono text-xs text-weaver-cream/90 whitespace-pre-wrap leading-relaxed">weaver observe get-card \
@@ -430,7 +430,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="xl:col-span-7 overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-sm paper-panel">
+                            <div class="xl:col-span-7 overflow-x-auto bg-white/75 border border-weaver-indigo/10 rounded-xs paper-panel">
                                 <table class="min-w-full text-sm spec-table">
                                     <thead>
                                         <tr class="text-left bg-weaver-indigo text-weaver-cream">
@@ -474,7 +474,7 @@
                                 </p>
                             </div>
                             <div class="xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-sm p-6 paper-panel">
+                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Failure Modes</p>
                                     <ul class="space-y-3 text-sm text-weaver-indigo/80 leading-relaxed">
                                         <li>If LSP is down, the card still reaches <code>structure</code> and the graph falls back to heuristic edges with lower confidence.</li>
@@ -482,7 +482,7 @@
                                         <li>If history extraction times out or blobs get too large, the system returns coarse diffs or explicit unavailability.</li>
                                     </ul>
                                 </div>
-                                <div class="bg-weaver-indigo text-weaver-cream rounded-sm p-6 paper-panel">
+                                <div class="bg-weaver-indigo text-weaver-cream rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Operational Expectations</p>
                                     <ul class="space-y-3 text-sm text-weaver-cream/85 leading-relaxed">
                                         <li>Reuse Tree-sitter parser registries and cache entity tables by repo, ref, path, and blob hash.</li>
@@ -490,20 +490,20 @@
                                         <li>Emit tracing spans, reason codes, and counters for duplicate overload and fallback triggers.</li>
                                     </ul>
                                 </div>
-                                <div class="md:col-span-2 bg-weaver-cream border border-weaver-indigo/20 rounded-sm p-6">
+                                <div class="md:col-span-2 bg-weaver-cream border border-weaver-indigo/20 rounded-xs p-6">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Semantic Risk Warnings</p>
                                     <p class="text-sm text-weaver-indigo/80 leading-relaxed mb-4">
                                         <code>graph-history</code> deltas include explicit warnings for semantic risk patterns. Warnings are scoped to the default slice neighbourhood (depth 2) and weigh <code>functional</code> changes higher than <code>text</code>.
                                     </p>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div class="flex items-start gap-3 bg-white/70 border border-weaver-indigo/10 p-4 rounded-sm">
+                                        <div class="flex items-start gap-3 bg-white/70 border border-weaver-indigo/10 p-4 rounded-xs">
                                             <i class="fa-solid fa-triangle-exclamation text-weaver-vermilion/60 mt-0.5"></i>
                                             <div>
                                                 <span class="font-mono text-xs font-bold text-weaver-indigo">DependencyAlsoModified</span>
                                                 <p class="text-xs text-weaver-indigo/60 mt-1">Symbol A changed and it depends on symbol B that also changed.</p>
                                             </div>
                                         </div>
-                                        <div class="flex items-start gap-3 bg-white/70 border border-weaver-indigo/10 p-4 rounded-sm">
+                                        <div class="flex items-start gap-3 bg-white/70 border border-weaver-indigo/10 p-4 rounded-xs">
                                             <i class="fa-solid fa-triangle-exclamation text-weaver-vermilion/60 mt-0.5"></i>
                                             <div>
                                                 <span class="font-mono text-xs font-bold text-weaver-indigo">DependentAlsoModified</span>
@@ -515,7 +515,7 @@
                                         Output includes a blast-radius score within the slice: propagate along edges with decay by graph distance, amplified by fan-in growth.
                                     </p>
                                 </div>
-                                <div class="md:col-span-2 bg-white/75 border border-weaver-indigo/10 rounded-sm p-6 paper-panel">
+                                <div class="md:col-span-2 bg-white/75 border border-weaver-indigo/10 rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Relationship to the rest of Weaver</p>
                                     <p class="text-sm text-weaver-indigo/80 leading-relaxed mb-4">
                                         Sempai is the discovery front door. Jacquard is what happens after discovery. One finds the interesting symbol. The other turns that symbol into a stable card, a bounded neighbourhood, and a recent change story. Search without context is brittle. Context without search is slow. The system needs both.
@@ -533,13 +533,13 @@
                             <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-4 block">06. References</span>
                             <h2 class="font-serif text-4xl text-weaver-indigo mb-5">Primary sources</h2>
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-sm p-6 paper-panel">
+                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Core design memo</p>
                                     <p class="text-sm text-weaver-indigo/80 leading-relaxed">
                                         Internal source: <code>../weaver/docs/jacquard-card-first-symbol-graph-design.md</code>.
                                     </p>
                                 </div>
-                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-sm p-6 paper-panel">
+                                <div class="bg-white/75 border border-weaver-indigo/10 rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-weaver-vermilion mb-3">Design anchors carried through</p>
                                     <ul class="space-y-3 text-sm text-weaver-indigo/80 leading-relaxed">
                                         <li>Cards-first extraction with typed edges and explicit budgets.</li>

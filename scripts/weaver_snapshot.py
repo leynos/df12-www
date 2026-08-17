@@ -28,6 +28,8 @@ from __future__ import annotations
 import contextlib
 import difflib
 import json
+import math
+import re
 import shutil
 import subprocess
 import sys
@@ -295,30 +297,297 @@ def shots(out_dir: Path, /, *, port: int = 8098) -> None:
     print(f"done: {resolved}")
 
 
-def _normalize(node: dict[str, typ.Any]) -> dict[str, typ.Any]:
+# The sRGB transfer function's linear-segment cutoff, from the sRGB
+# specification. Named so the conversion below does not read as a magic
+# number.
+SRGB_LINEAR_CUTOFF = 0.0031308
+
+# Every colour notation handled here takes three components before the
+# optional alpha.
+COLOUR_COMPONENTS = 3
+
+
+def _srgb_channel(value: float) -> int:
+    """Convert one linear-light channel to an 8-bit sRGB value.
+
+    Parameters
+    ----------
+    value
+        A linear-light channel, nominally in ``[0, 1]`` but allowed to fall
+        outside it for colours beyond the sRGB gamut.
+
+    Returns
+    -------
+    int
+        The gamma-encoded channel, clamped to ``[0, 255]``.
+    """
+    encoded = (
+        12.92 * value
+        if value <= SRGB_LINEAR_CUTOFF
+        else 1.055 * (abs(value) ** (1 / 2.4)) - 0.055
+    )
+    return max(0, min(255, round(encoded * 255)))
+
+
+def _oklab_to_rgb(lightness: float, a: float, b: float) -> tuple[int, int, int]:
+    """Convert an Oklab colour to 8-bit sRGB.
+
+    Parameters
+    ----------
+    lightness
+        The Oklab ``L`` component, nominally in ``[0, 1]``.
+    a, b
+        The Oklab opponent components.
+
+    Returns
+    -------
+    tuple of int
+        Red, green, and blue, each in ``[0, 255]``.
+    """
+    long_ = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3
+    medium = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3
+    short = (lightness - 0.0894841775 * a - 1.2914855480 * b) ** 3
+    return (
+        _srgb_channel(
+            4.0767416621 * long_ - 3.3077115913 * medium + 0.2309699292 * short
+        ),
+        _srgb_channel(
+            -1.2684380046 * long_ + 2.6097574011 * medium - 0.3413193965 * short
+        ),
+        _srgb_channel(
+            -0.0041960863 * long_ - 0.7034186147 * medium + 1.7076147010 * short
+        ),
+    )
+
+
+# Matches the colour notations Chromium reports in computed values. Tailwind
+# v3 resolved an opacity modifier to `rgba(...)`; v4 resolves it through
+# `color-mix()` in Oklab and reports `oklab(...)`. The colours are the same to
+# within a rounding step, but the strings share not one character.
+_COLOUR_FUNCTION = re.compile(
+    r"\b(rgba?|oklab|oklch)\(\s*([^)]*)\)",
+    re.IGNORECASE,
+)
+_NUMBER = re.compile(r"-?\d*\.?\d+(?:e-?\d+)?%?")
+
+
+def _canonical_colour(match: re.Match[str]) -> str:
+    """Rewrite one colour function as a canonical 8-bit ``rgba()`` string.
+
+    Parameters
+    ----------
+    match
+        A match of :data:`_COLOUR_FUNCTION`.
+
+    Returns
+    -------
+    str
+        ``rgba(r, g, b, a)`` with integer channels and alpha to three decimal
+        places, or the original text if the arguments cannot be read.
+    """
+    name = match.group(1).lower()
+    numbers = _NUMBER.findall(match.group(2))
+    if len(numbers) < COLOUR_COMPONENTS:
+        return match.group(0)
+
+    def value(index: int, scale: float = 1.0) -> float:
+        raw = numbers[index]
+        return float(raw.rstrip("%")) / 100 * scale if raw.endswith("%") else float(raw)
+
+    alpha = value(COLOUR_COMPONENTS) if len(numbers) > COLOUR_COMPONENTS else 1.0
+
+    if name.startswith("rgb"):
+        red, green, blue = (round(value(i, 255.0)) for i in range(COLOUR_COMPONENTS))
+    elif name == "oklab":
+        red, green, blue = _oklab_to_rgb(value(0), value(1), value(2))
+    else:  # oklch
+        chroma, hue = value(1), math.radians(value(2))
+        red, green, blue = _oklab_to_rgb(
+            value(0), chroma * math.cos(hue), chroma * math.sin(hue)
+        )
+
+    return f"rgba({red}, {green}, {blue}, {alpha:.3f})"
+
+
+def _canonical_value(value: str) -> str:
+    """Rewrite every colour function inside one computed value.
+
+    Values such as ``box-shadow`` embed a colour among other components, so
+    the substitution is applied in place rather than to the whole string.
+
+    Parameters
+    ----------
+    value
+        A computed property value.
+
+    Returns
+    -------
+    str
+        The value with each colour function in canonical ``rgba()`` form.
+    """
+    return _COLOUR_FUNCTION.sub(_canonical_colour, value)
+
+
+# A shadow layer that paints nothing: fully transparent, no offset, no blur,
+# no spread. Tailwind composes box-shadow from several `--tw-*` variables and
+# v4 uses more of them than v3 did, so the same visible shadow arrives with a
+# different number of these placeholders in front of it.
+_EMPTY_SHADOW = "rgba(0, 0, 0, 0.000) 0px 0px 0px 0px"
+
+
+def _canonical_shadow(value: str) -> str:
+    """Drop the placeholder layers from a composed ``box-shadow``.
+
+    Parameters
+    ----------
+    value
+        A canonicalized ``box-shadow`` value.
+
+    Returns
+    -------
+    str
+        The value with every layer that paints nothing removed, or ``"none"``
+        if no layer survives.
+    """
+    # Split on top-level commas only: the layers themselves contain commas,
+    # inside their rgba() colour.
+    layers: list[str] = []
+    buffer = ""
+    depth = 0
+    for char in value:
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+        if char == "," and depth == 0:
+            layers.append(buffer.strip())
+            buffer = ""
+        else:
+            buffer += char
+    if buffer.strip():
+        layers.append(buffer.strip())
+
+    painted = [layer for layer in layers if layer != _EMPTY_SHADOW]
+    return ", ".join(painted) if painted else "none"
+
+
+# The physical and logical names for each border edge, paired so a width can
+# be looked up from a colour property and vice versa.
+_BORDER_EDGES = (
+    ("border-top", "border-block-start"),
+    ("border-right", "border-inline-end"),
+    ("border-bottom", "border-block-end"),
+    ("border-left", "border-inline-start"),
+)
+_ZERO_WIDTHS = frozenset({"0px", "0", "medium"})
+
+
+def _drop_invisible_border_colours(style: dict[str, typ.Any]) -> None:
+    """Remove the colour of any border edge that is not drawn.
+
+    Tailwind v3's preflight defaulted every border to ``gray-200``; v4 leaves
+    it at ``currentColor``. That changes the reported colour on roughly four
+    and a half thousand nodes per page, of which only forty draw a border at
+    all. Reporting the rest would bury the forty.
+
+    Parameters
+    ----------
+    style
+        A node's computed styles, modified in place.
+    """
+    for physical, logical in _BORDER_EDGES:
+        width = style.get(f"{physical}-width", style.get(f"{logical}-width"))
+        # A missing width means the walker saw the user-agent default, which
+        # is zero for every element the preflight touches.
+        if width is None or width in _ZERO_WIDTHS:
+            style.pop(f"{physical}-color", None)
+            style.pop(f"{logical}-color", None)
+
+
+# Properties that take their value from the parent in practice, but which the
+# walker compares against the user-agent default instead of against the
+# parent. It therefore repeats them on every node in the subtree. `color-scheme`
+# is inherited by specification; the rest default to `currentColor` and so
+# follow `color` wherever it goes. Set once on `:root`, any of them would
+# otherwise be reported five thousand times.
+_TRACKS_PARENT = frozenset(
+    {
+        "color-scheme",
+        "outline-color",
+        "caret-color",
+        "column-rule-color",
+        "row-rule-color",
+        "text-emphasis-color",
+        "-webkit-text-fill-color",
+        "-webkit-text-stroke-color",
+    }
+)
+
+
+def _normalize(
+    node: dict[str, typ.Any],
+    inherited: dict[str, typ.Any] | None = None,
+) -> dict[str, typ.Any]:
     """Strip incidental variation from one walker node, recursively.
 
-    Two properties vary between captures of an unchanged page:
+    Seven kinds of variation are incidental here:
 
     - ``opacity`` on a node running a CSS animation. The Weaver pages carry an
       ``animate-pulse`` status dot whose opacity is sampled mid-cycle.
     - Bounding-box coordinates, which carry subpixel text-shaping jitter.
       Rounding to two decimal places absorbs that without hiding a real
       layout shift.
+    - Colour notation. Tailwind v3 resolved `text-primary/80` to `rgba(...)`;
+      v4 resolves it through `color-mix()` and Chromium reports `oklab(...)`.
+      Comparing the strings would report every translucent colour on the site
+      as changed and bury the handful that really did. Each colour is
+      therefore converted to 8-bit sRGB before comparison, which is the
+      precision a screen has anyway.
+    - ``--tw-*`` custom properties. These are Tailwind's own plumbing, and
+      which of them exist is an implementation detail of the version in use,
+      not something a reader can see.
+    - Placeholder ``box-shadow`` layers, for the same reason: v4 composes the
+      property from more slots than v3 did, so an unchanged shadow arrives
+      behind a different number of fully transparent, zero-size layers.
+    - The colour of a border edge with no width. See
+      :func:`_drop_invisible_border_colours`.
+    - A property in :data:`_TRACKS_PARENT` whose value matches the parent's.
+      The walker compares these against the user-agent default rather than
+      against the parent, so one declaration on ``:root`` is reported on every
+      node beneath it.
 
     Parameters
     ----------
     node
         A walker-mode node, as emitted by ``css-view``.
+    inherited
+        The values the parent node carried for the properties in
+        :data:`_TRACKS_PARENT`. Empty at the root.
 
     Returns
     -------
     dict
         The node with those variations removed, and its children likewise.
     """
-    style = dict(node.get("styleDiff") or {})
+    style = {
+        key: _canonical_value(value) if isinstance(value, str) else value
+        for key, value in (node.get("styleDiff") or {}).items()
+        if not key.startswith("--tw-")
+    }
     if style.get("animation-name", "none") != "none":
         style.pop("opacity", None)
+    for key in ("box-shadow", "text-shadow"):
+        if isinstance(style.get(key), str):
+            style[key] = _canonical_shadow(style[key])
+    _drop_invisible_border_colours(style)
+
+    inherited = inherited or {}
+    carried = dict(inherited)
+    for key in _TRACKS_PARENT & style.keys():
+        if style[key] == inherited.get(key):
+            del style[key]
+        else:
+            carried[key] = style[key]
 
     bbox = node.get("bbox")
     if isinstance(bbox, dict):
@@ -331,7 +600,9 @@ def _normalize(node: dict[str, typ.Any]) -> dict[str, typ.Any]:
     normalized["styleDiff"] = style
     if bbox is not None:
         normalized["bbox"] = bbox
-    normalized["children"] = [_normalize(child) for child in node.get("children") or []]
+    normalized["children"] = [
+        _normalize(child, carried) for child in node.get("children") or []
+    ]
     return normalized
 
 

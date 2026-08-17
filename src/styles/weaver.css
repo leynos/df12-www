@@ -14,6 +14,23 @@
 
 @import "tailwindcss";
 
+/* The sub-site's hand-written stylesheet, imported into the components layer
+ * rather than left unlayered as it was when it stood alone.
+ *
+ * That placement is the whole point. Under the Play CDN both this sheet and
+ * the utilities were unlayered, so a tie went to the utilities on source
+ * order — the CDN injected its <style> after this file's <link>. Compiled
+ * Tailwind puts its utilities in @layer utilities, and per CSS Cascade Level
+ * 5 an unlayered declaration beats every layered one regardless of
+ * specificity or order. Left unlayered, this sheet would silently start
+ * winning arguments it used to lose. In the components layer the old
+ * relationship holds: a utility in the markup still wins.
+ *
+ * It is a single file for now, carrying the same rules and the same colour
+ * literals it always had. A later commit splits it by concern and replaces
+ * those literals with theme tokens. */
+@import "./weaver/legacy.css" layer(components);
+
 @source "../../templates/weaver/**/*.jinja";
 @source "../static/weaver/assets/js/mobile-nav.js";
 
@@ -95,4 +112,41 @@
   --color-weaver-vermilion: #e8502b;
   --color-weaver-dark: #0f2440;
   --color-weaver-faded: #4a6fa5;
+
+  /* Also transitional: Tailwind's own stock palette, pinned to the v3 values
+     the markup was designed against. v4 redefined the palette in OKLCH, which
+     moves the greys by about one part in 255 and the saturated colours
+     visibly — `green-400` goes from #4ade80 to #05df72, in forty-two places.
+     That is a redesign, and this commit is a re-plumbing.
+
+     Nearly all of these are syntax colours inside the dark code samples. The
+     sweep that gives them proper `--color-code-*` names deletes this block
+     along with the one above. */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-green-100: #dcfce7;
+  --color-green-300: #86efac;
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-800: #166534;
+  --color-blue-100: #dbeafe;
+  --color-blue-300: #93c5fd;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-yellow-300: #fde047;
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-purple-600: #9333ea;
 }

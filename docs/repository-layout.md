@@ -117,9 +117,17 @@ Build-time scripts outside the Python package:
 
 ### `src/`
 
-Frontend source files. `styles/` contains the Tailwind CSS entrypoints for the
-main site, mxd, and Episodic, plus their supporting partials and plugins. The
-compiled outputs are written beneath `public/` by `build:css`.
+Frontend source files. `styles/` contains one Tailwind CSS entry point per
+compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css`
+and `weaver.css` for those sub-sites — plus any plugins. Each is compiled to
+its own file under `public/`: `public/assets/site.css`,
+`public/mxd/assets/tailwind.css`, `public/episodic/assets/styles/tailwind.css`,
+and `public/weaver/assets/styles/weaver.css`.
+
+An entry point that has grown past a single file keeps its partials in a
+directory beside it. `styles/episodic/` and `styles/weaver/` are the examples:
+the entry point declares the theme and imports partials named for what they
+style, each into an explicit cascade layer.
 
 `static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
 and favicons — that are copied verbatim into the published tree. Its layout

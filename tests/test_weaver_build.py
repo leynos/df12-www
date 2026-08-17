@@ -33,15 +33,13 @@ WEAVER_TEMPLATES = REPO_ROOT / "templates" / "weaver"
 WEAVER_STYLES = REPO_ROOT / "src" / "styles"
 COMPILED_STYLESHEET = PUBLIC_WEAVER / "assets" / "styles" / "weaver.css"
 
-# Hosts the sub-site currently reaches at runtime, each of which the migration
-# replaces with a locally served asset.
-FORBIDDEN_HOSTS = (
-    "cdn.tailwindcss.com",
-    "cdnjs.cloudflare.com",
-    "fonts.googleapis.com",
-    "fonts.gstatic.com",
-    "code.iconify.design",
-    "transparenttextures.com",
+# An attribute that makes the browser fetch from another origin. `href` counts
+# only on a `<link>`; on an `<a>` it is a link to somewhere else, which is the
+# point of a link.
+SUBRESOURCE = re.compile(
+    r"""(?:src|srcset)\s*=\s*["']\s*(?:https?:)?//"""
+    r"""|<link\b[^>]*?\bhref\s*=\s*["']\s*(?:https?:)?//""",
+    re.IGNORECASE,
 )
 
 # Three- to eight-digit hex colours, and any rgb()/rgba() call. Deliberately
@@ -111,17 +109,25 @@ def test_weaver_stylesheet_is_compiled(built_site: Path) -> None:
 
 @pytest.mark.timeout(300)
 def test_weaver_pages_reach_no_third_party_hosts(built_site: Path) -> None:
-    """No published Weaver page should load anything from another origin."""
+    """No published Weaver page should load anything from another origin.
+
+    This looks at the attributes that make a browser fetch something rather
+    than at a list of hosts someone thought of. The list version passed for
+    several commits while four illustrations on the design-system page were
+    still being served from Google Cloud Storage. Editorial ``<a href>`` links
+    to other sites are left alone: pointing somewhere else is what a link is
+    for.
+    """
     offenders: dict[str, list[str]] = {}
     for page in sorted(built_site.rglob("*.html")):
         markup = page.read_text(encoding="utf-8")
-        found = [host for host in FORBIDDEN_HOSTS if host in markup]
-        if found:
-            offenders[str(page.relative_to(built_site))] = found
+        remote = sorted({m.group(0)[:80] for m in SUBRESOURCE.finditer(markup)})
+        if remote:
+            offenders[str(page.relative_to(built_site))] = remote
 
     assert not offenders, (
-        "expected every Weaver page to be self-contained, but these reach "
-        f"third-party hosts: {offenders}"
+        "expected every Weaver page to be self-contained, but these fetch "
+        f"subresources from elsewhere: {offenders}"
     )
 
 
@@ -185,3 +191,26 @@ def test_no_font_awesome_markup_remains() -> None:
         )
     }
     assert not offenders, f"Font Awesome classes remain in: {offenders}"
+
+
+@pytest.mark.parametrize(
+    ("markup", "is_remote"),
+    [
+        ('<img src="https://storage.googleapis.com/x.png">', True),
+        ('<img src="//cdn.example.com/x.png">', True),
+        ('<script src="https://cdn.tailwindcss.com"></script>', True),
+        ('<link rel="stylesheet" href="https://fonts.googleapis.com/css2">', True),
+        ('<img src="/weaver/assets/x.png">', False),
+        ('<link rel="stylesheet" href="/weaver/assets/styles/weaver.css">', False),
+        # A link to somewhere else is what a link is for.
+        ('<a href="https://github.com/leynos/weaver">source</a>', False),
+        ('<a class="btn" href="https://example.com">read</a>', False),
+    ],
+)
+def test_subresource_pattern_distinguishes_fetches_from_links(
+    markup: str,
+    *,
+    is_remote: bool,
+) -> None:
+    """The self-contained check must not pass vacuously, or ban hyperlinks."""
+    assert bool(SUBRESOURCE.search(markup)) is is_remote

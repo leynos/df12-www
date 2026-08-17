@@ -29,6 +29,10 @@ ignore = [
   '--my-brand-color',
   '\{color\}',
   '`color`',
+  # The CSS `color` property quoted as a declaration, and the name of the
+  # accessibility tool that measures it. Both are citations.
+  'color:\s*var\(',
+  'check_color_contrast',
   # CSS longhand property names ending in -color. The specification spells
   # them the American way, so quoting one in prose is a citation, not a
   # lapse. The leading segment is required, so bare "color" stays caught.

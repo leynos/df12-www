@@ -79,15 +79,16 @@ a clean tree, and will not deploy.
 
 Every published file therefore has a source elsewhere in the repository:
 
-| Published under `public/`                  | Comes from                                            |
-| ------------------------------------------ | ----------------------------------------------------- |
-| `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`                          | Tailwind compiling `src/styles/`                      |
-| `mxd/assets/tailwind.css`                  | Tailwind compiling `src/styles/`                      |
-| `episodic/assets/styles/tailwind.css`      | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
-| `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
-| everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`             | Comes from                                            |
+| ------------------------------------- | ----------------------------------------------------- |
+| `**/*.html`                           | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`                     | Tailwind compiling `src/styles/`                      |
+| `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                      |
+| `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
+| `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |
+| everything else                       | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 To add an asset, put it in `src/static/` at the path it should occupy in the
 published site, then rebuild.
@@ -127,22 +128,31 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Three entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Four entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
-`dracula` for dark mode) and `src/styles/mxd.css` for the mxd sub-site (the
-`mxd` theme), plus `src/styles/episodic.css` for the Episodic sub-site (the
-`episodic` theme).
+`dracula` for dark mode), `src/styles/mxd.css` for the mxd sub-site (the `mxd`
+theme), `src/styles/episodic.css` for Episodic (the `episodic` theme), and
+`src/styles/weaver.css` for Weaver (the `weaver` theme).
 
-The other three sub-sites each carry a hand-crafted stylesheet, and none of
-them uses daisyUI, but they do not all stand outside Tailwind. Netsuke and
-Weaver load the **Tailwind Play CDN** at runtime and use its utilities freely
-in their markup; Netsuke also extends the default theme through
-`/netsuke/assets/js/tailwind-config.js`. Only Stilyagi uses neither. The Play
-CDN is not the compiled build: it injects its utilities into a `<style>` tag
-after the stylesheet link, which is why handwritten rules on those two
-sub-sites sometimes need the doubled selector described below. Their colour
+Weaver's entrypoint is the one to read first when adding a sub-site
+stylesheet, and Episodic's follows the same shape. It declares the theme, then
+imports partials named for what they style — `weaver/chrome.css`,
+`weaver/panels.css`, `weaver/content.css` and so on — with element defaults in
+`layer(base)` beside Tailwind's preflight and everything else in
+`layer(components)`. The layering is deliberate: an unlayered declaration
+beats every layered one regardless of specificity, so a sub-site stylesheet
+left unlayered silently outranks the utilities in the markup. In the
+components layer a utility still wins, which is what anyone writing
+`class="mt-8"` expects.
+
+Netsuke and Stilyagi still carry hand-crafted stylesheets and neither uses
+daisyUI. Netsuke loads the **Tailwind Play CDN** at runtime and extends the
+default theme through `/netsuke/assets/js/tailwind-config.js`; Stilyagi uses
+neither. The Play CDN is not the compiled build: it injects its utilities into
+a `<style>` tag after the stylesheet link, which is why handwritten rules on
+Netsuke sometimes need the doubled selector described below. Their colour
 tokens live in their own stylesheets, and the accessibility rules below apply
-to all of them just the same.
+to them just the same.
 
 Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
 build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which

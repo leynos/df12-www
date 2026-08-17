@@ -5,7 +5,7 @@ This ExecPlan (execution plan) is a living document. The sections
 `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
 proceeds.
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 ## Purpose / big picture
 
@@ -187,7 +187,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       fixes. 621 failing text runs measured, 621 fixed; every page now
       clears WCAG 2.2 AA by direct computed-style measurement, at both 360px
       and 1440px.
-- [ ] Milestone 9 — Documentation and cleanup.
+- [x] (2026-08-17 23:20Z) Milestone 9 — Documentation and cleanup.
 
 ## Surprises & discoveries
 
@@ -234,7 +234,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   both `#E8502B` on `#F3EFD9` and `#4A6FA5` on `#F3EFD9` — the *required*
   ratio rather than the measured one, which are 3.23 and 4.42. Separately,
   axe-core reported twenty-eight colour-contrast violations on the docs page
-  with `background color: #ffffff` for text inside panels whose rendered
+  with a reported background of white for text inside panels whose rendered
   pixels are `rgb(15, 36, 64)` — sampled directly from the screenshot, and
   confirmed by `getComputedStyle` on the elements themselves. The panels do
   not overflow at that viewport and the finding does not move when the
@@ -478,7 +478,62 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 
 ## Outcomes & retrospective
 
-To be completed at the end of the work.
+The Weaver sub-site now builds the way every compiled sub-site does: one
+stylesheet, emitted by `bun run build` from `src/styles/weaver.css`, with no
+runtime compiler, no inline configuration, and no request to any other host.
+Colour is declared once and named for the job it does. The chrome is defined
+once instead of four times. Every page clears WCAG 2.2 AA at 360px and 1440px.
+
+Measured against the pre-migration baseline, eight of the seventeen pages are
+identical in total height and the largest shift anywhere is 1.78%, on
+`commands/act/`. The three accepted categories of change are recorded above
+with their measurements.
+
+What worked, and would be worth repeating:
+
+- **Building the gate before the work.** The computed-style harness took a
+  morning and paid for itself in the first hour of Milestone 2, when the diff
+  opened at 140,000 lines and five real regressions were hiding in it. Every
+  milestone after that was judged rather than eyeballed, and four of the ten
+  landed with a provable zero.
+- **Teaching the gate to compare styles rather than spellings.** Almost all of
+  that 140,000 was notation: `oklab()` where v3 said `rgba()`, extra
+  placeholder shadow layers, `currentColor` on borders nobody draws.
+  Normalizing those — and unit-testing the normalization in both directions —
+  was the difference between a gate and a wall of noise.
+- **Writing the three invariants as failing tests up front.** Each carried a
+  strict `xfail` naming the milestone that would turn it green, so none could
+  be quietly forgotten and none could outlive its purpose.
+- **Pinning, not accepting, where v4 newly honoured a suppressed
+  declaration.** Twelve headings, two lead paragraphs, a nav divider, and an
+  inline-code rule were all about to change because Tailwind v4 corrects
+  conflicts v3 resolved by source order. Pinning each to what the page already
+  rendered kept the claim "this commit changed nothing" true and left the
+  improvements available as a separate, legible decision.
+
+What would be done differently:
+
+- **Trust no colour tool without checking it against the pixels.** Of three
+  instruments used, two were wrong: an MCP helper returned the required ratio
+  in place of the measured one, and axe-core reported a white background for
+  text whose rendered pixels sample as `rgb(15, 36, 64)`. The harness written
+  to replace them was itself wrong twice — parsing `oklab()` as `rgb()`, then
+  forcing composited alpha to 1 — and both bugs invented failures. Every
+  measurement in Milestone 8 was checked against `getComputedStyle` or a
+  screenshot before anything was changed on the strength of it.
+- **Assert the property, not a list.** The self-contained check enumerated
+  known hosts and passed for five commits while four illustrations on the
+  design-system page were served from Google Cloud Storage. It now looks for
+  the attributes that make a browser fetch, and carries cases proving it does
+  not pass vacuously. The lesson generalizes: an allowlist tests the author's
+  memory, not the codebase.
+- **Look for dead assets earlier.** Two of five paper textures had been
+  returning 404 for the life of the site, and one CSS rule had been asking for
+  a font-size it never got. A migration is a good moment to find these, but a
+  cheap audit at the start would have found them sooner and shaped the plan.
+
+Left for another day, deliberately: Netsuke is now the only sub-site on the
+Play CDN, and this plan is the worked example of what moving it would cost.
 
 ## Context and orientation
 

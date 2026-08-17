@@ -122,6 +122,16 @@
   --font-sans: "IBM Plex Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
 
+  /* The brand mark is a kanji, and none of the three families above
+     carries one. This asks the system for a serif CJK face, to sit in the
+     same register as Playfair, and falls back to whatever serif the
+     platform has. Nothing is self-hosted for it: a CJK font is several
+     megabytes for a single glyph, and every current desktop and mobile
+     platform ships one. */
+  --font-kanji:
+    "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", "Noto Serif JP", "Source Han Serif",
+    "Songti SC", serif;
+
   /* The muted indigo. daisyUI has no slot for a third text weight between
      base-content and the surface, so it is a token of its own. */
   --color-ink-muted: var(--color-ink-muted-deep);

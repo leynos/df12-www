@@ -217,6 +217,20 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `commands/observe/`, `commands/verify/`, and the three legal pages.
   Impact: the harness derives its page list from the published tree, so the
   count corrects itself and stays correct as pages are added.
+- **Observation:** the icon sweep missed the one place the icons were not
+  markup, and the test written to catch that missed it too.
+  Evidence: `mobile-nav.js` builds the drawer's toggle at runtime and set
+  `innerHTML` to `<i class="fa-solid fa-bars">`. Removing the Font Awesome CDN
+  left that glyph with nothing behind it, so the menu button rendered as an
+  empty box on every page below 1024px — reported by the user, not by the
+  suite. `test_no_font_awesome_markup_remains` scanned `templates/weaver/**`
+  only, and a scan of the built HTML would have missed it too, since the
+  markup does not exist until the script runs.
+  Impact: the test now scans the sub-site's scripts and stylesheets as well,
+  and was checked by reintroducing the bug. The general lesson is that
+  "replace every X in the templates" is the wrong frame when a script can
+  write markup at runtime; the question is what the *page* contains, not what
+  the templates say.
 - **Observation:** the Weaver palette had 621 text runs below the WCAG AA
   floor before this migration touched it, and the two worst offenders were the
   colours the design uses most.

@@ -35,7 +35,11 @@
   btn.setAttribute("aria-controls", nav.id || "sidebar-nav");
   btn.setAttribute("aria-label", "Open navigation menu");
   if (!nav.id) nav.id = "sidebar-nav";
-  btn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+  /* The button *is* the brand mark: the glyph and the block of indigo
+     both come from `.weaver-brand-mark` in weaver/chrome.css, so this
+     file carries no markup of its own. `aria-label` above says what the
+     button does, and is kept in step with its state below. */
+  btn.className = "weaver-brand-mark";
   header.style.position = "relative";
   header.appendChild(btn);
 
@@ -70,7 +74,6 @@
     sidebar.classList.add("mobile-nav-open");
     btn.setAttribute("aria-expanded", "true");
     btn.setAttribute("aria-label", "Close navigation menu");
-    btn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
     previousBodyOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     setHeaderHeight();
@@ -127,7 +130,6 @@
     sidebar.classList.remove("mobile-nav-open");
     btn.setAttribute("aria-expanded", "false");
     btn.setAttribute("aria-label", "Open navigation menu");
-    btn.innerHTML = '<i class="fa-solid fa-bars"></i>';
     document.body.style.overflow = previousBodyOverflow;
 
     /* Remove focus trap */

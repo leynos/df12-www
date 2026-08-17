@@ -105,21 +105,22 @@
     border-top: 2px solid color-mix(in oklab, var(--color-primary) 20%, transparent);
   }
 
+  /* The toggle wears `.weaver-brand-mark`, which supplies the indigo block,
+     the glyph, and the centring; what is left here is where it sits and how
+     big it is. */
   #mobile-nav-toggle {
+    /* `display` has to be restated here, not left to `.weaver-brand-mark`:
+       the rule above hides the button by default, and an id selector outranks
+       a class whatever the order. */
     display: flex;
-    align-items: center;
-    justify-content: center;
     position: absolute;
     top: 50%;
     right: 1.5rem;
     transform: translateY(-50%);
     width: 2.5rem;
     height: 2.5rem;
-    background: transparent;
-    border: 1px solid color-mix(in oklab, var(--color-primary) 20%, transparent);
     border-radius: 0.125rem;
-    color: var(--color-primary);
-    font-size: 1.125rem;
+    font-size: 1.5rem;
     cursor: pointer;
     z-index: 42;
   }
@@ -143,3 +144,30 @@
 }
 
 /* Structured shared-content pages (legal pages: TOC, sections, badge cards) */
+
+/* The brand mark: 織, "weave", on a block of indigo. The page's paper texture
+   sits over the top of it, which is where the grain comes from.
+
+   The glyph is generated content rather than markup, so the one definition
+   serves both the footer and the drawer's toggle button — one of which is
+   built by `mobile-nav.js` at runtime and cannot reach a Jinja macro. It is
+   also the right register for it: a logo is not a word in the sentence, and
+   a screen reader announcing "shiki" mid-footer would be noise. Both callers
+   carry their own accessible name.
+
+   Sizing is left to the caller: the footer wants 2rem, the toggle 2.5rem. */
+.weaver-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: var(--color-primary-content);
+  border: 0;
+  line-height: 1;
+}
+
+.weaver-brand-mark::before {
+  content: "\7e54";
+  font-family: var(--font-kanji);
+  font-size: 0.7em;
+}

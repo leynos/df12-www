@@ -25,7 +25,7 @@
                         <h3 class="font-serif text-base-content font-bold mb-3 text-sm">Design &amp; Concept</h3>
                         <ul class="space-y-2 border-l border-base-content/10 ml-1">
                             <li><a href="#design-docs" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Design Documents</a></li>
-                            <li><a href="#architecture" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Architecture Deep Dive</a></li>
+                            <li><a href="#architecture" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Architecture Decisions</a></li>
                         </ul>
                     </div>
 
@@ -88,6 +88,9 @@
                             <span class="h-px w-8 bg-accent mr-4"></span>
                             <h2 class="font-serif text-3xl text-base-content">Design Documents</h2>
                         </div>
+                        <p class="mb-8 text-base-content/80 max-w-2xl">
+                            The vision and the systems it demands: what Weaver is, how Sempai and Jacquard work, and where the roadmap goes next.
+                        </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <a href="https://github.com/leynos/weaver/blob/main/docs/weaver-design.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -97,65 +100,6 @@
                                 <p class="text-sm text-base-content/88 mb-4">Architecture, Semantic Fusion Engine, Double-Lock harness, client-daemon model, and composable UNIX primitives.</p>
                                 <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">weaver-design.md</span>
-                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
-                                </div>
-                            </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-007-agent-native-command-surface.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
-                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    {{ icon('terminal', 'text-4xl text-base-content') }}
-                                </div>
-                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-007: Agent-Native Command Surface</h3>
-                                <p class="text-sm text-base-content/88 mb-4">The 0.1.0 reset: noun-verb grammar, dual renderers, universal <code>--json</code>, and the capability model that hides providers.</p>
-                                <div class="flex items-center text-xs font-mono text-base-content/78">
-                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
-                                    <span class="font-mono">adr-007</span>
-                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
-                                </div>
-                            </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/rfcs/0002-multi-workspace-daemon.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
-                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    {{ icon('server', 'text-4xl text-base-content') }}
-                                </div>
-                                <h3 class="font-serif text-xl text-base-content mb-2">RFC 0002: Multi-Workspace Daemon</h3>
-                                <p class="text-sm text-base-content/88 mb-4">One per-user daemon, workspace-scoped state, language servers keyed by execution identity, and workspace-local concurrency. With ADRs 008&ndash;010.</p>
-                                <div class="flex items-center text-xs font-mono text-base-content/78">
-                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
-                                    <span class="font-mono">rfc-0002</span>
-                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
-                                </div>
-                            </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/rfcs/0003-sempai-query-to-selector.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
-                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    {{ icon('diagram-project', 'text-4xl text-base-content') }}
-                                </div>
-                                <h3 class="font-serif text-xl text-base-content mb-2">RFC 0003: Query to Selector</h3>
-                                <p class="text-sm text-base-content/88 mb-4">The Sempai pipeline: query input, versioned selector streams, and the typed handoff into safe actuation. With ADRs 011&ndash;012.</p>
-                                <div class="flex items-center text-xs font-mono text-base-content/78">
-                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
-                                    <span class="font-mono">rfc-0003</span>
-                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
-                                </div>
-                            </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/ui-gap-analysis.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
-                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    {{ icon('scale-balanced', 'text-4xl text-base-content') }}
-                                </div>
-                                <h3 class="font-serif text-xl text-base-content mb-2">UI Gap Analysis</h3>
-                                <p class="text-sm text-base-content/88 mb-4">Principle-by-principle audit of the current surface against the target: errors that teach, bounded output, non-interactive defaults.</p>
-                                <div class="flex items-center text-xs font-mono text-base-content/78">
-                                    <span class="font-mono">ui-gap-analysis.md</span>
-                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
-                                </div>
-                            </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
-                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    {{ icon('shield-halved', 'text-4xl text-base-content') }}
-                                </div>
-                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-001: Plugin Capability Model</h3>
-                                <p class="text-sm text-base-content/88 mb-4">Capability-first model for act operations, including <code>extricate-symbol</code> and provider resolution.</p>
-                                <div class="flex items-center text-xs font-mono text-base-content/78">
-                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
-                                    <span class="font-mono">adr-001</span>
                                     {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
@@ -200,6 +144,78 @@
                                 <p class="text-sm text-base-content/88 mb-4">Phased delivery plan from foundation through plugin ecosystem to long-term intelligence features.</p>
                                 <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">roadmap.md</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+
+                    <!-- Architecture Decisions Section -->
+                    <section id="architecture" class="mb-20 scroll-mt-20">
+                        <div class="flex items-center mb-8">
+                            <span class="h-px w-8 bg-accent mr-4"></span>
+                            <h2 class="font-serif text-3xl text-base-content">Architecture Decisions</h2>
+                        </div>
+                        <p class="mb-8 text-base-content/80 max-w-2xl">
+                            The RFCs and Architecture Decision Records (ADRs) that reset the public surface for 0.1.0, plus the gap analysis that keeps the target honest. All are Status: Proposed.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-007-agent-native-command-surface.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('terminal', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-007: Agent-Native Command Surface</h3>
+                                <p class="text-sm text-base-content/88 mb-4">The 0.1.0 reset: noun-verb grammar, dual renderers, universal <code>--json</code>, and the capability model that hides providers.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">adr-007</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/rfcs/0002-multi-workspace-daemon.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('server', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">RFC 0002: Multi-Workspace Daemon</h3>
+                                <p class="text-sm text-base-content/88 mb-4">One per-user daemon, workspace-scoped state, language servers keyed by execution identity, and workspace-local concurrency. With ADRs 008&ndash;010.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">rfc-0002</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/rfcs/0003-sempai-query-to-selector.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('diagram-project', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">RFC 0003: Query to Selector</h3>
+                                <p class="text-sm text-base-content/88 mb-4">The Sempai pipeline: query input, versioned selector streams, and the typed handoff into safe actuation. With ADRs 011&ndash;012.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">rfc-0003</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('shield-halved', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-001: Plugin Capability Model</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Capability-first model for change operations, including <code>extricate-symbol</code> and provider resolution.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">adr-001</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/ui-gap-analysis.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('scale-balanced', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">UI Gap Analysis</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Principle-by-principle audit of the current surface against the target: errors that teach, bounded output, non-interactive defaults.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="font-mono">ui-gap-analysis.md</span>
                                     {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>

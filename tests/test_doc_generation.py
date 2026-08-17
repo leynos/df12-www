@@ -539,6 +539,10 @@ def test_doc_prose_code_spans_have_expected_computed_style(
                     "css-view",
                     "--mode",
                     "walker",
+                    # Pinned to match the Chromium availability guard above.
+                    # css-view defaults to Firefox, so without this the guard
+                    # passes on a Chromium-only machine and the run then fails
+                    # on a missing Firefox build.
                     "--browser",
                     "chromium",
                     url,

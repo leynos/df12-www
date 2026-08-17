@@ -16,6 +16,12 @@ reference/*
 # assets live in src/static and are copied here by `bun run build:static`.
 public/
 
+# Computed-style snapshots and screenshots written by
+# scripts/weaver_snapshot.py while migrating the Weaver sub-site. They are
+# large, machine-generated, and only meaningful against the working tree that
+# produced them, so they are regenerated rather than tracked.
+.weaver-*/
+
 # Project build outputs
 out
 coverage

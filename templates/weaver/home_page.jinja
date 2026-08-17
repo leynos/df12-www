@@ -18,7 +18,7 @@
                         <div>
                             <div class="masthead-eyebrow mb-8">
                                 <span class="w-2 h-2 bg-accent rounded-full"></span>
-                                <span class="font-mono text-xs tracking-widest uppercase text-base-content">Weaver CLI v0.1.0</span>
+                                <span class="font-mono text-xs tracking-widest uppercase text-base-content">Weaver CLI &mdash; 0.1.0 target</span>
                             </div>
 
                             <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
@@ -27,7 +27,11 @@
                             </h1>
 
                             <p class="font-sans text-lg text-base-content/80 leading-relaxed mb-8 max-w-lg font-light">
-                                Weaver connects AI agents to a real codebase through concrete observe, act, and verify operations. The CLI stays thin, the daemon keeps context loaded, and Double-Lock plus Birdcage constrain the risky parts.
+                                Weaver turns semantic code operations into shell primitives. Query symbols structurally, pipe the matches through <code class="text-sm bg-primary/10 px-1">jq</code>, and hand them to a rename &ndash; every command has one readable renderer and one stable <code class="text-sm bg-primary/10 px-1">--json</code> contract, with Double-Lock and Birdcage constraining the risky parts.
+                            </p>
+
+                            <p class="font-mono text-xs text-base-content/75 leading-relaxed mb-8 max-w-lg">
+                                Weaver is in active early development. These pages document the v0.1.0 target surface; the prototype grammar it replaces is not preserved.
                             </p>
 
                             <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -85,7 +89,7 @@
                             </div>
                             <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent-ink transition-colors">Composable</h3>
                             <p class="font-sans text-base-content/88 leading-relaxed mb-6">
-                                Use one surface for structural queries, patch application, and diagnostics. The daemon streams JSONL to the CLI, which then forwards raw payloads or human-readable output as needed.
+                                One noun-verb grammar covers reading, querying, and changing code. Queries emit versioned selector streams that pipe through <code class="text-xs bg-primary/10 px-1">jq</code> or straight into a mutation &ndash; the shell is the integration layer.
                             </p>
                             <a href="/weaver/how-it-works/#fusion" class="inline-flex items-center font-mono text-xs font-bold text-base-content uppercase tracking-wider group-hover:underline decoration-accent underline-offset-4">
                                 Explore Fusion {{ icon('arrow-right', 'ml-2 text-3xs') }}
@@ -165,27 +169,20 @@
 
                         <!-- Terminal Body -->
                         <div class="p-6 font-mono text-sm md:text-base overflow-x-auto">
-                            <!-- Command 1: observe get-definition -->
+                            <!-- The query-to-selector pipeline -->
                             <div class="mb-6">
                                 <div class="flex text-code-dim">
                                     <span class="text-accent-ink mr-2">➜</span>
                                     <span class="mr-2">~</span>
-                                    <span class="text-white">weaver observe get-definition --output json --uri file:///src/main.rs --position 10:5</span>
+                                    <span class="text-white">weaver symbols list --lang rust --query 'fn $NAME($...ARGS)' --json \</span>
                                 </div>
+                                <div class="text-white pl-10">| jq -c 'select(.captures.NAME.text | startswith("old_"))' \</div>
+                                <div class="text-white pl-10">| weaver symbols rename --selectors - --new-name run --dry-run</div>
                                 <div class="text-note-info mt-2 pl-4 border-l-2 border-note-info-line/30">
-                                    [{"uri":"file:///src/lib.rs","line":42,"column":17}]
+                                    {"schema":"weaver.selector.v1","uri":"file:///src/lib.rs","captures":{"NAME":{"text":"old_run"}}}
                                 </div>
-                            </div>
-
-                            <!-- Command 2: act apply-patch -->
-                            <div class="mb-6">
-                                <div class="flex text-code-dim">
-                                    <span class="text-accent-ink mr-2">➜</span>
-                                    <span class="mr-2">~</span>
-                                    <span class="text-white">weaver act apply-patch --output json &lt; fix.diff</span>
-                                </div>
-                                <div class="text-note-warn mt-2 pl-4 border-l-2 border-status-warn/30">
-                                    {"applied":true,"files":["src/lib.rs"]}
+                                <div class="text-note-warn pl-4 border-l-2 border-status-warn/30">
+                                    dry run: 1 rename planned, 3 files would change, verification clean
                                 </div>
                             </div>
 
@@ -193,7 +190,7 @@
                             <div class="flex text-code-dim">
                                 <span class="text-accent-ink mr-2">➜</span>
                                 <span class="mr-2">~</span>
-                                <span class="text-white">weaver verify diagnostics --output json --uri file:///src/lib.rs<span class="animate-pulse inline-block w-2.5 h-5 bg-code-dim ml-1 align-middle"></span></span>
+                                <span class="text-white">weaver diagnostics list --workspace . --json<span class="animate-pulse inline-block w-2.5 h-5 bg-code-dim ml-1 align-middle"></span></span>
                             </div>
                         </div>
                     </div>
@@ -232,20 +229,20 @@
                             <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">Query layer</span>
                             <h2 class="font-serif text-4xl text-base-content mb-6">Sempai Query Engine</h2>
                             <p class="font-sans text-lg text-base-content/80 mb-6 font-light leading-relaxed">
-                                Sempai adds Semgrep-compatible structural queries to <code class="text-xs bg-primary/10 px-1">observe</code>. It runs on Tree-sitter, exposes a query-focused operator surface, and keeps compatibility boundaries explicit.
+                                Sempai powers <code class="text-xs bg-primary/10 px-1">weaver symbols list</code>: Semgrep-shaped queries on a Tree-sitter spine, with explicit compatibility boundaries. Matches leave as versioned selector records that any consumer can trust.
                             </p>
                             <ul class="space-y-4 mb-8">
                                 <li class="flex items-start">
                                     {{ icon('check', 'text-accent-ink mt-1 mr-3 text-sm') }}
-                                    <span class="text-base-content/80 text-sm">Semgrep-compatible rules with a Tree-sitter backend</span>
+                                    <span class="text-base-content/80 text-sm">Bare structural patterns, an expression DSL, or Semgrep-style YAML rules &ndash; three explicit front doors, no guessing</span>
                                 </li>
                                 <li class="flex items-start">
                                     {{ icon('check', 'text-accent-ink mt-1 mr-3 text-sm') }}
-                                    <span class="text-base-content/80 text-sm">Rust, Python, and TypeScript support today; Go and HCL are planned</span>
+                                    <span class="text-base-content/80 text-sm">Rust, Python, TypeScript, and Go core; HCL optional. The first executable slice covers Rust, Python, and TypeScript</span>
                                 </li>
                                 <li class="flex items-start">
                                     {{ icon('check', 'text-accent-ink mt-1 mr-3 text-sm') }}
-                                    <span class="text-base-content/80 text-sm">Designed to turn source structure into agent-ready context</span>
+                                    <span class="text-base-content/80 text-sm">Deterministic selector streams with spans, captures, and source digests &ndash; matches that survive the pipe</span>
                                 </li>
                             </ul>
                             <a href="/weaver/sempai/" class="text-base-content font-bold border-b-2 border-accent hover:text-accent-ink transition-colors pb-1 inline-block">

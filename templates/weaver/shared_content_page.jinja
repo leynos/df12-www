@@ -22,8 +22,8 @@
 
 {% block sidebar_footer %}
             {% if parent_link %}
-            <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
-                <a href="{{ parent_link.href }}" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">{{ parent_link.label }}</a>
+            <div class="p-6 border-t border-base-content/10 hidden lg:block">
+                <a href="{{ parent_link.href }}" class="font-mono text-xs text-base-content/60 hover:text-accent transition-colors">{{ parent_link.label }}</a>
             </div>
             {% endif %}
 {% endblock %}
@@ -31,10 +31,10 @@
 {% block content %}
             <section class="py-20 px-8 lg:px-16">
                 <div class="max-w-3xl mx-auto">
-                    <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-2 block">Legal</span>
-                    <h1 class="font-serif text-4xl text-weaver-indigo mb-10">{{ title }}</h1>
+                    <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-2 block">Legal</span>
+                    <h1 class="font-serif text-4xl text-base-content mb-10">{{ title }}</h1>
 
-                    <article class="prose prose-indigo max-w-none font-sans text-weaver-indigo/80 leading-relaxed space-y-6">
+                    <article class="prose prose-indigo max-w-none font-sans text-base-content/80 leading-relaxed space-y-6">
                         {{ body_html | safe }}
                     </article>
                 </div>
@@ -42,16 +42,16 @@
 {% endblock %}
 
 {% block page_footer %}
-    <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16 relative lg:ml-64">
+    <footer class="bg-base-100 border-t border-base-content/20 p-8 lg:p-16 relative lg:ml-64">
         <div class="max-w-3xl mx-auto flex flex-col md:flex-row justify-between items-center">
             <div>
-                <p class="font-mono text-xs text-weaver-indigo/60">&copy; 2026 df12 Productions</p>
-                <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
+                <p class="font-mono text-xs text-base-content/60">&copy; 2026 df12 Productions</p>
+                <p class="font-mono text-xs text-base-content/60 mt-1">Serious tools, <span class="text-accent">playful worlds.</span></p>
             </div>
             <nav class="flex space-x-6 mt-4 md:mt-0" aria-label="Legal">
-                <a href="/weaver/privacy-policy/" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">Privacy Policy</a>
-                <a href="/weaver/terms-of-use/" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">Terms of Use</a>
-                <a href="/weaver/code-of-conduct/" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">Code of Conduct</a>
+                <a href="/weaver/privacy-policy/" class="font-mono text-xs text-base-content/60 hover:text-accent transition-colors">Privacy Policy</a>
+                <a href="/weaver/terms-of-use/" class="font-mono text-xs text-base-content/60 hover:text-accent transition-colors">Terms of Use</a>
+                <a href="/weaver/code-of-conduct/" class="font-mono text-xs text-base-content/60 hover:text-accent transition-colors">Code of Conduct</a>
             </nav>
         </div>
     </footer>

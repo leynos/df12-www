@@ -1,0 +1,69 @@
+/* The three animations the illustrated panels use.
+ *
+ * Each was declared in a `<style>` block on the single page that used it,
+ * which is defensible for a one-off but put colour literals in the templates
+ * and kept the keyframes out of reach of the stylesheet's own tokens.
+ *
+ * All three respect `prefers-reduced-motion`. They did not before; each is a
+ * decorative loop with no informational content, so stopping them costs the
+ * reader nothing and stopping them is what the preference asks for.
+ */
+
+/* The sandbox panel on commands/act, whose border breathes to suggest the
+   boundary is live. */
+@keyframes weaver-pulse-border {
+  0%,
+  100% {
+    border-color: color-mix(in oklab, var(--color-accent) 20%, transparent);
+  }
+
+  50% {
+    border-color: color-mix(in oklab, var(--color-accent) 80%, transparent);
+  }
+}
+
+.sandbox-active {
+  animation: weaver-pulse-border 2s infinite;
+}
+
+/* The verification indicator on commands/verify. */
+@keyframes weaver-pulse-opacity {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.verify-pulse {
+  animation: weaver-pulse-opacity 2s infinite;
+}
+
+/* The double lock on the safety page. */
+@keyframes weaver-lock-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+.lock-animation {
+  animation: weaver-lock-pulse 4s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sandbox-active,
+  .verify-pulse,
+  .lock-animation {
+    animation: none;
+  }
+}

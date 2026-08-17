@@ -1,0 +1,92 @@
+/* Per-page components.
+ *
+ * Each of these was a small `<style>` block inlined in the one template that
+ * used it. That is a defensible shape for a one-off, but it kept colour
+ * literals in the markup and put the rules out of reach of the stylesheet's
+ * own tokens — `#193C6E` at 20% opacity for the roadmap's timeline rule, and
+ * `rgba(25, 60, 110, 0.2)` for the install page's step connector, are the
+ * same colour written two ways and neither knew about the theme.
+ *
+ * They stay separate rules rather than being merged: a timeline and a step
+ * connector are different things that happen to be thin indigo lines.
+ */
+
+/* Docs: the search field and the table of contents beside it. */
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.sticky-toc {
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+/* Architecture: the hand-drawn ASCII diagrams, which need their line box
+   tight and their whitespace preserved. */
+.ascii-diagram {
+  line-height: 1.2;
+  white-space: pre;
+}
+
+/* Install: the copy button that appears on hovering a code block, and the
+   line joining one numbered step to the next. */
+.code-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.copy-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.code-container:hover .copy-btn {
+  opacity: 1;
+}
+
+.step-line {
+  position: absolute;
+  left: 15px;
+  top: 40px;
+  bottom: -20px;
+  width: 2px;
+  background-color: color-mix(in oklab, var(--color-primary) 20%, transparent);
+  z-index: 0;
+}
+
+.last-step .step-line {
+  display: none;
+}
+
+/* Roadmap: the vertical rule the milestones hang off, and their hover nudge. */
+.timeline-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px;
+  width: 2px;
+  background: var(--color-primary);
+  opacity: 0.2;
+}
+
+.roadmap-item {
+  transition: all 0.3s ease;
+}
+
+.roadmap-item:hover {
+  transform: translateX(5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roadmap-item {
+    transition: none;
+  }
+
+  .roadmap-item:hover {
+    transform: none;
+  }
+}

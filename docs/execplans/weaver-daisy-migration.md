@@ -175,7 +175,10 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - [x] (2026-08-17 20:20Z) Milestone 5 — Replace Font Awesome with inline
       Carbon SVG. 146 tags across 14 templates; `test_weaver_pages_reach_no_third_party_hosts`
       now passes, so the sub-site fetches nothing from anyone.
-- [ ] Milestone 6 — Semantic-class sweep across the 16 templates.
+- [x] (2026-08-17 21:30Z) Milestone 6 — Semantic-class sweep across the
+      templates. About 2,900 substitutions; not one node moved and not one
+      colour changed. The seven inline `<style>` blocks the templates
+      carried moved into partials on the way past.
 - [ ] Milestone 7 — Fold `weaver-site.css` into layered partials.
 - [ ] Milestone 8 — Accessibility audit and contrast fixes.
 - [ ] Milestone 9 — Documentation and cleanup.
@@ -286,6 +289,23 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   the letter of the document. Worth reconciling one way or the other, but not
   as part of this migration.
   Date/Author: 2026-08-17, Milestone 0.
+- **Decision:** map `bg-weaver-indigo` to `primary` and every other indigo
+  property to `base-content`, uniformly, including the opacity tints.
+  Rationale: the plan's rule was "on text or a border it is base-content; on a
+  filled surface it is primary", and the tints are the awkward case — a 5%
+  indigo wash is not really a surface to read against. Uniformity won: a rule
+  that can be stated in one line and checked mechanically is worth more than a
+  per-case judgement, `bg-primary/5` is idiomatic daisyUI for a tint, and both
+  slots hold the same colour, so nothing renders differently either way.
+  Date/Author: 2026-08-17, Milestone 6.
+- **Decision:** narrow `test_weaver_sources_declare_no_colour_literals` to
+  `class` and `style` attributes rather than whole templates.
+  Rationale: the design-system page prints the palette's hex codes as its own
+  content — `#193C6E` beside the swatch it names — which is the page's entire
+  purpose and not a colour anyone is specifying. The invariant worth holding
+  is that colour is not *specified* in the markup, and only those two
+  attributes can specify it. The partials are still scanned whole.
+  Date/Author: 2026-08-17, Milestone 6.
 - **Decision:** accept Carbon's lighter stroke weight in place of Font
   Awesome's solid glyphs.
   Rationale: it is inherent to the substitution — Carbon is a line-drawn set

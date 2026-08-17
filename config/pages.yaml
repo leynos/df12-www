@@ -82,7 +82,7 @@ homepage:
         meta_label: Learn more
         external: false
       - label: Weaver
-        description: CLI tooling for code-aware AI agents. Observe, act, verify.
+        description: CLI tooling for code-aware AI agents. Semantic code operations as composable shell primitives.
         href: "weaver/"
         icon: weaver
         meta_label: Learn more
@@ -658,7 +658,8 @@ pages:
     page_title_suffix: "Weaver"
     description: >
       Semantic CLI for codebases. A light client, a `weaverd` daemon,
-      sandboxed language servers, and tree-sitter – observe, act, verify.
+      sandboxed language servers, and tree-sitter – query, select, change,
+      all Double-Lock verified.
 
   whitaker:
     label: "Whitaker"
@@ -1472,15 +1473,15 @@ sites:
         template: pages/commands.jinja
         output_slug: commands
       - key: commands-act
-        label: "Commands: Act"
+        label: "Commands: Change"
         template: pages/commands-act.jinja
         output_slug: commands/act
       - key: commands-observe
-        label: "Commands: Observe"
+        label: "Commands: Read"
         template: pages/commands-observe.jinja
         output_slug: commands/observe
       - key: commands-verify
-        label: "Commands: Verify"
+        label: "Commands: Verification"
         template: pages/commands-verify.jinja
         output_slug: commands/verify
       - key: safety

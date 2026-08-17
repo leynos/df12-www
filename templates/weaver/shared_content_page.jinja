@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} — Weaver</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/playfair-display-latin-wght-normal.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/ibm-plex-sans-latin-wght-normal.woff2">
     <link rel="stylesheet" href="{{ stylesheet or '/weaver/assets/styles/weaver.css' }}">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">

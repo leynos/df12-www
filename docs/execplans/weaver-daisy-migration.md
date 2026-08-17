@@ -164,7 +164,10 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       layer, so the sub-site now has exactly one stylesheet link. Fourteen of
       seventeen pages are byte-identical by bounding box; three shift by
       0.2–1.5% for the reason recorded under "accepted v4 semantics".
-- [ ] Milestone 3 — Self-host fonts and paper textures.
+- [x] (2026-08-17 18:55Z) Milestone 3 — Self-host fonts and paper textures.
+      Zero nodes moved or resized: the vendored faces render identically to
+      Google's. Two of the five textures turned out to have been 404ing all
+      along and were dropped rather than vendored.
 - [ ] Milestone 4 — Consolidate the page chrome; introduce the nav macro.
 - [ ] Milestone 5 — Replace Font Awesome with inline Carbon SVG.
 - [ ] Milestone 6 — Semantic-class sweep across the 16 templates.

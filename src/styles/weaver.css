@@ -29,6 +29,11 @@
  * It is a single file for now, carrying the same rules and the same colour
  * literals it always had. A later commit splits it by concern and replaces
  * those literals with theme tokens. */
+/* @font-face rules belong to no layer: an unlayered at-rule that declares a
+ * font rather than styling an element cannot lose a cascade argument, and
+ * putting it in `base` would be a claim about precedence it does not need. */
+@import "./weaver/fonts.css";
+
 @import "./weaver/legacy.css" layer(components);
 
 @source "../../templates/weaver/**/*.jinja";

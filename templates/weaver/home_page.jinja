@@ -9,7 +9,10 @@
         window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/playfair-display-latin-wght-normal.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/ibm-plex-sans-latin-wght-normal.woff2">
     <link rel="stylesheet" href="/weaver/assets/styles/weaver.css">
 </head>
 <body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
@@ -210,7 +213,7 @@
             <!-- Command Preview Section -->
             <section id="commands-preview" class="py-20 px-8 lg:px-16 border-b border-weaver-indigo/20 relative">
                 <!-- Background Pattern -->
-                <div class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+                <div class="absolute inset-0 opacity-5" style="background-image: url('/weaver/assets/textures/cubes.png');"></div>
 
                 <div class="max-w-6xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-end mb-12">

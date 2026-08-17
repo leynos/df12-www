@@ -533,7 +533,20 @@ def test_doc_prose_code_spans_have_expected_computed_style(
         url = f"http://127.0.0.1:{port}/{doc_path.name}"
         try:
             result = subprocess.run(  # noqa: S603 - FIXME: inputs are controlled fixture paths in tests; no user-provided arguments
-                [bun_exe, "x", "css-view", "--mode", "walker", url],
+                [
+                    bun_exe,
+                    "x",
+                    "css-view",
+                    "--mode",
+                    "walker",
+                    # Pinned to match the Chromium availability guard above.
+                    # css-view defaults to Firefox, so without this the guard
+                    # passes on a Chromium-only machine and the run then fails
+                    # on a missing Firefox build.
+                    "--browser",
+                    "chromium",
+                    url,
+                ],
                 cwd=REPO_ROOT,
                 check=True,
                 capture_output=True,

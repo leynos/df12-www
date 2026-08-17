@@ -150,7 +150,8 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 ## Progress
 
 - [x] (2026-08-17 16:45Z) Milestone 0 — Baseline capture and tooling.
-- [ ] Milestone 1 — Theme, entrypoint, and build wiring (red tests first).
+- [x] (2026-08-17 17:00Z) Milestone 1 — Theme, entrypoint, and build wiring
+      (red tests first).
 - [ ] Milestone 2 — Cut over to the compiled stylesheet; retire the Play CDN.
 - [ ] Milestone 3 — Self-host fonts and paper textures.
 - [ ] Milestone 4 — Consolidate the page chrome; introduce the nav macro.

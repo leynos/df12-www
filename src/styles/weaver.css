@@ -1,0 +1,98 @@
+/* Weaver sub-site stylesheet — the Tailwind 4 + daisyUI 5 entry.
+ *
+ * Compiled by the shared df12 build into
+ * public/weaver/assets/styles/weaver.css, alongside the main, mxd, and
+ * Episodic entrypoints. It replaces the Tailwind Play CDN the sub-site used
+ * to load at runtime, together with the inline `tailwind.config` block that
+ * was duplicated across four templates.
+ *
+ * The palette is declared once — as the daisyUI "weaver" theme plus the brand
+ * tokens under @theme — and every template and partial consumes those
+ * variables rather than restating a colour literal. See
+ * docs/execplans/weaver-daisy-migration.md.
+ */
+
+@import "tailwindcss";
+
+@source "../../templates/weaver/**/*.jinja";
+@source "../static/weaver/assets/js/mobile-nav.js";
+
+@plugin "daisyui" {
+  themes: weaver --default;
+  logs: false;
+}
+
+/* The Weaver palette as a daisyUI theme.
+ *
+ * Indigo does two jobs: it is the body-text colour and it is the brand fill
+ * behind the active navigation item and the primary buttons. It therefore
+ * occupies both base-content and primary, which is not a duplication so much
+ * as an honest description — if the text colour and the brand ever part
+ * company, they part here.
+ *
+ * The base ramp is a parchment scale rather than daisyUI's usual descent into
+ * grey. Panels on this site sit *above* the page as white cards, which the
+ * ramp cannot express, so they use the separate --color-surface token below.
+ */
+@plugin "daisyui/theme" {
+  name: "weaver";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #f3efd9;
+  --color-base-200: #ece7cd;
+  --color-base-300: #ded8bc;
+  --color-base-content: #193c6e;
+
+  --color-primary: #193c6e;
+  --color-primary-content: #f3efd9;
+  --color-secondary: #0f2440;
+  --color-secondary-content: #f3efd9;
+  --color-accent: #e8502b;
+  --color-accent-content: #ffffff;
+  --color-neutral: #0f2440;
+  --color-neutral-content: #f3efd9;
+
+  --color-info: #193c6e;
+  --color-info-content: #f3efd9;
+  --color-success: #3a7049;
+  --color-success-content: #ffffff;
+  --color-warning: #8a6420;
+  --color-warning-content: #fff4e0;
+  --color-error: #c43a3a;
+  --color-error-content: #ffffff;
+
+  /* Weaver's surfaces are hard-edged: the markup reaches for rounded-sm and
+     rounded-[2px] almost exclusively, and its elevation is drawn with offset
+     block shadows rather than blur. daisyUI's depth shading would fight
+     that, so it is off. */
+  --radius-selector: 0.2rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.125rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  /* Typography. Playfair Display carries the mastheads and pull quotes, IBM
+     Plex Sans the prose, IBM Plex Mono the labels, code, and the stamped
+     small-caps the design uses for section numbering. */
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* Transitional: the five colour names the Play CDN's inline config
+     declared. Keeping them means the compiled stylesheet emits exactly the
+     utilities the CDN did, so the cutover can be proved behaviour-preserving
+     before a single class name changes. The sweep that replaces
+     `text-weaver-indigo` with `text-base-content` deletes this block. */
+  --color-weaver-cream: #f3efd9;
+  --color-weaver-indigo: #193c6e;
+  --color-weaver-vermilion: #e8502b;
+  --color-weaver-dark: #0f2440;
+  --color-weaver-faded: #4a6fa5;
+}

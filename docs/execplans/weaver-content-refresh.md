@@ -153,7 +153,11 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   RFC 0003 supersede it for anything user-facing.
   Evidence: Weaver branch survey, 2026-08-17.
   Impact: recorded as a source-precedence rule below so copywriters do not
-  reintroduce the retired surface from a stale document.
+  reintroduce the retired surface from a stale document. Flagged upstream on
+  2026-08-17 as a comment on Weaver PR #228
+  (<https://github.com/leynos/weaver/pull/228#issuecomment-5319893016>); if
+  the Weaver branch resolves it (status note or trimmed sections), relax the
+  precedence caveat at Stage B.
 
 ## Decision log
 

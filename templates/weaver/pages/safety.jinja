@@ -16,7 +16,7 @@
                     </div>
 
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
-                        Safety <span class="text-accent italic font-light">&amp;</span><br>
+                        Safety <span class="text-accent-ink italic font-light">&amp;</span><br>
                         Sandboxing
                     </h1>
 
@@ -44,7 +44,7 @@
                     </div>
 
                         <p class="text-base-content/80 mb-10 leading-relaxed max-w-3xl">
-                            Every <code class="font-mono text-sm bg-primary/10 px-1 text-accent">act</code> command passes through a two-phase verification harness before any file is written to disk. For files with a recognised parser and language-server path, edits are applied to <strong>in-memory copies</strong>, checked syntactically, then checked semantically. Unsupported file types are preserved in the transaction, but they do not receive the full parser-plus-diagnostics lock sequence.
+                            Every <code class="font-mono text-sm bg-primary/10 px-1 text-accent-ink">act</code> command passes through a two-phase verification harness before any file is written to disk. For files with a recognised parser and language-server path, edits are applied to <strong>in-memory copies</strong>, checked syntactically, then checked semantically. Unsupported file types are preserved in the transaction, but they do not receive the full parser-plus-diagnostics lock sequence.
                         </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
@@ -57,15 +57,15 @@
                             </p>
                             <ul class="space-y-3 font-mono text-xs text-base-content">
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent">{{ icon('code') }}</div>
+                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent-ink">{{ icon('code') }}</div>
                                     <span>Tree-sitter parsers for Rust, Python, TypeScript</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent">{{ icon('bolt') }}</div>
+                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent-ink">{{ icon('bolt') }}</div>
                                     <span>Fast, local — no language server needed</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent">{{ icon('forward') }}</div>
+                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent-ink">{{ icon('forward') }}</div>
                                     <span>Unknown file types pass through without parser or semantic checks</span>
                                 </li>
                             </ul>
@@ -84,20 +84,20 @@
                             </p>
                             <ul class="space-y-3 font-mono text-xs text-base-content">
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent">{{ icon('microscope') }}</div>
+                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent-ink">{{ icon('microscope') }}</div>
                                     <span>LSP diagnostics via didOpen / didChange / didClose</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent">{{ icon('scale-balanced') }}</div>
+                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent-ink">{{ icon('scale-balanced') }}</div>
                                     <span>Compares against pre-edit baseline</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent">{{ icon('shield-halved') }}</div>
+                                    <div class="w-6 h-6 rounded-full border border-base-content flex items-center justify-center text-accent-ink">{{ icon('shield-halved') }}</div>
                                     <span>No disk writes until both locks pass</span>
                                 </li>
                             </ul>
                             <!-- Decorative padlock -->
-                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-accent text-white flex items-center justify-center rounded-xs shadow-md z-10">
+                            <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-accent-deep text-white flex items-center justify-center rounded-xs shadow-md z-10">
                                 {{ icon('lock') }}
                             </div>
                         </div>
@@ -132,8 +132,8 @@
                                     <path d="M12 42h72v24a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V42z"></path>
                                 </svg>
                             </div>
-                            <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent transition-colors">Filesystem Jail</h3>
-                            <p class="text-sm font-mono text-base-content/50 mb-4">mount_policy</p>
+                            <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent-ink transition-colors">Filesystem Jail</h3>
+                            <p class="text-sm font-mono text-base-content/78 mb-4">mount_policy</p>
                             <p class="text-base-content/80 mb-6 text-sm leading-relaxed min-h-[96px]">
                                 The agent sees a virtualized filesystem. It can only write to the specific project directory explicitly mounted for the task.
                             </p>
@@ -156,8 +156,8 @@
                                     <rect x="45" y="24" width="6" height="48"></rect>
                                 </svg>
                             </div>
-                            <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent transition-colors">Network Gap</h3>
-                            <p class="text-sm font-mono text-base-content/50 mb-4">egress_policy</p>
+                            <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent-ink transition-colors">Network Gap</h3>
+                            <p class="text-sm font-mono text-base-content/78 mb-4">egress_policy</p>
                             <p class="text-base-content/80 mb-6 text-sm leading-relaxed min-h-[96px]">
                                 By default, the network namespace is empty (loopback only). Access to package registries and APIs must be explicitly allowlisted via proxy.
                             </p>
@@ -184,8 +184,8 @@
                                     <rect x="74" y="50" width="16" height="4"></rect>
                                 </svg>
                             </div>
-                            <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent transition-colors">Resource Quotas</h3>
-                            <p class="text-sm font-mono text-base-content/50 mb-4">quota_guard</p>
+                            <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent-ink transition-colors">Resource Quotas</h3>
+                            <p class="text-sm font-mono text-base-content/78 mb-4">quota_guard</p>
                             <p class="text-base-content/80 mb-6 text-sm leading-relaxed min-h-[96px]">
                                 cgroups limit CPU cycles, memory usage, and process counts to prevent fork bombs, runaway builds, or mining attempts by rogue agents.
                             </p>
@@ -213,24 +213,24 @@
 
                             <div class="space-y-6">
                                 <div class="flex gap-4">
-                                    <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0 text-white font-bold text-xs">01</div>
+                                    <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center shrink-0 text-white font-bold text-xs">01</div>
                                     <div>
                                         <h4 class="font-bold font-mono text-sm mb-1 text-white">Exfiltration Prevention</h4>
-                                        <p class="text-xs text-base-100/60">Strict egress filtering prevents agents from sending your codebase to unauthorized external servers.</p>
+                                        <p class="text-xs text-base-100/70">Strict egress filtering prevents agents from sending your codebase to unauthorized external servers.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-4">
-                                    <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0 text-white font-bold text-xs">02</div>
+                                    <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center shrink-0 text-white font-bold text-xs">02</div>
                                     <div>
                                         <h4 class="font-bold font-mono text-sm mb-1 text-white">Destructive Action Mitigation</h4>
-                                        <p class="text-xs text-base-100/60">Read-only system mounts prevent `rm -rf /` or modification of critical binaries.</p>
+                                        <p class="text-xs text-base-100/70">Read-only system mounts prevent `rm -rf /` or modification of critical binaries.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-4">
-                                    <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0 text-white font-bold text-xs">03</div>
+                                    <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center shrink-0 text-white font-bold text-xs">03</div>
                                     <div>
                                         <h4 class="font-bold font-mono text-sm mb-1 text-white">Supply Chain Injection</h4>
-                                        <p class="text-xs text-base-100/60">Dependency lockfiles are verified against policies to prevent adding malicious crates or packages.</p>
+                                        <p class="text-xs text-base-100/70">Dependency lockfiles are verified against policies to prevent adding malicious crates or packages.</p>
                                     </div>
                                 </div>
                             </div>
@@ -251,18 +251,18 @@
                                     </ul>
                                 </div>
                                 <div>
-                                    <h4 class="font-mono text-xs text-accent font-bold mb-3 uppercase tracking-wider">Don't</h4>
+                                    <h4 class="font-mono text-xs text-accent-ink font-bold mb-3 uppercase tracking-wider">Don't</h4>
                                     <ul class="space-y-2 text-xs text-base-100/80">
-                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent') }} Run as root</li>
-                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent') }} Disable sandbox in prod</li>
-                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent') }} Share API keys in env</li>
-                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent') }} Blindly auto-merge</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent-ink') }} Run as root</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent-ink') }} Disable sandbox in prod</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent-ink') }} Share API keys in env</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-accent-ink') }} Blindly auto-merge</li>
                                     </ul>
                                 </div>
                             </div>
 
                             <div class="mt-8 pt-6 border-t border-white/10">
-                                <p class="font-mono text-3xs text-base-100/40 italic">
+                                <p class="font-mono text-3xs text-base-100/70 italic">
                                     "Trust, but verify inside a chroot."
                                 </p>
                             </div>
@@ -285,9 +285,9 @@
                             Keep the safety model here. Keep configuration defaults, daemon lifecycle, and the JSONL envelope in the docs hub. That page is now the maintained source of truth for operator-facing config and protocol details.
                         </p>
                         <div class="flex flex-wrap gap-3 text-xs font-mono">
-                            <a href="/weaver/docs/#configuration" class="text-accent hover:underline">Configuration</a>
-                            <a href="/weaver/docs/#jsonl-schema" class="text-accent hover:underline">JSONL protocol</a>
-                            <a href="/weaver/docs/#daemon-lifecycle" class="text-accent hover:underline">Daemon lifecycle</a>
+                            <a href="/weaver/docs/#configuration" class="text-accent-ink hover:underline">Configuration</a>
+                            <a href="/weaver/docs/#jsonl-schema" class="text-accent-ink hover:underline">JSONL protocol</a>
+                            <a href="/weaver/docs/#daemon-lifecycle" class="text-accent-ink hover:underline">Daemon lifecycle</a>
                         </div>
                     </div>
 
@@ -320,7 +320,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-primary/5 border border-base-content/10 rounded-xs">
                         <div>
                             <h3 class="font-serif text-xl text-base-content mb-2">Understand the Agent's Mind</h3>
-                            <p class="text-sm text-base-content/70">Explore how Sempai queries the codebase structure.</p>
+                            <p class="text-sm text-base-content/88">Explore how Sempai queries the codebase structure.</p>
                         </div>
                         <a href="/weaver/sempai/" class="group flex items-center gap-3 px-6 py-3 bg-primary text-base-100 font-mono text-xs font-bold uppercase tracking-wider hover:bg-accent transition-colors shadow-md">
                             Next: Sempai Engine

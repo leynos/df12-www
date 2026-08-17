@@ -60,3 +60,29 @@
    effect and shrink every inline code span on the site by eight per cent.
    That is a typographic decision, not a migration, so the declaration goes
    rather than silently landing. */
+
+/* Reading weights invert on a dark surface.
+ *
+ * `--color-accent-ink` is the accent cut deep enough to read on parchment;
+ * on a dark panel that same cut is worse than the brand vermilion it
+ * replaced. Rather than asking every label inside a panel to name a
+ * different token — twenty-seven of them, each a judgement about which
+ * surface it happens to sit on — the panels re-point the token at its
+ * lighter cut. Tailwind compiles `text-accent-ink` to
+ * `color: var(--color-accent-ink)`, so a label inside one of these inherits
+ * the lift without knowing anything about where it is.
+ *
+ * The same applies to the two code greys, which are chosen for the dark
+ * panels and are too dark to read on anything else.
+ */
+:is(.bg-neutral, .bg-primary, .bg-secondary, .bg-ink-deep, .bg-code-surface) {
+  --color-accent-ink: var(--color-accent-lift);
+  --color-ink-muted: var(--color-ink-muted-lift);
+}
+
+/* A light card nested inside a dark panel takes the deep cut back. */
+:is(.bg-neutral, .bg-primary, .bg-secondary, .bg-ink-deep, .bg-code-surface)
+:is(.bg-base-100, .bg-base-200, .bg-base-300, .bg-white) {
+  --color-accent-ink: var(--color-accent-deep);
+  --color-ink-muted: var(--color-ink-muted-deep);
+}

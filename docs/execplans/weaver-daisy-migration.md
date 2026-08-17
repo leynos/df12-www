@@ -183,7 +183,10 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       partials. Six concern files plus the five lifted from templates, and
       the last colour literal gone: all three invariant tests now pass on
       their own.
-- [ ] Milestone 8 — Accessibility audit and contrast fixes.
+- [x] (2026-08-17 22:50Z) Milestone 8 — Accessibility audit and contrast
+      fixes. 621 failing text runs measured, 621 fixed; every page now
+      clears WCAG 2.2 AA by direct computed-style measurement, at both 360px
+      and 1440px.
 - [ ] Milestone 9 — Documentation and cleanup.
 
 ## Surprises & discoveries
@@ -214,6 +217,35 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `commands/observe/`, `commands/verify/`, and the three legal pages.
   Impact: the harness derives its page list from the published tree, so the
   count corrects itself and stays correct as pages are added.
+- **Observation:** the Weaver palette had 621 text runs below the WCAG AA
+  floor before this migration touched it, and the two worst offenders were the
+  colours the design uses most.
+  Evidence: measuring every rendered text run against its composited
+  background, `text-accent` on parchment came out at 3.23:1 across roughly 150
+  places and the muted ink ramp — `base-content` at 40%, 50%, 60% and 70% —
+  at 2.12, 2.64, 3.34, and 4.30:1 across roughly 230 more.
+  Impact: the fix is the largest deliberate visual change in the migration and
+  it is entirely a pre-existing debt, not something the re-plumbing
+  introduced. The plan predicted both pairings; it under-estimated how much
+  else was riding on them.
+- **Observation:** the two contrast tools available disagreed with the page,
+  in opposite directions, and both had to be checked against the browser.
+  Evidence: the `check_color_contrast` MCP helper returned exactly `4.5` for
+  both `#E8502B` on `#F3EFD9` and `#4A6FA5` on `#F3EFD9` — the *required*
+  ratio rather than the measured one, which are 3.23 and 4.42. Separately,
+  axe-core reported twenty-eight colour-contrast violations on the docs page
+  with `background color: #ffffff` for text inside panels whose rendered
+  pixels are `rgb(15, 36, 64)` — sampled directly from the screenshot, and
+  confirmed by `getComputedStyle` on the elements themselves. The panels do
+  not overflow at that viewport and the finding does not move when the
+  viewport is made 11,000px tall, so it is not a below-the-fold artefact
+  either.
+  Impact: the audit's evidence is the direct measurement — compositing each
+  text run's colour over its resolved ancestor background — which was itself
+  wrong twice before it was right, first parsing `oklab()` as `rgb()` and then
+  forcing composited alpha to 1. Both bugs invented failures that were not
+  there. A tool that measures colour has to be checked against the pixels
+  before it is believed, including one you wrote yourself.
 - **Observation:** the cutover diff is dominated by notation, not by change.
   Of the roughly 140,000 differing lines the first comparison reported, all
   but about 3,000 were the same styles spelled differently: v4 reports an
@@ -292,6 +324,26 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   the letter of the document. Worth reconciling one way or the other, but not
   as part of this migration.
   Date/Author: 2026-08-17, Milestone 0.
+- **Decision:** let dark surfaces re-point the ink tokens rather than asking
+  each label to name a different one.
+  Rationale: `--color-accent-ink` is the accent cut deep enough to read on
+  parchment, and on a dark panel that cut is worse than the vermilion it
+  replaced. Twenty-seven labels sat on dark panels. Tailwind compiles
+  `text-accent-ink` to `color: var(--color-accent-ink)`, so a rule on the
+  panels — `:is(.bg-neutral, .bg-primary, …) { --color-accent-ink:
+  var(--color-accent-lift) }` — reaches every one of them without touching the
+  markup, handles nesting correctly, and keeps working for labels added later.
+  A light card nested inside a dark panel takes the deep cut back.
+  Date/Author: 2026-08-17, Milestone 8.
+- **Decision:** treat axe-core's twenty-eight code-panel findings as a tool
+  artefact and record the evidence rather than change the colours.
+  Rationale: satisfying them would mean darkening `code-text` and
+  `code-string` until they read on white, which would make them wrong on the
+  dark panels they actually sit on — trading a real design for a tool's
+  misreading. The rendered pixels, the computed styles, and the direct
+  measurement all agree the text is light-on-dark at 10.58:1 and 8.95:1. Every
+  other axe rule passes on every page, at 360px and 1440px.
+  Date/Author: 2026-08-17, Milestone 8.
 - **Decision:** map `bg-weaver-indigo` to `primary` and every other indigo
   property to `base-content`, uniformly, including the opacity tints.
   Rationale: the plan's rule was "on text or a border it is base-content; on a

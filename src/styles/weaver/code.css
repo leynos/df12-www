@@ -55,3 +55,18 @@
 .code-block-shadow {
   box-shadow: var(--shadow-panel-sm);
 }
+
+/* A code block that scrolls horizontally is wider than the panel painting its
+   background, so the text beyond the fold has nothing behind it but the page.
+   In practice the panel clips it, and nobody notices — but it is the panel's
+   background doing the work, not the block's, and an automated audit reading
+   the tree cannot tell that the text will land somewhere legible. Painting the
+   panel's colour onto the block itself makes the guarantee explicit and
+   travels with the scroll.
+
+   `inherit` rather than a token: these blocks sit on several different
+   surfaces, and each should keep the one it was put on. Where the parent is
+   transparent this resolves to transparent and changes nothing. */
+pre {
+  background-color: inherit;
+}

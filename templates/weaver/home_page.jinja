@@ -23,7 +23,7 @@
 
                             <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
                                 CLI tooling for <br>
-                                <span class="text-accent italic font-light">code-aware</span> agents.
+                                <span class="text-accent-ink italic font-light">code-aware</span> agents.
                             </h1>
 
                             <p class="font-sans text-lg text-base-content/80 leading-relaxed mb-8 max-w-lg font-light">
@@ -35,9 +35,9 @@
                                 <div class="relative group">
                                     <div class="absolute -inset-0.5 bg-accent rounded-xs blur-sm opacity-20 group-hover:opacity-40 transition duration-200"></div>
                                     <div class="relative flex items-center bg-neutral text-base-100 font-mono text-sm px-6 py-4 rounded-xs border border-base-content shadow-lg">
-                                        <span class="text-accent mr-3">$</span>
+                                        <span class="text-accent-ink mr-3">$</span>
                                         <span class="mr-8">cargo install weaver</span>
-                                        <button class="text-base-content/60 hover:text-white transition-colors" title="Copy to clipboard">
+                                        <button class="text-base-content/82 hover:text-white transition-colors" title="Copy to clipboard">
                                             {{ icon('copy') }}
                                         </button>
                                     </div>
@@ -64,7 +64,7 @@
                             <!-- Technical Marks -->
                             <div class="absolute -left-3 top-1/2 w-2 h-2 bg-primary"></div>
                             <div class="absolute -right-3 top-1/2 w-2 h-2 bg-primary"></div>
-                            <div class="absolute bottom-2 right-2 font-mono text-3xs text-base-content/60">SCALE: 1:1</div>
+                            <div class="absolute bottom-2 right-2 font-mono text-3xs text-base-content/82">SCALE: 1:1</div>
                         </div>
                     </div>
                 </div>
@@ -83,8 +83,8 @@
                             <div class="w-12 h-12 bg-primary text-base-100 flex items-center justify-center mb-6 text-xl rounded-xs">
                                 {{ icon('cubes-stacked') }}
                             </div>
-                            <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent transition-colors">Composable</h3>
-                            <p class="font-sans text-base-content/70 leading-relaxed mb-6">
+                            <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent-ink transition-colors">Composable</h3>
+                            <p class="font-sans text-base-content/88 leading-relaxed mb-6">
                                 Use one surface for structural queries, patch application, and diagnostics. The daemon streams JSONL to the CLI, which then forwards raw payloads or human-readable output as needed.
                             </p>
                             <a href="/weaver/how-it-works/#fusion" class="inline-flex items-center font-mono text-xs font-bold text-base-content uppercase tracking-wider group-hover:underline decoration-accent underline-offset-4">
@@ -102,8 +102,8 @@
                             <div class="w-12 h-12 bg-primary text-base-100 flex items-center justify-center mb-6 text-xl rounded-xs">
                                 {{ icon('lock') }}
                             </div>
-                            <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent transition-colors">Safe</h3>
-                            <p class="font-sans text-base-content/70 leading-relaxed mb-6">
+                            <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent-ink transition-colors">Safe</h3>
+                            <p class="font-sans text-base-content/88 leading-relaxed mb-6">
                                 Block bad edits before they land. Double-Lock checks the change; Birdcage isolates untrusted tooling with seccomp-bpf and namespaces.
                             </p>
                             <a href="/weaver/safety/" class="inline-flex items-center font-mono text-xs font-bold text-base-content uppercase tracking-wider group-hover:underline decoration-accent underline-offset-4">
@@ -121,8 +121,8 @@
                             <div class="w-12 h-12 bg-primary text-base-100 flex items-center justify-center mb-6 text-xl rounded-xs">
                                 {{ icon('microchip') }}
                             </div>
-                            <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent transition-colors">Fast</h3>
-                            <p class="font-sans text-base-content/70 leading-relaxed mb-6">
+                            <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent-ink transition-colors">Fast</h3>
+                            <p class="font-sans text-base-content/88 leading-relaxed mb-6">
                                 Keep state in a resident daemon instead of re-parsing on every call. Rust binaries stream JSONL over Unix domain sockets for low-friction automation.
                             </p>
                             <a href="/weaver/how-it-works/#daemon" class="inline-flex items-center font-mono text-xs font-bold text-base-content uppercase tracking-wider group-hover:underline decoration-accent underline-offset-4">
@@ -144,10 +144,10 @@
                 <div class="max-w-6xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-end mb-12">
                         <div>
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-2 block">Interface</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">Interface</span>
                             <h2 class="font-serif text-4xl text-base-content">Command Reference</h2>
                         </div>
-                        <a href="/weaver/commands/" class="hidden md:inline-block font-mono text-sm text-base-content hover:text-accent transition-colors border-b border-base-content/30 pb-1">
+                        <a href="/weaver/commands/" class="hidden md:inline-block font-mono text-sm text-base-content hover:text-accent-ink transition-colors border-b border-base-content/30 pb-1">
                             View all commands ->
                         </a>
                     </div>
@@ -168,7 +168,7 @@
                             <!-- Command 1: observe get-definition -->
                             <div class="mb-6">
                                 <div class="flex text-code-dim">
-                                    <span class="text-accent mr-2">➜</span>
+                                    <span class="text-accent-ink mr-2">➜</span>
                                     <span class="mr-2">~</span>
                                     <span class="text-white">weaver observe get-definition --output json --uri file:///src/main.rs --position 10:5</span>
                                 </div>
@@ -180,7 +180,7 @@
                             <!-- Command 2: act apply-patch -->
                             <div class="mb-6">
                                 <div class="flex text-code-dim">
-                                    <span class="text-accent mr-2">➜</span>
+                                    <span class="text-accent-ink mr-2">➜</span>
                                     <span class="mr-2">~</span>
                                     <span class="text-white">weaver act apply-patch --output json &lt; fix.diff</span>
                                 </div>
@@ -191,7 +191,7 @@
 
                             <!-- Cursor -->
                             <div class="flex text-code-dim">
-                                <span class="text-accent mr-2">➜</span>
+                                <span class="text-accent-ink mr-2">➜</span>
                                 <span class="mr-2">~</span>
                                 <span class="text-white">weaver verify diagnostics --output json --uri file:///src/lib.rs<span class="animate-pulse inline-block w-2.5 h-5 bg-code-dim ml-1 align-middle"></span></span>
                             </div>
@@ -221,7 +221,7 @@
                                         class="w-full h-full object-cover"
                                     >
                                 </div>
-                                <div class="figure-fullbleed-caption mt-4 flex justify-between font-mono text-3xs text-base-content/60">
+                                <div class="figure-fullbleed-caption mt-4 flex justify-between font-mono text-3xs text-base-content/82">
                                     <span>INPUT: RAW SOURCE</span>
                                     <span>OUTPUT: STRUCTURED JSONL</span>
                                 </div>
@@ -229,26 +229,26 @@
                         </div>
 
                         <div class="order-1 lg:order-2">
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-2 block">Query layer</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">Query layer</span>
                             <h2 class="font-serif text-4xl text-base-content mb-6">Sempai Query Engine</h2>
                             <p class="font-sans text-lg text-base-content/80 mb-6 font-light leading-relaxed">
                                 Sempai adds Semgrep-compatible structural queries to <code class="text-xs bg-primary/10 px-1">observe</code>. It runs on Tree-sitter, exposes a query-focused operator surface, and keeps compatibility boundaries explicit.
                             </p>
                             <ul class="space-y-4 mb-8">
                                 <li class="flex items-start">
-                                    {{ icon('check', 'text-accent mt-1 mr-3 text-sm') }}
+                                    {{ icon('check', 'text-accent-ink mt-1 mr-3 text-sm') }}
                                     <span class="text-base-content/80 text-sm">Semgrep-compatible rules with a Tree-sitter backend</span>
                                 </li>
                                 <li class="flex items-start">
-                                    {{ icon('check', 'text-accent mt-1 mr-3 text-sm') }}
+                                    {{ icon('check', 'text-accent-ink mt-1 mr-3 text-sm') }}
                                     <span class="text-base-content/80 text-sm">Rust, Python, and TypeScript support today; Go and HCL are planned</span>
                                 </li>
                                 <li class="flex items-start">
-                                    {{ icon('check', 'text-accent mt-1 mr-3 text-sm') }}
+                                    {{ icon('check', 'text-accent-ink mt-1 mr-3 text-sm') }}
                                     <span class="text-base-content/80 text-sm">Designed to turn source structure into agent-ready context</span>
                                 </li>
                             </ul>
-                            <a href="/weaver/sempai/" class="text-base-content font-bold border-b-2 border-accent hover:text-accent transition-colors pb-1 inline-block">
+                            <a href="/weaver/sempai/" class="text-base-content font-bold border-b-2 border-accent hover:text-accent-ink transition-colors pb-1 inline-block">
                                 Read the query design
                             </a>
                         </div>
@@ -266,8 +266,8 @@
                             <div class="bg-white border border-base-content/20 p-8 h-full hover:border-base-content hover:shadow-md transition-all relative overflow-hidden">
                                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-colors"></div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Documentation</h3>
-                                <p class="text-sm text-base-content/60 mb-4">Read the command, install, safety, and configuration references.</p>
-                                <span class="text-xs font-mono text-accent font-bold uppercase group-hover:underline">Read Docs &rarr;</span>
+                                <p class="text-sm text-base-content/82 mb-4">Read the command, install, safety, and configuration references.</p>
+                                <span class="text-xs font-mono text-accent-ink font-bold uppercase group-hover:underline">Read Docs &rarr;</span>
                             </div>
                         </a>
 
@@ -276,8 +276,8 @@
                             <div class="bg-white border border-base-content/20 p-8 h-full hover:border-base-content hover:shadow-md transition-all relative overflow-hidden">
                                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-colors"></div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Roadmap</h3>
-                                <p class="text-sm text-base-content/60 mb-4">See which phases are shipped, which are planned, and which ideas remain directional.</p>
-                                <span class="text-xs font-mono text-accent font-bold uppercase group-hover:underline">View plan &rarr;</span>
+                                <p class="text-sm text-base-content/82 mb-4">See which phases are shipped, which are planned, and which ideas remain directional.</p>
+                                <span class="text-xs font-mono text-accent-ink font-bold uppercase group-hover:underline">View plan &rarr;</span>
                             </div>
                         </a>
 
@@ -286,8 +286,8 @@
                             <div class="bg-white border border-base-content/20 p-8 h-full hover:border-base-content hover:shadow-md transition-all relative overflow-hidden">
                                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-colors"></div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">GitHub</h3>
-                                <p class="text-sm text-base-content/60 mb-4">Read the source, track issues, and follow release work in the open.</p>
-                                <span class="text-xs font-mono text-accent font-bold uppercase group-hover:underline">Open repo &rarr;</span>
+                                <p class="text-sm text-base-content/82 mb-4">Read the source, track issues, and follow release work in the open.</p>
+                                <span class="text-xs font-mono text-accent-ink font-bold uppercase group-hover:underline">Open repo &rarr;</span>
                             </div>
                         </a>
 
@@ -296,8 +296,8 @@
                             <div class="bg-white border border-base-content/20 p-8 h-full hover:border-base-content hover:shadow-md transition-all relative overflow-hidden">
                                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-colors"></div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Community</h3>
-                                <p class="text-sm text-base-content/60 mb-4">Discord is not live yet. Use GitHub issues until the public channel opens.</p>
-                                <span class="text-xs font-mono text-accent font-bold uppercase group-hover:underline">Track updates &rarr;</span>
+                                <p class="text-sm text-base-content/82 mb-4">Discord is not live yet. Use GitHub issues until the public channel opens.</p>
+                                <span class="text-xs font-mono text-accent-ink font-bold uppercase group-hover:underline">Track updates &rarr;</span>
                             </div>
                         </a>
 

@@ -9,9 +9,9 @@
 {% block nav_subitems_commands %}
                     <!-- Sub-navigation for Commands -->
                     <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
-                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors">/observe</a>
-                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono font-bold text-accent bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/act</a>
-                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors">/verify</a>
+                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/observe</a>
+                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono font-bold text-accent-ink bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/act</a>
+                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/verify</a>
                     </div>
 {% endblock %}
 
@@ -22,15 +22,15 @@
                 <div class="masthead-frame mx-auto">
                     <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
                         <div class="masthead-eyebrow self-start">
-                            <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-base-content/60 hover:text-accent transition-colors">COMMANDS</a>
-                            <span class="text-base-content/40">/</span>
+                            <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-base-content/82 hover:text-accent-ink transition-colors">COMMANDS</a>
+                            <span class="text-base-content/75">/</span>
                             <span class="font-mono text-xs tracking-widest uppercase text-base-content font-bold">ACT</span>
                         </div>
                     </div>
 
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
                         Controlled <br>
-                        <span class="text-accent italic font-light">Intervention</span>.
+                        <span class="text-accent-ink italic font-light">Intervention</span>.
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-3xl font-light">
@@ -56,18 +56,18 @@
                         <!-- Left: Synopsis -->
                         <div class="lg:col-span-1">
                             <h2 class="font-serif text-2xl text-base-content mb-4">Synopsis</h2>
-                            <p class="text-sm text-base-content/70 mb-6 leading-relaxed">
+                            <p class="text-sm text-base-content/88 mb-6 leading-relaxed">
                                 Each <code class="font-mono text-xs bg-primary/10 px-1">act</code> operation sends a structured request to the daemon. The daemon applies the edit in memory, runs both locks, and writes to disk only on success. Failures leave the filesystem untouched.
                             </p>
 
                             <div class="bg-base-100 border border-base-content p-4 relative mb-6">
-                                <div class="absolute -top-3 left-4 bg-base-100 px-2 text-xs font-mono text-accent font-bold">SYNTAX</div>
+                                <div class="absolute -top-3 left-4 bg-base-100 px-2 text-xs font-mono text-accent-ink font-bold">SYNTAX</div>
                                 <code class="font-mono text-sm text-base-content block break-all">
                                     weaver act &lt;OPERATION&gt; [ARG ...]
                                 </code>
                             </div>
 
-                            <div class="flex items-center gap-2 text-xs font-mono text-base-content/60">
+                            <div class="flex items-center gap-2 text-xs font-mono text-base-content/82">
                                 {{ icon('shield-halved') }}
                                 <span>All writes pass through the Double-Lock harness</span>
                             </div>
@@ -87,23 +87,23 @@
                                     </thead>
                                     <tbody class="divide-y divide-base-content/10">
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent border-r border-base-content/10">apply-patch</td>
-                                            <td class="p-3 font-mono text-xs text-base-content/60 border-r border-base-content/10">STDIN</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">apply-patch</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">STDIN</td>
                                             <td class="p-3 text-sm text-base-content/80">Read a Git-style patch from STDIN. Supports modify, create, and delete hunks.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent border-r border-base-content/10">apply-rewrite</td>
-                                            <td class="p-3 font-mono text-xs text-base-content/60 border-r border-base-content/10">Flags</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">apply-rewrite</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Flags</td>
                                             <td class="p-3 text-sm text-base-content/80">AST-aware search-and-replace via <span class="font-mono text-xs bg-primary/10 px-1">--pattern</span> and <span class="font-mono text-xs bg-primary/10 px-1">--replacement</span>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent border-r border-base-content/10">refactor</td>
-                                            <td class="p-3 font-mono text-xs text-base-content/60 border-r border-base-content/10">Flags</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">refactor</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Flags</td>
                                             <td class="p-3 text-sm text-base-content/80">Delegate to a registered plugin via <span class="font-mono text-xs bg-primary/10 px-1">--provider</span> and <span class="font-mono text-xs bg-primary/10 px-1">--refactoring</span>. Add <span class="font-mono text-xs bg-primary/10 px-1">--file</span> when the provider needs explicit workspace-relative file context, then pass provider-specific trailing <span class="font-mono text-xs bg-primary/10 px-1">KEY=VALUE</span> operands. Built-in <code>rename</code> examples use <code>new_name=&lt;IDENT&gt;</code> and <code>offset=&lt;BYTE_OFFSET&gt;</code>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent border-r border-base-content/10">extricate <span class="status-pill status-pill-planned ml-1">Planned</span></td>
-                                            <td class="p-3 font-mono text-xs text-base-content/60 border-r border-base-content/10">Flags</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">extricate <span class="status-pill status-pill-planned ml-1">Planned</span></td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Flags</td>
                                             <td class="p-3 text-sm text-base-content/80">Move a symbol to a different module. Capability: <code>extricate-symbol</code>.</td>
                                         </tr>
                                     </tbody>
@@ -122,9 +122,9 @@
                 <div class="max-w-6xl mx-auto relative z-10">
                     <div class="flex flex-col md:flex-row justify-between items-end mb-12">
                         <div>
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-2 block">SAFETY ARCHITECTURE</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">SAFETY ARCHITECTURE</span>
                             <h2 class="font-serif text-3xl text-base-content">The "Birdcage" Sandbox</h2>
-                            <p class="text-base-content/70 mt-2 max-w-xl">
+                            <p class="text-base-content/88 mt-2 max-w-xl">
                                 Code execution happens in an ephemeral environment using <code class="text-xs bg-primary/10 px-1">seccomp-bpf</code> filters to prevent unauthorized syscalls.
                             </p>
                         </div>
@@ -145,8 +145,8 @@
 
                         <!-- Safety Note Footer -->
                         <div class="mt-8 border-t border-base-content/10 pt-4 flex items-start gap-3 figure-fullbleed-footer">
-                            {{ icon('triangle-exclamation', 'text-accent mt-1') }}
-                            <p class="text-sm text-base-content/70 font-mono">
+                            {{ icon('triangle-exclamation', 'text-accent-ink mt-1') }}
+                            <p class="text-sm text-base-content/88 font-mono">
                                 <strong class="text-base-content">Violation Policy:</strong> Any attempt to access unauthorized paths (e.g., <code class="text-xs">/etc/passwd</code>, <code class="text-xs">~/.ssh</code>) immediately kills the child process and logs a security event.
                             </p>
                         </div>
@@ -168,14 +168,14 @@
                                 <span class="font-mono text-xs font-bold text-base-100 bg-primary px-2 py-1 rounded-xs">EXAMPLE</span>
                                 <h3 class="font-serif text-xl text-base-content">apply-patch</h3>
                             </div>
-                            <p class="text-sm text-base-content/70 mb-4 pl-4 max-w-2xl">
+                            <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
                                 Pipe a Git-style diff to STDIN. The daemon parses it, applies to in-memory copies, runs both locks, and commits atomically.
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
                                 <div class="bg-neutral rounded-xs p-4 border border-base-content/20">
                                     <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
-                                        <span class="text-xs font-mono text-base-100/50">TERMINAL</span>
+                                        <span class="text-xs font-mono text-base-100/70">TERMINAL</span>
                                     </div>
                                     <div class="font-mono text-sm leading-relaxed">
                                         <span class="text-code-string">$</span> <span class="text-white">cat fix.diff |</span> <span class="text-code-string">weaver</span> <span class="text-white">act apply-patch</span>
@@ -183,7 +183,7 @@
                                 </div>
 
                                 <div class="bg-code-surface rounded-xs p-4 border border-base-content/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-3xs text-white/30 uppercase tracking-widest">JSONL</div>
+                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">JSONL</div>
 <pre class="text-code-text">
 {<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,<span class="token-key">"data"</span>:<span class="token-string">"{\"status\":\"ok\",\"files_written\":1,\"files_deleted\":0}"</span>}
 {<span class="token-key">"kind"</span>:<span class="token-string">"exit"</span>,<span class="token-key">"status"</span>:<span class="token-number">0</span>}
@@ -201,17 +201,17 @@
                         <div class="relative group">
                             <div class="absolute -left-4 top-0 bottom-0 w-1 bg-accent opacity-30 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-baseline gap-3 mb-4 pl-4">
-                                <span class="font-mono text-xs font-bold text-white bg-accent px-2 py-1 rounded-xs">EXAMPLE</span>
+                                <span class="font-mono text-xs font-bold text-white bg-accent-deep px-2 py-1 rounded-xs">EXAMPLE</span>
                                 <h3 class="font-serif text-xl text-base-content">refactor (rename via plugin)</h3>
                             </div>
-                            <p class="text-sm text-base-content/70 mb-4 pl-4 max-w-2xl">
+                            <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
                                 The provider returns a unified diff to the daemon. The daemon validates that diff through the Double-Lock, commits files to disk only on success, and discards the overlay on any failure.
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
                                 <div class="bg-neutral rounded-xs p-4 border border-base-content/20">
                                     <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
-                                        <span class="text-xs font-mono text-base-100/50">TERMINAL</span>
+                                        <span class="text-xs font-mono text-base-100/70">TERMINAL</span>
                                     </div>
                                     <div class="font-mono text-sm leading-relaxed">
                                         <span class="text-code-string">$</span> <span class="text-code-string">weaver</span> <span class="text-white">act refactor \</span><br>
@@ -223,7 +223,7 @@
                                 </div>
 
                                 <div class="bg-code-surface rounded-xs p-4 border border-base-content/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-3xs text-white/30 uppercase tracking-widest">JSONL</div>
+                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">JSONL</div>
 <pre class="text-code-text">
 {<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,<span class="token-key">"data"</span>:<span class="token-string">"{\"status\":\"ok\",\"files_written\":1,\"files_deleted\":0}"</span>}
 {<span class="token-key">"kind"</span>:<span class="token-string">"exit"</span>,<span class="token-key">"status"</span>:<span class="token-number">0</span>}
@@ -246,8 +246,8 @@
                         <div class="bg-base-100 border border-accent/30 p-5 rounded-xs relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-accent"></div>
                             <div class="flex items-start justify-between mb-3">
-                                <span class="font-mono text-xs font-bold text-accent">ERR_SYNTACTIC_LOCK</span>
-                                {{ icon('code', 'text-accent/40') }}
+                                <span class="font-mono text-xs font-bold text-accent-ink">ERR_SYNTACTIC_LOCK</span>
+                                {{ icon('code', 'text-accent-ink/40') }}
                             </div>
                             <p class="text-xs text-base-content/80 leading-relaxed mb-3">
                                 The modified file failed Tree-sitter parsing. Structural error (e.g. unbalanced braces, missing semicolons).
@@ -261,8 +261,8 @@
                         <div class="bg-base-100 border border-accent/30 p-5 rounded-xs relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-accent"></div>
                             <div class="flex items-start justify-between mb-3">
-                                <span class="font-mono text-xs font-bold text-accent">ERR_SEMANTIC_LOCK</span>
-                                {{ icon('microscope', 'text-accent/40') }}
+                                <span class="font-mono text-xs font-bold text-accent-ink">ERR_SEMANTIC_LOCK</span>
+                                {{ icon('microscope', 'text-accent-ink/40') }}
                             </div>
                             <p class="text-xs text-base-content/80 leading-relaxed mb-3">
                                 New diagnostics detected after the edit. The language server found type errors or unresolved references that were not present before.
@@ -277,7 +277,7 @@
                             <div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                             <div class="flex items-start justify-between mb-3">
                                 <span class="font-mono text-xs font-bold text-base-content">ERR_SANDBOX_VIOLATION</span>
-                                {{ icon('ban', 'text-base-content/40') }}
+                                {{ icon('ban', 'text-base-content/75') }}
                             </div>
                             <p class="text-xs text-base-content/80 leading-relaxed mb-3">
                                 A plugin attempted to access a path outside the sandbox allowlist. The child process is killed immediately.
@@ -360,42 +360,42 @@
                                         <span class="w-6 h-6 bg-primary text-base-100 flex items-center justify-center font-mono text-xs font-bold rounded-xs">1</span>
                                         <span class="font-mono text-xs font-bold text-base-content">Resolve</span>
                                     </div>
-                                    <p class="text-xs text-base-content/70">Validate arguments, resolve the selected definition, and collect pre-move references.</p>
+                                    <p class="text-xs text-base-content/88">Validate arguments, resolve the selected definition, and collect pre-move references.</p>
                                 </div>
                                 <div class="bg-base-100 border border-base-content/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="w-6 h-6 bg-primary text-base-100 flex items-center justify-center font-mono text-xs font-bold rounded-xs">2</span>
                                         <span class="font-mono text-xs font-bold text-base-content">Overlay</span>
                                     </div>
-                                    <p class="text-xs text-base-content/70">Start an in-memory overlay transaction. No filesystem writes until all checks pass.</p>
+                                    <p class="text-xs text-base-content/88">Start an in-memory overlay transaction. No filesystem writes until all checks pass.</p>
                                 </div>
                                 <div class="bg-base-100 border border-base-content/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="w-6 h-6 bg-primary text-base-100 flex items-center justify-center font-mono text-xs font-bold rounded-xs">3</span>
                                         <span class="font-mono text-xs font-bold text-base-content">Move</span>
                                     </div>
-                                    <p class="text-xs text-base-content/70">Build move-set closure for the symbol and associated <code class="font-mono">impl</code> blocks. Apply edits to overlay.</p>
+                                    <p class="text-xs text-base-content/88">Build move-set closure for the symbol and associated <code class="font-mono">impl</code> blocks. Apply edits to overlay.</p>
                                 </div>
                                 <div class="bg-base-100 border border-base-content/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="w-6 h-6 bg-primary text-base-100 flex items-center justify-center font-mono text-xs font-bold rounded-xs">4</span>
                                         <span class="font-mono text-xs font-bold text-base-content">Import Repair</span>
                                     </div>
-                                    <p class="text-xs text-base-content/70">Rewrite external references and <code class="font-mono">use</code> trees. Disambiguate imports via definition-equivalence probes.</p>
+                                    <p class="text-xs text-base-content/88">Rewrite external references and <code class="font-mono">use</code> trees. Disambiguate imports via definition-equivalence probes.</p>
                                 </div>
                                 <div class="bg-base-100 border border-base-content/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="w-6 h-6 bg-primary text-base-100 flex items-center justify-center font-mono text-xs font-bold rounded-xs">5</span>
                                         <span class="font-mono text-xs font-bold text-base-content">Verify</span>
                                     </div>
-                                    <p class="text-xs text-base-content/70">Run semantic invariants: no new diagnostics, all reference probes resolve to the moved definition.</p>
+                                    <p class="text-xs text-base-content/88">Run semantic invariants: no new diagnostics, all reference probes resolve to the moved definition.</p>
                                 </div>
                                 <div class="bg-base-100 border border-base-content/20 p-4 rounded-xs">
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="w-6 h-6 bg-primary text-base-100 flex items-center justify-center font-mono text-xs font-bold rounded-xs">6</span>
                                         <span class="font-mono text-xs font-bold text-base-content">Commit / Rollback</span>
                                     </div>
-                                    <p class="text-xs text-base-content/70">The provider returns a unified diff to the daemon on success. The daemon then commits the edit to disk and updates <code class="font-mono bg-primary/5 px-1 rounded-sm">files_written</code> only if both locks pass; on any failure it discards the overlay and returns diagnostics unchanged.</p>
+                                    <p class="text-xs text-base-content/88">The provider returns a unified diff to the daemon on success. The daemon then commits the edit to disk and updates <code class="font-mono bg-primary/5 px-1 rounded-sm">files_written</code> only if both locks pass; on any failure it discards the overlay and returns diagnostics unchanged.</p>
                                 </div>
                             </div>
                         </div>
@@ -463,31 +463,31 @@
                             </p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="flex items-start gap-3 bg-base-100 border border-base-content/20 p-4 rounded-xs">
-                                    {{ icon('xmark', 'text-accent/60 mt-0.5') }}
+                                    {{ icon('xmark', 'text-accent-ink/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-base-content">Macro-generated items</span>
-                                        <p class="text-xs text-base-content/60 mt-1">Items lacking stable editable source ranges cannot be moved safely.</p>
+                                        <p class="text-xs text-base-content/82 mt-1">Items lacking stable editable source ranges cannot be moved safely.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3 bg-base-100 border border-base-content/20 p-4 rounded-xs">
-                                    {{ icon('xmark', 'text-accent/60 mt-0.5') }}
+                                    {{ icon('xmark', 'text-accent-ink/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-base-content">Ambiguous imports</span>
-                                        <p class="text-xs text-base-content/60 mt-1">Import repair without a unique semantic match is a hard error.</p>
+                                        <p class="text-xs text-base-content/82 mt-1">Import repair without a unique semantic match is a hard error.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3 bg-base-100 border border-base-content/20 p-4 rounded-xs">
-                                    {{ icon('xmark', 'text-accent/60 mt-0.5') }}
+                                    {{ icon('xmark', 'text-accent-ink/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-base-content">Unsupported visibility</span>
-                                        <p class="text-xs text-base-content/60 mt-1">Non-preservable <code class="font-mono text-3xs">pub(in ...)</code> constraints that cannot be maintained across modules.</p>
+                                        <p class="text-xs text-base-content/82 mt-1">Non-preservable <code class="font-mono text-3xs">pub(in ...)</code> constraints that cannot be maintained across modules.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3 bg-base-100 border border-base-content/20 p-4 rounded-xs">
-                                    {{ icon('xmark', 'text-accent/60 mt-0.5') }}
+                                    {{ icon('xmark', 'text-accent-ink/60 mt-0.5') }}
                                     <div>
                                         <span class="font-mono text-xs font-bold text-base-content">Incomplete payloads</span>
-                                        <p class="text-xs text-base-content/60 mt-1">File payload does not cover all files required for deterministic execution.</p>
+                                        <p class="text-xs text-base-content/82 mt-1">File payload does not cover all files required for deterministic execution.</p>
                                     </div>
                                 </div>
                             </div>
@@ -503,7 +503,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-primary/5 border border-base-content/10 rounded-xs">
                         <div>
                             <h3 class="font-serif text-xl text-base-content mb-2">Trust, but Verify.</h3>
-                            <p class="text-sm text-base-content/70">Ensure the actions taken produced the desired outcome.</p>
+                            <p class="text-sm text-base-content/88">Ensure the actions taken produced the desired outcome.</p>
                         </div>
                         <a href="/weaver/commands/verify/" class="group flex items-center gap-3 px-6 py-3 bg-primary text-base-100 font-mono text-xs font-bold uppercase tracking-wider hover:bg-accent transition-colors shadow-md">
                             Next: Verify Command

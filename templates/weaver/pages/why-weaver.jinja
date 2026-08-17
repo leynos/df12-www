@@ -14,7 +14,7 @@
 
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-8">
                         The Craft of <br>
-                        <span class="text-accent italic font-light">Principled</span> Tooling.
+                        <span class="text-accent-ink italic font-light">Principled</span> Tooling.
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-2xl font-light">
@@ -29,7 +29,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                         <!-- Left: Manifest -->
                         <div class="lg:col-span-5">
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-4 block">01. Experience</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-4 block">01. Experience</span>
                             <h2 class="font-serif text-3xl text-base-content mb-6">Pragmatic Developer Experience</h2>
                             <div class="prose prose-indigo text-base-content/80">
                                 <p class="mb-4">
@@ -37,13 +37,13 @@
                                 </p>
                                 <ul class="list-none space-y-3 pl-0 font-mono text-sm">
                                     <li class="flex items-start">
-                                        <span class="text-accent mr-2">::</span> No GUI required; lives in your terminal.
+                                        <span class="text-accent-ink mr-2">::</span> No GUI required; lives in your terminal.
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="text-accent mr-2">::</span> Unix philosophy: Do one thing well.
+                                        <span class="text-accent-ink mr-2">::</span> Unix philosophy: Do one thing well.
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="text-accent mr-2">::</span> Plain text outputs over proprietary binaries.
+                                        <span class="text-accent-ink mr-2">::</span> Plain text outputs over proprietary binaries.
                                     </li>
                                 </ul>
                             </div>
@@ -58,7 +58,7 @@
                                 <div class="font-mono text-sm">
                                     <div class="text-code-dim mb-2"># Piping output to standard tools</div>
                                     <div class="flex text-white mb-4">
-                                        <span class="text-accent mr-2">$</span>
+                                        <span class="text-accent-ink mr-2">$</span>
                                         weaver observe src/lib.rs | jq '.functions[] | select(.public)'
                                     </div>
                                     <div class="text-note-info pl-4 border-l border-white/20">
@@ -93,7 +93,7 @@
 
                         <!-- Right: Manifest -->
                         <div class="lg:col-span-6 order-1 lg:order-2">
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-4 block">02. Standards</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-4 block">02. Standards</span>
                             <h2 class="font-serif text-3xl text-base-content mb-6">Open Interfaces, No Lock-in</h2>
                             <div class="prose prose-indigo text-base-content/80">
                                 <p class="mb-4">
@@ -122,7 +122,7 @@
 
                 <div class="max-w-4xl mx-auto text-center relative z-10">
                     <div class="inline-block border border-accent px-4 py-1 mb-6 rounded-full">
-                        <span class="font-mono text-xs text-accent tracking-widest uppercase font-bold">03. Security</span>
+                        <span class="font-mono text-xs text-accent-ink tracking-widest uppercase font-bold">03. Security</span>
                     </div>
 
                     <h2 class="font-serif text-4xl lg:text-5xl mb-8">Safety-First Posture</h2>
@@ -133,19 +133,19 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                         <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
-                            {{ icon('lock', 'text-accent text-2xl mb-4') }}
+                            {{ icon('lock', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Sandboxing</h3>
-                            <p class="text-xs text-base-100/60">Execution occurs in isolated environments with strictly limited syscall access.</p>
+                            <p class="text-xs text-base-100/70">Execution occurs in isolated environments with strictly limited syscall access.</p>
                         </div>
                         <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
-                            {{ icon('eye', 'text-accent text-2xl mb-4') }}
+                            {{ icon('eye', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Lock-Guarded Validation</h3>
-                            <p class="text-xs text-base-100/60">Every edit passes syntactic (Tree-sitter) and semantic (LSP) checks on an in-memory copy before it touches disk.</p>
+                            <p class="text-xs text-base-100/70">Every edit passes syntactic (Tree-sitter) and semantic (LSP) checks on an in-memory copy before it touches disk.</p>
                         </div>
                         <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
-                            {{ icon('rotate-left', 'text-accent text-2xl mb-4') }}
+                            {{ icon('rotate-left', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Reversibility</h3>
-                            <p class="text-xs text-base-100/60">State changes are tracked. Rollback is a first-class citizen in the command set.</p>
+                            <p class="text-xs text-base-100/70">State changes are tracked. Rollback is a first-class citizen in the command set.</p>
                         </div>
                     </div>
                 </div>
@@ -156,12 +156,12 @@
                 <div class="max-w-6xl mx-auto">
                     <div class="flex flex-col md:flex-row gap-12">
                         <div class="md:w-1/3">
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-4 block">04. Automation</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-4 block">04. Automation</span>
                             <h2 class="font-serif text-3xl text-base-content mb-6">CI/CD Supervision</h2>
                             <p class="text-base-content/80 mb-6">
                                 AI shouldn't just run on your laptop. Weaver is designed to be the supervisory layer in your continuous integration pipeline.
                             </p>
-                            <a href="/weaver/docs/" class="text-sm font-bold text-base-content border-b border-base-content pb-1 hover:text-accent hover:border-accent transition-colors">
+                            <a href="/weaver/docs/" class="text-sm font-bold text-base-content border-b border-base-content pb-1 hover:text-accent-ink hover:border-accent transition-colors">
                                 View CI Integration Docs &gt;
                             </a>
                         </div>
@@ -169,7 +169,7 @@
                         <div class="md:w-2/3">
                             <div class="bg-white border border-base-content/20 p-2 shadow-xs">
                                 <div class="bg-mock-surface border-b border-mock-line px-4 py-2 flex items-center">
-                                    <span class="text-xs font-mono text-code-muted">.github/workflows/ai-review.yml</span>
+                                    <span class="text-xs font-mono text-base-content/82">.github/workflows/ai-review.yml</span>
                                 </div>
                                 <div class="p-4 overflow-x-auto">
                                     <pre class="font-mono text-xs text-code-ink leading-relaxed">
@@ -202,7 +202,7 @@
             <section class="py-20 px-8 lg:px-16 border-t border-base-content/20 bg-base-100 text-center">
                 <div class="max-w-2xl mx-auto">
                     <h2 class="font-serif text-3xl text-base-content mb-6">Ready to weave intelligence into your code?</h2>
-                    <p class="font-sans text-base-content/70 mb-8">
+                    <p class="font-sans text-base-content/88 mb-8">
                         Start with the CLI. Build with the daemon. Trust the process.
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-4">

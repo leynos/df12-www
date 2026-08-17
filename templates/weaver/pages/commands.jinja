@@ -8,9 +8,9 @@
 
 {% block nav_subitems_commands %}
                     <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
-                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors">/observe</a>
-                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors">/act</a>
-                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent transition-colors">/verify</a>
+                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/observe</a>
+                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/act</a>
+                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/verify</a>
                     </div>
 {% endblock %}
 
@@ -25,7 +25,7 @@
 
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-8">
                         The Vocabulary of <br>
-                        <span class="text-accent italic font-light">Action</span>.
+                        <span class="text-accent-ink italic font-light">Action</span>.
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-2xl font-light">
@@ -52,49 +52,49 @@
                             <tbody class="divide-y divide-base-content/10">
                                 <tr class="group hover:bg-primary/5 transition-colors">
                                     <td class="p-4 font-mono text-sm font-bold text-base-content border-r border-base-content/10">
-                                        <a href="/weaver/commands/observe/" class="flex items-center gap-2 hover:text-accent">
+                                        <a href="/weaver/commands/observe/" class="flex items-center gap-2 hover:text-accent-ink">
                                             observe {{ icon('arrow-right', '-rotate-45 text-3xs opacity-0 group-hover:opacity-100 transition-opacity') }}
                                         </a>
                                     </td>
                                     <td class="p-4 text-sm text-base-content/80 border-r border-base-content/10">
                                         Query code structure and relationships via LSP and Tree-sitter.
                                     </td>
-                                    <td class="p-4 font-mono text-xs text-base-content/60 border-r border-base-content/10">
+                                    <td class="p-4 font-mono text-xs text-base-content/82 border-r border-base-content/10">
                                         get-definition, find-references, call-hierarchy, grep
                                     </td>
-                                    <td class="p-4 font-mono text-xs text-base-content/60">
+                                    <td class="p-4 font-mono text-xs text-base-content/82">
                                         JSONL (<code class="text-3xs">kind</code> envelope)
                                     </td>
                                 </tr>
                                 <tr class="group hover:bg-primary/5 transition-colors">
                                     <td class="p-4 font-mono text-sm font-bold text-base-content border-r border-base-content/10">
-                                        <a href="/weaver/commands/act/" class="flex items-center gap-2 hover:text-accent">
+                                        <a href="/weaver/commands/act/" class="flex items-center gap-2 hover:text-accent-ink">
                                             act {{ icon('arrow-right', '-rotate-45 text-3xs opacity-0 group-hover:opacity-100 transition-opacity') }}
                                         </a>
                                     </td>
                                     <td class="p-4 text-sm text-base-content/80 border-r border-base-content/10">
                                         Lock-guarded, transactional code mutation via patches or rewrites.
                                     </td>
-                                    <td class="p-4 font-mono text-xs text-base-content/60 border-r border-base-content/10">
+                                    <td class="p-4 font-mono text-xs text-base-content/82 border-r border-base-content/10">
                                         apply-patch, apply-rewrite, refactor
                                     </td>
-                                    <td class="p-4 font-mono text-xs text-base-content/60">
+                                    <td class="p-4 font-mono text-xs text-base-content/82">
                                         JSONL (<code class="text-3xs">kind</code> envelope)
                                     </td>
                                 </tr>
                                 <tr class="group hover:bg-primary/5 transition-colors">
                                     <td class="p-4 font-mono text-sm font-bold text-base-content border-r border-base-content/10">
-                                        <a href="/weaver/commands/verify/" class="flex items-center gap-2 hover:text-accent">
+                                        <a href="/weaver/commands/verify/" class="flex items-center gap-2 hover:text-accent-ink">
                                             verify {{ icon('arrow-right', '-rotate-45 text-3xs opacity-0 group-hover:opacity-100 transition-opacity') }}
                                         </a>
                                     </td>
                                     <td class="p-4 text-sm text-base-content/80 border-r border-base-content/10">
                                         Pull diagnostics from language servers to confirm code health.
                                     </td>
-                                    <td class="p-4 font-mono text-xs text-base-content/60 border-r border-base-content/10">
+                                    <td class="p-4 font-mono text-xs text-base-content/82 border-r border-base-content/10">
                                         diagnostics
                                     </td>
-                                    <td class="p-4 font-mono text-xs text-base-content/60">
+                                    <td class="p-4 font-mono text-xs text-base-content/82">
                                         JSONL (<code class="text-3xs">kind</code> envelope)
                                     </td>
                                 </tr>
@@ -113,15 +113,15 @@
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             {{ icon('eye', 'text-6xl text-base-content') }}
                         </div>
-                        <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent transition-colors">Observe</h3>
-                        <p class="text-sm font-mono text-base-content/50 mb-4">perception</p>
+                        <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent-ink transition-colors">Observe</h3>
+                        <p class="text-sm font-mono text-base-content/78 mb-4">perception</p>
                         <p class="text-base-content/80 mb-6 text-sm leading-relaxed min-h-[80px]">
                             The agent's eyes. Queries code structure via LSP and Tree-sitter — definitions, references, call hierarchies, structural grep.
                         </p>
                         <div class="bg-neutral p-3 rounded-xs mb-4 border border-base-content/20">
                             <code class="font-mono text-xs text-code-string block">$ weaver observe get-definition \<br>&nbsp;&nbsp;--uri file:///src/main.rs --position 10:5</code>
                         </div>
-                        <a href="/weaver/commands/observe/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-accent hover:text-base-content transition-colors">
+                        <a href="/weaver/commands/observe/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-accent-ink hover:text-base-content transition-colors">
                             Full Documentation {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
@@ -131,15 +131,15 @@
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             {{ icon('hand-holding-hand', 'text-6xl text-base-content') }}
                         </div>
-                        <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent transition-colors">Act</h3>
-                        <p class="text-sm font-mono text-base-content/50 mb-4">mutation</p>
+                        <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent-ink transition-colors">Act</h3>
+                        <p class="text-sm font-mono text-base-content/78 mb-4">mutation</p>
                         <p class="text-base-content/80 mb-6 text-sm leading-relaxed min-h-[80px]">
                             The agent's hands. Applies patches and rewrites through Double-Lock validation — every edit passes syntactic and semantic checks before it touches disk.
                         </p>
                         <div class="bg-neutral p-3 rounded-xs mb-4 border border-base-content/20">
                             <code class="font-mono text-xs text-code-string block">$ weaver act apply-patch &lt; fix.diff</code>
                         </div>
-                        <a href="/weaver/commands/act/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-accent hover:text-base-content transition-colors">
+                        <a href="/weaver/commands/act/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-accent-ink hover:text-base-content transition-colors">
                             Full Documentation {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
@@ -149,15 +149,15 @@
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             {{ icon('scale-balanced', 'text-6xl text-base-content') }}
                         </div>
-                        <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent transition-colors">Verify</h3>
-                        <p class="text-sm font-mono text-base-content/50 mb-4">validation</p>
+                        <h3 class="font-serif text-2xl text-base-content mb-2 group-hover:text-accent-ink transition-colors">Verify</h3>
+                        <p class="text-sm font-mono text-base-content/78 mb-4">validation</p>
                         <p class="text-base-content/80 mb-6 text-sm leading-relaxed min-h-[80px]">
                             The agent's conscience. Currently pulls LSP diagnostics for any file with a supported language server. Policy and test orchestration are planned, not implemented yet.
                         </p>
                         <div class="bg-neutral p-3 rounded-xs mb-4 border border-base-content/20">
                             <code class="font-mono text-xs text-code-string block">$ weaver verify diagnostics \<br>&nbsp;&nbsp;--uri file:///src/lib.rs</code>
                         </div>
-                        <a href="/weaver/commands/verify/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-accent hover:text-base-content transition-colors">
+                        <a href="/weaver/commands/verify/" class="inline-flex items-center text-xs font-bold font-mono uppercase tracking-wider text-accent-ink hover:text-base-content transition-colors">
                             Full Documentation {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
@@ -175,12 +175,12 @@
                 <div class="max-w-6xl mx-auto relative z-10">
                     <div class="flex flex-col md:flex-row justify-between md:items-end mb-10">
                         <div>
-                            <span class="font-mono text-xs text-accent font-bold tracking-widest uppercase mb-2 block">WORKFLOW</span>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">WORKFLOW</span>
                             <h2 class="font-serif text-3xl text-base-content">End-to-End Pipeline</h2>
-                            <p class="text-base-content/70 mt-2 max-w-xl">How an agent typically chains commands to safely refactor code.</p>
+                            <p class="text-base-content/88 mt-2 max-w-xl">How an agent typically chains commands to safely refactor code.</p>
                         </div>
                         <div class="hidden md:block">
-                             <div class="flex items-center gap-2 text-xs font-mono text-base-content/60">
+                             <div class="flex items-center gap-2 text-xs font-mono text-base-content/82">
                                 <span class="w-3 h-3 bg-neutral rounded-full"></span> Input
                                 <span class="w-3 h-3 bg-accent rounded-full ml-2"></span> Process
                                 <span class="w-3 h-3 bg-primary rounded-full ml-2"></span> Output
@@ -208,9 +208,9 @@
                                         <span class="font-mono text-xs font-bold bg-primary text-base-100 px-2 py-0.5 rounded-xs">01</span>
                                         <h3 class="font-serif text-xl text-base-content">Observe Context</h3>
                                     </div>
-                                    <p class="text-sm text-base-content/70 mb-4">Agent jumps to the definition of <code class="text-xs bg-primary/10 px-1">process_data</code> to understand it before editing.</p>
-                                    <div class="font-mono text-xs text-base-content/50 bg-base-100 p-2 border border-base-content/10 rounded-sm">
-                                        <span class="text-accent">$</span> weaver observe get-definition \<br>
+                                    <p class="text-sm text-base-content/88 mb-4">Agent jumps to the definition of <code class="text-xs bg-primary/10 px-1">process_data</code> to understand it before editing.</p>
+                                    <div class="font-mono text-xs text-base-content/78 bg-base-100 p-2 border border-base-content/10 rounded-sm">
+                                        <span class="text-accent-ink">$</span> weaver observe get-definition \<br>
                                         &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/main.rs --position 10:5
                                     </div>
@@ -235,12 +235,12 @@
                             <div class="flex flex-col lg:flex-row gap-6">
                                 <div class="lg:w-1/3 flex flex-col justify-center">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="font-mono text-xs font-bold bg-accent text-white px-2 py-0.5 rounded-xs">02</span>
+                                        <span class="font-mono text-xs font-bold bg-accent-deep text-white px-2 py-0.5 rounded-xs">02</span>
                                         <h3 class="font-serif text-xl text-base-content">Apply Patch</h3>
                                     </div>
-                                    <p class="text-sm text-base-content/70 mb-4">Agent pipes a diff through Double-Lock validation and onto disk.</p>
-                                    <div class="font-mono text-xs text-base-content/50 bg-base-100 p-2 border border-base-content/10 rounded-sm">
-                                        <span class="text-accent">$</span> weaver act apply-patch --output json &lt; refactor.diff
+                                    <p class="text-sm text-base-content/88 mb-4">Agent pipes a diff through Double-Lock validation and onto disk.</p>
+                                    <div class="font-mono text-xs text-base-content/78 bg-base-100 p-2 border border-base-content/10 rounded-sm">
+                                        <span class="text-accent-ink">$</span> weaver act apply-patch --output json &lt; refactor.diff
                                     </div>
                                 </div>
                                 <div class="lg:w-2/3 bg-neutral p-4 rounded-xs font-mono text-xs text-code-text overflow-x-auto border border-base-content/10 shadow-inner">
@@ -266,9 +266,9 @@
                                         <span class="font-mono text-xs font-bold bg-status-ok-strong text-white px-2 py-0.5 rounded-xs">03</span>
                                         <h3 class="font-serif text-xl text-base-content">Verify Diagnostics</h3>
                                     </div>
-                                    <p class="text-sm text-base-content/70 mb-4">Agent confirms the edited file has no compiler warnings or errors.</p>
-                                    <div class="font-mono text-xs text-base-content/50 bg-base-100 p-2 border border-base-content/10 rounded-sm">
-                                        <span class="text-accent">$</span> weaver verify diagnostics \<br>
+                                    <p class="text-sm text-base-content/88 mb-4">Agent confirms the edited file has no compiler warnings or errors.</p>
+                                    <div class="font-mono text-xs text-base-content/78 bg-base-100 p-2 border border-base-content/10 rounded-sm">
+                                        <span class="text-accent-ink">$</span> weaver verify diagnostics \<br>
                                         &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/lib.rs
                                     </div>
@@ -302,36 +302,36 @@
                                 Keep command semantics on this page. Keep config defaults, override precedence, and the JSONL envelope in the docs hub.
                             </p>
                             <div class="flex flex-wrap gap-3 text-xs font-mono">
-                                <a href="/weaver/docs/#configuration" class="text-accent hover:underline">Configuration</a>
-                                <a href="/weaver/docs/#jsonl-schema" class="text-accent hover:underline">JSONL protocol</a>
-                                <a href="/weaver/docs/#capability-overrides" class="text-accent hover:underline">Capability overrides</a>
+                                <a href="/weaver/docs/#configuration" class="text-accent-ink hover:underline">Configuration</a>
+                                <a href="/weaver/docs/#jsonl-schema" class="text-accent-ink hover:underline">JSONL protocol</a>
+                                <a href="/weaver/docs/#capability-overrides" class="text-accent-ink hover:underline">Capability overrides</a>
                             </div>
                         </div>
                         <div class="bg-base-100 border border-base-content/20 rounded-xs overflow-hidden">
                             <table class="w-full text-left">
                                 <tbody class="divide-y divide-base-content/10">
                                     <tr>
-                                        <td class="p-3 font-mono text-xs text-accent bg-primary/5 w-44">--output</td>
+                                        <td class="p-3 font-mono text-xs text-accent-ink bg-primary/5 w-44">--output</td>
                                         <td class="p-3 text-sm text-base-content/80">Output mode: <code class="text-xs bg-primary/10 px-1">auto</code> (default), <code class="text-xs bg-primary/10 px-1">human</code>, or <code class="text-xs bg-primary/10 px-1">json</code>. <code class="text-xs bg-primary/10 px-1">auto</code> selects <code class="text-xs bg-primary/10 px-1">human</code> on a TTY, <code class="text-xs bg-primary/10 px-1">json</code> when redirected. Must appear <em>before</em> the domain/operation.</td>
                                     </tr>
                                     <tr>
-                                        <td class="p-3 font-mono text-xs text-accent bg-primary/5">--config-path</td>
+                                        <td class="p-3 font-mono text-xs text-accent-ink bg-primary/5">--config-path</td>
                                         <td class="p-3 text-sm text-base-content/80">Path to an explicit <code class="text-xs bg-primary/10 px-1">weaver.toml</code> configuration file.</td>
                                     </tr>
                                     <tr>
-                                        <td class="p-3 font-mono text-xs text-accent bg-primary/5">--daemon-socket</td>
+                                        <td class="p-3 font-mono text-xs text-accent-ink bg-primary/5">--daemon-socket</td>
                                         <td class="p-3 text-sm text-base-content/80">Override daemon transport (e.g. <code class="text-xs bg-primary/10 px-1">unix:///run/user/1000/weaver.sock</code>).</td>
                                     </tr>
                                     <tr>
-                                        <td class="p-3 font-mono text-xs text-accent bg-primary/5">--log-filter</td>
+                                        <td class="p-3 font-mono text-xs text-accent-ink bg-primary/5">--log-filter</td>
                                         <td class="p-3 text-sm text-base-content/80">Tracing filter (default <code class="text-xs bg-primary/10 px-1">info</code>).</td>
                                     </tr>
                                     <tr>
-                                        <td class="p-3 font-mono text-xs text-accent bg-primary/5">--log-format</td>
+                                        <td class="p-3 font-mono text-xs text-accent-ink bg-primary/5">--log-format</td>
                                         <td class="p-3 text-sm text-base-content/80">Log output format: <code class="text-xs bg-primary/10 px-1">json</code> (default) or <code class="text-xs bg-primary/10 px-1">compact</code>.</td>
                                     </tr>
                                     <tr>
-                                        <td class="p-3 font-mono text-xs text-accent bg-primary/5">--capability-overrides</td>
+                                        <td class="p-3 font-mono text-xs text-accent-ink bg-primary/5">--capability-overrides</td>
                                         <td class="p-3 text-sm text-base-content/80">Capability overrides. See the override syntax in the docs hub before repeating directives on the CLI.</td>
                                     </tr>
                                 </tbody>
@@ -382,9 +382,9 @@
                             This page keeps the command map. The authoritative defaults, override syntax, and JSONL envelope live in the docs hub so those details only drift in one place.
                         </p>
                         <div class="flex flex-wrap gap-3 text-xs font-mono">
-                            <a href="/weaver/docs/#configuration" class="text-accent hover:underline">Configuration</a>
-                            <a href="/weaver/docs/#capability-overrides" class="text-accent hover:underline">Capability overrides</a>
-                            <a href="/weaver/docs/#jsonl-schema" class="text-accent hover:underline">JSONL protocol</a>
+                            <a href="/weaver/docs/#configuration" class="text-accent-ink hover:underline">Configuration</a>
+                            <a href="/weaver/docs/#capability-overrides" class="text-accent-ink hover:underline">Capability overrides</a>
+                            <a href="/weaver/docs/#jsonl-schema" class="text-accent-ink hover:underline">JSONL protocol</a>
                         </div>
                     </div>
 

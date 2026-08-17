@@ -124,7 +124,25 @@
 
   /* The muted indigo. daisyUI has no slot for a third text weight between
      base-content and the surface, so it is a token of its own. */
-  --color-ink-muted: #4a6fa5;
+  --color-ink-muted: var(--color-ink-muted-deep);
+  --color-ink-muted-deep: #4a6fa5;
+  --color-ink-muted-lift: #90a9cd; /* the same role, read on a dark panel */
+
+  /* The accent in its two reading weights. `--color-accent` itself stays
+     the brand vermilion and is used for fills, rules, and display type,
+     where the contrast floor does not apply. At body size it does, and
+     3.23:1 on the parchment is not enough, so text takes a deeper cut of
+     the same hue — and a lighter one on the dark panels, where the deeper
+     cut would be worse than what it replaced. */
+  --color-accent-deep: #af3114; /* 5.55:1 on base-100, and 4.68:1 on the
+                                   deepest of the tinted grounds these
+                                   labels sit on */
+  --color-accent-lift: #f4a694; /* 5.61:1 on primary, the lightest of the
+                                   dark surfaces, and better on the rest.
+                                   The headroom is deliberate: some of
+                                   those panels carry a texture that lifts
+                                   the ground a little. */
+  --color-accent-ink: var(--color-accent-deep);
 
   /* The near-black the design-system page names Deep Contrast. Darker and
      cooler than `neutral`, and used where a panel has to read as a void
@@ -156,7 +174,8 @@
   --color-token-string: #f1fa8c;
   --color-token-number: #bd93f9;
   --color-token-boolean: #ff79c6;
-  --color-token-comment: #6272a4;
+  --color-token-comment: #8390b7; /* lifted from Dracula's #6272a4, which
+                                     reads at 3.03:1 on its own surface */
   --color-token-cmd: #50fa7b;
   --color-token-arg: #f8f8f2;
   --color-token-pass: #50fa7b;
@@ -169,7 +188,9 @@
   /* Syntax colours inside the dark terminal and code panels. */
   --color-code-text: #d1d5db; /* was gray-300: body text in a dark code panel */
   --color-code-dim: #9ca3af; /* was gray-400: secondary text in a dark panel */
-  --color-code-muted: #6b7280; /* was gray-500: comments and gutter labels */
+  --color-code-muted: #a1a7b1; /* was gray-500: comments and gutter labels;
+                                  lightened from #6b7280, which read at
+                                  3.23:1 on the panels it is used on */
   --color-code-string: #4ade80; /* was green-400: strings and shell output */
   --color-code-key: #9333ea; /* was purple-600: YAML and JSON keys */
   --color-code-name: #2563eb; /* was blue-600: identifiers and job names */
@@ -179,7 +200,8 @@
 
   /* Syntax colours for the code samples set on a light surface. */
   --color-code-ink: #374151; /* was gray-700: body text on a light code surface */
-  --color-code-literal: #15803d; /* was green-700: quoted literals */
+  --color-code-literal: #127036; /* was green-700: quoted literals, deepened
+                                    from #15803d for 5.35:1 on parchment */
   --color-code-ref: #1d4ed8; /* was blue-700: quoted references */
 
   /* Annotation callouts hung off a code sample, text and rule. */
@@ -189,7 +211,9 @@
 
   /* Status signals: the pulsing dots, bars, and badges. */
   --color-status-ok: #22c55e; /* was green-500: operational */
-  --color-status-ok-strong: #16a34a; /* was green-600: a filled bar or badge */
+  --color-status-ok-strong: #117c38; /* was green-600: a filled bar or badge;
+                                        deepened from #16a34a, which carried
+                                        white text at 3.30:1 */
   --color-status-warn: #eab308; /* was yellow-500: degraded, and the rule under a warning note */
   --color-status-error: #ef4444; /* was red-500: failed */
 

@@ -16,7 +16,7 @@
                     </div>
 
                     <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
-                        Initialize the <br><span class="text-accent italic font-light">Loom</span>
+                        Initialize the <br><span class="text-accent-ink italic font-light">Loom</span>
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-2xl font-light">
@@ -55,7 +55,7 @@
                             </div>
                             <div>
                                 <h3 class="font-serif font-bold text-base-content text-sm">Rust Toolchain</h3>
-                                <p class="text-xs text-base-content/70 mt-1">1.75.0 or newer required for installation.</p>
+                                <p class="text-xs text-base-content/88 mt-1">1.75.0 or newer required for installation.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4 p-4 border border-base-content/10 bg-base-100/50">
@@ -64,7 +64,7 @@
                             </div>
                             <div>
                                 <h3 class="font-serif font-bold text-base-content text-sm">Linux Environment</h3>
-                                <p class="text-xs text-base-content/70 mt-1">Kernel 5.10+ for full seccomp-bpf sandbox support.</p>
+                                <p class="text-xs text-base-content/88 mt-1">Kernel 5.10+ for full seccomp-bpf sandbox support.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4 p-4 border border-base-content/10 bg-base-100/50">
@@ -73,7 +73,7 @@
                             </div>
                             <div>
                                 <h3 class="font-serif font-bold text-base-content text-sm">Shell Access</h3>
-                                <p class="text-xs text-base-content/70 mt-1">Bash, Zsh, or Fish. Root privileges not required.</p>
+                                <p class="text-xs text-base-content/88 mt-1">Bash, Zsh, or Fish. Root privileges not required.</p>
                             </div>
                         </div>
                     </div>
@@ -91,10 +91,10 @@
                     <!-- Step 1 -->
                     <div class="relative pl-12 pb-12">
                         <div class="step-line"></div>
-                        <div class="absolute left-0 top-0 w-8 h-8 bg-accent text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">01</div>
+                        <div class="absolute left-0 top-0 w-8 h-8 bg-accent-deep text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">01</div>
 
                         <h3 class="font-serif text-xl font-bold text-base-content mb-2">Install from Crates.io</h3>
-                        <p class="text-base-content/70 mb-4 max-w-2xl">Download and compile the weaver binary. This includes both the client CLI and the daemon.</p>
+                        <p class="text-base-content/88 mb-4 max-w-2xl">Download and compile the weaver binary. This includes both the client CLI and the daemon.</p>
 
                         <div class="bg-neutral rounded-xs p-4 shadow-lg border border-base-content/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
@@ -112,7 +112,7 @@
                         <div class="absolute left-0 top-0 w-8 h-8 bg-primary text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">02</div>
 
                         <h3 class="font-serif text-xl font-bold text-base-content mb-2">Verify Installation</h3>
-                        <p class="text-base-content/70 mb-4 max-w-2xl">No init ceremony required — Weaver discovers configuration through XDG paths, environment variables, and CLI flags, all with sensible defaults. Run the capability probe to confirm the binary is installed:</p>
+                        <p class="text-base-content/88 mb-4 max-w-2xl">No init ceremony required — Weaver discovers configuration through XDG paths, environment variables, and CLI flags, all with sensible defaults. Run the capability probe to confirm the binary is installed:</p>
 
                         <div class="bg-neutral rounded-xs p-4 shadow-lg border border-base-content/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
@@ -136,9 +136,9 @@
                                 Need the real defaults, XDG discovery rules, or the daemon JSONL envelope? Use the docs hub instead of this quick-start page.
                             </p>
                             <div class="flex flex-wrap gap-3 text-xs font-mono">
-                                <a href="/weaver/docs/#configuration" class="text-accent hover:underline">Configuration</a>
-                                <a href="/weaver/docs/#jsonl-schema" class="text-accent hover:underline">JSONL protocol</a>
-                                <a href="/weaver/docs/#daemon-lifecycle" class="text-accent hover:underline">Daemon lifecycle</a>
+                                <a href="/weaver/docs/#configuration" class="text-accent-ink hover:underline">Configuration</a>
+                                <a href="/weaver/docs/#jsonl-schema" class="text-accent-ink hover:underline">JSONL protocol</a>
+                                <a href="/weaver/docs/#daemon-lifecycle" class="text-accent-ink hover:underline">Daemon lifecycle</a>
                             </div>
                         </div>
                     </div>
@@ -148,7 +148,7 @@
                         <div class="absolute left-0 top-0 w-8 h-8 bg-primary text-white font-mono font-bold flex items-center justify-center rounded-xs shadow-xs z-10">03</div>
 
                         <h3 class="font-serif text-xl font-bold text-base-content mb-2">Try a Command</h3>
-                        <p class="text-base-content/70 mb-4 max-w-2xl">The daemon auto-starts when you issue a domain command — no manual launch needed. Just run:</p>
+                        <p class="text-base-content/88 mb-4 max-w-2xl">The daemon auto-starts when you issue a domain command — no manual launch needed. Just run:</p>
 
                         <div class="bg-neutral rounded-xs p-4 shadow-lg border border-base-content/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
@@ -182,7 +182,7 @@
                             <p class="text-base-100/70 mt-2 max-w-xl">Execute the standard Observe → Act → Verify loop on a sample project.</p>
                         </div>
                         <div class="hidden md:block">
-                            {{ icon('arrow-right-long', 'text-4xl text-accent opacity-50') }}
+                            {{ icon('arrow-right-long', 'text-4xl text-accent-ink opacity-50') }}
                         </div>
                     </div>
 
@@ -190,10 +190,10 @@
                         <!-- Observe Card -->
                         <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white font-bold text-xs">1</div>
+                                <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center text-white font-bold text-xs">1</div>
                                 <h3 class="font-mono font-bold text-white">OBSERVE</h3>
                             </div>
-                            <p class="text-xs text-base-100/60 mb-4 h-10">Jump to a symbol definition to understand the code before editing.</p>
+                            <p class="text-xs text-base-100/70 mb-4 h-10">Jump to a symbol definition to understand the code before editing.</p>
                             <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-code-string border border-white/5">
                                 $ weaver observe get-definition \<br>
                                 &nbsp;&nbsp;--uri file:///path/to/project/src/main.rs \<br>
@@ -204,10 +204,10 @@
                         <!-- Act Card -->
                         <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white font-bold text-xs">2</div>
+                                <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center text-white font-bold text-xs">2</div>
                                 <h3 class="font-mono font-bold text-white">ACT</h3>
                             </div>
-                            <p class="text-xs text-base-100/60 mb-4 h-10">Apply a patch through Double-Lock validation.</p>
+                            <p class="text-xs text-base-100/70 mb-4 h-10">Apply a patch through Double-Lock validation.</p>
                             <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-code-string border border-white/5">
                                 $ weaver act apply-patch &lt; fix.diff
                             </div>
@@ -216,10 +216,10 @@
                         <!-- Verify Card -->
                         <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
-                                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white font-bold text-xs">3</div>
+                                <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center text-white font-bold text-xs">3</div>
                                 <h3 class="font-mono font-bold text-white">VERIFY</h3>
                             </div>
-                            <p class="text-xs text-base-100/60 mb-4 h-10">Pull diagnostics to confirm no regressions.</p>
+                            <p class="text-xs text-base-100/70 mb-4 h-10">Pull diagnostics to confirm no regressions.</p>
                             <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-code-string border border-white/5">
                                 $ weaver verify diagnostics \<br>
                                 &nbsp;&nbsp;--uri file:///path/to/project/src/main.rs
@@ -238,14 +238,14 @@
                         <!-- Issue 1 -->
                         <div class="border border-base-content/20 bg-white p-6 rounded-xs">
                             <h3 class="font-serif text-xl text-base-content flex items-center gap-2">
-                                {{ icon('triangle-exclamation', 'text-accent') }}
+                                {{ icon('triangle-exclamation', 'text-accent-ink') }}
                                 Unix Socket Permission Denied
                             </h3>
-                            <p class="text-sm text-base-content/70 mt-2 mb-4">
+                            <p class="text-sm text-base-content/88 mt-2 mb-4">
                                 If you see <code>Error: connect(2) failed</code>, the daemon socket may have incorrect ownership. The default socket lives at <code>$XDG_RUNTIME_DIR/weaver/weaverd.sock</code> (fallback: <code>/tmp/weaver/uid-$UID/weaverd.sock</code>). The usual fix is to ensure the daemon runs as the correct user rather than chowning the socket directly:
                             </p>
                             <div class="bg-base-100 p-3 font-mono text-xs text-base-content border-l-2 border-base-content">
-                                <span class="text-base-content/50"># Stop any stale daemon, then restart as your user</span><br>
+                                <span class="text-base-content/82"># Stop any stale daemon, then restart as your user</span><br>
                                 weaver daemon stop &amp;&amp; weaver daemon start
                             </div>
                         </div>
@@ -256,11 +256,11 @@
                                 {{ icon('server', 'text-ink-muted') }}
                                 Non-Unix / Windows Mode
                             </h3>
-                            <p class="text-sm text-base-content/70 mt-2 mb-4">
+                            <p class="text-sm text-base-content/88 mt-2 mb-4">
                                 Unix domain sockets are not supported on Windows. Switch to TCP mode in <code>weaver.toml</code>.
                             </p>
                             <div class="bg-neutral p-4 rounded-xs text-xs font-mono text-code-text">
-                                <span class="text-base-content/50"># weaver.toml — switch to TCP transport</span><br>
+                                <span class="text-code-muted"># weaver.toml — switch to TCP transport</span><br>
                                 daemon_socket = { transport = <span class="text-code-string">"tcp"</span>, host = <span class="text-code-string">"127.0.0.1"</span>, port = <span class="text-code-warn">9779</span> }
                             </div>
                         </div>

@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Safety & Sandboxing - Weaver AI Codebase Tooling{% endblock %}
 
@@ -71,21 +72,21 @@
                             </p>
                             <ul class="space-y-3 font-mono text-xs text-weaver-indigo">
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-code"></i></div>
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion">{{ icon('code') }}</div>
                                     <span>Tree-sitter parsers for Rust, Python, TypeScript</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-bolt"></i></div>
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion">{{ icon('bolt') }}</div>
                                     <span>Fast, local — no language server needed</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-forward"></i></div>
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion">{{ icon('forward') }}</div>
                                     <span>Unknown file types pass through without parser or semantic checks</span>
                                 </li>
                             </ul>
                             <!-- Decorative padlock -->
                             <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-indigo text-white flex items-center justify-center rounded-xs shadow-md z-10">
-                                <i class="fa-solid fa-lock"></i>
+                                {{ icon('lock') }}
                             </div>
                         </div>
 
@@ -98,21 +99,21 @@
                             </p>
                             <ul class="space-y-3 font-mono text-xs text-weaver-indigo">
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-microscope"></i></div>
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion">{{ icon('microscope') }}</div>
                                     <span>LSP diagnostics via didOpen / didChange / didClose</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-scale-balanced"></i></div>
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion">{{ icon('scale-balanced') }}</div>
                                     <span>Compares against pre-edit baseline</span>
                                 </li>
                                 <li class="flex items-center gap-3">
-                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion"><i class="fa-solid fa-shield-halved"></i></div>
+                                    <div class="w-6 h-6 rounded-full border border-weaver-indigo flex items-center justify-center text-weaver-vermilion">{{ icon('shield-halved') }}</div>
                                     <span>No disk writes until both locks pass</span>
                                 </li>
                             </ul>
                             <!-- Decorative padlock -->
                             <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-weaver-vermilion text-white flex items-center justify-center rounded-xs shadow-md z-10">
-                                <i class="fa-solid fa-lock"></i>
+                                {{ icon('lock') }}
                             </div>
                         </div>
                     </div>
@@ -258,19 +259,19 @@
                                 <div>
                                     <h4 class="font-mono text-xs text-green-400 font-bold mb-3 uppercase tracking-wider">Do</h4>
                                     <ul class="space-y-2 text-xs text-weaver-cream/80">
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Run verify often</li>
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Audit policy files</li>
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Use specific mounts</li>
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-check mt-1 text-green-400"></i> Review diffs manually</li>
+                                        <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-green-400') }} Run verify often</li>
+                                        <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-green-400') }} Audit policy files</li>
+                                        <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-green-400') }} Use specific mounts</li>
+                                        <li class="flex items-start gap-2">{{ icon('check', 'mt-1 text-green-400') }} Review diffs manually</li>
                                     </ul>
                                 </div>
                                 <div>
                                     <h4 class="font-mono text-xs text-weaver-vermilion font-bold mb-3 uppercase tracking-wider">Don't</h4>
                                     <ul class="space-y-2 text-xs text-weaver-cream/80">
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Run as root</li>
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Disable sandbox in prod</li>
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Share API keys in env</li>
-                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark mt-1 text-weaver-vermilion"></i> Blindly auto-merge</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-weaver-vermilion') }} Run as root</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-weaver-vermilion') }} Disable sandbox in prod</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-weaver-vermilion') }} Share API keys in env</li>
+                                        <li class="flex items-start gap-2">{{ icon('xmark', 'mt-1 text-weaver-vermilion') }} Blindly auto-merge</li>
                                     </ul>
                                 </div>
                             </div>
@@ -292,7 +293,7 @@
 
                     <div class="reference-callout mb-8">
                         <div class="reference-callout-title">
-                            <i class="fa-solid fa-book-open"></i>
+                            {{ icon('book-open') }}
                             Canonical reference
                         </div>
                         <p class="text-sm text-weaver-indigo/80 mb-3">
@@ -338,7 +339,7 @@
                         </div>
                         <a href="/weaver/sempai/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
                             Next: Sempai Engine
-                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            {{ icon('arrow-right', 'group-hover:translate-x-1 transition-transform') }}
                         </a>
                     </div>
                 </div>

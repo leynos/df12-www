@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Philosophy - Weaver AI Codebase Tooling{% endblock %}
 
@@ -52,7 +53,7 @@
                         <div class="lg:col-span-7">
                             <div class="bg-weaver-dark rounded-xs p-6 shadow-lg border border-weaver-indigo relative overflow-hidden group">
                                 <div class="absolute top-0 right-0 p-4 opacity-10">
-                                    <i class="fa-solid fa-terminal text-6xl text-white"></i>
+                                    {{ icon('terminal', 'text-6xl text-white') }}
                                 </div>
                                 <div class="font-mono text-sm">
                                     <div class="text-gray-400 mb-2"># Piping output to standard tools</div>
@@ -132,17 +133,17 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                         <div class="bg-weaver-dark/50 p-6 border border-weaver-cream/20 backdrop-blur-sm">
-                            <i class="fa-solid fa-lock text-weaver-vermilion text-2xl mb-4"></i>
+                            {{ icon('lock', 'text-weaver-vermilion text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Sandboxing</h3>
                             <p class="text-xs text-weaver-cream/60">Execution occurs in isolated environments with strictly limited syscall access.</p>
                         </div>
                         <div class="bg-weaver-dark/50 p-6 border border-weaver-cream/20 backdrop-blur-sm">
-                            <i class="fa-solid fa-eye text-weaver-vermilion text-2xl mb-4"></i>
+                            {{ icon('eye', 'text-weaver-vermilion text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Lock-Guarded Validation</h3>
                             <p class="text-xs text-weaver-cream/60">Every edit passes syntactic (Tree-sitter) and semantic (LSP) checks on an in-memory copy before it touches disk.</p>
                         </div>
                         <div class="bg-weaver-dark/50 p-6 border border-weaver-cream/20 backdrop-blur-sm">
-                            <i class="fa-solid fa-rotate-left text-weaver-vermilion text-2xl mb-4"></i>
+                            {{ icon('rotate-left', 'text-weaver-vermilion text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Reversibility</h3>
                             <p class="text-xs text-weaver-cream/60">State changes are tracked. Rollback is a first-class citizen in the command set.</p>
                         </div>

@@ -1,3 +1,4 @@
+{% from '_icons.jinja' import icon %}
 {#
   The Weaver design-system reference.
 
@@ -12,19 +13,9 @@
 {% import '_chrome.jinja' as chrome %}<html lang="en">
 
   <head>
-    <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weaver Design Language</title>
-    <script>
-      window.FontAwesomeConfig = {
-        autoReplaceSvg: 'nest'
-      };
-    </script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
-      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="preload" as="font" type="font/woff2" crossorigin
           href="/weaver/assets/fonts/playfair-display-latin-wght-normal.woff2">
     <link rel="preload" as="font" type="font/woff2" crossorigin
@@ -441,8 +432,7 @@
                 <p class="text-sm text-weaver-indigo/70 mb-4">Represents
                   continuous data streams, flow, and resilience. Use for
                   backgrounds or connecting elements.</p>
-                <div class="absolute bottom-4 right-4 text-weaver-vermilion"><i
-                    class="fa-solid fa-water"></i></div>
+                <div class="absolute bottom-4 right-4 text-weaver-vermilion">{{ icon('water') }}</div>
               </div><!-- Motif 2 -->
               <div
                 class="bg-weaver-cream border border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300">
@@ -457,8 +447,7 @@
                 <p class="text-sm text-weaver-indigo/70 mb-4">Symbolizes
                   connection, logic gates, and secure functions. Use for points
                   of interaction or conclusion.</p>
-                <div class="absolute bottom-4 right-4 text-weaver-vermilion"><i
-                    class="fa-solid fa-link"></i></div>
+                <div class="absolute bottom-4 right-4 text-weaver-vermilion">{{ icon('link') }}</div>
               </div><!-- Motif 3 -->
               <div
                 class="bg-weaver-cream border border-weaver-indigo p-6 relative group hover:-translate-y-1 transition-transform duration-300">
@@ -473,8 +462,7 @@
                 <p class="text-sm text-weaver-indigo/70 mb-4">Marks of approval,
                   authorship, and completion. Always placed bottom-right. Use
                   sparingly.</p>
-                <div class="absolute bottom-4 right-4 text-weaver-vermilion"><i
-                    class="fa-solid fa-stamp"></i></div>
+                <div class="absolute bottom-4 right-4 text-weaver-vermilion">{{ icon('stamp') }}</div>
               </div>
             </div>
           </div>
@@ -604,16 +592,13 @@
                   official kit for your projects.</p>
               </div><button
                 class="mt-4 md:mt-0 px-6 py-3 bg-weaver-vermilion text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-weaver-vermilion transition-colors border border-weaver-vermilion">
-                Download All Assets <i
-                  class="fa-solid fa-download ml-2"></i></button>
+                Download All Assets {{ icon('download', 'ml-2') }}</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"><a
                 href="#" class="block group">
                 <div
                   class="bg-weaver-dark/50 border border-weaver-cream/20 p-6 hover:bg-weaver-cream/10 transition-colors h-full">
-                  <div class="flex justify-between items-start mb-4"><i
-                      class="fa-solid fa-swatchbook text-2xl text-weaver-cream/80"></i><i
-                      class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0"></i>
+                  <div class="flex justify-between items-start mb-4">{{ icon('swatchbook', 'text-2xl text-weaver-cream/80') }}{{ icon('arrow-right', 'text-xs opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0') }}
                   </div>
                   <h3 class="font-serif text-lg mb-1">Colour Swatches</h3>
                   <p class="text-xs text-weaver-cream/50 font-mono">.ASE, .CLR,
@@ -622,9 +607,7 @@
               </a><a href="#" class="block group">
                 <div
                   class="bg-weaver-dark/50 border border-weaver-cream/20 p-6 hover:bg-weaver-cream/10 transition-colors h-full">
-                  <div class="flex justify-between items-start mb-4"><i
-                      class="fa-solid fa-font text-2xl text-weaver-cream/80"></i><i
-                      class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0"></i>
+                  <div class="flex justify-between items-start mb-4">{{ icon('font', 'text-2xl text-weaver-cream/80') }}{{ icon('arrow-right', 'text-xs opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0') }}
                   </div>
                   <h3 class="font-serif text-lg mb-1">Typography Pack</h3>
                   <p class="text-xs text-weaver-cream/50 font-mono">Webfonts
@@ -633,9 +616,7 @@
               </a><a href="#" class="block group">
                 <div
                   class="bg-weaver-dark/50 border border-weaver-cream/20 p-6 hover:bg-weaver-cream/10 transition-colors h-full">
-                  <div class="flex justify-between items-start mb-4"><i
-                      class="fa-solid fa-shapes text-2xl text-weaver-cream/80"></i><i
-                      class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0"></i>
+                  <div class="flex justify-between items-start mb-4">{{ icon('shapes', 'text-2xl text-weaver-cream/80') }}{{ icon('arrow-right', 'text-xs opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0') }}
                   </div>
                   <h3 class="font-serif text-lg mb-1">Motif Library</h3>
                   <p class="text-xs text-weaver-cream/50 font-mono">SVG, PNG,

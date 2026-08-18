@@ -320,7 +320,7 @@
                                     The execution plan splits anchor-producing terms from constraint terms, then evaluates them in order: first anchor matches, then predicates such as <code>Inside</code>, <code>Not</code>, <code>Anywhere</code>, and <code>Where</code>, then compatible existential matches from additional anchors, then projection of <code>span</code>, <code>captures</code>, and <code>focus</code>. That is not just neat. It is debuggable.
                                 </p>
                             </div>
-                            <div class="xl:col-span-7">
+                            <div class="xl:col-span-7 xl:sticky xl:top-8">
                                 <figure class="bg-white/75 border border-base-content/10 p-4 rounded-xs figure-frame figure-fullbleed">
                                     <img src="/weaver/assets/sempai/sempai-whitepaper-evaluation.png" alt="Illustrated diagram of anchor matching, constraint evaluation, and focus span selection for actuation." class="w-full rounded-xs border border-base-content/10">
                                     <figcaption class="mt-4 text-sm text-base-content/75 leading-relaxed">
@@ -346,6 +346,12 @@
   --lang rust \
   --query 'fn $F($...ARGS) { ... }' \
   --json</pre>
+                                </div>
+                                <div class="bg-white/70 border border-base-content/10 rounded-xs p-6 mt-6">
+                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Actuation Handoff</p>
+                                    <p class="text-sm text-base-content/80 leading-relaxed">
+                                        Sempai does not edit code. It hands Weaver an address. Consumers take the stream through the typed <code>--selectors &lt;path|-&gt;</code> flag; <code>focus</code> is the primary target when present, <code>span</code> the fallback, and the actuator re-checks the source digest before touching anything. That keeps query execution and actuation separate, which is exactly where the blast radius should stop.
+                                    </p>
                                 </div>
                             </div>
                             <div class="space-y-6">
@@ -381,12 +387,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
-                                <div class="bg-white/70 border border-base-content/10 rounded-xs p-6">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Actuation Handoff</p>
-                                    <p class="text-sm text-base-content/80 leading-relaxed">
-                                        Sempai does not edit code. It hands Weaver an address. Consumers take the stream through the typed <code>--selectors &lt;path|-&gt;</code> flag; <code>focus</code> is the primary target when present, <code>span</code> the fallback, and the actuator re-checks the source digest before touching anything. That keeps query execution and actuation separate, which is exactly where the blast radius should stop.
-                                    </p>
                                 </div>
                             </div>
                         </div>

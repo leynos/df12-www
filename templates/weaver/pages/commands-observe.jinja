@@ -82,7 +82,6 @@
                                         <tr class="bg-primary text-base-100 font-mono text-xs uppercase tracking-wider">
                                             <th class="p-3 border-r border-base-100/20 w-44">Command</th>
                                             <th class="p-3 border-r border-base-100/20 w-24">Source</th>
-                                            <th class="p-3 border-r border-base-100/20 w-28">Status</th>
                                             <th class="p-3">Description</th>
                                         </tr>
                                     </thead>
@@ -90,37 +89,31 @@
                                         <tr class="hover:bg-primary/5 transition-colors">
                                             <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">definitions get</td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
-                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Target</td>
                                             <td class="p-3 text-sm text-base-content/80">Jump to definition. Requires <span class="font-mono text-xs bg-primary/10 px-1">--uri</span> and <span class="font-mono text-xs bg-primary/10 px-1">--position</span>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
                                             <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">references list</td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
-                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Target</td>
                                             <td class="p-3 text-sm text-base-content/80">Every usage of a symbol, with <span class="font-mono text-xs bg-primary/10 px-1">--limit</span> and continuation cursors.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
                                             <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">diagnostics list</td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
-                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Target</td>
                                             <td class="p-3 text-sm text-base-content/80">Compiler warnings and language-server errors for a file or the whole workspace.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
                                             <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">symbols list</td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Sempai</td>
-                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Target</td>
                                             <td class="p-3 text-sm text-base-content/80">Structural queries via <span class="font-mono text-xs bg-primary/10 px-1">--query</span>, <span class="font-mono text-xs bg-primary/10 px-1">--expr</span>, or <span class="font-mono text-xs bg-primary/10 px-1">--rule</span>. See the <a href="/weaver/sempai/" class="text-accent-ink hover:underline">Sempai Engine</a>.</td>
                                         </tr>
-                                        <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">cards get</td>
+                                        <tr class="hover:bg-primary/5 transition-colors opacity-60">
+                                            <td class="p-3 font-mono text-xs font-bold text-base-content/82 border-r border-base-content/10">cards get <span class="status-pill status-pill-planned ml-1">Planned</span></td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Jacquard</td>
-                                            <td class="p-3 font-mono text-xs border-r border-base-content/10"><span class="status-pill status-pill-planned">Planned</span></td>
                                             <td class="p-3 text-sm text-base-content/80">Compact symbol card with bounded one-hop relations (callers, callees, imports). Progressive detail levels and cache provenance.</td>
                                         </tr>
-                                        <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">graph-slices get</td>
+                                        <tr class="hover:bg-primary/5 transition-colors opacity-60">
+                                            <td class="p-3 font-mono text-xs font-bold text-base-content/82 border-r border-base-content/10">graph-slices get <span class="status-pill status-pill-planned ml-1">Planned</span></td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Jacquard</td>
-                                            <td class="p-3 font-mono text-xs border-r border-base-content/10"><span class="status-pill status-pill-planned">Planned</span></td>
                                             <td class="p-3 text-sm text-base-content/80">Budgeted subgraph rooted at a symbol, with typed edges and explicit <span class="font-mono text-xs bg-primary/10 px-1">max_cards</span> / <span class="font-mono text-xs bg-primary/10 px-1">max_edges</span> / <span class="font-mono text-xs bg-primary/10 px-1">max_estimated_tokens</span> caps.</td>
                                         </tr>
                                     </tbody>

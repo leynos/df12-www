@@ -55,7 +55,7 @@
     sidebar.style.setProperty("--mobile-header-height", `${h}px`);
   }
 
-  var previousBodyOverflow = "";
+  var previousBodyOverflowY = "";
   var savedFocus = null;
   var focusTrapHandler = null;
 
@@ -74,8 +74,15 @@
     sidebar.classList.add("mobile-nav-open");
     btn.setAttribute("aria-expanded", "true");
     btn.setAttribute("aria-label", "Close navigation menu");
-    previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    /* Lock the vertical axis only.
+     *
+     * `style.overflow` would set both axes, momentarily replacing the
+     * `overflow-x: hidden` the body carries as a class — the clip that
+     * keeps the page from scrolling sideways — and then removing both on
+     * close. The horizontal clip should never be disturbed: the drawer
+     * only ever needed to stop the page scrolling underneath it. */
+    previousBodyOverflowY = document.body.style.overflowY;
+    document.body.style.overflowY = "hidden";
     setHeaderHeight();
 
     /* Save focus and move it into the nav */
@@ -130,7 +137,7 @@
     sidebar.classList.remove("mobile-nav-open");
     btn.setAttribute("aria-expanded", "false");
     btn.setAttribute("aria-label", "Open navigation menu");
-    document.body.style.overflow = previousBodyOverflow;
+    document.body.style.overflowY = previousBodyOverflowY;
 
     /* Remove focus trap */
     if (focusTrapHandler) {

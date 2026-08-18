@@ -14,6 +14,20 @@
   color: var(--color-white);
 }
 
+/* A slim scrollbar, asked for through the standard property rather than the
+   `-webkit-` pseudo-elements below. Chromium honours `scrollbar-width` and
+   `scrollbar-color` in preference to those, and Firefox has never supported
+   them at all, so this is the rule that actually runs on a current browser.
+   It measures 10px against the platform default of 15. The colour comes from
+   daisyUI's own `:root` declaration. */
+:root {
+  scrollbar-width: thin;
+}
+
+/* Retained as a fallback, not as dead weight: browsers predating
+   `scrollbar-width` support ignore the rule above and take these instead.
+   Where both are understood, the standard property wins and these do
+   nothing. */
 ::-webkit-scrollbar {
   width: 8px;
 }

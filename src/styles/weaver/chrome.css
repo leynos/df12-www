@@ -169,5 +169,4 @@
 .weaver-brand-mark::before {
   content: "\7e54";
   font-family: var(--font-kanji);
-  font-size: 0.7em;
 }

@@ -56,6 +56,22 @@
 
 /* ---- Mobile hamburger navigation ---- */
 
+/* Hold the scrollbar's place while the drawer is open.
+ *
+ * Opening the drawer locks the page with `overflow-y: hidden`, which takes
+ * the scrollbar away — and with it about fifteen pixels of layout viewport,
+ * so the whole page reflows wider and then snaps back on close. It is visible
+ * as the menu being wider than the page it covers.
+ *
+ * daisyUI reserves a gutter for exactly this, but scopes it to its own
+ * components: `:root:has(.modal-open, .modal[open], …, .drawer:not(.drawer-open) > .drawer-toggle:checked)`.
+ * This drawer is hand-rolled and matches none of those selectors, so it needs
+ * to say so itself. The gutter replaces the scrollbar rather than adding to
+ * it, so the layout viewport does not move. */
+:root:has(#sidebar.mobile-nav-open) {
+  scrollbar-gutter: stable;
+}
+
 /* Hide toggle button by default (visible only in mobile media query) */
 #mobile-nav-toggle {
   display: none;

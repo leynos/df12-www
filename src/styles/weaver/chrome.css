@@ -7,18 +7,6 @@
  * visible.
  */
 
-/* daisyUI paints the root scrollbar with `scrollbar-color`, and Chromium
-   honours the standard property in preference to the `::-webkit-scrollbar`
-   pseudo-elements this sub-site has always used. Returning it to its initial
-   value hands control back to those rules.
-
-   This sits in the components layer rather than beside them in `base`,
-   because daisyUI's declaration is itself in `base` and lands after this
-   file's imports; a later layer is the only way to reach past it. */
-:root {
-  scrollbar-color: auto;
-}
-
 .grid-bg {
   background-image:
     linear-gradient(

@@ -6,59 +6,74 @@
 {% block content %}
 
             <!-- Hero Section -->
-            <section id="hero" class="relative pt-16 px-8 lg:px-16 lg:pt-24 border-b border-base-content/20 overflow-hidden">
+            <section id="hero" class="relative border-b border-base-content/20 overflow-hidden">
+                <!-- Desktop backdrop: the loom fills the hero; text sits in its clear left field -->
+                <div class="absolute inset-0 hidden lg:block pointer-events-none" aria-hidden="true">
+                    <img
+                        src="/weaver/assets/home/home-hero-loom-architecture.png"
+                        alt=""
+                        class="w-full h-full object-cover object-[30%_40%]"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-r from-base-100/95 from-15% via-base-100/70 via-50% to-transparent to-85%"></div>
+                </div>
 
-                <div class="masthead-frame mx-auto relative z-10">
-                    <div class="max-w-3xl">
-                        <div class="masthead-eyebrow mb-8">
-                            <span class="w-2 h-2 bg-accent rounded-full"></span>
-                            <span class="font-mono text-xs tracking-widest uppercase text-base-content">Weaver CLI &mdash; 0.1.0 target</span>
-                        </div>
-
-                        <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
-                            CLI tooling for <br>
-                            <span class="text-accent-ink italic font-light">code-aware</span> agents.
-                        </h1>
-
-                        <p class="font-sans text-lg text-base-content/80 leading-relaxed mb-8 max-w-lg font-light">
-                            Weaver turns semantic code operations into shell primitives. Query symbols structurally, pipe the matches through <code class="text-sm bg-primary/10 px-1">jq</code>, and hand them to a rename &ndash; every command has one readable renderer and one stable <code class="text-sm bg-primary/10 px-1">--json</code> contract, with Double-Lock and Birdcage constraining the risky parts.
-                        </p>
-
-                        <p class="font-mono text-xs text-base-content/75 leading-relaxed mb-8 max-w-lg">
-                            Weaver is in active early development. These pages document the v0.1.0 target surface; the prototype grammar it replaces is not preserved.
-                        </p>
-
-                        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                            <!-- CLI Install Command Box -->
-                            <div class="relative group">
-                                <div class="absolute -inset-0.5 bg-accent rounded-xs blur-sm opacity-20 group-hover:opacity-40 transition duration-200"></div>
-                                <div class="relative flex items-center bg-neutral text-base-100 font-mono text-sm px-6 py-4 rounded-xs border border-base-content shadow-lg">
-                                    <span class="text-accent-ink mr-3">$</span>
-                                    <span class="mr-8">cargo install weaver</span>
-                                    {#- Wired the same way as the three copy buttons on the install
-                                        page: an inline handler, because no Weaver page loads a
-                                        copy-button script. Until now this one only looked the part. -#}
-                                    <button class="text-base-content/82 hover:text-white transition-colors" title="Copy to clipboard" onclick="df12WeaverCopy('cargo install weaver')">
-                                        {{ icon('copy') }}
-                                    </button>
-                                </div>
+                <div class="relative z-10 pt-16 pb-12 px-8 lg:px-16 lg:pt-24 lg:pb-24">
+                    <div class="masthead-frame mx-auto">
+                        <div class="max-w-3xl lg:max-w-xl">
+                            <div class="masthead-eyebrow mb-8">
+                                <span class="w-2 h-2 bg-accent rounded-full"></span>
+                                <span class="font-mono text-xs tracking-widest uppercase text-base-content">Weaver CLI &mdash; 0.1.0 target</span>
                             </div>
-                            <a href="/weaver/install/" class="px-6 py-4 font-mono text-sm font-bold text-base-content border border-base-content hover:bg-primary hover:text-base-100 transition-all uppercase tracking-wide">
-                                Quick Start {{ icon('arrow-right', 'ml-2') }}
-                            </a>
+
+                            <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
+                                CLI tooling for <br>
+                                <span class="text-accent-ink italic font-light">code-aware</span> agents.
+                            </h1>
+
+                            <p class="font-sans text-lg text-base-content/80 leading-relaxed mb-8 max-w-lg font-light">
+                                Weaver turns semantic code operations into shell primitives. Query symbols structurally, pipe the matches through <code class="text-sm bg-primary/10 px-1">jq</code>, and hand them to a rename &ndash; every command has one readable renderer and one stable <code class="text-sm bg-primary/10 px-1">--json</code> contract, with Double-Lock and Birdcage constraining the risky parts.
+                            </p>
+
+                            <p class="font-mono text-xs text-base-content/75 leading-relaxed mb-8 max-w-lg">
+                                Weaver is in active early development. These pages document the v0.1.0 target surface; the prototype grammar it replaces is not preserved.
+                            </p>
+
+                            <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                                <!-- CLI Install Command Box -->
+                                <div class="relative group">
+                                    <div class="absolute -inset-0.5 bg-accent rounded-xs blur-sm opacity-20 group-hover:opacity-40 transition duration-200"></div>
+                                    <div class="relative flex items-center bg-neutral text-base-100 font-mono text-sm px-6 py-4 rounded-xs border border-base-content shadow-lg">
+                                        <span class="text-accent-ink mr-3">$</span>
+                                        <span class="mr-8">cargo install weaver</span>
+                                        {#- Wired the same way as the three copy buttons on the install
+                                            page: an inline handler, because no Weaver page loads a
+                                            copy-button script. Until now this one only looked the part. -#}
+                                        <button class="text-base-content/82 hover:text-white transition-colors" title="Copy to clipboard" onclick="df12WeaverCopy('cargo install weaver')">
+                                            {{ icon('copy') }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <a href="/weaver/install/" class="px-6 py-4 font-mono text-sm font-bold text-base-content border border-base-content hover:bg-primary hover:text-base-100 transition-all uppercase tracking-wide">
+                                    Quick Start {{ icon('arrow-right', 'ml-2') }}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Hero Banner: Blueprint / Loom Metaphor, full bleed -->
-                <div class="relative mt-12 lg:mt-16 -mx-8 lg:-mx-16 border-t-2 border-base-content">
-                    <div class="absolute top-3 left-8 lg:left-16 z-10 bg-base-100 text-3xs font-mono text-base-content border border-base-content px-1">FIG 1.0: ARCHITECTURE</div>
+                <!-- Desktop figure furniture -->
+                <div class="absolute top-3 right-8 lg:right-16 z-10 bg-base-100 text-3xs font-mono text-base-content border border-base-content px-1 hidden lg:block">FIG 1.0: ARCHITECTURE</div>
+                <div class="absolute bottom-3 right-8 lg:right-16 z-10 font-mono text-3xs text-base-content/82 bg-base-100/80 px-1 hidden lg:block">SCALE: 1:1</div>
+
+                <!-- Below lg: the loom as a banner strip under the text -->
+                <div class="relative border-t-2 border-base-content lg:hidden">
+                    <div class="absolute top-3 left-8 z-10 bg-base-100 text-3xs font-mono text-base-content border border-base-content px-1">FIG 1.0: ARCHITECTURE</div>
                     <img
                         src="/weaver/assets/home/home-hero-loom-architecture.png"
                         alt="Illustrated loom fused with a software architecture diagram, showing indigo and vermilion threads moving through a daemon-like central hub with blueprint measurements and wave motifs."
-                        class="w-full h-48 sm:h-64 lg:h-96 object-cover"
+                        class="w-full h-48 sm:h-64 object-cover"
                     >
-                    <div class="absolute bottom-3 right-8 lg:right-16 font-mono text-3xs text-base-content/82 bg-base-100/80 px-1">SCALE: 1:1</div>
+                    <div class="absolute bottom-3 right-8 font-mono text-3xs text-base-content/82 bg-base-100/80 px-1">SCALE: 1:1</div>
                 </div>
             </section>
 

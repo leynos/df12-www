@@ -138,12 +138,22 @@
       focusTrapHandler = null;
     }
 
-    /* Restore focus */
-    if (savedFocus && typeof savedFocus.focus === "function") {
-      savedFocus.focus();
-    } else {
-      btn.focus();
-    }
+    /* Restore focus.
+     *
+     * `<body>` is not a focus holder worth returning to. It is what
+     * `document.activeElement` reports when nothing is focused, which is the
+     * usual case for someone who opened the drawer by tapping it: the saved
+     * element is the body, `body.focus()` does nothing, and focus is left on
+     * a nav link inside a drawer that has just been hidden. Falling back to
+     * the toggle puts it somewhere the reader can see and use. */
+    var restoreTo =
+      savedFocus &&
+      savedFocus !== document.body &&
+      savedFocus.isConnected &&
+      typeof savedFocus.focus === "function"
+        ? savedFocus
+        : btn;
+    restoreTo.focus();
     savedFocus = null;
   }
 

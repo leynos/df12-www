@@ -578,6 +578,7 @@ button.hm-config-keys__label {
      fall across its neighbours now that they touch. */
   .hm-config-keys__panel.is-preview {
     border-color: var(--netsuke-indigo-light);
+    filter: brightness(1.3);
   }
 }
 

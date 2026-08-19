@@ -208,7 +208,7 @@ targets:
                     <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
                         <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">2</div>
                         <h4 class="font-bold text-charcoal mb-2">Recipe field</h4>
-                        <p class="text-sm text-charcoal-mid">A rule carries exactly one recipe: <code class="font-mono text-xs">command</code> or <code class="font-mono text-xs">script</code>.</p>
+                        <p class="text-sm text-charcoal-mid">A rule carries exactly one recipe: <code class="font-mono text-xs">command</code> or <code class="font-mono text-xs">script</code>. A <code class="font-mono text-xs">command</code> may be one shell string or an ordered list of commands chained fail-fast with <code class="font-mono text-xs">&amp;&amp;</code>.</p>
                     </div>
                     <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
                         <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">3</div>
@@ -251,6 +251,16 @@ targets:
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Dependencies that must run first but do not trigger rebuilds when they change.</td>
                             </tr>
                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">dependency_order</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">serial</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Scheduling policy for the <code>deps</code> list. <code>parallel</code> (the default) keeps Ninja's ordinary concurrent scheduling; <code>serial</code> runs the direct dependencies in declaration order.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">description</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">"Package a release"</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Discovery metadata shown by <code>netsuke help targets</code>. On a rule, <code>description</code> instead drives Ninja's progress display.</td>
+                            </tr>
+                            <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">phony / always</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">true / false</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Control whether a target is logical only or should run every time.</td>
@@ -274,6 +284,71 @@ targets:
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Serial dependency ordering -->
+            <section id="serial-ordering" class="mb-16">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal">Serial dependency ordering</h2>
+                    <span class="text-xs font-mono text-matcha bg-matcha/10 px-2 py-1 rounded">New in v{% endraw %}{{ netsuke_version }}{% raw %}</span>
+                </div>
+
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Targets and actions accept <code class="font-mono text-sm">dependency_order</code>. Omit it, or set it to
+                    <code class="font-mono text-sm">parallel</code>, to keep Ninja's ordinary concurrent scheduling. Set it to
+                    <code class="font-mono text-sm">serial</code> when the direct <code class="font-mono text-sm">deps</code> list is an ordered
+                    workflow: each dependency starts only after the preceding one succeeds, and if an earlier dependency fails,
+                    later ones in the list do not start through the serial path.
+                </p>
+
+                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-8">
+                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber"></div>
+                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                        </div>
+                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
+                        <div class="w-12"></div>
+                    </div>
+                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+actions:
+  - name: check-fmt
+    command: "make check-fmt"
+  - name: lint
+    command: "make lint"
+  - name: test
+    command: "make test"
+  - name: all
+    command: ":"
+    dependency_order: serial
+    deps:
+      - check-fmt
+      - lint
+      - test
+{% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">What serial ordering guarantees</h3>
+                        <ul class="space-y-2 text-sm text-charcoal-mid">
+                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Direct <code>deps</code> run in declaration order, each starting only after the previous one succeeds.</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Repeated or shared dependencies still execute at most once in the Ninja invocation.</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A failed dependency stops later entries from starting through the serial path.</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">What to watch for</h3>
+                        <ul class="space-y-2 text-sm text-charcoal-mid">
+                            <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Only the direct <code>deps</code> list is serialized &mdash; not <code>sources</code>, <code>order_only_deps</code>, or unrelated work. A dependency reachable through another path can still start there; use a dedicated aggregate action when the whole workflow must share one ordered entry point.</span></li>
+                            <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Serial lists with two or more dependencies use Ninja's <code>dyndep</code> support and require Ninja 1.10 or newer.</span></li>
+                            <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Netsuke materializes content-addressed sidecars under <code>.netsuke/dyndep</code>; the paths <code>.netsuke/serial</code> and <code>.netsuke/dyndep</code> are reserved and must not appear in the build graph.</span></li>
+                        </ul>
                     </div>
                 </div>
             </section>

@@ -203,6 +203,13 @@ defaults:
                                 </td>
                             </tr>
                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">description</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">String</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">
+                                    On a rule, the text Ninja shows in its progress display. On a target or action, discovery metadata surfaced by <code class="bg-stone-light/30 px-1 rounded">netsuke help targets</code>.
+                                </td>
+                            </tr>
+                            <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">defaults</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">List of String</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
@@ -272,9 +279,9 @@ targets:
                             <div class="border-l-2 border-indigo pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
                                     <code class="font-mono font-bold text-indigo">command</code>
-                                    <span class="text-xs text-charcoal-light font-mono">String</span>
+                                    <span class="text-xs text-charcoal-light font-mono">String or List of String</span>
                                 </div>
-                                <p class="text-sm text-charcoal-mid mt-1">A single shell command string. Use <code>{{ ins }}</code> for quoted inputs and <code>{{ outs }}</code> for quoted outputs. Interpolated values are shell-escaped by default.</p>
+                                <p class="text-sm text-charcoal-mid mt-1">One shell command string, or an ordered list of commands run in declaration order and stopped at the first non-zero exit &mdash; the fail-fast behaviour of a handwritten <code>&amp;&amp;</code> chain. Each entry sees the same Jinja context; use <code>{{ ins }}</code> for quoted inputs and <code>{{ outs }}</code> for quoted outputs. An empty command list is rejected at parse time.</p>
                             </div>
                             <div class="border-l-2 border-indigo pl-4 py-1">
                                 <div class="flex items-baseline justify-between">

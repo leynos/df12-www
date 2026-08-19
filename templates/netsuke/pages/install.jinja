@@ -121,7 +121,7 @@ $ sudo apt install ./PACKAGE.deb
 $ sudo dnf install ./PACKAGE.rpm
 {% endraw %}{% endhighlight %}{% raw %}
                     </div>
-                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture. Standalone binaries with SHA-256 checksum sidecars are also published; the installer packages themselves do not have checksum sidecars in v{% endraw %}{{ netsuke_version }}{% raw %}.</p>
+                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture. Standalone binaries with SHA-256 checksum sidecars are also published, and each standalone release archive stages shell completions for Bash, Elvish, Fish, PowerShell, and Zsh under <code>completions/&lt;shell&gt;/</code> &mdash; the installer packages do not install completion files. The installer packages themselves do not have checksum sidecars in v{% endraw %}{{ netsuke_version }}{% raw %}.</p>
                 </div>
 
                 <!-- macOS panel -->
@@ -146,7 +146,7 @@ $ brew install ninja
                 <div class="p-8 lg:p-10 hidden" id="install-panel-windows" data-install-panel="windows" role="tabpanel" aria-labelledby="install-tab-windows">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Windows installer</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-indigo hover:underline">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts.</p>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-indigo hover:underline">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts. An MSI product version cannot carry a pre-release suffix, so every beta in the 0.1.0 series shares the numeric version <code>0.1.0</code>: installing a later pre-release MSI replaces the existing installation rather than sitting alongside it.</p>
                     </div>
                     <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'powershell' %}{% raw %}

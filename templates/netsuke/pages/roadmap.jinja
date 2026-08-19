@@ -32,7 +32,7 @@
                     </div>
                     <p class="text-charcoal-mid mb-6 max-w-3xl">
                         The core build-system compiler is implemented and packaged for Linux, macOS, and Windows.
-                        The first public release covers:
+                        The public beta releases so far cover:
                     </p>
                     <div class="grid md:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
@@ -42,6 +42,7 @@
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Jinja variables, macros, <code>foreach</code>, <code>when</code>, and globbing</span></li>
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Environment helpers, executable discovery, and opt-in network helpers</span></li>
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Rules, targets, actions, defaults, and explicit, implicit, and order-only dependencies</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordered <code>command</code> lists with fail-fast <code>&amp;&amp;</code> chaining, and <code>description</code> metadata on rules, targets, and actions</span></li>
                             </ul>
                         </div>
                         <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
@@ -50,6 +51,7 @@
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A deterministic build graph with duplicate-output, missing-rule, and cycle checks</span></li>
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ninja generation and execution, plus <code>clean</code> and standalone manifest generation</span></li>
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency graphs as Graphviz DOT or self-contained, accessible HTML</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Serial dependency ordering with <code>dependency_order: serial</code>, backed by Ninja dyndep</span></li>
                             </ul>
                         </div>
                         <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
@@ -57,6 +59,8 @@
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Layered configuration, localized output, and accessibility preferences</span></li>
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Progress reporting, stage timings, and versioned JSON results or diagnostics</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A <code>netsuke help targets</code> catalogue of targets and actions</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Configuration-selection diagnostics and bounded metrics under <code>--verbose</code></span></li>
                             </ul>
                         </div>
                         <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
@@ -213,13 +217,13 @@
                         </h3>
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-charcoal">v{% endraw %}{{ netsuke_version }}{% raw %}</span></div>
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Release date</span><span class="font-mono text-charcoal">5 August 2026</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Release date</span><span class="font-mono text-charcoal">19 August 2026</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Licence</span><span class="font-mono text-charcoal">ISC</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Rust (source builds)</span><span class="font-mono text-charcoal">nightly-2026-06-25</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Crate</span><span class="font-mono text-charcoal">netsuke-build</span></div>
                         </div>
                         <div class="mt-5 pt-4 border-t border-stone-light space-y-2">
-                            <a href="https://github.com/leynos/netsuke/releases" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">Release notes &amp; installers (from 5 August 2026)</a>
+                            <a href="https://github.com/leynos/netsuke/releases" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">Release notes &amp; installers<br>(from 19 August 2026)</a>
                             <a href="/netsuke/install/" class="block w-full py-2 px-4 bg-transparent border border-stone text-charcoal text-center rounded text-sm font-bold hover:bg-boxwood-pale transition-colors">Install Netsuke</a>
                         </div>
                     </div>
@@ -228,7 +232,7 @@
                     <div class="bg-charcoal rounded-xl overflow-hidden">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Canonical vocabulary (target state)</div>
                         <div class="p-5 font-mono text-xs text-stone-light space-y-1">
-                            <div><span class="text-stone-light">Shipped:</span> <span class="text-matcha">build</span> · <span class="text-matcha">check</span> · <span class="text-matcha">clean</span> · <span class="text-matcha">generate</span> · <span class="text-matcha">graph</span></div>
+                            <div><span class="text-stone-light">Shipped:</span> <span class="text-matcha">build</span> · <span class="text-matcha">check</span> · <span class="text-matcha">clean</span> · <span class="text-matcha">generate</span> · <span class="text-matcha">graph</span> · <span class="text-matcha">help targets</span></div>
                             <div><span class="text-stone-light">Planned:</span> <span class="text-amber">context</span> · <span class="text-amber">skill-path</span> · <span class="text-amber">runs</span> · <span class="text-amber">profile</span> · <span class="text-amber">feedback</span></div>
                             <div class="pt-2 text-charcoal-light">--json · --no-input · --force · --dry-run</div>
                             <div class="text-charcoal-light">--limit · --cursor · --output · --deliver</div>

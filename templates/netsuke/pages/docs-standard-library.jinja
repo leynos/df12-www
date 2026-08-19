@@ -174,7 +174,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">glob</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Finds workspace paths matching a pattern. Host-observing: results depend on workspace contents and platform. Use sparingly to maintain explicit dependencies.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Finds workspace paths matching a pattern, including parent-relative patterns such as <code>glob('../shared/*.h')</code>. Expansion holds only the authority of the pattern's literal directory prefix; a match reached through a symbolic link that escapes the prefix is skipped. Host-observing: results depend on workspace contents and platform. Use sparingly to maintain explicit dependencies.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             glob('src/*.c')
                         </div>
@@ -391,6 +391,8 @@
                         <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                             Resolves executables using the current <code>PATH</code> without marking the template impure.
                             Available as both a filter (<code>{{ 'clang++' | which }}</code>) and a function (<code>{{ which('clang++') }}</code>).
+                            On Windows, an extensionless name is matched against the effective <code>PATHEXT</code>, so <code>which('cargo')</code> finds <code>cargo.exe</code>.
+                            Set <code>NETSUKE_WHICH_WORKSPACE=0</code> to disable the workspace-tree fallback search used when a command is absent from <code>PATH</code>.
                         </p>
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>

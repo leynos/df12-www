@@ -180,6 +180,21 @@ $ netsuke \
                     </div>
                 </div>
 
+                <div class="bg-boxwood-pale border-l-4 border-indigo p-6 rounded-r-lg mb-12">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <span class="iconify text-indigo mt-1" data-icon="carbon:folder-shared" aria-hidden="true"></span>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-sm font-bold text-charcoal">Scoped glob authority</h3>
+                            <div class="mt-2 text-sm text-charcoal-mid space-y-2">
+                                <p>Since v{% endraw %}{{ netsuke_version }}{% raw %}, the filesystem capability used for <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">glob()</code> metadata checks is opened at the pattern's longest literal directory prefix &mdash; not at the filesystem root or the working directory &mdash; so glob expansion holds only the authority its pattern can reach.</p>
+                                <p>A pattern whose literal prefix is missing, or names something other than a directory, expands to no matches. A match reached through a symbolic link that resolves outside the prefix, or dangles, is skipped rather than failing the expansion; a cyclic symbolic link still fails it, and a literal prefix that is itself a symbolic link cannot establish the capability, so the expansion fails. Glob tracing redacts caller-controlled path fields as <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">&lt;redacted&gt;</code>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Security Chart -->
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Vulnerability Mitigation</h3>

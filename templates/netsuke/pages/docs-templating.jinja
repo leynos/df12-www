@@ -207,6 +207,7 @@ defaults:
                             <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Undefined values are errors, not silent empty strings.</span></li>
                             <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Only <code>{{ ins }}</code> and <code>{{ outs }}</code> are automatically quoted for the host shell; other rendered values are not.</span></li>
                             <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Structural statements such as <code>{% for %}</code> cannot reshape the YAML document. Use <code>foreach</code>, <code>when</code>, and declared macros instead.</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>vars</code> keys named <code>env</code> or <code>glob</code> are rejected at parse time &mdash; they would silently shadow the built-in helpers of the same name. The error names the offending key.</span></li>
                         </ul>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">

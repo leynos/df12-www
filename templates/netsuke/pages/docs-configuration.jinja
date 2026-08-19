@@ -122,6 +122,7 @@
                             <li>User configuration directories (e.g. <code>$XDG_CONFIG_HOME</code>)</li>
                         </ol>
                         <p class="text-xs text-charcoal-mid mt-3">CLI-only controls such as <code>--config</code>, <code>--directory</code>, and subcommands are not read from configuration files.</p>
+                        <p class="text-xs text-charcoal-mid mt-3">When discovery finds no file, Netsuke uses its built-in defaults. When it finds a file that cannot be loaded &mdash; malformed TOML, for example &mdash; it reports the load error rather than treating the broken file as absent. An explicit <code>--config</code> or <code>NETSUKE_CONFIG</code> selection that is missing or invalid is likewise an error; Netsuke does not fall back to discovery.</p>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                         <h3 class="font-bold text-charcoal mb-3 text-sm flex items-center">

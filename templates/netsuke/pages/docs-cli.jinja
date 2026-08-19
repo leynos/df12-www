@@ -187,6 +187,19 @@
                             </div>
                         </div>
 
+                        <div id="help-targets" class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden group hover:border-indigo transition-colors">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-mono text-lg font-bold text-charcoal">help targets</h3>
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-indigo/10 text-indigo">Discovery</span>
+                                </div>
+                                <p class="text-charcoal-mid text-sm mb-4">Prints the target and action catalogue for the selected manifest &mdash; actions first, then targets &mdash; with a <code>[★ default]</code> marker on manifest defaults and each entry's <code>description</code> metadata. The manifest is loaded and validated through the same stages as a build, but no recipes run and no outputs are created; rendering uses a restricted, side-effect-free Jinja surface that rejects <code>env()</code>, <code>glob()</code>, and other host-observing helpers. Honours <code>--file</code>, <code>-C</code>, and the usual colour, accessibility, locale, and <code>--json</code> conventions, and works without Ninja installed.</p>
+                            </div>
+                            <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
+                                netsuke help targets
+                            </div>
+                        </div>
+
                         <div id="clean-maintenance" class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden group hover:border-indigo transition-colors">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-2">
@@ -427,7 +440,10 @@ Success: Build complete.
                     All user-facing text in Netsuke &mdash; help messages, status lines, error explanations, hints &mdash; is externalised into
                     <a href="https://projectfluent.org/" class="text-indigo hover:underline">Fluent</a> <code>.ftl</code> resource files.
                     This means the entire CLI can be translated to a new language without changing a line of Rust.
-                    Spanish (<code>es-ES</code>) ships as a reference translation; unsupported locales fall back to English (<code>en-US</code>).
+                    Thirty-five locale catalogues ship, from Arabic (<code>ar</code>) to Traditional Chinese (<code>zh-Hant</code>).
+                    Catalogues are selected by exact locale tag with deliberate per-language fallback rules, so
+                    <code>es-419</code> and <code>es-ES</code>, <code>pt-BR</code> and <code>pt-PT</code>, and <code>zh-Hans</code> and <code>zh-Hant</code>
+                    stay distinct; unsupported locales fall back to English (<code>en-US</code>), the source locale.
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
@@ -534,6 +550,10 @@ error-file-not-found = Error: File "{ $path }" was not found.
                                     <li class="flex items-start">
                                         <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
                                         <span><strong>Template failure:</strong> A variable or macro expanded unexpectedly. Check the rendered string fields and the <code>vars</code> precedence.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
+                                        <span><strong>Surprising configuration:</strong> Run with <code>--verbose</code> to see whether <code>--config</code>, <code>NETSUKE_CONFIG</code>, or automatic discovery selected the configuration, and a bounded metrics snapshot after the command completes.</span>
                                     </li>
                                 </ul>
                             </div>

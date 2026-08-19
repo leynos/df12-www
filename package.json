@@ -19,7 +19,7 @@
     "bump": "uv run pages bump"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.7",
+    "@biomejs/biome": "2.5.8",
     "@tailwindcss/cli": "^4.1.15",
     "@tailwindcss/typography": "^0.5.19",
     "@types/bun": "latest",

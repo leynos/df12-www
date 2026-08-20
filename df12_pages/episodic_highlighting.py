@@ -43,7 +43,19 @@ from pygments.token import (
 
 
 class EpisodicStyle(Style):
-    """Pygments style drawn from the Episodic signal palette."""
+    """Render Pygments tokens using Episodic's accessible signal palette.
+
+    The style reserves the site's signal colours for their established roles
+    and keeps every emitted token colour legible on the code surface. The
+    companion generator serializes this mapping into the tracked Episodic
+    syntax stylesheet; edit this source class and regenerate that output rather
+    than hand-editing CSS token rules.
+
+    Notes
+    -----
+    This class is the sole source for the generated token rules in
+    ``src/static/episodic/assets/styles/syntax.css``.
+    """
 
     name = "episodic"
     background_color = "#08090a"

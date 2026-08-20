@@ -204,7 +204,7 @@ kbd {
 
 code {
   font-size: 0.88em;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 button {
@@ -219,7 +219,6 @@ button {
 :focus-visible {
   outline: 0.19rem solid var(--color-signal-cyan);
   outline-offset: 0.22rem;
-  border-radius: 0.1rem;
 }
 
 ::selection {

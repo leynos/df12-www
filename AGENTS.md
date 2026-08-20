@@ -144,9 +144,11 @@ Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
 build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which
 runs Pygments and emits token classes. The colours come from a Pygments `Style`
 (`EpisodicStyle`, `HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is
-generated, not handwritten — rerun `scripts/generate_himotoshi_pygments_css.py`
-or `scripts/generate_stilyagi_pygments_css.py` after changing a style, and
-never edit the marked block by hand.
+generated, not handwritten — rerun
+`scripts/generate_episodic_pygments_css.py`,
+`scripts/generate_himotoshi_pygments_css.py`, and
+`scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
+edit the marked block by hand.
 
 Stilyagi's palette is split by role rather than by hue: `--press-red` paints
 fills, borders, and stamps, while red *type* uses `--accent-text`, which each

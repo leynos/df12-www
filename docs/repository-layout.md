@@ -131,11 +131,11 @@ build output and are overwritten on the next build.
 ### `templates/`
 
 Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `episodic/`,
-`netsuke/`, `weaver/`, `stilyagi/`) holds the template wrapper for that
-sub-site's design system, including `shared_content_page.jinja` and a
-`partials/` directory for shared macros and components. Stilyagi instead
-centralizes its chrome in a `_layout.jinja` that every page extends. These are
-distinct from the main-site templates in `df12_pages/templates/`.
+`netsuke/`, `weaver/`, `stilyagi/`) holds the templates for that sub-site's
+design system. Episodic and Netsuke keep shared macros in `components.jinja`,
+and Stilyagi centralizes its chrome in `_layout.jinja` that every page
+extends. These are distinct from the main-site templates in
+`df12_pages/templates/`.
 
 ### `tests/`
 

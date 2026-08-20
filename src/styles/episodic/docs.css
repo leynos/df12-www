@@ -164,8 +164,8 @@
 
 .command-list dt code {
   display: inline-block;
-  overflow-x: auto;
   max-width: 100%;
+  overflow-wrap: anywhere;
   padding: 0.2rem 0.5rem;
   border: 1px solid var(--color-edge-soft);
   border-radius: var(--radius-field);

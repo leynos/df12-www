@@ -4,7 +4,9 @@
   A page sets `page_eyebrow`, `page_title`, `page_lede`, `page_trail`, and
   optionally `page_sections`, then fills the `sections` block. The intro is
   fixed because the site map requires every page to state its job in one
-  sentence before anything else.
+  sentence before anything else. The `rec` namespace and inherited `ui`
+  namespace are provided to child `sections` blocks; do not remove either
+  binding without adding the corresponding child imports.
 #}
 {% extends "_layout.jinja" %}
 {% import "records.jinja" as rec %}

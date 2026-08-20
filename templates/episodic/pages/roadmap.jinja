@@ -1,14 +1,23 @@
-{% set page_eyebrow = "Delivery" %}
-{% set page_title = "What is complete, what is active, and what is still planned" %}
-{% set page_lede = "Six phases and 120 tasks, projected from the upstream roadmap at build time. This site keeps no second set of completion states." %}
-{% set page_trail = [{"label": "Roadmap"}] %}
-{% extends "pages/_page.jinja" %}
 {% from "data/roadmap.jinja" import roadmap_phases, roadmap_totals %}
 {% from "data/status.jinja" import source_base %}
+{% set phase_summary %}
+  {% for phase in roadmap_phases %}Phase {{ phase.number }} is {{ phase.state | replace("-", " ") }}{{ "; " if not loop.last else "." }}{% endfor %}
+{% endset %}
+{% set page_eyebrow = "Delivery" %}
+{% set page_title = "What is complete, what is active, and what is still planned" %}
+{% set page_lede = roadmap_phases | length ~ " phases and " ~ roadmap_totals.total ~ " tasks, projected from the upstream roadmap at build time. This site keeps no second set of completion states." %}
+{% set page_trail = [{"label": "Roadmap"}] %}
+{% set page_sections = [
+  {"id": "summary", "title": "Where delivery stands"},
+  {"id": "recent", "title": "Recently completed"},
+  {"id": "phases", "title": "Every phase, task by task"},
+  {"id": "reading", "title": "Reading this roadmap"}
+] %}
+{% extends "pages/_page.jinja" %}
 
 {% block sections %}
   {{ ui.section_open(1, "summary", "Where delivery stands",
-     roadmap_totals.done ~ " of " ~ roadmap_totals.total ~ " tasks complete. Phase 1 is finished; phases 2 and 4 are partly built.") }}
+     roadmap_totals.done ~ " of " ~ roadmap_totals.total ~ " tasks complete. " ~ phase_summary | trim) }}
     <ol class="phase-preview">
       {% for phase in roadmap_phases %}
       <li class="phase-preview__item">

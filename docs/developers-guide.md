@@ -4,7 +4,8 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Netsuke and Stilyagi sub-sites is generated, the shared Jinja macros and the
+Episodic, Netsuke, and Stilyagi sub-sites is generated, the shared Jinja
+macros and the
 component classes they pair with, the convention used for browser-side
 components, the cascade quirks introduced by the Netsuke and Weaver sub-sites'
 use of the Tailwind Play content delivery network (CDN), and how accessibility
@@ -14,7 +15,8 @@ is checked. It does not restate deployment or OpenTofu guidance, which lives in
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
 [df12 Pages App Design](df12-pages-app-design.md). For Tailwind and daisyUI
-conventions used by the main site and the mxd and Episodic sub-sites, see the
+conventions used by the main site, the mxd sub-site, and the Episodic
+sub-site, see the
 [Tailwind v4 guide](tailwind-v4-guide.md) and the
 [daisyUI v5 guide](daisyui-v5-guide.md). Documentation formatting itself
 follows the [documentation style guide](documentation-style-guide.md).
@@ -226,17 +228,19 @@ together on the Episodic, Netsuke, and Stilyagi sub-sites, referenced from the
 
 ### 4.1. Styles, lexers, and the highlight tag
 
-Code blocks on both sub-sites are highlighted at build time by the Jinja tag
-`{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
-`df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
-`pygments.highlight` with the named lexer, and wraps the result in a
-`<div class="hm-syntax">` (or the named class, when a second argument is given)
-using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
-syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
-must be wrapped in `{% raw %}` inside the tag.
+Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
+build time by the Jinja tag `{% highlight '<lexer>'[, '<class>'] %} ... {%
+endhighlight %}`, implemented in `df12_pages/jinja_highlight.py`. The tag
+dedents its body, runs it through `pygments.highlight` with the named lexer,
+and wraps the result in a `<div class="hm-syntax">` (or the named class, when
+a second argument is given) using `pygments.formatters.html.HtmlFormatter`.
+Source text containing Jinja syntax of its own — every `Netsukefile` example
+with `{{ ins }}` placeholders — must be wrapped in `{% raw %}` inside the tag.
 
-Two Pygments styles supply the colours:
+Three Pygments styles supply the colours:
 
+- `EpisodicStyle` in `df12_pages/episodic_highlighting.py`, for the Episodic
+  sub-site.
 - `HimotoshiStyle` in `df12_pages/highlighting.py`, for the Netsuke sub-site.
   The module also defines `NetsukeLexer` (YAML with embedded Jinja, for
   `Netsukefile` manifests) and `NetsukeConsoleLexer` (`$`-prompted shell
@@ -245,20 +249,23 @@ Two Pygments styles supply the colours:
 - `StilyagiStyle` in `df12_pages/stilyagi_highlighting.py`, for the Stilyagi
   sub-site.
 
-Both styles and the two custom lexers are registered with Pygments through the
-`pygments.lexers` and `pygments.styles` entry points in `pyproject.toml`, so
-`get_lexer_by_name("netsuke")` and `get_style_by_name("stilyagi")` resolve
-anywhere in the pipeline without an explicit import.
+`EpisodicStyle` is imported directly by the Episodic generator. The Netsuke
+custom lexers and the `HimotoshiStyle` and `StilyagiStyle` classes are
+registered with Pygments through the `pygments.lexers` and `pygments.styles`
+entry points in `pyproject.toml`, so `get_lexer_by_name("netsuke")` and
+`get_style_by_name("stilyagi")` resolve anywhere in the pipeline without an
+explicit import.
 
 ### 4.2. The shared helper and the division of responsibility
 
 `scripts/pygments_css.py` provides
 `token_rules(formatter, style, css_class, prefix, bold_weight)`, the single
 translation from a Pygments `Style` to CSS rules, shared by
-`scripts/generate_himotoshi_pygments_css.py` and
+`scripts/generate_episodic_pygments_css.py`,
+`scripts/generate_himotoshi_pygments_css.py`, and
 `scripts/generate_stilyagi_pygments_css.py`. Site-specific chrome —
 backgrounds, padding, media queries, the surrounding wrapper markup — stays in
-each generator, since that is where the two sub-sites genuinely diverge; only
+each generator, since that is where the three sub-sites genuinely diverge; only
 the token-to-selector translation is shared.
 
 The module exports two functions. Everything else in it is private and may be
@@ -306,7 +313,7 @@ uninteresting rather than obviously wrong. This exact defect shipped on
 twenty-one Netsuke pages — comments, strings, numbers, and keyword constants
 all rendering at body colour — before it was found; see the addendum to the
 [Netsuke update execution plan](execplans/netsuke-update.md). `token_rules`
-exists specifically to close this gap for both sub-sites, and
+exists specifically to close this gap for all three sub-sites, and
 `scripts/pygments_css.py`'s module docstring documents the same risk for
 Stilyagi.
 
@@ -327,30 +334,35 @@ long as the style declares parents before children.
   added inside the marked block by hand; it is why that rule is now emitted by
   `generate_himotoshi_pygments_css.py` itself, alongside the generated token
   rules.
-- Rerun the relevant generator after any change to `HimotoshiStyle` or
-  `StilyagiStyle`.
+- Rerun the relevant generator after any change to `EpisodicStyle`,
+  `HimotoshiStyle`, or `StilyagiStyle`.
 - The generators write to the tracked source under `src/static/` —
-  `src/static/netsuke/assets/css/himotoshi.css` and
-  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`. Writing
-  to `public/` would lose the change on the next clean build.
+  `src/static/episodic/assets/styles/syntax.css`,
+  `src/static/netsuke/assets/css/himotoshi.css`, and
+  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`.
+  Writing to `public/` would lose the change on the next clean build.
 - A test asserts the committed marked block matches what the generator would
   produce (`test_committed_stylesheet_matches_the_generator` in each test
   module below). A stale stylesheet fails the commit gates.
-- Both generated stylesheets are excluded from the Biome formatter, in the
-  `**/*.css` overrides in `biome.jsonc`. `token_rules` emits one rule per line,
-  which the formatter would expand; the next generator run would collapse it
-  again, and the two would undo each other on alternate runs — with the test
-  above failing on whichever ran last. Formatting is the generator's output
-  shape, so if it needs to change, change `scripts/pygments_css.py` and
-  regenerate. Do not remove the exclusion to tidy a diff.
+- All three generated stylesheets are excluded from the Biome formatter, in the
+  `src/static/stilyagi/assets/styles/syntax.css`,
+  `src/static/netsuke/assets/css/himotoshi.css`, and
+  `src/static/episodic/assets/styles/syntax.css` override in `biome.jsonc`.
+  `token_rules` emits one rule per line, which the formatter would expand; the
+  next generator run would collapse it again, and the tools would undo each
+  other on alternate runs — with the test above failing on whichever ran last.
+  Formatting is the generator's output shape, so if it needs to change, change
+  `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to
+  tidy a diff.
 
 ### 4.5. Regenerating and verifying
 
 ```bash
+uv run python scripts/generate_episodic_pygments_css.py
 uv run python scripts/generate_himotoshi_pygments_css.py
 uv run python scripts/generate_stilyagi_pygments_css.py
-uv run pytest tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py
-bunx biome check src/static/netsuke/assets/css src/static/stilyagi/assets/styles
+uv run pytest tests/test_episodic_highlight.py tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py
+bunx biome check src/static/episodic/assets/styles src/static/netsuke/assets/css src/static/stilyagi/assets/styles
 ```
 
 Each script is idempotent: rerunning it without changing the corresponding
@@ -367,6 +379,7 @@ block outright, so a run restores it without needing the previous content.
 
 | Site     | Style            | Lexers                                             | Wrapper class     | Variable prefix      | Bold weight | Stylesheet                                     |
 | -------- | ---------------- | -------------------------------------------------- | ----------------- | -------------------- | ----------- | ---------------------------------------------- |
+| Episodic | `EpisodicStyle`  | `bash`, `console`, `json`, `make`, `xml`           | `episodic-syntax` | `--episodic-syntax-` | `600`       | `src/static/episodic/assets/styles/syntax.css` |
 | Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/static/netsuke/assets/css/himotoshi.css`  |
 | Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
 
@@ -375,10 +388,11 @@ in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
 The lexer list reflects what the templates currently use, not the full set
-Pygments supports; `toml` and `powershell` are stock Pygments lexers used
-unmodified. The bold weight differs because the two sub-sites' monospace faces
-read differently at the same weight: Netsuke's mono face reads heavy, so its
-bold stops at semibold, while Stilyagi's lighter face goes to full bold.
+Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`,
+and `xml` are stock Pygments lexers used unmodified. The bold weight differs
+because the sub-sites' monospace faces read differently at the same weight:
+Episodic and Netsuke stop at semibold, while Stilyagi's lighter face goes to
+full bold.
 
 ## 5. Template components
 
@@ -389,8 +403,9 @@ a component class with no macro still leaves every call site restating the
 wrapper element. The "Reach for the cheapest layer that works" ladder in the
 "Styling" section of [AGENTS.md](../AGENTS.md) sets out when each is warranted.
 
-`templates/netsuke/components.jinja` holds the Netsuke sub-site's shared
-macros. Import it as `ui`:
+`templates/episodic/components.jinja` and `templates/netsuke/components.jinja`
+hold the Episodic and Netsuke sub-sites' shared macros. Import the one for the
+sub-site you're editing as `ui`:
 
 ```jinja
 {% extends "doc_page.jinja" %}
@@ -406,6 +421,9 @@ back in:
 
 That escaping is a wart of the current template shape rather than of the macro;
 narrowing the raw regions is tracked separately.
+
+Stilyagi centralizes its chrome in `templates/stilyagi/_layout.jinja`, which
+every page extends.
 
 ### 5.1. `ui.kicker`
 

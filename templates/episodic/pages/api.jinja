@@ -1,6 +1,10 @@
+{% from "data/endpoints.jinja" import endpoint_groups, endpoint_total %}
+{% from "data/interfaces.jinja" import request_contracts %}
+{% from "data/status.jinja" import source_base %}
+{% import "records.jinja" as rec %}
 {% set page_eyebrow = "API reference" %}
 {% set page_title = "The REST surface Episodic actually serves" %}
-{% set page_lede = "Twenty-one routes, read from the application's route table rather than transcribed. Anything not listed here is not registered." %}
+{% set page_lede = endpoint_total ~ " routes, read from the application's route table rather than transcribed. Anything not listed here is not registered." %}
 {% set page_trail = [
   {"label": "Documentation", "href": "/episodic/docs/"},
   {"label": "API reference"}
@@ -13,9 +17,6 @@
   {"id": "absent", "title": "Not implemented"}
 ] %}
 {% extends "pages/_page.jinja" %}
-{% from "data/endpoints.jinja" import endpoint_groups, endpoint_total %}
-{% from "data/interfaces.jinja" import request_contracts %}
-{% from "data/status.jinja" import source_base %}
 
 {% block sections %}
   {{ ui.section_open(1, "basis", "How this list is produced",
@@ -34,7 +35,7 @@
   {{ ui.section_close() }}
 
   {{ ui.section_open(2, "cross-cutting", "Before the first request",
-     "Four behaviours apply across the surface. One of them is a gap worth knowing about.") }}
+     request_contracts | length ~ " behaviours apply across the surface. One of them is a gap worth knowing about.") }}
     <div class="catalogue catalogue--compact">
       {% for contract in request_contracts %}
       {% call ui.ledger_row("%02d" | format(loop.index), contract.name, contract.status, none, "api-contract-" ~ loop.index) %}

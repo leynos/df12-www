@@ -2036,4 +2036,3 @@
     return MiniSearch;
 
 }));
-//# sourceMappingURL=index.js.map

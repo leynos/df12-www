@@ -80,7 +80,7 @@
       {{ ui.status_badge(phase.state) }}
       <p class="phase-matrix__tally">{{ phase.done_count }} of {{ phase.total_count }} tasks</p>
       <span class="phase-matrix__bar" aria-hidden="true"
-            style="--done: {{ (100 * phase.done_count / phase.total_count) | round | int }}%"></span>
+            style="--done: {{ (100 * phase.done_count / phase.total_count) | round | int if phase.total_count else 0 }}%"></span>
     </li>
     {% endfor %}
   </ol>
@@ -226,6 +226,30 @@
   A roadmap phase: its completion count in text, then its steps and tasks.
   Checkbox state is carried by a word and a glyph, never by colour.
 #}
+{% macro roadmap_task(task) -%}
+  <li class="task" data-done="{{ 'yes' if task.done else 'no' }}">
+    <span class="task__state">
+      <span class="task__mark" aria-hidden="true">{{ '☑' if task.done else '☐' }}</span>
+      <span class="visually-hidden">{{ 'Complete' if task.done else 'Not started' }}</span>
+    </span>
+    <span class="task__id" aria-hidden="true">{{ task.id if task.id else "" }}</span>
+    <span class="task__title">{{ ui.rich(task.title) }}</span>
+    {% if task.requires %}
+    <span class="task__requires">Requires {{ task.requires | join(", ") }}</span>
+    {% endif %}
+    {% if task.completion_note %}
+    <span class="task__note">Completed {{ task.completed_on }}. {{ ui.rich(task.completion_note) }}</span>
+    {% endif %}
+    {% if task.subtasks %}
+    <ul class="task-list task-list--nested">
+      {% for subtask in task.subtasks %}
+      {{ roadmap_task(subtask) }}
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </li>
+{%- endmacro %}
+
 {% macro roadmap_phase(phase) -%}
   <section class="phase" id="phase-{{ phase.number }}" aria-labelledby="phase-{{ phase.number }}-heading">
     <header class="phase__head">
@@ -252,20 +276,7 @@
       {% if step.summary %}<p class="step__summary">{{ ui.rich(step.summary) }}</p>{% endif %}
       <ul class="task-list">
         {% for task in step.tasks %}
-        <li class="task" data-done="{{ 'yes' if task.done else 'no' }}">
-          <span class="task__state">
-            <span class="task__mark" aria-hidden="true">{{ '☑' if task.done else '☐' }}</span>
-            <span class="visually-hidden">{{ 'Complete' if task.done else 'Not started' }}</span>
-          </span>
-          <span class="task__id" aria-hidden="true">{{ task.id }}</span>
-          <span class="task__title">{{ ui.rich(task.title) }}</span>
-          {% if task.requires %}
-          <span class="task__requires">Requires {{ task.requires | join(", ") }}</span>
-          {% endif %}
-          {% if task.completion_note %}
-          <span class="task__note">Completed {{ task.completed_on }}. {{ ui.rich(task.completion_note) }}</span>
-          {% endif %}
-        </li>
+        {{ roadmap_task(task) }}
         {% endfor %}
       </ul>
     </details>
@@ -305,21 +316,23 @@
 #}
 {% macro doc_category(category, source_base, disclose_over=10) -%}
   {% set documents = category.documents %}
+  {% set document_count = documents | length %}
+  {% set document_label = "document" if document_count == 1 else "documents" %}
   <section class="doc-category" id="docs-{{ category.key }}" aria-labelledby="docs-{{ category.key }}-heading">
     <header class="doc-category__head">
       <h3 id="docs-{{ category.key }}-heading">{{ category.label }}</h3>
       <p class="doc-category__meta">
         <span class="doc-category__type">{{ category.type }}</span>
         <span class="doc-category__audience">For: {{ category.audience }}</span>
-        <span class="doc-category__count">{{ documents | length }} documents</span>
+        <span class="doc-category__count">{{ document_count }} {{ document_label }}</span>
       </p>
       <p class="doc-category__blurb">{{ category.blurb }}</p>
     </header>
-    {% if documents | length > disclose_over %}
+    {% if document_count > disclose_over %}
     <details class="doc-disclosure">
       <summary>
         <span class="disclosure-marker" aria-hidden="true"></span>
-        <span class="doc-disclosure__label">All {{ documents | length }} documents</span>
+        <span class="doc-disclosure__label">All {{ document_count }} {{ document_label }}</span>
       </summary>
       {{ doc_list(documents, source_base) }}
     </details>

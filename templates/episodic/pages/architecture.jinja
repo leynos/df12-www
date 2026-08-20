@@ -1,3 +1,5 @@
+{% from "data/architecture.jinja" import components, boundary_rule, ownership %}
+{% import "records.jinja" as rec %}
 {% set page_eyebrow = "Platform architecture" %}
 {% set page_title = "Ports, adapters, and a boundary that is actually checked" %}
 {% set page_lede = "Enough of the technical shape to judge whether the platform stays testable as it grows. Implementation detail lives in the linked design documents." %}
@@ -10,7 +12,6 @@
   {"id": "platform", "title": "Infrastructure"}
 ] %}
 {% extends "pages/_page.jinja" %}
-{% from "data/architecture.jinja" import components, boundary_rule, ownership %}
 
 {% block sections %}
   {{ ui.section_open(1, "shape", "The shape",
@@ -56,9 +57,9 @@
   {{ ui.section_open(4, "request", "A request through the system",
      "The source-to-script path, as an ordered sequence. No diagram required.") }}
     <ol class="sequence">
+      <li>Authorization middleware resolves the principal before any resource runs.</li>
       <li>A client posts a source document with an idempotency key. The upload is stored and recorded.</li>
       <li>The client creates an ingestion job and attaches the upload or a remote source URI.</li>
-      <li>Authorization middleware resolves the principal before any resource runs.</li>
       <li>The job is accepted; normalization runs as worker tasks off the request path.</li>
       <li>Sources are classified, weighted, and merged into a canonical TEI episode with provenance in its header.</li>
       <li>The client polls the job until the source context is ready.</li>
@@ -67,8 +68,8 @@
       <li>The run suspends at the editorial checkpoint, holding durable state until a person decides.</li>
     </ol>
     <p class="section__more">
-      Steps one to six are implemented. Steps seven and eight are partly built.
-      Step nine is designed.
+      The authorization and source-ingestion path is implemented. Generation
+      and evaluation are partly built. The editorial checkpoint is designed.
       <a class="text-link" href="/episodic/workflow/">See the stage-by-stage maturity</a>
     </p>
   {{ ui.section_close() }}

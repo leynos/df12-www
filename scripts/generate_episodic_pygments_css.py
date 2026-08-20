@@ -43,7 +43,15 @@ HEADER = """/* Syntax highlighting for build-time Pygments output.
 
 
 def build_css() -> str:
-    """Build the stylesheet from the Episodic style."""
+    """Build the tracked CSS contract for Episodic syntax highlighting.
+
+    Returns
+    -------
+    str
+        The complete deterministic stylesheet, including token variables,
+        the keyboard-reachable code-scroll region and every rule emitted from
+        :class:`df12_pages.episodic_highlighting.EpisodicStyle`.
+    """
     formatter = HtmlFormatter(style=EpisodicStyle, cssclass=CSS_CLASS)
     variables, rules = token_rules(
         formatter,

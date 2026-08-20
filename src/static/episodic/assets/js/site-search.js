@@ -32,15 +32,25 @@
     return;
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  const initialiseAll = () => {
     for (const root of document.querySelectorAll("[data-search-root]")) {
+      if (root.dataset.searchInitialised === "true") {
+        continue;
+      }
+      root.dataset.searchInitialised = "true";
       try {
         initialise(root);
       } catch (error) {
         console.warn("Episodic search failed to initialise.", error);
       }
     }
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialiseAll);
+  } else {
+    initialiseAll();
+  }
 
   function initialise(root) {
     const input = root.querySelector("[data-search-input]");
@@ -64,10 +74,6 @@
     list.id = listId;
     input.setAttribute("autocomplete", "off");
     input.setAttribute("spellcheck", "false");
-    input.setAttribute("role", "combobox");
-    input.setAttribute("aria-autocomplete", "list");
-    input.setAttribute("aria-expanded", "false");
-    input.setAttribute("aria-controls", listId);
 
     let engine = null;
     let loading = null;
@@ -137,6 +143,9 @@
       }
 
       const loaded = await ensureIndex();
+      if (query !== input.value.trim()) {
+        return;
+      }
       if (!loaded) {
         list.replaceChildren();
         meta.textContent =
@@ -151,13 +160,10 @@
 
     const open = () => {
       panel.hidden = false;
-      input.setAttribute("aria-expanded", "true");
     };
 
     const close = () => {
       panel.hidden = true;
-      input.setAttribute("aria-expanded", "false");
-      input.removeAttribute("aria-activedescendant");
       active = -1;
     };
 
@@ -166,14 +172,10 @@
       const options = [...list.children];
       options.forEach((option, position) => {
         const selected = position === index;
-        option.setAttribute("aria-selected", selected ? "true" : "false");
         option.classList.toggle("is-active", selected);
       });
       if (index >= 0 && options[index]) {
-        input.setAttribute("aria-activedescendant", options[index].id);
         options[index].scrollIntoView({ block: "nearest" });
-      } else {
-        input.removeAttribute("aria-activedescendant");
       }
     };
 
@@ -252,9 +254,7 @@
   function buildOption(result, index, listId) {
     const item = document.createElement("li");
     item.className = "search-result";
-    item.id = `${listId}-option-${index}`;
-    item.setAttribute("role", "option");
-    item.setAttribute("aria-selected", "false");
+    item.id = `${listId}-result-${index}`;
     item.setAttribute("data-result-index", String(index));
 
     const link = document.createElement("a");

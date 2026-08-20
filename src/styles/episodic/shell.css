@@ -266,6 +266,8 @@
 @media (prefers-reduced-motion: reduce), (max-height: 34rem) {
   .section__aside {
     position: static;
+    overflow: visible;
+    max-height: none;
   }
 }
 

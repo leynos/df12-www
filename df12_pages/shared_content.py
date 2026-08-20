@@ -92,6 +92,8 @@ class SharedContentGenerator:
             trim_blocks=True,
             lstrip_blocks=True,
         )
+        if page_chrome and page_chrome.template_vars:
+            self.env.globals.update(page_chrome.template_vars)
         self.template = self.env.get_template(self.template_name)
         self._markdown_extensions = [
             "sane_lists",

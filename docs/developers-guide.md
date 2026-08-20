@@ -36,12 +36,12 @@ rationale for a specific change lives in its execution plan under
 depends on the last:
 
 ```bash
-bun run build         # build:static, build:css, build:images, build:pages, build:search
+bun run build         # build assets, pages, search indices, then refresh copied assets
 bun run build:static  # copy src/static/ verbatim (scripts/copy-static.ts)
 bun run build:css     # compile the main, mxd, and Episodic Tailwind entrypoints
 bun run build:images  # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages   # uv run pages generate --all-sites
-bun run build:search  # build the Netsuke search index (scripts/build-netsuke-search-index.mjs)
+bun run build:search  # build Netsuke and Episodic search indices
 ```
 
 `build:static` runs first because `build:images` reads the source images it
@@ -52,6 +52,15 @@ directly:
 uv run pages generate --all-sites     # main site plus every sub-site
 uv run pages generate --site netsuke  # one sub-site
 ```
+
+`scripts/build-episodic-search-index.mjs` then reads the rendered
+`public/episodic/` routes and the upstream-document manifest, writing the
+committed MiniSearch projection at
+`src/static/episodic/assets/search/episodic-search.json`. `build:search`
+regenerates it and immediately runs its `--check` mode; the final
+`build:static` copy publishes that checked projection. Run `bun run build` or
+`bun run build:pages && bun run build:search && bun run build:static` after
+changing an Episodic page or its documentation manifest.
 
 `bun run dev` (or `make dev`, which builds once first) watches `src/**/*`,
 `df12_pages/**/*`, `config/**/*`, `scripts/**/*`, and `pyproject.toml` with

@@ -258,7 +258,7 @@ translation from a Pygments `Style` to CSS rules, shared by
 `scripts/generate_stilyagi_pygments_css.py`. The generated `:root` variables
 and token rules are shared output. Himotoshi's site-specific chrome remains in
 its generator; Stilyagi's layout rules for `.code-scroll`, `.stilyagi-syntax`,
-and `.stilyagi-syntax pre` are hand-written above the `BEGIN` marker in
+and `.stilyagi-syntax pre` are handwritten above the `BEGIN` marker in
 `syntax.css`.
 
 The module exports two functions. Everything else in it is private and may be

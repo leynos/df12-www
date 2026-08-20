@@ -25,3 +25,13 @@ def test_build_css_compiles_the_episodic_entrypoint() -> None:
         "bunx tailwindcss -i ./src/styles/episodic.css "
         "-o ./public/episodic/assets/styles/tailwind.css --minify"
     )
+
+
+def test_build_search_regenerates_and_checks_the_episodic_index() -> None:
+    """The build regenerates the committed Episodic search projection."""
+    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    build_search = package_json["scripts"]["build:search"]
+    command = "bun run scripts/build-episodic-search-index.mjs"
+
+    assert command in build_search
+    assert f"{command} --check" in build_search

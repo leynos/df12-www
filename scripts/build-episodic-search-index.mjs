@@ -1,0 +1,302 @@
+/**
+ * Build the MiniSearch index for the Episodic subsite.
+ *
+ * Follows the Netsuke static-index approach, with one Episodic-specific
+ * difference: Netsuke hosts its own documentation, so its index covers only
+ * on-site pages. Episodic's documentation lives upstream and is linked rather
+ * than copied, so this index carries two kinds of record:
+ *
+ *   - `page` and `section`, extracted from the rendered subsite, linking to
+ *     on-site anchors; and
+ *   - `document`, read from the committed documentation manifest, linking to
+ *     the upstream repository.
+ *
+ * Searching "idempotency" should therefore surface both the API reference
+ * section that explains it and the users' guide that documents it.
+ *
+ * The index is written into `src/static/`, then copied into the render output
+ * by the site's static-assets build step. That makes it a committed generated
+ * file, and `--check` fails when it drifts from the content it describes.
+ *
+ * @module
+ */
+
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+
+import MiniSearch from "minisearch";
+
+const SITE_DIR = "public/episodic";
+const MANIFEST_PATH = "templates/episodic/data/docs_manifest.jinja";
+const OUTPUT_PATH = "src/static/episodic/assets/search/episodic-search.json";
+const SOURCE_BASE = "https://github.com/leynos/episodic/blob/main/";
+
+/**
+ * One indexed page, section, or upstream document with its destination.
+ *
+ * @interface SearchRecord
+ * @property {string} id Stable identifier.
+ * @property {string} kind One of `page`, `section`, or `document`.
+ * @property {string} title Result heading.
+ * @property {string} pageTitle Owning page or category.
+ * @property {string} sectionTitle Subheading, or the record's classification.
+ * @property {string} headings Heading text, for weighting.
+ * @property {string} body Searchable text.
+ * @property {string} excerpt Shown beneath the result.
+ * @property {string} sitePath Destination href.
+ */
+
+const INDEX_OPTIONS = {
+  fields: ["title", "pageTitle", "sectionTitle", "headings", "body"],
+  storeFields: ["title", "sitePath", "pageTitle", "sectionTitle", "excerpt", "kind"],
+  searchOptions: {
+    boost: { title: 6, pageTitle: 4, sectionTitle: 3, headings: 2 },
+    prefix: true,
+    fuzzy: 0.15,
+  },
+};
+
+async function main() {
+  const check = process.argv.includes("--check");
+  const documents = [...(await collectSitePages()), ...(await collectUpstreamDocuments())];
+
+  if (documents.length === 0) {
+    console.error(`No content found. Run \`bun run build:pages\` before building the index.`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const miniSearch = new MiniSearch({
+    fields: INDEX_OPTIONS.fields,
+    storeFields: INDEX_OPTIONS.storeFields,
+  });
+  miniSearch.addAll(documents);
+
+  // No build timestamp: the file is committed, and a timestamp would make
+  // every rebuild a spurious change and defeat the drift check.
+  const payload = `${JSON.stringify(
+    { indexOptions: INDEX_OPTIONS, index: JSON.stringify(miniSearch.toJSON()) },
+    null,
+    2,
+  )}\n`;
+
+  if (check) {
+    const current = await readFile(OUTPUT_PATH, "utf8").catch(() => "");
+    if (current !== payload) {
+      console.error(`${OUTPUT_PATH} is stale. Run \`bun run build:search\` to regenerate it.`);
+      process.exitCode = 1;
+      return;
+    }
+    console.log(`${OUTPUT_PATH} matches the rendered site (${documents.length} records).`);
+    return;
+  }
+
+  await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
+  await writeFile(OUTPUT_PATH, payload);
+  console.log(`wrote ${OUTPUT_PATH} (${documents.length} records indexed)`);
+}
+
+/**
+ * Walk the rendered preview for every published page.
+ *
+ * @param {string} dir Directory to search.
+ * @returns {Promise<string[]>} Paths of every index.html beneath `dir`.
+ */
+async function findPages(dir) {
+  const found = [];
+  const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      found.push(...(await findPages(full)));
+    } else if (entry.name === "index.html") {
+      found.push(full);
+    }
+  }
+  return found;
+}
+
+async function collectSitePages() {
+  const files = (await findPages(SITE_DIR)).sort();
+  const documents = [];
+  for (const filePath of files) {
+    const html = await readFile(filePath, "utf8");
+    documents.push(...extractDocuments(filePath, html));
+  }
+  return documents;
+}
+
+/**
+ * Read the documentation manifest. It is a Jinja data template whose payload
+ * is a JSON literal, so the categories can be parsed without a Jinja runtime.
+ */
+async function collectUpstreamDocuments() {
+  const text = await readFile(MANIFEST_PATH, "utf8").catch(() => "");
+  const match = text.match(/\{% set doc_categories = ([\s\S]*?) %\}\n\{% set doc_featured/);
+  if (!match) {
+    return [];
+  }
+  /** @type {{label: string, type: string, audience: string, blurb: string,
+      documents: {title: string, path: string, summary: string}[]}[]} */
+  const categories = JSON.parse(match[1]);
+  return categories.flatMap((category) =>
+    category.documents.map((document) => ({
+      id: document.path,
+      kind: "document",
+      title: document.title,
+      pageTitle: category.label,
+      sectionTitle: `${category.type} · ${category.audience}`,
+      headings: `${category.label} ${category.type} ${category.audience}`,
+      body: `${document.title} ${document.summary} ${category.blurb}`,
+      excerpt: document.summary,
+      sitePath: `${SOURCE_BASE}${document.path}`,
+    })),
+  );
+}
+
+/**
+ * @param {string} filePath Rendered page on disk.
+ * @param {string} html Its contents.
+ * @returns {SearchRecord[]} One page record plus one per section.
+ */
+function extractDocuments(filePath, html) {
+  const sitePath = toSitePath(filePath);
+  const mainHtml = matchFirst(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i) ?? html;
+  const pageTitle =
+    stripTags(matchFirst(mainHtml, /<h1\b[^>]*>([\s\S]*?)<\/h1>/i) ?? "") ||
+    stripTags(matchFirst(html, /<title\b[^>]*>([\s\S]*?)<\/title>/i) ?? "") ||
+    sitePath;
+  const pageExcerpt = firstMeaningfulParagraph(mainHtml);
+  const documents = [
+    {
+      id: sitePath,
+      kind: "page",
+      title: pageTitle,
+      pageTitle,
+      sectionTitle: "",
+      headings: extractHeadings(mainHtml).join(" "),
+      body: normalizeText(mainHtml),
+      excerpt: pageExcerpt,
+      sitePath,
+    },
+  ];
+
+  for (const match of mainHtml.matchAll(
+    /<section\b[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/section>/gi,
+  )) {
+    const [, sectionId, sectionHtml] = match;
+    const sectionTitle =
+      stripTags(matchFirst(sectionHtml, /<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) ?? "") || pageTitle;
+    const body = normalizeText(sectionHtml);
+    if (!body) {
+      continue;
+    }
+    documents.push({
+      id: `${sitePath}#${sectionId}`,
+      kind: "section",
+      title: `${sectionTitle} - ${pageTitle}`,
+      pageTitle,
+      sectionTitle,
+      headings: extractHeadings(sectionHtml).join(" "),
+      body,
+      excerpt: firstMeaningfulParagraph(sectionHtml) || pageExcerpt,
+      sitePath: `${sitePath}#${sectionId}`,
+    });
+  }
+
+  return documents;
+}
+
+/**
+ * @param {string} filePath Rendered page on disk.
+ * @returns {string} The site-absolute route it publishes.
+ */
+function toSitePath(filePath) {
+  const relative = path.relative(SITE_DIR, filePath).replace(/\\/g, "/");
+  return `/episodic/${relative.replace(/index\.html$/, "")}`;
+}
+
+/**
+ * @param {string} html Fragment to scan.
+ * @returns {string[]} Heading text, outermost first.
+ */
+function extractHeadings(html) {
+  return [...html.matchAll(/<h[1-4]\b[^>]*>([\s\S]*?)<\/h[1-4]>/gi)]
+    .map((match) => stripTags(match[1]))
+    .filter(Boolean);
+}
+
+/**
+ * @param {string} html Fragment to scan.
+ * @returns {string} The first paragraph long enough to serve as an excerpt.
+ */
+function firstMeaningfulParagraph(html) {
+  for (const match of html.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)) {
+    const text = stripTags(match[1]);
+    if (text.length >= 40) {
+      return truncate(text, 180);
+    }
+  }
+  return "";
+}
+
+/**
+ * @param {string} html Fragment to flatten.
+ * @returns {string} Collapsed, truncated plain text.
+ */
+function normalizeText(html) {
+  return truncate(stripTags(html).replace(/\s+/g, " ").trim(), 4000);
+}
+
+/**
+ * @param {string} html Fragment to flatten.
+ * @returns {string} Text with markup and entities resolved.
+ */
+function stripTags(html) {
+  return decodeEntities(
+    html
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
+}
+
+/**
+ * @param {string} text Text carrying HTML entities.
+ * @returns {string} Text with the common entities resolved.
+ */
+function decodeEntities(text) {
+  return text
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&copy;/g, "©");
+}
+
+/**
+ * @param {string} text Text to shorten.
+ * @param {number} maxLength Maximum length, including the ellipsis.
+ * @returns {string} Text no longer than `maxLength`.
+ */
+function truncate(text, maxLength) {
+  return text.length <= maxLength ? text : `${text.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+/**
+ * @param {string} text Text to search.
+ * @param {RegExp} pattern Pattern whose first group is returned.
+ * @returns {string | null} The first capture, or null.
+ */
+function matchFirst(text, pattern) {
+  return pattern.exec(text)?.[1] ?? null;
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -279,10 +279,10 @@
 {#
   Search, as progressive enhancement.
 
-  The root ships `hidden`. site-search.js removes that only once MiniSearch
-  has loaded, so a reader without JavaScript never meets an input that does
-  nothing, and every destination stays reachable through the category listing
-  that follows. Nothing here is required to find a document.
+  The root ships `hidden`. site-search.js reveals it only when MiniSearch is
+  available, so a reader without JavaScript never meets an input that does
+  nothing. Every destination remains reachable through the category listing
+  that follows, including if the index cannot load.
 #}
 {% macro search_box(label, placeholder) -%}
   <div class="search" data-search-root

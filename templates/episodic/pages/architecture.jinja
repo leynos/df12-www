@@ -1,0 +1,105 @@
+{% from "data/architecture.jinja" import components, boundary_rule, ownership %}
+{% import "records.jinja" as rec %}
+{% set page_eyebrow = "Platform architecture" %}
+{% set page_title = "Ports, adapters, and a boundary that is actually checked" %}
+{% set page_lede = "Enough of the technical shape to judge whether the platform stays testable as it grows. Implementation detail lives in the linked design documents." %}
+{% set page_trail = [{"label": "Architecture"}] %}
+{% set page_sections = [
+  {"id": "shape", "title": "The shape"},
+  {"id": "boundary", "title": "The boundary rule"},
+  {"id": "components", "title": "Component catalogue"},
+  {"id": "request", "title": "A request through the system"},
+  {"id": "platform", "title": "Infrastructure"}
+] %}
+{% extends "pages/_page.jinja" %}
+
+{% block sections %}
+  {{ ui.section_open(1, "shape", "The shape",
+     "Three processes, one database, one message broker. The conceptual picture first.") }}
+    <p>
+      An HTTP service accepts requests and returns canonical state. Work that
+      outlives a request is handed to a worker over a queue. Generation runs
+      inside a state graph that can suspend for as long as an editorial review
+      takes and resume where it stopped. Everything durable lives in
+      PostgreSQL.
+    </p>
+    <p>
+      Nothing in that description is unusual, which is the intent. The design
+      choices worth examining are where the boundaries fall and what enforces
+      them.
+    </p>
+    {{ ui.photo(
+      "patchbay",
+      "The back of a studio equipment rack, showing two rows of patch-bay jacks and cable looms dressed away to one side.",
+      "Ports and adapters, in the older sense. What matters is that every connection is named and reachable.") }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "boundary", "The boundary rule",
+     "Hexagonal architecture is a claim many projects make. This one is testable.") }}
+    <blockquote class="rule">
+      <p>{{ boundary_rule.statement }}</p>
+    </blockquote>
+    <p>{{ boundary_rule.enforcement }}</p>
+    <p>
+      That distinction matters more than the pattern. An import rule that only
+      exists in a contributing guide degrades on a deadline; one that fails the
+      build does not. The check runs as part of the standard lint target, so a
+      violation stops a change before review rather than during it.
+    </p>
+    {{ ui.evidence(boundary_rule.evidence) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "components", "Component catalogue",
+     "Responsibility, adapter, and where each component keeps state.") }}
+    {{ rec.component_catalogue(components) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "request", "A request through the system",
+     "The source-to-script path, as an ordered sequence. No diagram required.") }}
+    <ol class="sequence">
+      <li>Authorization middleware resolves the principal before any resource runs.</li>
+      <li>A client posts a source document with an idempotency key. The upload is stored and recorded.</li>
+      <li>The client creates an ingestion job and attaches the upload or a remote source URI.</li>
+      <li>The job is accepted; normalization runs as worker tasks off the request path.</li>
+      <li>Sources are classified, weighted, and merged into a canonical TEI episode with provenance in its header.</li>
+      <li>The client polls the job until the source context is ready.</li>
+      <li>Generation composes a structured brief with pinned reference revisions and guardrails, then runs the graph.</li>
+      <li>Evaluators execute in parallel; findings aggregate and the graph routes on the result.</li>
+      <li>The run suspends at the editorial checkpoint, holding durable state until a person decides.</li>
+    </ol>
+    <p class="section__more">
+      The authorization and source-ingestion path is implemented. Generation
+      and evaluation are partly built. The editorial checkpoint is designed.
+      <a class="text-link" href="/episodic/workflow/">See the stage-by-stage maturity</a>
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "platform", "Infrastructure",
+     "DigitalOcean Kubernetes, reconciled by FluxCD. The application owns less of this than it might appear.") }}
+    <p>
+      OpenTofu provisions the clusters and shared services. FluxCD reconciles
+      platform and application manifests from a GitOps repository. Postgres is
+      supplied by the CloudNativePG operator, cache by the Valkey operator, and
+      messaging by the RabbitMQ operator. Observability is Prometheus, Tempo,
+      and Loki behind an OpenTelemetry Collector. Ingress is Traefik with
+      cert-manager issuing certificates.
+    </p>
+    <p>
+      Episodic supplies an image, a runtime contract, health semantics, and a
+      Helm chart. The platform supplies everything else. That split is the
+      subject of its own page, because conflating the two is how a working
+      chart gets mistaken for a deployed environment.
+    </p>
+    {{ rec.contract_table(
+      "Application and platform ownership",
+      "architecture-ownership",
+      ownership,
+      ["concern", "owner", "detail"],
+      ["Concern", "Owned by", "Detail"]) }}
+    <p class="section__more">
+      <a class="text-link" href="/episodic/hosting/">Read the Nile Valley hosting contract</a>
+      ·
+      <a class="text-link" href="/episodic/interfaces/">See which interfaces are live</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

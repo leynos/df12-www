@@ -1,0 +1,122 @@
+{% set page_eyebrow = "Quality and review" %}
+{% set page_title = "What the system may decide, and what it must hand over" %}
+{% set page_lede = "Six evaluators inspect a draft and return typed findings. None of them approves anything, and the difference is the whole design." %}
+{% set page_trail = [
+  {"label": "Workflow", "href": "/episodic/workflow/"},
+  {"label": "Quality and human review"}
+] %}
+{% set page_sections = [
+  {"id": "evaluators", "title": "The evaluator catalogue"},
+  {"id": "findings", "title": "What a finding looks like"},
+  {"id": "boundary", "title": "The decision boundary"},
+  {"id": "guardrails", "title": "Guardrails and budgets"},
+  {"id": "checkpoints", "title": "Editorial checkpoints"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/quality.jinja" import evaluators, decision_boundary, failure_modes %}
+
+{% block sections %}
+  {{ ui.section_open(1, "evaluators", "The evaluator catalogue",
+     "Five run as structured model calls inside the generation graph. Chrono makes no model call at all.") }}
+    <p>
+      Evaluators execute in parallel over a draft and aggregate before the
+      graph routes on the result. Each returns typed findings and, where a
+      model was involved, normalized usage metrics for cost accounting.
+      Schemas are versioned alongside the prompts and the orchestration code.
+    </p>
+    {{ rec.evaluator_catalogue(evaluators) }}
+    <p class="section__more">
+      Two of six are implemented. The rest are specified with their contracts
+      and not yet built; the status on each record says which is which.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "findings", "What a finding looks like",
+     "Structured, per-claim, and carrying remediation guidance rather than a verdict. The example is synthetic.") }}
+    {% call ui.code_block(
+      "Synthetic Pedante finding",
+      "Shape only; support levels and severities are defined by the evaluator contract") %}
+      {% highlight 'json', 'episodic-syntax' %}
+      {
+        "claim_id": "c-014",
+        "claim_kind": "attributed-quotation",
+        "cited_sources": ["src-transcript-01"],
+        "support_level": "partial",
+        "severity": "high",
+        "remediation": "The transcript records this phrasing at 00:14:22 but attributes it to the second speaker. Confirm the attribution or cut the quotation."
+      }
+      {% endhighlight %}
+    {% endcall %}
+    <p>
+      A finding names what it examined, what it could and could not tie to a
+      source, and what a person might do about it. It does not say the script
+      is wrong, and nothing downstream treats a severity as an instruction.
+    </p>
+    <aside class="callout" aria-labelledby="score-caution">
+      <h3 id="score-caution">Scoring is not approval</h3>
+      <p>
+        A model scoring another model's output produces a signal, not a fact.
+        High-severity findings raise something for attention; low-severity
+        findings mean the evaluator noticed nothing, which is not the same as
+        there being nothing to notice.
+      </p>
+    </aside>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "boundary", "The decision boundary",
+     "Stated as a matrix. Status is per row, because the boundary is delivered in pieces.") }}
+    {{ rec.boundary_matrix(decision_boundary, "quality-boundary") }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "guardrails", "Guardrails and budgets",
+     "Two mechanisms stop a run: an editorial guardrail and an exhausted budget.") }}
+    <p>
+      Guardrails persist on series profiles and episode templates, so a
+      generation request carries stable editorial instructions as its system
+      prompt rather than depending on whoever composed the call. Changing the
+      guardrail changes every subsequent run from one place, under the same
+      change history and optimistic locking as the rest of the profile.
+    </p>
+    <p>
+      Budgets use reservation semantics around each billable call: reserve,
+      then commit on success or release on failure. A run that cannot reserve
+      does not make the call. Cost line items pin the provider pricing
+      snapshot in force at the time, so a later price change does not rewrite
+      what an episode cost.
+    </p>
+    {{ rec.failure_list(failure_modes) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "checkpoints", "Editorial checkpoints",
+     "Designed, not delivered. The honest state of the most important part of the system.") }}
+    <p>
+      A checkpoint suspends the generation graph and preserves its state while
+      an editor considers the findings. Because the state is durable, a review
+      period can last as long as it needs to without losing the run - the graph
+      resumes rather than restarting.
+    </p>
+    {{ ui.photo(
+      "markup",
+      "A thick stack of printed transcript pages under a desk lamp, the top page marked up in pencil with margin notes and struck-through lines.",
+      "What an evaluator cannot do. Findings raise a question; a person answers it.") }}
+    <p>
+      The reviewer actions the design provides for are approve, request
+      changes, and redirect the run with targeted remediation prompts. Drafts
+      that fall below threshold re-enter generation; drafts above it proceed to
+      approval. Which threshold, and whether a team wants automatic re-entry at
+      all, is a series-level decision.
+    </p>
+    <aside class="callout callout--status" aria-labelledby="checkpoint-status">
+      <h3 id="checkpoint-status">Current state {{ ui.status_badge("planned") }}</h3>
+      <p>
+        Durable checkpointing is specified in ADR 007. The approval state
+        machine, its service-level timers, and the endpoints that would expose
+        it are roadmap step 4.2 and are not implemented. No approval endpoint
+        is registered in the application.
+      </p>
+      <p>
+        <a class="text-link" href="/episodic/docs/api/">See what the API actually serves</a>
+      </p>
+    </aside>
+  {{ ui.section_close() }}
+{% endblock %}

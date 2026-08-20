@@ -1,0 +1,188 @@
+{#
+  The component catalogue.
+
+  One record set drives the dependency diagram labels, the narrow-screen
+  component list, and the related links, so the diagram and the list cannot
+  drift apart. `state` describes where a component keeps state, not its
+  delivery status; `status` is the delivery state.
+#}
+{% set components = [
+  {
+    "key": "api",
+    "name": "HTTP API service",
+    "status": "available",
+    "responsibility": "Serves the canonical REST surface and the operator health contract.",
+    "adapter": "Falcon ASGI application on the Granian runtime, composed through a typed ApiDependencies seam.",
+    "state": "Stateless. All state goes through the unit-of-work boundary.",
+    "evidence": {
+      "label": "ADR 002: HTTP service composition root",
+      "path": "docs/adr/adr-002-http-service-composition-root.md"
+    }
+  },
+  {
+    "key": "persistence",
+    "name": "Persistence layer",
+    "status": "available",
+    "responsibility": "Stores canonical episodes, TEI headers, profiles, templates, reference documents, bindings, and ingestion records.",
+    "adapter": "SQLAlchemy repositories behind per-aggregate interfaces, with Alembic migrations gated in CI.",
+    "state": "PostgreSQL. Large TEI payloads compress with standard-library Zstandard; read paths return plain text.",
+    "evidence": {
+      "label": "Repository and unit-of-work implementation",
+      "path": "docs/episodic-podcast-generation-system-design.md"
+    }
+  },
+  {
+    "key": "ingestion",
+    "name": "Multi-source ingestion",
+    "status": "available",
+    "responsibility": "Normalizes heterogeneous sources into canonical TEI and captures provenance in the header.",
+    "adapter": "Document classifiers, source weighting heuristics, and a conflict-resolution matrix.",
+    "state": "Writes canonical episodes and retains every source, preferred or rejected.",
+    "evidence": {
+      "label": "Multi-source ingestion service",
+      "path": "docs/episodic-podcast-generation-system-design.md"
+    }
+  },
+  {
+    "key": "workers",
+    "name": "Task workers",
+    "status": "available",
+    "responsibility": "Executes long-running work off the request path.",
+    "adapter": "Celery with RabbitMQ, with queue bindings and separate pools for I/O-bound and CPU-bound work.",
+    "state": "Stateless workers; durable state stays in PostgreSQL.",
+    "evidence": {
+      "label": "ADR 003: Celery worker scaffold",
+      "path": "docs/adr/adr-003-celery-worker-scaffold.md"
+    }
+  },
+  {
+    "key": "orchestrator",
+    "name": "Generation orchestrator",
+    "status": "in-progress",
+    "responsibility": "Drives generation, routes on evaluator findings, and suspends at editorial checkpoints.",
+    "adapter": "LangGraph state graphs over LLMPort adapters, with retry discipline and per-template guardrails.",
+    "state": "Durable checkpoints, so a review period does not lose the run.",
+    "evidence": {
+      "label": "ADR 007: Durable generation checkpoints",
+      "path": "docs/adr/adr-007-durable-generation-checkpoints.md"
+    }
+  },
+  {
+    "key": "cost",
+    "name": "Cost and budget ledger",
+    "status": "in-progress",
+    "responsibility": "Meters token usage and enforces per-episode budgets.",
+    "adapter": "CostLedgerPort records per-call line items against pinned provider pricing snapshots; BudgetPort reserves, commits, and releases around billable calls.",
+    "state": "Ledger rows in PostgreSQL, retained for dispute resolution.",
+    "evidence": {
+      "label": "Cost management in LangGraph agentic systems",
+      "path": "docs/cost-management-in-langgraph-agentic-systems.md"
+    }
+  },
+  {
+    "key": "audio",
+    "name": "Audio pipeline",
+    "status": "planned",
+    "responsibility": "Renders speech, mixes beds and transitions, and normalizes loudness.",
+    "adapter": "Speech capability negotiation across provider adapters, with a pronunciation repository supplying speech markup.",
+    "state": "Rendered artefacts in object storage.",
+    "evidence": {
+      "label": "ADR 013: Speech synthesis adapters",
+      "path": "docs/adr/adr-013-speech-synthesis-adapters.md"
+    }
+  }
+] %}
+
+{#
+  The hexagonal boundary rule, stated once. Enforcement is a lint gate, not a
+  convention, which is the only reason it is worth claiming.
+#}
+{% set boundary_rule = {
+  "statement": "Domain logic depends on ports. Infrastructure supplies adapters. Nothing in the domain imports a framework, a driver, or a provider client.",
+  "enforcement": "Import boundaries are enforced by lint rules in CI rather than by review.",
+  "evidence": {
+    "label": "ADR 014: Hexagonal architecture enforcement",
+    "path": "docs/adr/adr-014-hexagonal-architecture-enforcement.md"
+  }
+} %}
+
+{#
+  The deployable contract with the Nile Valley hosting platform.
+
+  Values are taken from charts/episodic and the local k3d preview design. Keep
+  Helm value names exactly as the chart spells them.
+#}
+{% set runtime_contract = [
+  {
+    "item": "Entrypoint",
+    "value": "granian episodic.api.runtime:create_app_from_env --interface asgi --factory",
+    "note": "The production HTTP process. Granian is the ASGI server; Falcon is the application."
+  },
+  {
+    "item": "Port",
+    "value": "8080",
+    "note": "Exposed by the image and named `http` in the chart."
+  },
+  {
+    "item": "Required configuration",
+    "value": "DATABASE_URL",
+    "note": "The runtime refuses to start without it."
+  },
+  {
+    "item": "Liveness probe",
+    "value": "GET /health/live",
+    "note": "Reports that the process has booted."
+  },
+  {
+    "item": "Readiness probe",
+    "value": "GET /health/ready",
+    "note": "Checks database connectivity and returns 503 on failure, so the platform withholds traffic."
+  },
+  {
+    "item": "Process user",
+    "value": "Non-root, uid and gid 10001",
+    "note": "With a read-only root filesystem and all capabilities dropped."
+  }
+] %}
+
+{#
+  Who owns what. The line between these two columns is the whole point of the
+  hosting page: a working chart does not prove a deployed environment.
+#}
+{% set ownership = [
+  {
+    "concern": "Container image",
+    "owner": "Episodic",
+    "detail": "Builds a wheel in a builder stage, installs it into a slim runtime stage, and declares its own HEALTHCHECK."
+  },
+  {
+    "concern": "Health semantics",
+    "owner": "Episodic",
+    "detail": "Liveness and readiness meanings live in the domain; the Falcon adapter maps them to status codes."
+  },
+  {
+    "concern": "Helm chart and application values",
+    "owner": "Episodic",
+    "detail": "charts/episodic renders Deployment, Service, ConfigMap, ServiceAccount, and optional Ingress, ExternalSecret, and PodDisruptionBudget."
+  },
+  {
+    "concern": "Kubernetes cluster and ingress",
+    "owner": "Nile Valley",
+    "detail": "Shared cluster provisioning, Traefik ingress, certificates, and DNS."
+  },
+  {
+    "concern": "GitOps reconciliation",
+    "owner": "Nile Valley",
+    "detail": "FluxCD reconciles desired state from the GitOps repository. Application automation publishes an immutable image and desired Helm state; it does not deploy workloads directly."
+  },
+  {
+    "concern": "Secret material",
+    "owner": "Nile Valley",
+    "detail": "Secret sync from the shared Vault appliance. Git holds references, never secret values."
+  },
+  {
+    "concern": "Database and cache",
+    "owner": "Nile Valley",
+    "detail": "CloudNativePG and the Valkey operator supply the shared data services."
+  }
+] %}

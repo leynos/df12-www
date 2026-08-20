@@ -1,0 +1,28 @@
+{#
+  Shared df12 policy content rendered through Episodic chrome.
+
+  The Markdown is owned by df12-www and is authoritative. This template only
+  supplies the surrounding page: heading structure, revision information, and
+  link targets come through unchanged.
+#}
+{% extends "_layout.jinja" %}
+
+{% block title %}{{ title }} · Episodic{% endblock %}
+{% block description %}{{ summary or title }}{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs-shell">{{ ui.breadcrumbs([{"label": title}]) }}</div>
+{% endblock %}
+
+{% block main_class %}site-main--legal{% endblock %}
+
+{% block content %}
+  <div class="content-shell content-shell--legal">
+    <header class="page-intro">
+      <p class="page-intro__eyebrow">{{ eyebrow or "df12 Productions policy" }}</p>
+      <h1 class="page-intro__title">{{ title }}</h1>
+      {% if summary %}<p class="page-intro__lede">{{ summary }}</p>{% endif %}
+    </header>
+    <article class="prose">{{ body_html | safe }}</article>
+  </div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{#
+  Curated purpose text for each registered route.
+
+  Paths here are validated against the Episodic Falcon composition root by
+  `make site-data --check`: a route without a note, or a note without a route,
+  fails the build. Keep each sentence to what the endpoint does, in the terms
+  the users' guide uses.
+#}
+{% set endpoint_notes = {
+  "/health/live": "Reports that the process has booted. Used as the container liveness probe.",
+  "/health/ready": "Reports infrastructure readiness, including database connectivity. Returns 503 when the check fails so the platform withholds traffic.",
+
+  "/v1/series-profiles": "List series profiles, or create one carrying tone descriptors, segment ordering, audio preferences, and guardrails.",
+  "/v1/series-profiles/{profile_id}": "Read a series profile, or update it under optimistic locking with `expected_revision`.",
+  "/v1/series-profiles/{profile_id}/history": "Retrieve the change history for a series profile.",
+  "/v1/series-profiles/{profile_id}/brief": "Fetch the structured brief payload that downstream generators consume.",
+  "/v1/series-profiles/{profile_id}/resolved-bindings": "Resolve the exact reference-document revisions that apply to a target episode.",
+
+  "/v1/episode-templates": "List episode templates, or create one linked to a series profile.",
+  "/v1/episode-templates/{template_id}": "Read an episode template, or update it under optimistic locking.",
+  "/v1/episode-templates/{template_id}/history": "Retrieve the change history for an episode template.",
+
+  "/v1/series-profiles/{profile_id}/reference-documents": "List reusable reference documents for a series, or create one. Host and guest profiles are series-aligned reference documents.",
+  "/v1/series-profiles/{profile_id}/reference-documents/{document_id}": "Read or update a single reference document.",
+  "/v1/series-profiles/{profile_id}/reference-documents/{document_id}/revisions": "List revisions of a reference document, or add one.",
+  "/v1/reference-document-revisions/{revision_id}": "Read a pinned reference-document revision by identifier.",
+
+  "/v1/reference-bindings": "List reference bindings, or bind a pinned revision to a series, template, or episode scope.",
+  "/v1/reference-bindings/{binding_id}": "Read a single reference binding, including its `effective_from_episode_id` scope.",
+
+  "/v1/uploads": "Upload one source document. Requires an `Idempotency-Key`.",
+  "/v1/uploads/{upload_id}": "Read the stored metadata for an uploaded source document.",
+  "/v1/ingestion-jobs": "List ingestion jobs, or create one. Requires an `Idempotency-Key`.",
+  "/v1/ingestion-jobs/{job_id}": "Poll an ingestion job until its source context is ready for draft generation.",
+  "/v1/ingestion-jobs/{job_id}/sources": "List the sources attached to an ingestion job, or attach an upload or remote source URI."
+} %}

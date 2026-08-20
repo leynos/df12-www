@@ -43,10 +43,10 @@ is authored directly as HTML.
 
 - **`config/pages.yaml`** is the single source of layout and copy data. It
   defines the main site's homepage, about page, and documentation bundles, and a
-  `sites:` mapping that configures each sub-site (`mxd`, `netsuke`, `weaver`,
-  `stilyagi`). A sub-site entry declares its `output_dir`, `templates_dir`,
-  `stylesheet`, `base_path`, theme metadata, navigation links, shared-content
-  pages, and content pages.
+  `sites:` mapping that configures each sub-site (`mxd`, `episodic`, `netsuke`,
+  `weaver`, `stilyagi`). A sub-site entry declares its `output_dir`,
+  `templates_dir`, `stylesheet`, `base_path`, theme metadata, navigation links,
+  shared-content pages, and content pages.
 - **`config/shared/*.md`** holds copy shared across sub-sites — the privacy
   policy, terms of use, and code of conduct. Each sub-site opts in through its
   `shared_content` list and renders the same Markdown through its own chrome.
@@ -79,13 +79,13 @@ a clean tree, and will not deploy.
 
 Every published file therefore has a source elsewhere in the repository:
 
-| Published under `public/`                    | Comes from                                            |
-| -------------------------------------------- | ----------------------------------------------------- |
-| `**/*.html`                                  | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`, `mxd/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`             | `scripts/generate-image-variants.ts`                  |
-| `netsuke/assets/search/*.json`               | `scripts/build-netsuke-search-index.mjs`              |
-| everything else                              | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`                  | Comes from                                            |
+| ------------------------------------------ | ----------------------------------------------------- |
+| `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`, `*/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
+| `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
+| everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 To add an asset, put it in `src/static/` at the path it should occupy in the
 published site, then rebuild.
@@ -123,10 +123,11 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Two entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Three entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode) and `src/styles/mxd.css` for the mxd sub-site (the
-`mxd` theme).
+`mxd` theme), plus `src/styles/episodic.css` for the Episodic sub-site (the
+`episodic` theme).
 
 The other three sub-sites each carry a hand-crafted stylesheet, and none of
 them uses daisyUI, but they do not all stand outside Tailwind. Netsuke and
@@ -139,11 +140,13 @@ sub-sites sometimes need the doubled selector described below. Their colour
 tokens live in their own stylesheets, and the accessibility rules below apply
 to all of them just the same.
 
-Code blocks on the Netsuke and Stilyagi sub-sites are highlighted at build time
-by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which runs Pygments
-and emits token classes. The colours come from a Pygments `Style`
-(`HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is generated, not
-handwritten — rerun `scripts/generate_himotoshi_pygments_css.py` or
+Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
+build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which
+runs Pygments and emits token classes. The colours come from a Pygments `Style`
+(`EpisodicStyle`, `HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is
+generated, not handwritten — rerun
+`scripts/generate_episodic_pygments_css.py`,
+`scripts/generate_himotoshi_pygments_css.py`, and
 `scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
 edit the marked block by hand.
 

@@ -77,10 +77,10 @@ homepage:
         external: false
       - label: Episodic
         description: Agentic podcast studio with human-in-the-loop polish.
-        href: "https://github.com/leynos/episodic"
+        href: "episodic/"
         icon: episodic
-        meta_label: View on GitHub
-        external: true
+        meta_label: Learn more
+        external: false
       - label: Weaver
         description: CLI tooling for code-aware AI agents. Observe, act, verify.
         href: "weaver/"
@@ -1230,6 +1230,57 @@ sites:
         output_slug: changelog
     homepage:
       title: Home
+    pages: {}
+
+  episodic:
+    output_dir: public/episodic
+    templates_dir: templates/episodic
+    stylesheet: assets/styles/tailwind.css
+    base_path: /episodic/
+    theme:
+      site_name: Episodic
+      hero_eyebrow: Agentic podcast synthesis
+      hero_tagline: Production with intent, evidence, and human control
+    parent_link:
+      label: "Back to df12 Productions"
+      href: /
+    nav_links:
+      - label: Overview
+        href: /episodic/
+      - label: Workflow
+        href: /episodic/workflow/
+      - label: Quality
+        href: /episodic/workflow/quality/
+      - label: Architecture
+        href: /episodic/architecture/
+      - label: Docs
+        href: /episodic/docs/
+      - label: Roadmap
+        href: /episodic/roadmap/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    homepage:
+      title: "Episodic — agentic podcast production with human control"
+    template_vars:
+      site_version: "0.1.0"
+      site_status: "Active development"
+      repository_url: "https://github.com/leynos/episodic"
+    content_pages:
+      - { key: why, label: Why Episodic, template: pages/why.jinja, output_slug: why }
+      - { key: workflow, label: Workflow, template: pages/workflow.jinja, output_slug: workflow }
+      - { key: content, label: Content and provenance, template: pages/content.jinja, output_slug: workflow/content }
+      - { key: quality, label: Quality and human review, template: pages/quality.jinja, output_slug: workflow/quality }
+      - { key: audio, label: Audio production, template: pages/audio.jinja, output_slug: workflow/audio }
+      - { key: architecture, label: Architecture, template: pages/architecture.jinja, output_slug: architecture }
+      - { key: interfaces, label: Interfaces, template: pages/interfaces.jinja, output_slug: interfaces }
+      - { key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs }
+      - { key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: docs/getting-started }
+      - { key: api, label: API and integration reference, template: pages/api.jinja, output_slug: docs/api }
+      - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
+      - { key: contributing, label: Contributing, template: pages/contributing.jinja, output_slug: contributing }
+      - { key: hosting, label: Hosting contract, template: pages/hosting.jinja, output_slug: hosting }
     pages: {}
 
   netsuke:

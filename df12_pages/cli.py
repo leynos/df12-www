@@ -338,6 +338,7 @@ def _generate_subsite(
                 stylesheet=subsite.stylesheet,
                 site_title_suffix=subsite.theme.site_name,
                 site_brand=subsite.theme.site_name,
+                template_vars=subsite.template_vars,
             ),
         ).run()
         print(f"[{subsite.key}] wrote {_format_path(sc_path)}")

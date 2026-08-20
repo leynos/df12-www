@@ -1,0 +1,117 @@
+{% from "data/endpoints.jinja" import endpoint_groups, endpoint_total %}
+{% from "data/interfaces.jinja" import request_contracts %}
+{% from "data/status.jinja" import source_base %}
+{% import "records.jinja" as rec %}
+{% set page_eyebrow = "API reference" %}
+{% set page_title = "The REST surface Episodic actually serves" %}
+{% set page_lede = endpoint_total ~ " routes, read from the application's route table rather than transcribed. Anything not listed here is not registered." %}
+{% set page_trail = [
+  {"label": "Documentation", "href": "/episodic/docs/"},
+  {"label": "API reference"}
+] %}
+{% set page_sections = [
+  {"id": "basis", "title": "How this list is produced"},
+  {"id": "cross-cutting", "title": "Before the first request"},
+  {"id": "routes", "title": "Endpoint groups"},
+  {"id": "example", "title": "A worked intake sequence"},
+  {"id": "absent", "title": "Not implemented"}
+] %}
+{% extends "pages/_page.jinja" %}
+
+{% block sections %}
+  {{ ui.section_open(1, "basis", "How this list is produced",
+     "Because a hand-maintained endpoint list is a hand-maintained lie.") }}
+    <p>
+      Paths and methods on this page are extracted from the Falcon composition
+      root in the Episodic repository and checked against this site at build
+      time. A route that gains a method changes this page; a route documented
+      here that stops existing fails the build.
+    </p>
+    <p>
+      Purpose text is written by hand and validated against the same route
+      table, so a description cannot outlive the endpoint it describes.
+    </p>
+    {{ ui.evidence({"label": "Falcon composition root", "path": "episodic/api/app.py"}) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "cross-cutting", "Before the first request",
+     request_contracts | length ~ " behaviours apply across the surface. One of them is a gap worth knowing about.") }}
+    <div class="catalogue catalogue--compact">
+      {% for contract in request_contracts %}
+      {% call ui.ledger_row("%02d" | format(loop.index), contract.name, contract.status, none, "api-contract-" ~ loop.index) %}
+        <p>{{ contract.detail }}</p>
+      {% endcall %}
+      {% endfor %}
+    </div>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "routes", "Endpoint groups",
+     endpoint_total ~ " registered routes across " ~ endpoint_groups | length ~ " groups.") }}
+    {% for group in endpoint_groups %}
+    <div class="endpoint-group">
+      <h3 class="endpoint-group__title" id="group-{{ group.key }}">
+        {{ group.label }}
+        <span class="endpoint-group__count">{{ group.routes | length }} route{{ "" if group.routes | length == 1 else "s" }}</span>
+      </h3>
+      {{ rec.endpoint_table(group) }}
+    </div>
+    {% endfor %}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "example", "A worked intake sequence",
+     "The narrowest useful path through the implemented surface. Placeholders are obvious on purpose.") }}
+    {% call ui.code_block(
+      "Upload a source, attach it to a job, and poll until ready",
+      "Request shapes follow the users' guide; field names are not a published schema") %}
+      {% highlight 'bash', 'episodic-syntax' %}
+      curl -X POST "$EPISODIC_BASE/v1/uploads" \
+        -H "Authorization: Bearer REPLACE_WITH_TOKEN" \
+        -H "Idempotency-Key: 2f8c1e40-upload-01" \
+        -F "file=@interview-transcript.txt"
+
+      curl -X POST "$EPISODIC_BASE/v1/ingestion-jobs" \
+        -H "Authorization: Bearer REPLACE_WITH_TOKEN" \
+        -H "Idempotency-Key: 2f8c1e40-job-01" \
+        -H "Content-Type: application/json" \
+        -d '{"series_profile_id": "REPLACE_WITH_PROFILE_ID"}'
+
+      curl -X POST "$EPISODIC_BASE/v1/ingestion-jobs/$JOB_ID/sources" \
+        -H "Authorization: Bearer REPLACE_WITH_TOKEN" \
+        -H "Idempotency-Key: 2f8c1e40-source-01" \
+        -H "Content-Type: application/json" \
+        -d '{"upload_id": "REPLACE_WITH_UPLOAD_ID"}'
+
+      curl "$EPISODIC_BASE/v1/ingestion-jobs/$JOB_ID" \
+        -H "Authorization: Bearer REPLACE_WITH_TOKEN"
+      {% endhighlight %}
+    {% endcall %}
+    <p>
+      Repeating any of those <code>POST</code> requests with the same
+      idempotency key and the same canonical body replays the stored response.
+      Reusing a key with a different body returns <code>409 Conflict</code>.
+      The key is scoped to the authenticated principal, so two clients cannot
+      collide on one.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="{{ source_base }}docs/users-guide.md">Read the source-to-script intake section of the users' guide</a>
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "absent", "Not implemented",
+     "Endpoint families the design specifies and the application does not register.") }}
+    <ul class="claim-list">
+      <li><strong>Episodes and TEI.</strong> <code>/v1/episodes</code> and its TEI, lifecycle, and approval-event routes are roadmap step 4.2.</li>
+      <li><strong>Quality artefacts.</strong> Retrieving evaluator findings and runtime estimates by episode is roadmap task 2.2.7.</li>
+      <li><strong>Audio, preview, and export.</strong> Every audio route is roadmap phase 3.</li>
+      <li><strong>Resumable uploads.</strong> <code>POST /v1/uploads/init</code> awaits an object-store adapter that can issue pre-signed URLs.</li>
+      <li><strong>Event streaming.</strong> No WebSocket endpoint is registered; streaming is roadmap step 4.5.</li>
+    </ul>
+    <p>
+      Routes that existed before the <code>/v1</code> prefix were treated as
+      pre-release implementation details and carry no compatibility promise.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/roadmap/">See where each of these sits in the roadmap</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

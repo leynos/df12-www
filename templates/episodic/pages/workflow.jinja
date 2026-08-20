@@ -1,0 +1,54 @@
+{% set page_eyebrow = "Production path" %}
+{% set page_title = "From a bundle of sources to a delivered episode" %}
+{% set page_lede = "Seven stages, each with a declared input, output, and owner. Find the stage that concerns you; its maturity is stated on the stage, not inherited from the pipeline." %}
+{% set page_trail = [{"label": "Workflow"}] %}
+{% set page_sections = [
+  {"id": "sequence", "title": "The seven stages"},
+  {"id": "maturity", "title": "Reading the maturity labels"},
+  {"id": "failure", "title": "What stops a run"},
+  {"id": "detail", "title": "Stages in detail"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/workflow.jinja" import workflow_stages %}
+{% from "data/quality.jinja" import failure_modes %}
+
+{% block sections %}
+  {{ ui.section_open(1, "sequence", "The seven stages",
+     "The order is the content, so it is an ordered list. No diagram is required to follow it.") }}
+    {{ rec.stage_sequence(workflow_stages) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "maturity", "Reading the maturity labels",
+     "Two stages are complete. That does not make the pipeline complete, and the labels are per stage for exactly that reason.") }}
+    <p>
+      Source intake and canonical content are available: an integration client
+      can push material through them today and get a canonical TEI document
+      with its provenance attached. Draft generation and automated evaluation
+      are partly built. Everything after the editorial checkpoint is designed
+      and not implemented.
+    </p>
+    <p>
+      A finished early stage is the usual way a pipeline misleads. It is
+      tempting to read "ingestion works" as "the pipeline works", so each stage
+      above carries its own state and its own evidence link, and no summary on
+      this site rounds them up into a single verdict.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "failure", "What stops a run",
+     "Fail-fast is a design commitment. These are the conditions that halt work rather than publishing quietly.") }}
+    {{ rec.failure_list(failure_modes) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "detail", "Stages in detail",
+     "Three pages cover the stages that carry the most weight.") }}
+    {{ ui.local_nav("Workflow detail", [
+      {"href": "/episodic/workflow/content/", "label": "Content and provenance",
+       "detail": "How heterogeneous sources become one canonical, traceable document."},
+      {"href": "/episodic/workflow/quality/", "label": "Quality and human review",
+       "detail": "The evaluator catalogue, guardrails, and where an editor takes over."},
+      {"href": "/episodic/workflow/audio/", "label": "Audio production",
+       "detail": "The planned route from approved script to mastered, exportable audio."}
+    ]) }}
+  {{ ui.section_close() }}
+{% endblock %}

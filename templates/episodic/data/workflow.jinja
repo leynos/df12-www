@@ -1,0 +1,154 @@
+{#
+  The ordered production path from source material to a delivered episode.
+
+  One record set drives the overview summary, the workflow page, the child-page
+  navigation, and every cross-reference to a stage. Each stage declares its
+  input, output, responsible actor, maturity, and the evidence for that
+  maturity claim, so no template restates a delivery state.
+#}
+{% set workflow_stages = [
+  {
+    "number": "01",
+    "key": "intake",
+    "label": "Source intake",
+    "status": "available",
+    "summary": "Briefs, transcripts, feeds, press releases, and research notes arrive as uploads or remote URIs and are recorded against an ingestion job.",
+    "input": "Heterogeneous source documents",
+    "output": "Ingestion job with attached, classified sources",
+    "actor": "Integration client",
+    "href": "/episodic/workflow/content/",
+    "evidence": {
+      "label": "Source-to-script intake, users' guide",
+      "path": "docs/users-guide.md"
+    }
+  },
+  {
+    "number": "02",
+    "key": "canonical",
+    "label": "Canonical content",
+    "status": "available",
+    "summary": "Sources are weighted, conflicts resolved by documented rule, and the result normalized into canonical TEI with provenance captured in the header.",
+    "input": "Classified source documents",
+    "output": "Canonical TEI episode with provenance",
+    "actor": "Ingestion service",
+    "href": "/episodic/workflow/content/",
+    "evidence": {
+      "label": "Multi-source ingestion service",
+      "path": "docs/episodic-podcast-generation-system-design.md"
+    }
+  },
+  {
+    "number": "03",
+    "key": "generation",
+    "label": "Draft generation",
+    "status": "in-progress",
+    "summary": "Structured briefs and guardrails compose the prompt; a LangGraph state graph drives generation with metered, interruptible model calls.",
+    "input": "Structured brief, pinned reference revisions, guardrails",
+    "output": "Draft TEI script, show notes, chapter markers",
+    "actor": "Content generation orchestrator",
+    "href": "/episodic/workflow/",
+    "evidence": {
+      "label": "Roadmap step 2.4, LangGraph orchestration",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "number": "04",
+    "key": "evaluation",
+    "label": "Automated evaluation",
+    "status": "in-progress",
+    "summary": "The in-progress evaluator stack is designed to run five model evaluators and the Chrono local estimator in parallel over the draft, returning typed findings. Malformed structured output and invalid timing stop the run rather than publishing quietly.",
+    "input": "Draft TEI script and cited source packets",
+    "output": "Typed findings, runtime estimate, usage metrics",
+    "actor": "Quality assurance stack",
+    "href": "/episodic/workflow/quality/",
+    "evidence": {
+      "label": "Quality assurance stack",
+      "path": "docs/episodic-podcast-generation-system-design.md"
+    }
+  },
+  {
+    "number": "05",
+    "key": "review",
+    "label": "Editorial checkpoint",
+    "status": "planned",
+    "summary": "Findings are surfaced to an editor, who approves, requests changes, or redirects the graph. The workflow suspends without losing state while that decision is pending.",
+    "input": "Draft with aggregated findings",
+    "output": "Approval decision and audit record",
+    "actor": "Editor",
+    "href": "/episodic/workflow/quality/",
+    "evidence": {
+      "label": "Roadmap step 4.2, approval workflow endpoints",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "number": "06",
+    "key": "speech",
+    "label": "Speech and mixing",
+    "status": "planned",
+    "summary": "Approved segments render to speech with pinned pronunciation, then mix with beds and transitions and normalize to a broadcast loudness target.",
+    "input": "Approved script segments",
+    "output": "Mastered episode audio",
+    "actor": "Audio pipeline",
+    "href": "/episodic/workflow/audio/",
+    "evidence": {
+      "label": "Roadmap phase 3, audio synthesis and delivery",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "number": "07",
+    "key": "delivery",
+    "label": "Preview and export",
+    "status": "planned",
+    "summary": "Editors preview the rendered episode, embed chapter markers and metadata, and export delivery formats.",
+    "input": "Mastered audio and canonical metadata",
+    "output": "Published episode package",
+    "actor": "Editor and export service",
+    "href": "/episodic/workflow/audio/",
+    "evidence": {
+      "label": "Roadmap step 3.6, voice preview and export jobs",
+      "path": "docs/roadmap.md"
+    }
+  }
+] %}
+
+{#
+  The four-stage summary used on the overview, where seven stages is too many
+  for a five-second scan. Each collapses a contiguous run of the full model.
+#}
+{% set workflow_summary = [
+  {
+    "number": "01",
+    "label": "Source to canon",
+    "status": "available",
+    "stages": ["intake", "canonical"],
+    "detail": "Heterogeneous material becomes canonical TEI, with the source trail retained whether a source was preferred or rejected.",
+    "href": "/episodic/workflow/content/"
+  },
+  {
+    "number": "02",
+    "label": "Draft and evaluate",
+    "status": "in-progress",
+    "stages": ["generation", "evaluation"],
+    "detail": "Bounded model orchestration produces a draft; six evaluators return typed findings against it.",
+    "href": "/episodic/workflow/quality/"
+  },
+  {
+    "number": "03",
+    "label": "Editorial decision",
+    "status": "planned",
+    "stages": ["review"],
+    "detail": "An editor approves, requests changes, or redirects. The system does not approve its own output.",
+    "href": "/episodic/workflow/quality/"
+  },
+  {
+    "number": "04",
+    "label": "Speech to delivery",
+    "status": "planned",
+    "stages": ["speech", "delivery"],
+    "detail": "Approved segments render, mix, normalize, and export with chapter markers and metadata.",
+    "href": "/episodic/workflow/audio/"
+  }
+] %}

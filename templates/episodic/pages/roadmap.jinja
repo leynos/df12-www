@@ -1,0 +1,92 @@
+{% from "data/roadmap.jinja" import roadmap_phases, roadmap_totals %}
+{% from "data/status.jinja" import source_base %}
+{% set phase_summary %}
+  {% for phase in roadmap_phases %}Phase {{ phase.number }} is {{ phase.state | replace("-", " ") }}{{ "; " if not loop.last else "." }}{% endfor %}
+{% endset %}
+{% set page_eyebrow = "Delivery" %}
+{% set page_title = "What is complete, what is active, and what is still planned" %}
+{% set page_lede = roadmap_phases | length ~ " phases and " ~ roadmap_totals.total ~ " tasks, projected from the upstream roadmap at build time. This site keeps no second set of completion states." %}
+{% set page_trail = [{"label": "Roadmap"}] %}
+{% set page_sections = [
+  {"id": "summary", "title": "Where delivery stands"},
+  {"id": "recent", "title": "Recently completed"},
+  {"id": "phases", "title": "Every phase, task by task"},
+  {"id": "reading", "title": "Reading this roadmap"}
+] %}
+{% extends "pages/_page.jinja" %}
+
+{% block sections %}
+  {{ ui.section_open(1, "summary", "Where delivery stands",
+     roadmap_totals.done ~ " of " ~ roadmap_totals.total ~ " tasks complete. " ~ phase_summary | trim) }}
+    <ol class="phase-preview">
+      {% for phase in roadmap_phases %}
+      <li class="phase-preview__item">
+        <span class="phase-preview__number" aria-hidden="true">{{ phase.number }}</span>
+        <a class="phase-preview__title" href="#phase-{{ phase.number }}">{{ phase.title }}</a>
+        {{ ui.status_badge(phase.state) }}
+        <span class="phase-preview__tally">{{ phase.done_count }} of {{ phase.total_count }} tasks</span>
+      </li>
+      {% endfor %}
+    </ol>
+    <p>
+      No dates appear on this page. The upstream roadmap does not record them,
+      and inventing a delivery date to fill a column would be the one piece of
+      information here that nothing supports.
+    </p>
+    {{ ui.evidence({"label": "Upstream roadmap", "path": "docs/roadmap.md"}) }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "recent", "Recently completed",
+     "Tasks whose completion notes record when they landed.") }}
+    <ul class="claim-list">
+      {% for phase in roadmap_phases %}
+        {% for step in phase.steps %}
+          {% for task in step.tasks if task.completed_on %}
+          <li>
+            <strong>{{ task.id }} · {{ task.title }}</strong>
+            <span class="claim-list__meta">Completed {{ task.completed_on }}</span>
+            <span>{{ task.completion_note }}</span>
+          </li>
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+    </ul>
+    <p class="section__more">
+      Only tasks carrying an explicit completion note appear here. The rest are
+      marked complete without a recorded date, and this page does not guess one.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "phases", "Every phase, task by task",
+     "Each step expands. Task state is carried by a word and a glyph, never by colour alone.") }}
+    <p class="section__note">
+      Steps are collapsed by default to keep the page scannable. Any number can
+      be open at once, so two steps can be compared side by side, and every
+      task remains in the document and reachable by keyboard.
+    </p>
+    {% for phase in roadmap_phases %}
+      {{ rec.roadmap_phase(phase) }}
+    {% endfor %}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "reading", "Reading this roadmap",
+     "Two conventions worth knowing before drawing conclusions from it.") }}
+    <p>
+      <strong>Phases are not sequential in practice.</strong> Phase 4 has
+      completed tasks while phase 3 has none, because the API surface work
+      unblocks integration earlier than audio does. A partly complete later
+      phase does not imply an earlier one finished.
+    </p>
+    <p>
+      <strong>A completed step is not a completed capability.</strong> Steps
+      group tasks by workstream, so a step can finish while the capability it
+      contributes to waits on another phase entirely. Capability states are
+      recorded per capability elsewhere on this site.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/">See capability states on the overview</a>
+      ·
+      <a class="text-link" href="{{ source_base }}docs/roadmap.md">Read the upstream roadmap in full</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

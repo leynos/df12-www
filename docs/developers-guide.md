@@ -625,7 +625,7 @@ idiom below exists because the CDN's injected `<style>` is unlayered; the
 compiled build has no such tie to break, because its utilities sit in
 `@layer utilities` and a sub-site's own rules sit in `@layer components`,
 where they lose to a utility by construction rather than by source order. The
-inversion is the trap: a hand-written stylesheet that was _left_ unlayered
+inversion is the trap: a handwritten stylesheet that was _left_ unlayered
 under the compiled build stops losing those arguments and starts winning them,
 silently. See `src/styles/weaver.css` for the arrangement and
 `docs/execplans/weaver-daisy-migration.md` for what the change turned up.

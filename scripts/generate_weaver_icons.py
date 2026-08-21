@@ -148,7 +148,26 @@ def build_macro() -> str:
 
 
 def main() -> int:
-    """Rewrite the generated macro if it differs from the current file."""
+    """Regenerate the Weaver icon macro and report whether it changed.
+
+    Builds the macro from the mapping and the Carbon package, then compares
+    it against the existing ``templates/weaver/_icons.jinja``. When the two
+    differ, ``OUTPUT`` (``templates/weaver/_icons.jinja``) is overwritten
+    with the freshly built macro; when they match, the file is left alone.
+    Either way, a one-line status is written to stdout.
+
+    Returns
+    -------
+    int
+        Always ``0``. This function has no failure path of its own; a
+        missing Carbon package instead raises ``SystemExit`` out of
+        ``build_macro`` before this point is reached.
+
+    Raises
+    ------
+    SystemExit
+        Propagated from ``build_macro`` if the Carbon package is absent.
+    """
     macro = build_macro()
     current = OUTPUT.read_text(encoding="utf-8") if OUTPUT.exists() else ""
     if macro != current:

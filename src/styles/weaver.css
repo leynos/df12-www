@@ -159,6 +159,16 @@
      rather than as ink. */
   --color-ink-deep: #0f172a;
 
+  /* The ruled-paper grid lines, named once so the two gradients that draw
+     each grid cannot drift apart. `.grid-bg-fine` in weaver/chrome.css is the
+     only consumer.
+
+     It is a line tint at 3% rather than a colour anything should be painted
+     in, so the `bg-grid-fine` and `text-grid-fine` utilities this mints are
+     not meant to be used; the token is here because this file is where the
+     stylesheet keeps its colour. */
+  --color-grid-fine: color-mix(in oklab, var(--color-primary) 3%, transparent);
+
   /* Three sizes below Tailwind's `text-xs`, which the design uses for its
      stamped labels and gutter numbers. No paired line-height, matching the
      arbitrary values they replace. */

@@ -37,7 +37,10 @@
                                     <div class="relative flex items-center bg-neutral text-base-100 font-mono text-sm px-6 py-4 rounded-xs border border-base-content shadow-lg">
                                         <span class="text-accent-ink mr-3">$</span>
                                         <span class="mr-8">cargo install weaver</span>
-                                        <button class="text-base-content/82 hover:text-white transition-colors" title="Copy to clipboard">
+                                        {#- Wired the same way as the three copy buttons on the install
+                                            page: an inline handler, because no Weaver page loads a
+                                            copy-button script. Until now this one only looked the part. -#}
+                                        <button class="text-base-content/82 hover:text-white transition-colors" title="Copy to clipboard" onclick="navigator.clipboard.writeText('cargo install weaver')">
                                             {{ icon('copy') }}
                                         </button>
                                     </div>

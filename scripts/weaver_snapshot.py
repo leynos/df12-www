@@ -31,6 +31,7 @@ import json
 import math
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import time
@@ -118,11 +119,36 @@ def _served(port: int) -> cabc.Iterator[str]:
     Raises
     ------
     SystemExit
-        If the server does not accept connections within roughly ten seconds.
+        If the port is already occupied, if the server exits while starting,
+        or if it does not accept connections within roughly ten seconds.
     """
     if not HTTP_SERVER.is_file():
         message = "node_modules/.bin/http-server is missing; run 'bun install'"
         raise SystemExit(message)
+
+    # Refuse a port somebody else is already serving.
+    #
+    # `http-server` exits 1 when it cannot bind, but the poll below would then
+    # connect to the *pre-existing* server and take it for the one just
+    # spawned — silently snapshotting another worktree's `public/` and
+    # reporting the diff as this branch's work. The ports are fixed defaults,
+    # so two worktrees collide by default rather than by bad luck.
+    #
+    # Checking `server.poll()` alone would not close this: node needs about a
+    # hundred milliseconds to start and fail its bind, and the first request
+    # can be answered by the squatter before the child has exited. Probing
+    # first makes the common case deterministic; the liveness check below
+    # still catches anything that claims the port in between.
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        try:
+            probe.bind(("127.0.0.1", port))
+        except OSError as exc:
+            message = (
+                f"port {port} is already in use, so the snapshot would capture "
+                f"whatever is being served there rather than this worktree's "
+                f"public/ ({exc}). Stop that server, or pass --port."
+            )
+            raise SystemExit(message) from exc
 
     base = f"http://127.0.0.1:{port}"
     server = subprocess.Popen(  # noqa: S603 - fixed argv, no shell, no user input
@@ -135,6 +161,14 @@ def _served(port: int) -> cabc.Iterator[str]:
         # Poll rather than sleeping a fixed interval, so a slow start does not
         # silently yield a directory full of failed captures.
         for _ in range(50):
+            # A server that has already exited will never answer, and anything
+            # that does answer on its port is not it.
+            if (status := server.poll()) is not None:
+                message = (
+                    f"http-server exited with status {status} while starting on "
+                    f"port {port}; it may have lost a race to bind it"
+                )
+                raise SystemExit(message)
             try:
                 with urllib.request.urlopen(f"{base}/weaver/", timeout=1):  # noqa: S310 - literal loopback URL
                     break

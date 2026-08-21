@@ -112,11 +112,16 @@ describe("opening and closing", () => {
     // and then removing both on close. The drawer only ever needed to stop the
     // page scrolling underneath it, so it must leave the horizontal axis
     // exactly as it found it.
-    dom.document.body.style.overflowX = "hidden";
+    //
+    // Starting from no inline value is what gives the assertion teeth. Seeding
+    // `overflowX = "hidden"` first made the expected value identical to the
+    // seeded one, so a drawer that wrote `hidden` itself — exactly the bug this
+    // guards — would have passed. Empty is a value only the drawer can spoil.
+    expect(dom.document.body.style.overflowX).toBe("");
     click(dom.window, dom.toggle);
-    expect(dom.document.body.style.overflowX).toBe("hidden");
+    expect(dom.document.body.style.overflowX).toBe("");
     click(dom.window, dom.toggle);
-    expect(dom.document.body.style.overflowX).toBe("hidden");
+    expect(dom.document.body.style.overflowX).toBe("");
   });
 
   test("opening moves focus to the first item in the nav", () => {

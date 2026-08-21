@@ -47,6 +47,14 @@
   opacity: 1;
 }
 
+/* The button is only ever revealed by hovering its container, which a keyboard
+   never does. It stays focusable at `opacity: 0`, so tabbing onto it moved
+   focus somewhere invisible — the focus ring was being drawn on a transparent
+   button. Showing it on focus is what makes that ring worth drawing. */
+.copy-btn:focus-visible {
+  opacity: 1;
+}
+
 .step-line {
   position: absolute;
   left: 15px;

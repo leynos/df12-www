@@ -28,16 +28,8 @@
    weight to suit two sections would repaint the whole site. */
 .grid-bg-fine {
   background-image:
-    linear-gradient(
-      to right,
-      color-mix(in oklab, var(--color-primary) 3%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--color-primary) 3%, transparent) 1px,
-      transparent 1px
-    );
+    linear-gradient(to right, var(--color-grid-fine) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-fine) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 

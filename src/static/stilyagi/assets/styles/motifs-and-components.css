@@ -394,10 +394,10 @@ pre.code .tok-nm {
   color: var(--jazz-magenta);
 }
 
-/* .code-scroll itself is declared in the generated Pygments block, which
-   cannot be hand-edited; the wrapper is a scroller, so it is in the tab
-   order and needs a ring.  The ring is drawn inside, over the block's own
-   ink ground, so it is paper: 15.21:1 there. */
+/* .code-scroll itself is hand-written above the generated marker in
+   syntax.css; the wrapper is a scroller, so it is in the tab order and needs
+   a ring. The ring is drawn inside, over the block's own ink ground, so it is
+   paper: 15.21:1 there. */
 .code-scroll:focus-visible {
   --focus-ring-color: var(--paper);
   outline-offset: -3px;

@@ -176,6 +176,33 @@ class TestStilyagiHighlighting:
             f"{STYLESHEET} is stale; rerun scripts/generate_stilyagi_pygments_css.py"
         )
 
+    def test_layout_rules_stay_before_the_generated_marker(self) -> None:
+        """The generator owns tokens, while hand-written CSS owns layout."""
+        css = STYLESHEET.read_text(encoding="utf-8")
+        marker = css.index(BEGIN)
+        generated = css[marker : css.index(END) + len(END)]
+        layout_rules = (
+            ".code-scroll {",
+            ".stilyagi-syntax {\n  flex: 1;",
+            ".stilyagi-syntax pre {",
+        )
+
+        for rule in layout_rules:
+            assert rule in css[:marker], (
+                f"{rule!r} should remain before the generated marker"
+            )
+            assert rule not in generated, f"{rule!r} should not be generated"
+
+        built = build_css()
+        assert built.startswith(f"{BEGIN}\n\n:root {{")
+        assert built.endswith(f"\n\n{END}")
+        assert "--stilyagi-syntax-" in built
+        assert ".stilyagi-syntax { color:" in built
+        assert ".stilyagi-syntax ." in built
+        assert ".code-scroll" not in built
+        assert ".stilyagi-syntax {\n  flex: 1;" not in built
+        assert ".stilyagi-syntax pre" not in built
+
     def test_generator_writes_to_the_tracked_stylesheet(self) -> None:
         """The target is the tracked source, not the git-ignored build output.
 

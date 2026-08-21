@@ -1,28 +1,3 @@
-/* BEGIN generated stilyagi-pygments (scripts/generate_stilyagi_pygments_css.py) */
-
-:root {
-  --stilyagi-syntax-text: #efe4ce;
-  --stilyagi-syntax-comment: #827b6a;
-  --stilyagi-syntax-comment-preproc: #d69f2e;
-  --stilyagi-syntax-keyword: #29b4c4;
-  --stilyagi-syntax-operator: #efe4ce;
-  --stilyagi-syntax-punctuation: #efe4ce;
-  --stilyagi-syntax-name: #efe4ce;
-  --stilyagi-syntax-name-class: #e22d85;
-  --stilyagi-syntax-name-function: #e22d85;
-  --stilyagi-syntax-name-decorator: #d69f2e;
-  --stilyagi-syntax-name-builtin: #787f4e;
-  --stilyagi-syntax-name-builtin-pseudo: #787f4e;
-  --stilyagi-syntax-literal-string: #d69f2e;
-  --stilyagi-syntax-literal-string-doc: #827b6a;
-  --stilyagi-syntax-literal-string-escape: #da474e;
-  --stilyagi-syntax-literal-number: #d69f2e;
-  --stilyagi-syntax-generic-prompt: #787f4e;
-  --stilyagi-syntax-generic-output: #efe4ce;
-  --stilyagi-syntax-generic-error: #da474e;
-  --stilyagi-syntax-error: #da474e;
-}
-
 /* The scroll lives on a wrapper the template supplies, because a
    scrollable region must be keyboard reachable and Pygments emits
    the inner markup without attributes. Templates wrap the tag in
@@ -60,6 +35,31 @@
      without scrolling at desktop widths. */
   font-size: 0.88rem;
   line-height: 1.55;
+}
+
+/* BEGIN generated stilyagi-pygments (scripts/generate_stilyagi_pygments_css.py) */
+
+:root {
+  --stilyagi-syntax-text: #efe4ce;
+  --stilyagi-syntax-comment: #827b6a;
+  --stilyagi-syntax-comment-preproc: #d69f2e;
+  --stilyagi-syntax-keyword: #29b4c4;
+  --stilyagi-syntax-operator: #efe4ce;
+  --stilyagi-syntax-punctuation: #efe4ce;
+  --stilyagi-syntax-name: #efe4ce;
+  --stilyagi-syntax-name-class: #e22d85;
+  --stilyagi-syntax-name-function: #e22d85;
+  --stilyagi-syntax-name-decorator: #d69f2e;
+  --stilyagi-syntax-name-builtin: #787f4e;
+  --stilyagi-syntax-name-builtin-pseudo: #787f4e;
+  --stilyagi-syntax-literal-string: #d69f2e;
+  --stilyagi-syntax-literal-string-doc: #827b6a;
+  --stilyagi-syntax-literal-string-escape: #da474e;
+  --stilyagi-syntax-literal-number: #d69f2e;
+  --stilyagi-syntax-generic-prompt: #787f4e;
+  --stilyagi-syntax-generic-output: #efe4ce;
+  --stilyagi-syntax-generic-error: #da474e;
+  --stilyagi-syntax-error: #da474e;
 }
 
 .stilyagi-syntax { color: var(--stilyagi-syntax-text); }

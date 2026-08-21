@@ -8,15 +8,18 @@ import pytest
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
-from pygments.token import Comment, Punctuation
 
 from df12_pages.highlighting import HimotoshiStyle
 from scripts.generate_himotoshi_pygments_css import (
     BEGIN,
+    BOLD_WEIGHT,
+    CSS_CLASS,
     END,
     STYLESHEET,
+    VARIABLE_PREFIX,
     build_css,
 )
+from scripts.pygments_css import token_rules
 
 #: A Netsukefile exercising comments, YAML keys, Jinja expressions, quoted
 #: and plain scalars, and the block scalars the examples use for commands.
@@ -209,26 +212,26 @@ class TestHimotoshiPygmentsCss:
             f"Comment.Preproc should inherit Comment's italic: {preproc}"
         )
 
-    def test_the_private_token_class_api_still_behaves(self) -> None:
-        """Pin the one private Pygments API the generator depends on.
-
-        ``HtmlFormatter._get_css_classes`` has no public equivalent:
-        ``get_style_defs`` emits one class per styled token, not the
-        space-separated ancestor chain the grouping in
-        ``scripts.pygments_css`` needs. Pygments carries no upper bound
-        here, so assert the contract directly rather than inferring a
-        break from whichever downstream assertion happens to fail first.
-        """
-        formatter = HtmlFormatter(style=HimotoshiStyle, cssclass="hm-syntax")
-        class_for = formatter._get_css_classes
-
-        plain = class_for(Comment.Single)
-        compound = class_for(Punctuation.Indicator)
-
-        assert plain == "c1", f"expected the leaf class alone, got {plain!r}"
-        assert compound.split() == ["p", "p-Indicator"], (
-            f"expected a space-separated ancestor chain, got {compound!r}"
+    def test_token_rules_honour_the_formatter_class_prefix(self) -> None:
+        """Token rules prefix leaf classes and non-standard alias chains."""
+        formatter = HtmlFormatter(
+            style=HimotoshiStyle,
+            cssclass=CSS_CLASS,
+            classprefix="tok-",
         )
+        _variables, rules = token_rules(
+            formatter,
+            HimotoshiStyle,
+            CSS_CLASS,
+            VARIABLE_PREFIX,
+            BOLD_WEIGHT,
+        )
+        css = "\n".join(rules)
+
+        assert f".{CSS_CLASS} .tok-c1" in css
+        assert f".{CSS_CLASS} .tok-p.tok-p-Indicator" in css
+        assert f".{CSS_CLASS} .c1" not in css
+        assert f".{CSS_CLASS} .p.p-Indicator" not in css
 
     def test_committed_stylesheet_matches_the_generator(self) -> None:
         """The checked-in block is regenerated, never hand-edited.

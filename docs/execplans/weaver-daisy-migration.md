@@ -27,8 +27,12 @@ After this change:
   so a future palette change is a single-file edit.
 - Every page renders with **no third-party runtime requests at all**: fonts,
   icons, and paper textures are served from `/weaver/assets/`.
-- Every page passes an axe-core WCAG 2.2 AA scan with zero colour-contrast
-  violations.
+- Every page carries zero colour-contrast failures measured directly against
+  computed styles. axe-core's own WCAG 2.2 AA scan additionally reports
+  twenty-eight findings against code-panel text; these are false positives —
+  axe-core misreads those panels' background as `#ffffff` when the
+  rendered pixels sample `rgb(15, 36, 64)`, so the ratios it derives are
+  wrong (see the Decision Log).
 - The page chrome (sidebar, mobile drawer, head) is defined once instead of
   four times, so the legal pages gain the mobile navigation they currently
   lack.
@@ -496,7 +500,11 @@ The Weaver sub-site now builds the way every compiled sub-site does: one
 stylesheet, emitted by `bun run build` from `src/styles/weaver.css`, with no
 runtime compiler, no inline configuration, and no request to any other host.
 Colour is declared once and named for the job it does. The chrome is defined
-once instead of four times. Every page clears WCAG 2.2 AA at 360px and 1440px.
+once instead of four times. Every page carries zero colour-contrast failures,
+measured directly against computed styles, at 360px and 1440px. axe-core's
+own scan additionally reports twenty-eight findings against code-panel text;
+these are false positives, recorded as such in the Decision Log, not fixes
+made against the design.
 
 Measured against the pre-migration baseline, eight of the seventeen pages are
 identical in total height and the largest shift anywhere is 1.78%, on
@@ -899,9 +907,18 @@ inline-block align-[-0.125em]` so the substitution is metrically close, and
 tune per-site where the baseline diff shows a shift.
 
 Go/no-go: `test_weaver_pages_have_no_cdn_references` goes green. Screenshot
-comparison at 1440px across all fifteen pages shows an icon in every place one
-was before, at approximately the same size. A human reviews the icon grid; a
-"creative substitution" that reads wrongly is a bug, not an accepted variance.
+comparison at 1440px across all seventeen pages shows an icon in every place
+one was before, at approximately the same size. A human reviews the icon
+grid; a "creative substitution" that reads wrongly is a bug, not an accepted
+variance.
+
+**Correction (2026-08-21):** the generator actually implemented and committed
+is `scripts/generate_weaver_icons.py`, a Python script, invoked as
+`uv run python scripts/generate_weaver_icons.py` — not the TypeScript
+`scripts/generate-weaver-icons.ts` named above, in the `Interfaces and
+dependencies` list below, and in Milestone 9's documentation-update
+instruction. Regenerate `templates/weaver/_icons.jinja` with that command;
+`config/weaver-icons.yaml` and the drift test are unaffected.
 
 ### Milestone 6 — Semantic-class sweep
 
@@ -968,7 +985,7 @@ Go/no-go: diff is empty; `git grep -n 'weaver-site.css'` returns nothing;
 
 ### Milestone 8 — Accessibility audit and contrast fixes
 
-Run axe-core against all fifteen pages via agent-browser, at 360px and 1440px
+Run axe-core against all seventeen pages via agent-browser, at 360px and 1440px
 (the mobile drawer only exists at the narrow width, and its focus trap deserves
 a check). Record every violation.
 
@@ -991,9 +1008,11 @@ Also check non-colour findings the migration may have introduced: the icon
 substitution must not have left an interactive control without an accessible
 name, and the consolidated legal-page sidebar must not duplicate a landmark.
 
-Go/no-go: zero axe violations on all fifteen pages at both widths. The
-computed-style diff is non-empty and every entry corresponds to a logged
-substitution.
+Go/no-go: zero colour-contrast failures, measured directly against computed
+styles, on all seventeen pages at both widths. axe-core's twenty-eight
+code-panel findings are recorded in the Decision Log as false positives, not
+fixed. The computed-style diff is non-empty and every entry corresponds to a
+logged substitution.
 
 ### Milestone 9 — Documentation and cleanup
 
@@ -1017,6 +1036,11 @@ Add `config/weaver-icons.yaml` and the texture licences to
 
 All commands run from the repository root,
 `/data/leynos/Projects/df12-www.worktrees/update-weaver`.
+
+**Correction (2026-08-21):** the path above names this worktree's
+checkout-specific location and should not be relied upon. The instruction is
+simply to run all commands from the repository root, whatever its checkout
+path happens to be.
 
 Set up and build:
 
@@ -1075,7 +1099,7 @@ make all
 ```
 
 Run the accessibility scan (Milestone 8), via the agent-browser skill against
-the served site, at 360px and 1440px for each of the fifteen URLs.
+the served site, at 360px and 1440px for each of the seventeen URLs.
 
 ## Validation and acceptance
 
@@ -1106,8 +1130,10 @@ removed as part of the green step.
   CSS partials.
 - Types: `make typecheck` passes.
 - Docs: `make markdownlint`, `make nixie`, and `make spelling` pass.
-- Accessibility: axe-core reports zero violations on fifteen pages at two
-  viewport widths.
+- Accessibility: zero colour-contrast failures, measured directly against
+  computed styles, across all seventeen pages at two viewport widths.
+  axe-core's twenty-eight code-panel findings are logged as false positives,
+  not fixed (see Decision Log).
 - Styling: the final computed-style diff against the Milestone 0 baseline
   contains only entries traceable to a `Decision Log` line.
 
@@ -1143,6 +1169,16 @@ To be filled during execution: the Milestone 2 diff transcript (the critical
 proof that the compiled pipeline matches the CDN), the axe violation table with
 before and after ratios, the icon mapping table, and the texture licence
 attributions.
+
+**Correction (2026-08-21):** the transcripts and tables anticipated above were
+not produced as a standalone artefact; the axe and computed-style evidence
+instead lives inline, in `Surprises & Discoveries` and `Decision Log` above.
+Wherever this plan requires a scan or comparison "across all pages", that
+means all seventeen published pages, derived from the published-page
+inventory rather than hard-coded (see the Milestone 0 correction to the page
+count). The axe evidence records twenty-eight code-panel findings as false
+positives, not as violations awaiting a fix — see the Decision Log entry for
+the measured basis.
 
 ## Interfaces and dependencies
 

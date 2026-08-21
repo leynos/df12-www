@@ -1,0 +1,72 @@
+/* Syntax colouring for the hand-marked code samples.
+ *
+ * These rules were four near-identical copies of each other, inlined in
+ * `<style>` blocks on commands/act, commands/observe, commands/verify, and
+ * safety. Each copy carried the same seven or eight colour literals, and they
+ * had already begun to disagree about which tokens existed.
+ *
+ * The palette is Dracula, which is where the values came from. Unlike the
+ * Netsuke and Stilyagi sub-sites, these samples are marked up by hand in the
+ * templates rather than highlighted by Pygments, so there is no generator
+ * here — just the class names the markup uses.
+ */
+
+.token-key {
+  color: var(--color-token-key);
+}
+
+.token-string {
+  color: var(--color-token-string);
+}
+
+.token-number {
+  color: var(--color-token-number);
+}
+
+.token-boolean {
+  color: var(--color-token-boolean);
+}
+
+.token-comment {
+  color: var(--color-token-comment);
+  font-style: italic;
+}
+
+.token-cmd {
+  color: var(--color-token-cmd);
+  font-weight: bold;
+}
+
+.token-arg {
+  color: var(--color-token-arg);
+}
+
+.token-pass {
+  color: var(--color-token-pass);
+}
+
+.token-fail {
+  color: var(--color-token-fail);
+}
+
+/* The offset block under a code panel, matching the `shadow-panel-sm` token
+   the rest of the site uses. Named separately because the markup that carries
+   it predates the token. */
+.code-block-shadow {
+  box-shadow: var(--shadow-panel-sm);
+}
+
+/* A code block that scrolls horizontally is wider than the panel painting its
+   background, so the text beyond the fold has nothing behind it but the page.
+   In practice the panel clips it, and nobody notices — but it is the panel's
+   background doing the work, not the block's, and an automated audit reading
+   the tree cannot tell that the text will land somewhere legible. Painting the
+   panel's colour onto the block itself makes the guarantee explicit and
+   travels with the scroll.
+
+   `inherit` rather than a token: these blocks sit on several different
+   surfaces, and each should keep the one it was put on. Where the parent is
+   transparent this resolves to transparent and changes nothing. */
+pre {
+  background-color: inherit;
+}

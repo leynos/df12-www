@@ -1,0 +1,62 @@
+/* Element defaults for the Weaver sub-site.
+ *
+ * These sit in the base layer, beside Tailwind's preflight rather than
+ * above it, because they describe what an element looks like before any
+ * class touches it. A utility in the markup still wins.
+ *
+ * `code` carries no font-size on purpose: see the note in the commit that
+ * removed it. The preflight's `font-size: 1em` is what this site has
+ * always rendered.
+ */
+
+::selection {
+  background: var(--color-neutral);
+  color: var(--color-white);
+}
+
+/* A slim scrollbar, asked for through the standard property rather than the
+   `-webkit-` pseudo-elements below. Chromium honours `scrollbar-width` and
+   `scrollbar-color` in preference to those, and Firefox has never supported
+   them at all, so this is the rule that actually runs on a current browser.
+   It measures 10px against the platform default of 15. The colour comes from
+   daisyUI's own `:root` declaration. */
+:root {
+  scrollbar-width: thin;
+}
+
+/* Retained as a fallback, not as dead weight: browsers predating
+   `scrollbar-width` support ignore the rule above and take these instead.
+   Where both are understood, the standard property wins and these do
+   nothing. */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-base-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+body {
+  background-color: var(--color-base-100);
+  color: var(--color-primary);
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+code {
+  font-family: "IBM Plex Mono", monospace;
+  background: color-mix(in oklab, var(--color-primary) 8%, transparent);
+  padding: 0.12rem 0.32rem;
+  border-radius: 0.2rem;
+}
+
+pre code {
+  display: block;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}

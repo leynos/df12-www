@@ -1,0 +1,241 @@
+/* Weaver sub-site stylesheet — the Tailwind 4 + daisyUI 5 entry.
+ *
+ * Compiled by the shared df12 build into
+ * public/weaver/assets/styles/weaver.css, alongside the main, mxd, and
+ * Episodic entrypoints. It replaces the Tailwind Play CDN the sub-site used
+ * to load at runtime, together with the inline `tailwind.config` block that
+ * was duplicated across four templates.
+ *
+ * The palette is declared once — as the daisyUI "weaver" theme plus the brand
+ * tokens under @theme — and every template and partial consumes those
+ * variables rather than restating a colour literal. See
+ * docs/execplans/weaver-daisy-migration.md.
+ */
+
+@import "tailwindcss";
+
+/* @font-face rules belong to no layer: an unlayered at-rule that declares a
+ * font rather than styling an element cannot lose a cascade argument, and
+ * putting it in `base` would be a claim about precedence it does not need. */
+@import "./weaver/fonts.css";
+
+/* The sub-site's own rules, split by concern and placed in layers.
+ *
+ * The layering is load-bearing. When this stylesheet stood alone beside the
+ * Play CDN, both it and the utilities were unlayered, so ties went to the
+ * utilities on source order — the CDN injected its <style> after this file's
+ * <link>. Compiled Tailwind puts utilities in @layer utilities, and per CSS
+ * Cascade Level 5 an unlayered declaration beats every layered one regardless
+ * of specificity. Left unlayered, these rules would start winning arguments
+ * they used to lose. In the components layer the old relationship holds: a
+ * utility in the markup still wins.
+ *
+ * Element defaults go a layer lower, beside the preflight, for the same
+ * reason in reverse: they describe an element before any class touches it.
+ *
+ * Order within the layer matters only where two rules could meet on the same
+ * element, which here means `chrome` before `content`: a legal page's
+ * sidebar and its prose both live under the same shell. */
+@import "./weaver/site-base.css" layer(base);
+
+@import "./weaver/chrome.css" layer(components);
+@import "./weaver/panels.css" layer(components);
+@import "./weaver/callouts.css" layer(components);
+@import "./weaver/figures.css" layer(components);
+@import "./weaver/code.css" layer(components);
+@import "./weaver/motion.css" layer(components);
+@import "./weaver/pages.css" layer(components);
+@import "./weaver/content.css" layer(components);
+@import "./weaver/design-language.css" layer(components);
+
+@source "../../templates/weaver/**/*.jinja";
+@source "../static/weaver/assets/js/mobile-nav.js";
+
+@plugin "daisyui" {
+  themes: weaver --default;
+  logs: false;
+}
+
+/* The Weaver palette as a daisyUI theme.
+ *
+ * Indigo does two jobs: it is the body-text colour and it is the brand fill
+ * behind the active navigation item and the primary buttons. It therefore
+ * occupies both base-content and primary, which is not a duplication so much
+ * as an honest description — if the text colour and the brand ever part
+ * company, they part here.
+ *
+ * The base ramp is a parchment scale rather than daisyUI's usual descent
+ * into grey. It is also barely used: panels on this site sit *above* the
+ * page as white cards, which a base ramp cannot express, so the markup
+ * reaches for `bg-white` and its opacity modifiers instead. The ramp is
+ * declared because daisyUI requires it and because a future panel may want
+ * a parchment step rather than a white one.
+ */
+@plugin "daisyui/theme" {
+  name: "weaver";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #f3efd9;
+  --color-base-200: #ece7cd;
+  --color-base-300: #ded8bc;
+  --color-base-content: #193c6e;
+
+  --color-primary: #193c6e;
+  --color-primary-content: #f3efd9;
+  --color-secondary: #0f2440;
+  --color-secondary-content: #f3efd9;
+  --color-accent: #e8502b;
+  --color-accent-content: #ffffff;
+  --color-neutral: #0f2440;
+  --color-neutral-content: #f3efd9;
+
+  --color-info: #193c6e;
+  --color-info-content: #f3efd9;
+  --color-success: #3a7049;
+  --color-success-content: #ffffff;
+  --color-warning: #8a6420;
+  --color-warning-content: #fff4e0;
+  --color-error: #c43a3a;
+  --color-error-content: #ffffff;
+
+  /* Weaver's surfaces are hard-edged: the markup reaches for rounded-sm and
+     rounded-[2px] almost exclusively, and its elevation is drawn with offset
+     block shadows rather than blur. daisyUI's depth shading would fight
+     that, so it is off. */
+  --radius-selector: 0.2rem;
+  --radius-field: 0.125rem;
+  --radius-box: 0.125rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  /* Typography. Playfair Display carries the mastheads and pull quotes, IBM
+     Plex Sans the prose, IBM Plex Mono the labels, code, and the stamped
+     small-caps the design uses for section numbering. */
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* The brand mark is a kanji, and none of the three families above
+     carries one. This asks the system for a serif CJK face, to sit in the
+     same register as Playfair, and falls back to whatever serif the
+     platform has. Nothing is self-hosted for it: a CJK font is several
+     megabytes for a single glyph, and every current desktop and mobile
+     platform ships one. */
+  --font-kanji:
+    "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", "Noto Serif JP", "Source Han Serif",
+    "Songti SC", serif;
+
+  /* The muted indigo. daisyUI has no slot for a third text weight between
+     base-content and the surface, so it is a token of its own. */
+  --color-ink-muted: var(--color-ink-muted-deep);
+  --color-ink-muted-deep: #4a6fa5;
+  --color-ink-muted-lift: #90a9cd; /* the same role, read on a dark panel */
+
+  /* The accent in its two reading weights. `--color-accent` itself stays
+     the brand vermilion and is used for fills, rules, and display type,
+     where the contrast floor does not apply. At body size it does, and
+     3.23:1 on the parchment is not enough, so text takes a deeper cut of
+     the same hue — and a lighter one on the dark panels, where the deeper
+     cut would be worse than what it replaced. */
+  --color-accent-deep: #af3114; /* 5.55:1 on base-100, and 4.68:1 on the
+                                   deepest of the tinted grounds these
+                                   labels sit on */
+  --color-accent-lift: #f4a694; /* 5.61:1 on primary, the lightest of the
+                                   dark surfaces, and better on the rest.
+                                   The headroom is deliberate: some of
+                                   those panels carry a texture that lifts
+                                   the ground a little. */
+  --color-accent-ink: var(--color-accent-deep);
+
+  /* The near-black the design-system page names Deep Contrast. Darker and
+     cooler than `neutral`, and used where a panel has to read as a void
+     rather than as ink. */
+  --color-ink-deep: #0f172a;
+
+  /* Three sizes below Tailwind's `text-xs`, which the design uses for its
+     stamped labels and gutter numbers. No paired line-height, matching the
+     arbitrary values they replace. */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-3xs: 0.625rem; /* 10px */
+  --text-4xs: 0.5rem; /* 8px */
+
+  /* The two letter-spacings the stamped small-caps use. */
+  --tracking-stamp: 0.3em;
+  --tracking-label: 0.2em;
+
+  /* Elevation is drawn as a hard offset block, never a blur. `block` is the
+     solid one under the current nav item; the panel shadows are washes of the
+     same indigo at three weights. */
+  --shadow-block: 2px 2px 0 #193c6e;
+  --shadow-panel-sm: 4px 4px 0 rgba(25, 60, 110, 0.1);
+  --shadow-panel: 8px 8px 0 rgba(25, 60, 110, 0.1);
+  --shadow-panel-soft: 8px 8px 0 rgba(25, 60, 110, 0.08);
+
+  /* Dracula, which is where the hand-marked code samples took their colours.
+     The `.token-*` classes in weaver/code.css are the only consumers. */
+  --color-token-key: #8be9fd;
+  --color-token-string: #f1fa8c;
+  --color-token-number: #bd93f9;
+  --color-token-boolean: #ff79c6;
+  --color-token-comment: #8390b7; /* lifted from Dracula's #6272a4, which
+                                     reads at 3.03:1 on its own surface */
+  --color-token-cmd: #50fa7b;
+  --color-token-arg: #f8f8f2;
+  --color-token-pass: #50fa7b;
+  --color-token-fail: #ff5555;
+  --color-code-surface: #282a36;
+
+  /* Weaver's own signal palette. These began as Tailwind's stock shades,
+     used directly in the markup; each is kept at the value the design was
+     drawn against and given the name of the job it does. */
+  /* Syntax colours inside the dark terminal and code panels. */
+  --color-code-text: #d1d5db; /* was gray-300: body text in a dark code panel */
+  --color-code-dim: #9ca3af; /* was gray-400: secondary text in a dark panel */
+  --color-code-muted: #a1a7b1; /* was gray-500: comments and gutter labels;
+                                  lightened from #6b7280, which read at
+                                  3.23:1 on the panels it is used on */
+  --color-code-string: #4ade80; /* was green-400: strings and shell output */
+  --color-code-key: #9333ea; /* was purple-600: YAML and JSON keys */
+  --color-code-name: #2563eb; /* was blue-600: identifiers and job names */
+  --color-code-pass: #86efac; /* was green-300: the tick beside a passing check */
+  --color-code-fail: #f87171; /* was red-400: the cross beside a failing check */
+  --color-code-warn: #facc15; /* was yellow-400: counts and warning marks */
+
+  /* Syntax colours for the code samples set on a light surface. */
+  --color-code-ink: #374151; /* was gray-700: body text on a light code surface */
+  --color-code-literal: #127036; /* was green-700: quoted literals, deepened
+                                    from #15803d for 5.35:1 on parchment */
+  --color-code-ref: #1d4ed8; /* was blue-700: quoted references */
+
+  /* Annotation callouts hung off a code sample, text and rule. */
+  --color-note-info: #93c5fd; /* was blue-300: informational annotation */
+  --color-note-info-line: #3b82f6; /* was blue-500: its rule */
+  --color-note-warn: #fde047; /* was yellow-300: cautionary annotation */
+
+  /* Status signals: the pulsing dots, bars, and badges. */
+  --color-status-ok: #22c55e; /* was green-500: operational */
+  --color-status-ok-strong: #117c38; /* was green-600: a filled bar or badge;
+                                        deepened from #16a34a, which carried
+                                        white text at 3.30:1 */
+  --color-status-warn: #eab308; /* was yellow-500: degraded, and the rule under a warning note */
+  --color-status-error: #ef4444; /* was red-500: failed */
+
+  /* Tinted status pills in the docs and roadmap tables: fill and ink. */
+  --color-status-ok-soft: #dcfce7; /* was green-100 */
+  --color-status-ok-ink: #166534; /* was green-800 */
+  --color-status-info-soft: #dbeafe; /* was blue-100 */
+  --color-status-info-ink: #1e40af; /* was blue-800 */
+  --color-status-idle-soft: #f3f4f6; /* was gray-100 */
+  --color-status-idle-ink: #4b5563; /* was gray-600 */
+
+  /* The mock interface drawn on the philosophy page. */
+  --color-mock-surface: #f9fafb; /* was gray-50 */
+  --color-mock-line: #e5e7eb; /* was gray-200 */
+}

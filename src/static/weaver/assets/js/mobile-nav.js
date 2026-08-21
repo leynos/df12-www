@@ -35,7 +35,11 @@
   btn.setAttribute("aria-controls", nav.id || "sidebar-nav");
   btn.setAttribute("aria-label", "Open navigation menu");
   if (!nav.id) nav.id = "sidebar-nav";
-  btn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+  /* The button *is* the brand mark: the glyph and the block of indigo
+     both come from `.weaver-brand-mark` in weaver/chrome.css, so this
+     file carries no markup of its own. `aria-label` above says what the
+     button does, and is kept in step with its state below. */
+  btn.className = "weaver-brand-mark";
   header.style.position = "relative";
   header.appendChild(btn);
 
@@ -51,7 +55,7 @@
     sidebar.style.setProperty("--mobile-header-height", `${h}px`);
   }
 
-  var previousBodyOverflow = "";
+  var previousBodyOverflowY = "";
   var savedFocus = null;
   var focusTrapHandler = null;
 
@@ -70,9 +74,15 @@
     sidebar.classList.add("mobile-nav-open");
     btn.setAttribute("aria-expanded", "true");
     btn.setAttribute("aria-label", "Close navigation menu");
-    btn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-    previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    /* Lock the vertical axis only.
+     *
+     * `style.overflow` would set both axes, momentarily replacing the
+     * `overflow-x: hidden` the body carries as a class — the clip that
+     * keeps the page from scrolling sideways — and then removing both on
+     * close. The horizontal clip should never be disturbed: the drawer
+     * only ever needed to stop the page scrolling underneath it. */
+    previousBodyOverflowY = document.body.style.overflowY;
+    document.body.style.overflowY = "hidden";
     setHeaderHeight();
 
     /* Save focus and move it into the nav */
@@ -127,8 +137,7 @@
     sidebar.classList.remove("mobile-nav-open");
     btn.setAttribute("aria-expanded", "false");
     btn.setAttribute("aria-label", "Open navigation menu");
-    btn.innerHTML = '<i class="fa-solid fa-bars"></i>';
-    document.body.style.overflow = previousBodyOverflow;
+    document.body.style.overflowY = previousBodyOverflowY;
 
     /* Remove focus trap */
     if (focusTrapHandler) {
@@ -136,12 +145,22 @@
       focusTrapHandler = null;
     }
 
-    /* Restore focus */
-    if (savedFocus && typeof savedFocus.focus === "function") {
-      savedFocus.focus();
-    } else {
-      btn.focus();
-    }
+    /* Restore focus.
+     *
+     * `<body>` is not a focus holder worth returning to. It is what
+     * `document.activeElement` reports when nothing is focused, which is the
+     * usual case for someone who opened the drawer by tapping it: the saved
+     * element is the body, `body.focus()` does nothing, and focus is left on
+     * a nav link inside a drawer that has just been hidden. Falling back to
+     * the toggle puts it somewhere the reader can see and use. */
+    var restoreTo =
+      savedFocus &&
+      savedFocus !== document.body &&
+      savedFocus.isConnected &&
+      typeof savedFocus.focus === "function"
+        ? savedFocus
+        : btn;
+    restoreTo.focus();
     savedFocus = null;
   }
 

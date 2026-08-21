@@ -1,15 +1,9 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Documentation - Weaver AI Codebase Tooling{% endblock %}
 
 {% block extra_head %}
-    <style>
-        /* Search Input */
-        .search-input:focus { outline: none; border-color: #E8502B; }
-
-        /* Sticky TOC */
-        .sticky-toc { position: sticky; top: 2rem; max-height: calc(100vh - 4rem); overflow-y: auto; }
-    </style>
 {% endblock %}
 
 {% block main_extra_class %} flex flex-col xl:flex-row{% endblock %}
@@ -17,49 +11,49 @@
 {% block content %}
 
             <!-- Inner Sidebar / Table of Contents -->
-            <aside class="w-full xl:w-72 bg-weaver-cream/80 backdrop-blur border-r border-weaver-indigo/10 p-8 hidden xl:block z-30 sticky top-0 h-screen overflow-y-auto">
+            <aside class="w-full xl:w-72 bg-base-100/80 backdrop-blur border-r border-base-content/10 p-8 hidden xl:block z-30 sticky top-0 h-screen overflow-y-auto">
                 <div class="mb-8">
                     <div class="relative">
-                        <i class="fa-solid fa-search absolute left-3 top-3 text-weaver-indigo/40 text-xs"></i>
-                        <input type="text" placeholder="Search docs..." class="w-full pl-8 pr-3 py-2 bg-white border border-weaver-indigo/20 rounded-sm text-xs font-mono text-weaver-indigo search-input focus:ring-1 focus:ring-weaver-vermilion">
-                        <div class="absolute right-2 top-2 px-1 border border-weaver-indigo/10 rounded text-[10px] text-weaver-indigo/40 font-mono">⌘K</div>
+                        {{ icon('search', 'absolute left-3 top-3 text-base-content/75 text-xs') }}
+                        <input type="text" placeholder="Search docs..." class="w-full pl-8 pr-3 py-2 bg-white border border-base-content/20 rounded-xs text-xs font-mono text-base-content search-input focus:ring-1 focus:ring-accent">
+                        <div class="absolute right-2 top-2 px-1 border border-base-content/10 rounded-sm text-3xs text-base-content/75 font-mono">⌘K</div>
                     </div>
                 </div>
 
                 <div class="space-y-8 sticky-toc">
                     <div>
-                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Design &amp; Concept</h3>
-                        <ul class="space-y-2 border-l border-weaver-indigo/10 ml-1">
-                            <li><a href="#design-docs" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Design Documents</a></li>
-                            <li><a href="#architecture" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Architecture Deep Dive</a></li>
+                        <h3 class="font-serif text-base-content font-bold mb-3 text-sm">Design &amp; Concept</h3>
+                        <ul class="space-y-2 border-l border-base-content/10 ml-1">
+                            <li><a href="#design-docs" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Design Documents</a></li>
+                            <li><a href="#architecture" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Architecture Deep Dive</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Core Systems</h3>
-                        <ul class="space-y-2 border-l border-weaver-indigo/10 ml-1">
-                            <li><a href="#configuration" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Configuration Reference</a></li>
-                            <li><a href="#environment-variables" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Environment Variables</a></li>
-                            <li><a href="#jsonl-schema" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">JSONL Schema</a></li>
-                            <li><a href="#daemon-lifecycle" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Daemon Lifecycle</a></li>
+                        <h3 class="font-serif text-base-content font-bold mb-3 text-sm">Core Systems</h3>
+                        <ul class="space-y-2 border-l border-base-content/10 ml-1">
+                            <li><a href="#configuration" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Configuration Reference</a></li>
+                            <li><a href="#environment-variables" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Environment Variables</a></li>
+                            <li><a href="#jsonl-schema" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">JSONL Schema</a></li>
+                            <li><a href="#daemon-lifecycle" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Daemon Lifecycle</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Plugins &amp; Extensibility</h3>
-                        <ul class="space-y-2 border-l border-weaver-indigo/10 ml-1">
-                            <li><a href="#plugins" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Plugin System</a></li>
-                            <li><a href="#capability-ids" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Capability IDs</a></li>
-                            <li><a href="#language-servers" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Language Servers</a></li>
+                        <h3 class="font-serif text-base-content font-bold mb-3 text-sm">Plugins &amp; Extensibility</h3>
+                        <ul class="space-y-2 border-l border-base-content/10 ml-1">
+                            <li><a href="#plugins" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Plugin System</a></li>
+                            <li><a href="#capability-ids" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Capability IDs</a></li>
+                            <li><a href="#language-servers" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Language Servers</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h3 class="font-serif text-weaver-indigo font-bold mb-3 text-sm">Parsing &amp; Analysis</h3>
-                        <ul class="space-y-2 border-l border-weaver-indigo/10 ml-1">
-                            <li><a href="#tree-sitter" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Tree-sitter Integration</a></li>
-                            <li><a href="#semgrep-patterns" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">Sempai Patterns</a></li>
-                            <li><a href="#lsp-setup" class="block pl-4 text-xs text-weaver-indigo/70 hover:text-weaver-vermilion hover:border-l-2 hover:border-weaver-vermilion -ml-[1px] py-1 transition-all">LSP Configuration</a></li>
+                        <h3 class="font-serif text-base-content font-bold mb-3 text-sm">Parsing &amp; Analysis</h3>
+                        <ul class="space-y-2 border-l border-base-content/10 ml-1">
+                            <li><a href="#tree-sitter" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Tree-sitter Integration</a></li>
+                            <li><a href="#semgrep-patterns" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Sempai Patterns</a></li>
+                            <li><a href="#lsp-setup" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">LSP Configuration</a></li>
                         </ul>
                     </div>
                 </div>
@@ -68,22 +62,22 @@
             <!-- Content Area -->
             <div class="flex-1 min-w-0">
                 <!-- Mobile Search & TOC Toggle (Visible only on small screens) -->
-                <div class="xl:hidden p-4 border-b border-weaver-indigo/10 bg-weaver-cream sticky top-0 z-30">
+                <div class="xl:hidden p-4 border-b border-base-content/10 bg-base-100 sticky top-0 z-30">
                     <div class="relative">
-                        <i class="fa-solid fa-search absolute left-3 top-3 text-weaver-indigo/40 text-xs"></i>
-                        <input type="text" placeholder="Search documentation..." class="w-full pl-8 pr-3 py-2 bg-white border border-weaver-indigo/20 rounded-sm text-xs font-mono text-weaver-indigo">
+                        {{ icon('search', 'absolute left-3 top-3 text-base-content/75 text-xs') }}
+                        <input type="text" placeholder="Search documentation..." class="w-full pl-8 pr-3 py-2 bg-white border border-base-content/20 rounded-xs text-xs font-mono text-base-content">
                     </div>
                 </div>
 
                 <div class="p-8 lg:p-16 masthead-frame mx-auto">
 
                     <!-- Header -->
-                    <header class="mb-16 border-b border-weaver-indigo/20 pb-8">
+                    <header class="mb-16 border-b border-base-content/20 pb-8">
                         <div class="masthead-eyebrow mb-6">
-                            <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Reference Manual</span>
+                            <span class="font-mono text-xs tracking-widest uppercase text-base-content">Reference Manual</span>
                         </div>
-                        <h1 class="font-serif text-5xl text-weaver-indigo font-bold mb-4">Documentation</h1>
-                        <p class="text-lg text-weaver-indigo/70 font-light max-w-2xl">
+                        <h1 class="font-serif text-5xl text-base-content font-bold mb-4">Documentation</h1>
+                        <p class="text-lg text-base-content/88 font-light max-w-2xl">
                             Comprehensive guides for the Weaver toolchain, from low-level protocol specifications to high-level integration patterns.
                         </p>
                     </header>
@@ -91,75 +85,75 @@
                     <!-- Design Docs Section -->
                     <section id="design-docs" class="mb-20 scroll-mt-20">
                         <div class="flex items-center mb-8">
-                            <span class="h-px w-8 bg-weaver-vermilion mr-4"></span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo">Design Documents</h2>
+                            <span class="h-px w-8 bg-accent mr-4"></span>
+                            <h2 class="font-serif text-3xl text-base-content">Design Documents</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/weaver-design.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/weaver-design.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-pen-ruler text-4xl text-weaver-indigo"></i>
+                                    {{ icon('pen-ruler', 'text-4xl text-base-content') }}
                                 </div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Weaver Design Document</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-4">Architecture, Semantic Fusion Engine, Double-Lock harness, client-daemon model, and composable UNIX primitives.</p>
-                                <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
+                                <h3 class="font-serif text-xl text-base-content mb-2">Weaver Design Document</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Architecture, Semantic Fusion Engine, Double-Lock harness, client-daemon model, and composable UNIX primitives.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">weaver-design.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-shield-halved text-4xl text-weaver-indigo"></i>
+                                    {{ icon('shield-halved', 'text-4xl text-base-content') }}
                                 </div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">ADR-001: Plugin Capability Model</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-4">Capability-first model for act operations, including <code>extricate-symbol</code> and provider resolution.</p>
-                                <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
-                                    <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded mr-2">PROPOSED</span>
+                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-001: Plugin Capability Model</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Capability-first model for act operations, including <code>extricate-symbol</code> and provider resolution.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
                                     <span class="font-mono">adr-001</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/sempai-query-language-design.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/sempai-query-language-design.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-magnifying-glass text-4xl text-weaver-indigo"></i>
+                                    {{ icon('magnifying-glass', 'text-4xl text-base-content') }}
                                 </div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Sempai Query Language Design</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-4">Semgrep-compatible query engine backed by Tree-sitter for semantics-aware code pattern matching.</p>
-                                <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
+                                <h3 class="font-serif text-xl text-base-content mb-2">Sempai Query Language Design</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Semgrep-compatible query engine backed by Tree-sitter for semantics-aware code pattern matching.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">sempai-query-language-design.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/jacquard-card-first-symbol-graph-design.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/jacquard-card-first-symbol-graph-design.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-diagram-project text-4xl text-weaver-indigo"></i>
+                                    {{ icon('diagram-project', 'text-4xl text-base-content') }}
                                 </div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Jacquard: Card-First Symbol Graph</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-4">Structured symbol cards, bounded graph slices, and time-travel diffs over recent commits.</p>
-                                <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
+                                <h3 class="font-serif text-xl text-base-content mb-2">Jacquard: Card-First Symbol Graph</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Structured symbol cards, bounded graph slices, and time-travel diffs over recent commits.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">jacquard-card-first-symbol-graph-design.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/users-guide.md" target="_blank" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/users-guide.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-book text-4xl text-weaver-indigo"></i>
+                                    {{ icon('book', 'text-4xl text-base-content') }}
                                 </div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">User's Guide</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-4">CLI commands, domain operations, configuration, daemon lifecycle, and plugin system.</p>
-                                <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
+                                <h3 class="font-serif text-xl text-base-content mb-2">User's Guide</h3>
+                                <p class="text-sm text-base-content/88 mb-4">CLI commands, domain operations, configuration, daemon lifecycle, and plugin system.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">users-guide.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
-                            <a href="/weaver/roadmap/" class="group block p-6 bg-white border border-weaver-indigo/10 rounded-sm relative overflow-hidden hover:border-weaver-vermilion/40 transition-colors">
+                            <a href="/weaver/roadmap/" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <i class="fa-solid fa-route text-4xl text-weaver-indigo"></i>
+                                    {{ icon('route', 'text-4xl text-base-content') }}
                                 </div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Roadmap</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-4">Phased delivery plan from foundation through plugin ecosystem to long-term intelligence features.</p>
-                                <div class="flex items-center text-xs font-mono text-weaver-indigo/50">
+                                <h3 class="font-serif text-xl text-base-content mb-2">Roadmap</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Phased delivery plan from foundation through plugin ecosystem to long-term intelligence features.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">roadmap.md</span>
-                                    <i class="fa-solid fa-arrow-right ml-auto text-weaver-vermilion opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
                         </div>
@@ -168,100 +162,100 @@
                     <!-- Configuration Section -->
                     <section id="configuration" class="mb-20 scroll-mt-20">
                         <div class="flex items-center mb-8">
-                            <span class="h-px w-8 bg-weaver-vermilion mr-4"></span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo">Configuration</h2>
+                            <span class="h-px w-8 bg-accent mr-4"></span>
+                            <h2 class="font-serif text-3xl text-base-content">Configuration</h2>
                         </div>
-                        <p class="mb-6 text-weaver-indigo/80">
-                            Configuration is layered with <code class="font-mono text-xs bg-weaver-indigo/10 px-1">ortho-config</code>. Each successive layer overrides earlier sources, so a CLI flag always wins.
+                        <p class="mb-6 text-base-content/80">
+                            Configuration is layered with <code class="font-mono text-xs bg-primary/10 px-1">ortho-config</code>. Each successive layer overrides earlier sources, so a CLI flag always wins.
                         </p>
                         <div class="reference-callout mb-8">
                             <div class="reference-callout-title">
-                                <i class="fa-solid fa-book-open"></i>
+                                {{ icon('book-open') }}
                                 Canonical reference
                             </div>
-                            <p class="text-sm text-weaver-indigo/80 mb-3">
+                            <p class="text-sm text-base-content/80 mb-3">
                                 This docs hub is the maintained source of truth for configuration defaults, global flags, daemon lifecycle, and the JSONL envelope. Other pages link back here rather than carrying parallel copies of the same contract.
                             </p>
                             <div class="flex flex-wrap gap-3 text-xs font-mono">
-                                <a href="#configuration" class="text-weaver-vermilion hover:underline">Configuration</a>
-                                <a href="#jsonl-schema" class="text-weaver-vermilion hover:underline">JSONL protocol</a>
-                                <a href="#daemon-lifecycle" class="text-weaver-vermilion hover:underline">Daemon lifecycle</a>
+                                <a href="#configuration" class="text-accent-ink hover:underline">Configuration</a>
+                                <a href="#jsonl-schema" class="text-accent-ink hover:underline">JSONL protocol</a>
+                                <a href="#daemon-lifecycle" class="text-accent-ink hover:underline">Daemon lifecycle</a>
                             </div>
                         </div>
 
                         <!-- Precedence table -->
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium w-16">Priority</th>
                                         <th class="p-4 font-medium">Source</th>
                                         <th class="p-4 font-medium">Notes</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">4</td>
-                                        <td class="p-4 font-mono text-weaver-indigo">CLI flags</td>
-                                        <td class="p-4 text-weaver-indigo/80">Always honoured. See table below.</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">4</td>
+                                        <td class="p-4 font-mono text-base-content">CLI flags</td>
+                                        <td class="p-4 text-base-content/80">Always honoured. See table below.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">3</td>
-                                        <td class="p-4 font-mono text-weaver-indigo">Environment variables</td>
-                                        <td class="p-4 text-weaver-indigo/80"><code>WEAVER_*</code> convention. Override files, yield to flags.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">3</td>
+                                        <td class="p-4 font-mono text-base-content">Environment variables</td>
+                                        <td class="p-4 text-base-content/80"><code>WEAVER_*</code> convention. Override files, yield to flags.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">2</td>
-                                        <td class="p-4 font-mono text-weaver-indigo">Configuration files</td>
-                                        <td class="p-4 text-weaver-indigo/80">TOML. Discovered via <code>--config-path</code> or XDG search.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">2</td>
+                                        <td class="p-4 font-mono text-base-content">Configuration files</td>
+                                        <td class="p-4 text-base-content/80">TOML. Discovered via <code>--config-path</code> or XDG search.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">1</td>
-                                        <td class="p-4 font-mono text-weaver-indigo">Built-in defaults</td>
-                                        <td class="p-4 text-weaver-indigo/80">Unix socket, <code>info</code> filter, <code>json</code> format, no overrides.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">1</td>
+                                        <td class="p-4 font-mono text-base-content">Built-in defaults</td>
+                                        <td class="p-4 text-base-content/80">Unix socket, <code>info</code> filter, <code>json</code> format, no overrides.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- TOML example -->
-                        <div class="bg-weaver-dark p-6 rounded-sm shadow-lg overflow-x-auto border border-weaver-indigo/20 mb-8 paper-panel">
+                        <div class="bg-neutral p-6 rounded-xs shadow-lg overflow-x-auto border border-base-content/20 mb-8 paper-panel">
                             <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                                <span class="text-xs font-mono text-weaver-cream/60">weaver.toml</span>
-                                <button class="text-xs text-weaver-cream/40 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                                <span class="text-xs font-mono text-base-100/70">weaver.toml</span>
+                                <button type="button" aria-label="Copy to clipboard" class="text-xs text-base-100/70 hover:text-white">{{ icon('copy') }}</button>
                             </div>
-<pre class="font-mono text-sm text-gray-300 leading-relaxed">
-<span class="text-gray-500"># Top-level keys (no [section] headers)</span>
+<pre class="font-mono text-sm text-code-text leading-relaxed">
+<span class="text-code-muted"># Top-level keys (no [section] headers)</span>
 
-<span class="text-gray-500"># Daemon transport (Unix socket or TCP)</span>
-daemon_socket = { transport = <span class="text-green-400">"tcp"</span>, host = <span class="text-green-400">"127.0.0.1"</span>, port = <span class="text-yellow-400">9779</span> }
+<span class="text-code-muted"># Daemon transport (Unix socket or TCP)</span>
+daemon_socket = { transport = <span class="text-code-string">"tcp"</span>, host = <span class="text-code-string">"127.0.0.1"</span>, port = <span class="text-code-warn">9779</span> }
 
-<span class="text-gray-500"># Logging</span>
-log_filter = <span class="text-green-400">"info"</span>
-log_format = <span class="text-green-400">"compact"</span>  <span class="text-gray-500"># Example override: default is "json"</span>
+<span class="text-code-muted"># Logging</span>
+log_filter = <span class="text-code-string">"info"</span>
+log_format = <span class="text-code-string">"compact"</span>  <span class="text-code-muted"># Example override: default is "json"</span>
 
-<span class="text-gray-500"># Capability overrides (repeatable)</span>
-<span class="text-weaver-faded">[[capability_overrides]]</span>
-language = <span class="text-green-400">"python"</span>
-capability = <span class="text-green-400">"observe.call-hierarchy"</span>
-directive = <span class="text-green-400">"force"</span>
+<span class="text-code-muted"># Capability overrides (repeatable)</span>
+<span class="text-ink-muted">[[capability_overrides]]</span>
+language = <span class="text-code-string">"python"</span>
+capability = <span class="text-code-string">"observe.call-hierarchy"</span>
+directive = <span class="text-code-string">"force"</span>
 </pre>
                         </div>
 
                         <!-- XDG discovery -->
-                        <h3 id="xdg-discovery" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">File Discovery</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
-                            When <code class="font-mono text-xs bg-weaver-indigo/10 px-1">--config-path</code> is not supplied, the loader searches the standard XDG locations for <code class="font-mono text-xs bg-weaver-indigo/10 px-1">weaver.toml</code> or <code class="font-mono text-xs bg-weaver-indigo/10 px-1">.weaver.toml</code>. Discovery honours <code class="font-mono text-xs bg-weaver-indigo/10 px-1">XDG_CONFIG_HOME</code> (typically <code class="font-mono text-xs bg-weaver-indigo/10 px-1">~/.config/weaver/</code>) and falls back to the project root. If no files exist, the built-in defaults apply.
+                        <h3 id="xdg-discovery" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">File Discovery</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
+                            When <code class="font-mono text-xs bg-primary/10 px-1">--config-path</code> is not supplied, the loader searches the standard XDG locations for <code class="font-mono text-xs bg-primary/10 px-1">weaver.toml</code> or <code class="font-mono text-xs bg-primary/10 px-1">.weaver.toml</code>. Discovery honours <code class="font-mono text-xs bg-primary/10 px-1">XDG_CONFIG_HOME</code> (typically <code class="font-mono text-xs bg-primary/10 px-1">~/.config/weaver/</code>) and falls back to the project root. If no files exist, the built-in defaults apply.
                         </p>
 
                         <!-- Fail-fast behaviour -->
-                        <h3 id="fail-fast" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Fail-Fast Validation</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
-                            <code class="font-mono text-xs bg-weaver-indigo/10 px-1">ortho-config</code> v0.6.0 treats invalid configuration files as fatal. Both the CLI and daemon abort with a <code class="font-mono text-xs bg-weaver-indigo/10 px-1">LoadConfiguration</code> error that lists every offending path. No silent fallback — fix or remove the reported files.
+                        <h3 id="fail-fast" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Fail-Fast Validation</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
+                            <code class="font-mono text-xs bg-primary/10 px-1">ortho-config</code> v0.6.0 treats invalid configuration files as fatal. Both the CLI and daemon abort with a <code class="font-mono text-xs bg-primary/10 px-1">LoadConfiguration</code> error that lists every offending path. No silent fallback — fix or remove the reported files.
                         </p>
-                        <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 overflow-x-auto mb-8 paper-panel">
-                            <div class="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">EXAMPLE ERROR OUTPUT</div>
-<pre class="font-mono text-xs text-gray-300 leading-relaxed">
+                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
+                            <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">EXAMPLE ERROR OUTPUT</div>
+<pre class="font-mono text-xs text-code-text leading-relaxed">
 failed to load configuration: multiple configuration errors:
 1: Configuration file error in '/etc/weaver/weaver.toml': expected `}`
 2: Configuration file error in '/home/alex/.weaver.toml': invalid type:
@@ -270,133 +264,133 @@ string "yes", expected a boolean
                         </div>
 
                         <!-- Environment variables -->
-                        <h3 id="environment-variables" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Environment Variables</h3>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <h3 id="environment-variables" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Environment Variables</h3>
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Variable</th>
                                         <th class="p-4 font-medium">Equivalent Flag</th>
                                         <th class="p-4 font-medium">Description</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVER_CONFIG_PATH</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">--config-path</td>
-                                        <td class="p-4 text-weaver-indigo/80">Explicit configuration file path.</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_CONFIG_PATH</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">--config-path</td>
+                                        <td class="p-4 text-base-content/80">Explicit configuration file path.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVER_DAEMON_SOCKET</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">--daemon-socket</td>
-                                        <td class="p-4 text-weaver-indigo/80">Daemon transport endpoint (<code>unix://</code> or <code>tcp://</code>).</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_DAEMON_SOCKET</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">--daemon-socket</td>
+                                        <td class="p-4 text-base-content/80">Daemon transport endpoint (<code>unix://</code> or <code>tcp://</code>).</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVER_LOG_FILTER</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">--log-filter</td>
-                                        <td class="p-4 text-weaver-indigo/80">Tracing filter directive (default: <code>info</code>).</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_LOG_FILTER</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">--log-filter</td>
+                                        <td class="p-4 text-base-content/80">Tracing filter directive (default: <code>info</code>).</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVER_LOG_FORMAT</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">--log-format</td>
-                                        <td class="p-4 text-weaver-indigo/80">Log output format: <code>json</code> or <code>compact</code>.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_LOG_FORMAT</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">--log-format</td>
+                                        <td class="p-4 text-base-content/80">Log output format: <code>json</code> or <code>compact</code>.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVER_FOREGROUND</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">env only</td>
-                                        <td class="p-4 text-weaver-indigo/80">Keep <code>weaverd</code> attached to the terminal instead of daemonising. Set to <code>1</code> for debugging and CI.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_FOREGROUND</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">env only</td>
+                                        <td class="p-4 text-base-content/80">Keep <code>weaverd</code> attached to the terminal instead of daemonising. Set to <code>1</code> for debugging and CI.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVERD_BIN</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">env only</td>
-                                        <td class="p-4 text-weaver-indigo/80">Override the daemon binary path used by <code>weaver daemon start</code> and automatic daemon startup.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVERD_BIN</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">env only</td>
+                                        <td class="p-4 text-base-content/80">Override the daemon binary path used by <code>weaver daemon start</code> and automatic daemon startup.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVER_ROPE_PLUGIN_PATH</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">env only</td>
-                                        <td class="p-4 text-weaver-indigo/80">Override the executable path for the built-in Rope refactoring provider.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_ROPE_PLUGIN_PATH</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">env only</td>
+                                        <td class="p-4 text-base-content/80">Override the executable path for the built-in Rope refactoring provider.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">WEAVER_RUST_ANALYZER_PLUGIN_PATH</td>
-                                        <td class="p-4 font-mono text-weaver-faded text-xs">env only</td>
-                                        <td class="p-4 text-weaver-indigo/80">Override the executable path for the built-in <code>rust-analyzer</code> integration used for Rust semantic operations.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_RUST_ANALYZER_PLUGIN_PATH</td>
+                                        <td class="p-4 font-mono text-ink-muted text-xs">env only</td>
+                                        <td class="p-4 text-base-content/80">Override the executable path for the built-in <code>rust-analyzer</code> integration used for Rust semantic operations.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Capability overrides -->
-                        <h3 id="capability-overrides" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Capability Overrides</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
-                            Override directives let operators mask unreliable capabilities or force a feature on when a language server under-reports support. Each directive uses the syntax <code class="font-mono text-xs bg-weaver-indigo/10 px-1">language:capability=directive</code>.
+                        <h3 id="capability-overrides" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Capability Overrides</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
+                            Override directives let operators mask unreliable capabilities or force a feature on when a language server under-reports support. Each directive uses the syntax <code class="font-mono text-xs bg-primary/10 px-1">language:capability=directive</code>.
                         </p>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-6">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-6">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Directive</th>
                                         <th class="p-4 font-medium">Effect</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">allow</td>
-                                        <td class="p-4 text-weaver-indigo/80">Permits the capability if the server advertises it (the default).</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">allow</td>
+                                        <td class="p-4 text-base-content/80">Permits the capability if the server advertises it (the default).</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">deny</td>
-                                        <td class="p-4 text-weaver-indigo/80">Blocks the capability even if the server advertises it.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">deny</td>
+                                        <td class="p-4 text-base-content/80">Blocks the capability even if the server advertises it.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">force</td>
-                                        <td class="p-4 text-weaver-indigo/80">Enables the capability regardless of server advertisement.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">force</td>
+                                        <td class="p-4 text-base-content/80">Enables the capability regardless of server advertisement.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
-                            Identifiers are case-insensitive and whitespace-trimmed. Duplicates are resolved by keeping the last directive for each language/capability pair. In TOML, use the <code class="font-mono text-xs bg-weaver-indigo/10 px-1">[[capability_overrides]]</code> array; from the CLI, repeat <code class="font-mono text-xs bg-weaver-indigo/10 px-1">--capability-overrides</code>:
+                        <p class="mb-4 text-sm text-base-content/80">
+                            Identifiers are case-insensitive and whitespace-trimmed. Duplicates are resolved by keeping the last directive for each language/capability pair. In TOML, use the <code class="font-mono text-xs bg-primary/10 px-1">[[capability_overrides]]</code> array; from the CLI, repeat <code class="font-mono text-xs bg-primary/10 px-1">--capability-overrides</code>:
                         </p>
-                        <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 overflow-x-auto mb-4 paper-panel">
-<pre class="font-mono text-xs text-gray-300 leading-relaxed">
-<span class="text-weaver-cream/60">$</span> weaver observe get-definition \
-    --capability-overrides <span class="text-green-400">"python:observe.call-hierarchy=force"</span> \
-    --capability-overrides <span class="text-green-400">"rust:observe.call-hierarchy=deny"</span> \
+                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-4 paper-panel">
+<pre class="font-mono text-xs text-code-text leading-relaxed">
+<span class="text-base-100/70">$</span> weaver observe get-definition \
+    --capability-overrides <span class="text-code-string">"python:observe.call-hierarchy=force"</span> \
+    --capability-overrides <span class="text-code-string">"rust:observe.call-hierarchy=deny"</span> \
     --uri file:///src/main.rs --position 10:5
 </pre>
                         </div>
 
                         <!-- CLI flags (expanded) -->
-                        <div class="bg-white border border-weaver-indigo/10 p-4 rounded-sm">
-                            <h4 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-3">CLI Flags</h4>
-                            <div class="border border-weaver-indigo/20 rounded-sm overflow-hidden">
+                        <div class="bg-white border border-base-content/10 p-4 rounded-xs">
+                            <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">CLI Flags</h4>
+                            <div class="border border-base-content/20 rounded-xs overflow-hidden">
                                 <table class="w-full text-left text-sm">
-                                    <thead class="bg-weaver-indigo/5 font-mono text-xs uppercase text-weaver-indigo">
+                                    <thead class="bg-primary/5 font-mono text-xs uppercase text-base-content">
                                         <tr>
                                             <th class="p-3 font-medium">Flag</th>
                                             <th class="p-3 font-medium">Description</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-weaver-indigo/10">
-                                        <tr class="hover:bg-weaver-cream/30">
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo font-bold whitespace-nowrap">--config-path &lt;PATH&gt;</td>
-                                            <td class="p-3 text-xs text-weaver-indigo/80">Read an explicit configuration file instead of using XDG discovery.</td>
+                                    <tbody class="divide-y divide-base-content/10">
+                                        <tr class="hover:bg-base-100/30">
+                                            <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--config-path &lt;PATH&gt;</td>
+                                            <td class="p-3 text-xs text-base-content/80">Read an explicit configuration file instead of using XDG discovery.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-cream/30">
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo font-bold whitespace-nowrap">--daemon-socket &lt;ENDPOINT&gt;</td>
-                                            <td class="p-3 text-xs text-weaver-indigo/80">Override the daemon transport. Accepts <code>unix://</code> or <code>tcp://</code> URIs.</td>
+                                        <tr class="hover:bg-base-100/30">
+                                            <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--daemon-socket &lt;ENDPOINT&gt;</td>
+                                            <td class="p-3 text-xs text-base-content/80">Override the daemon transport. Accepts <code>unix://</code> or <code>tcp://</code> URIs.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-cream/30">
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo font-bold whitespace-nowrap">--log-filter &lt;FILTER&gt;</td>
-                                            <td class="p-3 text-xs text-weaver-indigo/80">Tracing filter directive (default: <code>info</code>).</td>
+                                        <tr class="hover:bg-base-100/30">
+                                            <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--log-filter &lt;FILTER&gt;</td>
+                                            <td class="p-3 text-xs text-base-content/80">Tracing filter directive (default: <code>info</code>).</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-cream/30">
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo font-bold whitespace-nowrap">--log-format &lt;FORMAT&gt;</td>
-                                            <td class="p-3 text-xs text-weaver-indigo/80">Log output format: <code>json</code> or <code>compact</code>.</td>
+                                        <tr class="hover:bg-base-100/30">
+                                            <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--log-format &lt;FORMAT&gt;</td>
+                                            <td class="p-3 text-xs text-base-content/80">Log output format: <code>json</code> or <code>compact</code>.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-cream/30">
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo font-bold whitespace-nowrap">--capability-overrides &lt;DIRECTIVE&gt;</td>
-                                            <td class="p-3 text-xs text-weaver-indigo/80">Append a <code>language:capability=directive</code> override. Repeatable.</td>
+                                        <tr class="hover:bg-base-100/30">
+                                            <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--capability-overrides &lt;DIRECTIVE&gt;</td>
+                                            <td class="p-3 text-xs text-base-content/80">Append a <code>language:capability=directive</code> override. Repeatable.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -407,181 +401,181 @@ string "yes", expected a boolean
                     <!-- JSONL Schema Section -->
                     <section id="jsonl-schema" class="mb-20 scroll-mt-20">
                         <div class="flex items-center mb-8">
-                            <span class="h-px w-8 bg-weaver-vermilion mr-4"></span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo">JSONL Protocol</h2>
+                            <span class="h-px w-8 bg-accent mr-4"></span>
+                            <h2 class="font-serif text-3xl text-base-content">JSONL Protocol</h2>
                         </div>
-                        <p class="mb-6 text-weaver-indigo/80 max-w-3xl">
-                            Communication between the CLI and daemon uses a <code class="font-mono text-xs bg-weaver-indigo/10 px-1">kind</code>-based JSONL envelope. Each line is a JSON object with <code class="font-mono text-xs bg-weaver-indigo/10 px-1">kind</code> set to <code class="font-mono text-xs bg-weaver-indigo/10 px-1">stream</code> or <code class="font-mono text-xs bg-weaver-indigo/10 px-1">exit</code>.
+                        <p class="mb-6 text-base-content/80 max-w-3xl">
+                            Communication between the CLI and daemon uses a <code class="font-mono text-xs bg-primary/10 px-1">kind</code>-based JSONL envelope. Each line is a JSON object with <code class="font-mono text-xs bg-primary/10 px-1">kind</code> set to <code class="font-mono text-xs bg-primary/10 px-1">stream</code> or <code class="font-mono text-xs bg-primary/10 px-1">exit</code>.
                         </p>
-                        <p class="mb-6 text-sm text-weaver-indigo/70 max-w-3xl">
+                        <p class="mb-6 text-sm text-base-content/88 max-w-3xl">
                             Treat this section as canonical. Command, install, and safety pages now summarize the protocol and link back here when they need operator detail.
                         </p>
 
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-6">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-6">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium w-1/4">Field</th>
                                         <th class="p-4 font-medium w-1/6">Type</th>
                                         <th class="p-4 font-medium">Description</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">kind</td>
-                                        <td class="p-4 font-mono text-weaver-faded">enum</td>
-                                        <td class="p-4 text-weaver-indigo/80">Discriminator: <code>"stream"</code> for data messages or <code>"exit"</code> for termination.</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">kind</td>
+                                        <td class="p-4 font-mono text-ink-muted">enum</td>
+                                        <td class="p-4 text-base-content/80">Discriminator: <code>"stream"</code> for data messages or <code>"exit"</code> for termination.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">stream</td>
-                                        <td class="p-4 font-mono text-weaver-faded">enum</td>
-                                        <td class="p-4 text-weaver-indigo/80">Target host stream: <code>"stdout"</code> or <code>"stderr"</code>. Present when <code>kind</code> is <code>"stream"</code>.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">stream</td>
+                                        <td class="p-4 font-mono text-ink-muted">enum</td>
+                                        <td class="p-4 text-base-content/80">Target host stream: <code>"stdout"</code> or <code>"stderr"</code>. Present when <code>kind</code> is <code>"stream"</code>.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">data</td>
-                                        <td class="p-4 font-mono text-weaver-faded">string</td>
-                                        <td class="p-4 text-weaver-indigo/80">Payload (plain text or JSON). Present when <code>kind</code> is <code>"stream"</code>.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">data</td>
+                                        <td class="p-4 font-mono text-ink-muted">string</td>
+                                        <td class="p-4 text-base-content/80">Payload (plain text or JSON). Present when <code>kind</code> is <code>"stream"</code>.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">status</td>
-                                        <td class="p-4 font-mono text-weaver-faded">number</td>
-                                        <td class="p-4 text-weaver-indigo/80">Numeric exit code. Present when <code>kind</code> is <code>"exit"</code>.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">status</td>
+                                        <td class="p-4 font-mono text-ink-muted">number</td>
+                                        <td class="p-4 text-base-content/80">Numeric exit code. Present when <code>kind</code> is <code>"exit"</code>.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
-                        <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 overflow-x-auto">
-                            <div class="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">EXAMPLE ENVELOPE</div>
-<pre class="font-mono text-xs text-gray-300 leading-relaxed">
+                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto">
+                            <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">EXAMPLE ENVELOPE</div>
+<pre class="font-mono text-xs text-code-text leading-relaxed">
 {"kind":"stream","stream":"stdout","data":"[{\"uri\":\"file:///src/main.rs\",\"line\":42,\"column\":17}]\n"}
 {"kind":"exit","status":0}
 </pre>
                         </div>
-                        <p class="mt-4 text-sm text-weaver-indigo/70">
-                            This wrapper is daemon transport, not CLI display. The CLI parses each line, strips the envelope, and then either forwards <code class="font-mono text-xs bg-weaver-indigo/10 px-1">data</code> verbatim in JSON mode or renders recognised payloads for humans.
+                        <p class="mt-4 text-sm text-base-content/88">
+                            This wrapper is daemon transport, not CLI display. The CLI parses each line, strips the envelope, and then either forwards <code class="font-mono text-xs bg-primary/10 px-1">data</code> verbatim in JSON mode or renders recognised payloads for humans.
                         </p>
                     </section>
 
                     <!-- Daemon Lifecycle -->
                     <section id="daemon-lifecycle" class="mb-20 scroll-mt-20">
                         <div class="flex items-center mb-8">
-                            <span class="h-px w-8 bg-weaver-vermilion mr-4"></span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo">Daemon Lifecycle</h2>
+                            <span class="h-px w-8 bg-accent mr-4"></span>
+                            <h2 class="font-serif text-3xl text-base-content">Daemon Lifecycle</h2>
                         </div>
 
-                        <div class="relative pl-8 border-l-2 border-dashed border-weaver-indigo/30 space-y-12 mb-12">
+                        <div class="relative pl-8 border-l-2 border-dashed border-base-content/30 space-y-12 mb-12">
                             <div class="relative">
-                                <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-weaver-indigo text-white flex items-center justify-center text-xs font-bold">1</div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Start</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-3"><code class="font-mono text-xs bg-weaver-indigo/10 px-1">weaver daemon start</code> verifies the configured socket is free, spawns <code class="font-mono text-xs bg-weaver-indigo/10 px-1">weaverd</code> (overridable via <code class="font-mono text-xs bg-weaver-indigo/10 px-1">WEAVERD_BIN</code>), and waits for the health snapshot to report <code>ready</code>. The daemon daemonises itself, creates runtime artefacts, and binds the socket.</p>
-                                <code class="bg-weaver-indigo/5 px-2 py-1 rounded text-xs font-mono text-weaver-indigo">Auto-start: domain commands start the daemon automatically if it is not running (30&nbsp;s timeout).</code>
+                                <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">1</div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">Start</h3>
+                                <p class="text-sm text-base-content/88 mb-3"><code class="font-mono text-xs bg-primary/10 px-1">weaver daemon start</code> verifies the configured socket is free, spawns <code class="font-mono text-xs bg-primary/10 px-1">weaverd</code> (overridable via <code class="font-mono text-xs bg-primary/10 px-1">WEAVERD_BIN</code>), and waits for the health snapshot to report <code>ready</code>. The daemon daemonises itself, creates runtime artefacts, and binds the socket.</p>
+                                <code class="bg-primary/5 px-2 py-1 rounded-sm text-xs font-mono text-base-content">Auto-start: domain commands start the daemon automatically if it is not running (30&nbsp;s timeout).</code>
                             </div>
 
                             <div class="relative">
-                                <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-weaver-faded text-white flex items-center justify-center text-xs font-bold">2</div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Serve</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-3">The daemon accepts concurrent client connections and runs a JSONL request dispatch loop, routing <code>observe</code>, <code>act</code>, and <code>verify</code> commands to the appropriate domain handlers. Language servers are initialised lazily on first use.</p>
+                                <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-ink-muted text-white flex items-center justify-center text-xs font-bold">2</div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">Serve</h3>
+                                <p class="text-sm text-base-content/88 mb-3">The daemon accepts concurrent client connections and runs a JSONL request dispatch loop, routing <code>observe</code>, <code>act</code>, and <code>verify</code> commands to the appropriate domain handlers. Language servers are initialised lazily on first use.</p>
                             </div>
 
                             <div class="relative">
-                                <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-weaver-vermilion text-white flex items-center justify-center text-xs font-bold">3</div>
-                                <h3 class="font-serif text-xl text-weaver-indigo mb-2">Stop</h3>
-                                <p class="text-sm text-weaver-indigo/70 mb-3"><code class="font-mono text-xs bg-weaver-indigo/10 px-1">weaver daemon stop</code> reads the PID file, sends SIGTERM, and waits for the runtime artefacts and socket to disappear. Running language servers receive <code>shutdown</code> + <code>exit</code>. If the socket is reachable but the PID file is missing, the command surfaces an error rather than blindly killing a process.</p>
+                                <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-accent-deep text-white flex items-center justify-center text-xs font-bold">3</div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">Stop</h3>
+                                <p class="text-sm text-base-content/88 mb-3"><code class="font-mono text-xs bg-primary/10 px-1">weaver daemon stop</code> reads the PID file, sends SIGTERM, and waits for the runtime artefacts and socket to disappear. Running language servers receive <code>shutdown</code> + <code>exit</code>. If the socket is reachable but the PID file is missing, the command surfaces an error rather than blindly killing a process.</p>
                             </div>
                         </div>
 
                         <!-- Runtime files table -->
-                        <h3 id="runtime-files" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Runtime Artefacts</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
-                            The daemon creates three files in the runtime directory (typically <code class="font-mono text-xs bg-weaver-indigo/10 px-1">$XDG_RUNTIME_DIR/weaver/</code>). PID and health files are written atomically.
+                        <h3 id="runtime-files" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Runtime Artefacts</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
+                            The daemon creates three files in the runtime directory (typically <code class="font-mono text-xs bg-primary/10 px-1">$XDG_RUNTIME_DIR/weaver/</code>). PID and health files are written atomically.
                         </p>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">File</th>
                                         <th class="p-4 font-medium">Purpose</th>
                                         <th class="p-4 font-medium">Lifecycle</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">weaverd.lock</td>
-                                        <td class="p-4 text-weaver-indigo/80">Prevents duplicate daemon instances.</td>
-                                        <td class="p-4 text-weaver-indigo/80">Created on start, removed on shutdown. Stale locks from unclean exits are cleaned up automatically.</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">weaverd.lock</td>
+                                        <td class="p-4 text-base-content/80">Prevents duplicate daemon instances.</td>
+                                        <td class="p-4 text-base-content/80">Created on start, removed on shutdown. Stale locks from unclean exits are cleaned up automatically.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">weaverd.pid</td>
-                                        <td class="p-4 text-weaver-indigo/80">Records the daemon process ID.</td>
-                                        <td class="p-4 text-weaver-indigo/80">Written atomically after daemonisation; read by <code>daemon stop</code> and <code>daemon status</code>.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">weaverd.pid</td>
+                                        <td class="p-4 text-base-content/80">Records the daemon process ID.</td>
+                                        <td class="p-4 text-base-content/80">Written atomically after daemonisation; read by <code>daemon stop</code> and <code>daemon status</code>.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">weaverd.health</td>
-                                        <td class="p-4 text-weaver-indigo/80">JSON health snapshot for readiness polling.</td>
-                                        <td class="p-4 text-weaver-indigo/80">Updated through state transitions; removed on shutdown.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">weaverd.health</td>
+                                        <td class="p-4 text-base-content/80">JSON health snapshot for readiness polling.</td>
+                                        <td class="p-4 text-base-content/80">Updated through state transitions; removed on shutdown.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Health snapshot -->
-                        <h3 id="health-snapshot" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Health Snapshot</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
-                            The health file is a single-line JSON document that operators and automation can poll without speaking the daemon protocol. Status transitions: <code class="font-mono text-xs bg-weaver-indigo/10 px-1">starting</code> &rarr; <code class="font-mono text-xs bg-weaver-indigo/10 px-1">ready</code> &rarr; <code class="font-mono text-xs bg-weaver-indigo/10 px-1">stopping</code>.
+                        <h3 id="health-snapshot" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Health Snapshot</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
+                            The health file is a single-line JSON document that operators and automation can poll without speaking the daemon protocol. Status transitions: <code class="font-mono text-xs bg-primary/10 px-1">starting</code> &rarr; <code class="font-mono text-xs bg-primary/10 px-1">ready</code> &rarr; <code class="font-mono text-xs bg-primary/10 px-1">stopping</code>.
                         </p>
-                        <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 overflow-x-auto mb-8 paper-panel">
-                            <div class="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">HEALTH SNAPSHOT</div>
-<pre class="font-mono text-xs text-gray-300 leading-relaxed">
+                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
+                            <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">HEALTH SNAPSHOT</div>
+<pre class="font-mono text-xs text-code-text leading-relaxed">
 {"status":"ready","pid":12345,"timestamp":1713356400}
 </pre>
                         </div>
 
                         <!-- Signal handling -->
-                        <h3 id="signal-handling" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Signal Handling</h3>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <h3 id="signal-handling" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Signal Handling</h3>
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Signal</th>
                                         <th class="p-4 font-medium">Behaviour</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">SIGTERM / SIGINT</td>
-                                        <td class="p-4 text-weaver-indigo/80">Graceful shutdown within a 10-second budget. Language servers receive <code>shutdown</code> + <code>exit</code>. Runtime artefacts and socket are cleaned up.</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">SIGTERM / SIGINT</td>
+                                        <td class="p-4 text-base-content/80">Graceful shutdown within a 10-second budget. Language servers receive <code>shutdown</code> + <code>exit</code>. Runtime artefacts and socket are cleaned up.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">SIGQUIT</td>
-                                        <td class="p-4 text-weaver-indigo/80">Graceful shutdown (same sequence as SIGTERM).</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">SIGQUIT</td>
+                                        <td class="p-4 text-base-content/80">Graceful shutdown (same sequence as SIGTERM).</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">SIGHUP</td>
-                                        <td class="p-4 text-weaver-indigo/80">Graceful shutdown (same sequence as SIGTERM).</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">SIGHUP</td>
+                                        <td class="p-4 text-base-content/80">Graceful shutdown (same sequence as SIGTERM).</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Operational details -->
-                        <h3 id="daemon-operations" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Operational Details</h3>
+                        <h3 id="daemon-operations" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Operational Details</h3>
                         <div class="space-y-4 mb-4">
-                            <div class="bg-white border border-weaver-indigo/10 p-4 rounded-sm">
-                                <h4 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-2">Foreground Mode</h4>
-                                <p class="text-sm text-weaver-indigo/80">Set <code class="font-mono text-xs bg-weaver-indigo/10 px-1">WEAVER_FOREGROUND=1</code> to keep the daemon attached to the terminal. Useful for interactive debugging and CI jobs. Lock, PID, and health semantics are preserved.</p>
+                            <div class="bg-white border border-base-content/10 p-4 rounded-xs">
+                                <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-2">Foreground Mode</h4>
+                                <p class="text-sm text-base-content/80">Set <code class="font-mono text-xs bg-primary/10 px-1">WEAVER_FOREGROUND=1</code> to keep the daemon attached to the terminal. Useful for interactive debugging and CI jobs. Lock, PID, and health semantics are preserved.</p>
                             </div>
-                            <div class="bg-white border border-weaver-indigo/10 p-4 rounded-sm">
-                                <h4 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-2">Auto-Start</h4>
-                                <p class="text-sm text-weaver-indigo/80">Domain commands (<code>observe</code>, <code>act</code>, <code>verify</code>) spawn the daemon automatically if it is not running. The CLI prints <code class="font-mono text-xs bg-weaver-indigo/10 px-1">Waiting for daemon start&hellip;</code> to stderr and waits up to 30&nbsp;seconds. Configuration flags passed to the command are forwarded to the daemon. Errors unrelated to the daemon being offline (e.g.&nbsp;permission denied) bypass auto-start and are reported immediately.</p>
+                            <div class="bg-white border border-base-content/10 p-4 rounded-xs">
+                                <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-2">Auto-Start</h4>
+                                <p class="text-sm text-base-content/80">Domain commands (<code>observe</code>, <code>act</code>, <code>verify</code>) spawn the daemon automatically if it is not running. The CLI prints <code class="font-mono text-xs bg-primary/10 px-1">Waiting for daemon start&hellip;</code> to stderr and waits up to 30&nbsp;seconds. Configuration flags passed to the command are forwarded to the daemon. Errors unrelated to the daemon being offline (e.g.&nbsp;permission denied) bypass auto-start and are reported immediately.</p>
                             </div>
-                            <div class="bg-white border border-weaver-indigo/10 p-4 rounded-sm">
-                                <h4 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-2">WEAVERD_BIN</h4>
-                                <p class="text-sm text-weaver-indigo/80">Override the daemon binary path via the <code class="font-mono text-xs bg-weaver-indigo/10 px-1">WEAVERD_BIN</code> environment variable. Primarily useful for development and CI where the daemon is not on <code>$PATH</code>.</p>
+                            <div class="bg-white border border-base-content/10 p-4 rounded-xs">
+                                <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-2">WEAVERD_BIN</h4>
+                                <p class="text-sm text-base-content/80">Override the daemon binary path via the <code class="font-mono text-xs bg-primary/10 px-1">WEAVERD_BIN</code> environment variable. Primarily useful for development and CI where the daemon is not on <code>$PATH</code>.</p>
                             </div>
-                            <div class="bg-white border border-weaver-indigo/10 p-4 rounded-sm">
-                                <h4 class="font-mono text-xs font-bold text-weaver-indigo uppercase tracking-wider mb-2">Duplicate-Start Handling</h4>
-                                <p class="text-sm text-weaver-indigo/80">If the socket is already bound by a running daemon, <code class="font-mono text-xs bg-weaver-indigo/10 px-1">daemon start</code> fails fast with an "already running" error reporting the existing PID. If the original launch is still initialising, the second invocation reports "launch already in progress" instead of removing the lock. Stale artefacts from unclean exits are cleaned up automatically.</p>
+                            <div class="bg-white border border-base-content/10 p-4 rounded-xs">
+                                <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-2">Duplicate-Start Handling</h4>
+                                <p class="text-sm text-base-content/80">If the socket is already bound by a running daemon, <code class="font-mono text-xs bg-primary/10 px-1">daemon start</code> fails fast with an "already running" error reporting the existing PID. If the original launch is still initialising, the second invocation reports "launch already in progress" instead of removing the lock. Stale artefacts from unclean exits are cleaned up automatically.</p>
                             </div>
                         </div>
                     </section>
@@ -589,112 +583,112 @@ string "yes", expected a boolean
                     <!-- Plugin System -->
                     <section id="plugins" class="mb-20 scroll-mt-20">
                         <div class="flex items-center mb-8">
-                            <span class="h-px w-8 bg-weaver-vermilion mr-4"></span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo">Plugin System</h2>
+                            <span class="h-px w-8 bg-accent mr-4"></span>
+                            <h2 class="font-serif text-3xl text-base-content">Plugin System</h2>
                         </div>
-                        <p class="mb-6 text-weaver-indigo/80">
-                            The <code class="font-mono text-xs bg-weaver-indigo/10 px-1">weaver-plugins</code> crate delegates specialist tasks to external tools running in sandboxed processes. Plugins fall into two categories:
+                        <p class="mb-6 text-base-content/80">
+                            The <code class="font-mono text-xs bg-primary/10 px-1">weaver-plugins</code> crate delegates specialist tasks to external tools running in sandboxed processes. Plugins fall into two categories:
                         </p>
 
                         <!-- Categories -->
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Category</th>
                                         <th class="p-4 font-medium">Role</th>
                                         <th class="p-4 font-medium">Output</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">Sensor</td>
-                                        <td class="p-4 text-weaver-indigo/80">Provides data to the intelligence engine (e.g.&nbsp;<code>jedi</code> for Python static analysis).</td>
-                                        <td class="p-4 text-weaver-indigo/80">Structured JSON.</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">Sensor</td>
+                                        <td class="p-4 text-base-content/80">Provides data to the intelligence engine (e.g.&nbsp;<code>jedi</code> for Python static analysis).</td>
+                                        <td class="p-4 text-base-content/80">Structured JSON.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold">Actuator</td>
-                                        <td class="p-4 text-weaver-indigo/80">Performs actions on the codebase (e.g.&nbsp;<code>rope</code> for Python refactoring).</td>
-                                        <td class="p-4 text-weaver-indigo/80">Unified diffs, validated by the Double-Lock.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">Actuator</td>
+                                        <td class="p-4 text-base-content/80">Performs actions on the codebase (e.g.&nbsp;<code>rope</code> for Python refactoring).</td>
+                                        <td class="p-4 text-base-content/80">Unified diffs, validated by the Double-Lock.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Manifest -->
-                        <h3 id="plugin-manifest" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Plugin Manifest</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">Each plugin is described by a TOML manifest:</p>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-4">
+                        <h3 id="plugin-manifest" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Plugin Manifest</h3>
+                        <p class="mb-4 text-sm text-base-content/80">Each plugin is described by a TOML manifest:</p>
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-4">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Field</th>
                                         <th class="p-4 font-medium">Description</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">name</td>
-                                        <td class="p-4 text-weaver-indigo/80">Unique plugin identifier (e.g.&nbsp;<code>rope</code>).</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">name</td>
+                                        <td class="p-4 text-base-content/80">Unique plugin identifier (e.g.&nbsp;<code>rope</code>).</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">version</td>
-                                        <td class="p-4 text-weaver-indigo/80">Plugin version string.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">version</td>
+                                        <td class="p-4 text-base-content/80">Plugin version string.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">kind</td>
-                                        <td class="p-4 text-weaver-indigo/80"><code>sensor</code> or <code>actuator</code>.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">kind</td>
+                                        <td class="p-4 text-base-content/80"><code>sensor</code> or <code>actuator</code>.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">languages</td>
-                                        <td class="p-4 text-weaver-indigo/80">Supported languages (case-insensitive).</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">languages</td>
+                                        <td class="p-4 text-base-content/80">Supported languages (case-insensitive).</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">executable</td>
-                                        <td class="p-4 text-weaver-indigo/80">Absolute path to the plugin binary.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">executable</td>
+                                        <td class="p-4 text-base-content/80">Absolute path to the plugin binary.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">timeout_secs</td>
-                                        <td class="p-4 text-weaver-indigo/80">Maximum execution time in seconds (default: 30).</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">timeout_secs</td>
+                                        <td class="p-4 text-base-content/80">Maximum execution time in seconds (default: 30).</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">capabilities</td>
-                                        <td class="p-4 text-weaver-indigo/80">Capability IDs declared by actuator plugins. Sensors must not declare capabilities.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">capabilities</td>
+                                        <td class="p-4 text-base-content/80">Capability IDs declared by actuator plugins. Sensors must not declare capabilities.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20 overflow-x-auto mb-8 paper-panel">
-                            <div class="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">EXAMPLE MANIFEST</div>
-<pre class="font-mono text-xs text-gray-300 leading-relaxed">
-name = <span class="text-green-400">"rope"</span>
-version = <span class="text-green-400">"1.0.0"</span>
-kind = <span class="text-green-400">"actuator"</span>
-languages = [<span class="text-green-400">"python"</span>]
-executable = <span class="text-green-400">"/usr/bin/weaver-plugin-rope"</span>
-capabilities = [<span class="text-green-400">"rename-symbol"</span>]
+                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
+                            <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">EXAMPLE MANIFEST</div>
+<pre class="font-mono text-xs text-code-text leading-relaxed">
+name = <span class="text-code-string">"rope"</span>
+version = <span class="text-code-string">"1.0.0"</span>
+kind = <span class="text-code-string">"actuator"</span>
+languages = [<span class="text-code-string">"python"</span>]
+executable = <span class="text-code-string">"/usr/bin/weaver-plugin-rope"</span>
+capabilities = [<span class="text-code-string">"rename-symbol"</span>]
 </pre>
                         </div>
 
                         <!-- IPC protocol -->
-                        <h3 id="plugin-ipc" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">IPC Protocol</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
+                        <h3 id="plugin-ipc" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">IPC Protocol</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
                             Plugins are short-lived, one-shot processes communicating via JSONL over standard I/O:
                         </p>
-                        <ol class="list-decimal list-inside space-y-2 mb-8 text-sm text-weaver-indigo/80">
+                        <ol class="list-decimal list-inside space-y-2 mb-8 text-sm text-base-content/80">
                             <li>The broker writes one JSONL request to the plugin's stdin and closes stdin.</li>
                             <li>The plugin writes one JSONL response to stdout and exits.</li>
                             <li>Plugin stderr is captured for diagnostic logging (not part of the protocol).</li>
                         </ol>
-                        <p class="mb-8 text-sm text-weaver-indigo/80">
+                        <p class="mb-8 text-sm text-base-content/80">
                             File content is passed in-band as part of the request body, so sandboxed plugins do not need filesystem access.
                         </p>
 
                         <!-- Default plugins -->
-                        <h3 id="default-plugins" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Default Plugins</h3>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <h3 id="default-plugins" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Default Plugins</h3>
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Plugin</th>
                                         <th class="p-4 font-medium">Kind</th>
@@ -703,56 +697,56 @@ capabilities = [<span class="text-green-400">"rename-symbol"</span>]
                                         <th class="p-4 font-medium">Path Override</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">rope</td>
-                                        <td class="p-4 text-weaver-indigo/80">actuator</td>
-                                        <td class="p-4 text-weaver-indigo/80">Python</td>
-                                        <td class="p-4 font-mono text-weaver-indigo/80">30s</td>
-                                        <td class="p-4 font-mono text-xs text-weaver-indigo/80">WEAVER_ROPE_PLUGIN_PATH</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">rope</td>
+                                        <td class="p-4 text-base-content/80">actuator</td>
+                                        <td class="p-4 text-base-content/80">Python</td>
+                                        <td class="p-4 font-mono text-base-content/80">30s</td>
+                                        <td class="p-4 font-mono text-xs text-base-content/80">WEAVER_ROPE_PLUGIN_PATH</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Capability IDs -->
-                        <h3 id="capability-ids" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Capability IDs</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
+                        <h3 id="capability-ids" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Capability IDs</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
                             The daemon routes operations to plugins based on the requested capability and target language. Stable capability identifiers:
                         </p>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Capability ID</th>
                                         <th class="p-4 font-medium">Description</th>
                                         <th class="p-4 font-medium">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">rename-symbol</td>
-                                        <td class="p-4 text-weaver-indigo/80">Rename a symbol across a codebase.</td>
-                                        <td class="p-4"><span class="text-[10px] font-bold font-mono bg-green-100 text-green-800 px-1.5 py-0.5 uppercase tracking-widest rounded-sm">shipped</span></td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">rename-symbol</td>
+                                        <td class="p-4 text-base-content/80">Rename a symbol across a codebase.</td>
+                                        <td class="p-4"><span class="text-3xs font-bold font-mono bg-status-ok-soft text-status-ok-ink px-1.5 py-0.5 uppercase tracking-widest rounded-xs">shipped</span></td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30 opacity-80">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">extricate-symbol</td>
-                                        <td class="p-4 text-weaver-indigo/80">Move a symbol to a different module or file.</td>
+                                    <tr class="hover:bg-base-100/30 opacity-80">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">extricate-symbol</td>
+                                        <td class="p-4 text-base-content/80">Move a symbol to a different module or file.</td>
                                         <td class="p-4"><span class="status-pill status-pill-planned">Planned</span></td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30 opacity-80">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">extract-method</td>
-                                        <td class="p-4 text-weaver-indigo/80">Extract a code region into a new function or method.</td>
+                                    <tr class="hover:bg-base-100/30 opacity-80">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">extract-method</td>
+                                        <td class="p-4 text-base-content/80">Extract a code region into a new function or method.</td>
                                         <td class="p-4"><span class="status-pill status-pill-planned">Planned</span></td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30 opacity-80">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">replace-body</td>
-                                        <td class="p-4 text-weaver-indigo/80">Replace the body of a function or method.</td>
+                                    <tr class="hover:bg-base-100/30 opacity-80">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">replace-body</td>
+                                        <td class="p-4 text-base-content/80">Replace the body of a function or method.</td>
                                         <td class="p-4"><span class="status-pill status-pill-planned">Planned</span></td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30 opacity-80">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">extract-predicate</td>
-                                        <td class="p-4 text-weaver-indigo/80">Extract a conditional expression into a predicate.</td>
+                                    <tr class="hover:bg-base-100/30 opacity-80">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">extract-predicate</td>
+                                        <td class="p-4 text-base-content/80">Extract a conditional expression into a predicate.</td>
                                         <td class="p-4"><span class="status-pill status-pill-planned">Planned</span></td>
                                     </tr>
                                 </tbody>
@@ -760,80 +754,80 @@ capabilities = [<span class="text-green-400">"rename-symbol"</span>]
                         </div>
 
                         <!-- Refusal codes -->
-                        <h3 id="refusal-codes" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Refusal Reason Codes</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
-                            When a plugin cannot perform an operation, it returns a failure response with diagnostics. Each diagnostic may include a <code class="font-mono text-xs bg-weaver-indigo/10 px-1">reason_code</code> for programmatic matching:
+                        <h3 id="refusal-codes" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Refusal Reason Codes</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
+                            When a plugin cannot perform an operation, it returns a failure response with diagnostics. Each diagnostic may include a <code class="font-mono text-xs bg-primary/10 px-1">reason_code</code> for programmatic matching:
                         </p>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-8">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-8">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Reason Code</th>
                                         <th class="p-4 font-medium">Meaning</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">symbol_not_found</td>
-                                        <td class="p-4 text-weaver-indigo/80">The target symbol could not be located.</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">symbol_not_found</td>
+                                        <td class="p-4 text-base-content/80">The target symbol could not be located.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">macro_generated</td>
-                                        <td class="p-4 text-weaver-indigo/80">The symbol is generated by a macro.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">macro_generated</td>
+                                        <td class="p-4 text-base-content/80">The symbol is generated by a macro.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">ambiguous_references</td>
-                                        <td class="p-4 text-weaver-indigo/80">Multiple candidate symbols match the position.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">ambiguous_references</td>
+                                        <td class="p-4 text-base-content/80">Multiple candidate symbols match the position.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">unsupported_language</td>
-                                        <td class="p-4 text-weaver-indigo/80">The plugin does not support the target language.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">unsupported_language</td>
+                                        <td class="p-4 text-base-content/80">The plugin does not support the target language.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">incomplete_payload</td>
-                                        <td class="p-4 text-weaver-indigo/80">Required fields are missing from the request.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">incomplete_payload</td>
+                                        <td class="p-4 text-base-content/80">Required fields are missing from the request.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">name_conflict</td>
-                                        <td class="p-4 text-weaver-indigo/80">The new name conflicts with an existing symbol.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">name_conflict</td>
+                                        <td class="p-4 text-base-content/80">The new name conflicts with an existing symbol.</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 font-mono text-weaver-indigo font-bold text-xs">operation_not_supported</td>
-                                        <td class="p-4 text-weaver-indigo/80">The plugin does not support the requested operation.</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold text-xs">operation_not_supported</td>
+                                        <td class="p-4 text-base-content/80">The plugin does not support the requested operation.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Language servers -->
-                        <h3 id="language-servers" class="font-serif text-xl text-weaver-indigo mb-3 scroll-mt-20">Language Servers</h3>
-                        <p class="mb-4 text-sm text-weaver-indigo/80">
+                        <h3 id="language-servers" class="font-serif text-xl text-base-content mb-3 scroll-mt-20">Language Servers</h3>
+                        <p class="mb-4 text-sm text-base-content/80">
                             The daemon spawns language server processes for each language, communicating via JSON-RPC 2.0 over stdio. Servers are initialised lazily on first use and shut down gracefully (5&nbsp;s timeout) when the daemon stops.
                         </p>
-                        <div class="border border-weaver-indigo/20 rounded-sm bg-white overflow-hidden mb-4">
+                        <div class="border border-base-content/20 rounded-xs bg-white overflow-hidden mb-4">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-weaver-indigo text-white font-mono text-xs uppercase">
+                                <thead class="bg-primary text-white font-mono text-xs uppercase">
                                     <tr>
                                         <th class="p-4 font-medium">Language</th>
                                         <th class="p-4 font-medium">Binary</th>
                                         <th class="p-4 font-medium">Invocation</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-weaver-indigo/10">
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 text-weaver-indigo font-bold">Rust</td>
-                                        <td class="p-4 font-mono text-xs text-weaver-indigo">rust-analyzer</td>
-                                        <td class="p-4 font-mono text-xs text-weaver-indigo/80">rust-analyzer</td>
+                                <tbody class="divide-y divide-base-content/10">
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 text-base-content font-bold">Rust</td>
+                                        <td class="p-4 font-mono text-xs text-base-content">rust-analyzer</td>
+                                        <td class="p-4 font-mono text-xs text-base-content/80">rust-analyzer</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 text-weaver-indigo font-bold">Python</td>
-                                        <td class="p-4 font-mono text-xs text-weaver-indigo">pyrefly</td>
-                                        <td class="p-4 font-mono text-xs text-weaver-indigo/80">pyrefly lsp</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 text-base-content font-bold">Python</td>
+                                        <td class="p-4 font-mono text-xs text-base-content">pyrefly</td>
+                                        <td class="p-4 font-mono text-xs text-base-content/80">pyrefly lsp</td>
                                     </tr>
-                                    <tr class="hover:bg-weaver-cream/30">
-                                        <td class="p-4 text-weaver-indigo font-bold">TypeScript</td>
-                                        <td class="p-4 font-mono text-xs text-weaver-indigo">tsgo</td>
-                                        <td class="p-4 font-mono text-xs text-weaver-indigo/80">tsgo --lsp</td>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 text-base-content font-bold">TypeScript</td>
+                                        <td class="p-4 font-mono text-xs text-base-content">tsgo</td>
+                                        <td class="p-4 font-mono text-xs text-base-content/80">tsgo --lsp</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -843,29 +837,29 @@ capabilities = [<span class="text-green-400">"rename-symbol"</span>]
                     <!-- Parsing Section (Tree-sitter & Semgrep) -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
                         <section id="tree-sitter" class="scroll-mt-20">
-                            <h2 class="font-serif text-2xl text-weaver-indigo mb-6 pb-2 border-b border-weaver-indigo/10">Tree-sitter Parsing</h2>
-                            <p class="text-sm text-weaver-indigo/80 mb-4 leading-relaxed">
+                            <h2 class="font-serif text-2xl text-base-content mb-6 pb-2 border-b border-base-content/10">Tree-sitter Parsing</h2>
+                            <p class="text-sm text-base-content/80 mb-4 leading-relaxed">
                                 Weaver uses Tree-sitter to generate Concrete Syntax Trees (CST) for supported languages. This allows for error-tolerant parsing even when code is in a broken state during editing.
                             </p>
-                            <div class="bg-white p-4 border border-weaver-indigo/10 rounded-sm">
-                                <h4 class="font-mono text-xs font-bold text-weaver-indigo mb-2 uppercase">Supported Languages</h4>
+                            <div class="bg-white p-4 border border-base-content/10 rounded-xs">
+                                <h4 class="font-mono text-xs font-bold text-base-content mb-2 uppercase">Supported Languages</h4>
                                 <div class="flex flex-wrap gap-2">
-                                    <span class="px-2 py-1 bg-weaver-cream text-xs font-mono text-weaver-indigo border border-weaver-indigo/20 rounded">Rust</span>
-                                    <span class="px-2 py-1 bg-weaver-cream text-xs font-mono text-weaver-indigo border border-weaver-indigo/20 rounded">Python</span>
-                                    <span class="px-2 py-1 bg-weaver-cream text-xs font-mono text-weaver-indigo border border-weaver-indigo/20 rounded">TypeScript</span>
-                                    <span class="px-2 py-1 bg-weaver-cream text-xs font-mono text-weaver-indigo/60 border-2 border-dashed border-weaver-indigo/30 rounded opacity-80">Go <span class="status-pill status-pill-planned ml-1">Planned</span></span>
-                                    <span class="px-2 py-1 bg-weaver-cream text-xs font-mono text-weaver-indigo/60 border-2 border-dashed border-weaver-indigo/30 rounded opacity-80">HCL <span class="status-pill status-pill-planned ml-1">Planned</span></span>
+                                    <span class="px-2 py-1 bg-base-100 text-xs font-mono text-base-content border border-base-content/20 rounded-sm">Rust</span>
+                                    <span class="px-2 py-1 bg-base-100 text-xs font-mono text-base-content border border-base-content/20 rounded-sm">Python</span>
+                                    <span class="px-2 py-1 bg-base-100 text-xs font-mono text-base-content border border-base-content/20 rounded-sm">TypeScript</span>
+                                    <span class="px-2 py-1 bg-base-100 text-xs font-mono text-base-content/82 border-2 border-dashed border-base-content/30 rounded-sm opacity-80">Go <span class="status-pill status-pill-planned ml-1">Planned</span></span>
+                                    <span class="px-2 py-1 bg-base-100 text-xs font-mono text-base-content/82 border-2 border-dashed border-base-content/30 rounded-sm opacity-80">HCL <span class="status-pill status-pill-planned ml-1">Planned</span></span>
                                 </div>
                             </div>
                         </section>
 
                         <section id="semgrep-patterns" class="scroll-mt-20">
-                            <h2 class="font-serif text-2xl text-weaver-indigo mb-6 pb-2 border-b border-weaver-indigo/10">Sempai Patterns</h2>
-                            <p class="text-sm text-weaver-indigo/80 mb-4 leading-relaxed">
+                            <h2 class="font-serif text-2xl text-base-content mb-6 pb-2 border-b border-base-content/10">Sempai Patterns</h2>
+                            <p class="text-sm text-base-content/80 mb-4 leading-relaxed">
                                 The Sempai engine extends Semgrep syntax for structural search. Patterns are defined in YAML and can include metavariables for extraction.
                             </p>
-                            <div class="bg-weaver-dark p-4 rounded-sm border border-weaver-indigo/20">
-<pre class="font-mono text-xs text-gray-300">
+                            <div class="bg-neutral p-4 rounded-xs border border-base-content/20">
+<pre class="font-mono text-xs text-code-text">
 pattern:
   - pattern-inside: |
       fn $FUNC($ARGS) { ... }
@@ -878,13 +872,13 @@ pattern:
                     </div>
 
                     <!-- Help Footer -->
-                    <div class="bg-weaver-indigo text-weaver-cream p-8 rounded-sm mt-12 flex flex-col md:flex-row items-center justify-between panel-fullbleed">
+                    <div class="bg-primary text-base-100 p-8 rounded-xs mt-12 flex flex-col md:flex-row items-center justify-between panel-fullbleed">
                         <div class="mb-4 md:mb-0">
                             <h3 class="font-serif text-2xl mb-2">Need deeper integration?</h3>
-                            <p class="text-weaver-cream/70 text-sm">Check out the plugin development guide for extending Weaver.</p>
+                            <p class="text-base-100/70 text-sm">Check out the plugin development guide for extending Weaver.</p>
                         </div>
-                        <a href="#plugins" class="px-6 py-3 bg-weaver-vermilion text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-weaver-vermilion transition-colors border border-weaver-vermilion">
-                            Plugin Guide <i class="fa-solid fa-arrow-right ml-2"></i>
+                        <a href="#plugins" class="px-6 py-3 bg-accent-deep text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-accent-ink transition-colors border border-accent">
+                            Plugin Guide {{ icon('arrow-right', 'ml-2') }}
                         </a>
                     </div>
 

@@ -1,0 +1,60 @@
+/* Full-bleed media on narrow viewports.
+ *
+ * The `!important` here is load-bearing and deliberate. These rules have
+ * to beat the utilities the markup puts on the same elements — a border,
+ * a padding, a rounded corner that make sense in the column and not when
+ * the image runs to both edges — and layer order alone cannot do that,
+ * because utilities sit in a later layer than this file.
+ */
+
+@media (max-width: 767px) {
+  .figure-fullbleed {
+    border: none !important;
+    padding: 0 !important;
+    margin-left: calc(-1 * var(--fullbleed-offset, 2rem));
+    margin-right: calc(-1 * var(--fullbleed-offset, 2rem));
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+
+  .figure-fullbleed > .figure-fullbleed-label {
+    padding-right: calc(var(--fullbleed-offset, 2rem) + 0.5em) !important;
+  }
+
+  .figure-fullbleed > .figure-fullbleed-caption {
+    padding-left: calc(var(--fullbleed-offset, 2rem) + 0.5em) !important;
+    padding-right: calc(var(--fullbleed-offset, 2rem) + 0.5em) !important;
+  }
+
+  .figure-fullbleed > .figure-fullbleed-img {
+    height: auto !important;
+    border: none !important;
+  }
+
+  .figure-fullbleed > .figure-fullbleed-img > img,
+  .figure-fullbleed > img {
+    object-fit: contain !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  .figure-fullbleed > figcaption {
+    padding: 0.75rem var(--fullbleed-offset, 2rem) 0 !important;
+  }
+
+  .figure-fullbleed > .figure-fullbleed-footer {
+    padding-left: var(--fullbleed-offset, 2rem) !important;
+    padding-right: var(--fullbleed-offset, 2rem) !important;
+  }
+
+  .figure-fullbleed.figure-fullbleed-opaque {
+    background: white !important;
+  }
+
+  .panel-fullbleed {
+    margin-left: calc(-1 * var(--fullbleed-offset, 2rem)) !important;
+    margin-right: calc(-1 * var(--fullbleed-offset, 2rem)) !important;
+    border-radius: 0 !important;
+  }
+}

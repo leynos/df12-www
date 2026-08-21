@@ -35,8 +35,13 @@ ignore = [
   'check_color_contrast',
   # CSS longhand property names ending in -color. The specification spells
   # them the American way, so quoting one in prose is a citation, not a
-  # lapse. The leading segment is required, so bare "color" stays caught.
-  '[a-z][a-z0-9*]*(?:-[a-z0-9*]+)*-color\b',
+  # lapse. Named explicitly rather than matched by shape: a pattern of the
+  # form "word(-word)*-color" also exempts brand-color, water-color and
+  # anything else somebody coins, which is precisely the en-GB slip the
+  # check exists to catch.
+  # The `border-*-color` form appears where prose quotes the whole family at
+  # once, so the wildcard is spelled out alongside the real sides.
+  '\b-?(?:accent|background|border(?:-(?:block|inline)(?:-(?:start|end))?|-(?:top|right|bottom|left)|-\*)?|caret|column-rule|flood|lighting|outline|scrollbar|stop|text-decoration|text-emphasis|webkit-text-fill|webkit-text-stroke)-color\b',
   # daisyUI placement modifiers.
   '(?:carousel|dropdown|footer|indicator|navbar|toast)-center',
   # Netsuke design token, spelled with the double-l variant in the stylesheet.

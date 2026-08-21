@@ -38,8 +38,10 @@ COMPILED_STYLESHEET = PUBLIC_WEAVER / "assets" / "styles" / "weaver.css"
 # only on a `<link>`; on an `<a>` it is a link to somewhere else, which is the
 # point of a link.
 SUBRESOURCE = re.compile(
-    r"""(?:src|srcset)\s*=\s*["']\s*(?:https?:)?//"""
-    r"""|<link\b[^>]*?\bhref\s*=\s*["']\s*(?:https?:)?//""",
+    r"""(?:src|srcset|data|poster)\s*=\s*["']\s*(?:https?:)?//"""
+    r"""|<link\b[^>]*?\bhref\s*=\s*["']\s*(?:https?:)?//"""
+    r"""|url\(\s*["']?\s*(?:https?:)?//"""
+    r"""|@import\s+(?:url\(\s*)?["']\s*(?:https?:)?//""",
     re.IGNORECASE,
 )
 
@@ -52,7 +54,7 @@ RGB_COLOUR = re.compile(r"\brgba?\(")
 # In a template, only `class` and `style` attributes carry styling. The
 # design-system page prints the palette's hex codes as its own content, which
 # is the page's whole job and not a colour anyone is specifying.
-STYLING_ATTRIBUTE = re.compile(r'(?:class|style)="[^"]*"')
+STYLING_ATTRIBUTE = re.compile(r"""(?:class|style)\s*=\s*(?:"[^"]*"|'[^']*')""")
 
 
 @pytest.fixture(scope="session")
@@ -105,7 +107,6 @@ def test_weaver_stylesheet_is_compiled(built_site: Path) -> None:
         "expected the compiled stylesheet to define the daisyUI theme slots; "
         "found no --color-primary"
     )
-    assert built_site.is_dir()
 
 
 @pytest.mark.timeout(300)
@@ -152,6 +153,33 @@ def test_weaver_sources_declare_no_colour_literals() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("markup", "is_styling"),
+    [
+        ('<div class="bg-[#fdf8f0]">', True),
+        ("<div class='bg-[#fdf8f0]'>", True),
+        ('<div style="color: #fff">', True),
+        ("<div style='color: #fff'>", True),
+        ('<div class = "bg-white">', True),
+        # The design-system page prints hex codes as its own content, which is
+        # the page's job and not a colour anyone is specifying.
+        ("<p>The ground is #f3efd9</p>", False),
+    ],
+)
+def test_styling_attribute_matches_either_quote_style(
+    markup: str,
+    *,
+    is_styling: bool,
+) -> None:
+    """The colour scan must not miss a single-quoted attribute.
+
+    While the pattern required double quotes, a colour literal written with
+    single quotes was invisible to it, and the test that relies on it would
+    have passed regardless of what the attribute contained.
+    """
+    assert bool(STYLING_ATTRIBUTE.search(markup)) is is_styling
+
+
 def test_generated_icon_macro_matches_its_source() -> None:
     """The committed icon macro should be what the generator produces.
 
@@ -163,8 +191,10 @@ def test_generated_icon_macro_matches_its_source() -> None:
     spec = importlib.util.spec_from_file_location(
         "generate_weaver_icons", REPO_ROOT / "scripts" / "generate_weaver_icons.py"
     )
-    assert spec is not None
-    assert spec.loader is not None
+    assert spec is not None, "scripts/generate_weaver_icons.py could not be located"
+    assert spec.loader is not None, (
+        "spec for generate_weaver_icons has no loader; it cannot be executed"
+    )
     generator = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(generator)
 
@@ -203,7 +233,8 @@ def test_no_font_awesome_markup_remains() -> None:
         str(path.relative_to(REPO_ROOT))
         for path in sources
         if re.search(
-            r"\bfa-(solid|regular|brands|fw)\b", path.read_text(encoding="utf-8")
+            r"""class\s*=\s*["'][^"']*\bfa(?:-(?:solid|regular|brands|fw)|[srb]?)\b""",
+            path.read_text(encoding="utf-8"),
         )
     }
     assert not offenders, f"Font Awesome classes remain in: {offenders}"
@@ -221,6 +252,19 @@ def test_no_font_awesome_markup_remains() -> None:
         # A link to somewhere else is what a link is for.
         ('<a href="https://github.com/leynos/weaver">source</a>', False),
         ('<a class="btn" href="https://example.com">read</a>', False),
+        # CSS and embedded media reach other origins by their own routes.
+        ("<style>a{background:url(https://cdn.example.com/x.png)}</style>", True),
+        ('<style>@import url("//cdn.example.com/a.css");</style>', True),
+        ('<object data="https://example.com/x.pdf"></object>', True),
+        ('<video poster="//cdn.example.com/p.jpg"></video>', True),
+        # Every url() the built site actually contains is a local path, and
+        # none of them may be read as a remote fetch.
+        (
+            "<style>a{background:url('/weaver/assets/textures/cubes.png')}</style>",
+            False,
+        ),
+        ("<style>a{background:url(/weaver/assets/fonts/x.woff2)}</style>", False),
+        ("<style>a{mask:url(#a)}</style>", False),
     ],
 )
 def test_subresource_pattern_distinguishes_fetches_from_links(
@@ -229,4 +273,7 @@ def test_subresource_pattern_distinguishes_fetches_from_links(
     is_remote: bool,
 ) -> None:
     """The self-contained check must not pass vacuously, or ban hyperlinks."""
-    assert bool(SUBRESOURCE.search(markup)) is is_remote
+    verdict = "remote" if is_remote else "local"
+    assert bool(SUBRESOURCE.search(markup)) is is_remote, (
+        f"expected SUBRESOURCE to read this as {verdict}: {markup}"
+    )

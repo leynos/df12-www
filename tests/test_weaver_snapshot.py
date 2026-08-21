@@ -10,7 +10,6 @@ regression is normalized away and ships.
 from __future__ import annotations
 
 import importlib.util
-import sys
 import typing as typ
 from pathlib import Path
 
@@ -23,10 +22,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 _SPEC = importlib.util.spec_from_file_location(
     "weaver_snapshot", REPO_ROOT / "scripts" / "weaver_snapshot.py"
 )
-assert _SPEC is not None
-assert _SPEC.loader is not None
+assert _SPEC is not None, "scripts/weaver_snapshot.py could not be located"
+assert _SPEC.loader is not None, (
+    "spec for weaver_snapshot has no loader; it cannot be executed"
+)
 weaver_snapshot = importlib.util.module_from_spec(_SPEC)
-sys.modules["weaver_snapshot"] = weaver_snapshot
 _SPEC.loader.exec_module(weaver_snapshot)
 
 
@@ -123,7 +123,7 @@ def test_animated_opacity_is_ignored_but_static_opacity_is_not() -> None:
     )
     assert "opacity" not in animated["styleDiff"]
 
-    static = weaver_snapshot._normalize(_node(**{"opacity": "0.5"}))
+    static = weaver_snapshot._normalize(_node(opacity="0.5"))
     assert static["styleDiff"]["opacity"] == "0.5"
 
 
@@ -144,6 +144,15 @@ def test_bounding_boxes_are_rounded_not_discarded() -> None:
     node["bbox"] = {"x": 0.0, "y": jittered_y, "width": 640.0, "height": height}
     normalized = weaver_snapshot._normalize(node)
     assert normalized["bbox"]["y"] == settled_y
+
+    # The other half of the docstring's promise, which nothing checked: a
+    # rounding that also swallowed real movement would make the whole
+    # comparison worthless, and would have passed the assertion above.
+    shifted = _node()
+    shifted["bbox"] = {"x": 0.0, "y": jittered_y + 1, "width": 640.0, "height": height}
+    assert (
+        weaver_snapshot._normalize(shifted)["bbox"]["y"] != normalized["bbox"]["y"]
+    ), "a one-pixel shift must survive normalization, or diffs mean nothing"
     assert normalized["bbox"]["height"] == height
 
 
@@ -201,3 +210,24 @@ def test_root_only_declarations_are_not_repeated_down_the_tree() -> None:
     assert normalized["children"][0]["children"][0]["styleDiff"] == {
         "color-scheme": "dark"
     }
+
+
+def test_a_shadow_of_only_transparent_layers_becomes_none() -> None:
+    """With nothing left to paint, the value is reported as `none`."""
+    assert weaver_snapshot._canonical_shadow(
+        "rgba(0, 0, 0, 0.000) 0px 0px 0px 0px"
+    ) == ("none")
+
+
+def test_transparent_shadow_layers_are_dropped_whatever_their_geometry() -> None:
+    """Alpha decides whether a layer paints, not its offset or blur.
+
+    Matching the fully-zero placeholder by its exact text kept any transparent
+    layer that carried an offset, a blur or a spread, so two snapshots could
+    differ over a shadow neither of them drew.
+    """
+    geometry = "rgba(0, 0, 0, 0.000) 2px 4px 6px 0px"
+    assert weaver_snapshot._canonical_shadow(geometry) == "none"
+
+    visible = "rgba(25, 60, 110, 0.100) 4px 4px 0px 0px"
+    assert weaver_snapshot._canonical_shadow(f"{geometry}, {visible}") == visible

@@ -57,6 +57,12 @@ SCREENSHOT_WIDTHS = (360, 768, 1440)
 # the ceiling only guards against a runaway capture.
 MAX_NODES = 8000
 
+# How long a browser-driving subprocess may take before the run is called off.
+# A headless browser that never returns would otherwise hang the snapshot
+# indefinitely. Matches the timeout the css-view and Playwright probes in
+# tests/ already use for the same tools.
+TOOL_TIMEOUT_SECONDS = 90
+
 app = cyclopts.App(
     name="weaver-snapshot",
     help="Capture and compare Weaver computed-style snapshots.",
@@ -82,7 +88,7 @@ def _page_paths() -> list[str]:
         f"{path.parent.relative_to(PUBLIC_WEAVER).as_posix()}/".removeprefix("./")
         for path in PUBLIC_WEAVER.rglob("index.html")
     ]
-    return sorted(page if page != "./" else "" for page in pages)
+    return sorted(pages)
 
 
 def _slug(page: str) -> str:
@@ -180,8 +186,14 @@ def _served(port: int) -> cabc.Iterator[str]:
         yield base
     finally:
         server.terminate()
-        with contextlib.suppress(subprocess.TimeoutExpired):
+        try:
             server.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            # A server that will not stand down still holds the port, and the
+            # next run's bind probe would refuse to start because of it.
+            server.kill()
+            with contextlib.suppress(subprocess.TimeoutExpired):
+                server.wait(timeout=10)
 
 
 def _prepare_output_dir(out_dir: Path, suffix: str) -> Path:
@@ -273,6 +285,7 @@ def capture(out_dir: Path, /, *, port: int = 8099) -> None:
                 cwd=REPO_ROOT,
                 check=True,
                 stdout=subprocess.DEVNULL,
+                timeout=TOOL_TIMEOUT_SECONDS,
             )
             print(f"  {slug}")
 
@@ -305,6 +318,7 @@ def shots(out_dir: Path, /, *, port: int = 8098) -> None:
             cwd=REPO_ROOT,
             check=True,
             stdout=subprocess.DEVNULL,
+            timeout=TOOL_TIMEOUT_SECONDS,
         )
 
     with _served(port) as base:
@@ -325,7 +339,9 @@ def shots(out_dir: Path, /, *, port: int = 8098) -> None:
                     )
                 print(f"  {width}px done")
         finally:
-            with contextlib.suppress(subprocess.CalledProcessError):
+            with contextlib.suppress(
+                subprocess.CalledProcessError, subprocess.TimeoutExpired
+            ):
                 run("close")
 
     print(f"done: {resolved}")
@@ -468,6 +484,32 @@ def _canonical_value(value: str) -> str:
 # different number of these placeholders in front of it.
 _EMPTY_SHADOW = "rgba(0, 0, 0, 0.000) 0px 0px 0px 0px"
 
+# The alpha channel of a canonicalized `rgba()`, which `_canonical_colour` has
+# already normalized to three decimal places by the time this runs.
+_SHADOW_ALPHA = re.compile(r"rgba\([^)]*,\s*0\.000\s*\)")
+
+
+def _is_transparent_shadow(layer: str) -> bool:
+    """Report whether a shadow layer paints nothing.
+
+    Alpha decides this on its own. Matching the fully-zero placeholder by its
+    exact text missed any transparent layer that carried a geometry — an
+    offset, a blur, a spread — even though a shadow at alpha zero is invisible
+    whatever its dimensions. Two snapshots then differed over a layer neither
+    of them drew.
+
+    Parameters
+    ----------
+    layer
+        One comma-separated layer of a canonicalized shadow value.
+
+    Returns
+    -------
+    bool
+        True when the layer is fully transparent and so paints nothing.
+    """
+    return layer == _EMPTY_SHADOW or bool(_SHADOW_ALPHA.search(layer))
+
 
 def _canonical_shadow(value: str) -> str:
     """Drop the placeholder layers from a composed ``box-shadow``.
@@ -501,7 +543,7 @@ def _canonical_shadow(value: str) -> str:
     if buffer.strip():
         layers.append(buffer.strip())
 
-    painted = [layer for layer in layers if layer != _EMPTY_SHADOW]
+    painted = [layer for layer in layers if not _is_transparent_shadow(layer)]
     return ", ".join(painted) if painted else "none"
 
 

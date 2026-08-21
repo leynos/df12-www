@@ -70,7 +70,13 @@
                                     <span class="w-4 text-right text-base-content/82">3</span>
                                     <div class="flex-1 bg-primary/10 rounded-xs h-6 relative overflow-hidden">
                                         <div class="absolute inset-y-0 left-0 bg-accent rounded-xs" style="width: 55%"></div>
-                                        <span class="absolute inset-0 flex items-center px-3 text-base-content font-bold">Syntactic &amp; relational intelligence</span>
+                                        {#- `text-ink-deep`, not `text-base-content`: this label spans the
+                                            whole track, so its left 55% lies over the vermilion fill above
+                                            rather than the pale trough. Indigo on that fill measures 2.93:1
+                                            and fails AA at 12px bold; the darker ink measures 4.77:1. The
+                                            other phases keep `text-base-content` because their fills are
+                                            pale. -#}
+                                        <span class="absolute inset-0 flex items-center px-3 text-ink-deep font-bold">Syntactic &amp; relational intelligence</span>
                                     </div>
                                     <span class="text-accent-ink w-20 text-right">Active</span>
                                 </div>

@@ -162,7 +162,7 @@
                                 By default, the network namespace is empty (loopback only). Access to package registries and APIs must be explicitly allowlisted via proxy.
                             </p>
                             <div class="bg-neutral p-3 rounded-xs border border-base-content/20">
-                                <code class="font-mono text-xs text-code-string block">ALLOW api.uxpilot.ai:443</code>
+                                <code class="font-mono text-xs text-code-string block">ALLOW pypi.org:443</code>
                                 <code class="font-mono text-xs text-code-string block">ALLOW crates.io:443</code>
                                 <code class="font-mono text-xs text-code-fail block">DENY *</code>
                             </div>
@@ -223,7 +223,7 @@
                                     <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center shrink-0 text-white font-bold text-xs">02</div>
                                     <div>
                                         <h4 class="font-bold font-mono text-sm mb-1 text-white">Destructive Action Mitigation</h4>
-                                        <p class="text-xs text-base-100/70">Read-only system mounts prevent `rm -rf /` or modification of critical binaries.</p>
+                                        <p class="text-xs text-base-100/70">Read-only system mounts prevent <code>rm -rf /</code> or modification of critical binaries.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-4">

@@ -3,15 +3,30 @@
 
 {% block page_title %}Jacquard Symbol Graph White Paper - Weaver AI Codebase Tooling{% endblock %}
 
+{#- The page's seven sections, named once and rendered twice: in the site
+    sidebar below, and in the article's own contents list further down. The two
+    lists are styled differently but must always agree on what the page
+    contains, which they cannot be relied upon to do while each carries its own
+    copy of the anchors.
+
+    Labels are written as plain text, not as markup. They pass through the
+    autoescaping `{{ label }}` below, so an ampersand written as `&amp;` here
+    would arrive doubly encoded and read as literal `&amp;` on the page. -#}
+{%- set sections = [
+    ('#thesis', 'Thesis'),
+    ('#cards', 'Card Contract'),
+    ('#slices', 'Bounded Slices'),
+    ('#history', 'History & Matching'),
+    ('#commands', 'Command Surface'),
+    ('#operations', 'Operations'),
+    ('#references', 'References'),
+] -%}
+
 {% block nav_subitems_jacquard %}
 <ul class="space-y-1 mt-1 ml-4">
-    <li><a href="#thesis" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">Thesis</a></li>
-    <li><a href="#cards" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">Card Contract</a></li>
-    <li><a href="#slices" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">Bounded Slices</a></li>
-    <li><a href="#history" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">History &amp; Matching</a></li>
-    <li><a href="#commands" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">Command Surface</a></li>
-    <li><a href="#operations" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">Operations</a></li>
-    <li><a href="#references" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">References</a></li>
+    {%- for anchor, label in sections %}
+    <li><a href="{{ anchor }}" class="block px-4 py-1 text-xs text-base-content/88 hover:text-accent-ink transition-colors">{{ label }}</a></li>
+    {%- endfor %}
 </ul>
 {% endblock %}
 
@@ -28,14 +43,13 @@
                 <div class="space-y-8">
                     <div>
                         <h3 class="font-serif text-base-content font-bold mb-3 text-sm">Contents</h3>
+                        {#- The `-ml-[1px]` pulls each link back over the list's
+                            own `border-l`, which the sidebar copy above has no
+                            need of and so does not carry. -#}
                         <ul class="space-y-2 border-l border-base-content/10 ml-1">
-                            <li><a href="#thesis" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Thesis</a></li>
-                            <li><a href="#cards" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Card Contract</a></li>
-                            <li><a href="#slices" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Bounded Slices</a></li>
-                            <li><a href="#history" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">History &amp; Matching</a></li>
-                            <li><a href="#commands" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Command Surface</a></li>
-                            <li><a href="#operations" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Operations</a></li>
-                            <li><a href="#references" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">References</a></li>
+                            {%- for anchor, label in sections %}
+                            <li><a href="{{ anchor }}" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">{{ label }}</a></li>
+                            {%- endfor %}
                         </ul>
                     </div>
                     <div class="p-5 bg-white/70 border border-base-content/10 rounded-xs paper-panel">

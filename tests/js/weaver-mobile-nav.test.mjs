@@ -98,11 +98,30 @@ describe("opening and closing", () => {
   });
 
   test("opening locks page scrolling and closing gives it back", () => {
-    dom.document.body.style.overflow = "auto";
+    dom.document.body.style.overflowY = "auto";
     click(dom.window, dom.toggle);
-    expect(dom.document.body.style.overflow).toBe("hidden");
+    expect(dom.document.body.style.overflowY).toBe("hidden");
     click(dom.window, dom.toggle);
-    expect(dom.document.body.style.overflow).toBe("auto");
+    expect(dom.document.body.style.overflowY).toBe("auto");
+  });
+
+  test("the lock never touches the horizontal axis", () => {
+    // The body carries `overflow-x: hidden` as a class, and that clip is what
+    // keeps the page from scrolling sideways. Locking with `style.overflow`
+    // would set both axes, replacing that clip for the duration of the drawer
+    // and then removing both on close. The drawer only ever needed to stop the
+    // page scrolling underneath it, so it must leave the horizontal axis
+    // exactly as it found it.
+    //
+    // Starting from no inline value is what gives the assertion teeth. Seeding
+    // `overflowX = "hidden"` first made the expected value identical to the
+    // seeded one, so a drawer that wrote `hidden` itself — exactly the bug this
+    // guards — would have passed. Empty is a value only the drawer can spoil.
+    expect(dom.document.body.style.overflowX).toBe("");
+    click(dom.window, dom.toggle);
+    expect(dom.document.body.style.overflowX).toBe("");
+    click(dom.window, dom.toggle);
+    expect(dom.document.body.style.overflowX).toBe("");
   });
 
   test("opening moves focus to the first item in the nav", () => {

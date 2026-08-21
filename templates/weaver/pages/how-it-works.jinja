@@ -1,72 +1,66 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Architecture - Weaver AI Codebase Tooling{% endblock %}
 
 {% block extra_head %}
-    <style>
-        /* Custom ASCII Diagram Styling */
-        .ascii-diagram {
-            line-height: 1.2;
-            white-space: pre;
-        }
-    </style>
 {% endblock %}
 
 {% block nav_subitems_how %}
-                    <div class="ml-4 pl-4 border-l border-weaver-indigo/20 space-y-1 my-2">
-                        <a href="#fusion" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors"># Semantic Fusion</a>
-                        <a href="#daemon" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors"># Client-Daemon</a>
+                    <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
+                        <a href="#fusion" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors"># Semantic Fusion</a>
+                        <a href="#daemon" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors"># Client-Daemon</a>
                     </div>
 {% endblock %}
 
 {% block content %}
 
             <!-- Header Section -->
-            <section id="architecture-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-weaver-indigo/20">
+            <section id="architecture-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-base-content/20">
                 <div class="masthead-frame mx-auto">
                     <div class="masthead-eyebrow mb-6">
-                        <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">System Design</span>
+                        <span class="font-mono text-xs tracking-widest uppercase text-base-content">System Design</span>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-8">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-8">
                         The Loom of <br>
-                        <span class="text-weaver-vermilion italic font-light">Structured</span> Intelligence.
+                        <span class="text-accent-ink italic font-light">Structured</span> Intelligence.
                     </h1>
 
-                    <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
+                    <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-2xl font-light">
                         Weaver is built on a foundation of explicit state and semantic fusion. It treats code not just as text, but as a queryable, structured fabric of logic.
                     </p>
                 </div>
             </section>
 
             <!-- High Level Overview Diagram -->
-            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
+            <section class="py-16 px-8 lg:px-16 border-b border-base-content/20 bg-white/40">
                 <div class="max-w-6xl mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
-                            <h2 class="font-serif text-3xl text-weaver-indigo mb-6">System Topology</h2>
-                            <p class="text-weaver-indigo/80 mb-6 leading-relaxed">
+                            <h2 class="font-serif text-3xl text-base-content mb-6">System Topology</h2>
+                            <p class="text-base-content/80 mb-6 leading-relaxed">
                                 The Weaver architecture separates the ephemeral nature of CLI commands from the persistent state of the analysis daemon. This split ensures speed for user interactions while maintaining deep, semantic context in the background.
                             </p>
-                            <ul class="space-y-4 font-mono text-sm text-weaver-indigo">
+                            <ul class="space-y-4 font-mono text-sm text-base-content">
                                 <li class="flex items-center">
-                                    <span class="w-2 h-2 bg-weaver-vermilion rounded-full mr-3"></span>
+                                    <span class="w-2 h-2 bg-accent rounded-full mr-3"></span>
                                     CLI Client (Ephemeral)
                                 </li>
                                 <li class="flex items-center">
-                                    <span class="w-2 h-2 bg-weaver-indigo rounded-full mr-3"></span>
+                                    <span class="w-2 h-2 bg-primary rounded-full mr-3"></span>
                                     Weaver Daemon (Persistent)
                                 </li>
                                 <li class="flex items-center">
-                                    <span class="w-2 h-2 border border-weaver-indigo rounded-full mr-3"></span>
+                                    <span class="w-2 h-2 border border-base-content rounded-full mr-3"></span>
                                     LSP / Tree-sitter Integrations
                                 </li>
                             </ul>
                         </div>
 
                         <!-- ASCII / CSS Diagram -->
-                        <div class="bg-weaver-dark p-4 rounded-sm shadow-xl overflow-hidden border border-weaver-indigo/50 relative group figure-fullbleed">
-                            <div class="absolute top-2 right-2 text-[10px] text-weaver-vermilion opacity-50 figure-fullbleed-label">FIG 3.0</div>
+                        <div class="bg-neutral p-4 rounded-xs shadow-xl overflow-hidden border border-base-content/50 relative group figure-fullbleed">
+                            <div class="absolute top-2 right-2 text-3xs text-accent-ink opacity-50 figure-fullbleed-label">FIG 3.0</div>
                             <img
                                 src="/weaver/assets/how-it-works/how-it-works-system-topology.png"
                                 alt="System-topology illustration showing the Weaver CLI shell, daemon, semantic fusion core, JSONL output, and analysis engines."
@@ -78,41 +72,37 @@
             </section>
 
             <!-- Semantic Fusion Engine Section -->
-            <section id="fusion" class="py-20 px-8 lg:px-16 border-b border-weaver-indigo/20 relative">
-                <!-- Seigaiha Pattern Background -->
-                <div class="absolute right-0 top-0 bottom-0 w-1/3 opacity-5 pointer-events-none"
-                     style="background-image: url('https://www.transparenttextures.com/patterns/seigaiha.png');">
-                </div>
+            <section id="fusion" class="py-20 px-8 lg:px-16 border-b border-base-content/20 relative">
 
                 <div class="max-w-6xl mx-auto relative z-10">
                     <div class="flex flex-col lg:flex-row gap-16">
                         <!-- Left Content -->
                         <div class="lg:w-1/2">
-                            <div class="inline-block border border-weaver-indigo/30 px-2 py-1 mb-4 bg-weaver-cream">
-                                <span class="font-mono text-xs text-weaver-indigo font-bold">CORE COMPONENT</span>
+                            <div class="inline-block border border-base-content/30 px-2 py-1 mb-4 bg-base-100">
+                                <span class="font-mono text-xs text-base-content font-bold">CORE COMPONENT</span>
                             </div>
-                            <h2 class="font-serif text-4xl text-weaver-indigo mb-6">Semantic Fusion Engine</h2>
-                            <p class="text-lg text-weaver-indigo/80 mb-6 font-light">
+                            <h2 class="font-serif text-4xl text-base-content mb-6">Semantic Fusion Engine</h2>
+                            <p class="text-lg text-base-content/80 mb-6 font-light">
                                 The heart of Weaver is the Fusion Engine. It ingests raw code, AST data, and LSP diagnostics to build internal semantic data structures that power every observe, act, and verify operation.
                             </p>
 
                             <div class="space-y-8 mt-8">
                                 <div class="flex gap-4">
-                                    <div class="flex-shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-sm border border-weaver-indigo/20">
-                                        <i class="fa-solid fa-layer-group"></i>
+                                    <div class="shrink-0 w-12 h-12 bg-primary/10 flex items-center justify-center text-base-content rounded-xs border border-base-content/20">
+                                        {{ icon('layer-group') }}
                                     </div>
                                     <div>
-                                        <h3 class="font-serif text-xl text-weaver-indigo mb-2">Multi-Source Ingestion</h3>
-                                        <p class="text-sm text-weaver-indigo/70">Combines static analysis (Tree-sitter) with dynamic runtime data (LSP) to resolve references that static analysis misses.</p>
+                                        <h3 class="font-serif text-xl text-base-content mb-2">Multi-Source Ingestion</h3>
+                                        <p class="text-sm text-base-content/88">Combines static analysis (Tree-sitter) with dynamic runtime data (LSP) to resolve references that static analysis misses.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-4">
-                                    <div class="flex-shrink-0 w-12 h-12 bg-weaver-indigo/10 flex items-center justify-center text-weaver-indigo rounded-sm border border-weaver-indigo/20">
-                                        <i class="fa-solid fa-tag"></i>
+                                    <div class="shrink-0 w-12 h-12 bg-primary/10 flex items-center justify-center text-base-content rounded-xs border border-base-content/20">
+                                        {{ icon('tag') }}
                                     </div>
                                     <div>
-                                        <h3 class="font-serif text-xl text-weaver-indigo mb-2">Provenance Tagging</h3>
-                                        <p class="text-sm text-weaver-indigo/70">Every piece of data carries a provenance trail. We know exactly <em>why</em> the AI thinks a function is relevant.</p>
+                                        <h3 class="font-serif text-xl text-base-content mb-2">Provenance Tagging</h3>
+                                        <p class="text-sm text-base-content/88">Every piece of data carries a provenance trail. We know exactly <em>why</em> the AI thinks a function is relevant.</p>
                                     </div>
                                 </div>
                             </div>
@@ -120,121 +110,121 @@
 
                         <!-- Right Content: JSONL Example -->
                         <div class="lg:w-1/2">
-                            <div class="bg-white border-2 border-weaver-indigo shadow-[8px_8px_0px_0px_rgba(25,60,110,0.1)] p-1">
-                                <div class="bg-weaver-cream border border-weaver-indigo/20 p-6">
-                                    <div class="flex justify-between items-center mb-4 border-b border-weaver-indigo/10 pb-2">
-                                        <span class="font-mono text-xs font-bold text-weaver-indigo">INTERNAL TELEMETRY: FUSION_OUTPUT</span>
-                                        <span class="font-mono text-[10px] text-weaver-vermilion animate-pulse">● LIVE</span>
+                            <div class="bg-white border-2 border-base-content shadow-panel p-1">
+                                <div class="bg-base-100 border border-base-content/20 p-6">
+                                    <div class="flex justify-between items-center mb-4 border-b border-base-content/10 pb-2">
+                                        <span class="font-mono text-xs font-bold text-base-content">INTERNAL TELEMETRY: FUSION_OUTPUT</span>
+                                        <span class="font-mono text-3xs text-accent-ink animate-pulse">● LIVE</span>
                                     </div>
 
                                     <div class="font-mono text-xs space-y-4 overflow-x-auto">
                                         <!-- Code Block 1 -->
                                         <div class="opacity-50 hover:opacity-100 transition-opacity">
-                                            <span class="text-gray-400">{"timestamp": "2026-03-15T10:00:01Z", "type": "scan_start", "target": "src/"}</span>
+                                            <span class="text-code-ink">{"timestamp": "2026-03-15T10:00:01Z", "type": "scan_start", "target": "src/"}</span>
                                         </div>
 
                                         <!-- Code Block 2 (Highlighted) -->
-                                        <div class="bg-weaver-indigo/5 p-2 -mx-2 rounded border-l-2 border-weaver-vermilion">
-                                            <span class="text-weaver-indigo">{</span><br>
-                                            <span class="text-weaver-vermilion ml-4">"type"</span>: <span class="text-green-700">"semantic_node"</span>,<br>
-                                            <span class="text-weaver-vermilion ml-4">"id"</span>: <span class="text-blue-700">"fn::process_data"</span>,<br>
-                                            <span class="text-weaver-vermilion ml-4">"provenance"</span>: {<br>
-                                            <span class="text-weaver-indigo ml-8">"source"</span>: "tree-sitter-rust",<br>
-                                            <span class="text-weaver-indigo ml-8">"confidence"</span>: 0.98<br>
-                                            <span class="text-weaver-vermilion ml-4">}</span>,<br>
-                                            <span class="text-weaver-vermilion ml-4">"relationships"</span>: [<br>
-                                            <span class="text-weaver-indigo ml-8">"calls::validate_input"</span>,<br>
-                                            <span class="text-weaver-indigo ml-8">"uses::DataStruct"</span><br>
-                                            <span class="text-weaver-vermilion ml-4">]</span><br>
-                                            <span class="text-weaver-indigo">}</span>
+                                        <div class="bg-primary/5 p-2 -mx-2 rounded-sm border-l-2 border-accent">
+                                            <span class="text-base-content">{</span><br>
+                                            <span class="text-accent-ink ml-4">"type"</span>: <span class="text-code-literal">"semantic_node"</span>,<br>
+                                            <span class="text-accent-ink ml-4">"id"</span>: <span class="text-code-ref">"fn::process_data"</span>,<br>
+                                            <span class="text-accent-ink ml-4">"provenance"</span>: {<br>
+                                            <span class="text-base-content ml-8">"source"</span>: "tree-sitter-rust",<br>
+                                            <span class="text-base-content ml-8">"confidence"</span>: 0.98<br>
+                                            <span class="text-accent-ink ml-4">}</span>,<br>
+                                            <span class="text-accent-ink ml-4">"relationships"</span>: [<br>
+                                            <span class="text-base-content ml-8">"calls::validate_input"</span>,<br>
+                                            <span class="text-base-content ml-8">"uses::DataStruct"</span><br>
+                                            <span class="text-accent-ink ml-4">]</span><br>
+                                            <span class="text-base-content">}</span>
                                         </div>
 
                                         <!-- Code Block 3 -->
                                         <div class="opacity-50 hover:opacity-100 transition-opacity">
-                                            <span class="text-gray-400">{"timestamp": "2026-03-15T10:00:02Z", "type": "scan_complete", "nodes": 142}</span>
+                                            <span class="text-code-ink">{"timestamp": "2026-03-15T10:00:02Z", "type": "scan_complete", "nodes": 142}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                                    <p class="text-center font-mono text-xs text-weaver-indigo/50 mt-4">Figure 3.1: Internal fusion telemetry, not the public CLI and daemon JSONL envelope.</p>
+                                    <p class="text-center font-mono text-xs text-base-content/78 mt-4">Figure 3.1: Internal fusion telemetry, not the public CLI and daemon JSONL envelope.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- Client-Daemon Model Section -->
-            <section id="daemon" class="py-20 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-weaver-indigo text-weaver-cream">
+            <section id="daemon" class="py-20 px-8 lg:px-16 border-b border-base-content/20 bg-primary text-base-100">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center mb-16">
-                        <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
+                        <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
                         <h2 class="font-serif text-4xl text-white mb-4">Client–Daemon Model</h2>
-                        <p class="text-weaver-cream/70 max-w-2xl mx-auto">
+                        <p class="text-base-100/70 max-w-2xl mx-auto">
                             Decoupling the user interface from the intelligence engine allows for persistent context and faster CLI response times.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Card 1: Daemon -->
-                        <div class="bg-weaver-dark border border-weaver-cream/10 p-8 relative overflow-hidden group hover:border-weaver-vermilion/50 transition-colors">
+                        <div class="bg-neutral border border-base-100/10 p-8 relative overflow-hidden group hover:border-accent/50 transition-colors">
                             <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <i class="fa-solid fa-server text-8xl text-white"></i>
+                                {{ icon('server', 'text-8xl text-white') }}
                             </div>
 
                             <h3 class="font-serif text-2xl text-white mb-2">The Daemon</h3>
-                            <div class="font-mono text-xs text-weaver-vermilion mb-4">weaver daemon</div>
+                            <div class="font-mono text-xs text-accent-ink mb-4">weaver daemon</div>
 
-                            <ul class="space-y-3 text-sm text-weaver-cream/80 font-light">
+                            <ul class="space-y-3 text-sm text-base-100/80 font-light">
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Hosts LSP child processes (rust-analyzer, pyrefly lsp, etc.).</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Dispatches JSONL requests from the CLI and streams responses.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
-                                    <span>Listens on Unix Domain Socket (or TCP via <code class="text-xs text-weaver-cream/50">--daemon-socket</code>).</span>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
+                                    <span>Listens on Unix Domain Socket (or TCP via <code class="text-xs text-base-100/70">--daemon-socket</code>).</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Auto-starts when a domain command is issued — no manual launch needed.</span>
                                 </li>
                             </ul>
 
                             <div class="mt-8 pt-6 border-t border-white/10">
-                                <div class="font-mono text-xs text-gray-400 mb-2">Manual lifecycle:</div>
-                                <code class="block bg-black/30 p-2 rounded text-xs font-mono text-green-400">$ weaver daemon start</code>
+                                <div class="font-mono text-xs text-code-dim mb-2">Manual lifecycle:</div>
+                                <code class="block bg-black/30 p-2 rounded-sm text-xs font-mono text-code-string">$ weaver daemon start</code>
                             </div>
                         </div>
 
                         <!-- Card 2: Client -->
-                        <div class="bg-weaver-dark border border-weaver-cream/10 p-8 relative overflow-hidden group hover:border-weaver-vermilion/50 transition-colors">
+                        <div class="bg-neutral border border-base-100/10 p-8 relative overflow-hidden group hover:border-accent/50 transition-colors">
                             <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <i class="fa-solid fa-terminal text-8xl text-white"></i>
+                                {{ icon('terminal', 'text-8xl text-white') }}
                             </div>
 
                             <h3 class="font-serif text-2xl text-white mb-2">The Client</h3>
-                            <div class="font-mono text-xs text-weaver-vermilion mb-4">weaver &lt;domain&gt; &lt;operation&gt;</div>
+                            <div class="font-mono text-xs text-accent-ink mb-4">weaver &lt;domain&gt; &lt;operation&gt;</div>
 
-                            <ul class="space-y-3 text-sm text-weaver-cream/80 font-light">
+                            <ul class="space-y-3 text-sm text-base-100/80 font-light">
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
-                                    <span>Parses config (<code class="text-xs text-weaver-cream/50">--config-path</code>, XDG, env vars) and CLI flags.</span>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
+                                    <span>Parses config (<code class="text-xs text-base-100/70">--config-path</code>, XDG, env vars) and CLI flags.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
                                     <span>Sends JSONL requests to the daemon, streams the response.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <i class="fa-solid fa-check mt-1 text-weaver-vermilion text-xs"></i>
-                                    <span>Renders human-readable output when stdout is a TTY (<code class="text-xs text-weaver-cream/50">--output auto</code>).</span>
+                                    {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
+                                    <span>Renders human-readable output when stdout is a TTY (<code class="text-xs text-base-100/70">--output auto</code>).</span>
                                 </li>
                             </ul>
 
                             <div class="mt-8 pt-6 border-t border-white/10">
-                                <div class="font-mono text-xs text-gray-400 mb-2">Usage example:</div>
-                                <code class="block bg-black/30 p-2 rounded text-xs font-mono text-green-400">$ weaver observe get-definition --uri file:///src/main.rs --position 10:5</code>
+                                <div class="font-mono text-xs text-code-dim mb-2">Usage example:</div>
+                                <code class="block bg-black/30 p-2 rounded-sm text-xs font-mono text-code-string">$ weaver observe get-definition --uri file:///src/main.rs --position 10:5</code>
                             </div>
                         </div>
                     </div>
@@ -242,11 +232,11 @@
             </section>
 
             <!-- Data Flow Section -->
-            <section class="py-20 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-weaver-cream">
+            <section class="py-20 px-8 lg:px-16 border-b border-base-content/20 bg-base-100">
                 <div class="max-w-4xl mx-auto">
                     <div class="text-center mb-12">
-                        <h2 class="font-serif text-3xl text-weaver-indigo mb-4">Data Flow & Provenance</h2>
-                        <p class="text-weaver-indigo/80">
+                        <h2 class="font-serif text-3xl text-base-content mb-4">Data Flow & Provenance</h2>
+                        <p class="text-base-content/80">
                             Weaver ensures that every insight provided to the AI agent can be traced back to a source of truth.
                         </p>
                     </div>
@@ -254,42 +244,42 @@
                     <!-- Flow Steps -->
                     <div class="relative">
                         <!-- Vertical Line -->
-                        <div class="absolute left-8 top-0 bottom-0 w-px bg-weaver-indigo/30 hidden md:block"></div>
+                        <div class="absolute left-8 top-0 bottom-0 w-px bg-primary/30 hidden md:block"></div>
 
                         <div class="space-y-12">
                             <!-- Step 1 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">01</div>
-                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm">
-                                    <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">Ingestion & Parsing</h3>
-                                    <p class="text-sm text-weaver-indigo/70 mb-3">
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-base-100 border-2 border-base-content rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-base-content shadow-lg">01</div>
+                                <div class="flex-1 bg-white border border-base-content/20 p-6 rounded-xs shadow-xs">
+                                    <h3 class="font-serif font-bold text-base-content text-lg mb-2">Ingestion & Parsing</h3>
+                                    <p class="text-sm text-base-content/88 mb-3">
                                         When a file is observed, the Daemon invokes Tree-sitter to generate a Concrete Syntax Tree (CST).
                                     </p>
-                                    <div class="inline-flex items-center gap-2 px-2 py-1 bg-weaver-indigo/5 rounded text-xs font-mono text-weaver-indigo">
-                                        <i class="fa-solid fa-file-code"></i> source.rs
-                                        <i class="fa-solid fa-arrow-right mx-1 text-xs"></i>
-                                        <i class="fa-solid fa-tree"></i> CST
+                                    <div class="inline-flex items-center gap-2 px-2 py-1 bg-primary/5 rounded-sm text-xs font-mono text-base-content">
+                                        {{ icon('file-code') }} source.rs
+                                        {{ icon('arrow-right', 'mx-1 text-xs') }}
+                                        {{ icon('tree') }} CST
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Step 2 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">02</div>
-                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm">
-                                    <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">Sempai Pattern Matching</h3>
-                                    <p class="text-sm text-weaver-indigo/70 mb-3">
-                                        The <a href="/weaver/sempai/" class="text-weaver-vermilion hover:underline">Sempai Engine</a> runs structural queries against the CST to identify high-level constructs (functions, classes, API endpoints).
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-base-100 border-2 border-base-content rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-base-content shadow-lg">02</div>
+                                <div class="flex-1 bg-white border border-base-content/20 p-6 rounded-xs shadow-xs">
+                                    <h3 class="font-serif font-bold text-base-content text-lg mb-2">Sempai Pattern Matching</h3>
+                                    <p class="text-sm text-base-content/88 mb-3">
+                                        The <a href="/weaver/sempai/" class="text-accent-ink hover:underline">Sempai Engine</a> runs structural queries against the CST to identify high-level constructs (functions, classes, API endpoints).
                                     </p>
                                 </div>
                             </div>
 
                             <!-- Step 3 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-cream border-2 border-weaver-indigo rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-weaver-indigo shadow-lg">03</div>
-                                <div class="flex-1 bg-white border border-weaver-indigo/20 p-6 rounded-sm shadow-sm">
-                                    <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">LSP Enrichment</h3>
-                                    <p class="text-sm text-weaver-indigo/70 mb-3">
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-base-100 border-2 border-base-content rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-base-content shadow-lg">03</div>
+                                <div class="flex-1 bg-white border border-base-content/20 p-6 rounded-xs shadow-xs">
+                                    <h3 class="font-serif font-bold text-base-content text-lg mb-2">LSP Enrichment</h3>
+                                    <p class="text-sm text-base-content/88 mb-3">
                                         If available, the Language Server is queried for type definitions, references, and documentation, enriching the static nodes with semantic context.
                                     </p>
                                 </div>
@@ -297,16 +287,16 @@
 
                             <!-- Step 4 -->
                             <div class="relative flex flex-col md:flex-row gap-8">
-                                <div class="hidden md:flex flex-shrink-0 w-16 h-16 bg-weaver-vermilion border-2 border-weaver-vermilion rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-white shadow-lg">04</div>
-                                <div class="flex-1 bg-white border-2 border-weaver-vermilion p-6 rounded-sm shadow-md">
-                                    <h3 class="font-serif font-bold text-weaver-indigo text-lg mb-2">Graph Fusion</h3>
-                                    <p class="text-sm text-weaver-indigo/70 mb-3">
+                                <div class="hidden md:flex shrink-0 w-16 h-16 bg-accent-deep border-2 border-accent rounded-full items-center justify-center z-10 font-serif font-bold text-xl text-white shadow-lg">04</div>
+                                <div class="flex-1 bg-white border-2 border-accent p-6 rounded-xs shadow-md">
+                                    <h3 class="font-serif font-bold text-base-content text-lg mb-2">Graph Fusion</h3>
+                                    <p class="text-sm text-base-content/88 mb-3">
                                         All data points are merged into the Semantic Graph. Nodes are tagged with confidence scores based on their source (e.g., LSP > Regex).
                                     </p>
-                                    <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden mt-2">
-                                        <div class="h-full bg-weaver-vermilion w-3/4"></div>
+                                    <div class="w-full h-2 bg-status-idle-soft rounded-full overflow-hidden mt-2">
+                                        <div class="h-full bg-accent w-3/4"></div>
                                     </div>
-                                    <div class="flex justify-between text-[10px] font-mono text-gray-500 mt-1">
+                                    <div class="flex justify-between text-3xs font-mono text-base-content/82 mt-1">
                                         <span>Graph Integrity</span>
                                         <span>75% Confirmed</span>
                                     </div>
@@ -318,21 +308,21 @@
             </section>
 
             <!-- Bottom CTA -->
-            <section class="py-20 px-8 lg:px-16 border-t border-weaver-indigo/20 bg-weaver-cream text-center relative overflow-hidden">
+            <section class="py-20 px-8 lg:px-16 border-t border-base-content/20 bg-base-100 text-center relative overflow-hidden">
                 <!-- Decorative Elements -->
-                <div class="absolute -left-20 top-1/2 w-64 h-64 border border-weaver-indigo/10 rounded-full pointer-events-none"></div>
-                <div class="absolute -right-20 top-1/2 w-64 h-64 border border-weaver-indigo/10 rounded-full pointer-events-none"></div>
+                <div class="absolute -left-20 top-1/2 w-64 h-64 border border-base-content/10 rounded-full pointer-events-none"></div>
+                <div class="absolute -right-20 top-1/2 w-64 h-64 border border-base-content/10 rounded-full pointer-events-none"></div>
 
                 <div class="max-w-2xl mx-auto relative z-10">
-                    <h2 class="font-serif text-3xl text-weaver-indigo mb-6">Explore the Toolkit</h2>
-                    <p class="font-sans text-weaver-indigo/70 mb-8">
+                    <h2 class="font-serif text-3xl text-base-content mb-6">Explore the Toolkit</h2>
+                    <p class="font-sans text-base-content/88 mb-8">
                         Now that you understand the architecture, see how to wield it.
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="/weaver/commands/" class="px-8 py-3 bg-weaver-indigo text-weaver-cream font-mono text-sm font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-lg">
+                        <a href="/weaver/commands/" class="px-8 py-3 bg-primary text-base-100 font-mono text-sm font-bold uppercase tracking-wider hover:bg-accent transition-colors shadow-lg">
                             Command Reference
                         </a>
-                        <a href="/weaver/install/" class="px-8 py-3 bg-transparent border border-weaver-indigo text-weaver-indigo font-mono text-sm font-bold uppercase tracking-wider hover:bg-weaver-indigo/5 transition-colors">
+                        <a href="/weaver/install/" class="px-8 py-3 bg-transparent border border-base-content text-base-content font-mono text-sm font-bold uppercase tracking-wider hover:bg-primary/5 transition-colors">
                             Quick Start
                         </a>
                     </div>

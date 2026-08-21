@@ -1,48 +1,49 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Philosophy - Weaver AI Codebase Tooling{% endblock %}
 
 {% block content %}
 
             <!-- Header Section -->
-            <section id="philosophy-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-weaver-indigo/20">
+            <section id="philosophy-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-base-content/20">
                 <div class="masthead-frame mx-auto">
                     <div class="masthead-eyebrow mb-6">
-                        <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo">Manifesto</span>
+                        <span class="font-mono text-xs tracking-widest uppercase text-base-content">Manifesto</span>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-8">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-8">
                         The Craft of <br>
-                        <span class="text-weaver-vermilion italic font-light">Principled</span> Tooling.
+                        <span class="text-accent-ink italic font-light">Principled</span> Tooling.
                     </h1>
 
-                    <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-2xl font-light">
+                    <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-2xl font-light">
                         Weaver isn't just a bridge for AI agents; it's a statement on how AI should integrate with software engineering. We believe in tools that are transparent, standard-compliant, and respect the developer's craft.
                     </p>
                 </div>
             </section>
 
             <!-- Principle 1: Pragmatic DX -->
-            <section id="pragmatism" class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
+            <section id="pragmatism" class="py-16 px-8 lg:px-16 border-b border-base-content/20 bg-white/40">
                 <div class="masthead-frame mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                         <!-- Left: Manifest -->
                         <div class="lg:col-span-5">
-                            <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-4 block">01. Experience</span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo mb-6">Pragmatic Developer Experience</h2>
-                            <div class="prose prose-indigo text-weaver-indigo/80">
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-4 block">01. Experience</span>
+                            <h2 class="font-serif text-3xl text-base-content mb-6">Pragmatic Developer Experience</h2>
+                            <div class="prose prose-indigo text-base-content/80">
                                 <p class="mb-4">
                                     We reject "magic" that hides complexity behind opaque abstractions. Weaver exposes its logic through clear, composable CLI commands.
                                 </p>
                                 <ul class="list-none space-y-3 pl-0 font-mono text-sm">
                                     <li class="flex items-start">
-                                        <span class="text-weaver-vermilion mr-2">::</span> No GUI required; lives in your terminal.
+                                        <span class="text-accent-ink mr-2">::</span> No GUI required; lives in your terminal.
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="text-weaver-vermilion mr-2">::</span> Unix philosophy: Do one thing well.
+                                        <span class="text-accent-ink mr-2">::</span> Unix philosophy: Do one thing well.
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="text-weaver-vermilion mr-2">::</span> Plain text outputs over proprietary binaries.
+                                        <span class="text-accent-ink mr-2">::</span> Plain text outputs over proprietary binaries.
                                     </li>
                                 </ul>
                             </div>
@@ -50,24 +51,24 @@
 
                         <!-- Right: Visual/Code -->
                         <div class="lg:col-span-7">
-                            <div class="bg-weaver-dark rounded-sm p-6 shadow-lg border border-weaver-indigo relative overflow-hidden group">
+                            <div class="bg-neutral rounded-xs p-6 shadow-lg border border-base-content relative overflow-hidden group">
                                 <div class="absolute top-0 right-0 p-4 opacity-10">
-                                    <i class="fa-solid fa-terminal text-6xl text-white"></i>
+                                    {{ icon('terminal', 'text-6xl text-white') }}
                                 </div>
                                 <div class="font-mono text-sm">
-                                    <div class="text-gray-400 mb-2"># Piping output to standard tools</div>
+                                    <div class="text-code-dim mb-2"># Piping output to standard tools</div>
                                     <div class="flex text-white mb-4">
-                                        <span class="text-weaver-vermilion mr-2">$</span>
+                                        <span class="text-accent-lift mr-2">$</span>
                                         weaver observe src/lib.rs | jq '.functions[] | select(.public)'
                                     </div>
-                                    <div class="text-blue-300 pl-4 border-l border-white/20">
+                                    <div class="text-note-info pl-4 border-l border-white/20">
                                         { "name": "init_daemon", "line": 42, "complexity": 5 }<br>
                                         { "name": "parse_config", "line": 88, "complexity": 8 }
                                     </div>
                                 </div>
                                 <!-- Decorative connecting line -->
-                                <div class="absolute -left-3 top-1/2 w-3 h-px bg-weaver-indigo"></div>
-                                <div class="absolute -left-3 top-1/2 w-1 h-1 bg-weaver-indigo rounded-full transform -translate-y-1/2"></div>
+                                <div class="absolute -left-3 top-1/2 w-3 h-px bg-primary"></div>
+                                <div class="absolute -left-3 top-1/2 w-1 h-1 bg-primary rounded-full transform -translate-y-1/2"></div>
                             </div>
                         </div>
                     </div>
@@ -75,36 +76,36 @@
             </section>
 
             <!-- Principle 2: Open Interfaces -->
-            <section id="standards" class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20">
+            <section id="standards" class="py-16 px-8 lg:px-16 border-b border-base-content/20">
                 <div class="max-w-6xl mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                         <!-- Left: Visual -->
                         <div class="lg:col-span-6 order-2 lg:order-1">
-                            <div class="relative border-2 border-weaver-indigo bg-weaver-cream p-4 figure-fullbleed">
-                                <div class="absolute top-2 left-2 text-[10px] font-mono text-weaver-indigo border border-weaver-indigo px-1 bg-weaver-cream/90 figure-fullbleed-label">FIG 2.1: PROTOCOLS</div>
+                            <div class="relative border-2 border-base-content bg-base-100 p-4 figure-fullbleed">
+                                <div class="absolute top-2 left-2 text-3xs font-mono text-base-content border border-base-content px-1 bg-base-100/90 figure-fullbleed-label">FIG 2.1: PROTOCOLS</div>
                                 <img
                                     src="/weaver/assets/why-weaver/why-weaver-open-interfaces.png"
                                     alt="Illustration of Weaver's open interface model connecting language servers, a JSONL event spine, and terminal tools."
-                                    class="block w-full h-auto rounded-[2px] border border-weaver-indigo/10 bg-white"
+                                    class="block w-full h-auto rounded-[2px] border border-base-content/10 bg-white"
                                 >
                             </div>
                         </div>
 
                         <!-- Right: Manifest -->
                         <div class="lg:col-span-6 order-1 lg:order-2">
-                            <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-4 block">02. Standards</span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo mb-6">Open Interfaces, No Lock-in</h2>
-                            <div class="prose prose-indigo text-weaver-indigo/80">
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-4 block">02. Standards</span>
+                            <h2 class="font-serif text-3xl text-base-content mb-6">Open Interfaces, No Lock-in</h2>
+                            <div class="prose prose-indigo text-base-content/80">
                                 <p class="mb-4">
                                     Proprietary protocols are the enemy of longevity. Weaver speaks the languages your tools already know.
                                 </p>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                                    <div class="border-l-2 border-weaver-vermilion pl-4 py-1">
-                                        <h4 class="font-bold text-weaver-indigo text-sm">JSONL Streaming</h4>
+                                    <div class="border-l-2 border-accent pl-4 py-1">
+                                        <h4 class="font-bold text-base-content text-sm">JSONL Streaming</h4>
                                         <p class="text-xs mt-1 font-mono">Universal data exchange format, parseable by anything.</p>
                                     </div>
-                                    <div class="border-l-2 border-weaver-vermilion pl-4 py-1">
-                                        <h4 class="font-bold text-weaver-indigo text-sm">LSP Integration</h4>
+                                    <div class="border-l-2 border-accent pl-4 py-1">
+                                        <h4 class="font-bold text-base-content text-sm">LSP Integration</h4>
                                         <p class="text-xs mt-1 font-mono">Leverages existing language servers for analysis.</p>
                                     </div>
                                 </div>
@@ -115,36 +116,36 @@
             </section>
 
             <!-- Principle 3: Safety First -->
-            <section id="safety" class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-weaver-indigo text-weaver-cream relative overflow-hidden">
+            <section id="safety" class="py-16 px-8 lg:px-16 border-b border-base-content/20 bg-primary text-base-100 relative overflow-hidden">
                 <!-- Background Pattern -->
-                <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/diagmonds-light.png');"></div>
+                <div class="absolute inset-0 opacity-10" style="background-image: url('/weaver/assets/textures/diagmonds-light.png');"></div>
 
                 <div class="max-w-4xl mx-auto text-center relative z-10">
-                    <div class="inline-block border border-weaver-vermilion px-4 py-1 mb-6 rounded-full">
-                        <span class="font-mono text-xs text-weaver-vermilion tracking-widest uppercase font-bold">03. Security</span>
+                    <div class="inline-block border border-accent px-4 py-1 mb-6 rounded-full">
+                        <span class="font-mono text-xs text-accent-lift tracking-widest uppercase font-bold">03. Security</span>
                     </div>
 
                     <h2 class="font-serif text-4xl lg:text-5xl mb-8">Safety-First Posture</h2>
 
-                    <p class="font-sans text-xl text-weaver-cream/80 leading-relaxed mb-12 max-w-2xl mx-auto font-light">
+                    <p class="font-sans text-xl text-base-100/80 leading-relaxed mb-12 max-w-2xl mx-auto font-light">
                         We don't trust agents blindly. Weaver validates every edit against syntactic and semantic integrity (the Double-Lock) and sandboxes external tool execution separately.
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                        <div class="bg-weaver-dark/50 p-6 border border-weaver-cream/20 backdrop-blur-sm">
-                            <i class="fa-solid fa-lock text-weaver-vermilion text-2xl mb-4"></i>
+                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
+                            {{ icon('lock', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Sandboxing</h3>
-                            <p class="text-xs text-weaver-cream/60">Execution occurs in isolated environments with strictly limited syscall access.</p>
+                            <p class="text-xs text-base-100/70">Execution occurs in isolated environments with strictly limited syscall access.</p>
                         </div>
-                        <div class="bg-weaver-dark/50 p-6 border border-weaver-cream/20 backdrop-blur-sm">
-                            <i class="fa-solid fa-eye text-weaver-vermilion text-2xl mb-4"></i>
+                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
+                            {{ icon('eye', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Lock-Guarded Validation</h3>
-                            <p class="text-xs text-weaver-cream/60">Every edit passes syntactic (Tree-sitter) and semantic (LSP) checks on an in-memory copy before it touches disk.</p>
+                            <p class="text-xs text-base-100/70">Every edit passes syntactic (Tree-sitter) and semantic (LSP) checks on an in-memory copy before it touches disk.</p>
                         </div>
-                        <div class="bg-weaver-dark/50 p-6 border border-weaver-cream/20 backdrop-blur-sm">
-                            <i class="fa-solid fa-rotate-left text-weaver-vermilion text-2xl mb-4"></i>
+                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
+                            {{ icon('rotate-left', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Reversibility</h3>
-                            <p class="text-xs text-weaver-cream/60">State changes are tracked. Rollback is a first-class citizen in the command set.</p>
+                            <p class="text-xs text-base-100/70">State changes are tracked. Rollback is a first-class citizen in the command set.</p>
                         </div>
                     </div>
                 </div>
@@ -155,36 +156,36 @@
                 <div class="max-w-6xl mx-auto">
                     <div class="flex flex-col md:flex-row gap-12">
                         <div class="md:w-1/3">
-                            <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-4 block">04. Automation</span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo mb-6">CI/CD Supervision</h2>
-                            <p class="text-weaver-indigo/80 mb-6">
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-4 block">04. Automation</span>
+                            <h2 class="font-serif text-3xl text-base-content mb-6">CI/CD Supervision</h2>
+                            <p class="text-base-content/80 mb-6">
                                 AI shouldn't just run on your laptop. Weaver is designed to be the supervisory layer in your continuous integration pipeline.
                             </p>
-                            <a href="/weaver/docs/" class="text-sm font-bold text-weaver-indigo border-b border-weaver-indigo pb-1 hover:text-weaver-vermilion hover:border-weaver-vermilion transition-colors">
+                            <a href="/weaver/docs/" class="text-sm font-bold text-base-content border-b border-base-content pb-1 hover:text-accent-ink hover:border-accent transition-colors">
                                 View CI Integration Docs &gt;
                             </a>
                         </div>
 
                         <div class="md:w-2/3">
-                            <div class="bg-white border border-weaver-indigo/20 p-2 shadow-sm">
-                                <div class="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center">
-                                    <span class="text-xs font-mono text-gray-500">.github/workflows/ai-review.yml</span>
+                            <div class="bg-white border border-base-content/20 p-2 shadow-xs">
+                                <div class="bg-mock-surface border-b border-mock-line px-4 py-2 flex items-center">
+                                    <span class="text-xs font-mono text-base-content/82">.github/workflows/ai-review.yml</span>
                                 </div>
                                 <div class="p-4 overflow-x-auto">
-                                    <pre class="font-mono text-xs text-gray-700 leading-relaxed">
-<span class="text-purple-600">name:</span> AI Code Review
-<span class="text-purple-600">on:</span> [pull_request]
+                                    <pre class="font-mono text-xs text-code-ink leading-relaxed">
+<span class="text-code-key">name:</span> AI Code Review
+<span class="text-code-key">on:</span> [pull_request]
 
-<span class="text-purple-600">jobs:</span>
-  <span class="text-blue-600">weaver-check:</span>
-    <span class="text-purple-600">runs-on:</span> ubuntu-latest
-    <span class="text-purple-600">steps:</span>
-      - <span class="text-purple-600">uses:</span> actions/checkout@v3
-      - <span class="text-purple-600">name:</span> Install Weaver
-        <span class="text-purple-600">run:</span> cargo install weaver
+<span class="text-code-key">jobs:</span>
+  <span class="text-code-name">weaver-check:</span>
+    <span class="text-code-key">runs-on:</span> ubuntu-latest
+    <span class="text-code-key">steps:</span>
+      - <span class="text-code-key">uses:</span> actions/checkout@v3
+      - <span class="text-code-key">name:</span> Install Weaver
+        <span class="text-code-key">run:</span> cargo install weaver
 
-      - <span class="text-purple-600">name:</span> Verify Semantic Integrity
-        <span class="text-purple-600">run:</span> |
+      - <span class="text-code-key">name:</span> Verify Semantic Integrity
+        <span class="text-code-key">run:</span> |
           weaver verify --strict --json > report.json
           if [ $(jq '.errors | length' report.json) -gt 0 ]; then
             echo "::error::AI detected semantic violations"
@@ -198,17 +199,17 @@
             </section>
 
             <!-- Bottom CTA -->
-            <section class="py-20 px-8 lg:px-16 border-t border-weaver-indigo/20 bg-weaver-cream text-center">
+            <section class="py-20 px-8 lg:px-16 border-t border-base-content/20 bg-base-100 text-center">
                 <div class="max-w-2xl mx-auto">
-                    <h2 class="font-serif text-3xl text-weaver-indigo mb-6">Ready to weave intelligence into your code?</h2>
-                    <p class="font-sans text-weaver-indigo/70 mb-8">
+                    <h2 class="font-serif text-3xl text-base-content mb-6">Ready to weave intelligence into your code?</h2>
+                    <p class="font-sans text-base-content/88 mb-8">
                         Start with the CLI. Build with the daemon. Trust the process.
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="/weaver/install/" class="px-8 py-3 bg-weaver-indigo text-weaver-cream font-mono text-sm font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-lg">
+                        <a href="/weaver/install/" class="px-8 py-3 bg-primary text-base-100 font-mono text-sm font-bold uppercase tracking-wider hover:bg-accent transition-colors shadow-lg">
                             Install Weaver
                         </a>
-                        <a href="/weaver/how-it-works/" class="px-8 py-3 bg-transparent border border-weaver-indigo text-weaver-indigo font-mono text-sm font-bold uppercase tracking-wider hover:bg-weaver-indigo/5 transition-colors">
+                        <a href="/weaver/how-it-works/" class="px-8 py-3 bg-transparent border border-base-content text-base-content font-mono text-sm font-bold uppercase tracking-wider hover:bg-primary/5 transition-colors">
                             See Architecture
                         </a>
                     </div>

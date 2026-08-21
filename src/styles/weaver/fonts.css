@@ -1,0 +1,57 @@
+/* Self-hosted faces for the Weaver sub-site.
+ *
+ * These replace a Google Fonts stylesheet link. The files come from the
+ * Fontsource packages, are served from /weaver/assets/fonts/, and carry their
+ * SIL Open Font Licence text alongside them under src/static/weaver/.
+ *
+ * Only upright faces are vendored, because only upright faces were ever
+ * requested: the stylesheet link asked for `IBM+Plex+Mono:wght@400;500;600`,
+ * `IBM+Plex+Sans:wght@300..700`, and `Playfair+Display:wght@400;600;700;900`
+ * with no `ital` axis. The handful of italic runs on the site have always
+ * been synthesised by the browser, and still are.
+ *
+ * Two of the three families ship a variable face covering the whole weight
+ * range in one file. IBM Plex Mono has no variable release, so its three
+ * weights are three files.
+ */
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/weaver/assets/fonts/playfair-display-latin-wght-normal.woff2")
+    format("woff2-variations");
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("/weaver/assets/fonts/ibm-plex-sans-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/weaver/assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/weaver/assets/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/weaver/assets/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2");
+}

@@ -6,7 +6,7 @@ scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
 Netsuke and Stilyagi sub-sites is generated, the shared Jinja macros and the
 component classes they pair with, the convention used for browser-side
-components, the cascade quirks introduced by the Netsuke and Weaver sub-sites'
+components, the cascade quirks introduced by the Netsuke sub-site's
 use of the Tailwind Play content delivery network (CDN), and how accessibility
 is checked. It does not restate deployment or OpenTofu guidance, which lives in
 [`AGENTS.md`](../AGENTS.md).
@@ -609,15 +609,26 @@ restyled by it.
 
 ## 7. Styling and the cascade
 
-The Netsuke and Weaver sub-sites still load the
+The Netsuke sub-site still loads the
 [Tailwind Play CDN](https://tailwindcss.com) script
 (`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
-stylesheet, and use its utilities in their markup alongside their own
-hand-crafted stylesheets. Netsuke additionally extends the default theme through
-`/netsuke/assets/js/tailwind-config.js`; Weaver takes the defaults. Of the
-three hand-styled sub-sites, only Stilyagi uses neither Tailwind nor daisyUI.
-This differs from the main site and the mxd sub-site, which compile Tailwind v4
-ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md) for that path.
+stylesheet, and uses its utilities in its markup alongside its own
+hand-crafted stylesheet; it extends the default theme through
+`/netsuke/assets/js/tailwind-config.js`. Stilyagi uses neither Tailwind nor
+daisyUI. This differs from the main site, mxd, and Weaver, which compile
+Tailwind v4 ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md)
+for that path.
+
+Weaver was in Netsuke's position until recently, and moving it off the Play
+CDN is the worked example of what that migration costs. The doubled-selector
+idiom below exists because the CDN's injected `<style>` is unlayered; the
+compiled build has no such tie to break, because its utilities sit in
+`@layer utilities` and a sub-site's own rules sit in `@layer components`,
+where they lose to a utility by construction rather than by source order. The
+inversion is the trap: a handwritten stylesheet that was _left_ unlayered
+under the compiled build stops losing those arguments and starts winning them,
+silently. See `src/styles/weaver.css` for the arrangement and
+`docs/execplans/weaver-daisy-migration.md` for what the change turned up.
 
 The Play CDN script scans the rendered document for utility classes in use and
 injects the utilities it finds into a `<style>` element it appends to

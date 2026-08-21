@@ -127,7 +127,7 @@
                                 </ul>
                             </div>
                             <div class="bg-primary text-base-100 rounded-xs p-6 paper-panel">
-                                <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Explicitly Out</p>
+                                <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Explicitly Out</p>
                                 <ul class="space-y-3 text-sm text-base-100/85 leading-relaxed">
                                     <li>No full Semgrep parity in MVP.</li>
                                     <li>No autofix application inside Sempai.</li>
@@ -184,7 +184,7 @@
                         </div>
 
                         <div class="mt-8 bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Why the hierarchy matters</p>
+                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Why the hierarchy matters</p>
                             <p class="text-sm text-base-100/90 leading-relaxed mb-3">
                                 The design gets this exactly right: keep <code>regex</code> as a supported atom, keep raw Tree-sitter queries as an explicit escape hatch, and make Semgrep syntax the primary surface. That is not compromise. That is layering.
                             </p>
@@ -226,7 +226,7 @@
                                 </div>
                             </div>
                             <div class="bg-neutral text-base-100 rounded-xs p-5 paper-panel">
-                                <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Example</p>
+                                <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Example</p>
 <pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver observe query \
   --lang python \
   --uri file:///repo/app.py \
@@ -351,7 +351,7 @@
                             </div>
                             <div class="space-y-6">
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Request Envelope (daemon internal)</p>
+                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Request Envelope (daemon internal)</p>
 <pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">{
   "op": "observe.query",
   "engine": "sempai",
@@ -364,7 +364,7 @@
 }</pre>
                                 </div>
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">CLI JSON Output (--output json)</p>
+                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">CLI JSON Output (--output json)</p>
 <pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">{"type":"observe.query.match","engine":"sempai","rule_id":"interactive","uri":"file:///repo/app.py","span":{"start_byte":12,"end_byte":42,"start":{"line":2,"column":0},"end":{"line":4,"column":0}},"focus":null,"captures":{"$C":{"kind":"node","span":{"start_byte":18,"end_byte":26,"start":{"line":3,"column":6},"end":{"line":3,"column":14}},"kind_name":"identifier","text":"MyClass"}},"message":null,"fix":null}</pre>
                                 </div>
                                 <div class="bg-white/70 border border-base-content/10 rounded-xs p-6">
@@ -556,7 +556,7 @@
                                     </ol>
                                 </div>
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Bottom Line</p>
+                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Bottom Line</p>
                                     <p class="text-sm text-base-100/90 leading-relaxed">
                                         Sempai does not need to be magical. It needs to be dependable, structural, and explicit about what it can and cannot do. The design understands that. That is why it has a chance.
                                     </p>

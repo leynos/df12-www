@@ -1,7 +1,7 @@
 {% extends "doc_page.jinja" %}
 {% from '_icons.jinja' import icon %}
 
-{% block page_title %}Command: Verify - Weaver AI Codebase Tooling{% endblock %}
+{% block page_title %}Commands: Verification - Weaver AI Codebase Tooling{% endblock %}
 
 {% block extra_head %}
 {% endblock %}
@@ -9,9 +9,9 @@
 {% block nav_subitems_commands %}
                     <!-- Sub-navigation for Commands -->
                     <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
-                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/observe</a>
-                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/act</a>
-                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono font-bold text-accent-ink bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/verify</a>
+                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/read</a>
+                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/change</a>
+                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono font-bold text-accent-ink bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/verification</a>
                     </div>
 {% endblock %}
 
@@ -24,7 +24,7 @@
                         <div class="masthead-eyebrow self-start">
                             <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-base-content/82 hover:text-accent-ink transition-colors">COMMANDS</a>
                             <span class="text-base-content/75">/</span>
-                            <span class="font-mono text-xs tracking-widest uppercase text-base-content font-bold">VERIFY</span>
+                            <span class="font-mono text-xs tracking-widest uppercase text-base-content font-bold">VERIFICATION</span>
                         </div>
                     </div>
 
@@ -34,7 +34,7 @@
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-3xl font-light">
-                        The <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">verify</span> domain currently provides <code class="text-xs bg-primary/10 px-1 rounded-sm">diagnostics</code> — pulling compiler warnings and language-server errors for a given file. Broader capabilities (policy checks, test orchestration, provenance) are planned, not implemented yet.
+                        Verification is not a separate command an agent may forget to run &ndash; the Double-Lock executes inside every mutation. <code class="text-xs bg-primary/10 px-1 rounded-sm">diagnostics list</code> is the standalone read on workspace health. Broader layers (policy checks, test orchestration) are planned, not implemented yet.
                     </p>
                 </div>
 
@@ -57,13 +57,13 @@
                         <div class="lg:col-span-1">
                             <h2 class="font-serif text-2xl text-base-content mb-4">Synopsis</h2>
                             <p class="text-sm text-base-content/88 mb-6 leading-relaxed">
-                                Each <code class="text-xs bg-primary/10 px-1">verify</code> operation checks a facet of code health via the daemon. Currently only <code class="text-xs bg-primary/10 px-1">diagnostics</code> is implemented.
+                                Two verification surfaces exist: the Double-Lock, which runs inside every mutation, and <code class="text-xs bg-primary/10 px-1">diagnostics list</code>, the standalone read for a file or a workspace. One caveat travels with both: an LSP-clean result does not claim behavioural correctness.
                             </p>
 
                             <div class="bg-base-100 border border-base-content p-4 relative mb-6">
                                 <div class="absolute -top-3 left-4 bg-base-100 px-2 text-xs font-mono text-accent-ink font-bold">SYNTAX</div>
                                 <code class="font-mono text-sm text-base-content block break-all">
-                                    weaver verify &lt;OPERATION&gt; [ARG ...]
+                                    weaver diagnostics list [--uri | --workspace] [FLAGS]
                                 </code>
                             </div>
 
@@ -75,21 +75,26 @@
 
                         <!-- Right: Operations Table -->
                         <div class="lg:col-span-2">
-                            <h2 class="font-serif text-2xl text-base-content mb-4">Operations</h2>
+                            <h2 class="font-serif text-2xl text-base-content mb-4">Surfaces</h2>
                             <div class="overflow-hidden border border-base-content/20 rounded-xs shadow-xs bg-base-100">
-                                <table class="w-full text-left border-collapse">
+                                <table class="command-table w-full text-left border-collapse">
                                     <thead>
                                         <tr class="bg-primary text-base-100 font-mono text-xs uppercase tracking-wider">
-                                            <th class="p-3 border-r border-base-100/20 w-48">Operation</th>
+                                            <th class="p-3 border-r border-base-100/20 w-48">Surface</th>
                                             <th class="p-3 border-r border-base-100/20 w-24">Source</th>
                                             <th class="p-3">Description</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-base-content/10">
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">diagnostics</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">diagnostics list</td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
-                                            <td class="p-3 text-sm text-base-content/80">Pull compiler warnings and language-server errors for a file. Requires <code class="text-xs bg-primary/10 px-1">--uri</code>.</td>
+                                            <td class="p-3 text-sm text-base-content/80">Compiler warnings and language-server errors for a file (<code class="text-xs bg-primary/10 px-1">--uri</code>) or the whole workspace (<code class="text-xs bg-primary/10 px-1">--workspace</code>).</td>
+                                        </tr>
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">the Double-Lock</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Engine</td>
+                                            <td class="p-3 text-sm text-base-content/80">Runs inside every mutation: Tree-sitter validates the staged result, LSP observes the complete proposed delta. Not optional, not skippable.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors opacity-60">
                                             <td class="p-3 font-mono text-xs font-bold text-base-content/82 border-r border-base-content/10">policy <span class="status-pill status-pill-planned ml-1">Planned</span></td>
@@ -99,7 +104,7 @@
                                         <tr class="hover:bg-primary/5 transition-colors opacity-60">
                                             <td class="p-3 font-mono text-xs font-bold text-base-content/82 border-r border-base-content/10">tests <span class="status-pill status-pill-planned ml-1">Planned</span></td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Runner</td>
-                                            <td class="p-3 text-sm text-base-content/82">Orchestrate test suites and report results as structured JSONL.</td>
+                                            <td class="p-3 text-sm text-base-content/82">Orchestrate test suites and report results as structured output.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -119,7 +124,7 @@
                             <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
                             <h2 class="font-serif text-3xl text-base-content">The Verification Stack</h2>
                             <p class="text-base-content/88 mt-2 max-w-xl">
-                                Today, <code class="text-xs bg-primary/10 px-1">diagnostics</code> is the working layer. Policy enforcement and test orchestration are planned follow-on layers.
+                                The Double-Lock and <code class="text-xs bg-primary/10 px-1">diagnostics list</code> form the base layer. Policy enforcement and test orchestration are planned follow-on layers.
                             </p>
                         </div>
                     </div>
@@ -136,11 +141,11 @@
                         <!-- Current: Diagnostics -->
                         <div class="bg-white border-2 border-base-content p-6 shadow-panel-sm group hover:-translate-y-1 transition-transform">
                             <div class="flex items-center justify-between mb-4 pb-4 border-b border-base-content/10">
-                                <span class="font-mono text-xs font-bold text-white bg-primary px-2 py-1">CURRENT</span>
+                                <span class="font-mono text-xs font-bold text-white bg-primary px-2 py-1">BASE LAYER</span>
                                 {{ icon('stethoscope', 'text-accent-ink text-xl') }}
                             </div>
                             <h3 class="font-serif text-xl text-base-content mb-2">Diagnostics</h3>
-                            <p class="text-xs text-base-content/88 mb-4 h-10">Pulls compiler warnings and LSP errors for any file with a supported language server.</p>
+                            <p class="text-xs text-base-content/88 mb-4 h-10">Compiler warnings and LSP errors for any file or workspace with a supported language server.</p>
                             <div class="bg-neutral p-3 rounded-xs font-mono text-3xs text-code-text">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-code-warn">!</span> unused variable `x`
@@ -190,6 +195,44 @@
                 </div>
             </section>
 
+            <!-- Double-Lock in the Mutation Contract -->
+            <section class="py-16 px-8 lg:px-16 border-b border-base-content/20">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="font-serif text-3xl text-base-content mb-4">The Double-Lock, In Detail</h2>
+                    <p class="text-sm text-base-content/80 max-w-3xl mb-10">
+                        Every proposed change is staged into one workspace view and verified twice before commit. No path silently weakens this contract.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                        <div class="bg-white border border-base-content/15 p-6 rounded-xs">
+                            <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Syntactic lock</h3>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                Tree-sitter parses the final staged content of every touched file. Structural breakage &ndash; unbalanced braces, truncated blocks &ndash; is refused before any semantic work runs.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-base-content/15 p-6 rounded-xs">
+                            <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Semantic lock</h3>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                The language server observes the complete proposed delta and flushes diagnostics once per language. A missing semantic backend yields an explicit <code class="text-xs bg-primary/10 px-1">unavailable</code> or <code class="text-xs bg-primary/10 px-1">inconclusive</code> status under declared policy &ndash; never a silent pass.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-base-content/15 p-6 rounded-xs mb-8">
+                        <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">The diagnostics delta</h3>
+                        <p class="text-sm text-base-content/75 leading-relaxed mb-4">
+                            Post-mutation diagnostics are classified rather than dumped: <span class="font-mono text-xs">introduced</span>, <span class="font-mono text-xs">severity-worsened</span>, <span class="font-mono text-xs">resolved</span>, <span class="font-mono text-xs">unchanged</span>, or <span class="font-mono text-xs">relocated</span>. Concise deltas render inline; the complete set sits behind a bounded spool reference.
+                        </p>
+                        <div class="bg-neutral p-3 rounded-xs font-mono text-3xs text-code-text overflow-x-auto">
+                            {"diagnostics":{"introduced":0,"severity_worsened":0,"resolved":1,"unchanged":12,"relocated":2},"spool":"weaver jobs get txn_01j9... --json"}
+                        </div>
+                    </div>
+                    <div class="p-4 bg-primary/5 border-l-2 border-base-content">
+                        <p class="text-xs font-mono text-base-content italic">
+                            An LSP-clean result does not claim behavioural correctness. The locks prove the change parses and type-checks; the test suite still owns behaviour.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             <!-- Policy Configuration Example -->
             <section class="py-16 px-8 lg:px-16 border-b border-base-content/20">
                 <div class="max-w-6xl mx-auto">
@@ -200,7 +243,7 @@
                             <h2 class="font-serif text-3xl text-base-content mb-2">Planned: Policy Rules</h2>
                             <span class="status-pill status-pill-planned">Planned</span>
                             <p class="text-base-content/80 mb-6 mt-4 leading-relaxed">
-                                Future <code class="text-xs bg-primary/10 px-1">verify policy</code> operations will combine standard linters with custom <a href="/weaver/sempai/" class="text-accent-ink underline decoration-1 underline-offset-2">Sempai</a> queries to enforce architectural constraints. The schema below is illustrative.
+                                A future policy surface will combine standard linters with custom <a href="/weaver/sempai/" class="text-accent-ink underline decoration-1 underline-offset-2">Sempai</a> queries to enforce architectural constraints. The schema below is illustrative.
                             </p>
 
                             <ul class="space-y-4 mb-8">
@@ -273,13 +316,13 @@
                             <div class="flex-1">
                                 <h3 class="font-serif text-xl text-base-content mb-2">CLI Output Modes</h3>
                                 <p class="text-sm text-base-content/88 mb-4">
-                                    The daemon uses a <code class="text-xs bg-primary/10 px-1">kind</code>-based JSONL envelope on the wire, but the CLI strips that wrapper before printing. In JSON mode it forwards the inner payload verbatim; in human mode it renders recognised diagnostics with source context.
+                                    Results go to stdout; progress and warnings go to stderr. With <code class="text-xs bg-primary/10 px-1">--json</code>, the stable machine contract streams verbatim; without it, the human renderer applies, with <code class="text-xs bg-primary/10 px-1">--limit</code> and truncation markers keeping large workspaces bounded.
                                 </p>
                                 <div class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
 <pre class="text-code-text">
-<span class="token-cmd">$</span> <span class="token-arg">weaver verify diagnostics --output json --uri file:///src/lib.rs</span>
+<span class="token-cmd">$</span> <span class="token-arg">weaver diagnostics list --json --uri file:///src/lib.rs</span>
 
-<span class="token-comment">// CLI JSON output</span>
+<span class="token-comment">// stable machine contract (--json)</span>
 {<span class="token-key">"diagnostics"</span>:[{<span class="token-key">"line"</span>:<span class="token-number">12</span>,<span class="token-key">"column"</span>:<span class="token-number">5</span>,<span class="token-key">"message"</span>:<span class="token-string">"unused variable `x`"</span>}]}
 </pre>
                                 </div>
@@ -298,7 +341,7 @@
                                 </p>
                                 <div class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
 <pre class="text-code-text">
-<span class="token-cmd">$</span> <span class="token-arg">weaver verify diagnostics --uri file:///src/lib.rs</span>
+<span class="token-cmd">$</span> <span class="token-arg">weaver diagnostics list --uri file:///src/lib.rs</span>
 
 <span class="token-comment">src/lib.rs</span>
   <span class="token-comment">--></span> <span class="token-number">12</span>:<span class="token-number">5</span>

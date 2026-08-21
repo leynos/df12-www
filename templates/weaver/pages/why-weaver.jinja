@@ -45,6 +45,12 @@
                                     <li class="flex items-start">
                                         <span class="text-accent-ink mr-2">::</span> Plain text outputs over proprietary binaries.
                                     </li>
+                                    <li class="flex items-start">
+                                        <span class="text-accent-ink mr-2">::</span> Errors that teach: a rejection names the invalid value, the valid ones, and a working next command.
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-accent-ink mr-2">::</span> Bounded output: lists carry limits, cursors, and truncation markers, never surprises.
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -59,11 +65,11 @@
                                     <div class="text-code-dim mb-2"># Piping output to standard tools</div>
                                     <div class="flex text-white mb-4">
                                         <span class="text-accent-ink mr-2">$</span>
-                                        weaver observe src/lib.rs | jq '.functions[] | select(.public)'
+                                        weaver symbols list --lang rust --query 'pub fn $NAME($...ARGS)' --json | jq -r '.captures.NAME.text // empty'
                                     </div>
                                     <div class="text-note-info pl-4 border-l border-white/20">
-                                        { "name": "init_daemon", "line": 42, "complexity": 5 }<br>
-                                        { "name": "parse_config", "line": 88, "complexity": 8 }
+                                        init_daemon<br>
+                                        parse_config
                                     </div>
                                 </div>
                                 <!-- Decorative connecting line -->
@@ -186,9 +192,9 @@
 
       - <span class="text-code-key">name:</span> Verify Semantic Integrity
         <span class="text-code-key">run:</span> |
-          weaver verify --strict --json > report.json
-          if [ $(jq '.errors | length' report.json) -gt 0 ]; then
-            echo "::error::AI detected semantic violations"
+          weaver diagnostics list --workspace . --json > report.json
+          if [ $(jq '[.[] | select(.severity == "error")] | length' report.json) -gt 0 ]; then
+            echo "::error::semantic violations detected"
             exit 1
           fi</pre>
                                 </div>

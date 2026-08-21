@@ -591,9 +591,13 @@
           if (!target) return;
 
           e.preventDefault();
+          // Honour a reader who has asked for less motion. An explicit
+          // `behavior` argument overrides the CSS `scroll-behavior` property,
+          // so no stylesheet can make this decision on the script's behalf.
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           target.scrollIntoView(
           {
-            behavior: 'smooth'
+            behavior: reduceMotion ? 'auto' : 'smooth'
           });
         });
       });

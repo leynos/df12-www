@@ -15,7 +15,7 @@ import { Window } from "happy-dom";
 import {
   click,
   evaluateScript,
-  generatedTransitionSequences,
+  exhaustiveTransitionSequences,
   installMatchMedia,
   pressKey,
   pressTab,
@@ -270,7 +270,7 @@ describe("focus trap with nothing focusable in the menu", () => {
 
 describe("bounded navigation state machine", () => {
   const menuSizes = [0, 1, 3, 6];
-  const sequences = generatedTransitionSequences(1201);
+  const sequences = exhaustiveTransitionSequences({ depth: 4 });
 
   for (const menuSize of menuSizes) {
     test(`preserves state and focus invariants with ${menuSize} menu items`, () => {

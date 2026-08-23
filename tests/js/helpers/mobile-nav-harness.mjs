@@ -49,22 +49,30 @@ export function pressKey(window, target, key, { shiftKey = false } = {}) {
   return event;
 }
 
-/* Build a bounded, repeatable corpus of transition traces without depending
-   on a property-testing package. The fixed prefix proves every transition is
-   represented; the seeded suffix mixes them into less obvious orders. */
-export function generatedTransitionSequences(seed, { count = 18, length = 8 } = {}) {
-  const transitions = ["toggle", "tab", "shift-tab", "escape", "wide", "narrow"];
-  const sequences = transitions.map((transition) => ["toggle", transition]);
-  let state = seed;
+export const TRANSITIONS = ["toggle", "tab", "shift-tab", "escape", "wide", "narrow"];
 
-  for (let sequenceIndex = sequences.length; sequenceIndex < count; sequenceIndex += 1) {
-    const sequence = ["toggle"];
-    for (let eventIndex = 1; eventIndex < length; eventIndex += 1) {
-      state = (state * 48271) % 2147483647;
-      sequence.push(transitions[state % transitions.length]);
-    }
-    sequences.push(sequence);
-  }
+/* Enumerate *every* transition trace up to `depth`, which for a state machine
+   this small is worth more than a property-testing package would be.
+
+   The drawer has six transitions and a handful of states, so the reachable
+   space is finite and small. Sampling it randomly — which is what a generator
+   library does — leaves the result depending on a seed, and says nothing about
+   the traces it happened not to draw. Enumerating instead turns the test from
+   "these traces held" into "no trace of this length breaks the invariants",
+   which is the claim actually wanted, and it removes the seed entirely.
+
+   Growth is 6^depth, so the depth is the budget: 258 traces at depth 4 and
+   1554 at depth 5, each of which builds a fresh DOM. Every trace opens the
+   drawer first, since a closed drawer ignores almost everything and those
+   traces prove little about the trap. */
+export function exhaustiveTransitionSequences({ depth = 4 } = {}) {
+  const sequences = [];
+  const walk = (prefix) => {
+    if (prefix.length > 1) sequences.push(prefix);
+    if (prefix.length >= depth) return;
+    for (const transition of TRANSITIONS) walk([...prefix, transition]);
+  };
+  walk(["toggle"]);
   return sequences;
 }
 

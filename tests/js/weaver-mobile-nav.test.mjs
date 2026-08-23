@@ -11,7 +11,7 @@ import { Window } from "happy-dom";
 import {
   click,
   evaluateScript,
-  generatedTransitionSequences,
+  exhaustiveTransitionSequences,
   installMatchMedia,
   pressKey,
   pressTab,
@@ -300,7 +300,10 @@ describe("focus trap with nothing focusable in the nav", () => {
 
 describe("bounded navigation state machine", () => {
   const menuSizes = [0, 1, 3, 6];
-  const sequences = generatedTransitionSequences(1217);
+  /* Every trace up to this length, not a sample of them — see the harness for
+     why exhaustive enumeration suits a state machine this small better than a
+     generator library would. */
+  const sequences = exhaustiveTransitionSequences({ depth: 4 });
 
   for (const menuSize of menuSizes) {
     test(`preserves state and focus invariants with ${menuSize} nav items`, () => {

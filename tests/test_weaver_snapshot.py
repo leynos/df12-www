@@ -214,9 +214,12 @@ def test_root_only_declarations_are_not_repeated_down_the_tree() -> None:
 
 def test_a_shadow_of_only_transparent_layers_becomes_none() -> None:
     """With nothing left to paint, the value is reported as `none`."""
-    assert weaver_snapshot._canonical_shadow(
-        "rgba(0, 0, 0, 0.000) 0px 0px 0px 0px"
-    ) == ("none")
+    placeholder = "rgba(0, 0, 0, 0.000) 0px 0px 0px 0px"
+    collapsed = weaver_snapshot._canonical_shadow(placeholder)
+    assert collapsed == "none", (
+        "a shadow whose every layer is transparent paints nothing, so it "
+        f"should normalize to 'none'; {placeholder!r} gave {collapsed!r}"
+    )
 
 
 def test_transparent_shadow_layers_are_dropped_whatever_their_geometry() -> None:
@@ -227,7 +230,15 @@ def test_transparent_shadow_layers_are_dropped_whatever_their_geometry() -> None
     differ over a shadow neither of them drew.
     """
     geometry = "rgba(0, 0, 0, 0.000) 2px 4px 6px 0px"
-    assert weaver_snapshot._canonical_shadow(geometry) == "none"
+    dropped = weaver_snapshot._canonical_shadow(geometry)
+    assert dropped == "none", (
+        "a transparent layer paints nothing whatever its offset, blur or "
+        f"spread, so it should be dropped; {geometry!r} gave {dropped!r}"
+    )
 
     visible = "rgba(25, 60, 110, 0.100) 4px 4px 0px 0px"
-    assert weaver_snapshot._canonical_shadow(f"{geometry}, {visible}") == visible
+    kept = weaver_snapshot._canonical_shadow(f"{geometry}, {visible}")
+    assert kept == visible, (
+        "dropping the transparent layer must leave the visible one intact; "
+        f"expected {visible!r}, got {kept!r}"
+    )

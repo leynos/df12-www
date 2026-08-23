@@ -132,17 +132,17 @@
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
+                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-xs">
                             {{ icon('lock', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Sandboxing</h3>
                             <p class="text-xs text-base-100/70">Execution occurs in isolated environments with strictly limited syscall access.</p>
                         </div>
-                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
+                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-xs">
                             {{ icon('eye', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Lock-Guarded Validation</h3>
                             <p class="text-xs text-base-100/70">Every edit passes syntactic (Tree-sitter) and semantic (LSP) checks on an in-memory copy before it touches disk.</p>
                         </div>
-                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-sm">
+                        <div class="bg-neutral/50 p-6 border border-base-100/20 backdrop-blur-xs">
                             {{ icon('rotate-left', 'text-accent-ink text-2xl mb-4') }}
                             <h3 class="font-mono text-sm font-bold mb-2 uppercase">Reversibility</h3>
                             <p class="text-xs text-base-100/70">State changes are tracked. Rollback is a first-class citizen in the command set.</p>

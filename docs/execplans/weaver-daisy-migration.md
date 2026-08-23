@@ -192,6 +192,17 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       clears WCAG 2.2 AA by direct computed-style measurement, at both 360px
       and 1440px.
 - [x] (2026-08-17 23:20Z) Milestone 9 — Documentation and cleanup.
+- [x] (2026-08-23) Review-driven fixes and refactors, seven commits
+      (`65df8946`..`88cf175f`, atop `06959ecc`): registered the typography
+      plugin the migration had carried class names for but never enabled;
+      fixed the `srcset` arm of the self-contained-host test, which read only
+      the first candidate in a comma-separated list; documented the icon
+      generator's `main()` failure path; gave the snapshot harness's
+      transparent-shadow assertions descriptive messages; formatting-only
+      blank lines in `design-language.css`; softened `backdrop-blur-sm` to
+      `-xs` on four elements, a deliberate visual change; swapped two borrowed
+      ink tokens for proper status tokens on the safety page; and split
+      `_normalize` in `scripts/weaver_snapshot.py` into three named helpers.
 
 ## Surprises & discoveries
 
@@ -300,6 +311,31 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   recorded in a comment beside the call so the next reader does not rediscover
   it. Any future screenshot automation in this repository should assert the
   file exists rather than trusting the exit status.
+- **Observation:** `src/styles/weaver.css` registered the `prose prose-indigo`
+  classes carried across from the Play CDN in three templates
+  (`shared_content_page.jinja` and two blocks in `pages/why-weaver.jinja`) but
+  never registered `@tailwindcss/typography`, the plugin that gives those
+  classes any meaning. The classes matched nothing for several commits, and
+  no test caught it.
+  Evidence: a test asserting the literal word `prose`, or even the shape
+  `.prose :where(...)`, passes whether or not the plugin is registered,
+  because daisyUI ships its own `.prose .btn` and `.prose :where(code)`
+  compatibility rules — the compiled sheet always contains matches for both
+  patterns. The assertion that actually distinguishes the two states is
+  anchored on `not-prose`, the plugin's escape hatch, which appears nowhere
+  else in the dependency tree; it was confirmed to go red when the `@plugin`
+  line is removed. Registering the plugin adds roughly 14KB to the compiled
+  sheet. Worth recording honestly: this finding was first dismissed on the
+  strength of a grep for `prose` in the minified stylesheet, where `grep -c`
+  reported 1 and `sort -u` collapsed every hit to one row — both readings
+  were artefacts of grepping a minified single-line file, not evidence of
+  anything. The repository's own memory already carries a related note about
+  this exact failure mode.
+  Impact: the plugin is now registered, and the regression test is anchored
+  on `not-prose` rather than on `prose`, so it can actually fail. The general
+  lesson repeats: never grep a minified, single-line stylesheet for a
+  substring and trust the count; use Python's `re` over the file contents
+  instead.
 
 ## Decision log
 
@@ -493,6 +529,67 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   computed styles — out from under a comparison, and the resulting diff would
   look like a regression in the site.
   Date/Author: 2026-08-17, Milestone 0.
+- **Decision:** on `pages/safety.jinja`'s Operational Guidance panel, swap the
+  borrowed `text-code-string` and `text-accent-ink` for `text-status-ok` and
+  `text-status-error`, and record the resulting contrast numbers even though
+  one of them regresses.
+  Rationale: the panel composites to `#244675` (`bg-white/5` over
+  `bg-primary`), and the labels are `text-xs font-bold`, so WCAG AA wants
+  4.5:1. The "do" label improves: `#4ade80` → `#22c55e` moves 5.46:1 to
+  4.17:1. The "don't" label is the one worth flagging: `#f4a694` → `#ef4444`
+  moves 4.86:1 to 2.53:1. That drop is not the status token being weaker in
+  the abstract — `text-accent-ink` measures as accent-lift on this panel
+  because `src/styles/weaver/panels.css` remaps it on dark surfaces, the same
+  mechanism recorded above for Milestone 8, and `#ef4444` gets no such lift.
+  The swap was made because it was explicitly requested after the contrast
+  concern was raised. The remedy, if both labels need to pass AA, is lift
+  variants of the status tokens remapped on the same dark-surface selector
+  panels.css already uses for the accent token; that is a stylesheet change
+  and is left for a decision rather than made here.
+  Date/Author: 2026-08-23, review batch.
+- **Decision:** treat `backdrop-blur-sm` → `-xs` on four elements (three cards
+  on `pages/why-weaver.jinja`, one panel on `pages/design-language.jinja`) as
+  a deliberate visual change, not a stale-name fix.
+  Rationale: both `backdrop-blur-sm` and `backdrop-blur-xs` are valid
+  Tailwind v4 utilities — this is not one of the v3-to-v4 renames tracked
+  elsewhere in this plan. The change was requested and applied as such; its
+  effect is to drop the blur radius from 8px to 4px on the affected elements.
+  Date/Author: 2026-08-23, review batch.
+- **Decision:** in the refactored `scripts/weaver_snapshot.py`, have
+  `_rounded_bbox` leave a non-mapping bbox unchanged rather than replacing it
+  with `None`.
+  Rationale: the walker, not this function, owns the shape of the `bbox`
+  field. If a future snapshot reports it in a different shape, that is a
+  finding the diff should surface, not one this helper should silently paper
+  over by coercing it to `None`. Covered by a parametrized test over `None`,
+  a string, a list, and a number.
+  Date/Author: 2026-08-23, review batch.
+- **Decision:** verify the `_normalize` split (into `_canonical_style`,
+  `_resolve_tracked`, and `_rounded_bbox`) by checking rather than asserting
+  behaviour-preservation.
+  Rationale: 3,000 randomized trees, covering every odd bbox shape alongside
+  absent and null `styleDiff` and `children`, were confirmed to normalize
+  byte-identically under the old and new code before the old code was
+  deleted. A unit test on a handful of hand-picked cases would not have
+  covered the same ground with the same confidence.
+  Date/Author: 2026-08-23, review batch.
+- **Decision:** decline a request to remove `text-xs` from the Observe
+  Integration link in `pages/sempai.jinja` and keep only `text-3xs`.
+  Rationale: commit `16dd6ae1` had already resolved the underlying finding —
+  a duplicate font-size utility on that link — by removing `text-3xs`, so the
+  link now carries exactly one font-size utility, which was the finding's
+  stated goal. Applying the later request literally would leave the link
+  with no font-size utility at all, out of step with its eight siblings,
+  every one of which uses `text-xs`.
+  Date/Author: 2026-08-23, review batch.
+- **Decision:** decline to run stylelint against the `design-language.css`
+  formatting fix, and make the fix anyway.
+  Rationale: no stylelint configuration exists anywhere in this repository,
+  and `make lint` runs `ruff` and Biome only, so there is no gate to run the
+  requested validation against. The blank-line change is made regardless,
+  since it is what such a rule would ask for and costs nothing; the CSS Biome
+  emits is unaffected.
+  Date/Author: 2026-08-23, review batch.
 
 ## Outcomes & retrospective
 
@@ -556,6 +653,13 @@ What would be done differently:
 
 Left for another day, deliberately: Netsuke is now the only sub-site on the
 Play CDN, and this plan is the worked example of what moving it would cost.
+
+A review pass after completion found and fixed six further issues, the
+largest of which — the missing typography plugin — had survived several
+commits precisely because the test written against it could not fail (see
+Surprises & discoveries). `make all` passes on the tree at `88cf175f`: 177
+passed, 1 skipped for pytest; 145 passed, 0 failed for the bun suite; all
+eight sub-targets green.
 
 ## Context and orientation
 

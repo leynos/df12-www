@@ -36,8 +36,10 @@
   --tw-ring-shadow: 0 0 transparent;
   --tw-shadow: 0 0 transparent;
   --tw-shadow-colored: 0 0 transparent;
+
   margin-top: 32px;
   --tw-text-opacity: 1;
+
   color: var(--color-primary);
   --tw-space-y-reverse: 0;
 }
@@ -67,6 +69,7 @@
   --tw-shadow: 0 0 transparent;
   --tw-shadow-colored: 0 0 transparent;
   --tw-text-opacity: 1;
+
   color: var(--color-accent);
 }
 

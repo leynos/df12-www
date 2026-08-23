@@ -37,12 +37,33 @@ COMPILED_STYLESHEET = PUBLIC_WEAVER / "assets" / "styles" / "weaver.css"
 # An attribute that makes the browser fetch from another origin. `href` counts
 # only on a `<link>`; on an `<a>` it is a link to somewhere else, which is the
 # point of a link.
+#
+# `srcset` needs its own alternative. Its value is a comma-separated candidate
+# list, so a remote host can sit anywhere in it — `/local.png 1x,
+# //cdn/remote.png 2x` is a fetch from another origin that an anchored pattern
+# reads as local, because it only ever looked at the first candidate.
 SUBRESOURCE = re.compile(
-    r"""(?:src|srcset|data|poster)\s*=\s*["']\s*(?:https?:)?//"""
+    r"""(?:src|data|poster)\s*=\s*["']\s*(?:https?:)?//"""
+    r"""|srcset\s*=\s*["'](?:[^"']*,)?\s*(?:https?:)?//"""
     r"""|<link\b[^>]*?\bhref\s*=\s*["']\s*(?:https?:)?//"""
     r"""|url\(\s*["']?\s*(?:https?:)?//"""
     r"""|@import\s+(?:url\(\s*)?["']\s*(?:https?:)?//""",
     re.IGNORECASE,
+)
+
+# A rule the typography plugin emits and nothing else does.
+#
+# Searching for `prose` alone passes vacuously: daisyUI ships its own
+# compatibility rules — `.prose .btn` and `.prose :where(code)` — so both the
+# word and the `.prose :where(...)` shape appear in the compiled sheet whether
+# or not the plugin is registered. That is how `prose prose-indigo` sat
+# unstyled in three templates without anything noticing.
+#
+# The `not-prose` escape hatch belongs to the plugin alone; it appears nowhere
+# else in the dependency tree. Anchoring it to the paragraph rule keeps the
+# assertion a concrete selector rather than a substring search.
+PROSE_RULE = re.compile(
+    r"""\.prose\s+:where\(p\):not\(:where\(\[class~=["']?not-prose"""
 )
 
 # Three- to eight-digit hex colours, and any rgb()/rgba() call. Deliberately
@@ -106,6 +127,13 @@ def test_weaver_stylesheet_is_compiled(built_site: Path) -> None:
     assert "--color-primary" in compiled, (
         "expected the compiled stylesheet to define the daisyUI theme slots; "
         "found no --color-primary"
+    )
+    # Three templates carry `prose prose-indigo`, which styled nothing at all
+    # between the Play CDN's removal and this assertion. See PROSE_RULE for why
+    # the selector has to be this specific to catch that.
+    assert PROSE_RULE.search(compiled), (
+        "expected the compiled stylesheet to carry @tailwindcss/typography's "
+        "prose rules; is the @plugin registration still in src/styles/weaver.css?"
     )
 
 
@@ -265,6 +293,15 @@ def test_no_font_awesome_markup_remains() -> None:
         ),
         ("<style>a{background:url(/weaver/assets/fonts/x.woff2)}</style>", False),
         ("<style>a{mask:url(#a)}</style>", False),
+        # A srcset names several candidates. Only the first sits against the
+        # opening quote, so the remote one hides behind a local one.
+        ('<img srcset="//cdn.example.com/x.png 2x">', True),
+        ('<img srcset="/weaver/a.png 1x, //cdn.example.com/a@2x.png 2x">', True),
+        (
+            '<img srcset="/weaver/a.png 1x, https://cdn.example.com/a@2x.png 2x">',
+            True,
+        ),
+        ('<img srcset="/weaver/a.png 1x, /weaver/a@2x.png 2x">', False),
     ],
 )
 def test_subresource_pattern_distinguishes_fetches_from_links(

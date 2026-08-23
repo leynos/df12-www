@@ -51,6 +51,13 @@
 @source "../../templates/weaver/**/*.jinja";
 @source "../static/weaver/assets/js/mobile-nav.js";
 
+/* Three templates carry `prose prose-indigo`, which was styled by the Play
+ * CDN's typography plugin and by nothing at all once the CDN went away. The
+ * class names stayed in the markup and quietly did nothing; the only `.prose`
+ * rule in the compiled sheet was daisyUI's own `.prose .btn` reset. Tailwind 4
+ * registers plugins from the stylesheet rather than a config file. */
+@plugin "@tailwindcss/typography";
+
 @plugin "daisyui" {
   themes: weaver --default;
   logs: false;

@@ -36,13 +36,16 @@ rationale for a specific change lives in its execution plan under
 depends on the last:
 
 ```bash
-bun run build         # build assets, pages, search indices, then refresh copied assets
-bun run build:static  # copy src/static/ verbatim (scripts/copy-static.ts)
-bun run build:css     # compile the main, mxd, and Episodic Tailwind entrypoints
-bun run build:images  # generate responsive image variants (scripts/generate-image-variants.ts)
-bun run build:pages   # uv run pages generate --all-sites
-bun run build:search  # build Netsuke and Episodic search indices
-bun run check:search  # fail when the committed Episodic index has drifted
+bun run build              # build:static, build:css, build:images, build:pages, build:search, build:static
+bun run build:static       # copy src/static/ verbatim (scripts/copy-static.ts)
+bun run build:css          # compile the main, mxd, Episodic and Weaver Tailwind entrypoints
+bun run build:css:mxd      # just the mxd entrypoint, for iterating on one sub-site
+bun run build:css:episodic # just the Episodic entrypoint
+bun run build:css:weaver   # just the Weaver entrypoint
+bun run build:images       # generate responsive image variants (scripts/generate-image-variants.ts)
+bun run build:pages        # uv run pages generate --all-sites
+bun run build:search       # build the Netsuke and Episodic search indices
+bun run check:search       # fail when the committed Episodic index has drifted
 ```
 
 `build:static` runs first because `build:images` reads the source images it
@@ -71,9 +74,6 @@ Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It
 uses `scripts/episodic_roadmap_parser.py` to turn the Markdown into phase,
 step, and task records, and `make site-data` runs it with
 `--episodic-root $(EPISODIC_SOURCE)` before rebuilding the committed template.
-`EPISODIC_SOURCE` defaults to `../episodic`; override it when the authoritative
-checkout lives elsewhere. `make check-site-data` reruns the same projection
-with `--check` and fails when the committed file drifts.
 
 `bun run dev` (or `make dev`, which builds once first) watches `src/**/*`,
 `df12_pages/**/*`, `config/**/*`, `scripts/**/*`, and `pyproject.toml` with
@@ -222,15 +222,17 @@ anyone rebuilds from a clean tree.
 
 Every published file has a source elsewhere in the repository:
 
-| Published under `public/`                  | Comes from                                            |
-| ------------------------------------------ | ----------------------------------------------------- |
-| `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`                          | Tailwind compiling `src/styles/`                      |
-| `mxd/assets/tailwind.css`                  | Tailwind compiling `src/styles/`                      |
-| `episodic/assets/styles/tailwind.css`      | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
-| `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
-| everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`             | Comes from                                            |
+| ------------------------------------- | ----------------------------------------------------- |
+| `**/*.html`                           | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`                     | Tailwind compiling `src/styles/`                      |
+| `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                      |
+| `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
+| `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |
+| `episodic/assets/search/*.json`       | `scripts/build-episodic-search-index.mjs`             |
+| everything else                       | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 _Table 2: Published paths under `public/` and the source that generates them._
 
@@ -426,6 +428,30 @@ and `xml` are stock Pygments lexers used unmodified. The bold weight differs
 because the sub-sites' monospace faces read differently at the same weight:
 Episodic and Netsuke stop at semibold, while Stilyagi's lighter face goes to
 full bold.
+
+
+### 4.7. The Weaver icon generator
+
+`scripts/generate_weaver_icons.py` is unrelated to syntax highlighting, but
+follows the same "generated, never handwritten" convention as the Pygments
+generators above. It reads the checked-in mapping at
+`config/weaver-icons.yaml`, which pairs each Font Awesome icon name the Weaver
+sub-site used to reference with a Carbon icon identifier, pulls that icon's
+path data out of the `@iconify-json/carbon` package, and writes
+`templates/weaver/_icons.jinja`: a Jinja macro that inlines the SVG directly
+into the page, so a published Weaver page fetches no icon assets over the
+network.
+
+```bash
+uv run python scripts/generate_weaver_icons.py
+```
+
+It reports `_icons.jinja updated` or `_icons.jinja unchanged`, the same
+idempotence contract as the Pygments generators. A drift test in the suite
+fails if the committed macro does not match what the generator would produce
+from the current mapping, so `templates/weaver/_icons.jinja` must never be
+hand-edited — change `config/weaver-icons.yaml` and rerun the generator
+instead.
 
 ## 5. Template components
 
@@ -738,6 +764,40 @@ this sub-site, for example
 `section .hm-faux-window--card-bleed.hm-faux-window--card-bleed` a little
 further down the same file. Prefer raising specificity by doubling the class
 over `!important`, which would also outrank a later, deliberate override.
+
+
+### 7.1. Verifying a styling change against Weaver
+
+`scripts/weaver_snapshot.py` exists because a cascade change on a compiled
+Tailwind sheet is easy to get subtly wrong: nothing errors, a selector simply
+stops matching what it used to, and the only symptom is an element that has
+quietly moved, resized, or changed colour somewhere the change was not meant
+to reach. The harness answers that by recording every Weaver page's computed
+styles before and after a change and diffing the two, rather than relying on
+a reviewer noticing a drift by eye.
+
+It is a cyclopts app with three subcommands, invoked bare — there is no
+Makefile target and no console-script entry point:
+
+```bash
+uv run python scripts/weaver_snapshot.py capture <out-dir>
+uv run python scripts/weaver_snapshot.py shots <out-dir>
+uv run python scripts/weaver_snapshot.py diff <before> <after>
+```
+
+`capture` serves `public/` and records every published Weaver page's computed
+styles as JSON, via `bun x css-view --mode walker`. `shots` screenshots each
+page at 360, 768, and 1440 CSS pixels with `agent-browser`, for the cases a
+style diff cannot catch on its own — a wrong icon glyph, a texture that failed
+to load. `diff` normalizes both snapshot trees and prints a unified diff per
+page, exiting non-zero when any page differs; that exit status is what makes
+it usable as a gate rather than merely informative.
+
+The typical loop is to capture a baseline before touching anything, make the
+change, capture again, and diff the two directories. An empty diff confirms
+the change moved nothing it was not meant to; a non-empty one should be read
+entry by entry, since every difference ought to trace back to something the
+change deliberately did.
 
 ## 8. Accessibility checks
 

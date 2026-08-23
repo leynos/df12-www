@@ -164,6 +164,14 @@ generated, not handwritten — rerun
 `scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
 edit the marked block by hand.
 
+Weaver's icons are generated the same way. `config/weaver-icons.yaml` maps
+each Font Awesome name the sub-site used to a Carbon replacement, and
+`scripts/generate_weaver_icons.py` inlines the SVG into
+`templates/weaver/_icons.jinja`. Add a row, rerun the generator, commit
+both; a test fails if the two disagree. Weaver's code samples are marked up
+by hand rather than run through Pygments, and their `.token-*` colours live
+in `src/styles/weaver/code.css`.
+
 Stilyagi's palette is split by role rather than by hue: `--press-red` paints
 fills, borders, and stamps, while red *type* uses `--accent-text`, which each
 dark panel re-points from the paper-surface red to the ink-ground one. Because

@@ -203,6 +203,17 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       `-xs` on four elements, a deliberate visual change; swapped two borrowed
       ink tokens for proper status tokens on the safety page; and split
       `_normalize` in `scripts/weaver_snapshot.py` into three named helpers.
+- [x] (2026-08-23) Milestone 9 follow-up: `docs/developers-guide.md` updated
+      to cover Weaver's tooling, which had been left undocumented. Corrected
+      the `build:css` line to name all three Tailwind entrypoints and their
+      per-sub-site targets; added Weaver to the generated-versus-hand-crafted
+      table in section 3; documented `scripts/generate_weaver_icons.py`
+      alongside the Pygments generators in section 4; and documented
+      `scripts/weaver_snapshot.py` in a new section 7.1. Also corrected the
+      two remaining stale `scripts/generate-weaver-icons.ts` references (the
+      TypeScript name superseded by the 2026-08-21 correction note) at what
+      were Milestone 9's documentation instruction and the "Interfaces and
+      dependencies" list.
 
 ## Surprises & discoveries
 
@@ -1130,7 +1141,7 @@ alongside the Pygments generators in the "generated, never handwritten" list.
 
 Update `docs/repository-layout.md` and `docs/developers-guide.md` for the new
 `src/styles/weaver/` tree, the fonts and textures directories, and
-`scripts/generate-weaver-icons.ts`.
+`scripts/generate_weaver_icons.py`.
 
 Add `config/weaver-icons.yaml` and the texture licences to
 `Artefacts and notes` below. Remove `.weaver-baseline*` directories. Confirm
@@ -1301,7 +1312,7 @@ New files:
   `{% macro icon(name, extra_class='') %}` returning inline SVG.
 - `config/weaver-icons.yaml` — the Font Awesome to Carbon mapping, hand-curated
   and reviewed as data.
-- `scripts/generate-weaver-icons.ts` — reads the mapping and
+- `scripts/generate_weaver_icons.py` — reads the mapping and
   `@iconify-json/carbon`, writes `templates/weaver/_icons.jinja`.
 - `scripts/weaver_snapshot.py` — the validation harness, a Cyclopts CLI with
   `capture`, `shots`, and `diff` subcommands.

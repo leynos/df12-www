@@ -150,6 +150,39 @@ describe("opening and closing", () => {
     expect(dom.document.activeElement).toBe(dom.toggle);
   });
 
+  /* The two tests below are the only ones that can tell the restore apart
+     from its fallback. Everywhere else in this file the drawer is opened
+     either with nothing focused — so the saved element is `<body>`, which the
+     restore declines — or with the toggle focused, which is what it falls
+     back to anyway. Both paths converge on the toggle, so `isConnected` could
+     be deleted from mobile-nav.js and the rest of the suite would stay green. */
+  test("closing returns focus to whatever held it before opening", () => {
+    const outside = dom.document.getElementById("outside");
+    outside.focus();
+    click(dom.window, dom.toggle);
+    expect(dom.document.activeElement).not.toBe(outside);
+
+    pressKey(dom.window, dom.document.body, "Escape");
+    expect(dom.isOpen()).toBe(false);
+    expect(dom.document.activeElement).toBe(outside);
+  });
+
+  test("a saved element removed while open gives the toggle the focus", () => {
+    const outside = dom.document.getElementById("outside");
+    outside.focus();
+    click(dom.window, dom.toggle);
+
+    // Whatever held focus is gone by the time the drawer closes — a route
+    // change, or a menu that unmounted behind the backdrop. Focusing it would
+    // put the caret nowhere, so the toggle takes it instead.
+    outside.remove();
+    expect(outside.isConnected).toBe(false);
+
+    pressKey(dom.window, dom.document.body, "Escape");
+    expect(dom.isOpen()).toBe(false);
+    expect(dom.document.activeElement).toBe(dom.toggle);
+  });
+
   test("Escape is ignored while the drawer is closed", () => {
     dom.document.getElementById("outside").focus();
     pressKey(dom.window, dom.document.body, "Escape");

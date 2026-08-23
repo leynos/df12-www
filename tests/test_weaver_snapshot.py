@@ -135,6 +135,102 @@ def test_normalization_recurses_into_children() -> None:
     assert normalized["children"][0]["styleDiff"] == {}
 
 
+def test_canonical_style_leaves_its_argument_alone() -> None:
+    """The caller's ``styleDiff`` must survive normalization untouched.
+
+    ``_normalize`` shallow-copies each node, so a helper that edited the
+    styles in place would reach back into the parsed snapshot and corrupt it
+    for anything reading the same object afterwards.
+    """
+    original = {"--tw-text-opacity": "1", "color": "rgb(1, 2, 3)"}
+    style_diff = dict(original)
+    normalized = weaver_snapshot._canonical_style(style_diff)
+
+    assert style_diff == original, (
+        f"_canonical_style must not modify its argument; it became {style_diff!r}"
+    )
+    assert normalized == {"color": "rgba(1, 2, 3, 1.000)"}, (
+        "the returned styles should drop --tw-* plumbing and canonicalize the "
+        f"colour; got {normalized!r}"
+    )
+
+
+def test_canonical_style_treats_an_absent_style_diff_as_empty() -> None:
+    """A node with no styles of its own is not an error."""
+    assert weaver_snapshot._canonical_style(None) == {}, (
+        "a missing styleDiff should normalize to an empty mapping"
+    )
+
+
+def test_resolve_tracked_reports_a_departure_and_carries_it_down() -> None:
+    """A tracked property is kept only where the node overrides the parent."""
+    style = {"color-scheme": "dark", "caret-color": "rgb(1, 2, 3)"}
+    carried = weaver_snapshot._resolve_tracked(
+        style, {"color-scheme": "light", "caret-color": "rgb(1, 2, 3)"}
+    )
+
+    assert style == {"color-scheme": "dark"}, (
+        "the property matching the parent should be dropped and the departure "
+        f"kept; the styles came out as {style!r}"
+    )
+    assert carried == {"color-scheme": "dark", "caret-color": "rgb(1, 2, 3)"}, (
+        "children are compared against the overridden value, not the one the "
+        f"parent handed down; got {carried!r}"
+    )
+
+
+def test_resolve_tracked_leaves_the_inherited_mapping_alone() -> None:
+    """The parent's values are shared down the tree, so they must not be edited."""
+    inherited = {"color-scheme": "light"}
+    weaver_snapshot._resolve_tracked({"color-scheme": "dark"}, inherited)
+
+    assert inherited == {"color-scheme": "light"}, (
+        "_resolve_tracked must return a new mapping rather than mutate the "
+        f"one its siblings also hold; it became {inherited!r}"
+    )
+
+
+@pytest.mark.parametrize(
+    "bbox",
+    [
+        None,
+        "0 0 640 480",
+        [0, 0, 640, 480],
+        42,
+    ],
+    ids=["none", "string", "list", "number"],
+)
+def test_a_non_mapping_bbox_survives_unchanged(
+    bbox: list[typ.Any] | str | float | None,
+) -> None:
+    """Only a mapping is rounded; anything else passes straight through.
+
+    The walker owns this field's shape. If it ever reports a bbox some other
+    way, that belongs in the diff for someone to look at — replacing it with
+    ``None``, or dropping it, would hide the very change worth seeing.
+    """
+    node = _node()
+    node["bbox"] = bbox
+    normalized = weaver_snapshot._normalize(node)
+
+    assert "bbox" in normalized, (
+        f"the bbox key should be preserved for a {type(bbox).__name__} value"
+    )
+    assert normalized["bbox"] == bbox, (
+        f"a non-mapping bbox should pass through unchanged; {bbox!r} became "
+        f"{normalized['bbox']!r}"
+    )
+
+
+def test_a_node_without_a_bbox_does_not_gain_one() -> None:
+    """Normalization reports what the walker saw, and invents nothing."""
+    normalized = weaver_snapshot._normalize(_node())
+    assert "bbox" not in normalized, (
+        f"a node the walker gave no bbox should not acquire one; got "
+        f"{normalized.get('bbox')!r}"
+    )
+
+
 def test_bounding_boxes_are_rounded_not_discarded() -> None:
     """Subpixel jitter is absorbed; a real layout shift still shows."""
     jittered_y = 1850.004

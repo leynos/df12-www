@@ -600,37 +600,134 @@ _TRACKS_PARENT = frozenset(
 )
 
 
-def _normalize(
-    node: dict[str, typ.Any],
-    inherited: dict[str, typ.Any] | None = None,
-) -> dict[str, typ.Any]:
-    """Strip incidental variation from one walker node, recursively.
+def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any]:
+    """Strip incidental variation from one node's reported styles.
 
-    Seven kinds of variation are incidental here:
+    Five kinds of variation are incidental:
 
-    - ``opacity`` on a node running a CSS animation. The Weaver pages carry an
-      ``animate-pulse`` status dot whose opacity is sampled mid-cycle.
-    - Bounding-box coordinates, which carry subpixel text-shaping jitter.
-      Rounding to two decimal places absorbs that without hiding a real
-      layout shift.
+    - ``--tw-*`` custom properties. These are Tailwind's own plumbing, and
+      which of them exist is an implementation detail of the version in use,
+      not something a reader can see.
     - Colour notation. Tailwind v3 resolved `text-primary/80` to `rgba(...)`;
       v4 resolves it through `color-mix()` and Chromium reports `oklab(...)`.
       Comparing the strings would report every translucent colour on the site
       as changed and bury the handful that really did. Each colour is
       therefore converted to 8-bit sRGB before comparison, which is the
       precision a screen has anyway.
-    - ``--tw-*`` custom properties. These are Tailwind's own plumbing, and
-      which of them exist is an implementation detail of the version in use,
-      not something a reader can see.
-    - Placeholder ``box-shadow`` layers, for the same reason: v4 composes the
-      property from more slots than v3 did, so an unchanged shadow arrives
-      behind a different number of fully transparent, zero-size layers.
+    - ``opacity`` on a node running a CSS animation. The Weaver pages carry an
+      ``animate-pulse`` status dot whose opacity is sampled mid-cycle.
+    - Placeholder shadow layers. v4 composes ``box-shadow`` from more slots
+      than v3 did, so an unchanged shadow arrives behind a different number of
+      fully transparent, zero-size layers. See :func:`_canonical_shadow`.
     - The colour of a border edge with no width. See
       :func:`_drop_invisible_border_colours`.
-    - A property in :data:`_TRACKS_PARENT` whose value matches the parent's.
-      The walker compares these against the user-agent default rather than
-      against the parent, so one declaration on ``:root`` is reported on every
-      node beneath it.
+
+    Parameters
+    ----------
+    style_diff
+        The ``styleDiff`` a walker node reported, or ``None`` when it carried
+        no styles of its own.
+
+    Returns
+    -------
+    dict
+        A fresh mapping with those variations removed. The argument is left
+        alone.
+    """
+    style = {
+        key: _canonical_value(value) if isinstance(value, str) else value
+        for key, value in (style_diff or {}).items()
+        if not key.startswith("--tw-")
+    }
+    if style.get("animation-name", "none") != "none":
+        style.pop("opacity", None)
+    for key in ("box-shadow", "text-shadow"):
+        if isinstance(style.get(key), str):
+            style[key] = _canonical_shadow(style[key])
+    _drop_invisible_border_colours(style)
+    return style
+
+
+def _resolve_tracked(
+    style: dict[str, typ.Any],
+    inherited: dict[str, typ.Any],
+) -> dict[str, typ.Any]:
+    """Drop the tracked properties a node merely repeats from its parent.
+
+    The walker compares the properties in :data:`_TRACKS_PARENT` against the
+    user-agent default rather than against the parent, so one declaration on
+    ``:root`` is reported on every node beneath it. A node keeps such a
+    property only where it genuinely departs from what it was handed, and the
+    departure is what its own children are then compared against.
+
+    Parameters
+    ----------
+    style
+        The node's normalized styles, modified in place: any tracked property
+        matching the inherited value is removed.
+    inherited
+        What the parent carried for those properties. Empty at the root.
+
+    Returns
+    -------
+    dict
+        The values to hand to this node's children, which is *inherited*
+        updated with whatever this node overrode.
+    """
+    carried = dict(inherited)
+    for key in _TRACKS_PARENT & style.keys():
+        if style[key] == inherited.get(key):
+            del style[key]
+        else:
+            carried[key] = style[key]
+    return carried
+
+
+# Whatever the walker put in a node's `bbox`. It is a mapping today; the type
+# says "some JSON value" because the normalization deliberately does not
+# require that, and a snapshot reporting it otherwise should reach the diff
+# rather than be dropped on the way.
+type _Bbox = dict[str, typ.Any] | list[typ.Any] | str | float | bool | None
+
+
+def _rounded_bbox(bbox: _Bbox) -> _Bbox:
+    """Round a bounding box's numbers, absorbing subpixel text-shaping jitter.
+
+    Two decimal places is finer than any layout shift worth reporting and
+    coarser than the noise, so a real move still shows and a re-shaped glyph
+    does not.
+
+    Parameters
+    ----------
+    bbox
+        A walker node's ``bbox``. Anything that is not a mapping is returned
+        unchanged rather than discarded: the walker owns this field's shape,
+        and a snapshot that starts reporting it differently should surface in
+        the diff rather than be quietly dropped here.
+
+    Returns
+    -------
+    dict or list or str or float or bool or None
+        A fresh mapping with each numeric value rounded, or the argument
+        itself when it is not a mapping.
+    """
+    if not isinstance(bbox, dict):
+        return bbox
+    return {
+        key: round(value, 2) if isinstance(value, (int, float)) else value
+        for key, value in bbox.items()
+    }
+
+
+def _normalize(
+    node: dict[str, typ.Any],
+    inherited: dict[str, typ.Any] | None = None,
+) -> dict[str, typ.Any]:
+    """Strip incidental variation from one walker node and its descendants.
+
+    The normalization itself lives in :func:`_canonical_style`,
+    :func:`_resolve_tracked` and :func:`_rounded_bbox`; this function walks the
+    tree and reassembles each node from their results.
 
     Parameters
     ----------
@@ -643,39 +740,16 @@ def _normalize(
     Returns
     -------
     dict
-        The node with those variations removed, and its children likewise.
+        The node with those variations removed, and its children likewise. The
+        argument is left alone.
     """
-    style = {
-        key: _canonical_value(value) if isinstance(value, str) else value
-        for key, value in (node.get("styleDiff") or {}).items()
-        if not key.startswith("--tw-")
-    }
-    if style.get("animation-name", "none") != "none":
-        style.pop("opacity", None)
-    for key in ("box-shadow", "text-shadow"):
-        if isinstance(style.get(key), str):
-            style[key] = _canonical_shadow(style[key])
-    _drop_invisible_border_colours(style)
-
-    inherited = inherited or {}
-    carried = dict(inherited)
-    for key in _TRACKS_PARENT & style.keys():
-        if style[key] == inherited.get(key):
-            del style[key]
-        else:
-            carried[key] = style[key]
-
-    bbox = node.get("bbox")
-    if isinstance(bbox, dict):
-        bbox = {
-            key: round(value, 2) if isinstance(value, (int, float)) else value
-            for key, value in bbox.items()
-        }
+    style = _canonical_style(node.get("styleDiff"))
+    carried = _resolve_tracked(style, inherited or {})
 
     normalized = dict(node)
     normalized["styleDiff"] = style
-    if bbox is not None:
-        normalized["bbox"] = bbox
+    if "bbox" in node:
+        normalized["bbox"] = _rounded_bbox(node["bbox"])
     normalized["children"] = [
         _normalize(child, carried) for child in node.get("children") or []
     ]

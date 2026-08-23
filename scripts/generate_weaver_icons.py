@@ -159,14 +159,17 @@ def main() -> int:
     Returns
     -------
     int
-        Always ``0``. This function has no failure path of its own; a
-        missing Carbon package instead raises ``SystemExit`` out of
-        ``build_macro`` before this point is reached.
+        Always ``0``, on both the updated and unchanged paths. Failure is
+        signalled through an exception rather than the return value, so a
+        non-zero result never arises here.
 
     Raises
     ------
     SystemExit
         Propagated from ``build_macro`` if the Carbon package is absent.
+    OSError
+        If reading or writing ``OUTPUT`` fails, for example because of
+        permissions, a read-only tree, or a full disk.
     """
     macro = build_macro()
     current = OUTPUT.read_text(encoding="utf-8") if OUTPUT.exists() else ""

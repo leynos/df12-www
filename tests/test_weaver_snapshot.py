@@ -10,8 +10,15 @@ regression is normalized away and ships.
 from __future__ import annotations
 
 import importlib.util
+import json
+import os
+import socket
+import subprocess
 import typing as typ
 from pathlib import Path
+
+if typ.TYPE_CHECKING:
+    import collections.abc as cabc
 
 import pytest
 
@@ -337,4 +344,323 @@ def test_transparent_shadow_layers_are_dropped_whatever_their_geometry() -> None
     assert kept == visible, (
         "dropping the transparent layer must leave the visible one intact; "
         f"expected {visible!r}, got {kept!r}"
+    )
+
+
+# --- The command boundary -------------------------------------------------
+#
+# Everything above tests normalization, which is where the subtle bugs are but
+# not where the harness meets the world. These cover the commands themselves:
+# what argv they build, what they do when a tool fails, and — for `diff` — the
+# exit status that lets it gate a milestone.
+
+
+def _snapshot(tmp_path: Path, name: str, **style: str) -> Path:
+    """Write a minimal css-view snapshot file and return its path."""
+    payload = {
+        "payload": {
+            "tree": {
+                "tag": "div",
+                "classes": [],
+                "styleDiff": dict(style),
+                "children": [],
+            }
+        }
+    }
+    path = tmp_path / f"{name}.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def test_the_css_view_argv_pins_the_browser_and_names_the_output() -> None:
+    """A comparison is only meaningful if both sides rendered the same way."""
+    argv = weaver_snapshot._css_view_argv(
+        "/usr/bin/bun", "http://127.0.0.1:8099", "commands/act/", Path("/out")
+    )
+
+    assert argv[:2] == ["/usr/bin/bun", "x"], (
+        f"css-view is run through bun; argv starts {argv[:2]!r}"
+    )
+    assert "--browser" in argv, (
+        "the engine must be pinned rather than left to css-view's default, or "
+        f"a change to that default silently reshapes the comparison: {argv!r}"
+    )
+    assert argv[argv.index("--browser") + 1] == "chromium", (
+        f"the pinned engine should be chromium; got {argv!r}"
+    )
+    assert argv[argv.index("--output") + 1] == str(Path("/out/commands__act.json")), (
+        f"the snapshot should be named after the page's slug; got {argv!r}"
+    )
+    assert argv[-1] == "http://127.0.0.1:8099/weaver/commands/act/", (
+        f"the page URL is the final positional argument; got {argv[-1]!r}"
+    )
+
+
+def test_the_screenshot_path_precedes_its_flags() -> None:
+    """Order is load-bearing here, and getting it wrong still reports success.
+
+    Passing ``--full`` first makes agent-browser read the path as a selector
+    and write the image somewhere else, exiting zero either way. Only the
+    argument order distinguishes the two.
+    """
+    argv = weaver_snapshot._screenshot_argv(Path("/out/home@360.png"))
+
+    assert argv[0] == "screenshot", f"the subcommand comes first; got {argv!r}"
+    assert argv[1] == "/out/home@360.png", (
+        f"the path is positional and must precede any flag; got {argv!r}"
+    )
+    assert Path(argv[1]).is_absolute(), (
+        "agent-browser runs as a daemon with its own working directory, so a "
+        f"relative path would land somewhere unexpected; got {argv[1]!r}"
+    )
+
+
+def test_concurrent_runs_do_not_share_a_browser_session() -> None:
+    """A shared session name would let two runs interleave.
+
+    agent-browser sessions are named globally and hold one viewport and one
+    current page between calls, so two runs sharing a name would resize each
+    other's viewport mid-capture and report success for both.
+    """
+    name = weaver_snapshot._session_name()
+
+    assert str(os.getpid()) in name, (
+        f"the session name must distinguish this process; got {name!r}"
+    )
+    assert name.startswith("weaver-shots"), (
+        f"the name should still say what the session is for; got {name!r}"
+    )
+
+
+def test_capture_drives_one_tool_run_per_page() -> None:
+    """Page discovery feeds the runner, and nothing is silently skipped."""
+    calls: list[list[str]] = []
+    pages = ["", "install/", "commands/act/"]
+    weaver_snapshot._capture_pages(
+        pages,
+        Path("/out"),
+        "http://127.0.0.1:8099",
+        "/usr/bin/bun",
+        lambda argv: calls.append(list(argv)),
+    )
+
+    assert len(calls) == len(pages), (
+        f"expected one run per page, got {len(calls)} for {len(pages)} pages"
+    )
+    assert [argv[-1].rsplit("/weaver/", 1)[1] for argv in calls] == [
+        "",
+        "install/",
+        "commands/act/",
+    ], f"each page should be captured once, in order; got {calls!r}"
+
+
+def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None:
+    """A tool that exits non-zero must not leave a partial snapshot passing."""
+
+    def explode(argv: cabc.Sequence[str]) -> None:
+        raise subprocess.CalledProcessError(1, list(argv))
+
+    with pytest.raises(subprocess.CalledProcessError):
+        weaver_snapshot._capture_pages(
+            ["", "install/"], Path("/out"), "http://x", "/usr/bin/bun", explode
+        )
+
+
+def test_shots_closes_its_session_even_when_a_page_fails() -> None:
+    """An interrupted run must not strand a daemon holding the viewport."""
+    calls: list[list[str]] = []
+
+    def fail_on_screenshot(argv: cabc.Sequence[str]) -> None:
+        calls.append(list(argv))
+        if "screenshot" in argv:
+            raise subprocess.CalledProcessError(1, list(argv))
+
+    with pytest.raises(subprocess.CalledProcessError):
+        weaver_snapshot._shoot_pages(
+            [""], Path("/out"), "http://x", "/usr/bin/agent-browser", fail_on_screenshot
+        )
+
+    assert calls[-1][1] == "close", (
+        f"the session should be closed on the way out; last call was {calls[-1]!r}"
+    )
+
+
+def test_a_failure_to_close_the_session_does_not_mask_the_real_error() -> None:
+    """The page failure is what the reader needs, not the cleanup's complaint."""
+
+    def fail_everything(argv: cabc.Sequence[str]) -> None:
+        raise subprocess.CalledProcessError(2, list(argv))
+
+    with pytest.raises(subprocess.CalledProcessError) as caught:
+        weaver_snapshot._shoot_pages(
+            [""], Path("/out"), "http://x", "/usr/bin/agent-browser", fail_everything
+        )
+
+    assert "close" not in caught.value.cmd, (
+        f"the surfaced error should be the page's, not the cleanup's; got "
+        f"{caught.value.cmd!r}"
+    )
+
+
+def test_every_page_is_shot_at_every_width() -> None:
+    """A width that quietly captured nothing would look like a clean run."""
+    calls: list[list[str]] = []
+    weaver_snapshot._shoot_pages(
+        ["", "install/"],
+        Path("/out"),
+        "http://x",
+        "/usr/bin/agent-browser",
+        lambda argv: calls.append(list(argv)),
+    )
+
+    shots = [argv[2] for argv in calls if argv[1] == "screenshot"]
+    expected = [
+        f"/out/{slug}@{width}.png"
+        for width in weaver_snapshot.SCREENSHOT_WIDTHS
+        for slug in ("home", "install")
+    ]
+    assert shots == expected, f"expected {expected!r}, got {shots!r}"
+
+
+def test_diff_reports_no_differences_and_exits_cleanly(tmp_path: Path) -> None:
+    """Two identical captures are not a change, so nothing should be raised."""
+    before, after = tmp_path / "before", tmp_path / "after"
+    before.mkdir()
+    after.mkdir()
+    _snapshot(before, "home", color="rgb(1, 2, 3)")
+    _snapshot(after, "home", color="rgb(1, 2, 3)")
+
+    weaver_snapshot.diff(before, after)
+
+
+def test_diff_exits_non_zero_when_a_page_changed(tmp_path: Path) -> None:
+    """The exit status is what lets this gate a milestone."""
+    before, after = tmp_path / "before", tmp_path / "after"
+    before.mkdir()
+    after.mkdir()
+    _snapshot(before, "home", color="rgb(1, 2, 3)")
+    _snapshot(after, "home", color="rgb(9, 9, 9)")
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot.diff(before, after)
+    assert caught.value.code == 1, (
+        f"a changed page should exit 1, not {caught.value.code!r}"
+    )
+
+
+def test_diff_ignores_a_change_the_normalization_calls_incidental(
+    tmp_path: Path,
+) -> None:
+    """The same colour in two notations is not a difference worth reporting."""
+    before, after = tmp_path / "before", tmp_path / "after"
+    before.mkdir()
+    after.mkdir()
+    _snapshot(before, "home", color="rgb(1, 2, 3)")
+    _snapshot(after, "home", color="rgba(1, 2, 3, 1)")
+
+    weaver_snapshot.diff(before, after)
+
+
+def test_a_page_missing_from_the_candidate_counts_as_a_difference(
+    tmp_path: Path,
+) -> None:
+    """A page that stopped being published is a change, not an absence."""
+    before, after = tmp_path / "before", tmp_path / "after"
+    before.mkdir()
+    after.mkdir()
+    _snapshot(before, "home", color="rgb(1, 2, 3)")
+    _snapshot(before, "install", color="rgb(1, 2, 3)")
+    _snapshot(after, "home", color="rgb(1, 2, 3)")
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot.diff(before, after)
+    assert caught.value.code == 1, "a missing page should fail the comparison"
+
+
+def test_a_page_only_in_the_candidate_counts_as_a_difference(
+    tmp_path: Path,
+) -> None:
+    """A new page is as much a change as an altered one."""
+    before, after = tmp_path / "before", tmp_path / "after"
+    before.mkdir()
+    after.mkdir()
+    _snapshot(before, "home", color="rgb(1, 2, 3)")
+    _snapshot(after, "home", color="rgb(1, 2, 3)")
+    _snapshot(after, "install", color="rgb(1, 2, 3)")
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot.diff(before, after)
+    assert caught.value.code == 1, "a new page should fail the comparison"
+
+
+def test_diff_says_so_rather_than_passing_on_an_empty_baseline(
+    tmp_path: Path,
+) -> None:
+    """An empty baseline would otherwise compare zero pages and report success."""
+    before, after = tmp_path / "before", tmp_path / "after"
+    before.mkdir()
+    after.mkdir()
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot.diff(before, after)
+    assert "no snapshots" in str(caught.value.code), (
+        f"expected a message naming the empty directory; got {caught.value.code!r}"
+    )
+
+
+def test_the_output_directory_is_cleared_of_the_previous_run(tmp_path: Path) -> None:
+    """A stale snapshot left behind would be compared as though it were fresh."""
+    out = tmp_path / "shots"
+    out.mkdir()
+    (out / "gone.json").write_text("{}", encoding="utf-8")
+    (out / "kept.png").write_text("x", encoding="utf-8")
+
+    resolved = weaver_snapshot._prepare_output_dir(out, ".json")
+
+    assert not (out / "gone.json").exists(), "the previous run's JSON should be cleared"
+    assert (out / "kept.png").exists(), (
+        "only the extension being written should be cleared, so a capture and "
+        "a screenshot run can share a directory"
+    )
+    assert resolved.is_absolute(), f"the path should be resolved; got {resolved!r}"
+
+
+def test_a_missing_tool_names_itself_rather_than_failing_obscurely() -> None:
+    """`FileNotFoundError` from deep inside subprocess helps nobody."""
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot._tool("definitely-not-a-real-tool-name")
+    assert "definitely-not-a-real-tool-name" in str(caught.value.code), (
+        f"the message should name the missing tool; got {caught.value.code!r}"
+    )
+
+
+@pytest.mark.parametrize(
+    ("page", "slug"),
+    [
+        ("", "home"),
+        ("/", "home"),
+        ("install/", "install"),
+        ("commands/act/", "commands__act"),
+    ],
+)
+def test_a_page_path_becomes_a_flat_filename_stem(page: str, slug: str) -> None:
+    """Snapshots sit in one directory, so the slug carries the whole path."""
+    assert weaver_snapshot._slug(page) == slug, (
+        f"{page!r} should slug to {slug!r}, got {weaver_snapshot._slug(page)!r}"
+    )
+
+
+def test_the_snapshot_port_refuses_to_borrow_someone_else_s_server() -> None:
+    """Polling a port someone else holds would snapshot their pages, not ours."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as squatter:
+        squatter.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        squatter.bind(("127.0.0.1", 0))
+        squatter.listen(1)
+        port = squatter.getsockname()[1]
+
+        with pytest.raises(SystemExit) as caught, weaver_snapshot._served(port):
+            pass  # pragma: no cover - the context must not be entered
+
+    assert str(port) in str(caught.value.code), (
+        f"the message should name the occupied port; got {caught.value.code!r}"
     )

@@ -102,6 +102,41 @@ def test_interface_catalogue_links_resolve_to_configured_routes(tmp_path: Path) 
     )
 
 
+def test_episodic_code_blocks_make_the_scroll_region_focusable(tmp_path: Path) -> None:
+    """Rendered code-block scroll regions retain a label and keyboard focus."""
+    site_config = load_site_config(REPO_ROOT / "config/pages.yaml")
+    episodic = site_config.sites["episodic"]
+    episodic.output_dir = tmp_path / "episodic"
+    assert episodic.homepage is not None, "Episodic must configure a homepage"
+    episodic.homepage.output = episodic.output_dir / "index.html"
+    _generate_subsite(site_config, episodic)
+
+    soup = BeautifulSoup(
+        (episodic.output_dir / "docs" / "api" / "index.html").read_text(
+            encoding="utf-8"
+        ),
+        "html.parser",
+    )
+    scroll_region = soup.select_one(".code-block .code-scroll")
+    assert scroll_region is not None, "API code blocks must render a scroll region"
+    assert scroll_region.get("tabindex") == "0", (
+        "the code-block scroll region must be keyboard-focusable"
+    )
+    assert scroll_region.get("role") == "region", (
+        "the code-block scroll region must retain its landmark role"
+    )
+    assert scroll_region.get("aria-label") == (
+        "Upload a source, attach it to a job, and poll until ready"
+    ), "the code-block scroll region must use the macro label as its accessible name"
+
+    reference_styles = (REPO_ROOT / "src/styles/episodic/reference.css").read_text(
+        encoding="utf-8"
+    )
+    assert ".code-scroll {\n  overflow-x: auto;\n}" in reference_styles, (
+        "the focusable code-scroll region must own horizontal scrolling"
+    )
+
+
 def test_roadmap_task_macro_renders_nested_tasks_with_missing_optional_fields() -> None:
     """The recursive roadmap macro accepts incomplete nested task records."""
     environment = Environment(

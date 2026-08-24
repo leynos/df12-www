@@ -33,8 +33,11 @@
   letter-spacing: 0.04em;
 }
 
-.code-block pre {
+.code-scroll {
   overflow-x: auto;
+}
+
+.code-block pre {
   padding: var(--space-4);
   margin: 0;
   background: var(--color-surface-inset);

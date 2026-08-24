@@ -515,20 +515,24 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - **Decision:** on `pages/safety.jinja`'s Operational Guidance panel, swap the
   borrowed `text-code-string` and `text-accent-ink` for `text-status-ok` and
   `text-status-error`, and record the resulting contrast numbers even though
-  one of them regresses. Rationale: the panel composites to `#244675`
-  (`bg-white/5` over `bg-primary`), and the labels are `text-xs font-bold`, so
-  WCAG AA wants 4.5:1. The "do" label improves: `#4ade80` → `#22c55e` moves
-  5.46:1 to 4.17:1. The "don't" label is the one worth flagging: `#f4a694` →
-  `#ef4444` moves 4.86:1 to 2.53:1. That drop is not the status token being
-  weaker in the abstract — `text-accent-ink` measures as accent-lift on this
-  panel because `src/styles/weaver/panels.css` remaps it on dark surfaces, the
-  same mechanism recorded above for Milestone 8, and `#ef4444` gets no such
-  lift. The swap was made because it was explicitly requested after the
-  contrast concern was raised. The remedy, if both labels need to pass AA, is
-  lift variants of the status tokens remapped on the same dark-surface selector
-  panels.css already uses for the accent token; that is a stylesheet change and
-  is left for a decision rather than made here. Date/Author: 2026-08-23, review
-  batch.
+  both regress. Rationale: the panel composites to `#244675` (`bg-white/5`
+  over `bg-primary`), and the labels are `text-xs font-bold`, so WCAG AA wants
+  4.5:1. Neither label clears that threshold after the swap. The "do" label,
+  `#4ade80` → `#22c55e`, moves 5.46:1 to 4.17:1 — a regression, and below the
+  4.5:1 threshold. The "don't" label is the one worth flagging: `#f4a694` →
+  `#ef4444` moves 4.86:1 to 2.53:1, also failing. That drop is not the status
+  token being weaker in the abstract — `text-accent-ink` measures as
+  accent-lift on this panel because `src/styles/weaver/panels.css` remaps it
+  on dark surfaces, the same mechanism recorded above for Milestone 8, and
+  `#ef4444` gets no such lift. The swap was made because it was explicitly
+  requested after the contrast concern was raised. The remedy, if both labels
+  need to pass AA, is lift variants of the status tokens remapped on the same
+  dark-surface selector panels.css already uses for the accent token; that is
+  a stylesheet change and is left for a decision rather than made here.
+  Date/Author: 2026-08-23, review batch.
+  Correction: 2026-08-24, review batch. — The earlier entry mischaracterised
+  the "do" change as an improvement; both ratios fail the 4.5:1 AA threshold,
+  at 4.17:1 and 2.53:1 respectively.
 - **Decision:** treat `backdrop-blur-sm` → `-xs` on four elements (three cards
   on `pages/why-weaver.jinja`, one panel on `pages/design-language.jinja`) as a
   deliberate visual change, not a stale-name fix. Rationale: both
@@ -935,6 +939,11 @@ Known inconsistencies found during planning:
    `nav_link(href, index, label, active)` in a new
    `templates/weaver/_chrome.jinja`, emitting two semantic classes,
    `weaver-nav-link` and `weaver-nav-link--current`, plus `aria-current="page"`.
+   (Milestone complete. The delivered signature takes `current_href` rather
+   than an `active` flag: a companion macro, `current_href(nav_links)`,
+   computes the current page's href once, and every `nav_link` call is passed
+   that value and compares it against its own `href`, rather than each call
+   site working out its own flag.)
 2. `weaver-site.css` styles the active nav item by *matching its utility
    classes* (`#sidebar nav a.bg-weaver-indigo.text-weaver-cream`) and
    special-cases the install link by href (`a[href$="/install/"]`). Both become
@@ -1273,7 +1282,11 @@ New files:
   the semantic partials, imported into `layer(base)` or `layer(components)`.
 - `templates/weaver/_chrome.jinja` — Jinja macros for the shared page
   furniture. At minimum:
-  `{% macro nav_link(href, index, label, current=false, variant='') %}`.
+  `{% macro nav_link(href, index, label, current_href, variant='') %}`,
+  rendering one sidebar link, current against `current_href` rather than a
+  boolean flag; and `{% macro current_href(nav_links) %}`, deriving the
+  current page's href from the nav-link list, returning `''` when none is
+  current.
 - `templates/weaver/_icons.jinja` — generated. Exposes
   `{% macro icon(name, extra_class='') %}` returning inline SVG.
 - `config/weaver-icons.yaml` — the Font Awesome to Carbon mapping, hand-curated

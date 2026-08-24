@@ -452,6 +452,60 @@ fails if the committed macro does not match what the generator would produce
 from the current mapping, so `templates/weaver/_icons.jinja` must never be
 hand-edited — change `config/weaver-icons.yaml` and rerun the generator instead.
 
+
+### 4.8. Weaver's chrome macros
+
+`templates/weaver/_chrome.jinja` holds two macros shared across every Weaver
+page, imported as `chrome`:
+
+```jinja
+{% import '_chrome.jinja' as chrome %}
+```
+
+`chrome.current_href(nav_links)` returns the `href` of whichever entry in
+`nav_links` the page generator has flagged `current`, or `''` when none is —
+which simply means no sidebar link is highlighted, the case for a page that
+sits outside the nav.
+
+`chrome.nav_link(href, index, label, current_href, variant='')` renders one
+sidebar `<a>`. Every link carries the base classes
+`weaver-nav-link block px-4 py-2 text-sm`. When `href` matches
+`current_href`, the macro also sets `aria-current="page"`; a link that is
+not current gets no `aria-current` attribute at all. It then appends one
+further class string, verbatim from `_chrome.jinja`, depending on state and
+`variant`:
+
+```text
+current:  weaver-nav-link--current font-semibold bg-primary text-base-100 rounded-xs border border-base-content shadow-block
+default:  font-medium text-base-content hover:bg-primary/5 transition-colors border border-transparent
+install:  font-medium text-neutral hover:bg-accent/5 transition-colors border border-transparent font-mono
+```
+
+| Parameter      | Purpose                                                                               |
+| -------------- | ------------------------------------------------------------------------------------- |
+| `href`         | The link target, compared against `current_href` to decide state.                     |
+| `index`        | The two-digit section number before the label, or `''` for unnumbered resource links. |
+| `label`        | The link text.                                                                        |
+| `current_href` | The href of the page being rendered, typically `chrome.current_href(nav_links)`.      |
+| `variant`      | `'install'` selects the monospaced install-link style instead of the default.         |
+
+_Table 4: the `nav_link` macro's parameters._
+
+`index` also switches how the label is prefixed: a truthy `index` renders it
+in a small monospaced span before the label (dimmed to 60% opacity unless the
+link is current); an empty `index` on the `'install'` variant instead
+prefixes a bare `>` and a space when the link is not current; any other
+combination prefixes nothing.
+
+A typical call site, from `templates/weaver/doc_page.jinja`:
+
+```jinja
+{%- set here = chrome.current_href(nav_links) -%}
+{{ chrome.nav_link('/weaver/', '00', 'Home', here) }}
+{{ chrome.nav_link('/weaver/why-weaver/', '01', 'Philosophy', here) }}
+{{ chrome.nav_link('/weaver/install/', '', 'Install', here, variant='install') }}
+```
+
 ## 5. Template components
 
 Repeated markup belongs in a Jinja macro, and the class list behind it belongs
@@ -500,7 +554,7 @@ The pill-shaped eyebrow above a page or section heading.
 | `icon_class` | Utility classes for that icon, typically a colour.                      |
 | `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |
 
-_Table 4: the `kicker` macro's parameters._
+_Table 5: the `kicker` macro's parameters._
 
 Three call sites show the range:
 
@@ -525,7 +579,7 @@ default.
 | `.hm-kicker--accent`  | Pairs with `--section` for the docs hub's indigo.      |
 | `.hm-kicker__dot`     | The roadmap's leading status dot.                      |
 
-_Table 5: the kicker component class and its modifiers._
+_Table 6: the kicker component class and its modifiers._
 
 **Normative:** a new variant is a new modifier on `.hm-kicker`, not a fresh
 class list at the call site and not a utility string passed through `extra`.
@@ -796,6 +850,48 @@ change, capture again, and diff the two directories. An empty diff confirms the
 change moved nothing it was not meant to; a non-empty one should be read entry
 by entry, since every difference ought to trace back to something the change
 deliberately did.
+
+
+### 7.2. Property-based tests for the snapshot normalizer
+
+`tests/test_weaver_snapshot_properties.py` complements the example-based
+`tests/test_weaver_snapshot.py` with
+[Hypothesis](https://hypothesis.readthedocs.io/) (`hypothesis` is a `dev`
+dependency-group entry in `pyproject.toml`). Rather than asserting what the
+normalizer in `scripts/weaver_snapshot.py` does to worked-example inputs, it
+asserts invariants that must hold for every input Hypothesis can generate —
+colour notations, style-diff shapes, and walker trees nobody thought to
+write by hand.
+
+Four families of property are checked:
+
+- **Idempotence.** Normalizing an already-normalized colour, shadow, or
+  walker tree changes nothing, since a snapshot is only ever compared
+  against another snapshot.
+- **Structure preservation.** Normalizing a walker tree never adds, drops,
+  or reorders a node; only the incidental values within it change.
+- **Totality of removal.** Every `--tw-*` custom property is stripped from a
+  style diff, and no transparent shadow layer survives normalization,
+  whatever else the value contains.
+- **Injectivity of the slug.** No two distinct page paths produce the same
+  snapshot filename stem, since one capture would otherwise overwrite
+  another and the diff would compare a page against itself. The generated
+  alphabet includes `_`, which is what makes the property able to reach the
+  collision at all: the stem uses `__` as its separator.
+
+Every test shares a module-level `SETTINGS` object, applied via `@SETTINGS`
+beside each `@given`. It pins `max_examples=200` and sets `deadline=None`,
+and it suppresses Hypothesis's `too_slow` and `data_too_large` health
+checks. This suite runs inside the commit gate (`make test`), where a health
+check flagging one slow-but-valid example, or an unpinned example count
+happening to pick a different case on a different run, would fail the gate
+on a finding rather than a genuine defect.
+
+Run just this file:
+
+```bash
+uv run pytest tests/test_weaver_snapshot_properties.py -v
+```
 
 ## 8. Accessibility checks
 

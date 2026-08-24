@@ -209,6 +209,27 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       TypeScript name superseded by the 2026-08-21 correction note) at what
       were Milestone 9's documentation instruction and the "Interfaces and
       dependencies" list.
+- [x] (2026-08-24) Made `_slug` in `scripts/weaver_snapshot.py` injective: `_`
+      is now escaped as `_u` before `/` becomes `__`, and the home page's stem
+      moved from `home` to `__home`, closing the collision a directory named
+      with an underscore could otherwise trigger.
+- [x] (2026-08-24) Separated rendering from reading in both generator
+      scripts — `scripts/generate_weaver_icons.py` and
+      `scripts/weaver_snapshot.py` — so the pure transformation
+      (`render_macro`/`_rendered_tree`) is exercised without touching the
+      filesystem, and the I/O boundary (`build_macro`/`_normalized_tree`) is
+      the only place a missing, unreadable, or malformed file can fail,
+      raising `SystemExit` that names the file at fault.
+- [x] (2026-08-24) Serialized `scripts/weaver_snapshot.py`'s server startup
+      behind an advisory `flock`, keyed on the port and the user id, closing
+      the check-then-act window between one run's port probe and its
+      `http-server` spawn.
+- [x] (2026-08-24) Added `tests/test_weaver_browser.py`, a browser-backed
+      suite driving `agent-browser` over a served `public/weaver/`. It found
+      three accessibility defects — the nav index numbers' contrast, 31
+      keyboard-unreachable scrollable panels, and a link on `how-it-works/`
+      distinguished by colour alone — each fixed as part of this round; see
+      Surprises & discoveries and the Decision Log.
 
 ## Surprises & discoveries
 
@@ -333,6 +354,27 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   can actually fail. The general lesson repeats: never grep a minified,
   single-line stylesheet for a substring and trust the count; use Python's `re`
   over the file contents instead.
+- **Observation:** the nav index numbers failed WCAG AA the moment a real
+  browser composited them. Evidence: `text-base-content` at `opacity-60` on
+  the sidebar's cream ground composites to `#708499`, measured at 3.33:1
+  against the 4.5:1 that 12px bold text needs. Impact: none of the text-based
+  suites could catch this, since `opacity-60` is a valid utility and the
+  colour token itself is correct in isolation — only a browser compositing
+  the two together shows the failure. Fixed by raising the opacity to 75%,
+  which measures 4.88:1; see the Decision Log.
+- **Observation:** 31 `overflow-x-auto` panels across ten templates could not
+  be reached by keyboard. Evidence: none of them carried `tabindex="0"`, so a
+  keyboard-only visitor had no way to scroll a code block or a wide table that
+  overflowed its container. Impact: fixed uniformly across all 31, rather than
+  only the ones a given axe run happened to flag at the viewports tested,
+  because which panels actually overflow depends on both the viewport and the
+  panel's content; see the Decision Log.
+- **Observation:** the Sempai Engine link inside `pages/how-it-works.jinja`'s
+  prose was distinguished from its surrounding text by colour alone.
+  Evidence: it carried `text-accent-ink` with no other visual marker. Impact:
+  a reader who cannot perceive that colour difference — including anyone
+  relying on a colour-contrast-only rendering — has no way to tell the link
+  from ordinary text; fixed by adding `underline` alongside the colour.
 
 ## Decision log
 
@@ -570,6 +612,50 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   The blank-line change is made regardless, since it is what such a rule would
   ask for and costs nothing; the CSS Biome emits is unaffected. Date/Author:
   2026-08-23, review batch.
+- **Decision:** make `_slug` in `scripts/weaver_snapshot.py` injective by
+  escaping `_` as `_u` before `/` becomes `__`, and by moving the home page's
+  stem to `__home`. Rationale: the pages come from the published tree, so a
+  directory named with an underscore is an ordinary thing to find there, and
+  the naive `"/" -> "__"` mapping is not injective over such names — `a/b`
+  and `a__b` both flatten to `a__b`. Leaving that in place would let two
+  distinct pages silently overwrite one another's capture and make the diff
+  compare a page against itself, on a collision that only an underscore in a
+  directory name would trigger. Existing snapshot directories must be
+  recaptured under the new stems; they are throwaway and git-ignored, so this
+  costs nothing. Date/Author: 2026-08-24, review batch.
+- **Decision:** serialize port acquisition in `scripts/weaver_snapshot.py`
+  behind an advisory `flock` keyed on the port and the user id, rather than
+  relying on the bind probe alone. Rationale: probing a port and then
+  spawning a server on it is check-then-act — two runs can both find the
+  port free, both spawn, and one then answers the other's readiness poll,
+  which the probe alone cannot close. The lock is released as soon as the
+  server answers, so it covers startup and not the capture itself, which
+  takes minutes. Date/Author: 2026-08-24, review batch.
+- **Decision:** waive the two `pages/safety.jinja` contrast failures in
+  `tests/test_weaver_browser.py` by page and CSS class, rather than xfailing
+  the whole page or changing the palette. Rationale: the palette change —
+  lift variants of the status tokens remapped on the dark-surface selector
+  `src/styles/weaver/panels.css` already uses for `text-accent-ink` — remains
+  the user's decision, not one to make inside a test suite. A companion test,
+  `test_the_recorded_contrast_exceptions_are_still_real`, fails if the waiver
+  ever stops matching what the page does, so it cannot silently outlive the
+  defect. Date/Author: 2026-08-24, review batch.
+- **Decision:** raise the nav index span's opacity from 60% to 75% in
+  `templates/weaver/_chrome.jinja`. Rationale: `opacity-60` composited the
+  ink to `#708499` on the sidebar's cream ground, measured at 3.33:1 against
+  the 4.5:1 that 12px text needs; `opacity-75` measures 4.88:1, clearing the
+  threshold while still reading as visually dimmed against the current link.
+  Date/Author: 2026-08-24, review batch.
+- **Decision:** make all 31 `overflow-x-auto` panels `tabindex="0"`
+  uniformly, rather than only the ones axe flagged at the viewports tested.
+  Rationale: which panels actually scroll depends on the viewport and on the
+  panel's own content, not on a fixed set the audit happened to catch; a
+  panel that does not overflow today can start to the moment its content
+  changes or the viewport narrows, and a keyboard-unreachable scroll
+  container is a defect whether or not this round's scan found it. Uniform
+  application is also the only version of the rule that is checkable by
+  inspection rather than by re-running the audit after every content change.
+  Date/Author: 2026-08-24, review batch.
 
 ## Outcomes & retrospective
 
@@ -1294,6 +1380,13 @@ New files:
   `capture`, `shots`, and `diff` subcommands.
 - `tests/test_weaver_build.py` — the three build-invariant tests plus the
   icon-generator drift test.
+- `tests/test_weaver_browser.py` — drives `agent-browser` over a served
+  `public/weaver/` to check self-containment, contrast, and layout at two
+  viewports; marked `playwright` and skipped when its tool dependencies are
+  absent.
+- `tests/conftest.py` — the session-scoped `built_site` fixture, shared
+  between `tests/test_weaver_build.py` and `tests/test_weaver_browser.py` so
+  `bun run build` runs once for both.
 
 Modified files:
 

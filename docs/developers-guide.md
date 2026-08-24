@@ -491,10 +491,12 @@ install:  font-medium text-neutral hover:bg-accent/5 transition-colors border bo
 _Table 4: the `nav_link` macro's parameters._
 
 `index` also switches how the label is prefixed: a truthy `index` renders it in
-a small monospaced span before the label (dimmed to 60% opacity unless the link
+a small monospaced span before the label (dimmed to 75% opacity unless the link
 is current); an empty `index` on the `'install'` variant instead prefixes a bare
 `>` and a space when the link is not current; any other combination prefixes
-nothing.
+nothing. The dimming stops at 75%, not 60%: on the sidebar's cream ground,
+`opacity-60` composites the ink to `#708499`, 3.33:1 against the 4.5:1 that
+12px text needs, while `opacity-75` measures 4.88:1.
 
 A typical call site, from `templates/weaver/doc_page.jinja`:
 
@@ -892,6 +894,85 @@ Run just this file:
 uv run pytest tests/test_weaver_snapshot_properties.py -v
 ```
 
+
+### 7.3. Browser-driven checks against the served pages
+
+`tests/test_weaver_browser.py` is the one Weaver suite that watches a real
+Chromium rather than reading text. The build tests read the delivered markup
+and the compiled stylesheet as strings, and the snapshot tests exercise the
+harness that drives a browser without ever starting one; this suite serves
+`public/` and drives `agent-browser` over it, so it can observe served
+responses, composited colours, and the laid-out result rather than the markup
+that describes them — whether a declared stylesheet actually 404s, what a
+translucent panel's colour composites to once the cascade has had its say, and
+whether the sidebar genuinely gives way to the drawer at a narrow viewport.
+
+It carries the `playwright` marker, so `uv run pytest -m "not playwright"`
+deselects it while iterating on something else. It also degrades to a skip
+rather than a failure when a dependency is absent: `agent-browser` not on
+`PATH`, `node_modules/.bin/http-server` missing (run `bun install`), or `uv`
+or `bun` themselves not on `PATH`.
+
+`built_site` is a session-scoped fixture in `tests/conftest.py`, shared with
+`tests/test_weaver_build.py`, so `bun run build` runs once for both suites
+rather than once per module.
+
+**The matrix.** Four pages are exercised — the home page's hero, `safety/` for
+a page of prose panels, `commands/act/` for its scrollable code blocks, and
+`how-it-works/` for the figure-heavy explainer — chosen because between them
+they carry every kind of chrome the sub-site has. Each is checked at two
+viewports: 360×800, the narrowest width the design targets and the one that
+puts the sidebar off-canvas behind a toggle, and 1440×900, the width the
+layout was drawn against. The two layouts share almost no chrome, so both have
+to be checked.
+
+**What each test asserts:**
+
+- `test_a_weaver_page_fetches_everything_from_the_local_server` — every
+  request the page makes comes from the local origin, and none fails.
+- `test_a_weaver_page_serves_its_own_stylesheet_fonts_and_script` — the
+  compiled stylesheet, the webfonts, and the drawer script are all actually
+  fetched, so the check above cannot pass vacuously on a page that fetched
+  nothing.
+- `test_a_weaver_page_meets_wcag_aa` — axe reports no unwaived violation
+  against WCAG 2.0 A and AA.
+- `test_the_recorded_contrast_exceptions_are_still_real` — the two waived
+  `safety/` labels still fail exactly as recorded (see below).
+- `test_exactly_one_nav_link_is_marked_as_the_current_page` — exactly one
+  sidebar link carries `aria-current="page"`.
+- `test_every_icon_renders_its_artwork` — every rendered `<svg>` has a body,
+  and no page contains the literal text `UNKNOWN ICON`.
+- `test_the_sidebar_gives_way_to_a_drawer_at_a_narrow_viewport` — the sidebar
+  lays out at 1440px and not at 360px, and the drawer toggle is present at
+  360px.
+- `test_no_page_scrolls_sideways_on_a_phone` — the document's scroll width
+  does not exceed the 360px viewport.
+- `test_the_capture_command_writes_one_snapshot_per_page` — runs
+  `scripts/weaver_snapshot.py capture` end to end and checks it writes one
+  non-empty snapshot per published page.
+
+**The `ACCEPTED` waiver.** `pages/safety.jinja`'s Operational Guidance panel
+carries two status-token labels whose measured contrast is a recorded,
+outstanding defect rather than something this suite is meant to catch fresh
+each run (see the Decision Log in
+`docs/execplans/weaver-daisy-migration.md`). `ACCEPTED` waives exactly those
+two: it is keyed by page, axe rule, and the CSS class carried on the failing
+node, so it excuses the `text-status-ok` and `text-status-error` labels on
+`safety/` and nothing else — a contrast failure anywhere else on the same page
+still fails the suite. `test_the_recorded_contrast_exceptions_are_still_real`
+asserts the two waived labels still fire; if a future palette change makes
+them pass, that test fails instead, so the waiver cannot quietly outlive the
+defect it was recorded against.
+
+Run just this file:
+
+```bash
+uv run pytest tests/test_weaver_browser.py -v
+```
+
+It takes roughly ninety seconds including the build, on the machine it was
+written on.
+
 ## 8. Accessibility checks
 
 Colour choices must meet WCAG 2.2 AA — 4.5:1 for body text, 3:1 for large text
@@ -916,6 +997,10 @@ report, and none is checked into the repository. Before treating a new audit
 finding as a regression, check the change under review actually altered the
 colour or markup in question, since an audit run against a wider page surface
 than the change touched can surface pairings the change did not introduce.
+
+The Weaver sub-site's pages are additionally checked with axe over WCAG 2.0 A
+and AA by the browser suite; see §7.3, "Browser-driven checks against the
+served pages".
 
 ### 8.1. Focus indicators
 

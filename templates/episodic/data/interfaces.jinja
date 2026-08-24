@@ -101,7 +101,7 @@
   {
     "name": "Authorization",
     "status": "in-progress",
-    "detail": "Authorization middleware runs ahead of every resource and supplies the authenticated principal. Role-based access control and tenancy isolation are roadmap phase 5."
+    "detail": "Authorization middleware runs ahead of every resource except health routes, which bypass authentication. It supplies the authenticated principal; tenancy isolation is roadmap phase 5."
   },
   {
     "name": "Idempotency",
@@ -119,9 +119,14 @@
     "detail": "A single error serializer produces a consistent error body across every resource."
   },
   {
-    "name": "Pagination and rate limits",
+    "name": "Pagination, filtering, and role enforcement",
+    "status": "available",
+    "detail": "Pagination, filtering, and role enforcement are delivered by the request surfaces that expose them."
+  },
+  {
+    "name": "Rate limits",
     "status": "planned",
-    "detail": "Pagination, filtering, and role enforcement are roadmap task 4.1.2. No rate-limit contract is defined; do not assume one."
+    "detail": "No rate-limit contract is defined yet; do not assume one."
   }
 ] %}
 

@@ -39,7 +39,7 @@ class ContentPageGenerator:
         stylesheet: str,
         parent_link: NavLinkConfig | None = None,
         base_path: str | None = None,
-        template_vars: dict[str, typ.Any] | None = None,
+        template_vars: dict[str, object] | None = None,
     ) -> None:
         self.config = config
         self.output_dir = output_dir

@@ -5,33 +5,49 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_build_pages_script_generates_all_sites() -> None:
+@pytest.fixture(scope="session")
+def package_scripts() -> dict[str, str]:
+    """Return the build-script mapping from the repository manifest."""
+    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    return package_json["scripts"]
+
+
+def test_build_pages_script_generates_all_sites(
+    package_scripts: dict[str, str],
+) -> None:
     """The default build pipeline should refresh main and sub-site outputs."""
-    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
-    build_pages = package_json["scripts"]["build:pages"]
-    assert build_pages == "uv run pages generate --all-sites"
-
-
-def test_build_css_compiles_the_episodic_entrypoint() -> None:
-    """The shared CSS pipeline should build Episodic from tracked sources."""
-    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
-    scripts = package_json["scripts"]
-
-    assert "bun run build:css:episodic" in scripts["build:css"]
-    assert scripts["build:css:episodic"] == (
-        "bunx tailwindcss -i ./src/styles/episodic.css "
-        "-o ./public/episodic/assets/styles/tailwind.css --minify"
+    build_pages = package_scripts["build:pages"]
+    assert build_pages == "uv run pages generate --all-sites", (
+        "build:pages must generate every configured site"
     )
 
 
-def test_build_search_regenerates_and_checks_the_episodic_index() -> None:
+def test_build_css_compiles_the_episodic_entrypoint(
+    package_scripts: dict[str, str],
+) -> None:
+    """The shared CSS pipeline should build Episodic from tracked sources."""
+    assert "bun run build:css:episodic" in package_scripts["build:css"], (
+        "build:css must invoke the Episodic stylesheet build"
+    )
+    assert package_scripts["build:css:episodic"] == (
+        "bunx tailwindcss -i ./src/styles/episodic.css "
+        "-o ./public/episodic/assets/styles/tailwind.css --minify"
+    ), "build:css:episodic must publish the configured Episodic Tailwind output"
+
+
+def test_build_search_regenerates_and_checks_the_episodic_index(
+    package_scripts: dict[str, str],
+) -> None:
     """The build regenerates the committed Episodic search projection."""
-    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
-    build_search = package_json["scripts"]["build:search"]
+    build_search = package_scripts["build:search"]
     command = "bun run scripts/build-episodic-search-index.mjs"
 
-    assert command in build_search
-    assert f"{command} --check" in build_search
+    assert command in build_search, "build:search must regenerate the Episodic index"
+    assert f"{command} --check" in build_search, (
+        "build:search must fail when the Episodic index projection is stale"
+    )

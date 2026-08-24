@@ -182,7 +182,9 @@ carries its reasoning in the file:
 | `tests/cassettes/`                                       | Betamax writes these HTTP recordings. A format gate over them would fail the moment anyone re-recorded a cassette.                                                                                                                          |
 | `reference/`                                             | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
 | `src/static/**/vendor`, `public/netsuke/assets/vendor`   | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
-| `src/static/{episodic,netsuke,stilyagi}/**/*syntax*.css` | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/episodic/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/netsuke/assets/css/himotoshi.css`            | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/stilyagi/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/episodic/assets/search/episodic-search.json` | Episodic's MiniSearch builder owns the serialized index. Reformatting it would make the committed projection differ from its generator.                                                                                                     |
 | `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
 | `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
@@ -210,7 +212,9 @@ Every published file has a source elsewhere in the repository:
 | Published under `public/`                  | Comes from                                            |
 | ------------------------------------------ | ----------------------------------------------------- |
 | `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`, `*/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `assets/site.css`                          | Tailwind compiling `src/styles/`                      |
+| `mxd/assets/tailwind.css`                  | Tailwind compiling `src/styles/`                      |
+| `episodic/assets/styles/tailwind.css`      | Tailwind compiling `src/styles/`                      |
 | `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
 | `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
 | everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |

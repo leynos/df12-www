@@ -33,7 +33,7 @@ class SubSiteHomePageBuilder:
         nav_links: list[NavLinkConfig] | None = None,
         parent_link: NavLinkConfig | None = None,
         base_path: str | None = None,
-        template_vars: dict[str, typ.Any] | None = None,
+        template_vars: dict[str, object] | None = None,
     ) -> None:
         """Initialize the sub-site homepage builder.
 

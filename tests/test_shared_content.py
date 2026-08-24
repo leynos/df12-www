@@ -65,8 +65,10 @@ def test_shared_content_exposes_subsite_template_vars(tmp_path: Path) -> None:
 
     soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
     repository_link = soup.find("a")
-    assert repository_link is not None
-    assert repository_link.get("href") == "https://github.com/leynos/episodic"
+    assert repository_link is not None, "shared page must render the repository link"
+    assert repository_link.get("href") == "https://github.com/leynos/episodic", (
+        "shared page must retain the configured repository URL"
+    )
 
 
 def test_structured_shared_content_renders_toc_sections_and_cards(

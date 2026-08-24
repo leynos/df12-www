@@ -18,7 +18,8 @@
  * by the site's static-assets build step. That makes it a committed generated
  * file, and `--check` fails when it drifts from the content it describes.
  *
- * @module
+ * @file
+ * @module scripts/build-episodic-search-index
  */
 
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
@@ -130,11 +131,11 @@ async function collectSitePages() {
  * Read the documentation manifest. It is a Jinja data template whose payload
  * is a JSON literal, so the categories can be parsed without a Jinja runtime.
  */
-async function collectUpstreamDocuments() {
-  const text = await readFile(MANIFEST_PATH, "utf8").catch(() => "");
+async function collectUpstreamDocuments(manifestPath = MANIFEST_PATH) {
+  const text = await readFile(manifestPath, "utf8").catch(() => "");
   const match = text.match(/\{% set doc_categories = ([\s\S]*?) %\}\n\{% set doc_featured/);
   if (!match) {
-    return [];
+    throw new Error(`${manifestPath} does not contain a doc_categories JSON payload.`);
   }
   /** @type {{label: string, type: string, audience: string, blurb: string,
       documents: {title: string, path: string, summary: string}[]}[]} */
@@ -181,10 +182,7 @@ function extractDocuments(filePath, html) {
     },
   ];
 
-  for (const match of mainHtml.matchAll(
-    /<section\b[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/section>/gi,
-  )) {
-    const [, sectionId, sectionHtml] = match;
+  for (const { id: sectionId, html: sectionHtml } of extractSections(mainHtml)) {
     const sectionTitle =
       stripTags(matchFirst(sectionHtml, /<h[2-4]\b[^>]*>([\s\S]*?)<\/h[2-4]>/i) ?? "") || pageTitle;
     const body = normalizeText(sectionHtml);
@@ -205,6 +203,44 @@ function extractDocuments(filePath, html) {
   }
 
   return documents;
+}
+
+/**
+ * Extract identified sections while retaining nested section content.
+ *
+ * @param {string} html Fragment containing section elements.
+ * @returns {{id: string, html: string}[]} Identified sections in document order.
+ */
+function extractSections(html) {
+  const stack = [];
+  const sections = [];
+  for (const match of html.matchAll(/<\/?section\b[^>]*>/gi)) {
+    const tag = match[0];
+    if (tag.startsWith("</")) {
+      const section = stack.pop();
+      if (section?.id) {
+        sections.push({
+          html: html.slice(section.contentStart, match.index),
+          id: section.id,
+          start: section.start,
+        });
+      }
+      continue;
+    }
+
+    const id = /\bid=(?:"([^"]*)"|'([^']*)')/i.exec(tag);
+    stack.push({
+      contentStart: (match.index ?? 0) + tag.length,
+      id: id?.[1] ?? id?.[2] ?? "",
+      start: match.index ?? 0,
+    });
+  }
+  return sections
+    .sort((left, right) => left.start - right.start)
+    .map(({ id, html: content }) => ({
+      html: content,
+      id,
+    }));
 }
 
 /**
@@ -296,7 +332,11 @@ function matchFirst(text, pattern) {
   return pattern.exec(text)?.[1] ?? null;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (import.meta.main) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
+
+export { extractDocuments };

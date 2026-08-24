@@ -139,7 +139,9 @@
             <li><a href="/episodic/hosting/">Nile Valley hosting contract</a></li>
             <li><a href="/episodic/roadmap/">Delivery roadmap</a></li>
             <li><a href="/episodic/contributing/">Contributing to Episodic</a></li>
+            {% if repository_url is defined and repository_url %}
             <li><a href="{{ repository_url }}">Episodic source repository</a></li>
+            {% endif %}
           </ul>
         </div>
       </div>

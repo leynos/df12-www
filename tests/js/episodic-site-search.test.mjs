@@ -15,7 +15,7 @@ const {
   initialiseAllEpisodicSearch,
   initialiseEpisodicSearch,
   searchEpisodicIndex,
-} = require("../../src/static/episodic/assets/js/site-search.js");
+} = require("../../public/episodic/assets/js/site-search.js");
 
 function deferred() {
   let resolve;
@@ -134,7 +134,7 @@ describe("index loading", () => {
   });
 
   test("rejects unsuccessful index requests", async () => {
-    expect(
+    await expect(
       fetchEpisodicSearchIndex("/index.json", {
         MiniSearch: { loadJSON: () => null },
         fetchImpl: async () => ({ ok: false, status: 503 }),
@@ -197,6 +197,9 @@ describe("root event state", () => {
     await settle();
     expect(dom.list.children).toHaveLength(1);
     expect(dom.list.querySelector("a").tabIndex).toBe(0);
+    expect(dom.input.getAttribute("role")).toBe("combobox");
+    expect(dom.input.getAttribute("aria-controls")).toBe(dom.list.id);
+    expect(dom.list.getAttribute("role")).toBe("listbox");
     expect(dom.meta.textContent).toBe("1 result for “film”.");
     expect(dom.panel.hidden).toBe(false);
     expect(calls).toBe(1);
@@ -264,6 +267,12 @@ describe("root event state", () => {
     expect(secondDown.defaultPrevented).toBe(true);
     expect(boundedDown.defaultPrevented).toBe(true);
     expect(dom.list.children[1].classList.contains("is-active")).toBe(true);
+    expect(dom.list.querySelectorAll('[role="option"]')[1].getAttribute("aria-selected")).toBe(
+      "true",
+    );
+    expect(dom.input.getAttribute("aria-activedescendant")).toBe(
+      dom.list.querySelectorAll('[role="option"]')[1].id,
+    );
 
     const enter = dispatchKey(dom.window, dom.input, "Enter");
     expect(enter.defaultPrevented).toBe(true);
@@ -271,6 +280,8 @@ describe("root event state", () => {
 
     dispatchKey(dom.window, dom.input, "Escape");
     expect(dom.panel.hidden).toBe(true);
+    expect(dom.input.getAttribute("aria-expanded")).toBe("false");
+    expect(dom.input.hasAttribute("aria-activedescendant")).toBe(false);
     dom.input.dispatchEvent(new dom.window.Event("focus"));
     expect(dom.panel.hidden).toBe(false);
     dom.document

@@ -122,7 +122,12 @@
     const listId = list.id || "search-results";
     list.id = listId;
     input.setAttribute("autocomplete", "off");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-controls", listId);
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("role", "combobox");
     input.setAttribute("spellcheck", "false");
+    list.setAttribute("role", "listbox");
 
     let results = [];
     let active = -1;
@@ -144,21 +149,28 @@
 
     const open = () => {
       panel.hidden = false;
+      input.setAttribute("aria-expanded", "true");
     };
 
     const close = () => {
       panel.hidden = true;
-      active = -1;
+      input.setAttribute("aria-expanded", "false");
+      setActive(-1);
     };
 
     const setActive = (index) => {
       active = index;
-      const options = [...list.children];
+      const options = [...list.querySelectorAll('[role="option"]')];
       options.forEach((option, position) => {
         option.classList.toggle("is-active", position === index);
+        option.closest(".search-result")?.classList.toggle("is-active", position === index);
+        option.setAttribute("aria-selected", String(position === index));
       });
       if (index >= 0 && options[index]) {
+        input.setAttribute("aria-activedescendant", options[index].id);
         options[index].scrollIntoView({ block: "nearest" });
+      } else {
+        input.removeAttribute("aria-activedescendant");
       }
     };
 
@@ -298,12 +310,15 @@
   function buildOption(pageDocument, result, index, listId) {
     const item = pageDocument.createElement("li");
     item.className = "search-result";
-    item.id = `${listId}-result-${index}`;
+    item.setAttribute("role", "presentation");
     item.setAttribute("data-result-index", String(index));
 
     const link = pageDocument.createElement("a");
     link.className = "search-result__link";
     link.href = result.sitePath;
+    link.id = `${listId}-option-${index}`;
+    link.setAttribute("aria-selected", "false");
+    link.setAttribute("role", "option");
 
     const kind = pageDocument.createElement("span");
     kind.className = "search-result__kind";

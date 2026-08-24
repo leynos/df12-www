@@ -82,7 +82,9 @@ Every published file therefore has a source elsewhere in the repository:
 | Published under `public/`                  | Comes from                                            |
 | ------------------------------------------ | ----------------------------------------------------- |
 | `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`, `*/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `assets/site.css`                          | Tailwind compiling `src/styles/`                      |
+| `mxd/assets/tailwind.css`                  | Tailwind compiling `src/styles/`                      |
+| `episodic/assets/styles/tailwind.css`      | Tailwind compiling `src/styles/`                      |
 | `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
 | `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
 | everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |

@@ -8,8 +8,10 @@ extension guidance belongs in the [developers' guide](developers-guide.md).
 
 ## 1. Where to start
 
-If you are trying to do something with the system, begin with the document
-that matches the task:
+For any task, begin with the document that matches it:
+
+Example: to verify a fresh checkout, start with [Getting started](/episodic/docs/getting-started/)
+and expect the local site to serve on `http://127.0.0.1:8080/episodic/`.
 
 | Task | Read |
 | ---- | ---- |
@@ -53,5 +55,5 @@ Do not assume the following are available just because they are designed:
 - approval flows are not part of the current contract, and
 - the system stops at the draft and evaluation surfaces documented above.
 
-If you need implementation detail rather than usage guidance, switch to the
-[developers' guide](developers-guide.md) or the relevant design document.
+For implementation detail rather than usage guidance, switch to the
+[developers' guide](developers-guide.md) or the [df12 Pages App Design](df12-pages-app-design.md).

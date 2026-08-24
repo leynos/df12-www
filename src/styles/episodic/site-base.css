@@ -12,7 +12,7 @@
  */
 
 @font-face {
-  font-family: "Economica";
+  font-family: Economica;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -155,7 +155,7 @@ body {
   font-family: var(--font-sans);
   font-size: 1.05rem;
   line-height: 1.6;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
 }
 
 h1,

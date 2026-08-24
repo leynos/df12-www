@@ -12,7 +12,7 @@
  * preflight would strip the list markers and heading rhythm the content
  * pages rely on.
  *
- * Layering: the partials sit in the components layer, so a Tailwind utility
+ * Layering: the partials sit in the base layer, so a Tailwind utility
  * in a template always wins over a semantic class on the same element.
  * Partial order preserves the old link order - motifs before the component
  * sheets, so a component rule of equal specificity wins over the motif
@@ -25,11 +25,11 @@
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
 @import "./episodic/site-base.css" layer(base);
-@import "./episodic/motifs.css" layer(components);
-@import "./episodic/chrome.css" layer(components);
+@import "./episodic/motifs.css" layer(base);
+@import "./episodic/chrome.css" layer(base);
 @import "./episodic/marks.css" layer(components);
 @import "./episodic/shell.css" layer(components);
-@import "./episodic/content.css" layer(components);
+@import "./episodic/content.css" layer(base);
 @import "./episodic/records.css" layer(components);
 @import "./episodic/tables.css" layer(components);
 @import "./episodic/reference.css" layer(components);

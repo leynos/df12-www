@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import contextlib
 import difflib
+import fcntl
 import json
 import math
 import os
@@ -35,6 +36,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 import typing as typ
 import urllib.error
@@ -63,6 +65,11 @@ MAX_NODES = 8000
 # indefinitely. Matches the timeout the css-view and Playwright probes in
 # tests/ already use for the same tools.
 TOOL_TIMEOUT_SECONDS = 90
+
+# How long to wait for another run to finish starting its server. A healthy
+# start takes under a second, so anything near this means the holder was
+# killed mid-start rather than that it is merely slow.
+STARTUP_LOCK_TIMEOUT_SECONDS = 30
 
 app = cyclopts.App(
     name="weaver-snapshot",
@@ -124,6 +131,229 @@ def _slug(page: str) -> str:
     return page.strip("/").replace("_", "_u").replace("/", "__") or "__home"
 
 
+def _lock_path(port: int) -> Path:
+    """Name the lock file guarding one port's startup.
+
+    It sits in the system temp directory rather than in the repository,
+    because the runs that contend are typically in different worktrees. The
+    port is what they share, so the port is what the name is keyed on — and
+    the user id too, since a shared ``/tmp`` is sticky and another user's file
+    could not be opened for writing. Two users racing for one port are left to
+    the bind probe, which catches them whoever owns the lock file.
+
+    Parameters
+    ----------
+    port
+        TCP port the lock guards.
+
+    Returns
+    -------
+    Path
+        The lock file's path. It is created on demand and left behind; the
+        lock is the ``flock`` on it, not the file's existence.
+    """
+    return Path(tempfile.gettempdir()) / f"weaver-snapshot-{os.getuid()}-{port}.lock"
+
+
+@contextlib.contextmanager
+def _startup_lock(port: int) -> cabc.Iterator[None]:
+    """Hold an exclusive lock on a port's startup for the duration.
+
+    Probing a port and then spawning a server on it is check-then-act: two
+    runs can both find the port free, both spawn, and one then answer the
+    other's readiness poll. The loser would snapshot the winner's ``public/``
+    and report the diff as its own work — and because the ports are fixed
+    defaults, two worktrees collide by default rather than by bad luck.
+
+    Serializing probe and spawn behind one lock removes the interleaving
+    rather than narrowing it: the second run reaches the probe only once the
+    first is already serving, and is then refused with the ordinary
+    port-in-use message rather than racing. The lock is released as soon as
+    the server answers, so it covers startup and not the capture, which takes
+    minutes.
+
+    ``flock`` is advisory and POSIX-only, which suits both facts here: the
+    only processes that need to co-operate are other runs of this script, and
+    the repository's tooling is POSIX throughout.
+
+    Parameters
+    ----------
+    port
+        TCP port whose startup is being serialized.
+
+    Yields
+    ------
+    None
+        With the lock held.
+
+    Raises
+    ------
+    SystemExit
+        If the lock is still held after :data:`STARTUP_LOCK_TIMEOUT_SECONDS`,
+        which means another run has been starting for far longer than a
+        healthy start takes.
+    """
+    path = _lock_path(port)
+    with path.open("w", encoding="utf-8") as handle:
+        deadline = time.monotonic() + STARTUP_LOCK_TIMEOUT_SECONDS
+        while True:
+            try:
+                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except OSError as exc:
+                if time.monotonic() >= deadline:
+                    message = (
+                        f"another run has held the startup lock for port {port} "
+                        f"({path}) for over {STARTUP_LOCK_TIMEOUT_SECONDS}s; "
+                        f"it may have been killed mid-start. Pass --port, or "
+                        f"remove the lock file if no run is active."
+                    )
+                    raise SystemExit(message) from exc
+                time.sleep(0.05)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle, fcntl.LOCK_UN)
+
+
+def _refuse_occupied_port(port: int) -> None:
+    """Exit rather than serve on a port somebody else already holds.
+
+    ``http-server`` exits 1 when it cannot bind, but the readiness poll would
+    then connect to the *pre-existing* server and take it for the one just
+    spawned. Probing first makes that deterministic for a foreign server;
+    :func:`_startup_lock` makes it deterministic for another run of this
+    script, which the probe alone cannot do.
+
+    Parameters
+    ----------
+    port
+        TCP port to test.
+
+    Raises
+    ------
+    SystemExit
+        If the port cannot be bound.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        try:
+            probe.bind(("127.0.0.1", port))
+        except OSError as exc:
+            message = (
+                f"port {port} is already in use, so the snapshot would capture "
+                f"whatever is being served there rather than this worktree's "
+                f"public/ ({exc}). Stop that server, or pass --port."
+            )
+            raise SystemExit(message) from exc
+
+
+def _await_server(server: subprocess.Popen[bytes], base: str, port: int) -> None:
+    """Wait until the spawned server answers, and confirm it is the one that did.
+
+    Parameters
+    ----------
+    server
+        The freshly spawned ``http-server`` process.
+    base
+        The origin it should be listening on.
+    port
+        The port, for the messages.
+
+    Raises
+    ------
+    SystemExit
+        If the child exits while starting, if it does not answer within
+        roughly ten seconds, or if it is no longer running once something on
+        its port has answered — in which case the answer came from something
+        else, and this run must not snapshot it.
+    """
+    # Poll rather than sleeping a fixed interval, so a slow start does not
+    # silently yield a directory full of failed captures.
+    for _ in range(50):
+        # A server that has already exited will never answer, and anything
+        # that does answer on its port is not it.
+        if (status := server.poll()) is not None:
+            message = (
+                f"http-server exited with status {status} while starting on "
+                f"port {port}; it may have lost a race to bind it"
+            )
+            raise SystemExit(message)
+        try:
+            with urllib.request.urlopen(f"{base}/weaver/", timeout=1):  # noqa: S310 - literal loopback URL
+                break
+        except (urllib.error.URLError, OSError):
+            time.sleep(0.2)
+    else:
+        message = f"http-server did not come up on port {port}"
+        raise SystemExit(message)
+
+    # The request succeeded, but that alone does not say who answered it. If
+    # the child has exited by now, something else on the port did, and the
+    # capture would silently be of that.
+    if (status := server.poll()) is not None:
+        message = (
+            f"port {port} answered, but this run's http-server had already "
+            f"exited with status {status}; the reply came from another server"
+        )
+        raise SystemExit(message)
+
+
+def _stop(server: subprocess.Popen[bytes]) -> None:
+    """Stop a served process, escalating if it will not stand down.
+
+    Parameters
+    ----------
+    server
+        The process to stop.
+    """
+    server.terminate()
+    try:
+        server.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        # A server that will not stand down still holds the port, and the
+        # next run's bind probe would refuse to start because of it.
+        server.kill()
+        with contextlib.suppress(subprocess.TimeoutExpired):
+            server.wait(timeout=10)
+
+
+def _start_server(port: int) -> subprocess.Popen[bytes]:
+    """Acquire the port and return a server already answering on it.
+
+    Parameters
+    ----------
+    port
+        TCP port to listen on.
+
+    Returns
+    -------
+    subprocess.Popen
+        The running server. The caller owns stopping it.
+
+    Raises
+    ------
+    SystemExit
+        If the startup lock cannot be taken, the port is occupied, or the
+        server does not come up as itself.
+    """
+    with _startup_lock(port):
+        _refuse_occupied_port(port)
+        server = subprocess.Popen(  # noqa: S603 - fixed argv, no shell, no user input
+            [str(HTTP_SERVER), "public", "-p", str(port), "-c-1", "--silent"],
+            cwd=REPO_ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        try:
+            _await_server(server, f"http://127.0.0.1:{port}", port)
+        except BaseException:
+            # Otherwise a failed start leaves a child holding the port, and
+            # the next run's probe refuses to start because of it.
+            _stop(server)
+            raise
+        return server
+
+
 @contextlib.contextmanager
 def _served(port: int) -> cabc.Iterator[str]:
     """Serve ``public/`` locally for the duration of the context.
@@ -141,75 +371,19 @@ def _served(port: int) -> cabc.Iterator[str]:
     Raises
     ------
     SystemExit
-        If the port is already occupied, if the server exits while starting,
+        If the server binary is absent, if another run holds the startup lock,
+        if the port is already occupied, if the server exits while starting,
         or if it does not accept connections within roughly ten seconds.
     """
     if not HTTP_SERVER.is_file():
         message = "node_modules/.bin/http-server is missing; run 'bun install'"
         raise SystemExit(message)
 
-    # Refuse a port somebody else is already serving.
-    #
-    # `http-server` exits 1 when it cannot bind, but the poll below would then
-    # connect to the *pre-existing* server and take it for the one just
-    # spawned — silently snapshotting another worktree's `public/` and
-    # reporting the diff as this branch's work. The ports are fixed defaults,
-    # so two worktrees collide by default rather than by bad luck.
-    #
-    # Checking `server.poll()` alone would not close this: node needs about a
-    # hundred milliseconds to start and fail its bind, and the first request
-    # can be answered by the squatter before the child has exited. Probing
-    # first makes the common case deterministic; the liveness check below
-    # still catches anything that claims the port in between.
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
-        try:
-            probe.bind(("127.0.0.1", port))
-        except OSError as exc:
-            message = (
-                f"port {port} is already in use, so the snapshot would capture "
-                f"whatever is being served there rather than this worktree's "
-                f"public/ ({exc}). Stop that server, or pass --port."
-            )
-            raise SystemExit(message) from exc
-
-    base = f"http://127.0.0.1:{port}"
-    server = subprocess.Popen(  # noqa: S603 - fixed argv, no shell, no user input
-        [str(HTTP_SERVER), "public", "-p", str(port), "-c-1", "--silent"],
-        cwd=REPO_ROOT,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    server = _start_server(port)
     try:
-        # Poll rather than sleeping a fixed interval, so a slow start does not
-        # silently yield a directory full of failed captures.
-        for _ in range(50):
-            # A server that has already exited will never answer, and anything
-            # that does answer on its port is not it.
-            if (status := server.poll()) is not None:
-                message = (
-                    f"http-server exited with status {status} while starting on "
-                    f"port {port}; it may have lost a race to bind it"
-                )
-                raise SystemExit(message)
-            try:
-                with urllib.request.urlopen(f"{base}/weaver/", timeout=1):  # noqa: S310 - literal loopback URL
-                    break
-            except (urllib.error.URLError, OSError):
-                time.sleep(0.2)
-        else:
-            message = f"http-server did not come up on port {port}"
-            raise SystemExit(message)
-        yield base
+        yield f"http://127.0.0.1:{port}"
     finally:
-        server.terminate()
-        try:
-            server.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            # A server that will not stand down still holds the port, and the
-            # next run's bind probe would refuse to start because of it.
-            server.kill()
-            with contextlib.suppress(subprocess.TimeoutExpired):
-                server.wait(timeout=10)
+        _stop(server)
 
 
 def _prepare_output_dir(out_dir: Path, suffix: str) -> Path:

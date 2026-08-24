@@ -9,6 +9,8 @@ regression is normalized away and ships.
 
 from __future__ import annotations
 
+import contextlib
+import fcntl
 import importlib.util
 import json
 import os
@@ -23,6 +25,11 @@ if typ.TYPE_CHECKING:
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# Stands in for whatever goes wrong between taking the startup lock and the
+# server answering. Named here so the `pytest.raises` block stays one
+# statement, which is what makes it assert on that statement alone.
+_MID_START_FAILURE = "the port was occupied"
 
 # The harness is a script rather than a package module, so it is loaded by
 # path rather than imported by name.
@@ -738,4 +745,152 @@ def test_a_missing_snapshot_exits_rather_than_raising_oserror(tmp_path: Path) ->
 
     assert str(absent) in str(caught.value.code), (
         f"the message should name the file; got {caught.value.code!r}"
+    )
+
+
+def _lock_on(
+    monkeypatch: pytest.MonkeyPatch, lock: Path, *, timeout: float = 0.2
+) -> None:
+    """Point the startup lock at a scratch file and shorten its wait."""
+    monkeypatch.setattr(weaver_snapshot, "_lock_path", lambda _port: lock)
+    monkeypatch.setattr(weaver_snapshot, "STARTUP_LOCK_TIMEOUT_SECONDS", timeout)
+
+
+def test_the_startup_lock_is_exclusive(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Two runs must not both get past the probe and both spawn a server."""
+    lock = tmp_path / "port.lock"
+    _lock_on(monkeypatch, lock)
+
+    # A second open file description on the same file is what a concurrent run
+    # would have, so `flock` treats it as one.
+    with (
+        weaver_snapshot._startup_lock(8099),
+        pytest.raises(SystemExit) as caught,
+        weaver_snapshot._startup_lock(8099),
+    ):
+        pass  # pragma: no cover - the lock must not be granted twice
+
+    message = str(caught.value.code)
+    assert "8099" in message, f"the message should name the port; got {message!r}"
+    assert str(lock) in message, f"the message should name the lock; got {message!r}"
+
+
+def test_the_startup_lock_is_released_when_the_run_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A run that exits mid-start must not leave the next one waiting it out."""
+    lock = tmp_path / "port.lock"
+    _lock_on(monkeypatch, lock)
+
+    with pytest.raises(RuntimeError), weaver_snapshot._startup_lock(8099):
+        raise RuntimeError(_MID_START_FAILURE)
+
+    # The lock must be free now, or a failed run would poison the port until
+    # its file was removed by hand.
+    with weaver_snapshot._startup_lock(8099):
+        pass
+
+
+def test_the_lock_file_is_named_for_the_port_and_the_user() -> None:
+    """Two ports must not serialize against each other, nor two users contend."""
+    first = weaver_snapshot._lock_path(8099)
+    second = weaver_snapshot._lock_path(8100)
+
+    assert first != second, f"both ports would serialize on {first}"
+    assert str(os.getuid()) in first.name, (
+        f"a shared /tmp is sticky, so the name needs the uid; got {first.name!r}"
+    )
+
+
+def test_a_server_that_died_before_answering_is_not_taken_for_the_responder() -> None:
+    """Something else answered on the port, and capturing it would be wrong."""
+
+    class _Exited:
+        """A child that answered nothing because it was never alive."""
+
+        def poll(self) -> int:
+            return 1
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot._await_server(_Exited(), "http://127.0.0.1:8099", 8099)
+
+    assert "8099" in str(caught.value.code), (
+        f"the message should name the port; got {caught.value.code!r}"
+    )
+
+
+def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A reply proves something is listening, not that it is this run's server.
+
+    The bind probe and the startup lock make this unreachable between two runs
+    of this script, but nothing stops an unrelated server from claiming the
+    port in the moment between the probe and the spawn. The ownership check is
+    what turns that into a refusal rather than a snapshot of someone else's
+    pages.
+    """
+    replies = iter([None, 0])
+
+    class _DiesAfterReplying:
+        """Alive when asked before the request, exited when asked after it."""
+
+        def poll(self) -> int | None:
+            return next(replies)
+
+    monkeypatch.setattr(
+        weaver_snapshot.urllib.request,
+        "urlopen",
+        lambda *_args, **_kwargs: contextlib.nullcontext(),
+    )
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot._await_server(
+            _DiesAfterReplying(), "http://127.0.0.1:8099", 8099
+        )
+
+    message = str(caught.value.code)
+    assert "another server" in message, (
+        f"the message should say the reply was not this run's; got {message!r}"
+    )
+
+
+def test_the_port_is_probed_with_the_startup_lock_held(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Probing outside the lock is the check-then-act the lock exists to remove.
+
+    If the probe ran before the lock were taken, two runs could still both
+    find the port free and both go on to spawn — the ordering is the whole
+    mechanism, so it is asserted rather than assumed.
+    """
+    lock = tmp_path / "port.lock"
+    monkeypatch.setattr(weaver_snapshot, "_lock_path", lambda _port: lock)
+
+    held: list[bool] = []
+
+    def probe(_port: int) -> None:
+        # An exclusive lock cannot be taken twice, so failing to take it here
+        # is how holding it is observed.
+        with lock.open("r+", encoding="utf-8") as rival:
+            try:
+                fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                held.append(True)
+            else:
+                fcntl.flock(rival, fcntl.LOCK_UN)
+                held.append(False)
+        message = "stop before spawning anything"
+        raise SystemExit(message)
+
+    monkeypatch.setattr(weaver_snapshot, "_refuse_occupied_port", probe)
+
+    with pytest.raises(SystemExit):
+        weaver_snapshot._start_server(8099)
+
+    assert held == [True], (
+        "the port must be probed while the startup lock is held, or two runs "
+        f"can still interleave; observed {held!r}"
     )

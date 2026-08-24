@@ -219,7 +219,7 @@
                         </div>
 
                         <!-- TOML example -->
-                        <div class="bg-neutral p-6 rounded-xs shadow-lg overflow-x-auto border border-base-content/20 mb-8 paper-panel">
+                        <div tabindex="0" class="bg-neutral p-6 rounded-xs shadow-lg overflow-x-auto border border-base-content/20 mb-8 paper-panel">
                             <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
                                 <span class="text-xs font-mono text-base-100/70">weaver.toml</span>
                                 <button type="button" aria-label="Copy to clipboard" class="text-xs text-base-100/70 hover:text-white">{{ icon('copy') }}</button>
@@ -253,7 +253,7 @@ directive = <span class="text-code-string">"force"</span>
                         <p class="mb-4 text-sm text-base-content/80">
                             <code class="font-mono text-xs bg-primary/10 px-1">ortho-config</code> v0.6.0 treats invalid configuration files as fatal. Both the CLI and daemon abort with a <code class="font-mono text-xs bg-primary/10 px-1">LoadConfiguration</code> error that lists every offending path. No silent fallback — fix or remove the reported files.
                         </p>
-                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
+                        <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
                             <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">EXAMPLE ERROR OUTPUT</div>
 <pre class="font-mono text-xs text-code-text leading-relaxed">
 failed to load configuration: multiple configuration errors:
@@ -351,7 +351,7 @@ string "yes", expected a boolean
                         <p class="mb-4 text-sm text-base-content/80">
                             Identifiers are case-insensitive and whitespace-trimmed. Duplicates are resolved by keeping the last directive for each language/capability pair. In TOML, use the <code class="font-mono text-xs bg-primary/10 px-1">[[capability_overrides]]</code> array; from the CLI, repeat <code class="font-mono text-xs bg-primary/10 px-1">--capability-overrides</code>:
                         </p>
-                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-4 paper-panel">
+                        <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-4 paper-panel">
 <pre class="font-mono text-xs text-code-text leading-relaxed">
 <span class="text-base-100/70">$</span> weaver observe get-definition \
     --capability-overrides <span class="text-code-string">"python:observe.call-hierarchy=force"</span> \
@@ -445,7 +445,7 @@ string "yes", expected a boolean
                             </table>
                         </div>
 
-                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto">
+                        <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto">
                             <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">EXAMPLE ENVELOPE</div>
 <pre class="font-mono text-xs text-code-text leading-relaxed">
 {"kind":"stream","stream":"stdout","data":"[{\"uri\":\"file:///src/main.rs\",\"line\":42,\"column\":17}]\n"}
@@ -524,7 +524,7 @@ string "yes", expected a boolean
                         <p class="mb-4 text-sm text-base-content/80">
                             The health file is a single-line JSON document that operators and automation can poll without speaking the daemon protocol. Status transitions: <code class="font-mono text-xs bg-primary/10 px-1">starting</code> &rarr; <code class="font-mono text-xs bg-primary/10 px-1">ready</code> &rarr; <code class="font-mono text-xs bg-primary/10 px-1">stopping</code>.
                         </p>
-                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
+                        <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
                             <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">HEALTH SNAPSHOT</div>
 <pre class="font-mono text-xs text-code-text leading-relaxed">
 {"status":"ready","pid":12345,"timestamp":1713356400}
@@ -658,7 +658,7 @@ string "yes", expected a boolean
                                 </tbody>
                             </table>
                         </div>
-                        <div class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
+                        <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-8 paper-panel">
                             <div class="text-3xs font-mono text-white/55 uppercase tracking-widest mb-2">EXAMPLE MANIFEST</div>
 <pre class="font-mono text-xs text-code-text leading-relaxed">
 name = <span class="text-code-string">"rope"</span>

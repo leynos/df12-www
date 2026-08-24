@@ -37,7 +37,11 @@
 {%- set is_current = (href == current_href) -%}
 {%- set rest = _nav_install if variant == 'install' else _nav_rest -%}
 <a href="{{ href }}" class="{{ _nav_base }} {{ _nav_current if is_current else rest }}"{% if is_current %} aria-current="page"{% endif %}>
-{%- if index %}<span class="mr-2 font-mono text-xs{% if not is_current %} opacity-60{% endif %}">{{ index }}</span> {% elif variant == 'install' and not is_current %}&gt; {% endif -%}
+{#- The index is dimmed on the links that are not current, so the current one
+    reads first. `opacity-60` is as far as that can go: it composited the ink
+    to #708499 on the sidebar's cream, which is 3.33:1 against it and fails AA
+    for 12px text. `opacity-75` gives 4.88:1 and still reads as dimmed. -#}
+{%- if index %}<span class="mr-2 font-mono text-xs{% if not is_current %} opacity-75{% endif %}">{{ index }}</span> {% elif variant == 'install' and not is_current %}&gt; {% endif -%}
 {{ label }}
 </a>
 {%- endmacro -%}

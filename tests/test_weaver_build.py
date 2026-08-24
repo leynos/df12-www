@@ -21,8 +21,6 @@ from __future__ import annotations
 
 import importlib.util
 import re
-import shutil
-import subprocess
 import typing as typ
 from pathlib import Path
 
@@ -82,24 +80,8 @@ RGB_COLOUR = re.compile(r"\brgba?\(")
 STYLING_ATTRIBUTE = re.compile(r"""(?:class|style)\s*=\s*(?:"[^"]*"|'[^']*')""")
 
 
-@pytest.fixture(scope="session")
-def built_site() -> Path:
-    """Build the published tree and return the Weaver sub-site's root.
-
-    Returns
-    -------
-    Path
-        ``public/weaver`` after a successful build.
-    """
-    bun_exe = shutil.which("bun")
-    if not bun_exe:  # pragma: no cover - environment guard
-        message = "Unable to locate 'bun' on PATH"
-        raise FileNotFoundError(message)
-    subprocess.run([bun_exe, "run", "build"], cwd=REPO_ROOT, check=True)  # noqa: S603 - fixed argv, no user input
-    if not PUBLIC_WEAVER.is_dir():  # pragma: no cover - defensive
-        message = f"expected the Weaver sub-site at {PUBLIC_WEAVER}"
-        raise FileNotFoundError(message)
-    return PUBLIC_WEAVER
+# `built_site` is a session fixture in tests/conftest.py, shared with
+# tests/test_weaver_browser.py so the build runs once for both.
 
 
 def _weaver_sources() -> list[Path]:

@@ -227,7 +227,7 @@
 
                         <!-- Code Block -->
                         <div class="bg-neutral rounded-xs p-1 shadow-lg border border-dashed border-base-content/30 opacity-80">
-                            <div class="bg-code-surface p-4 rounded-xs overflow-x-auto">
+                            <div tabindex="0" class="bg-code-surface p-4 rounded-xs overflow-x-auto">
                                 <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
                                     <span class="text-xs font-mono text-base-100/70">weaver.policy.yaml (illustrative)</span>
                                     <div class="flex gap-1">
@@ -275,7 +275,7 @@
                                 <p class="text-sm text-base-content/88 mb-4">
                                     The daemon uses a <code class="text-xs bg-primary/10 px-1">kind</code>-based JSONL envelope on the wire, but the CLI strips that wrapper before printing. In JSON mode it forwards the inner payload verbatim; in human mode it renders recognised diagnostics with source context.
                                 </p>
-                                <div class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
+                                <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
 <pre class="text-code-text">
 <span class="token-cmd">$</span> <span class="token-arg">weaver verify diagnostics --output json --uri file:///src/lib.rs</span>
 
@@ -296,7 +296,7 @@
                                 <p class="text-sm text-base-content/88 mb-4">
                                     Point at a file URI to pull every diagnostic the language server reports. Human-readable output is the default when stdout is a TTY, so recognised diagnostics render with source context instead of raw JSON.
                                 </p>
-                                <div class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
+                                <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 font-mono text-xs overflow-x-auto">
 <pre class="text-code-text">
 <span class="token-cmd">$</span> <span class="token-arg">weaver verify diagnostics --uri file:///src/lib.rs</span>
 

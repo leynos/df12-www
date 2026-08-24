@@ -895,8 +895,44 @@ def _normalize(
     return normalized
 
 
+def _rendered_tree(payload: dict[str, typ.Any]) -> str:
+    """Render a parsed snapshot's tree as stable, comparable text.
+
+    Kept free of I/O, so the normalization and its serialization can be
+    exercised on a literal payload rather than a file on disk.
+
+    Parameters
+    ----------
+    payload
+        A parsed ``css-view`` snapshot document.
+
+    Returns
+    -------
+    str
+        Pretty-printed JSON with sorted keys, ready to hand to a line differ.
+        The capture envelope — URL, timestamp, browser — is dropped, since it
+        records when the snapshot was taken, not what the page looks like.
+
+    Raises
+    ------
+    KeyError
+        If the document has no ``payload.tree``. :func:`_normalized_tree`
+        converts this into a ``SystemExit`` naming the file.
+    TypeError
+        If either level is not a mapping, for the same reason.
+    """
+    tree = _normalize(payload["payload"]["tree"])
+    return json.dumps(tree, indent=2, sort_keys=True, ensure_ascii=False)
+
+
 def _normalized_tree(snapshot: Path) -> str:
     """Read a snapshot and render its tree as stable, comparable text.
+
+    This is the I/O boundary. A snapshot directory is written by ``capture``
+    but read here by path, so it can be stale, truncated by an interrupted
+    run, or simply not a snapshot at all. Each of those surfaces as a
+    ``SystemExit`` naming the file rather than as a traceback partway through
+    a comparison, where the file at fault is the one thing not on screen.
 
     Parameters
     ----------
@@ -906,13 +942,35 @@ def _normalized_tree(snapshot: Path) -> str:
     Returns
     -------
     str
-        Pretty-printed JSON with sorted keys, ready to hand to a line differ.
-        The capture envelope — URL, timestamp, browser — is dropped, since it
-        records when the snapshot was taken, not what the page looks like.
+        The rendering :func:`_rendered_tree` produces.
+
+    Raises
+    ------
+    SystemExit
+        If the file cannot be read, does not hold valid JSON, or does not have
+        the shape ``css-view`` writes.
     """
-    payload = json.loads(snapshot.read_text(encoding="utf-8"))
-    tree = _normalize(payload["payload"]["tree"])
-    return json.dumps(tree, indent=2, sort_keys=True, ensure_ascii=False)
+    try:
+        text = snapshot.read_text(encoding="utf-8")
+    except OSError as exc:
+        message = f"{snapshot} could not be read ({exc})"
+        raise SystemExit(message) from exc
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        message = (
+            f"{snapshot} is not valid JSON ({exc}); an interrupted capture "
+            f"can leave a partial file behind, so recapture it"
+        )
+        raise SystemExit(message) from exc
+    try:
+        return _rendered_tree(payload)
+    except (KeyError, TypeError) as exc:
+        message = (
+            f"{snapshot} has no payload.tree, so it is not a css-view "
+            f"snapshot ({exc!r})"
+        )
+        raise SystemExit(message) from exc
 
 
 @app.command

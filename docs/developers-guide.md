@@ -469,11 +469,10 @@ sits outside the nav.
 
 `chrome.nav_link(href, index, label, current_href, variant='')` renders one
 sidebar `<a>`. Every link carries the base classes
-`weaver-nav-link block px-4 py-2 text-sm`. When `href` matches
-`current_href`, the macro also sets `aria-current="page"`; a link that is
-not current gets no `aria-current` attribute at all. It then appends one
-further class string, verbatim from `_chrome.jinja`, depending on state and
-`variant`:
+`weaver-nav-link block px-4 py-2 text-sm`. When `href` matches `current_href`,
+the macro also sets `aria-current="page"`; a link that is not current gets no
+`aria-current` attribute at all. It then appends one further class string,
+verbatim from `_chrome.jinja`, depending on state and `variant`:
 
 ```text
 current:  weaver-nav-link--current font-semibold bg-primary text-base-100 rounded-xs border border-base-content shadow-block
@@ -491,11 +490,11 @@ install:  font-medium text-neutral hover:bg-accent/5 transition-colors border bo
 
 _Table 4: the `nav_link` macro's parameters._
 
-`index` also switches how the label is prefixed: a truthy `index` renders it
-in a small monospaced span before the label (dimmed to 60% opacity unless the
-link is current); an empty `index` on the `'install'` variant instead
-prefixes a bare `>` and a space when the link is not current; any other
-combination prefixes nothing.
+`index` also switches how the label is prefixed: a truthy `index` renders it in
+a small monospaced span before the label (dimmed to 60% opacity unless the link
+is current); an empty `index` on the `'install'` variant instead prefixes a bare
+`>` and a space when the link is not current; any other combination prefixes
+nothing.
 
 A typical call site, from `templates/weaver/doc_page.jinja`:
 
@@ -860,32 +859,32 @@ deliberately did.
 dependency-group entry in `pyproject.toml`). Rather than asserting what the
 normalizer in `scripts/weaver_snapshot.py` does to worked-example inputs, it
 asserts invariants that must hold for every input Hypothesis can generate —
-colour notations, style-diff shapes, and walker trees nobody thought to
-write by hand.
+colour notations, style-diff shapes, and walker trees nobody thought to write
+by hand.
 
 Four families of property are checked:
 
 - **Idempotence.** Normalizing an already-normalized colour, shadow, or
-  walker tree changes nothing, since a snapshot is only ever compared
-  against another snapshot.
+  walker tree changes nothing, since a snapshot is only ever compared against
+  another snapshot.
 - **Structure preservation.** Normalizing a walker tree never adds, drops,
   or reorders a node; only the incidental values within it change.
 - **Totality of removal.** Every `--tw-*` custom property is stripped from a
-  style diff, and no transparent shadow layer survives normalization,
-  whatever else the value contains.
+  style diff, and no transparent shadow layer survives normalization, whatever
+  else the value contains.
 - **Injectivity of the slug.** No two distinct page paths produce the same
-  snapshot filename stem, since one capture would otherwise overwrite
-  another and the diff would compare a page against itself. The generated
-  alphabet includes `_`, which is what makes the property able to reach the
-  collision at all: the stem uses `__` as its separator.
+  snapshot filename stem, since one capture would otherwise overwrite another
+  and the diff would compare a page against itself. The generated alphabet
+  includes `_`, which is what makes the property able to reach the collision at
+  all: the stem uses `__` as its separator.
 
 Every test shares a module-level `SETTINGS` object, applied via `@SETTINGS`
-beside each `@given`. It pins `max_examples=200` and sets `deadline=None`,
-and it suppresses Hypothesis's `too_slow` and `data_too_large` health
-checks. This suite runs inside the commit gate (`make test`), where a health
-check flagging one slow-but-valid example, or an unpinned example count
-happening to pick a different case on a different run, would fail the gate
-on a finding rather than a genuine defect.
+beside each `@given`. It pins `max_examples=200` and sets `deadline=None`, and
+it suppresses Hypothesis's `too_slow` and `data_too_large` health checks. This
+suite runs inside the commit gate (`make test`), where a health check flagging
+one slow-but-valid example, or an unpinned example count happening to pick a
+different case on a different run, would fail the gate on a finding rather than
+a genuine defect.
 
 Run just this file:
 

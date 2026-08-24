@@ -20,11 +20,17 @@ carry the artwork themselves and fetch nothing.
 
 from __future__ import annotations
 
+import collections.abc as cabc
 import json
 import sys
+import typing as typ
 from pathlib import Path
 
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, YAMLError
+
+# How a file's text becomes a document. Passing it in rather than branching on
+# the file type keeps the read-and-report path in one place for both inputs.
+type _Parser = cabc.Callable[[str], typ.Any]
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MAPPING = REPO_ROOT / "config" / "weaver-icons.yaml"
@@ -110,8 +116,104 @@ def _resolve(
     return icons[name]["body"]
 
 
-def build_macro() -> str:
-    """Render the icon macro from the mapping and the Carbon package.
+def _read_document(path: Path, parse: _Parser, absent: str) -> typ.Any:  # noqa: ANN401 - the parsers return whatever their document holds
+    """Read and parse one input file, or exit naming it.
+
+    The three ways an input file can fail — absent, unreadable, unparseable —
+    are indistinguishable to the caller once they surface as a bare
+    ``FileNotFoundError`` or ``JSONDecodeError`` several frames up, and none
+    of them names the file. Converting them here means every failure of this
+    script says which file was at fault and, where the fix is known, what to
+    run.
+
+    Parameters
+    ----------
+    path
+        The file to read, as UTF-8 text.
+    parse
+        Turns that text into a document. Raises for malformed input.
+    absent
+        What to tell the operator when the file is not there, beyond its path.
+
+    Returns
+    -------
+    typing.Any
+        Whatever ``parse`` returned.
+
+    Raises
+    ------
+    SystemExit
+        If the file is absent, unreadable, or malformed.
+    """
+    if not path.is_file():
+        message = f"{path} is missing; {absent}"
+        raise SystemExit(message)
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        message = f"{path} could not be read ({exc})"
+        raise SystemExit(message) from exc
+    try:
+        return parse(text)
+    except (json.JSONDecodeError, YAMLError) as exc:
+        message = f"{path} is malformed ({exc})"
+        raise SystemExit(message) from exc
+
+
+def _entry(document: typ.Any, key: str, path: Path) -> dict[str, dict[str, str]]:  # noqa: ANN401 - the documents are untyped upstream data
+    """Pull a required top-level mapping out of a parsed document, or exit.
+
+    The value's shape is checked here rather than left to the first
+    subscript in the renderer, where the failure surfaces as ``'int' object is
+    not subscriptable`` and names neither the key nor the file.
+
+    Parameters
+    ----------
+    document
+        A parsed document, of whatever shape the file happened to hold.
+    key
+        The key the rest of this script needs.
+    path
+        The file the document came from, for the message.
+
+    Returns
+    -------
+    dict
+        The mapping at ``key``.
+
+    Raises
+    ------
+    SystemExit
+        If the document is not a mapping, has no such key, or holds something
+        other than a mapping there.
+    """
+    entry = document.get(key) if isinstance(document, cabc.Mapping) else None
+    if not isinstance(entry, cabc.Mapping):
+        message = f"{path} has no top-level {key!r} mapping; its format has changed"
+        raise SystemExit(message)
+    return dict(entry)
+
+
+def render_macro(
+    icons: dict[str, dict[str, str]],
+    aliases: dict[str, dict[str, str]],
+    mapping: dict[str, dict[str, str]],
+) -> str:
+    """Render the icon macro from data already read and parsed.
+
+    Kept free of I/O so the rendering can be exercised on a handful of
+    literal icons, without a ``node_modules`` tree or a mapping file.
+
+    Parameters
+    ----------
+    icons
+        The Carbon package's ``icons`` mapping, keyed by icon name.
+    aliases
+        The Carbon package's ``aliases`` mapping, each entry naming a
+        ``parent``.
+    mapping
+        The Font Awesome to Carbon mapping, keyed by Font Awesome name, each
+        entry carrying a ``carbon`` name.
 
     Returns
     -------
@@ -120,20 +222,11 @@ def build_macro() -> str:
 
     Raises
     ------
-    SystemExit
-        If the Carbon package is absent, with the command that installs it.
+    KeyError
+        If a mapped Carbon name is neither an icon nor an alias, or an alias
+        chain loops. :func:`build_macro` converts this into a ``SystemExit``
+        naming the mapping file.
     """
-    if not CARBON.is_file():
-        message = f"{CARBON} is missing; run 'bun install'"
-        raise SystemExit(message)
-
-    package = json.loads(CARBON.read_text(encoding="utf-8"))
-    icons = package["icons"]
-    aliases = package.get("aliases", {})
-
-    yaml = YAML(typ="safe")
-    mapping = yaml.load(MAPPING.read_text(encoding="utf-8"))["icons"]
-
     entries = []
     for fa_name in sorted(mapping):
         carbon = mapping[fa_name]["carbon"].removeprefix("carbon:")
@@ -145,6 +238,43 @@ def build_macro() -> str:
 
     footer = FOOTER.replace("__SVG__", f"{_SVG_CLASS} {_SVG_ATTRS}")
     return HEADER + "\n".join(entries) + "\n" + footer
+
+
+def build_macro() -> str:
+    """Read the mapping and the Carbon package, and render the icon macro.
+
+    This is the I/O boundary: everything that can fail because of the
+    filesystem or a malformed input fails here, as a ``SystemExit`` naming the
+    file. :func:`render_macro` does the rendering and touches nothing.
+
+    Returns
+    -------
+    str
+        The complete contents of ``templates/weaver/_icons.jinja``.
+
+    Raises
+    ------
+    SystemExit
+        If either input file is absent, unreadable, malformed, or has lost the
+        top-level key this script reads; or if the mapping names a Carbon icon
+        the package does not define.
+    """
+    package = _read_document(CARBON, json.loads, "run 'bun install'")
+    icons = _entry(package, "icons", CARBON)
+    aliases = package.get("aliases", {})
+
+    yaml = YAML(typ="safe")
+    mapping = _entry(
+        _read_document(MAPPING, yaml.load, "it is tracked, so restore it"),
+        "icons",
+        MAPPING,
+    )
+
+    try:
+        return render_macro(icons, aliases, mapping)
+    except KeyError as exc:
+        message = f"{MAPPING} names a Carbon icon the package does not define: {exc}"
+        raise SystemExit(message) from exc
 
 
 def main() -> int:
@@ -166,18 +296,27 @@ def main() -> int:
     Raises
     ------
     SystemExit
-        Propagated from ``build_macro`` if the Carbon package is absent.
-    OSError
-        If reading or writing ``OUTPUT`` fails, for example because of
-        permissions, a read-only tree, or a full disk.
+        Propagated from ``build_macro`` when an input file is absent,
+        unreadable, malformed, or names an icon the package lacks; and raised
+        here when reading or writing ``OUTPUT`` fails, for example because of
+        permissions, a read-only tree, or a full disk. Every message names the
+        file at fault.
     """
     macro = build_macro()
-    current = OUTPUT.read_text(encoding="utf-8") if OUTPUT.exists() else ""
-    if macro != current:
-        OUTPUT.write_text(macro, encoding="utf-8")
-        sys.stdout.write("_icons.jinja updated\n")
-    else:
+    try:
+        current = OUTPUT.read_text(encoding="utf-8") if OUTPUT.exists() else ""
+    except OSError as exc:
+        message = f"{OUTPUT} could not be read ({exc})"
+        raise SystemExit(message) from exc
+    if macro == current:
         sys.stdout.write("_icons.jinja unchanged\n")
+        return 0
+    try:
+        OUTPUT.write_text(macro, encoding="utf-8")
+    except OSError as exc:
+        message = f"{OUTPUT} could not be written ({exc})"
+        raise SystemExit(message) from exc
+    sys.stdout.write("_icons.jinja updated\n")
     return 0
 
 

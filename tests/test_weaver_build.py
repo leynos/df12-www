@@ -23,7 +23,11 @@ import importlib.util
 import re
 import shutil
 import subprocess
+import typing as typ
 from pathlib import Path
+
+if typ.TYPE_CHECKING:
+    from types import ModuleType
 
 import pytest
 
@@ -208,14 +212,9 @@ def test_styling_attribute_matches_either_quote_style(
     assert bool(STYLING_ATTRIBUTE.search(markup)) is is_styling
 
 
-def test_generated_icon_macro_matches_its_source() -> None:
-    """The committed icon macro should be what the generator produces.
-
-    ``templates/weaver/_icons.jinja`` is generated from
-    ``config/weaver-icons.yaml`` and the ``@iconify-json/carbon`` package. A
-    hand-edit there, or a mapping change without a regeneration, would survive
-    unnoticed otherwise.
-    """
+@pytest.fixture(scope="module")
+def generator() -> ModuleType:
+    """Load the icon generator, which is a script rather than an importable module."""
     spec = importlib.util.spec_from_file_location(
         "generate_weaver_icons", REPO_ROOT / "scripts" / "generate_weaver_icons.py"
     )
@@ -223,9 +222,19 @@ def test_generated_icon_macro_matches_its_source() -> None:
     assert spec.loader is not None, (
         "spec for generate_weaver_icons has no loader; it cannot be executed"
     )
-    generator = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(generator)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
+
+def test_generated_icon_macro_matches_its_source(generator: ModuleType) -> None:
+    """The committed icon macro should be what the generator produces.
+
+    ``templates/weaver/_icons.jinja`` is generated from
+    ``config/weaver-icons.yaml`` and the ``@iconify-json/carbon`` package. A
+    hand-edit there, or a mapping change without a regeneration, would survive
+    unnoticed otherwise.
+    """
     if not generator.CARBON.is_file():  # pragma: no cover - environment guard
         pytest.skip("@iconify-json/carbon is not installed; run 'bun install'")
 
@@ -313,4 +322,126 @@ def test_subresource_pattern_distinguishes_fetches_from_links(
     verdict = "remote" if is_remote else "local"
     assert bool(SUBRESOURCE.search(markup)) is is_remote, (
         f"expected SUBRESOURCE to read this as {verdict}: {markup}"
+    )
+
+
+def test_the_icon_macro_renders_from_data_without_reading_a_file(
+    generator: ModuleType,
+) -> None:
+    """The rendering is pure, so a handful of literal icons is enough to check it."""
+    macro = generator.render_macro(
+        {
+            "terminal": {"body": "<path d='M0 0'/>"},
+            "star": {"body": "<path d='M1 1'/>"},
+        },
+        {"asterisk": {"parent": "star"}},
+        {
+            "fa-terminal": {"carbon": "carbon:terminal"},
+            "fa-star": {"carbon": "carbon:asterisk"},
+        },
+    )
+
+    assert "'terminal': '<path d=\\'M0 0\\'/>'" in macro, (
+        f"the mapped icon should carry its escaped body; got {macro!r}"
+    )
+    assert "'star': '<path d=\\'M1 1\\'/>'" in macro, (
+        f"an alias should resolve to its parent's body; got {macro!r}"
+    )
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        pytest.param(("{ not json", None, "malformed"), id="carbon-malformed"),
+        pytest.param(('{"aliases": {}}', None, "'icons'"), id="carbon-no-icons"),
+        pytest.param((None, "icons: [1, 2]", "'icons'"), id="mapping-not-a-mapping"),
+        pytest.param(
+            (None, "not: a mapping of icons", "'icons'"), id="mapping-no-icons"
+        ),
+    ],
+)
+def test_an_unusable_generator_input_names_the_file(
+    generator: ModuleType,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    case: tuple[str | None, str | None, str],
+) -> None:
+    """A traceback out of json or ruamel names neither the file nor the fix."""
+    carbon, mapping, expected = case
+    carbon_path = tmp_path / "icons.json"
+    carbon_path.write_text(carbon or '{"icons": {}}', encoding="utf-8")
+    mapping_path = tmp_path / "weaver-icons.yaml"
+    mapping_path.write_text(mapping or "icons: {}", encoding="utf-8")
+    monkeypatch.setattr(generator, "CARBON", carbon_path)
+    monkeypatch.setattr(generator, "MAPPING", mapping_path)
+
+    with pytest.raises(SystemExit) as caught:
+        generator.build_macro()
+
+    message = str(caught.value.code)
+    at_fault = carbon_path if carbon is not None else mapping_path
+    assert str(at_fault) in message, (
+        f"the message should name {at_fault}; got {message!r}"
+    )
+    assert expected in message, f"expected {expected!r} in {message!r}"
+
+
+def test_an_absent_carbon_package_names_the_command_that_installs_it(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The one failure with a known fix should say what the fix is."""
+    monkeypatch.setattr(generator, "CARBON", tmp_path / "absent.json")
+
+    with pytest.raises(SystemExit) as caught:
+        generator.build_macro()
+
+    assert "bun install" in str(caught.value.code), (
+        f"the message should name the fix; got {caught.value.code!r}"
+    )
+
+
+def test_an_unmapped_carbon_icon_names_the_mapping(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A mapping naming an icon the package lacks is an editing mistake, not a crash."""
+    carbon_path = tmp_path / "icons.json"
+    carbon_path.write_text('{"icons": {"terminal": {"body": ""}}}', encoding="utf-8")
+    mapping_path = tmp_path / "weaver-icons.yaml"
+    mapping_path.write_text(
+        "icons:\n  fa-ghost:\n    carbon: carbon:no-such-icon\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(generator, "CARBON", carbon_path)
+    monkeypatch.setattr(generator, "MAPPING", mapping_path)
+
+    with pytest.raises(SystemExit) as caught:
+        generator.build_macro()
+
+    message = str(caught.value.code)
+    assert str(mapping_path) in message, (
+        f"the message should name the mapping; got {message!r}"
+    )
+    assert "no-such-icon" in message, f"expected the icon named in {message!r}"
+
+
+def test_an_unwritable_output_reports_the_path_rather_than_an_oserror(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """`main` is the CLI boundary, so its filesystem failures exit with a message."""
+    carbon_path = tmp_path / "icons.json"
+    carbon_path.write_text('{"icons": {}}', encoding="utf-8")
+    mapping_path = tmp_path / "weaver-icons.yaml"
+    mapping_path.write_text("icons: {}", encoding="utf-8")
+    # A directory cannot be opened for writing, so this fails without needing
+    # permissions the test suite may or may not be able to change.
+    output = tmp_path / "_icons.jinja"
+    output.mkdir()
+    monkeypatch.setattr(generator, "CARBON", carbon_path)
+    monkeypatch.setattr(generator, "MAPPING", mapping_path)
+    monkeypatch.setattr(generator, "OUTPUT", output)
+
+    with pytest.raises(SystemExit) as caught:
+        generator.main()
+
+    assert str(output) in str(caught.value.code), (
+        f"the message should name the output; got {caught.value.code!r}"
     )

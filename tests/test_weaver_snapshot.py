@@ -678,3 +678,64 @@ def test_the_snapshot_port_refuses_to_borrow_someone_else_s_server() -> None:
     assert str(port) in str(caught.value.code), (
         f"the message should name the occupied port; got {caught.value.code!r}"
     )
+
+
+def test_a_parsed_snapshot_renders_without_touching_the_filesystem() -> None:
+    """The rendering is pure, so it can be checked on a literal payload."""
+    payload = {
+        "meta": {"url": "http://127.0.0.1:8099/weaver/", "browser": "chromium"},
+        "payload": {
+            "tree": {
+                "tag": "html",
+                "styleDiff": {"--tw-ring-color": "rgb(1, 2, 3)", "color": "#ffffff"},
+                "children": [],
+            }
+        },
+    }
+    rendered = weaver_snapshot._rendered_tree(payload)
+
+    assert "--tw-ring-color" not in rendered, (
+        f"the Tailwind internal survived into {rendered!r}"
+    )
+    assert "chromium" not in rendered, (
+        "the capture envelope records when a snapshot was taken, not what the "
+        f"page looks like, so it must not reach the diff; got {rendered!r}"
+    )
+
+
+@pytest.mark.parametrize(
+    ("content", "expected"),
+    [
+        pytest.param("{ not json", "not valid JSON", id="truncated"),
+        pytest.param('{"payload": {}}', "payload.tree", id="wrong-shape"),
+        pytest.param('{"payload": null}', "payload.tree", id="null-payload"),
+        pytest.param("[]", "payload.tree", id="not-a-mapping"),
+    ],
+)
+def test_an_unusable_snapshot_names_the_file_it_came_from(
+    tmp_path: Path, content: str, expected: str
+) -> None:
+    """A traceback partway through a diff hides the one thing needed: which file."""
+    snapshot = tmp_path / "install.json"
+    snapshot.write_text(content, encoding="utf-8")
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot._normalized_tree(snapshot)
+
+    message = str(caught.value.code)
+    assert str(snapshot) in message, (
+        f"the message should name the file; got {message!r}"
+    )
+    assert expected in message, f"expected {expected!r} in {message!r}"
+
+
+def test_a_missing_snapshot_exits_rather_than_raising_oserror(tmp_path: Path) -> None:
+    """`diff` guards the candidate but reads the baseline by glob, not by check."""
+    absent = tmp_path / "gone.json"
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot._normalized_tree(absent)
+
+    assert str(absent) in str(caught.value.code), (
+        f"the message should name the file; got {caught.value.code!r}"
+    )

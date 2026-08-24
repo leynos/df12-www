@@ -95,6 +95,21 @@ def _page_paths() -> list[str]:
 def _slug(page: str) -> str:
     """Turn a page path into a filename stem.
 
+    The mapping has to be injective, because two pages sharing a stem would
+    have one capture silently overwrite the other and the diff would then
+    compare a page against itself. The pages come from the published tree, so
+    a directory named with an underscore is an ordinary thing to find there,
+    and a naive ``"/" -> "__"`` is not injective over such names: ``a/b`` and
+    ``a__b`` both flatten to ``a__b``.
+
+    So ``_`` introduces an escape and the character after it says which:
+    ``__`` is a separator and ``_u`` is a literal underscore. Reading the stem
+    left to right recovers the path unambiguously, which is what makes the
+    collision impossible rather than merely unlikely. The home page's stem is
+    ``__home`` for the same reason — a bare ``home`` would collide with a page
+    at ``home/``, and no path can produce a leading ``__`` because the leading
+    separator is stripped first.
+
     Parameters
     ----------
     page
@@ -103,10 +118,10 @@ def _slug(page: str) -> str:
     Returns
     -------
     str
-        A flat, filesystem-safe stem: ``"home"`` for the home page and
+        A flat, filesystem-safe stem: ``"__home"`` for the home page and
         ``"commands__act"`` for the example above.
     """
-    return page.strip("/").replace("/", "__") or "home"
+    return page.strip("/").replace("_", "_u").replace("/", "__") or "__home"
 
 
 @contextlib.contextmanager

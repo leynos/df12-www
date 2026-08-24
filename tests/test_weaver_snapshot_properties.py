@@ -263,7 +263,20 @@ def test_normalization_does_not_touch_its_argument(
     assert node == before, "normalization mutated the tree it was given"
 
 
-@given(st.lists(st.text(alphabet="abc/", max_size=8), min_size=2, max_size=6))
+# `_` earns its place in the alphabet: the slug uses `__` as its separator, so
+# a page whose directory name contains an underscore is exactly the input that
+# can collide with a nested one. `abc/` alone never generates that case, and a
+# strategy that cannot produce the collision cannot rule it out.
+#
+# The two literals cover the other way a stem can be claimed twice: the home
+# page has a sentinel stem, and a real page at that path would collide with it.
+page_paths = st.one_of(
+    st.text(alphabet="abc/_", max_size=8),
+    st.sampled_from(["home", "__home", "_uhome"]),
+)
+
+
+@given(st.lists(page_paths, min_size=2, max_size=6))
 @SETTINGS
 def test_distinct_pages_never_share_a_snapshot_filename(pages: list[str]) -> None:
     """Two pages sharing a slug would silently overwrite each other's capture."""

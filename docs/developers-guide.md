@@ -7,9 +7,9 @@ hand-crafted files are separated, how the Pygments syntax highlighting for the
 Episodic, Netsuke, and Stilyagi sub-sites is generated, the shared Jinja
 macros and the
 component classes they pair with, the convention used for browser-side
-components, the cascade quirks introduced by the Netsuke sub-site's
-use of the Tailwind Play content delivery network (CDN), and how accessibility
-is checked. It does not restate deployment or OpenTofu guidance, which lives in
+components, the cascade quirks introduced by the Netsuke sub-site's use of the
+Tailwind Play content delivery network (CDN), and how accessibility is checked.
+It does not restate deployment or OpenTofu guidance, which lives in
 [`AGENTS.md`](../AGENTS.md).
 
 For the shape of the repository, see [Repository layout](repository-layout.md).
@@ -450,8 +450,7 @@ It reports `_icons.jinja updated` or `_icons.jinja unchanged`, the same
 idempotence contract as the Pygments generators. A drift test in the suite
 fails if the committed macro does not match what the generator would produce
 from the current mapping, so `templates/weaver/_icons.jinja` must never be
-hand-edited — change `config/weaver-icons.yaml` and rerun the generator
-instead.
+hand-edited — change `config/weaver-icons.yaml` and rerun the generator instead.
 
 ## 5. Template components
 
@@ -715,22 +714,22 @@ restyled by it.
 The Netsuke sub-site still loads the
 [Tailwind Play CDN](https://tailwindcss.com) script
 (`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
-stylesheet, and uses its utilities in its markup alongside its own
-hand-crafted stylesheet; it extends the default theme through
+stylesheet, and uses its utilities in its markup alongside its own hand-crafted
+stylesheet; it extends the default theme through
 `/netsuke/assets/js/tailwind-config.js`. Stilyagi uses neither Tailwind nor
 daisyUI. This differs from the main site, mxd, and Weaver, which compile
 Tailwind v4 ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md)
 for that path.
 
-Weaver was in Netsuke's position until recently, and moving it off the Play
-CDN is the worked example of what that migration costs. The doubled-selector
-idiom below exists because the CDN's injected `<style>` is unlayered; the
-compiled build has no such tie to break, because its utilities sit in
-`@layer utilities` and a sub-site's own rules sit in `@layer components`,
-where they lose to a utility by construction rather than by source order. The
-inversion is the trap: a handwritten stylesheet that was _left_ unlayered
-under the compiled build stops losing those arguments and starts winning them,
-silently. See `src/styles/weaver.css` for the arrangement and
+Weaver was in Netsuke's position until recently, and moving it off the Play CDN
+is the worked example of what that migration costs. The doubled-selector idiom
+below exists because the CDN's injected `<style>` is unlayered; the compiled
+build has no such tie to break, because its utilities sit in `@layer utilities`
+and a sub-site's own rules sit in `@layer components`, where they lose to a
+utility by construction rather than by source order. The inversion is the trap:
+a handwritten stylesheet that was _left_ unlayered under the compiled build
+stops losing those arguments and starts winning them, silently. See
+`src/styles/weaver.css` for the arrangement and
 `docs/execplans/weaver-daisy-migration.md` for what the change turned up.
 
 The Play CDN script scans the rendered document for utility classes in use and
@@ -765,16 +764,15 @@ this sub-site, for example
 further down the same file. Prefer raising specificity by doubling the class
 over `!important`, which would also outrank a later, deliberate override.
 
-
 ### 7.1. Verifying a styling change against Weaver
 
 `scripts/weaver_snapshot.py` exists because a cascade change on a compiled
 Tailwind sheet is easy to get subtly wrong: nothing errors, a selector simply
 stops matching what it used to, and the only symptom is an element that has
-quietly moved, resized, or changed colour somewhere the change was not meant
-to reach. The harness answers that by recording every Weaver page's computed
-styles before and after a change and diffing the two, rather than relying on
-a reviewer noticing a drift by eye.
+quietly moved, resized, or changed colour somewhere the change was not meant to
+reach. The harness answers that by recording every Weaver page's computed
+styles before and after a change and diffing the two, rather than relying on a
+reviewer noticing a drift by eye.
 
 It is a cyclopts app with three subcommands, invoked bare — there is no
 Makefile target and no console-script entry point:
@@ -790,14 +788,14 @@ styles as JSON, via `bun x css-view --mode walker`. `shots` screenshots each
 page at 360, 768, and 1440 CSS pixels with `agent-browser`, for the cases a
 style diff cannot catch on its own — a wrong icon glyph, a texture that failed
 to load. `diff` normalizes both snapshot trees and prints a unified diff per
-page, exiting non-zero when any page differs; that exit status is what makes
-it usable as a gate rather than merely informative.
+page, exiting non-zero when any page differs; that exit status is what makes it
+usable as a gate rather than merely informative.
 
 The typical loop is to capture a baseline before touching anything, make the
-change, capture again, and diff the two directories. An empty diff confirms
-the change moved nothing it was not meant to; a non-empty one should be read
-entry by entry, since every difference ought to trace back to something the
-change deliberately did.
+change, capture again, and diff the two directories. An empty diff confirms the
+change moved nothing it was not meant to; a non-empty one should be read entry
+by entry, since every difference ought to trace back to something the change
+deliberately did.
 
 ## 8. Accessibility checks
 

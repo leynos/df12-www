@@ -517,7 +517,7 @@ def test_every_page_is_shot_at_every_width() -> None:
     expected = [
         f"/out/{slug}@{width}.png"
         for width in weaver_snapshot.SCREENSHOT_WIDTHS
-        for slug in ("home", "install")
+        for slug in (weaver_snapshot._slug(""), weaver_snapshot._slug("install/"))
     ]
     assert shots == expected, f"expected {expected!r}, got {shots!r}"
 
@@ -637,10 +637,14 @@ def test_a_missing_tool_names_itself_rather_than_failing_obscurely() -> None:
 @pytest.mark.parametrize(
     ("page", "slug"),
     [
-        ("", "home"),
-        ("/", "home"),
+        ("", "__home"),
+        ("/", "__home"),
         ("install/", "install"),
         ("commands/act/", "commands__act"),
+        # A page whose directory carries an underscore must not flatten onto
+        # the stem a nested page would produce.
+        ("what_next/", "what_unext"),
+        ("what/next/", "what__next"),
     ],
 )
 def test_a_page_path_becomes_a_flat_filename_stem(page: str, slug: str) -> None:
@@ -652,6 +656,16 @@ def test_a_page_path_becomes_a_flat_filename_stem(page: str, slug: str) -> None:
 
 def test_the_snapshot_port_refuses_to_borrow_someone_else_s_server() -> None:
     """Polling a port someone else holds would snapshot their pages, not ours."""
+    # `_served` checks for the server binary before it looks at the port, so
+    # without `bun install` this would pass on the wrong SystemExit: the
+    # message would name the missing binary and the port assertion below would
+    # fail for a reason that has nothing to do with the behaviour under test.
+    if not weaver_snapshot.HTTP_SERVER.is_file():  # pragma: no cover - env guard
+        pytest.skip(
+            f"{weaver_snapshot.HTTP_SERVER} is missing; run 'bun install' to "
+            "exercise the port guard"
+        )
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as squatter:
         squatter.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         squatter.bind(("127.0.0.1", 0))

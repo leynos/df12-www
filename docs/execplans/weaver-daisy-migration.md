@@ -1,9 +1,8 @@
 # Migrate the Weaver sub-site to Tailwind v4 and daisyUI v5
 
-This ExecPlan (execution plan) is a living document. The sections
-`Constraints`, `Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`,
-`Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
-proceeds.
+This ExecPlan (execution plan) is a living document. The sections `Constraints`,
+`Tolerances`, `Risks`, `Progress`, `Surprises & Discoveries`, `Decision Log`,
+and `Outcomes & Retrospective` must be kept up to date as work proceeds.
 
 Status: COMPLETE
 
@@ -12,30 +11,29 @@ Status: COMPLETE
 The Weaver sub-site (published at `/weaver/`) is the last large sub-site still
 served by the **Tailwind Play CDN** — a browser script,
 `https://cdn.tailwindcss.com`, that compiles Tailwind v3 utilities at page load
-from an inline JavaScript configuration block repeated in three templates. Every
-colour in the markup is spelled as a bespoke utility (`text-weaver-indigo`,
-`bg-weaver-cream`) or an arbitrary value (`shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]`),
-and a 370-line hand-written stylesheet sits outside Tailwind's cascade layers
-entirely.
+from an inline JavaScript configuration block repeated in three templates.
+Every colour in the markup is spelled as a bespoke utility
+(`text-weaver-indigo`, `bg-weaver-cream`) or an arbitrary value
+(`shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]`), and a 370-line hand-written
+stylesheet sits outside Tailwind's cascade layers entirely.
 
 After this change:
 
 - Weaver builds like every other sub-site: one compiled stylesheet emitted by
   the repository's Tailwind v4 pipeline, no runtime CDN, no inline config.
 - Colour is declared once, as a daisyUI v5 theme named `weaver`, and the markup
-  refers to it semantically (`text-base-content`, `bg-primary`, `border-accent`)
-  so a future palette change is a single-file edit.
+  refers to it semantically (`text-base-content`, `bg-primary`,
+  `border-accent`) so a future palette change is a single-file edit.
 - Every page renders with **no third-party runtime requests at all**: fonts,
   icons, and paper textures are served from `/weaver/assets/`.
 - Every page carries zero colour-contrast failures measured directly against
   computed styles. axe-core's own WCAG 2.2 AA scan additionally reports
   twenty-eight findings against code-panel text; these are false positives —
-  axe-core misreads those panels' background as `#ffffff` when the
-  rendered pixels sample `rgb(15, 36, 64)`, so the ratios it derives are
-  wrong (see the Decision Log).
+  axe-core misreads those panels' background as `#ffffff` when the rendered
+  pixels sample `rgb(15, 36, 64)`, so the ratios it derives are wrong (see the
+  Decision Log).
 - The page chrome (sidebar, mobile drawer, head) is defined once instead of
-  four times, so the legal pages gain the mobile navigation they currently
-  lack.
+  four times, so the legal pages gain the mobile navigation they currently lack.
 
 Observable success: run `bun run build`, serve `public/`, load
 `http://127.0.0.1:8080/weaver/` with the network throttled to block all
@@ -52,13 +50,13 @@ Hard invariants. Violation requires escalation, not a workaround.
    redesign. Computed styles for every element on every Weaver page must match
    the pre-migration baseline, except where a change is (a) an intentional
    contrast fix recorded in `Decision Log`, (b) an intentional chrome
-   consolidation recorded in the same place, or (c) one of the bounded
-   Tailwind v4 semantic changes enumerated in `Decision Log` under
-   "accepted v4 semantics". Category (c) was added during Milestone 2 and is
-   closed: it holds exactly one entry, the change from absolute to
-   proportional line-height inheritance, whose measured effect is a shift of
-   0.2% to 1.5% in page height on three of the seventeen pages and nothing at
-   all on the other fourteen.
+   consolidation recorded in the same place, or (c) one of the bounded Tailwind
+   v4 semantic changes enumerated in `Decision Log` under "accepted v4
+   semantics". Category (c) was added during Milestone 2 and is closed: it
+   holds exactly one entry, the change from absolute to proportional
+   line-height inheritance, whose measured effect is a shift of 0.2% to 1.5% in
+   page height on three of the seventeen pages and nothing at all on the other
+   fourteen.
 2. **Nothing under `public/` is edited by hand.** The published tree is
    generated; `public/` is git-ignored in its entirety. Sources are
    `src/styles/`, `src/static/`, `templates/`, and `config/pages.yaml`. See
@@ -113,49 +111,46 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   Renamed utilities (`shadow-sm` → `shadow-xs`, `rounded-sm` → `rounded-xs`,
   `flex-shrink-0` → `shrink-0`, `bg-gradient-*` → `bg-linear-*`) and changed
   defaults (bare `border` is `currentColor` in v4, not `gray-200`) will shift
-  rendering silently.
-  Severity: high. Likelihood: high.
-  Mitigation: the computed-style baseline in Milestone 0 is taken *before* any
-  edit and diffed after every milestone; these renames are the first thing to
-  check when a diff appears. A grep sweep for the known-renamed utilities is
-  part of Milestone 2's checklist.
+  rendering silently. Severity: high. Likelihood: high. Mitigation: the
+  computed-style baseline in Milestone 0 is taken *before* any edit and diffed
+  after every milestone; these renames are the first thing to check when a diff
+  appears. A grep sweep for the known-renamed utilities is part of Milestone
+  2's checklist.
 - **Risk:** Tailwind v4's preflight differs from v3's, so headings, lists, and
   `<pre>` may reset differently. `weaver-site.css` was written against the v3
-  reset.
-  Severity: high. Likelihood: medium.
-  Mitigation: the baseline diff catches it. If preflight proves the culprit,
-  the Episodic entrypoint (`src/styles/episodic.css` on branch
-  `import-episodic-www`) shows the documented escape hatch: import
-  `tailwindcss/theme.css` and `tailwindcss/utilities.css` separately and carry
-  element defaults in a `layer(base)` partial. Prefer keeping preflight and
-  fixing the partials; record the decision either way.
+  reset. Severity: high. Likelihood: medium. Mitigation: the baseline diff
+  catches it. If preflight proves the culprit, the Episodic entrypoint
+  (`src/styles/episodic.css` on branch `import-episodic-www`) shows the
+  documented escape hatch: import `tailwindcss/theme.css` and
+  `tailwindcss/utilities.css` separately and carry element defaults in a
+  `layer(base)` partial. Prefer keeping preflight and fixing the partials;
+  record the decision either way.
 - **Risk:** the hand-written CSS couples to utility classes —
   `#sidebar nav a.bg-weaver-indigo.text-weaver-cream` and
   `a[href$="/install/"]` selectors. Replacing the utilities with semantic
-  classes silently kills these rules.
-  Severity: medium. Likelihood: high (it *will* happen if unnoticed).
-  Mitigation: Milestone 4 rewrites the nav as a macro with explicit semantic
-  classes *before* Milestone 5 removes the utility hooks.
+  classes silently kills these rules. Severity: medium. Likelihood: high (it
+  *will* happen if unnoticed). Mitigation: Milestone 4 rewrites the nav as a
+  macro with explicit semantic classes *before* Milestone 5 removes the utility
+  hooks.
 - **Risk:** vermilion `#E8502B` on cream `#F3EFD9` measures roughly 3.2:1 and
   `weaver-faded` `#4A6FA5` roughly 3.9:1 — both below the 4.5:1 AA threshold
-  for body text. Fixing them changes visible colour.
-  Severity: medium. Likelihood: high.
-  Mitigation: this is the anticipated, sanctioned exception to visual
-  equivalence, exactly as the mxd migration handled it (commit `fad8da49`).
-  Split each colour into a decorative token (unchanged, used for fills and
-  rules) and a text token (darkened). Record every substitution with its
-  before/after ratio.
+  for body text. Fixing them changes visible colour. Severity: medium.
+  Likelihood: high. Mitigation: this is the anticipated, sanctioned exception
+  to visual equivalence, exactly as the mxd migration handled it (commit
+  `fad8da49`). Split each colour into a decorative token (unchanged, used for
+  fills and rules) and a text token (darkened). Record every substitution with
+  its before/after ratio.
 - **Risk:** the Font Awesome removal is ~150 substitutions across 14 templates
   and is the largest mechanical change here. A wrong glyph is easy to miss.
-  Severity: low (cosmetic). Likelihood: medium.
-  Mitigation: it is a separate milestone with its own screenshot pass, and the
-  mapping is generated from a checked-in table so it is reviewable as data.
+  Severity: low (cosmetic). Likelihood: medium. Mitigation: it is a separate
+  milestone with its own screenshot pass, and the mapping is generated from a
+  checked-in table so it is reviewable as data.
 - **Risk:** the `design-language.jinja` page is a standalone document with its
   own `<head>`, its own Tailwind config, and its own vocabulary. Folding it
-  into the shared layout may not be behaviour-preserving.
-  Severity: medium. Likelihood: medium.
-  Mitigation: it is handled last, and if it resists, it keeps a bespoke layout
-  that still uses the shared theme. That is an acceptable outcome; record it.
+  into the shared layout may not be behaviour-preserving. Severity: medium.
+  Likelihood: medium. Mitigation: it is handled last, and if it resists, it
+  keeps a bespoke layout that still uses the shared theme. That is an
+  acceptable outcome; record it.
 
 ## Progress
 
@@ -218,197 +213,184 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 ## Surprises & discoveries
 
 - **Observation:** the walker snapshots are all but deterministic. Two captures
-  of an unchanged page differ in exactly one property.
-  Evidence: capturing `/weaver/why-weaver/` twice produced identical trees
-  except `"opacity": "0.694981"` against `"opacity": "0.668446"` on the green
+  of an unchanged page differ in exactly one property. Evidence: capturing
+  `/weaver/why-weaver/` twice produced identical trees except
+  `"opacity": "0.694981"` against `"opacity": "0.668446"` on the green
   `animate-pulse` status dot in the sidebar — the animation sampled at
-  different points in its two-second cycle.
-  Impact: the harness only has to normalize two things — `opacity` on animated
-  nodes, and bounding boxes rounded to two decimal places — for a byte-exact
-  comparison. Everything else can be compared literally, which makes the diff a
-  far stronger gate than expected. Verified by capturing twice and diffing:
-  seventeen pages compared, zero differing.
+  different points in its two-second cycle. Impact: the harness only has to
+  normalize two things — `opacity` on animated nodes, and bounding boxes
+  rounded to two decimal places — for a byte-exact comparison. Everything else
+  can be compared literally, which makes the diff a far stronger gate than
+  expected. Verified by capturing twice and diffing: seventeen pages compared,
+  zero differing.
 - **Observation:** the Play CDN's Tailwind v3 preflight is already visible in
   the baseline as `border-*-color: rgb(229, 231, 235)` on elements with no
-  border colour of their own.
-  Evidence: the `styleDiff` of the sidebar status dot in
-  `.weaver-baseline/why-weaver.json`.
-  Impact: confirms the anticipated v3-to-v4 risk is real and pervasive rather
-  than theoretical. Tailwind v4 drops that implicit `gray-200` in favour of
-  `currentColor`, so every element relying on it will move unless the
-  Milestone 2 sweep catches it. The diff will name them precisely.
+  border colour of their own. Evidence: the `styleDiff` of the sidebar status
+  dot in `.weaver-baseline/why-weaver.json`. Impact: confirms the anticipated
+  v3-to-v4 risk is real and pervasive rather than theoretical. Tailwind v4
+  drops that implicit `gray-200` in favour of `currentColor`, so every element
+  relying on it will move unless the Milestone 2 sweep catches it. The diff
+  will name them precisely.
 - **Observation:** seventeen Weaver pages are published, not the fifteen this
-  plan first assumed, and the command sub-pages are nested.
-  Evidence: `find public/weaver -name index.html` lists `commands/act/`,
-  `commands/observe/`, `commands/verify/`, and the three legal pages.
-  Impact: the harness derives its page list from the published tree, so the
-  count corrects itself and stays correct as pages are added.
+  plan first assumed, and the command sub-pages are nested. Evidence:
+  `find public/weaver -name index.html` lists `commands/act/`,
+  `commands/observe/`, `commands/verify/`, and the three legal pages. Impact:
+  the harness derives its page list from the published tree, so the count
+  corrects itself and stays correct as pages are added.
 - **Observation:** the icon sweep missed the one place the icons were not
-  markup, and the test written to catch that missed it too.
-  Evidence: `mobile-nav.js` builds the drawer's toggle at runtime and set
-  `innerHTML` to `<i class="fa-solid fa-bars">`. Removing the Font Awesome CDN
-  left that glyph with nothing behind it, so the menu button rendered as an
-  empty box on every page below 1024px — reported by the user, not by the
-  suite. `test_no_font_awesome_markup_remains` scanned `templates/weaver/**`
-  only, and a scan of the built HTML would have missed it too, since the
-  markup does not exist until the script runs.
-  Impact: the test now scans the sub-site's scripts and stylesheets as well,
-  and was checked by reintroducing the bug. The general lesson is that
-  "replace every X in the templates" is the wrong frame when a script can
-  write markup at runtime; the question is what the *page* contains, not what
-  the templates say.
+  markup, and the test written to catch that missed it too. Evidence:
+  `mobile-nav.js` builds the drawer's toggle at runtime and set `innerHTML` to
+  `<i class="fa-solid fa-bars">`. Removing the Font Awesome CDN left that glyph
+  with nothing behind it, so the menu button rendered as an empty box on every
+  page below 1024px — reported by the user, not by the suite.
+  `test_no_font_awesome_markup_remains` scanned `templates/weaver/**` only, and
+  a scan of the built HTML would have missed it too, since the markup does not
+  exist until the script runs. Impact: the test now scans the sub-site's
+  scripts and stylesheets as well, and was checked by reintroducing the bug.
+  The general lesson is that "replace every X in the templates" is the wrong
+  frame when a script can write markup at runtime; the question is what the
+  *page* contains, not what the templates say.
 - **Observation:** the Weaver palette had 621 text runs below the WCAG AA
   floor before this migration touched it, and the two worst offenders were the
-  colours the design uses most.
-  Evidence: measuring every rendered text run against its composited
-  background, `text-accent` on parchment came out at 3.23:1 across roughly 150
-  places and the muted ink ramp — `base-content` at 40%, 50%, 60% and 70% —
-  at 2.12, 2.64, 3.34, and 4.30:1 across roughly 230 more.
-  Impact: the fix is the largest deliberate visual change in the migration and
-  it is entirely a pre-existing debt, not something the re-plumbing
-  introduced. The plan predicted both pairings; it under-estimated how much
-  else was riding on them.
+  colours the design uses most. Evidence: measuring every rendered text run
+  against its composited background, `text-accent` on parchment came out at
+  3.23:1 across roughly 150 places and the muted ink ramp — `base-content` at
+  40%, 50%, 60% and 70% — at 2.12, 2.64, 3.34, and 4.30:1 across roughly 230
+  more. Impact: the fix is the largest deliberate visual change in the
+  migration and it is entirely a pre-existing debt, not something the
+  re-plumbing introduced. The plan predicted both pairings; it under-estimated
+  how much else was riding on them.
 - **Observation:** the two contrast tools available disagreed with the page,
   in opposite directions, and both had to be checked against the browser.
   Evidence: the `check_color_contrast` MCP helper returned exactly `4.5` for
-  both `#E8502B` on `#F3EFD9` and `#4A6FA5` on `#F3EFD9` — the *required*
-  ratio rather than the measured one, which are 3.23 and 4.42. Separately,
-  axe-core reported twenty-eight colour-contrast violations on the docs page
-  with a reported background of white for text inside panels whose rendered
-  pixels are `rgb(15, 36, 64)` — sampled directly from the screenshot, and
-  confirmed by `getComputedStyle` on the elements themselves. The panels do
-  not overflow at that viewport and the finding does not move when the
-  viewport is made 11,000px tall, so it is not a below-the-fold artefact
-  either.
-  Impact: the audit's evidence is the direct measurement — compositing each
-  text run's colour over its resolved ancestor background — which was itself
-  wrong twice before it was right, first parsing `oklab()` as `rgb()` and then
-  forcing composited alpha to 1. Both bugs invented failures that were not
-  there. A tool that measures colour has to be checked against the pixels
-  before it is believed, including one you wrote yourself.
+  both `#E8502B` on `#F3EFD9` and `#4A6FA5` on `#F3EFD9` — the *required* ratio
+  rather than the measured one, which are 3.23 and 4.42. Separately, axe-core
+  reported twenty-eight colour-contrast violations on the docs page with a
+  reported background of white for text inside panels whose rendered pixels are
+  `rgb(15, 36, 64)` — sampled directly from the screenshot, and confirmed by
+  `getComputedStyle` on the elements themselves. The panels do not overflow at
+  that viewport and the finding does not move when the viewport is made
+  11,000px tall, so it is not a below-the-fold artefact either. Impact: the
+  audit's evidence is the direct measurement — compositing each text run's
+  colour over its resolved ancestor background — which was itself wrong twice
+  before it was right, first parsing `oklab()` as `rgb()` and then forcing
+  composited alpha to 1. Both bugs invented failures that were not there. A
+  tool that measures colour has to be checked against the pixels before it is
+  believed, including one you wrote yourself.
 - **Observation:** the cutover diff is dominated by notation, not by change.
-  Of the roughly 140,000 differing lines the first comparison reported, all
-  but about 3,000 were the same styles spelled differently: v4 reports an
-  opacity modifier as `oklab(...)` where v3 reported `rgba(...)`, composes
-  `box-shadow` from more placeholder layers, and leaves an undrawn border at
-  `currentColor` where v3's preflight said `gray-200` — on four and a half
-  thousand nodes per page, of which forty draw a border at all.
-  Evidence: normalizing each of those in `scripts/weaver_snapshot.py` took the
-  report from 140,000 lines to 38,000 to a handful; the Oklab conversion is
-  exact, with `oklab(0.359209 -0.0202858 -0.0934766 / 0.8)` and
-  `rgba(25, 60, 110, 0.8)` canonicalizing to the same eight-bit triple.
-  Impact: without this the gate would have been useless — the real findings
-  were four regressions hiding among a hundred thousand lines of spelling. The
-  normalization is unit-tested in both directions, since one that hides a real
-  change is worse than none.
+  Of the roughly 140,000 differing lines the first comparison reported, all but
+  about 3,000 were the same styles spelled differently: v4 reports an opacity
+  modifier as `oklab(...)` where v3 reported `rgba(...)`, composes `box-shadow`
+  from more placeholder layers, and leaves an undrawn border at `currentColor`
+  where v3's preflight said `gray-200` — on four and a half thousand nodes per
+  page, of which forty draw a border at all. Evidence: normalizing each of
+  those in `scripts/weaver_snapshot.py` took the report from 140,000 lines to
+  38,000 to a handful; the Oklab conversion is exact, with
+  `oklab(0.359209 -0.0202858 -0.0934766 / 0.8)` and `rgba(25, 60, 110, 0.8)`
+  canonicalizing to the same eight-bit triple. Impact: without this the gate
+  would have been useless — the real findings were four regressions hiding
+  among a hundred thousand lines of spelling. The normalization is unit-tested
+  in both directions, since one that hides a real change is worse than none.
 - **Observation:** every regression the cutover produced came from the same
-  root cause, and it was the one the plan predicted.
-  Evidence: the install link turned vermilion because moving the hand-written
-  sheet into the components layer let `text-weaver-vermilion` beat the
-  href-keyed rule that had been forcing it dark; the other four came from
-  Tailwind v4 wrapping `space-y-*` in `:where()` and routing `text-*`
-  line-height through `--tw-leading`, both of which let per-element utilities
-  win arguments they used to lose.
-  Impact: the risk register called this "it *will* happen if unnoticed" and
-  scheduled the nav rewrite for Milestone 4 to avoid it. The diff caught all
-  five without that help, which is a better outcome than the mitigation.
+  root cause, and it was the one the plan predicted. Evidence: the install link
+  turned vermilion because moving the hand-written sheet into the components
+  layer let `text-weaver-vermilion` beat the href-keyed rule that had been
+  forcing it dark; the other four came from Tailwind v4 wrapping `space-y-*` in
+  `:where()` and routing `text-*` line-height through `--tw-leading`, both of
+  which let per-element utilities win arguments they used to lose. Impact: the
+  risk register called this "it *will* happen if unnoticed" and scheduled the
+  nav rewrite for Milestone 4 to avoid it. The diff caught all five without
+  that help, which is a better outcome than the mitigation.
 - **Observation:** `agent-browser screenshot` silently misfiles its output in
   two distinct ways — it reads a path given after `--full` as a selector, and
   it resolves relative paths against its own daemon working directory. It
-  reports `✓ Screenshot saved to …` in both cases.
-  Evidence: two consecutive runs of the screenshot pass reported success and
-  left the output directory empty.
-  Impact: the harness passes the path positionally and absolutely, and this is
-  recorded in a comment beside the call so the next reader does not rediscover
-  it. Any future screenshot automation in this repository should assert the
-  file exists rather than trusting the exit status.
+  reports `✓ Screenshot saved to …` in both cases. Evidence: two consecutive
+  runs of the screenshot pass reported success and left the output directory
+  empty. Impact: the harness passes the path positionally and absolutely, and
+  this is recorded in a comment beside the call so the next reader does not
+  rediscover it. Any future screenshot automation in this repository should
+  assert the file exists rather than trusting the exit status.
 - **Observation:** `src/styles/weaver.css` registered the `prose prose-indigo`
   classes carried across from the Play CDN in three templates
   (`shared_content_page.jinja` and two blocks in `pages/why-weaver.jinja`) but
   never registered `@tailwindcss/typography`, the plugin that gives those
-  classes any meaning. The classes matched nothing for several commits, and
-  no test caught it.
-  Evidence: a test asserting the literal word `prose`, or even the shape
-  `.prose :where(...)`, passes whether or not the plugin is registered,
-  because daisyUI ships its own `.prose .btn` and `.prose :where(code)`
-  compatibility rules — the compiled sheet always contains matches for both
-  patterns. The assertion that actually distinguishes the two states is
-  anchored on `not-prose`, the plugin's escape hatch, which appears nowhere
-  else in the dependency tree; it was confirmed to go red when the `@plugin`
-  line is removed. Registering the plugin adds roughly 14KB to the compiled
-  sheet. Worth recording honestly: this finding was first dismissed on the
-  strength of a grep for `prose` in the minified stylesheet, where `grep -c`
-  reported 1 and `sort -u` collapsed every hit to one row — both readings
-  were artefacts of grepping a minified single-line file, not evidence of
-  anything. The repository's own memory already carries a related note about
-  this exact failure mode.
-  Impact: the plugin is now registered, and the regression test is anchored
-  on `not-prose` rather than on `prose`, so it can actually fail. The general
-  lesson repeats: never grep a minified, single-line stylesheet for a
-  substring and trust the count; use Python's `re` over the file contents
-  instead.
+  classes any meaning. The classes matched nothing for several commits, and no
+  test caught it. Evidence: a test asserting the literal word `prose`, or even
+  the shape `.prose :where(...)`, passes whether or not the plugin is
+  registered, because daisyUI ships its own `.prose .btn` and
+  `.prose :where(code)` compatibility rules — the compiled sheet always
+  contains matches for both patterns. The assertion that actually distinguishes
+  the two states is anchored on `not-prose`, the plugin's escape hatch, which
+  appears nowhere else in the dependency tree; it was confirmed to go red when
+  the `@plugin` line is removed. Registering the plugin adds roughly 14KB to
+  the compiled sheet. Worth recording honestly: this finding was first
+  dismissed on the strength of a grep for `prose` in the minified stylesheet,
+  where `grep -c` reported 1 and `sort -u` collapsed every hit to one row —
+  both readings were artefacts of grepping a minified single-line file, not
+  evidence of anything. The repository's own memory already carries a related
+  note about this exact failure mode. Impact: the plugin is now registered, and
+  the regression test is anchored on `not-prose` rather than on `prose`, so it
+  can actually fail. The general lesson repeats: never grep a minified,
+  single-line stylesheet for a substring and trust the count; use Python's `re`
+  over the file contents instead.
 
 ## Decision log
 
 - **Decision:** adopt the Episodic stylesheet shape (layered partials, one
   compiled artefact) rather than the mxd shape (compiled sheet plus a
-  hand-written companion sheet).
-  Rationale: the user chose it when presented with both. It removes the
-  unlayered-CSS cascade hazard permanently — the failure mode recorded in
-  commit `b162aa45`, where an unlayered `* { padding: 0 }` reset silently
-  zeroed every Tailwind spacing utility, since per CSS Cascade Level 5
-  unlayered declarations always beat layered ones regardless of specificity or
-  source order.
-  Date/Author: 2026-08-17, planning session.
+  hand-written companion sheet). Rationale: the user chose it when presented
+  with both. It removes the unlayered-CSS cascade hazard permanently — the
+  failure mode recorded in commit `b162aa45`, where an unlayered
+  `* { padding: 0 }` reset silently zeroed every Tailwind spacing utility,
+  since per CSS Cascade Level 5 unlayered declarations always beat layered ones
+  regardless of specificity or source order. Date/Author: 2026-08-17, planning
+  session.
 - **Decision:** scope includes contrast fixes, self-hosted fonts, Font Awesome
-  removal, and normalizing accidental chrome inconsistencies.
-  Rationale: the user selected all four, with the note that replicating
-  accidental inconsistencies "is only making a rod for your back" and that any
-  such change must be documented.
-  Date/Author: 2026-08-17, planning session.
+  removal, and normalizing accidental chrome inconsistencies. Rationale: the
+  user selected all four, with the note that replicating accidental
+  inconsistencies "is only making a rod for your back" and that any such change
+  must be documented. Date/Author: 2026-08-17, planning session.
 - **Decision:** icons become **build-time inline SVG**, not a runtime Iconify
-  script.
-  Rationale: Netsuke already migrated Font Awesome to Carbon icons and
+  script. Rationale: Netsuke already migrated Font Awesome to Carbon icons and
   documents the mapping at `templates/netsuke/pages/icon-replacements.jinja`,
   but it renders them through `https://code.iconify.design`, which is still a
   runtime CDN. The brief is to *drop* the CDN, so Weaver extracts the same
   Carbon glyphs from the `@iconify-json/carbon` package at build time. This
   also matches the repository's existing "generated, not handwritten"
-  convention for the Pygments stylesheets.
-  Date/Author: 2026-08-17, planning session.
+  convention for the Pygments stylesheets. Date/Author: 2026-08-17, planning
+  session.
 
 - **Decision:** write the validation harness as a Python Cyclopts CLI,
   `scripts/weaver_snapshot.py`, rather than the shell scripts this plan
-  originally specified.
-  Rationale: `docs/scripting-standards.md` makes Python with `uv` and Cyclopts
-  the baseline for project scripts, and the existing scripts under `scripts/`
-  follow it. Shell scripts would also sit outside the `ruff` and `ty` gates.
-  The standard names `plumbum` for subprocess work, but no script or module in
-  this repository uses it — `df12_pages/cli.py` and `df12_pages/deploy/`
-  both use `subprocess` directly — so the harness follows the code rather than
-  the letter of the document. Worth reconciling one way or the other, but not
-  as part of this migration.
-  Date/Author: 2026-08-17, Milestone 0.
+  originally specified. Rationale: `docs/scripting-standards.md` makes Python
+  with `uv` and Cyclopts the baseline for project scripts, and the existing
+  scripts under `scripts/` follow it. Shell scripts would also sit outside the
+  `ruff` and `ty` gates. The standard names `plumbum` for subprocess work, but
+  no script or module in this repository uses it — `df12_pages/cli.py` and
+  `df12_pages/deploy/` both use `subprocess` directly — so the harness follows
+  the code rather than the letter of the document. Worth reconciling one way or
+  the other, but not as part of this migration. Date/Author: 2026-08-17,
+  Milestone 0.
 - **Decision:** let dark surfaces re-point the ink tokens rather than asking
-  each label to name a different one.
-  Rationale: `--color-accent-ink` is the accent cut deep enough to read on
-  parchment, and on a dark panel that cut is worse than the vermilion it
-  replaced. Twenty-seven labels sat on dark panels. Tailwind compiles
-  `text-accent-ink` to `color: var(--color-accent-ink)`, so a rule on the
-  panels — `:is(.bg-neutral, .bg-primary, …) { --color-accent-ink:
-  var(--color-accent-lift) }` — reaches every one of them without touching the
-  markup, handles nesting correctly, and keeps working for labels added later.
-  A light card nested inside a dark panel takes the deep cut back.
-  Date/Author: 2026-08-17, Milestone 8.
+  each label to name a different one. Rationale: `--color-accent-ink` is the
+  accent cut deep enough to read on parchment, and on a dark panel that cut is
+  worse than the vermilion it replaced. Twenty-seven labels sat on dark panels.
+  Tailwind compiles `text-accent-ink` to `color: var(--color-accent-ink)`, so a
+  rule on the panels —
+  `:is(.bg-neutral, .bg-primary, …) { --color-accent-ink:
+  var(--color-accent-lift) }` —
+  reaches every one of them without touching the markup, handles nesting
+  correctly, and keeps working for labels added later. A light card nested
+  inside a dark panel takes the deep cut back. Date/Author: 2026-08-17,
+  Milestone 8.
 - **Decision:** treat axe-core's twenty-eight code-panel findings as a tool
-  artefact and record the evidence rather than change the colours.
-  Rationale: satisfying them would mean darkening `code-text` and
-  `code-string` until they read on white, which would make them wrong on the
-  dark panels they actually sit on — trading a real design for a tool's
-  misreading. The rendered pixels, the computed styles, and the direct
-  measurement all agree the text is light-on-dark at 10.58:1 and 8.95:1. Every
-  other axe rule passes on every page, at 360px and 1440px.
-  Date/Author: 2026-08-17, Milestone 8.
+  artefact and record the evidence rather than change the colours. Rationale:
+  satisfying them would mean darkening `code-text` and `code-string` until they
+  read on white, which would make them wrong on the dark panels they actually
+  sit on — trading a real design for a tool's misreading. The rendered pixels,
+  the computed styles, and the direct measurement all agree the text is
+  light-on-dark at 10.58:1 and 8.95:1. Every other axe rule passes on every
+  page, at 360px and 1440px. Date/Author: 2026-08-17, Milestone 8.
 - **Decision:** map `bg-weaver-indigo` to `primary` and every other indigo
   property to `base-content`, uniformly, including the opacity tints.
   Rationale: the plan's rule was "on text or a border it is base-content; on a
@@ -419,97 +401,89 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   slots hold the same colour, so nothing renders differently either way.
   Date/Author: 2026-08-17, Milestone 6.
 - **Decision:** narrow `test_weaver_sources_declare_no_colour_literals` to
-  `class` and `style` attributes rather than whole templates.
-  Rationale: the design-system page prints the palette's hex codes as its own
-  content — `#193C6E` beside the swatch it names — which is the page's entire
-  purpose and not a colour anyone is specifying. The invariant worth holding
-  is that colour is not *specified* in the markup, and only those two
-  attributes can specify it. The partials are still scanned whole.
-  Date/Author: 2026-08-17, Milestone 6.
+  `class` and `style` attributes rather than whole templates. Rationale: the
+  design-system page prints the palette's hex codes as its own content —
+  `#193C6E` beside the swatch it names — which is the page's entire purpose and
+  not a colour anyone is specifying. The invariant worth holding is that colour
+  is not *specified* in the markup, and only those two attributes can specify
+  it. The partials are still scanned whole. Date/Author: 2026-08-17, Milestone
+  6.
 - **Decision:** accept Carbon's lighter stroke weight in place of Font
-  Awesome's solid glyphs.
-  Rationale: it is inherent to the substitution — Carbon is a line-drawn set
-  and Font Awesome's `fa-solid` is filled — and the Netsuke sub-site already
-  made the same trade, so the two now agree about what a shield or a terminal
-  looks like. The alternative would be finding a filled icon set that matches
-  Font Awesome's drawing, which is a design decision nobody asked for. The
-  substitution costs at most 0.45% of a page's height; screenshots of the
-  security cards and the terminal blocks show every icon in place and legible.
-  Date/Author: 2026-08-17, Milestone 5.
+  Awesome's solid glyphs. Rationale: it is inherent to the substitution —
+  Carbon is a line-drawn set and Font Awesome's `fa-solid` is filled — and the
+  Netsuke sub-site already made the same trade, so the two now agree about what
+  a shield or a terminal looks like. The alternative would be finding a filled
+  icon set that matches Font Awesome's drawing, which is a design decision
+  nobody asked for. The substitution costs at most 0.45% of a page's height;
+  screenshots of the security cards and the terminal blocks show every icon in
+  place and legible. Date/Author: 2026-08-17, Milestone 5.
 - **Decision:** leave `pages/design-language.jinja` standalone rather than
-  extending the shared layout, and share only its vocabulary.
-  Rationale: its sidebar is a table of contents for the document itself, not
-  the site navigation, so extending the layout would mean overriding the one
-  part of it that matters. It now calls the same `nav_link` macro, so its
-  current item picks up the same treatment as everywhere else, and it already
-  carried the mobile-drawer hooks. This is the plan's stated fallback for that
-  page, taken deliberately rather than as a failure.
-  Date/Author: 2026-08-17, Milestone 4.
+  extending the shared layout, and share only its vocabulary. Rationale: its
+  sidebar is a table of contents for the document itself, not the site
+  navigation, so extending the layout would mean overriding the one part of it
+  that matters. It now calls the same `nav_link` macro, so its current item
+  picks up the same treatment as everywhere else, and it already carried the
+  mobile-drawer hooks. This is the plan's stated fallback for that page, taken
+  deliberately rather than as a failure. Date/Author: 2026-08-17, Milestone 4.
 - **Decision:** keep the utility strings inside the `nav_link` macro rather
-  than replacing them with semantic classes now.
-  Rationale: the macro's immediate job is to break the coupling between the
-  stylesheet and the utilities — `#sidebar nav a.bg-weaver-indigo.text-weaver-cream`
-  found the current link by the colours it happened to carry and would have
-  stopped matching the moment the sweep renamed them. A marker class on the
-  element fixes that today at zero visual risk, and writing the utilities once
-  instead of eleven times means the sweep has one place to change. Structure
-  in this milestone, vocabulary in the next.
-  Date/Author: 2026-08-17, Milestone 4.
+  than replacing them with semantic classes now. Rationale: the macro's
+  immediate job is to break the coupling between the stylesheet and the
+  utilities — `#sidebar nav a.bg-weaver-indigo.text-weaver-cream` found the
+  current link by the colours it happened to carry and would have stopped
+  matching the moment the sweep renamed them. A marker class on the element
+  fixes that today at zero visual risk, and writing the utilities once instead
+  of eleven times means the sweep has one place to change. Structure in this
+  milestone, vocabulary in the next. Date/Author: 2026-08-17, Milestone 4.
 - **Decision:** where Tailwind v4 newly honours a declaration that v3
   suppressed, pin the source to the value the page has always rendered rather
-  than letting the declaration take effect.
-  Rationale: Milestone 2's whole value is the claim that swapping the pipeline
-  changed nothing, and that claim is worth more than any of the individual
-  improvements on offer. v3 resolved several conflicts by source order or
-  specificity in ways v4 deliberately corrects, so a handful of declarations
-  that had never once applied were about to. Each is pinned to its rendered
-  value *explicitly* — `leading-none` rather than deleting the leading
-  utility, `mt-2` rather than `mt-4` — so the source now states what the page
-  does instead of contradicting it. Anyone who prefers the suppressed values
-  can have them in one legible commit.
-  Instances: eleven hero headings and the design-language masthead, where
-  `text-5xl lg:text-7xl` clobbered `leading-[1.1]`, `leading-[1.02]`, and
-  `leading-tight`; two lead paragraphs where `lg:text-2xl` clobbered
-  `leading-relaxed` (no single leading utility reproduces both breakpoints, so
-  there the dead utility went); the sidebar's trailing divider block, whose
-  `mt-4` lost to `space-y-2`'s more specific selector and rendered at 8px; the
-  footer column headings, whose `mb-1` sat alongside the `space-y-2` gap
-  rather than replacing it; `.content-section`, which asked for 2rem and
-  rendered at the article's 1.5rem rhythm; and `code { font-size: 0.92em }`,
-  which lost to the preflight's `font-size: 1em` and would have shrunk every
-  inline code span on the site by eight per cent.
-  Date/Author: 2026-08-17, Milestone 2.
+  than letting the declaration take effect. Rationale: Milestone 2's whole
+  value is the claim that swapping the pipeline changed nothing, and that claim
+  is worth more than any of the individual improvements on offer. v3 resolved
+  several conflicts by source order or specificity in ways v4 deliberately
+  corrects, so a handful of declarations that had never once applied were about
+  to. Each is pinned to its rendered value *explicitly* — `leading-none` rather
+  than deleting the leading utility, `mt-2` rather than `mt-4` — so the source
+  now states what the page does instead of contradicting it. Anyone who prefers
+  the suppressed values can have them in one legible commit. Instances: eleven
+  hero headings and the design-language masthead, where `text-5xl lg:text-7xl`
+  clobbered `leading-[1.1]`, `leading-[1.02]`, and `leading-tight`; two lead
+  paragraphs where `lg:text-2xl` clobbered `leading-relaxed` (no single leading
+  utility reproduces both breakpoints, so there the dead utility went); the
+  sidebar's trailing divider block, whose `mt-4` lost to `space-y-2`'s more
+  specific selector and rendered at 8px; the footer column headings, whose
+  `mb-1` sat alongside the `space-y-2` gap rather than replacing it;
+  `.content-section`, which asked for 2rem and rendered at the article's 1.5rem
+  rhythm; and `code { font-size: 0.92em }`, which lost to the preflight's
+  `font-size: 1em` and would have shrunk every inline code span on the site by
+  eight per cent. Date/Author: 2026-08-17, Milestone 2.
 - **Decision (accepted v4 semantics):** accept the change from absolute to
-  proportional line-height inheritance.
-  Rationale: v3's `text-sm` set `line-height: 1.25rem`, a length that
-  descendants inherit as 20px whatever their own font size; v4 sets a unitless
-  ratio, so a `text-[11px]` table header inside a `text-sm` region now sets at
-  15.7px rather than 20px. Pinning it would mean adding an explicit
-  `leading-*` to roughly 138 elements — writing v3's behaviour into the markup
-  permanently, in service of nothing a reader would notice. Measured effect:
-  table headers and small captions tighten by 1–9px; `commands/act/` loses
-  81px of its 5,460 (1.5%), `sempai` and `jacquard` 26px each (0.2%); the
-  other fourteen pages are unchanged. A before-and-after crop of the
-  `jacquard` comparison table is identical but for the offset. No text changes
-  size, colour, weight, or family.
-  Date/Author: 2026-08-17, Milestone 2.
+  proportional line-height inheritance. Rationale: v3's `text-sm` set
+  `line-height: 1.25rem`, a length that descendants inherit as 20px whatever
+  their own font size; v4 sets a unitless ratio, so a `text-[11px]` table
+  header inside a `text-sm` region now sets at 15.7px rather than 20px. Pinning
+  it would mean adding an explicit `leading-*` to roughly 138 elements —
+  writing v3's behaviour into the markup permanently, in service of nothing a
+  reader would notice. Measured effect: table headers and small captions
+  tighten by 1–9px; `commands/act/` loses 81px of its 5,460 (1.5%), `sempai` and
+  `jacquard` 26px each (0.2%); the other fourteen pages are unchanged. A
+  before-and-after crop of the `jacquard` comparison table is identical but for
+  the offset. No text changes size, colour, weight, or family. Date/Author:
+  2026-08-17, Milestone 2.
 - **Decision:** pin Tailwind's stock palette to its v3 values for the
-  twenty-seven shades the markup uses.
-  Rationale: v4 redefined the default palette in OKLCH. The greys move by
-  about one part in 255, but `green-400` goes from `#4ade80` to `#05df72` in
-  forty-two places. Nearly all of these are syntax colours inside the dark
-  code samples, which the semantic sweep will give proper `--color-code-*`
-  names; pinning defers a palette decision to the milestone that owns it
-  rather than making it by accident here.
-  Date/Author: 2026-08-17, Milestone 2.
+  twenty-seven shades the markup uses. Rationale: v4 redefined the default
+  palette in OKLCH. The greys move by about one part in 255, but `green-400`
+  goes from `#4ade80` to `#05df72` in forty-two places. Nearly all of these are
+  syntax colours inside the dark code samples, which the semantic sweep will
+  give proper `--color-code-*` names; pinning defers a palette decision to the
+  milestone that owns it rather than making it by accident here. Date/Author:
+  2026-08-17, Milestone 2.
 - **Decision:** return `scrollbar-color` to `auto` on `:root`.
   Rationale: daisyUI paints the root scrollbar through the standard property,
   and Chromium honours it in preference to the `::-webkit-scrollbar`
   pseudo-elements this sub-site has always used. Left alone, adopting daisyUI
   would have quietly replaced Weaver's cream-and-indigo scrollbar with
   daisyUI's. The `exclude: rootscrollgutter` plugin option covers a different
-  feature and does not remove the rule.
-  Date/Author: 2026-08-17, Milestone 2.
+  feature and does not remove the rule. Date/Author: 2026-08-17, Milestone 2.
 - **Decision:** fix the pre-existing failure in
   `tests/test_doc_generation.py::test_doc_prose_code_spans_have_expected_computed_style`
   rather than working around it, despite it being outside this migration.
@@ -521,86 +495,78 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `import-episodic-www`, which has not merged. Applying the same two-line fix
   here restores the commit gate that Constraint 6 depends on, and it is the
   same tooling this migration's harness uses. Flagged rather than folded in
-  silently, since it is outside the stated scope.
-  Date/Author: 2026-08-17, Milestone 0.
+  silently, since it is outside the stated scope. Date/Author: 2026-08-17,
+  Milestone 0.
 - **Decision:** exempt CSS longhand property names such as
   `border-bottom-color` from the en-GB spelling gate, via a pattern in
-  `typos.local.toml`.
-  Rationale: the plan and the stylesheets both have to quote property names
-  such as `border-bottom-color`, which the CSS specification spells the
-  American way. The pattern requires a leading segment, so a bare `color` in
-  prose is still caught — verified against a probe file. Edits go in
-  `typos.local.toml`, never `typos.toml`, which `make spelling` regenerates.
-  Date/Author: 2026-08-17, Milestone 0.
+  `typos.local.toml`. Rationale: the plan and the stylesheets both have to
+  quote property names such as `border-bottom-color`, which the CSS
+  specification spells the American way. The pattern requires a leading
+  segment, so a bare `color` in prose is still caught — verified against a
+  probe file. Edits go in `typos.local.toml`, never `typos.toml`, which
+  `make spelling` regenerates. Date/Author: 2026-08-17, Milestone 0.
 - **Decision:** pin the capture browser to Chromium explicitly rather than
-  accepting `css-view`'s default.
-  Rationale: the same reasoning as commit `68d6a2fa`, which pinned the
-  computed-style test in `tests/test_doc_generation.py`. A change to the tool's
-  default would otherwise swap the rendering engine — and therefore the
-  computed styles — out from under a comparison, and the resulting diff would
-  look like a regression in the site.
-  Date/Author: 2026-08-17, Milestone 0.
+  accepting `css-view`'s default. Rationale: the same reasoning as commit
+  `68d6a2fa`, which pinned the computed-style test in
+  `tests/test_doc_generation.py`. A change to the tool's default would
+  otherwise swap the rendering engine — and therefore the computed styles — out
+  from under a comparison, and the resulting diff would look like a regression
+  in the site. Date/Author: 2026-08-17, Milestone 0.
 - **Decision:** on `pages/safety.jinja`'s Operational Guidance panel, swap the
   borrowed `text-code-string` and `text-accent-ink` for `text-status-ok` and
   `text-status-error`, and record the resulting contrast numbers even though
-  one of them regresses.
-  Rationale: the panel composites to `#244675` (`bg-white/5` over
-  `bg-primary`), and the labels are `text-xs font-bold`, so WCAG AA wants
-  4.5:1. The "do" label improves: `#4ade80` → `#22c55e` moves 5.46:1 to
-  4.17:1. The "don't" label is the one worth flagging: `#f4a694` → `#ef4444`
-  moves 4.86:1 to 2.53:1. That drop is not the status token being weaker in
-  the abstract — `text-accent-ink` measures as accent-lift on this panel
-  because `src/styles/weaver/panels.css` remaps it on dark surfaces, the same
-  mechanism recorded above for Milestone 8, and `#ef4444` gets no such lift.
-  The swap was made because it was explicitly requested after the contrast
-  concern was raised. The remedy, if both labels need to pass AA, is lift
-  variants of the status tokens remapped on the same dark-surface selector
-  panels.css already uses for the accent token; that is a stylesheet change
-  and is left for a decision rather than made here.
-  Date/Author: 2026-08-23, review batch.
+  one of them regresses. Rationale: the panel composites to `#244675`
+  (`bg-white/5` over `bg-primary`), and the labels are `text-xs font-bold`, so
+  WCAG AA wants 4.5:1. The "do" label improves: `#4ade80` → `#22c55e` moves
+  5.46:1 to 4.17:1. The "don't" label is the one worth flagging: `#f4a694` →
+  `#ef4444` moves 4.86:1 to 2.53:1. That drop is not the status token being
+  weaker in the abstract — `text-accent-ink` measures as accent-lift on this
+  panel because `src/styles/weaver/panels.css` remaps it on dark surfaces, the
+  same mechanism recorded above for Milestone 8, and `#ef4444` gets no such
+  lift. The swap was made because it was explicitly requested after the
+  contrast concern was raised. The remedy, if both labels need to pass AA, is
+  lift variants of the status tokens remapped on the same dark-surface selector
+  panels.css already uses for the accent token; that is a stylesheet change and
+  is left for a decision rather than made here. Date/Author: 2026-08-23, review
+  batch.
 - **Decision:** treat `backdrop-blur-sm` → `-xs` on four elements (three cards
-  on `pages/why-weaver.jinja`, one panel on `pages/design-language.jinja`) as
-  a deliberate visual change, not a stale-name fix.
-  Rationale: both `backdrop-blur-sm` and `backdrop-blur-xs` are valid
-  Tailwind v4 utilities — this is not one of the v3-to-v4 renames tracked
-  elsewhere in this plan. The change was requested and applied as such; its
-  effect is to drop the blur radius from 8px to 4px on the affected elements.
-  Date/Author: 2026-08-23, review batch.
+  on `pages/why-weaver.jinja`, one panel on `pages/design-language.jinja`) as a
+  deliberate visual change, not a stale-name fix. Rationale: both
+  `backdrop-blur-sm` and `backdrop-blur-xs` are valid Tailwind v4 utilities —
+  this is not one of the v3-to-v4 renames tracked elsewhere in this plan. The
+  change was requested and applied as such; its effect is to drop the blur
+  radius from 8px to 4px on the affected elements. Date/Author: 2026-08-23,
+  review batch.
 - **Decision:** in the refactored `scripts/weaver_snapshot.py`, have
   `_rounded_bbox` leave a non-mapping bbox unchanged rather than replacing it
-  with `None`.
-  Rationale: the walker, not this function, owns the shape of the `bbox`
-  field. If a future snapshot reports it in a different shape, that is a
+  with `None`. Rationale: the walker, not this function, owns the shape of the
+  `bbox` field. If a future snapshot reports it in a different shape, that is a
   finding the diff should surface, not one this helper should silently paper
-  over by coercing it to `None`. Covered by a parametrized test over `None`,
-  a string, a list, and a number.
-  Date/Author: 2026-08-23, review batch.
+  over by coercing it to `None`. Covered by a parametrized test over `None`, a
+  string, a list, and a number. Date/Author: 2026-08-23, review batch.
 - **Decision:** verify the `_normalize` split (into `_canonical_style`,
   `_resolve_tracked`, and `_rounded_bbox`) by checking rather than asserting
-  behaviour-preservation.
-  Rationale: 3,000 randomized trees, covering every odd bbox shape alongside
-  absent and null `styleDiff` and `children`, were confirmed to normalize
-  byte-identically under the old and new code before the old code was
-  deleted. A unit test on a handful of hand-picked cases would not have
-  covered the same ground with the same confidence.
-  Date/Author: 2026-08-23, review batch.
+  behaviour-preservation. Rationale: 3,000 randomized trees, covering every odd
+  bbox shape alongside absent and null `styleDiff` and `children`, were
+  confirmed to normalize byte-identically under the old and new code before the
+  old code was deleted. A unit test on a handful of hand-picked cases would not
+  have covered the same ground with the same confidence. Date/Author:
+  2026-08-23, review batch.
 - **Decision:** decline a request to remove `text-xs` from the Observe
-  Integration link in `pages/sempai.jinja` and keep only `text-3xs`.
-  Rationale: commit `16dd6ae1` had already resolved the underlying finding —
-  a duplicate font-size utility on that link — by removing `text-3xs`, so the
-  link now carries exactly one font-size utility, which was the finding's
-  stated goal. Applying the later request literally would leave the link
-  with no font-size utility at all, out of step with its eight siblings,
-  every one of which uses `text-xs`.
-  Date/Author: 2026-08-23, review batch.
+  Integration link in `pages/sempai.jinja` and keep only `text-3xs`. Rationale:
+  commit `16dd6ae1` had already resolved the underlying finding — a duplicate
+  font-size utility on that link — by removing `text-3xs`, so the link now
+  carries exactly one font-size utility, which was the finding's stated goal.
+  Applying the later request literally would leave the link with no font-size
+  utility at all, out of step with its eight siblings, every one of which uses
+  `text-xs`. Date/Author: 2026-08-23, review batch.
 - **Decision:** decline to run stylelint against the `design-language.css`
-  formatting fix, and make the fix anyway.
-  Rationale: no stylelint configuration exists anywhere in this repository,
-  and `make lint` runs `ruff` and Biome only, so there is no gate to run the
-  requested validation against. The blank-line change is made regardless,
-  since it is what such a rule would ask for and costs nothing; the CSS Biome
-  emits is unaffected.
-  Date/Author: 2026-08-23, review batch.
+  formatting fix, and make the fix anyway. Rationale: no stylelint
+  configuration exists anywhere in this repository, and `make lint` runs `ruff`
+  and Biome only, so there is no gate to run the requested validation against.
+  The blank-line change is made regardless, since it is what such a rule would
+  ask for and costs nothing; the CSS Biome emits is unaffected. Date/Author:
+  2026-08-23, review batch.
 
 ## Outcomes & retrospective
 
@@ -609,10 +575,10 @@ stylesheet, emitted by `bun run build` from `src/styles/weaver.css`, with no
 runtime compiler, no inline configuration, and no request to any other host.
 Colour is declared once and named for the job it does. The chrome is defined
 once instead of four times. Every page carries zero colour-contrast failures,
-measured directly against computed styles, at 360px and 1440px. axe-core's
-own scan additionally reports twenty-eight findings against code-panel text;
-these are false positives, recorded as such in the Decision Log, not fixes
-made against the design.
+measured directly against computed styles, at 360px and 1440px. axe-core's own
+scan additionally reports twenty-eight findings against code-panel text; these
+are false positives, recorded as such in the Decision Log, not fixes made
+against the design.
 
 Measured against the pre-migration baseline, eight of the seventeen pages are
 identical in total height and the largest shift anywhere is 1.78%, on
@@ -665,20 +631,20 @@ What would be done differently:
 Left for another day, deliberately: Netsuke is now the only sub-site on the
 Play CDN, and this plan is the worked example of what moving it would cost.
 
-A review pass after completion found and fixed six further issues, the
-largest of which — the missing typography plugin — had survived several
-commits precisely because the test written against it could not fail (see
-Surprises & discoveries). `make all` passes on the tree at `88cf175f`: 177
-passed, 1 skipped for pytest; 145 passed, 0 failed for the bun suite; all
-eight sub-targets green.
+A review pass after completion found and fixed six further issues, the largest
+of which — the missing typography plugin — had survived several commits
+precisely because the test written against it could not fail (see Surprises &
+discoveries). `make all` passes on the tree at `88cf175f`: 177 passed, 1
+skipped for pytest; 145 passed, 0 failed for the bun suite; all eight
+sub-targets green.
 
 ## Context and orientation
 
 ### What this repository is
 
 `df12-www` builds a static site published from `public/`. Nothing under
-`public/` is tracked in git. The build has five stages, run by
-`bun run build` (see `package.json`):
+`public/` is tracked in git. The build has five stages, run by `bun run build`
+(see `package.json`):
 
 1. `build:static` — `scripts/copy-static.ts` copies `src/static/**` into
    `public/**`, mirroring the directory layout. `src/static/weaver/assets/x`
@@ -692,11 +658,12 @@ eight sub-targets green.
    templates under `templates/` into HTML, driven by `config/pages.yaml`.
 5. `build:search` — builds the Netsuke search index.
 
-The commit gate is `make all`, which runs `build check-fmt lint test test-js
-typecheck docs-check spelling`. Python is formatted by `ruff`, JavaScript, TypeScript
-and **CSS** by Biome (`biome.jsonc`, with `css.parser.tailwindDirectives`
-enabled so `@plugin` and `@utility` parse), Markdown by `mdformat-all` and
-`markdownlint-cli2` (80-column wrap).
+The commit gate is `make all`, which runs
+`build check-fmt lint test test-js typecheck docs-check spelling`. Python is
+formatted by `ruff`, JavaScript, TypeScript and **CSS** by Biome
+(`biome.jsonc`, with `css.parser.tailwindDirectives` enabled so `@plugin` and
+`@utility` parse), Markdown by `mdformat-all` and `markdownlint-cli2`
+(80-column wrap).
 
 ### What the Weaver sub-site is today
 
@@ -867,8 +834,8 @@ Milestone 8 audit:
 - `--color-neutral: #0f2440` with cream content.
 - Radii: the markup uses `rounded-sm` and `rounded-[2px]` almost exclusively,
   so `--radius-field: 0.125rem`, `--radius-box: 0.125rem`,
-  `--radius-selector: 0.2rem`; `--border: 1px`; `--depth: 0`; `--noise: 0`.
-  The Weaver look is hard-edged; daisyUI's default depth shading must be off.
+  `--radius-selector: 0.2rem`; `--border: 1px`; `--depth: 0`; `--noise: 0`. The
+  Weaver look is hard-edged; daisyUI's default depth shading must be off.
 
 `@theme` tokens for roles daisyUI does not model:
 
@@ -876,8 +843,9 @@ Milestone 8 audit:
 - `--color-accent-text` — the darkened vermilion for text on cream. Value set
   by the Milestone 8 audit; expect roughly `#c63c1b`.
 - `--color-ink-muted` — the darkened faded blue for muted *text*, likewise.
-- `--font-display: "Playfair Display", serif`, `--font-sans: "IBM Plex Sans",
-  sans-serif`, `--font-mono: "IBM Plex Mono", monospace`.
+- `--font-display: "Playfair Display", serif`,
+  `--font-sans: "IBM Plex Sans", sans-serif`,
+  `--font-mono: "IBM Plex Mono", monospace`.
 - `--shadow-block: 2px 2px 0 var(--color-primary)` and the two softer offsets
   the markup repeats (`4px 4px 0` and `8px 8px 0` at low alpha), replacing the
   twenty-six arbitrary `shadow-[…rgba(25,60,110,…)]` values.
@@ -900,26 +868,25 @@ green; `make lint` accepts the new CSS (Biome parses the Tailwind directives).
 ### Milestone 2 — Cut over to the compiled stylesheet
 
 In each of the four templates carrying a `<head>` (`doc_page.jinja`,
-`home_page.jinja`, `shared_content_page.jinja`,
-`pages/design-language.jinja`), delete the `<script src="https://cdn.tailwindcss.com">`
-tag and the inline `tailwind.config` block, and replace the
-`weaver-site.css` link with `/weaver/assets/styles/weaver.css`. Update
-`config/pages.yaml` `sites.weaver.stylesheet` to
-`assets/styles/weaver.css`. Note that `shared_content_page.jinja` builds its
-link as `../{{ stylesheet or … }}`, a relative path where the others use
-root-relative; normalize it to root-relative and record that as the first
-documented chrome inconsistency.
+`home_page.jinja`, `shared_content_page.jinja`, `pages/design-language.jinja`),
+delete the `<script src="https://cdn.tailwindcss.com">` tag and the inline
+`tailwind.config` block, and replace the `weaver-site.css` link with
+`/weaver/assets/styles/weaver.css`. Update `config/pages.yaml`
+`sites.weaver.stylesheet` to `assets/styles/weaver.css`. Note that
+`shared_content_page.jinja` builds its link as `../{{ stylesheet or … }}`, a
+relative path where the others use root-relative; normalize it to root-relative
+and record that as the first documented chrome inconsistency.
 
 `weaver-site.css` stays in place and keeps working for now — the compiled sheet
 and the hand-written sheet coexist through Milestones 3 to 6. Only Milestone 7
 retires it.
 
 This is the milestone where Tailwind v3→v4 differences surface. Before running
-the diff, grep the templates for the known renames and fix each:
-`shadow-sm`→`shadow-xs`, `rounded-sm`→`rounded-xs` (check against the intended
-radius — v4's `rounded-sm` is v3's `rounded`), `flex-shrink-0`→`shrink-0`,
-`flex-grow`→`grow`, `bg-gradient-to-*`→`bg-linear-to-*`, and any bare `border`
-that relied on v3's implicit `gray-200`.
+the diff, grep the templates for the known renames and fix each: `shadow-sm`→
+`shadow-xs`, `rounded-sm`→`rounded-xs` (check against the intended radius — v4's
+`rounded-sm` is v3's `rounded`), `flex-shrink-0`→`shrink-0`, `flex-grow`→
+`grow`, `bg-gradient-to-*`→`bg-linear-to-*`, and any bare `border` that relied
+on v3's implicit `gray-200`.
 
 Go/no-go: rebuild, re-capture, and diff against the Milestone 0 baseline. The
 diff must be empty. This is the single most important gate in the plan: it
@@ -930,12 +897,12 @@ refers to at the level of an individual property, not the milestone.
 
 ### Milestone 3 — Self-host fonts and paper textures
 
-Vendor the three families as `woff2` under
-`src/static/weaver/assets/fonts/`, following the Episodic naming convention
+Vendor the three families as `woff2` under `src/static/weaver/assets/fonts/`,
+following the Episodic naming convention
 (`ibm-plex-sans-latin-wght-normal.woff2` and so on). Prefer variable fonts
-where a family offers one: the templates use IBM Plex Sans at 300/400/500/600/700,
-IBM Plex Mono at 400/500/600, and Playfair Display at 400/600/700/900, which is
-twelve static faces or three variable ones.
+where a family offers one: the templates use IBM Plex Sans at
+300/400/500/600/700, IBM Plex Mono at 400/500/600, and Playfair Display at
+400/600/700/900, which is twelve static faces or three variable ones.
 
 Declare them with `@font-face` in a new `src/styles/weaver/site-base.css`
 imported into `@layer base`, using `font-display: swap` and
@@ -944,10 +911,10 @@ the two faces used above the fold (Playfair Display for the masthead, IBM Plex
 Sans regular).
 
 Do the same for the four `transparenttextures.com` PNG files — `cream-paper`,
-`subtle-paper`, `cubes`, and whichever the fourth is: download once, place
-under `src/static/weaver/assets/textures/`, and reference locally. Check the
-licence of each and record it in the `Artefacts and notes` section; these
-patterns are CC BY 3.0 and need attribution somewhere in the repository.
+`subtle-paper`, `cubes`, and whichever the fourth is: download once, place under
+`src/static/weaver/assets/textures/`, and reference locally. Check the licence
+of each and record it in the `Artefacts and notes` section; these patterns are
+CC BY 3.0 and need attribution somewhere in the repository.
 
 Go/no-go: diff against the Milestone 2 capture. Font metrics may shift by a
 hair if the self-hosted subset differs from Google's; a sub-pixel difference in
@@ -964,10 +931,10 @@ Known inconsistencies found during planning:
 
 1. `doc_page.jinja` repeats a ~230-character conditional class expression
    eleven times, once per nav link, to switch between active and inactive
-   styling. Replace it with a Jinja macro `nav_link(href, index, label,
-   active)` in a new `templates/weaver/_chrome.jinja`, emitting two semantic
-   classes, `weaver-nav-link` and `weaver-nav-link--current`, plus
-   `aria-current="page"`.
+   styling. Replace it with a Jinja macro
+   `nav_link(href, index, label, active)` in a new
+   `templates/weaver/_chrome.jinja`, emitting two semantic classes,
+   `weaver-nav-link` and `weaver-nav-link--current`, plus `aria-current="page"`.
 2. `weaver-site.css` styles the active nav item by *matching its utility
    classes* (`#sidebar nav a.bg-weaver-indigo.text-weaver-cream`) and
    special-cases the install link by href (`a[href$="/install/"]`). Both become
@@ -995,10 +962,10 @@ pages gain a sidebar and drawer; the other pages should be unchanged.
 
 Add `@iconify-json/carbon` as a dev dependency. Write
 `scripts/generate-weaver-icons.ts`, which reads a checked-in mapping table and
-emits `templates/weaver/_icons.jinja`: a Jinja macro `icon(name, extra_class='')`
-whose body is a `{% if %}` chain (or a dictionary lookup) returning inline
-`<svg>` markup with `fill="currentColor"`, `aria-hidden="true"`, and
-`focusable="false"`.
+emits `templates/weaver/_icons.jinja`: a Jinja macro
+`icon(name, extra_class='')` whose body is a `{% if %}` chain (or a dictionary
+lookup) returning inline `<svg>` markup with `fill="currentColor"`,
+`aria-hidden="true"`, and `focusable="false"`.
 
 The mapping table is `config/weaver-icons.yaml`, listing each of the 53 Font
 Awesome names against a `carbon:*` identifier. Seed it from the existing
@@ -1016,24 +983,23 @@ Then replace each `<i class="fa-solid fa-x"></i>` with `{{ icon('x') }}`, and
 delete the two Font Awesome `<link>`/`<script>` tags and the
 `window.FontAwesomeConfig` block.
 
-Sizing note: Font Awesome glyphs are font-sized and inherit `font-size`;
-Carbon SVGs need an explicit box. Give the macro a default `w-[1em] h-[1em]
-inline-block align-[-0.125em]` so the substitution is metrically close, and
-tune per-site where the baseline diff shows a shift.
+Sizing note: Font Awesome glyphs are font-sized and inherit `font-size`; Carbon
+SVGs need an explicit box. Give the macro a default
+`w-[1em] h-[1em] inline-block align-[-0.125em]` so the substitution is
+metrically close, and tune per-site where the baseline diff shows a shift.
 
 Go/no-go: `test_weaver_pages_have_no_cdn_references` goes green. Screenshot
 comparison at 1440px across all seventeen pages shows an icon in every place
-one was before, at approximately the same size. A human reviews the icon
-grid; a "creative substitution" that reads wrongly is a bug, not an accepted
-variance.
+one was before, at approximately the same size. A human reviews the icon grid;
+a "creative substitution" that reads wrongly is a bug, not an accepted variance.
 
-**Correction (2026-08-21):** the generator actually implemented and committed
-is `scripts/generate_weaver_icons.py`, a Python script, invoked as
+**Correction (2026-08-21):** the generator actually implemented and committed is
+`scripts/generate_weaver_icons.py`, a Python script, invoked as
 `uv run python scripts/generate_weaver_icons.py` — not the TypeScript
-`scripts/generate-weaver-icons.ts` named above, in the `Interfaces and
-dependencies` list below, and in Milestone 9's documentation-update
-instruction. Regenerate `templates/weaver/_icons.jinja` with that command;
-`config/weaver-icons.yaml` and the drift test are unaffected.
+`scripts/generate-weaver-icons.ts` named above, in the
+`Interfaces and dependencies` list below, and in Milestone 9's
+documentation-update instruction. Regenerate `templates/weaver/_icons.jinja`
+with that command; `config/weaver-icons.yaml` and the drift test are unaffected.
 
 ### Milestone 6 — Semantic-class sweep
 
@@ -1043,21 +1009,21 @@ Work **one template at a time**, rebuilding and diffing after each. Do not
 batch. The substitution table, to be confirmed once the Milestone 1 theme is
 settled:
 
-| Today | Becomes |
-| --- | --- |
-| `bg-weaver-cream` | `bg-base-100` |
-| `text-weaver-indigo` | `text-base-content` |
-| `bg-weaver-indigo` | `bg-primary` |
-| `text-weaver-cream` | `text-primary-content` (on primary) or `text-base-100` |
-| `border-weaver-indigo/20` | `border-base-content/20` |
-| `text-weaver-vermilion` | `text-accent` (decorative) / `text-accent-text` (body copy — see Milestone 8) |
-| `bg-weaver-vermilion` | `bg-accent` |
-| `bg-weaver-dark` | `bg-neutral` |
-| `text-weaver-dark` | `text-secondary` |
-| `text-weaver-faded` | `text-ink-muted` |
-| `shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]` | `shadow-block` |
-| `text-[10px]` | `text-2xs` |
-| `tracking-[0.3em]` | `tracking-stamp` |
+| Today                                        | Becomes                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------- |
+| `bg-weaver-cream`                            | `bg-base-100`                                                                 |
+| `text-weaver-indigo`                         | `text-base-content`                                                           |
+| `bg-weaver-indigo`                           | `bg-primary`                                                                  |
+| `text-weaver-cream`                          | `text-primary-content` (on primary) or `text-base-100`                        |
+| `border-weaver-indigo/20`                    | `border-base-content/20`                                                      |
+| `text-weaver-vermilion`                      | `text-accent` (decorative) / `text-accent-text` (body copy — see Milestone 8) |
+| `bg-weaver-vermilion`                        | `bg-accent`                                                                   |
+| `bg-weaver-dark`                             | `bg-neutral`                                                                  |
+| `text-weaver-dark`                           | `text-secondary`                                                              |
+| `text-weaver-faded`                          | `text-ink-muted`                                                              |
+| `shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]` | `shadow-block`                                                                |
+| `text-[10px]`                                | `text-2xs`                                                                    |
+| `tracking-[0.3em]`                           | `tracking-stamp`                                                              |
 
 Ordering: start with the smallest template (`pages/why-weaver.jinja`, 218
 lines) to validate the table end to end, then the rest in ascending size,
@@ -1133,10 +1099,10 @@ logged substitution.
 
 `AGENTS.md` currently states, in the Styling section, that "Netsuke and Weaver
 load the **Tailwind Play CDN** at runtime" and that three sub-sites carry a
-hand-crafted stylesheet and do not use daisyUI. Rewrite that passage: Weaver now
-compiles from `src/styles/weaver.css` with a daisyUI `weaver` theme, and only
-Netsuke and Stilyagi remain outside. Update the artefact table (line ~85) with
-the new `weaver/assets/styles/weaver.css` row, and add the icon generator
+hand-crafted stylesheet and do not use daisyUI. Rewrite that passage: Weaver
+now compiles from `src/styles/weaver.css` with a daisyUI `weaver` theme, and
+only Netsuke and Stilyagi remain outside. Update the artefact table (line ~85)
+with the new `weaver/assets/styles/weaver.css` row, and add the icon generator
 alongside the Pygments generators in the "generated, never handwritten" list.
 
 Update `docs/repository-layout.md` and `docs/developers-guide.md` for the new
@@ -1154,8 +1120,8 @@ All commands run from the repository root,
 
 **Correction (2026-08-21):** the path above names this worktree's
 checkout-specific location and should not be relied upon. The instruction is
-simply to run all commands from the repository root, whatever its checkout
-path happens to be.
+simply to run all commands from the repository root, whatever its checkout path
+happens to be.
 
 Set up and build:
 
@@ -1229,13 +1195,14 @@ configured to block every host except `127.0.0.1`:
   `/weaver/assets/js/mobile-nav.js`.
 - At 360px wide, `/weaver/privacy-policy/` shows a hamburger button that opens
   a modal drawer — behaviour that does not exist today.
-- Every icon that was a Font Awesome glyph is now an inline `<svg>`; `view-source`
+- Every icon that was a Font Awesome glyph is now an inline `<svg>`;
+  `view-source`
   contains no `<i class="fa-` anywhere.
 
 **Test acceptance.** `uv run pytest tests/test_weaver_build.py` reports three
-passed. Each test failed before its milestone and passes after; the red
-failure is observed via `@pytest.mark.xfail(strict=True)`, and the marker is
-removed as part of the green step.
+passed. Each test failed before its milestone and passes after; the red failure
+is observed via `@pytest.mark.xfail(strict=True)`, and the marker is removed as
+part of the green step.
 
 **Quality criteria.**
 
@@ -1252,9 +1219,9 @@ removed as part of the green step.
 - Styling: the final computed-style diff against the Milestone 0 baseline
   contains only entries traceable to a `Decision Log` line.
 
-**Quality method.** `make all` is the gate. The computed-style diff and the
-axe scan are run by hand at each milestone boundary and their transcripts
-pasted into `Artefacts and notes`.
+**Quality method.** `make all` is the gate. The computed-style diff and the axe
+scan are run by hand at each milestone boundary and their transcripts pasted
+into `Artefacts and notes`.
 
 ## Idempotence and recovery
 
@@ -1274,9 +1241,9 @@ Each milestone is one or more small commits. Recovery from a bad milestone is
 baseline is restored.
 
 The one irreversible-feeling step is deleting
-`src/static/weaver/assets/styles/weaver-site.css` in Milestone 7. It is
-tracked in git, so it is recoverable with `git show`; do not delete it until
-the partials are in place and the diff is empty.
+`src/static/weaver/assets/styles/weaver-site.css` in Milestone 7. It is tracked
+in git, so it is recoverable with `git show`; do not delete it until the
+partials are in place and the diff is empty.
 
 ## Artefacts and notes
 
@@ -1288,12 +1255,11 @@ attributions.
 **Correction (2026-08-21):** the transcripts and tables anticipated above were
 not produced as a standalone artefact; the axe and computed-style evidence
 instead lives inline, in `Surprises & Discoveries` and `Decision Log` above.
-Wherever this plan requires a scan or comparison "across all pages", that
-means all seventeen published pages, derived from the published-page
-inventory rather than hard-coded (see the Milestone 0 correction to the page
-count). The axe evidence records twenty-eight code-panel findings as false
-positives, not as violations awaiting a fix — see the Decision Log entry for
-the measured basis.
+Wherever this plan requires a scan or comparison "across all pages", that means
+all seventeen published pages, derived from the published-page inventory rather
+than hard-coded (see the Milestone 0 correction to the page count). The axe
+evidence records twenty-eight code-panel findings as false positives, not as
+violations awaiting a fix — see the Decision Log entry for the measured basis.
 
 ## Interfaces and dependencies
 

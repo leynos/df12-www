@@ -33,6 +33,7 @@ EXPECTED_ROUTES = (
     "hosting",
 )
 EXPECTED_ROUTE_COUNT = 17
+EXPECTED_STAGE_CARD_COUNT = 4
 
 
 def test_episodic_generation_renders_every_configured_route(tmp_path: Path) -> None:
@@ -54,6 +55,18 @@ def test_episodic_generation_renders_every_configured_route(tmp_path: Path) -> N
         assert "<main" in output_path.read_text(encoding="utf-8"), (
             f"rendered route lacks its main landmark: /episodic/{route}/"
         )
+
+    homepage = BeautifulSoup(
+        (episodic.output_dir / "index.html").read_text(encoding="utf-8"),
+        "html.parser",
+    )
+    stage_cards = homepage.select("a.stage-summary__card")
+    assert len(stage_cards) == EXPECTED_STAGE_CARD_COUNT, (
+        "homepage must render all four linked workflow stages"
+    )
+    assert all(card.select_one(".stage-summary__label") for card in stage_cards), (
+        "each homepage workflow card must keep its visible stage label"
+    )
 
 
 def test_interface_catalogue_links_resolve_to_configured_routes(tmp_path: Path) -> None:

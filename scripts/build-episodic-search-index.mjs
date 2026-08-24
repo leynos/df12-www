@@ -22,7 +22,8 @@
  * @module scripts/build-episodic-search-index
  */
 
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { mkdir, readdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import MiniSearch from "minisearch";
@@ -57,6 +58,11 @@ const INDEX_OPTIONS = {
   },
 };
 
+/**
+ * Build or verify the committed search index for the rendered Episodic site.
+ *
+ * @returns {Promise<void>} Resolves after generating or checking the index.
+ */
 async function main() {
   const check = process.argv.includes("--check");
   const documents = [...(await collectSitePages()), ...(await collectUpstreamDocuments())];
@@ -92,8 +98,7 @@ async function main() {
     return;
   }
 
-  await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
-  await writeFile(OUTPUT_PATH, payload);
+  await writeIndexAtomically(OUTPUT_PATH, payload);
   console.log(`wrote ${OUTPUT_PATH} (${documents.length} records indexed)`);
 }
 
@@ -105,7 +110,7 @@ async function main() {
  */
 async function findPages(dir) {
   const found = [];
-  const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
+  const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -117,6 +122,11 @@ async function findPages(dir) {
   return found;
 }
 
+/**
+ * Collect one search document for every rendered Episodic route.
+ *
+ * @returns {Promise<SearchRecord[]>} Page and section records from the site.
+ */
 async function collectSitePages() {
   const files = (await findPages(SITE_DIR)).sort();
   const documents = [];
@@ -128,11 +138,16 @@ async function collectSitePages() {
 }
 
 /**
- * Read the documentation manifest. It is a Jinja data template whose payload
- * is a JSON literal, so the categories can be parsed without a Jinja runtime.
+ * Read the documentation manifest without a Jinja runtime.
+ *
+ * Its ``doc_categories`` payload is a JSON literal committed with the
+ * rendered site data.
+
+ * @param {string} manifestPath Manifest to read.
+ * @returns {Promise<SearchRecord[]>} One record per upstream document.
  */
 async function collectUpstreamDocuments(manifestPath = MANIFEST_PATH) {
-  const text = await readFile(manifestPath, "utf8").catch(() => "");
+  const text = await readFile(manifestPath, "utf8");
   const match = text.match(/\{% set doc_categories = ([\s\S]*?) %\}\n\{% set doc_featured/);
   if (!match) {
     throw new Error(`${manifestPath} does not contain a doc_categories JSON payload.`);
@@ -241,6 +256,24 @@ function extractSections(html) {
       html: content,
       id,
     }));
+}
+
+/**
+ * Persist a completed index without exposing a partially written JSON file.
+ *
+ * @param {string} outputPath Destination of the committed search index.
+ * @param {string} payload Complete serialised index.
+ * @returns {Promise<void>} Resolves after the replacement is atomic.
+ */
+async function writeIndexAtomically(outputPath, payload) {
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  const temporaryPath = `${outputPath}.${randomUUID()}.tmp`;
+  try {
+    await writeFile(temporaryPath, payload, { flag: "wx" });
+    await rename(temporaryPath, outputPath);
+  } finally {
+    await unlink(temporaryPath).catch(() => undefined);
+  }
 }
 
 /**

@@ -547,6 +547,16 @@ so that restyling cannot break a selector, and an early return when the root
 element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
+`src/static/episodic/assets/js/site-search.js` follows the same plain-script
+shape. It exposes five helpers when `module.exports` is available:
+`createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
+for fetching and deserializing the MiniSearch payload,
+`searchEpisodicIndex` for query-time ranking, plus the single-root and
+document-wide initialization helpers. The search helpers are written so the
+loading boundary stays outside the query path: queries only consult an
+already-loaded index, while initialization owns the fetch and failure
+handling.
+
 An element may still carry an id for the stylesheet or for an ARIA
 relationship; what the convention rules out is _script_ depending on one. The
 Netsuke navbar is the worked example: `#navbar` and `#navbar-mobile-menu` are

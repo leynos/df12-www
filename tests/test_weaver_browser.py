@@ -40,7 +40,8 @@ import typing as typ
 from pathlib import Path
 
 import pytest
-from ruamel.yaml import YAML
+
+from df12_pages.config import load_site_config
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -48,6 +49,23 @@ if typ.TYPE_CHECKING:
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 pytestmark = pytest.mark.playwright
+
+
+def _weaver_config() -> typ.Any:  # noqa: ANN401 - SubSiteConfig is not exported
+    """Load the Weaver sub-site's configuration, through the generator's own loader.
+
+    `df12_pages.config.load_site_config` is what the generator reads this file
+    with, so it is what these tests read it with too: parsing the YAML here
+    separately would let the two drift, and the loader already validates the
+    shape and raises `SiteConfigError` on a malformed one.
+
+    Returns
+    -------
+    SubSiteConfig
+        The `weaver` entry, with `content_pages` and `shared_content_refs`
+        already parsed.
+    """
+    return load_site_config(REPO_ROOT / "config" / "pages.yaml").sites["weaver"]
 
 
 def _published_pages() -> tuple[str, ...]:
@@ -71,11 +89,9 @@ def _published_pages() -> tuple[str, ...]:
     tuple of str
         Paths relative to ``/weaver/``, home first and the rest sorted.
     """
-    weaver = YAML(typ="safe").load(
-        (REPO_ROOT / "config" / "pages.yaml").read_text(encoding="utf-8")
-    )["sites"]["weaver"]
-    slugs = [page["output_slug"] for page in weaver["content_pages"]]
-    slugs.extend(weaver["shared_content"])
+    weaver = _weaver_config()
+    slugs = [page.output_slug for page in weaver.content_pages]
+    slugs.extend(weaver.shared_content_refs)
     return ("", *sorted(f"{slug}/" for slug in slugs))
 
 
@@ -90,10 +106,7 @@ def _shared_content() -> frozenset[str]:
     frozenset of str
         Paths relative to ``/weaver/``.
     """
-    weaver = YAML(typ="safe").load(
-        (REPO_ROOT / "config" / "pages.yaml").read_text(encoding="utf-8")
-    )["sites"]["weaver"]
-    return frozenset(f"{name}/" for name in weaver["shared_content"])
+    return frozenset(f"{name}/" for name in _weaver_config().shared_content_refs)
 
 
 PAGES = _published_pages()

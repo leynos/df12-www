@@ -28,6 +28,7 @@ from __future__ import annotations
 import contextlib
 import difflib
 import fcntl
+import hashlib
 import json
 import math
 import os
@@ -70,7 +71,7 @@ TOOL_TIMEOUT_SECONDS = 90
 # How long to wait for another run to finish starting its server. A healthy
 # start takes under a second, so anything near this means the holder was
 # killed mid-start rather than that it is merely slow.
-STARTUP_LOCK_TIMEOUT_SECONDS = 30
+LOCK_TIMEOUT_SECONDS = 30
 
 app = cyclopts.App(
     name="weaver-snapshot",
@@ -78,24 +79,50 @@ app = cyclopts.App(
 )
 
 
-def _page_paths() -> list[str]:
+def _page_paths(root: Path = PUBLIC_WEAVER) -> list[str]:
     """List the published Weaver pages as base-relative URL paths.
 
     Derived from the published tree rather than hard-coded, so a page added to
     ``config/pages.yaml`` is captured without editing this script.
+
+    Parameters
+    ----------
+    root
+        The published sub-site to walk. Passed in so the traversal — and its
+        failure — can be exercised against a directory a test controls.
 
     Returns
     -------
     list of str
         Paths relative to ``/weaver/``, such as ``""`` for the home page and
         ``"commands/act/"`` for a nested one, in sorted order.
+
+    Raises
+    ------
+    SystemExit
+        If the root is absent, or if any part of the tree beneath it cannot be
+        read.
     """
-    if not PUBLIC_WEAVER.is_dir():
-        message = "public/weaver is missing; run 'bun run build' first"
+    if not root.is_dir():
+        message = f"{root} is missing; run 'bun run build' first"
         raise SystemExit(message)
+
+    def refuse(error: OSError) -> typ.NoReturn:
+        """Turn a failure to read part of the tree into a refusal to capture."""
+        message = (
+            f"{error.filename} under {root} could not be read ({error}), so the "
+            f"page list would be short by however much is beneath it. A capture "
+            f"missing a page compares clean against a baseline that has it."
+        )
+        raise SystemExit(message)
+
+    # `rglob` swallows an OSError on a descendant and yields nothing further
+    # beneath it, so an unreadable directory would silently shorten the list
+    # rather than stop the run. `os.walk` will report it if asked to.
     pages = [
-        f"{path.parent.relative_to(PUBLIC_WEAVER).as_posix()}/".removeprefix("./")
-        for path in PUBLIC_WEAVER.rglob("index.html")
+        f"{Path(directory).relative_to(root).as_posix()}/".removeprefix("./")
+        for directory, _subdirs, files in os.walk(root, onerror=refuse)
+        if "index.html" in files
     ]
     return sorted(pages)
 
@@ -197,13 +224,39 @@ def _startup_lock(port: int) -> cabc.Iterator[None]:
     Raises
     ------
     SystemExit
-        If the lock is still held after :data:`STARTUP_LOCK_TIMEOUT_SECONDS`,
+        If the lock is still held after :data:`LOCK_TIMEOUT_SECONDS`,
         which means another run has been starting for far longer than a
         healthy start takes.
     """
-    path = _lock_path(port)
+    with _exclusive(_lock_path(port), f"the startup lock for port {port}"):
+        yield
+
+
+@contextlib.contextmanager
+def _exclusive(path: Path, contended: str) -> cabc.Iterator[None]:
+    """Hold an exclusive advisory lock on ``path`` for the duration.
+
+    Parameters
+    ----------
+    path
+        The lock file. Created on demand and left behind; the lock is the
+        ``flock`` on it, not the file's existence.
+    contended
+        What is being locked, for the message a waiting run eventually gives up
+        with.
+
+    Yields
+    ------
+    None
+        With the lock held.
+
+    Raises
+    ------
+    SystemExit
+        If the lock is still held after :data:`LOCK_TIMEOUT_SECONDS`.
+    """
     with path.open("w", encoding="utf-8") as handle:
-        deadline = time.monotonic() + STARTUP_LOCK_TIMEOUT_SECONDS
+        deadline = time.monotonic() + LOCK_TIMEOUT_SECONDS
         while True:
             try:
                 fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -211,10 +264,9 @@ def _startup_lock(port: int) -> cabc.Iterator[None]:
             except OSError as exc:
                 if time.monotonic() >= deadline:
                     message = (
-                        f"another run has held the startup lock for port {port} "
-                        f"({path}) for over {STARTUP_LOCK_TIMEOUT_SECONDS}s; "
-                        f"it may have been killed mid-start. Pass --port, or "
-                        f"remove the lock file if no run is active."
+                        f"another run has held {contended} ({path}) for over "
+                        f"{LOCK_TIMEOUT_SECONDS}s; it may have been killed "
+                        f"partway. Remove the lock file if no run is active."
                     )
                     raise SystemExit(message) from exc
                 time.sleep(0.05)
@@ -222,6 +274,89 @@ def _startup_lock(port: int) -> cabc.Iterator[None]:
             yield
         finally:
             fcntl.flock(handle, fcntl.LOCK_UN)
+
+
+def _output_lock_path(out_dir: Path) -> Path:
+    """Name the lock file guarding one output directory's publication.
+
+    Keyed on the resolved path, so two runs writing the same directory contend
+    however they spelled it, and two writing different directories do not.
+
+    Parameters
+    ----------
+    out_dir
+        The directory the run will publish into.
+
+    Returns
+    -------
+    Path
+        The lock file's path.
+    """
+    digest = hashlib.sha256(str(out_dir).encode("utf-8")).hexdigest()[:16]
+    return Path(tempfile.gettempdir()) / f"weaver-snapshot-{os.getuid()}-{digest}.lock"
+
+
+@contextlib.contextmanager
+def _staged(out_dir: Path, suffix: str) -> cabc.Iterator[Path]:
+    """Capture into a private directory, and publish it only if everything worked.
+
+    Writing straight into ``out_dir`` gives a run no exclusive claim on it. Two
+    runs sharing one would interleave: the second clears the directory the
+    first is still filling, and the pages captured before that point are gone
+    while the ones after remain, so the result looks like a complete capture of
+    a site half of whose pages were never visited. A run that fails partway
+    leaves the same thing behind.
+
+    So each run captures into a directory of its own and publishes at the end,
+    under a lock keyed on the destination. Publication replaces file by file
+    with :func:`os.replace`, which is atomic per file, and the lock makes the
+    sequence of replacements atomic against another run of this script.
+
+    Parameters
+    ----------
+    out_dir
+        Where the results should end up.
+    suffix
+        File extension being written, including the leading dot.
+
+    Yields
+    ------
+    Path
+        The staging directory to write into.
+
+    Raises
+    ------
+    SystemExit
+        If the staging directory cannot be made, or publication fails.
+    """
+    destination = _ensure_output_dir(out_dir)
+    try:
+        staging = Path(
+            tempfile.mkdtemp(prefix=f".{destination.name}-", dir=destination.parent)
+        )
+    except OSError as exc:
+        message = f"a staging directory beside {destination} could not be made ({exc})"
+        raise SystemExit(message) from exc
+
+    try:
+        yield staging
+    except BaseException:
+        # A half-finished capture is worse than none: it would be compared as
+        # though it were whole.
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
+
+    try:
+        with _exclusive(_output_lock_path(destination), f"the output {destination}"):
+            for stale in destination.glob(f"*{suffix}"):
+                stale.unlink(missing_ok=True)
+            for captured in sorted(staging.glob(f"*{suffix}")):
+                captured.replace(destination / captured.name)
+    except OSError as exc:
+        message = f"{destination} could not be published to ({exc})"
+        raise SystemExit(message) from exc
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
 
 
 def _refuse_occupied_port(port: int) -> None:
@@ -341,6 +476,37 @@ def _stop(server: subprocess.Popen[bytes]) -> None:
             server.wait(timeout=10)
 
 
+def _server_argv(port: int) -> list[str]:
+    """Build the command that serves ``public/`` on one port.
+
+    ``-a 127.0.0.1`` is the part worth stating outright. ``http-server``
+    defaults its address to ``0.0.0.0``, so without it the published tree —
+    an unreleased sub-site, mid-migration — is offered to every host that can
+    reach this machine, for as long as a capture runs. Nothing in this script
+    needs that: every request it makes is to loopback.
+
+    Parameters
+    ----------
+    port
+        TCP port to listen on.
+
+    Returns
+    -------
+    list of str
+        The full argv, fixed apart from the port.
+    """
+    return [
+        str(HTTP_SERVER),
+        "public",
+        "-a",
+        "127.0.0.1",
+        "-p",
+        str(port),
+        "-c-1",
+        "--silent",
+    ]
+
+
 def _resolve_port(port: int) -> int:
     """Turn a requested port into the one to serve on.
 
@@ -455,7 +621,7 @@ def _start_server(port: int, marker: str) -> subprocess.Popen[bytes]:
     with _startup_lock(port):
         _refuse_occupied_port(port)
         server = subprocess.Popen(  # noqa: S603 - fixed argv, no shell, no user input
-            [str(HTTP_SERVER), "public", "-p", str(port), "-c-1", "--silent"],
+            _server_argv(port),
             cwd=REPO_ROOT,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -514,24 +680,34 @@ def _served(port: int) -> cabc.Iterator[str]:
             _stop(server)
 
 
-def _prepare_output_dir(out_dir: Path, suffix: str) -> Path:
-    """Create the output directory and clear any previous run's files.
+def _ensure_output_dir(out_dir: Path) -> Path:
+    """Create the output directory, without disturbing what is in it.
+
+    Clearing belongs to publication rather than to preparation. Emptying the
+    destination before a capture starts destroys the previous run's results in
+    exchange for nothing, and leaves nothing behind if this run then fails
+    partway — see :func:`_staged`.
 
     Parameters
     ----------
     out_dir
         Directory to create. Created with parents if absent.
-    suffix
-        File extension to clear, including the leading dot.
 
     Returns
     -------
     Path
         The resolved absolute path to the directory.
+
+    Raises
+    ------
+    SystemExit
+        If the directory cannot be created.
     """
-    out_dir.mkdir(parents=True, exist_ok=True)
-    for stale in out_dir.glob(f"*{suffix}"):
-        stale.unlink()
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        message = f"{out_dir} could not be created ({exc})"
+        raise SystemExit(message) from exc
     return out_dir.resolve()
 
 
@@ -756,15 +932,14 @@ def capture(out_dir: Path, /, *, port: int = 0) -> None:
         a free one, so two runs in two worktrees do not contend at all; pass a
         number only to reach the served tree from a browser by hand.
     """
-    resolved = _prepare_output_dir(out_dir, ".json")
     pages = _page_paths()
     bun = _tool("bun")
-    print(f"capturing {len(pages)} Weaver pages into {resolved}")
+    print(f"capturing {len(pages)} Weaver pages into {out_dir}")
 
-    with _served(port) as base:
-        _capture_pages(pages, resolved, base, bun, _run_tool)
+    with _staged(out_dir, ".json") as staging, _served(port) as base:
+        _capture_pages(pages, staging, base, bun, _run_tool)
 
-    print(f"done: {resolved}")
+    print(f"done: {out_dir.resolve()}")
 
 
 @app.command
@@ -781,15 +956,14 @@ def shots(out_dir: Path, /, *, port: int = 0) -> None:
         number only to reach the served tree from a browser by hand.
     """
     browser = _tool("agent-browser")
-    resolved = _prepare_output_dir(out_dir, ".png")
     pages = _page_paths()
     widths = " ".join(str(width) for width in SCREENSHOT_WIDTHS)
-    print(f"screenshotting {len(pages)} Weaver pages at {widths} into {resolved}")
+    print(f"screenshotting {len(pages)} Weaver pages at {widths} into {out_dir}")
 
-    with _served(port) as base:
-        _shoot_pages(pages, resolved, base, browser, _run_tool)
+    with _staged(out_dir, ".png") as staging, _served(port) as base:
+        _shoot_pages(pages, staging, base, browser, _run_tool)
 
-    print(f"done: {resolved}")
+    print(f"done: {out_dir.resolve()}")
 
 
 # The sRGB transfer function's linear-segment cutoff, from the sRGB

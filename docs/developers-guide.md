@@ -917,34 +917,34 @@ rather than a failure when a dependency is absent: `agent-browser` not on
 `tests/test_weaver_build.py`, so `bun run build` runs once for both suites
 rather than once per module.
 
-**The matrix.** The page list is derived from `config/pages.yaml` — the
-same file the generator itself reads — rather than hard-coded or drawn from
-the published tree, so all seventeen published pages are covered, and a
-page added to the config is covered automatically, without anyone
-remembering to add it here. The config has to be read this way because
-parametrization happens at collection, before the session-scoped
-`built_site` fixture has built anything; a companion test,
-`test_the_published_tree_holds_exactly_the_pages_checked_here`, asserts
-that the config and the published tree agree, so a config that has drifted
-from the build fails loudly rather than leaving a page silently unchecked.
-Most tests run at two viewports: 360×800, the narrowest width the design
-targets and the one that puts the sidebar off-canvas behind a toggle, and
-1440×900, the width the layout was drawn against. The two layouts share
-almost no chrome, so both have to be checked.
+**The matrix.** The page list is derived from `config/pages.yaml` — the same
+file the generator itself reads — rather than hard-coded or drawn from the
+published tree, so all seventeen published pages are covered, and a page added
+to the config is covered automatically, without anyone remembering to add it
+here. The config has to be read this way because parametrization happens at
+collection, before the session-scoped `built_site` fixture has built anything;
+a companion test,
+`test_the_published_tree_holds_exactly_the_pages_checked_here`, asserts that
+the config and the published tree agree, so a config that has drifted from the
+build fails loudly rather than leaving a page silently unchecked. Most tests
+run at two viewports: 360×800, the narrowest width the design targets and the
+one that puts the sidebar off-canvas behind a toggle, and 1440×900, the width
+the layout was drawn against. The two layouts share almost no chrome, so both
+have to be checked.
 
 **What each test asserts:**
 
 - `test_a_weaver_page_is_self_contained` — every request the page makes comes
   from the local origin and none fails, and the page actually fetched a
-  stylesheet, a font, and a script, so the first half of that check cannot
-  pass vacuously on a page that fetched nothing.
+  stylesheet, a font, and a script, so the first half of that check cannot pass
+  vacuously on a page that fetched nothing.
 - `test_a_weaver_page_meets_wcag_aa` — axe reports no unwaived violation
   against WCAG 2.0 A and AA.
 - `test_a_weaver_page_renders_its_chrome` — the current-link and icon
   contracts described below.
 - `test_a_weaver_page_fits_a_phone` — at 360px the drawer toggle is present,
-  the sidebar does not lay out, and the document's scroll width does not
-  exceed the viewport.
+  the sidebar does not lay out, and the document's scroll width does not exceed
+  the viewport.
 - `test_a_weaver_page_lays_out_its_sidebar_on_a_desktop` — the sidebar lays
   out at 1440px, the wide layout's half of the same swap.
 
@@ -953,21 +953,20 @@ Three further tests are not parametrized per page:
 - `test_the_recorded_contrast_exceptions_are_still_real` — the two waived
   `safety/` labels still fail exactly as recorded (see below).
 - `test_the_published_tree_holds_exactly_the_pages_checked_here` — the
-  companion test named above: the published tree and `config/pages.yaml`
-  name exactly the same pages.
+  companion test named above: the published tree and `config/pages.yaml` name
+  exactly the same pages.
 - `test_the_capture_command_writes_one_snapshot_per_page` — runs
   `scripts/weaver_snapshot.py capture` end to end and checks it writes one
   non-empty snapshot per published page.
 
 **The current-link contract.** At most one sidebar link may carry
 `aria-current="page"`, and where one does, it has to point at somewhere the
-page actually is. Three shapes are legitimate: the page's own href; an
-ancestor of it, since the three command sub-pages highlight the Commands
-section they belong to; and a fragment, since the design-language page reuses
-the nav classes for its own in-page anchors. A page the sidebar does not
-list — the three legal pages — has no current link at all, which is also
-correct: the chrome macro returns an empty string for them rather than
-guessing.
+page actually is. Three shapes are legitimate: the page's own href; an ancestor
+of it, since the three command sub-pages highlight the Commands section they
+belong to; and a fragment, since the design-language page reuses the nav
+classes for its own in-page anchors. A page the sidebar does not list — the
+three legal pages — has no current link at all, which is also correct: the
+chrome macro returns an empty string for them rather than guessing.
 
 **The icon check.** Every rendered `<svg>` must have a body, and no page may
 contain the literal text `UNKNOWN ICON`. The count of icons on a page is only
@@ -996,7 +995,6 @@ uv run pytest tests/test_weaver_browser.py -v
 It takes roughly 130 seconds for the file's 122 tests, including the build, on
 the machine it was written on.
 
-
 ### 7.4. Mobile overflow below the tablet breakpoint
 
 `src/styles/weaver/site-base.css` carries a `@media (max-width: 767px)` block
@@ -1005,17 +1003,17 @@ let the document scroll sideways. Below the breakpoint, `pre`, `code`, `th`,
 `td`, and `.font-mono` get `overflow-wrap: anywhere`; `h1`–`h4` get
 `overflow-wrap: break-word` together with `hyphens: auto`.
 
-It exists because four pages laid the document out wider than the 360px
-viewport `tests/test_weaver_browser.py` checks against: `sempai` at 826px,
-`jacquard` at 416px, `install` at 370px, and `docs` at 376px. Two causes, both
-of them content that cannot break at a space: a command line, a TOML key, or a
-table cell holding a path sets a minimum width its column cannot meet; and a
-display heading has the same problem for a different reason — "Documentation"
-at `text-5xl` is 344px on its own, against a 296px column.
+It exists because four pages laid the document out wider than the 360px viewport
+`tests/test_weaver_browser.py` checks against: `sempai` at 826px, `jacquard`
+at 416px, `install` at 370px, and `docs` at 376px. Two causes, both of them
+content that cannot break at a space: a command line, a TOML key, or a table
+cell holding a path sets a minimum width its column cannot meet; and a display
+heading has the same problem for a different reason — "Documentation" at
+`text-5xl` is 344px on its own, against a 296px column.
 
-The rule is deliberately scoped below the tablet breakpoint, so the wide
-layout — where nothing overflows and a mid-token break would be gratuitous —
-is untouched.
+The rule is deliberately scoped below the tablet breakpoint, so the wide layout
+— where nothing overflows and a mid-token break would be gratuitous — is
+untouched.
 
 ## 8. Accessibility checks
 

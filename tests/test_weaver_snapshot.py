@@ -34,6 +34,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # statement, which is what makes it assert on that statement alone.
 _MID_START_FAILURE = "the port was occupied"
 
+# A port number for the messages these tests read back. Nothing binds it;
+# the throwaway servers are given one by the kernel.
+PORT = 8099
+
 # The harness is a script rather than a package module, so it is loaded by
 # path rather than imported by name.
 _SPEC = importlib.util.spec_from_file_location(
@@ -618,21 +622,30 @@ def test_diff_says_so_rather_than_passing_on_an_empty_baseline(
     )
 
 
-def test_the_output_directory_is_cleared_of_the_previous_run(tmp_path: Path) -> None:
-    """A stale snapshot left behind would be compared as though it were fresh."""
+def test_publishing_clears_only_the_extension_being_written(tmp_path: Path) -> None:
+    """A capture and a screenshot run share a directory, so each clears its own.
+
+    Clearing happens at publication rather than before the capture: emptying
+    the destination up front destroys the previous run's results in exchange
+    for nothing, and leaves nothing behind if this run then fails.
+    """
     out = tmp_path / "shots"
     out.mkdir()
     (out / "gone.json").write_text("{}", encoding="utf-8")
     (out / "kept.png").write_text("x", encoding="utf-8")
 
-    resolved = weaver_snapshot._prepare_output_dir(out, ".json")
+    with weaver_snapshot._staged(out, ".json") as stage:
+        assert (out / "gone.json").exists(), (
+            "the previous run's results should survive until this one succeeds"
+        )
+        (stage / "fresh.json").write_text("{}", encoding="utf-8")
 
     assert not (out / "gone.json").exists(), "the previous run's JSON should be cleared"
+    assert (out / "fresh.json").exists(), "this run's snapshot should be published"
     assert (out / "kept.png").exists(), (
         "only the extension being written should be cleared, so a capture and "
         "a screenshot run can share a directory"
     )
-    assert resolved.is_absolute(), f"the path should be resolved; got {resolved!r}"
 
 
 def test_a_missing_tool_names_itself_rather_than_failing_obscurely() -> None:
@@ -756,7 +769,7 @@ def _lock_on(
 ) -> None:
     """Point the startup lock at a scratch file and shorten its wait."""
     monkeypatch.setattr(weaver_snapshot, "_lock_path", lambda _port: lock)
-    monkeypatch.setattr(weaver_snapshot, "STARTUP_LOCK_TIMEOUT_SECONDS", timeout)
+    monkeypatch.setattr(weaver_snapshot, "LOCK_TIMEOUT_SECONDS", timeout)
 
 
 def test_the_startup_lock_is_exclusive(
@@ -914,50 +927,67 @@ def test_an_unnamed_port_is_asked_for_rather_than_assumed() -> None:
     )
 
 
-def test_the_ownership_marker_is_served_and_then_removed(tmp_path: Path) -> None:
+def test_the_ownership_marker_is_served_and_then_removed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """The marker has to be reachable while serving and gone afterwards."""
     public = tmp_path / "public"
     public.mkdir()
-    monkeypatched = pytest.MonkeyPatch()
-    monkeypatched.setattr(weaver_snapshot, "REPO_ROOT", tmp_path)
-    try:
-        with weaver_snapshot._ownership_marker() as marker:
-            placed = public / marker
-            assert placed.is_file(), f"expected the marker at {placed}"
-            assert placed.read_text(encoding="utf-8") == marker, (
-                "the marker's contents name it, so a server that truncates or "
-                "rewrites files cannot pass the check by accident"
-            )
-    finally:
-        monkeypatched.undo()
+    monkeypatch.setattr(weaver_snapshot, "REPO_ROOT", tmp_path)
+
+    with weaver_snapshot._ownership_marker() as marker:
+        placed = public / marker
+        assert placed.is_file(), f"expected the marker at {placed}"
+        assert placed.read_text(encoding="utf-8") == marker, (
+            "the marker's contents name it, so a server that truncates or "
+            "rewrites files cannot pass the check by accident"
+        )
 
     assert not placed.exists(), f"{placed} was left behind in the served tree"
 
 
-def test_two_runs_are_given_different_ownership_markers(tmp_path: Path) -> None:
+def test_two_runs_are_given_different_ownership_markers(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """A shared name would let either run's server satisfy the other's check."""
     public = tmp_path / "public"
     public.mkdir()
-    monkeypatched = pytest.MonkeyPatch()
-    monkeypatched.setattr(weaver_snapshot, "REPO_ROOT", tmp_path)
-    try:
-        with (
-            weaver_snapshot._ownership_marker() as first,
-            weaver_snapshot._ownership_marker() as second,
-        ):
-            assert first != second, f"both runs were given {first!r}"
-    finally:
-        monkeypatched.undo()
+    monkeypatch.setattr(weaver_snapshot, "REPO_ROOT", tmp_path)
+
+    with (
+        weaver_snapshot._ownership_marker() as first,
+        weaver_snapshot._ownership_marker() as second,
+    ):
+        assert first != second, f"both runs were given {first!r}"
 
 
-def _serving(directory: Path) -> tuple[http.server.ThreadingHTTPServer, str]:
-    """Start a throwaway server over ``directory`` and return it and its origin."""
+@contextlib.contextmanager
+def _serving(directory: Path) -> cabc.Iterator[str]:
+    """Serve ``directory`` on a throwaway port for the duration of the context.
+
+    `shutdown` stops `serve_forever`'s loop but leaves the listening socket
+    open; only `server_close` releases it. Without both, each of these tests
+    leaks a socket, and the next one can be handed a port the previous
+    server's thread has not finished letting go of. Joining the thread is what
+    makes "finished" true rather than probable.
+
+    Yields
+    ------
+    str
+        The origin it is listening on, without a trailing slash.
+    """
     handler = functools.partial(
         http.server.SimpleHTTPRequestHandler, directory=str(directory)
     )
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    threading.Thread(target=server.serve_forever, daemon=True).start()
-    return server, f"http://127.0.0.1:{server.server_address[1]}"
+    serving = threading.Thread(target=server.serve_forever, daemon=True)
+    serving.start()
+    try:
+        yield f"http://127.0.0.1:{server.server_address[1]}"
+    finally:
+        server.shutdown()
+        server.server_close()
+        serving.join(timeout=10)
 
 
 def test_another_worktree_s_server_on_the_port_is_refused(tmp_path: Path) -> None:
@@ -976,14 +1006,10 @@ def test_another_worktree_s_server_on_the_port_is_refused(tmp_path: Path) -> Non
     theirs = tmp_path / "their-public"
     theirs.mkdir()
     (theirs / "index.html").write_text("<html>not ours</html>", encoding="utf-8")
-    server, base = _serving(theirs)
-    try:
-        with pytest.raises(SystemExit) as caught:
-            weaver_snapshot._confirm_ownership(
-                base, "weaver-snapshot-deadbeef.txt", 8099, "on starting"
-            )
-    finally:
-        server.shutdown()
+    with _serving(theirs) as base, pytest.raises(SystemExit) as caught:
+        weaver_snapshot._confirm_ownership(
+            base, "weaver-snapshot-deadbeef.txt", PORT, "on starting"
+        )
 
     message = str(caught.value.code)
     assert "8099" in message, f"the message should name the port; got {message!r}"
@@ -998,11 +1024,8 @@ def test_our_own_server_passes_the_ownership_check(tmp_path: Path) -> None:
     ours.mkdir()
     marker = "weaver-snapshot-0123456789abcdef.txt"
     (ours / marker).write_text(marker, encoding="utf-8")
-    server, base = _serving(ours)
-    try:
-        weaver_snapshot._confirm_ownership(base, marker, 8099, "on starting")
-    finally:
-        server.shutdown()
+    with _serving(ours) as base:
+        weaver_snapshot._confirm_ownership(base, marker, PORT, "on starting")
 
 
 def test_a_server_that_returns_the_wrong_marker_is_refused(tmp_path: Path) -> None:
@@ -1011,13 +1034,126 @@ def test_a_server_that_returns_the_wrong_marker_is_refused(tmp_path: Path) -> No
     theirs.mkdir()
     marker = "weaver-snapshot-0123456789abcdef.txt"
     (theirs / marker).write_text("something else entirely", encoding="utf-8")
-    server, base = _serving(theirs)
-    try:
-        with pytest.raises(SystemExit) as caught:
-            weaver_snapshot._confirm_ownership(base, marker, 8099, "on starting")
-    finally:
-        server.shutdown()
+    with _serving(theirs) as base, pytest.raises(SystemExit) as caught:
+        weaver_snapshot._confirm_ownership(base, marker, PORT, "on starting")
 
     assert "another server" in str(caught.value.code), (
         f"expected the mismatch to be reported; got {caught.value.code!r}"
     )
+
+
+def test_the_server_is_offered_only_to_this_machine() -> None:
+    """`http-server` defaults to 0.0.0.0, which publishes the tree to the LAN.
+
+    The tree being served is an unreleased sub-site mid-migration, and every
+    request this script makes is to loopback, so there is nothing to gain from
+    the default and a disclosure to lose. Verified against the packaged
+    binary's own help text, which documents `-a` as defaulting to `0.0.0.0`.
+    """
+    argv = weaver_snapshot._server_argv(8099)
+
+    assert "-a" in argv, f"no address was pinned, so the default applies: {argv}"
+    assert argv[argv.index("-a") + 1] == "127.0.0.1", (
+        f"the address should be loopback; got {argv}"
+    )
+
+
+def test_the_server_argv_still_names_the_port_and_the_tree() -> None:
+    """Pinning the address must not have displaced anything else."""
+    argv = weaver_snapshot._server_argv(9123)
+
+    assert argv[0] == str(weaver_snapshot.HTTP_SERVER), f"wrong executable: {argv}"
+    assert "public" in argv, f"the published tree should be served: {argv}"
+    assert argv[argv.index("-p") + 1] == "9123", f"the port should be passed: {argv}"
+
+
+def test_a_page_list_is_taken_from_the_tree_it_is_given(tmp_path: Path) -> None:
+    """The traversal is passed its root, so it can be exercised on a real one."""
+    for page in ("", "install", "commands/act"):
+        directory = tmp_path / page if page else tmp_path
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / "index.html").write_text("<html></html>", encoding="utf-8")
+
+    assert weaver_snapshot._page_paths(tmp_path) == ["", "commands/act/", "install/"], (
+        f"got {weaver_snapshot._page_paths(tmp_path)!r}"
+    )
+
+
+def test_an_unreadable_corner_of_the_tree_stops_the_capture(tmp_path: Path) -> None:
+    """A short page list is worse than a failure: it compares clean.
+
+    `rglob` swallows an `OSError` on a descendant and yields nothing further
+    beneath it, so a directory this process cannot read would quietly shorten
+    the list. The pages under it would be absent from the capture and absent
+    from the diff, which reads as "no differences" rather than "not looked at".
+    """
+    (tmp_path / "index.html").write_text("<html></html>", encoding="utf-8")
+    closed = tmp_path / "closed"
+    closed.mkdir()
+    (closed / "index.html").write_text("<html></html>", encoding="utf-8")
+    closed.chmod(0o000)
+    try:
+        if os.getuid() == 0:  # pragma: no cover - root ignores the mode
+            pytest.skip("running as root, which can read the directory anyway")
+        with pytest.raises(SystemExit) as caught:
+            weaver_snapshot._page_paths(tmp_path)
+    finally:
+        closed.chmod(0o755)
+
+    assert "could not be read" in str(caught.value.code), (
+        f"the message should say what failed; got {caught.value.code!r}"
+    )
+
+
+def test_a_capture_is_published_only_once_it_is_whole(tmp_path: Path) -> None:
+    """A run that fails partway must not leave half a capture to be compared."""
+    out_dir = tmp_path / "snapshots"
+    out_dir.mkdir()
+    (out_dir / "__home.json").write_text("previous run", encoding="utf-8")
+
+    def half_a_capture() -> None:
+        """Write one page, then fail the way an interrupted run does."""
+        with weaver_snapshot._staged(out_dir, ".json") as stage:
+            (stage / "__home.json").write_text("this run", encoding="utf-8")
+            raise RuntimeError(_MID_START_FAILURE)
+
+    with pytest.raises(RuntimeError):
+        half_a_capture()
+
+    assert (out_dir / "__home.json").read_text(encoding="utf-8") == "previous run", (
+        "a failed run replaced the previous capture with its own partial one"
+    )
+    assert not list(tmp_path.glob(".snapshots-*")), (
+        f"the staging directory was left behind: {list(tmp_path.iterdir())}"
+    )
+
+
+def test_a_finished_capture_replaces_the_previous_one(tmp_path: Path) -> None:
+    """Publication clears what was there, so a dropped page cannot linger."""
+    out_dir = tmp_path / "snapshots"
+    out_dir.mkdir()
+    (out_dir / "__home.json").write_text("previous run", encoding="utf-8")
+    (out_dir / "gone.json").write_text("a page that no longer exists", encoding="utf-8")
+
+    with weaver_snapshot._staged(out_dir, ".json") as stage:
+        (stage / "__home.json").write_text("this run", encoding="utf-8")
+
+    assert (out_dir / "__home.json").read_text(encoding="utf-8") == "this run"
+    assert not (out_dir / "gone.json").exists(), (
+        "a snapshot from a previous run survived, and would be compared as "
+        "though this run had written it"
+    )
+    assert not list(tmp_path.glob(".snapshots-*")), "the staging directory was left"
+
+
+def test_two_runs_publishing_the_same_directory_contend(tmp_path: Path) -> None:
+    """Publication is the moment two runs would interleave, so it is serialized."""
+    out_dir = tmp_path / "snapshots"
+    out_dir.mkdir()
+    first = weaver_snapshot._output_lock_path(out_dir.resolve())
+    second = weaver_snapshot._output_lock_path((tmp_path / "other").resolve())
+
+    assert first == weaver_snapshot._output_lock_path(out_dir.resolve()), (
+        "one directory should map to one lock, however often it is asked for"
+    )
+    assert first != second, f"two directories both locked on {first}"

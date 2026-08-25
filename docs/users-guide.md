@@ -34,6 +34,14 @@ The shared [terms](/episodic/terms-of-use/),
 [privacy policy](/episodic/privacy-policy/), and
 [code of conduct](/episodic/code-of-conduct/) complete the public route set.
 
+### Documentation search
+
+The [documentation](/episodic/docs/) page provides search across the published
+Episodic pages and the upstream documentation catalogue. Enter at least two
+characters to show matching pages, sections, and upstream documents. The
+category listing remains available when JavaScript or the search index is
+unavailable.
+
 ## 2. Supported behaviour
 
 The current checkout is useful for three things:

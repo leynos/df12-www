@@ -41,6 +41,7 @@ extend-ignore-re = [
     "background_color",
     "color-mix\\(\\)",
     "currentColor",
+    "initialise(?:All)?EpisodicSearch",
     "var\\.iamge_id",
 ]
 

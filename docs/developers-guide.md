@@ -551,11 +551,16 @@ it — `doc-search.js` is included on thirteen pages this way.
 shape. It exposes five helpers when `module.exports` is available:
 `createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
 for fetching and deserializing the MiniSearch payload,
-`searchEpisodicIndex` for query-time ranking, plus the single-root and
-document-wide initialization helpers. The search helpers are written so the
-loading boundary stays outside the query path: queries only consult an
-already-loaded index, while initialization owns the fetch and failure
-handling.
+`searchEpisodicIndex` for query-time ranking, `initialiseEpisodicSearch` for
+one root, and `initialiseAllEpisodicSearch` for the document. The latter two
+accept injected loader, search, and navigation dependencies so their DOM
+behaviour can be tested without a network request or navigation. Their roots
+must provide the `data-search-root`, `data-search-index`, `data-search-input`,
+`data-search-panel`, `data-search-results`, and `data-search-meta` contract.
+The search helpers are written so the loading boundary stays outside the query
+path: queries only consult an already-loaded index, while initialization owns
+the fetch and failure handling. Failed cache entries are evicted, allowing a
+later root initialization to retry.
 
 An element may still carry an id for the stylesheet or for an ARIA
 relationship; what the convention rules out is _script_ depending on one. The

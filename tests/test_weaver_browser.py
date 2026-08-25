@@ -560,6 +560,121 @@ def test_the_published_tree_holds_exactly_the_pages_checked_here(
     )
 
 
+# Pages carrying a copy-to-clipboard control, and what each one should hand
+# over. Every Weaver copy button is an inline `onclick`, because no Weaver page
+# loads a copy-button script; the Netsuke suite tests a different mechanism
+# entirely, so nothing covered these until now.
+COPY_CONTROLS = [
+    ("", "cargo install weaver"),
+    ("install/", None),
+]
+
+
+@pytest.mark.timeout(600)
+@pytest.mark.parametrize(("page", "expected"), COPY_CONTROLS)
+def test_a_copy_control_hands_the_clipboard_what_it_shows(
+    drive: cabc.Callable[..., str], served: str, page: str, expected: str | None
+) -> None:
+    """A copy button that copies the wrong thing looks exactly like one that works.
+
+    The handler is an `onclick` attribute in the template, so nothing between
+    the markup and a real click exercises it — a typo in the string, or a
+    quote that ends the attribute early, ships silently. `navigator.clipboard`
+    is stubbed rather than read back, because a headless browser's clipboard
+    permissions are their own source of flakiness and the question here is
+    what the handler passed, not whether Chromium would store it.
+
+    Where `expected` is None the assertion is that every control copies the
+    text it sits beside, which is the invariant that holds for the three
+    buttons on the install page.
+    """
+    _open(drive, served, page, DESKTOP_WIDTH, DESKTOP_HEIGHT)
+    copied = _evaluate(
+        drive,
+        "JSON.stringify((() => {"
+        "const copied = [];"
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true,"
+        " value: {writeText: (text) => { copied.push(text);"
+        " return Promise.resolve(); }}});"
+        "const shown = [];"
+        # The two pages label their controls differently — `title` on the home
+        # page, visible text on the install page — so they are found by the
+        # handler they share rather than by how they are labelled.
+        "for (const button of document.querySelectorAll("
+        "'button[onclick*=clipboard]')) {"
+        "  shown.push(button.closest('div').textContent.replace(/\\s+/g,' ').trim());"
+        "  button.click();"
+        "}"
+        "return {copied, shown};"
+        "})())",
+    )
+
+    assert copied["copied"], (
+        f"/weaver/{page} has a copy control that handed the clipboard nothing; "
+        "the handler did not run"
+    )
+    if expected is not None:
+        assert copied["copied"] == [expected], (
+            f"/weaver/{page}'s copy control passed {copied['copied']} rather "
+            f"than {[expected]}"
+        )
+    for text, beside in zip(copied["copied"], copied["shown"], strict=True):
+        assert text in beside, (
+            f"/weaver/{page} copies {text!r} from a control sitting beside "
+            f"{beside!r}, so the button copies something other than what it shows"
+        )
+
+
+@pytest.mark.timeout(600)
+@pytest.mark.parametrize("page", ["docs/", "commands/act/", "sempai/"])
+def test_a_long_code_line_scrolls_its_panel_and_not_the_page(
+    drive: cabc.Callable[..., str], served: str, page: str
+) -> None:
+    """Code panels scroll on purpose; the document must not scroll with them.
+
+    The mobile rule lets code break mid-token, but a `pre` inherits
+    ``white-space: pre`` unless a utility says otherwise, and `overflow-wrap`
+    does nothing to a line that is not allowed to wrap at all. Those panels
+    are meant to scroll, and they are reachable from a keyboard so that they
+    can be. What must not happen is the document scrolling instead, which is
+    what puts every line of body text out of reach.
+
+    A three-hundred-character line is injected rather than waited for, so the
+    guarantee is tested rather than the current content.
+    """
+    _open(drive, served, page, MOBILE_WIDTH, MOBILE_HEIGHT)
+    result = _evaluate(
+        drive,
+        "JSON.stringify((() => {"
+        "const pre = document.querySelector('pre');"
+        "if (!pre) return {found: false};"
+        "pre.textContent = 'weaver observe get-definition --overrides '"
+        " + 'x'.repeat(300);"
+        "let scroller = pre;"
+        "while (scroller && getComputedStyle(scroller).overflowX === 'visible')"
+        " scroller = scroller.parentElement;"
+        "return {found: true, page: document.documentElement.scrollWidth,"
+        " viewport: window.innerWidth,"
+        " wrapped: pre.scrollWidth <= pre.clientWidth + 1,"
+        " scrollable: !!scroller && scroller.scrollWidth > scroller.clientWidth};"
+        "})())",
+    )
+
+    assert result["found"], f"/weaver/{page} has no code panel to test"
+    assert result["page"] <= result["viewport"], (
+        f"a long line in a code panel on /weaver/{page} pushed the document to "
+        f"{result['page']}px in a {result['viewport']}px viewport"
+    )
+    # A panel may answer a long line either way: by wrapping it, where the
+    # markup asks for `whitespace-pre-wrap`, or by scrolling it, which is the
+    # default and why these panels are keyboard-reachable. What it may not do
+    # is clip the line away with no means of reading it.
+    assert result["wrapped"] or result["scrollable"], (
+        f"/weaver/{page}'s code panel neither wrapped the long line nor gave "
+        f"anything to scroll it with, so the end of it cannot be read"
+    )
+
+
 @pytest.mark.timeout(900)
 def test_the_capture_command_writes_one_snapshot_per_page(
     built_site: Path, tmp_path: Path

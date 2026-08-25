@@ -524,7 +524,7 @@ def test_an_unreadable_output_is_reported_separately(
 # makes a naive search of this markup report duplicates that are not there.
 FONT_SIZE = re.compile(r"^text-(?:[3-9]xs|2xs|xs|sm|base|lg|xl|[2-9]xl)$")
 
-CLASS_ATTRIBUTE = re.compile(r'class\s*=\s*"([^"]*)"')
+CLASS_ATTRIBUTE = re.compile(r'class\s*=\s*"([^"]*)"', re.DOTALL)
 
 
 def test_no_element_declares_two_font_sizes_at_once() -> None:
@@ -541,18 +541,21 @@ def test_no_element_declares_two_font_sizes_at_once() -> None:
     """
     offenders: dict[str, list[str]] = {}
     for source in sorted(WEAVER_TEMPLATES.rglob("*.jinja")):
-        for number, line in enumerate(
-            source.read_text(encoding="utf-8").splitlines(), start=1
-        ):
-            for attribute in CLASS_ATTRIBUTE.finditer(line):
-                sizes = [
-                    token
-                    for token in attribute.group(1).split()
-                    if FONT_SIZE.match(token)
-                ]
-                if len(sizes) > 1:
-                    where = f"{source.relative_to(REPO_ROOT)}:{number}"
-                    offenders[where] = sizes
+        # Matched against the whole file rather than line by line: a `class`
+        # attribute long enough to be wrapped would otherwise be seen as two
+        # fragments, neither of which is an attribute, and a duplicate split
+        # across the wrap would go unreported. The line number comes from the
+        # match offset, and the offset keys the report, so two attributes on
+        # one line are both kept.
+        text = source.read_text(encoding="utf-8")
+        for attribute in CLASS_ATTRIBUTE.finditer(text):
+            sizes = [
+                token for token in attribute.group(1).split() if FONT_SIZE.match(token)
+            ]
+            if len(sizes) > 1:
+                number = text.count("\n", 0, attribute.start()) + 1
+                where = f"{source.relative_to(REPO_ROOT)}:{number}+{attribute.start()}"
+                offenders[where] = sizes
 
     assert not offenders, (
         "these elements declare more than one font size, so which one applies "

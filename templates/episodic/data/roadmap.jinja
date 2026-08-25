@@ -3,7 +3,7 @@
 
   Projected from the upstream Episodic roadmap, which is authoritative
   for delivery state. Regenerate with `make site-data` after the
-  upstream roadmap changes; `make check` fails when this file drifts.
+  upstream roadmap changes; `make check-site-data` fails when this file drifts.
 
   Source: leynos/episodic docs/roadmap.md
 #}
@@ -537,7 +537,7 @@
         "tasks": [
           {
             "id": "2.6.1",
-            "title": "Define GenerationRunPort and implement domain model.",
+            "title": "Define `GenerationRunPort` and implement domain model.",
             "done": true,
             "requires": [
               "2.4.2"
@@ -648,7 +648,7 @@
           },
           {
             "id": "3.1.2",
-            "title": "Define the DialogueSpeechPort contract for multi-speaker conversation rendering.",
+            "title": "Define the `DialogueSpeechPort` contract for multi-speaker conversation rendering.",
             "requires": [
               "3.1.1"
             ],
@@ -827,7 +827,14 @@
           },
           {
             "id": "3.3.6",
-            "title": "Add adapter contract scenarios across capability combinations. Requires 3.3.1-3.3.5.",
+            "title": "Add adapter contract scenarios across capability combinations.",
+            "requires": [
+              "3.3.1",
+              "3.3.2",
+              "3.3.3",
+              "3.3.4",
+              "3.3.5"
+            ],
             "notes": [
               "Cover direct TTS, dialogue rendering, reference-audio voices, provider-managed voices, pronunciation strategies, timing requirements, streaming, queue execution, and unsupported-feature failures.",
               "Success: every adapter either fulfils requested capabilities or returns a stable unsupported-capability diagnostic."
@@ -886,7 +893,7 @@
         "tasks": [
           {
             "id": "3.5.1",
-            "title": "Define AudioRunPort and implement domain model.",
+            "title": "Define `AudioRunPort` and implement domain model.",
             "requires": [
               "3.1.1",
               "3.4.2"
@@ -947,7 +954,14 @@
         "tasks": [
           {
             "id": "3.6.1",
-            "title": "Define `VoicePreviewPort` and implement synthesis endpoints. Requires 3.1.1, 3.1.4, 3.3.1, 3.3.3, and 3.3.4.",
+            "title": "Define `VoicePreviewPort` and implement synthesis endpoints.",
+            "requires": [
+              "3.1.1",
+              "3.1.4",
+              "3.3.1",
+              "3.3.3",
+              "3.3.4"
+            ],
             "notes": [
               "Implement /v1/voice-previews (POST) accepting text and voice configuration.",
               "Implement /v1/voice-previews/{preview_id} (GET) returning status and signed audio URL.",
@@ -958,7 +972,7 @@
           },
           {
             "id": "3.6.2",
-            "title": "Define ExportJobPort and implement export endpoints.",
+            "title": "Define `ExportJobPort` and implement export endpoints.",
             "requires": [
               "3.4.2",
               "3.4.3"
@@ -1099,8 +1113,12 @@
             "id": "4.3.1",
             "title": "Implement source and presenter-profile intake for script generation.",
             "done": true,
+            "requires": [
+              "1.3.4",
+              "1.4.3",
+              "4.1.1"
+            ],
             "notes": [
-              "Requires 1.3.4, 1.4.3, and 4.1.1.",
               "Implemented POST /v1/uploads with idempotency keys, content-type allowlists, size limits, content hashes, upload metadata, and filesystem object-store runtime wiring. The resumable POST /v1/uploads/init flow is deferred until an object-store adapter can use pre-signed upload URLs.",
               "Implemented /v1/ingestion-jobs and /v1/ingestion-jobs/{job_id}/sources with pollable job status and source attachment by upload_id or source_uri.",
               "Uses reusable reference documents with kind=host_profile and kind=guest_profile as the presenter-profile contract.",
@@ -1110,8 +1128,12 @@
           {
             "id": "4.3.2",
             "title": "Implement no-QA generation runs and TEI-P5 retrieval.",
+            "requires": [
+              "2.1.1",
+              "2.4.2",
+              "4.3.1"
+            ],
             "notes": [
-              "Requires 2.1.1, 2.4.2, and 4.3.1.",
               "Implement /v1/episodes/{episode_id}/generation-runs creation with quality_mode=draft_without_qa, skip_qa_rationale, actor metadata, and Idempotency-Key enforcement.",
               "Implement /v1/generation-runs/{run_id} and /v1/generation-runs/{run_id}/events as JSON polling surfaces for the draft generation lifecycle.",
               "Persist the generated script into the canonical episode TEI with QA marked as skipped for the run, and the resulting TEI revision.",
@@ -1133,8 +1155,13 @@
           {
             "id": "4.4.1",
             "title": "Add QA-gated mode branching and Graph route plumbing.",
+            "requires": [
+              "2.1.1",
+              "2.2.6",
+              "2.4.2",
+              "4.3.2"
+            ],
             "notes": [
-              "Requires 2.1.1, 2.2.6, 2.4.2, and 4.3.2.",
               "Extend run creation and run state validation for quality_mode=qa_gated.",
               "Preserve draft_without_qa as a direct route to draft persistence.",
               "Route qa_gated runs into the full evaluation branch in the Content Generation Graph.",
@@ -1146,8 +1173,11 @@
           {
             "id": "4.4.2",
             "title": "Invoke Chrono in-loop and emit duration-based QA findings.",
+            "requires": [
+              "2.2.6",
+              "4.4.1"
+            ],
             "notes": [
-              "Requires 2.2.6 and 4.4.1.",
               "After each generation attempt, run generated TEI through Chrono and record estimated_seconds, estimator identity, and policy check outcome.",
               "Compare against minimum/maximum duration thresholds from configuration.",
               "Emit a signed QA finding artefact and generation event for short/long-draft outcomes that can drive a refinement turn.",
@@ -1158,8 +1188,11 @@
           {
             "id": "4.4.3",
             "title": "Trigger targeted redraft from duration outcomes.",
+            "requires": [
+              "4.4.2",
+              "2.4.2"
+            ],
             "notes": [
-              "Requires 4.4.2 and 2.4.2.",
               "Build refinement prompts from Chrono failure summaries and prior run context.",
               "Route failed duration checks back to the Generate node with an explicit iteration reason and cap-adjusted retry count.",
               "Enforce max_iterations from generation configuration and route exhausted runs to Escalate.",
@@ -1172,8 +1205,12 @@
           {
             "id": "4.4.4",
             "title": "Persist iterative quality context and resume points.",
+            "requires": [
+              "2.6.1",
+              "2.5.5",
+              "4.4.3"
+            ],
             "notes": [
-              "Requires 2.6.1, 2.5.5, and 4.4.3.",
               "Extend iteration metadata to include generation hash, prior draft summary, QA outcome snapshot, and refinement instructions.",
               "Persist per-iteration event details so run history explains why redrafts were triggered.",
               "Persist escalation checkpoints for human-in-the-loop recovery when the iteration cap is reached.",
@@ -1194,7 +1231,7 @@
         "tasks": [
           {
             "id": "4.5.1",
-            "title": "Define RunEventBusPort and implement WebSocket streaming for generation runs.",
+            "title": "Define `RunEventBusPort` and implement WebSocket streaming for generation runs.",
             "requires": [
               "2.6.1"
             ],

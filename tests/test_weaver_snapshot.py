@@ -11,11 +11,14 @@ from __future__ import annotations
 
 import contextlib
 import fcntl
+import functools
+import http.server
 import importlib.util
 import json
 import os
 import socket
 import subprocess
+import threading
 import typing as typ
 from pathlib import Path
 
@@ -890,9 +893,131 @@ def test_the_port_is_probed_with_the_startup_lock_held(
     monkeypatch.setattr(weaver_snapshot, "_refuse_occupied_port", probe)
 
     with pytest.raises(SystemExit):
-        weaver_snapshot._start_server(8099)
+        weaver_snapshot._start_server(8099, "weaver-snapshot-deadbeef.txt")
 
     assert held == [True], (
         "the port must be probed while the startup lock is held, or two runs "
         f"can still interleave; observed {held!r}"
+    )
+
+
+def test_an_unnamed_port_is_asked_for_rather_than_assumed() -> None:
+    """Two runs cannot contend over a port the kernel picked for each of them."""
+    first = weaver_snapshot._resolve_port(0)
+    second = weaver_snapshot._resolve_port(0)
+
+    for port in (first, second):
+        assert port > 0, f"the kernel should have named a port; got {port!r}"
+    named = 8099
+    assert weaver_snapshot._resolve_port(named) == named, (
+        "a port named explicitly should be honoured as given"
+    )
+
+
+def test_the_ownership_marker_is_served_and_then_removed(tmp_path: Path) -> None:
+    """The marker has to be reachable while serving and gone afterwards."""
+    public = tmp_path / "public"
+    public.mkdir()
+    monkeypatched = pytest.MonkeyPatch()
+    monkeypatched.setattr(weaver_snapshot, "REPO_ROOT", tmp_path)
+    try:
+        with weaver_snapshot._ownership_marker() as marker:
+            placed = public / marker
+            assert placed.is_file(), f"expected the marker at {placed}"
+            assert placed.read_text(encoding="utf-8") == marker, (
+                "the marker's contents name it, so a server that truncates or "
+                "rewrites files cannot pass the check by accident"
+            )
+    finally:
+        monkeypatched.undo()
+
+    assert not placed.exists(), f"{placed} was left behind in the served tree"
+
+
+def test_two_runs_are_given_different_ownership_markers(tmp_path: Path) -> None:
+    """A shared name would let either run's server satisfy the other's check."""
+    public = tmp_path / "public"
+    public.mkdir()
+    monkeypatched = pytest.MonkeyPatch()
+    monkeypatched.setattr(weaver_snapshot, "REPO_ROOT", tmp_path)
+    try:
+        with (
+            weaver_snapshot._ownership_marker() as first,
+            weaver_snapshot._ownership_marker() as second,
+        ):
+            assert first != second, f"both runs were given {first!r}"
+    finally:
+        monkeypatched.undo()
+
+
+def _serving(directory: Path) -> tuple[http.server.ThreadingHTTPServer, str]:
+    """Start a throwaway server over ``directory`` and return it and its origin."""
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(directory)
+    )
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server, f"http://127.0.0.1:{server.server_address[1]}"
+
+
+def test_another_worktree_s_server_on_the_port_is_refused(tmp_path: Path) -> None:
+    """Refuse a server that answers on the port but serves another tree.
+
+    The startup lock is keyed on the user id, so two users racing for one port
+    are not serialized by it — deliberately, since a sticky `/tmp` would make
+    another user's lock file unopenable. And a running child says only that
+    *something* of ours is alive, not that it is what answered. A server
+    belonging to another worktree answers a readiness poll perfectly well and
+    would have its pages captured as this branch's work.
+
+    A lock cannot catch this and liveness cannot detect it; fetching a marker
+    only this run knows the name of settles it.
+    """
+    theirs = tmp_path / "their-public"
+    theirs.mkdir()
+    (theirs / "index.html").write_text("<html>not ours</html>", encoding="utf-8")
+    server, base = _serving(theirs)
+    try:
+        with pytest.raises(SystemExit) as caught:
+            weaver_snapshot._confirm_ownership(
+                base, "weaver-snapshot-deadbeef.txt", 8099, "on starting"
+            )
+    finally:
+        server.shutdown()
+
+    message = str(caught.value.code)
+    assert "8099" in message, f"the message should name the port; got {message!r}"
+    assert "other tree" in message, (
+        f"the message should say whose tree is being served; got {message!r}"
+    )
+
+
+def test_our_own_server_passes_the_ownership_check(tmp_path: Path) -> None:
+    """The check must not refuse the server it was meant to accept."""
+    ours = tmp_path / "public"
+    ours.mkdir()
+    marker = "weaver-snapshot-0123456789abcdef.txt"
+    (ours / marker).write_text(marker, encoding="utf-8")
+    server, base = _serving(ours)
+    try:
+        weaver_snapshot._confirm_ownership(base, marker, 8099, "on starting")
+    finally:
+        server.shutdown()
+
+
+def test_a_server_that_returns_the_wrong_marker_is_refused(tmp_path: Path) -> None:
+    """A tree that happens to hold that name is still not this run's tree."""
+    theirs = tmp_path / "public"
+    theirs.mkdir()
+    marker = "weaver-snapshot-0123456789abcdef.txt"
+    (theirs / marker).write_text("something else entirely", encoding="utf-8")
+    server, base = _serving(theirs)
+    try:
+        with pytest.raises(SystemExit) as caught:
+            weaver_snapshot._confirm_ownership(base, marker, 8099, "on starting")
+    finally:
+        server.shutdown()
+
+    assert "another server" in str(caught.value.code), (
+        f"expected the mismatch to be reported; got {caught.value.code!r}"
     )

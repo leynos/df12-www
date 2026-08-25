@@ -32,6 +32,7 @@ import json
 import math
 import os
 import re
+import secrets
 import shutil
 import socket
 import subprocess
@@ -162,8 +163,11 @@ def _startup_lock(port: int) -> cabc.Iterator[None]:
     Probing a port and then spawning a server on it is check-then-act: two
     runs can both find the port free, both spawn, and one then answer the
     other's readiness poll. The loser would snapshot the winner's ``public/``
-    and report the diff as its own work — and because the ports are fixed
-    defaults, two worktrees collide by default rather than by bad luck.
+    and report the diff as its own work.
+
+    The default port is ephemeral, so two runs normally have nothing to
+    contend over; this covers the case where a port was named explicitly, and
+    two runs in two worktrees were given the same number.
 
     Serializing probe and spawn behind one lock removes the interleaving
     rather than narrowing it: the second run reaches the probe only once the
@@ -174,7 +178,11 @@ def _startup_lock(port: int) -> cabc.Iterator[None]:
 
     ``flock`` is advisory and POSIX-only, which suits both facts here: the
     only processes that need to co-operate are other runs of this script, and
-    the repository's tooling is POSIX throughout.
+    the repository's tooling is POSIX throughout. It is keyed on the user id
+    as well as the port, because a shared ``/tmp`` is sticky and another
+    user's lock file could not be opened for writing. That deliberately leaves
+    two *users* unserialized, which is what :func:`_confirm_ownership` is for:
+    a lock cannot prove whose server answered, and a marker can.
 
     Parameters
     ----------
@@ -333,13 +341,105 @@ def _stop(server: subprocess.Popen[bytes]) -> None:
             server.wait(timeout=10)
 
 
-def _start_server(port: int) -> subprocess.Popen[bytes]:
-    """Acquire the port and return a server already answering on it.
+def _resolve_port(port: int) -> int:
+    """Turn a requested port into the one to serve on.
+
+    Zero means "whatever the kernel has spare", which is the default and the
+    reason two concurrent runs normally have nothing to contend over at all.
+    A fixed port is honoured as given, since reaching the served tree from a
+    browser by hand needs a number known in advance.
+
+    Parameters
+    ----------
+    port
+        The requested port, or ``0``.
+
+    Returns
+    -------
+    int
+        A port to serve on.
+    """
+    if port:
+        return port
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
+
+
+@contextlib.contextmanager
+def _ownership_marker() -> cabc.Iterator[str]:
+    """Put a file under ``public/`` that only this run knows the name of.
+
+    Fetching it back is what turns "something is listening" into "the thing
+    listening is serving *this* worktree's tree". Liveness of the child cannot
+    establish that: an unrelated server can claim the port in the moment
+    between the bind probe and the spawn, and a run in another worktree — or
+    another user's, which the startup lock deliberately does not serialize —
+    answers requests just as readily.
+
+    Yields
+    ------
+    str
+        The marker's name, relative to the served root.
+    """
+    name = f"weaver-snapshot-{secrets.token_hex(8)}.txt"
+    marker = REPO_ROOT / "public" / name
+    marker.write_text(name, encoding="utf-8")
+    try:
+        yield name
+    finally:
+        marker.unlink(missing_ok=True)
+
+
+def _confirm_ownership(base: str, marker: str, port: int, when: str) -> None:
+    """Check that the server on this port is serving this run's ``public/``.
+
+    Parameters
+    ----------
+    base
+        The origin to ask.
+    marker
+        The name :func:`_ownership_marker` chose, which is also its contents.
+    port
+        The port, for the message.
+    when
+        What was happening, for the message: the check runs once before the
+        capture and once after, and the two failures mean different things.
+
+    Raises
+    ------
+    SystemExit
+        If the marker cannot be fetched or does not come back intact, in which
+        case whatever is on the port is not this run's server.
+    """
+    try:
+        with urllib.request.urlopen(f"{base}/{marker}", timeout=5) as response:  # noqa: S310 - literal loopback URL
+            served = response.read().decode("utf-8").strip()
+    except (urllib.error.URLError, OSError) as exc:
+        message = (
+            f"the server on port {port} did not serve this run's marker "
+            f"{when} ({exc}), so it is serving some other tree; the snapshot "
+            f"would be of that. Pass --port, or leave it unset to be given a "
+            f"free one."
+        )
+        raise SystemExit(message) from exc
+    if served != marker:
+        message = (
+            f"port {port} returned {served!r} for this run's marker {when}; "
+            f"another server has it"
+        )
+        raise SystemExit(message)
+
+
+def _start_server(port: int, marker: str) -> subprocess.Popen[bytes]:
+    """Acquire the port and return a server already answering on it, as itself.
 
     Parameters
     ----------
     port
         TCP port to listen on.
+    marker
+        The ownership marker to fetch back once it answers.
 
     Returns
     -------
@@ -361,7 +461,9 @@ def _start_server(port: int) -> subprocess.Popen[bytes]:
             stderr=subprocess.DEVNULL,
         )
         try:
-            _await_server(server, f"http://127.0.0.1:{port}", port)
+            base = f"http://127.0.0.1:{port}"
+            _await_server(server, base, port)
+            _confirm_ownership(base, marker, port, "on starting")
         except BaseException:
             # Otherwise a failed start leaves a child holding the port, and
             # the next run's probe refuses to start because of it.
@@ -377,7 +479,7 @@ def _served(port: int) -> cabc.Iterator[str]:
     Parameters
     ----------
     port
-        TCP port to listen on.
+        TCP port to listen on, or ``0`` to be given a free one.
 
     Yields
     ------
@@ -389,17 +491,27 @@ def _served(port: int) -> cabc.Iterator[str]:
     SystemExit
         If the server binary is absent, if another run holds the startup lock,
         if the port is already occupied, if the server exits while starting,
-        or if it does not accept connections within roughly ten seconds.
+        if it does not accept connections within roughly ten seconds, or if
+        the server answering on the port turns out not to be this run's —
+        either when it comes up or once the capture is finished.
     """
     if not HTTP_SERVER.is_file():
         message = "node_modules/.bin/http-server is missing; run 'bun install'"
         raise SystemExit(message)
 
-    server = _start_server(port)
-    try:
-        yield f"http://127.0.0.1:{port}"
-    finally:
-        _stop(server)
+    resolved = _resolve_port(port)
+    base = f"http://127.0.0.1:{resolved}"
+    with _ownership_marker() as marker:
+        server = _start_server(resolved, marker)
+        try:
+            yield base
+            # Ownership is checked again on the way out, so a capture is only
+            # accepted if the same server answered throughout it. Nothing
+            # stops a stopped-and-replaced server from taking the port
+            # mid-run, and the pages captured after that point would be its.
+            _confirm_ownership(base, marker, resolved, "after the capture")
+        finally:
+            _stop(server)
 
 
 def _prepare_output_dir(out_dir: Path, suffix: str) -> Path:
@@ -631,7 +743,7 @@ def _shoot_pages(
 
 
 @app.command
-def capture(out_dir: Path, /, *, port: int = 8099) -> None:
+def capture(out_dir: Path, /, *, port: int = 0) -> None:
     """Record a computed-style snapshot of every Weaver page.
 
     Parameters
@@ -640,7 +752,9 @@ def capture(out_dir: Path, /, *, port: int = 8099) -> None:
         Directory to write one JSON snapshot per page into. Existing snapshots
         are replaced.
     port
-        Port to serve ``public/`` on.
+        Port to serve ``public/`` on. The default of ``0`` asks the kernel for
+        a free one, so two runs in two worktrees do not contend at all; pass a
+        number only to reach the served tree from a browser by hand.
     """
     resolved = _prepare_output_dir(out_dir, ".json")
     pages = _page_paths()
@@ -654,7 +768,7 @@ def capture(out_dir: Path, /, *, port: int = 8099) -> None:
 
 
 @app.command
-def shots(out_dir: Path, /, *, port: int = 8098) -> None:
+def shots(out_dir: Path, /, *, port: int = 0) -> None:
     """Record full-page screenshots of every Weaver page at three widths.
 
     Parameters
@@ -662,7 +776,9 @@ def shots(out_dir: Path, /, *, port: int = 8098) -> None:
     out_dir
         Directory to write PNG files into. Existing images are replaced.
     port
-        Port to serve ``public/`` on.
+        Port to serve ``public/`` on. The default of ``0`` asks the kernel for
+        a free one, so two runs in two worktrees do not contend at all; pass a
+        number only to reach the served tree from a browser by hand.
     """
     browser = _tool("agent-browser")
     resolved = _prepare_output_dir(out_dir, ".png")

@@ -1,9 +1,19 @@
+/**
+ * @file End-to-end tests for the Episodic MiniSearch index-builder command.
+ *
+ * These tests run `scripts/build-episodic-search-index.mjs` against temporary
+ * rendered-site fixtures and verify generation, drift, input failures, and
+ * concurrent replacement behaviour.
+ */
+
 import { describe, expect, test } from "bun:test";
 import { spawn, spawnSync } from "node:child_process";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import MiniSearch from "minisearch";
 
 const SCRIPT = fileURLToPath(
   new URL("../../scripts/build-episodic-search-index.mjs", import.meta.url),
@@ -19,7 +29,7 @@ async function fixtureRoot() {
   );
   await writeFile(
     path.join(root, "templates/episodic/data/docs_manifest.jinja"),
-    "{% set doc_categories = [] %}\n{% set doc_featured = [] %}\n",
+    '{% set doc_categories = [{"label":"Guides","type":"guide","audience":"operators","blurb":"Fixture documentation is searchable.","documents":[{"title":"Fixture document","path":"docs/fixture.md","summary":"A fixture upstream document."}]}] %}\n{% set doc_featured = [] %}\n',
   );
   return root;
 }
@@ -50,7 +60,15 @@ describe("Episodic search-index command", () => {
     try {
       expect(runIndex(root).status).toBe(0);
       const generated = await readFile(outputPath, "utf8");
-      expect(JSON.parse(generated).index).toBeString();
+      const payload = JSON.parse(generated);
+      expect(payload.index).toBeString();
+      const index = MiniSearch.loadJSON(payload.index, {
+        fields: payload.indexOptions.fields,
+        storeFields: payload.indexOptions.storeFields,
+      });
+      expect(index.search("fixture").map((result) => result.sitePath)).toContain(
+        "https://github.com/leynos/episodic/blob/main/docs/fixture.md",
+      );
       expect(runIndex(root, "--check").status).toBe(0);
 
       await writeFile(outputPath, "stale\n");

@@ -30,10 +30,10 @@ build: uv .venv ## Build virtual-env and install deps
 	$(UV_ENV) uv sync --group dev
 
 site-data: ## Regenerate committed Episodic data from its authoritative roadmap
-	uv run scripts/build_episodic_roadmap_data.py --episodic-root $(EPISODIC_SOURCE)
+	uv run scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)"
 
 check-site-data: ## Check the committed Episodic roadmap projection for drift
-	uv run scripts/build_episodic_roadmap_data.py --episodic-root $(EPISODIC_SOURCE) --check
+	uv run scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)" --check
 
 # Biome, Tailwind, and the test runner all live in node_modules, so every
 # target that shells out to bun has to depend on this. `bun` is order-only:

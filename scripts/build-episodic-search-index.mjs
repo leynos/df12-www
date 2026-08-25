@@ -88,7 +88,12 @@ async function main() {
   )}\n`;
 
   if (check) {
-    const current = await readFile(OUTPUT_PATH, "utf8").catch(() => "");
+    const current = await readFile(OUTPUT_PATH, "utf8").catch((error) => {
+      if (error?.code === "ENOENT") {
+        return "";
+      }
+      throw error;
+    });
     if (current !== payload) {
       console.error(`${OUTPUT_PATH} is stale. Run \`bun run build:search\` to regenerate it.`);
       process.exitCode = 1;

@@ -58,9 +58,19 @@ uv run pages generate --site netsuke  # one sub-site
 committed MiniSearch projection at
 `src/static/episodic/assets/search/episodic-search.json`. `build:search`
 regenerates it and immediately runs its `--check` mode; the final
-`build:static` copy publishes that checked projection. Run `bun run build` or
+`build:static` copy publishes that checked projection to
+`public/episodic/assets/search/episodic-search.json`. Run `bun run build` or
 `bun run build:pages && bun run build:search && bun run build:static` after
 changing an Episodic page or its documentation manifest.
+
+`scripts/build_episodic_roadmap_data.py` projects the authoritative upstream
+Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It
+uses `scripts/episodic_roadmap_parser.py` to turn the Markdown into phase,
+step, and task records, and `make site-data` runs it with
+`--episodic-root $(EPISODIC_SOURCE)` before rebuilding the committed template.
+`EPISODIC_SOURCE` defaults to `../episodic`; override it when the authoritative
+checkout lives elsewhere. `make check-site-data` reruns the same projection
+with `--check` and fails when the committed file drifts.
 
 `bun run dev` (or `make dev`, which builds once first) watches `src/**/*`,
 `df12_pages/**/*`, `config/**/*`, `scripts/**/*`, and `pyproject.toml` with

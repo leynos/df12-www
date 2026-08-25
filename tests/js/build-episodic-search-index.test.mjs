@@ -1,3 +1,10 @@
+/**
+ * @file Unit tests for section extraction in the Episodic MiniSearch builder.
+ *
+ * These tests call `scripts/build-episodic-search-index.mjs` extraction logic
+ * with representative nested sections and verify search-record boundaries.
+ */
+
 import { describe, expect, test } from "bun:test";
 
 import { extractDocuments } from "../../scripts/build-episodic-search-index.mjs";

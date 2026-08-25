@@ -1,4 +1,17 @@
-"""Integration tests for the generated Episodic sub-site."""
+"""Integration tests for the generated Episodic sub-site.
+
+Notes
+-----
+The tests render every configured route in an isolated output directory and
+verify the resulting route, catalogue-link, code-block, and roadmap-macro
+contracts rather than relying on committed ``public/`` output.
+
+Examples
+--------
+Run the integration coverage with::
+
+    uv run pytest -q tests/test_episodic_site.py
+"""
 
 from __future__ import annotations
 

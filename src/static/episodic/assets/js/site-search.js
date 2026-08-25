@@ -1,10 +1,11 @@
-/* Client-side search over the Episodic subsite and its upstream documentation.
+/**
+ * @file Client-side search over the Episodic subsite and upstream documentation.
  *
- * Every `[data-search-root]` owns its input and results state. The shared
- * index begins loading at root initialisation, before any query is handled:
- * querying and rendering never make network requests.
- * The ordinary category listing remains the no-JavaScript path to every
- * document.
+ * Responsibilities: initialize each `[data-search-root]`, load the shared
+ * MiniSearch index at that explicit boundary, rank query-time results, and
+ * preserve keyboard-accessible listbox state. Load this classic deferred
+ * script after MiniSearch; the category listing remains the no-JavaScript
+ * path to every document.
  */
 (() => {
   const MIN_QUERY_LENGTH = 2;

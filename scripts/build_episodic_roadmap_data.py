@@ -14,8 +14,12 @@ import dataclasses as dc
 import json
 import sys
 from pathlib import Path
+from uuid import uuid4
 
-from episodic_roadmap_parser import Phase, load_roadmap
+if __package__:
+    from .episodic_roadmap_parser import Phase, load_roadmap
+else:
+    from episodic_roadmap_parser import Phase, load_roadmap
 
 BANNER = (
     "{#\n"
@@ -31,7 +35,18 @@ BANNER = (
 
 
 def phase_payload(phase: Phase) -> dict[str, object]:
-    """Return the serialisable template-facing projection of ``phase``."""
+    """Return the serialisable template-facing projection of ``phase``.
+
+    Parameters
+    ----------
+    phase : episodic_roadmap_parser.Phase
+        Parsed source phase to project.
+
+    Returns
+    -------
+    dict[str, object]
+        JSON-compatible phase, step, task, count, and state data for Jinja.
+    """
     return {
         "number": phase.number,
         "title": phase.title,
@@ -60,7 +75,20 @@ def phase_payload(phase: Phase) -> dict[str, object]:
 
 
 def render(phases: list[Phase], source: str) -> str:
-    """Render the complete Jinja data template for parsed ``phases``."""
+    """Render the complete Jinja data template for parsed ``phases``.
+
+    Parameters
+    ----------
+    phases : list[episodic_roadmap_parser.Phase]
+        Ordered phases parsed from the authoritative roadmap.
+    source : str
+        Human-readable provenance included in the generated-file banner.
+
+    Returns
+    -------
+    str
+        Complete ``roadmap_phases`` and ``roadmap_totals`` Jinja declarations.
+    """
     payload = [phase_payload(phase) for phase in phases]
     totals = {
         "done": sum(item["done_count"] for item in payload),  # type: ignore[misc]
@@ -76,7 +104,18 @@ def render(phases: list[Phase], source: str) -> str:
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    """Parse source, output, and drift-check command-line arguments."""
+    """Parse source, output, and drift-check command-line arguments.
+
+    Parameters
+    ----------
+    argv : list[str] | None
+        Argument vector, or ``None`` to read process arguments.
+
+    Returns
+    -------
+    argparse.Namespace
+        Resolved Episodic source path, output path, and check-mode flag.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--episodic-root",
@@ -99,7 +138,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Generate or verify the committed roadmap projection."""
+    """Generate or verify the committed roadmap projection.
+
+    Parameters
+    ----------
+    argv : list[str] | None
+        Argument vector, or ``None`` to read process arguments.
+
+    Returns
+    -------
+    int
+        Zero after generation or a matching check; one for missing input or
+        generated-data drift.
+    """
     args = parse_args(argv)
     roadmap = args.episodic_root / "docs/roadmap.md"
     if not roadmap.is_file():
@@ -120,10 +171,21 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{args.output} matches the upstream roadmap.")
         return 0
 
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(rendered, encoding="utf-8")
+    _write_atomically(args.output, rendered)
     print(f"Wrote {args.output}")
     return 0
+
+
+def _write_atomically(output: Path, payload: str) -> None:
+    """Replace ``output`` only after a complete projection has been written."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(f".{output.name}.{uuid4().hex}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8") as stream:
+            stream.write(payload)
+        temporary.replace(output)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

@@ -105,7 +105,9 @@ which matters when several worktrees are served at once.
 
 The steps run in order, because each depends on the last: `build:static` first,
 since the image step reads the source images it places; then `build:css`,
-`build:images`, `build:pages`, and `build:search`.
+`build:images`, `build:pages`, and `build:search`; and finally `build:static`
+again, so the checked `src/static/episodic/assets/search/episodic-search.json`
+is copied into `public/episodic/assets/search/episodic-search.json`.
 
 `bun run build:pages` wraps the generator, which can also be driven directly:
 

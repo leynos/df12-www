@@ -1,8 +1,9 @@
-/* Behavioural tests for the Episodic documentation search.
+/**
+ * @file Behavioural tests for the Episodic documentation search.
  *
- * The browser script remains a classic deferred script, but its initialiser
- * accepts its index loader at the boundary. That lets these tests drive the
- * real event handlers against happy-dom without fetching or navigating.
+ * These tests load the shipped classic script into happy-dom, inject its
+ * loader and navigation dependencies, and exercise index loading, result
+ * ranking, and keyboard interaction without live network requests.
  */
 import { describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";

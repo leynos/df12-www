@@ -37,7 +37,15 @@ INLINE_CODE = re.compile(r"`([^`]+)`")
 
 @dc.dataclass(slots=True)
 class Subtask:
-    """A nested checkbox beneath a roadmap task."""
+    """A nested checkbox beneath a roadmap task.
+
+    Attributes
+    ----------
+    title : str
+        Flattened subtask label from the upstream roadmap.
+    done : bool
+        Whether its source checkbox is complete.
+    """
 
     title: str
     done: bool
@@ -45,7 +53,27 @@ class Subtask:
 
 @dc.dataclass(slots=True)
 class Task:
-    """One execution unit within a roadmap step."""
+    """One execution unit within a roadmap step.
+
+    Attributes
+    ----------
+    id : str
+        Dotted task identifier from the roadmap.
+    title : str
+        Task title after dependency-sentence normalization.
+    done : bool
+        Whether its source checkbox is complete.
+    requires : list[str]
+        Dependency task identifiers extracted from the title or first note.
+    notes : list[str]
+        Remaining explanatory task notes.
+    subtasks : list[Subtask]
+        Nested checkbox items associated with this task.
+    completed_on : str
+        Completion date from a structured completion note, when present.
+    completion_note : str
+        Completion detail from a structured completion note, when present.
+    """
 
     id: str
     title: str
@@ -59,7 +87,21 @@ class Task:
 
 @dc.dataclass(slots=True)
 class Step:
-    """A workstream grouping related tasks."""
+    """A workstream grouping related tasks.
+
+    Attributes
+    ----------
+    id : str
+        Dotted step identifier from the roadmap.
+    title : str
+        Step heading.
+    anchor : str
+        GitHub-compatible fragment for the heading.
+    summary : str
+        Introductory prose belonging to the step.
+    tasks : list[Task]
+        Tasks ordered as they occur in the source.
+    """
 
     id: str
     title: str
@@ -75,7 +117,21 @@ class Step:
 
 @dc.dataclass(slots=True)
 class Phase:
-    """A strategic delivery milestone."""
+    """A strategic delivery milestone.
+
+    Attributes
+    ----------
+    number : str
+        Top-level phase number from the roadmap.
+    title : str
+        Phase heading.
+    anchor : str
+        GitHub-compatible fragment for the heading.
+    summary : str
+        Introductory prose belonging to the phase.
+    steps : list[Step]
+        Workstreams ordered as they occur in the source.
+    """
 
     number: str
     title: str
@@ -107,7 +163,18 @@ class Phase:
 
 
 def slugify(heading: str) -> str:
-    """Return the GitHub heading anchor for ``heading``."""
+    """Return the GitHub heading anchor for ``heading``.
+
+    Parameters
+    ----------
+    heading : str
+        Heading text without its leading Markdown hashes.
+
+    Returns
+    -------
+    str
+        Fragment identifier with links and inline code reduced to their text.
+    """
     text = LINK.sub(r"\1", heading)
     text = INLINE_CODE.sub(r"\1", text).lower()
     text = re.sub(r"[^\w\s-]", "", text)
@@ -146,9 +213,105 @@ def _finish_task(task: Task, buffer: list[str]) -> None:
         task.notes.append(note)
 
 
-def parse_roadmap(  # noqa: PLR0912, PLR0915 - A one-pass parser keeps Markdown state local.
-    text: str,
-) -> list[Phase]:
+@dc.dataclass(slots=True)
+class _ParserState:
+    """Mutable source-order state for the one-pass Markdown parser."""
+
+    phases: list[Phase] = dc.field(default_factory=list)
+    step: Step | None = None
+    task: Task | None = None
+    notes: list[str] = dc.field(default_factory=list)
+    summary: list[str] = dc.field(default_factory=list)
+
+
+def _close_task(state: _ParserState) -> None:
+    """Attach buffered notes and clear the current task."""
+    if state.task is not None:
+        _finish_task(state.task, state.notes)
+    state.task = None
+    state.notes = []
+
+
+def _summary_target(state: _ParserState) -> Phase | Step | None:
+    """Return the open step, or otherwise the most recent phase."""
+    return state.step or (state.phases[-1] if state.phases else None)
+
+
+def _close_summary(state: _ParserState) -> None:
+    """Attach buffered prose to the current phase or step."""
+    target = _summary_target(state)
+    if target is not None and not target.summary and state.summary:
+        target.summary = _strip_cross_references(_flatten(" ".join(state.summary)))
+    state.summary = []
+
+
+def _close_open_records(state: _ParserState) -> None:
+    """Finish any task and summary preceding a structural Markdown item."""
+    _close_task(state)
+    _close_summary(state)
+
+
+def _start_phase(state: _ParserState, match: re.Match[str]) -> None:
+    """Start a phase after finalizing preceding source-order state."""
+    _close_open_records(state)
+    state.step = None
+    title = _flatten(match.group(2))
+    state.phases.append(
+        Phase(
+            number=match.group(1),
+            title=title,
+            anchor=slugify(f"{match.group(1)}. {title}"),
+        )
+    )
+
+
+def _start_step(state: _ParserState, match: re.Match[str]) -> None:
+    """Start a step and attach it to the current phase when available."""
+    _close_open_records(state)
+    title = _flatten(match.group(2))
+    state.step = Step(
+        id=match.group(1),
+        title=title,
+        anchor=slugify(f"{match.group(1)}. {title}"),
+    )
+    if state.phases:
+        state.phases[-1].steps.append(state.step)
+
+
+def _start_task(state: _ParserState, match: re.Match[str]) -> None:
+    """Start a task and attach it to the current step when available."""
+    _close_open_records(state)
+    state.task = Task(
+        id=match.group(2),
+        title=match.group(3).strip(),
+        done=match.group(1) == "x",
+    )
+    if state.step is not None:
+        state.step.tasks.append(state.task)
+
+
+def _handle_task_detail(state: _ParserState, line: str) -> bool:
+    """Consume one task-owned source line and report whether it was claimed."""
+    if state.task is None:
+        return False
+    if sub_match := SUBTASK_ITEM.match(line):
+        state.task.subtasks.append(
+            Subtask(title=_flatten(sub_match.group(2)), done=sub_match.group(1) == "x")
+        )
+    elif note_match := NOTE_ITEM.match(line):
+        state.notes.append(note_match.group(1))
+    elif state.notes and (cont_match := NOTE_CONTINUATION.match(line)):
+        state.notes[-1] = f"{state.notes[-1]} {cont_match.group(1)}"
+    elif not state.notes and (cont_match := TITLE_CONTINUATION.match(line)):
+        state.task.title = f"{state.task.title} {cont_match.group(1).strip()}"
+    elif not line.strip():
+        pass
+    else:
+        _close_task(state)
+    return True
+
+
+def parse_roadmap(text: str) -> list[Phase]:
     """Parse roadmap Markdown into phase records.
 
     Parameters
@@ -161,98 +324,34 @@ def parse_roadmap(  # noqa: PLR0912, PLR0915 - A one-pass parser keeps Markdown 
     list[Phase]
         Ordered phases with their steps and tasks.
     """
-    phases: list[Phase] = []
-    step: Step | None = None
-    task: Task | None = None
-    notes: list[str] = []
-    summary: list[str] = []
-
-    def close_task() -> None:
-        nonlocal task, notes
-        if task is not None:
-            _finish_task(task, notes)
-        task, notes = None, []
-
-    def close_summary(target: Phase | Step | None) -> None:
-        nonlocal summary
-        if target is not None and not target.summary and summary:
-            target.summary = _strip_cross_references(_flatten(" ".join(summary)))
-        summary = []
+    state = _ParserState()
 
     for line in text.splitlines():
         if phase_match := PHASE_HEADING.match(line):
-            close_task()
-            close_summary(step or (phases[-1] if phases else None))
-            step = None
-            title = _flatten(phase_match.group(2))
-            phases.append(
-                Phase(
-                    number=phase_match.group(1),
-                    title=title,
-                    anchor=slugify(f"{phase_match.group(1)}. {title}"),
-                )
-            )
+            _start_phase(state, phase_match)
             continue
 
         if step_match := STEP_HEADING.match(line):
-            close_task()
-            close_summary(step or (phases[-1] if phases else None))
-            title = _flatten(step_match.group(2))
-            step = Step(
-                id=step_match.group(1),
-                title=title,
-                anchor=slugify(f"{step_match.group(1)}. {title}"),
-            )
-            if phases:
-                phases[-1].steps.append(step)
+            _start_step(state, step_match)
             continue
 
         if task_match := TASK_ITEM.match(line):
-            close_task()
-            close_summary(step or (phases[-1] if phases else None))
-            task = Task(
-                id=task_match.group(2),
-                title=task_match.group(3).strip(),
-                done=task_match.group(1) == "x",
-            )
-            if step is not None:
-                step.tasks.append(task)
+            _start_task(state, task_match)
             continue
 
-        if task is not None:
-            if sub_match := SUBTASK_ITEM.match(line):
-                task.subtasks.append(
-                    Subtask(
-                        title=_flatten(sub_match.group(2)),
-                        done=sub_match.group(1) == "x",
-                    )
-                )
-                continue
-            if note_match := NOTE_ITEM.match(line):
-                notes.append(note_match.group(1))
-                continue
-            if notes and (cont_match := NOTE_CONTINUATION.match(line)):
-                notes[-1] = f"{notes[-1]} {cont_match.group(1)}"
-                continue
-            if not notes and (cont_match := TITLE_CONTINUATION.match(line)):
-                task.title = f"{task.title} {cont_match.group(1).strip()}"
-                continue
-            if not line.strip():
-                continue
-            close_task()
+        if _handle_task_detail(state, line):
             continue
 
         if line.strip() and not line.startswith(("#", "-", "[", "|", "```")):
-            summary.append(line.strip())
+            state.summary.append(line.strip())
 
-    close_task()
-    close_summary(step or (phases[-1] if phases else None))
+    _close_open_records(state)
 
-    for phase in phases:
+    for phase in state.phases:
         for phase_step in phase.steps:
             for phase_task in phase_step.tasks:
                 _extract_requirements(phase_task)
-    return phases
+    return state.phases
 
 
 def _extract_requirements(task: Task) -> None:
@@ -309,5 +408,16 @@ def _parse_requirements(text: str) -> list[str]:
 
 
 def load_roadmap(path: Path) -> list[Phase]:
-    """Parse the roadmap Markdown at ``path``."""
+    """Parse the roadmap Markdown at ``path``.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        Authoritative Episodic roadmap Markdown file.
+
+    Returns
+    -------
+    list[Phase]
+        Ordered phase records with normalized task dependencies.
+    """
     return parse_roadmap(path.read_text(encoding="utf-8"))

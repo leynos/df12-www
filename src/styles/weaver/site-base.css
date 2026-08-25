@@ -60,3 +60,42 @@ pre code {
   padding: 0;
   border-radius: 0;
 }
+
+/* Keep the document itself from scrolling sideways on a phone.
+ *
+ * Four pages laid out wider than a 360px viewport — sempai at 826px, and
+ * jacquard, install and docs between 370 and 416 — so every line of body text
+ * needed a horizontal scroll to read. Two causes, both of them content that
+ * cannot be broken at a space:
+ *
+ * A command line, a TOML key, or a table cell holding a path has no space to
+ * wrap at, so it sets a minimum width its column cannot meet. `anywhere` lets
+ * the break fall mid-token, which is what the panels these sit in already
+ * imply by scrolling. The panels keep their own `overflow-x-auto`; this is
+ * about the ones whose parent does not scroll.
+ *
+ * A display heading has the same problem for a different reason: "Documentation"
+ * at `text-5xl` is 344px on its own, against a 296px column. `break-word` only
+ * breaks a word that cannot fit at all, and `hyphens: auto` puts the break at a
+ * syllable rather than mid-letter.
+ *
+ * Both are scoped below the tablet breakpoint, so the wide layout — where
+ * nothing overflows and a mid-token break would be gratuitous — is untouched.
+ */
+@media (max-width: 767px) {
+  pre,
+  code,
+  th,
+  td,
+  .font-mono {
+    overflow-wrap: anywhere;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}

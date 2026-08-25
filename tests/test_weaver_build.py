@@ -517,3 +517,65 @@ def test_an_unreadable_output_is_reported_separately(
     assert "could not be read" in message, (
         f"the read handler should be the one that fired; got {message!r}"
     )
+
+
+# A Tailwind font-size utility, as a whole class token. Anchored at both ends
+# so `text-base-content` is not read as `text-base`, which is the mistake that
+# makes a naive search of this markup report duplicates that are not there.
+FONT_SIZE = re.compile(r"^text-(?:[3-9]xs|2xs|xs|sm|base|lg|xl|[2-9]xl)$")
+
+CLASS_ATTRIBUTE = re.compile(r'class\s*=\s*"([^"]*)"')
+
+
+def test_no_element_declares_two_font_sizes_at_once() -> None:
+    """Two font-size utilities on one element make the winner a source-order accident.
+
+    The Sempai page carried `text-xs ... text-3xs` on one contents link for
+    several commits: the later class won, so that one link rendered smaller
+    than its eight siblings and nothing said why. Commit `16dd6ae1` resolved it
+    by dropping `text-3xs`, since `text-xs` is what the other eight carry.
+
+    Only unprefixed utilities are counted. A responsive variant beside a base
+    size — `text-sm md:text-base` — is the intended way to change size at a
+    breakpoint, not a duplicate.
+    """
+    offenders: dict[str, list[str]] = {}
+    for source in sorted(WEAVER_TEMPLATES.rglob("*.jinja")):
+        for number, line in enumerate(
+            source.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            for attribute in CLASS_ATTRIBUTE.finditer(line):
+                sizes = [
+                    token
+                    for token in attribute.group(1).split()
+                    if FONT_SIZE.match(token)
+                ]
+                if len(sizes) > 1:
+                    where = f"{source.relative_to(REPO_ROOT)}:{number}"
+                    offenders[where] = sizes
+
+    assert not offenders, (
+        "these elements declare more than one font size, so which one applies "
+        f"depends on the order the utilities happen to be written in: {offenders}"
+    )
+
+
+@pytest.mark.parametrize(
+    ("classes", "expected"),
+    [
+        # The reason the pattern is anchored: a colour token that starts with
+        # a size's name is not a size.
+        ("text-xs text-base-content/82", 1),
+        ("block pl-4 text-xs text-base-content/82 hover:text-accent-ink", 1),
+        ("text-xs text-3xs", 2),
+        # A breakpoint variant is how a size is meant to change, not a clash.
+        ("text-sm md:text-base lg:text-lg", 1),
+        ("font-mono tracking-stamp", 0),
+    ],
+)
+def test_the_font_size_pattern_counts_whole_tokens(classes: str, expected: int) -> None:
+    """The check is only as good as its ability to tell a size from a colour."""
+    sizes = [token for token in classes.split() if FONT_SIZE.match(token)]
+    assert len(sizes) == expected, (
+        f"expected {expected} font-size utilities in {classes!r}, found {sizes}"
+    )

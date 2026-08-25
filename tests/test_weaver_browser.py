@@ -40,6 +40,7 @@ import typing as typ
 from pathlib import Path
 
 import pytest
+from ruamel.yaml import YAML
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -48,14 +49,85 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 pytestmark = pytest.mark.playwright
 
-# Four pages that between them carry every kind of chrome the sub-site has:
-# the home page's hero, a page of prose panels, a command page's scrollable
-# code blocks, and the figure-heavy explainer.
-PAGES = ("", "safety/", "commands/act/", "how-it-works/")
+
+def _published_pages() -> tuple[str, ...]:
+    """List every Weaver page, from the config the generator itself reads.
+
+    A hand-picked few would leave the rest unchecked, and the pages most
+    likely to go unnoticed are exactly the ones nobody would think to pick:
+    the three legal pages, which no Weaver template of their own renders, and
+    the design-language page, which exists to display the palette. Taking the
+    list from `config/pages.yaml` means a page added there is covered without
+    anyone remembering to add it here.
+
+    The config is used rather than the published tree because parametrization
+    happens at collection, before the fixture that builds the tree has run.
+    `test_the_published_tree_holds_exactly_the_pages_checked_here` asserts the
+    two agree, so a config that has drifted from the build is a failure rather
+    than a silent gap.
+
+    Returns
+    -------
+    tuple of str
+        Paths relative to ``/weaver/``, home first and the rest sorted.
+    """
+    weaver = YAML(typ="safe").load(
+        (REPO_ROOT / "config" / "pages.yaml").read_text(encoding="utf-8")
+    )["sites"]["weaver"]
+    slugs = [page["output_slug"] for page in weaver["content_pages"]]
+    slugs.extend(weaver["shared_content"])
+    return ("", *sorted(f"{slug}/" for slug in slugs))
+
+
+def _shared_content() -> frozenset[str]:
+    """Name the pages rendered from shared content rather than a Weaver template.
+
+    The three legal pages get the sub-site's chrome but none of its
+    illustration, so an icon count of zero is what they should have.
+
+    Returns
+    -------
+    frozenset of str
+        Paths relative to ``/weaver/``.
+    """
+    weaver = YAML(typ="safe").load(
+        (REPO_ROOT / "config" / "pages.yaml").read_text(encoding="utf-8")
+    )["sites"]["weaver"]
+    return frozenset(f"{name}/" for name in weaver["shared_content"])
+
+
+PAGES = _published_pages()
+SHARED_CONTENT = _shared_content()
 
 # 360 is the narrowest viewport the design targets and the one that puts the
 # sidebar off-canvas; 1440 is the width it was drawn against.
-VIEWPORTS = (("mobile", 360, 800), ("desktop", 1440, 900))
+MOBILE_WIDTH, MOBILE_HEIGHT = 360, 800
+DESKTOP_WIDTH, DESKTOP_HEIGHT = 1440, 900
+VIEWPORTS = (
+    ("mobile", MOBILE_WIDTH, MOBILE_HEIGHT),
+    ("desktop", DESKTOP_WIDTH, DESKTOP_HEIGHT),
+)
+
+# The start of the HTTP error range. Named so the comparison below is not a
+# bare number.
+HTTP_ERROR = 400
+
+# What the two layouts are distinguished by, measured the same way at both
+# widths so the swap is one comparison rather than two descriptions.
+#
+# The drawer toggle has no markup of its own: `mobile-nav.js` builds it and
+# gives it this id, so finding it also proves the script ran.
+LAYOUT = (
+    "JSON.stringify((() => {"
+    "const toggle = document.querySelector('#mobile-nav-toggle');"
+    "const link = document.querySelector('.weaver-nav-link');"
+    "const box = link ? link.getBoundingClientRect() : null;"
+    "return {toggle: toggle ? toggle.getBoundingClientRect().width > 0 : false,"
+    "sidebar: box ? box.width > 0 && box.right > 0 : false,"
+    "page: document.documentElement.scrollWidth,"
+    "viewport: window.innerWidth};"
+    "})())"
+)
 
 # WCAG 2.0 A and AA, which is the conformance level the sub-site claims.
 AXE_TAGS = "wcag2a,wcag2aa"
@@ -250,22 +322,24 @@ CASES = [
 ]
 
 
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(900)
 @pytest.mark.parametrize(("page", "width", "height"), CASES)
-def test_a_weaver_page_fetches_everything_from_the_local_server(
+def test_a_weaver_page_is_self_contained(
     drive: cabc.Callable[..., str], served: str, page: str, width: int, height: int
 ) -> None:
     """Self-containment is the migration's point, asserted from the browser.
 
     The static check on the delivered markup cannot see a URL a stylesheet
     builds, an image a script inserts, or a font a ``@font-face`` resolves. It
-    also cannot see a request that failed. This reads the browser's own log,
-    so all three are observed.
+    also cannot see a request that failed, and a page that fetched nothing at
+    all would satisfy "nothing remote" vacuously. All three are read back from
+    the browser's own log.
     """
     _open(drive, served, page, width, height)
     requests = _requests(drive)
+    where = f"/weaver/{page} at {width}px"
 
-    assert requests, "the browser reported no requests at all, not even the page"
+    assert requests, f"{where} reported no requests at all, not even the page"
 
     remote = sorted(
         {
@@ -274,39 +348,21 @@ def test_a_weaver_page_fetches_everything_from_the_local_server(
             if not request["url"].startswith((served, "data:", "about:"))
         }
     )
-    assert not remote, (
-        f"/weaver/{page} at {width}px fetched from another origin: {remote}"
-    )
+    assert not remote, f"{where} fetched from another origin: {remote}"
 
     failed = sorted(
         {
             f"{request['status']} {request['url'].removeprefix(served)}"
             for request in requests
-            if request.get("status", 0) >= 400  # noqa: PLR2004 - the HTTP error range
+            if request.get("status", 0) >= HTTP_ERROR
         }
     )
-    assert not failed, (
-        f"/weaver/{page} at {width}px has subresources that failed: {failed}"
-    )
+    assert not failed, f"{where} has subresources that failed: {failed}"
 
-
-@pytest.mark.timeout(600)
-@pytest.mark.parametrize(("page", "width", "height"), CASES)
-def test_a_weaver_page_serves_its_own_stylesheet_fonts_and_script(
-    drive: cabc.Callable[..., str], served: str, page: str, width: int, height: int
-) -> None:
-    """A page that fetched nothing at all would pass the check above vacuously.
-
-    The sub-site used to pull Tailwind, Font Awesome, and its webfonts from
-    three CDNs. Each now has to be served from the published tree, which means
-    the browser has to have asked us for it.
-    """
-    _open(drive, served, page, width, height)
-    kinds = {request["resourceType"] for request in _requests(drive)}
-
+    kinds = {request["resourceType"] for request in requests}
     assert {"Document", "Stylesheet", "Font", "Script"} <= kinds, (
-        f"/weaver/{page} at {width}px fetched only {sorted(kinds)}; the compiled "
-        "stylesheet, the webfonts and the drawer script should all come from here"
+        f"{where} fetched only {sorted(kinds)}; the compiled stylesheet, the "
+        "webfonts and the drawer script should all be served from here"
     )
 
 
@@ -319,8 +375,8 @@ def test_a_weaver_page_meets_wcag_aa(
 
     ``text-base-content`` says nothing about what it composites to through an
     ``opacity-60`` on a cream panel; only a browser can say, and what it said
-    was 3.33:1. This check is what found that, and the four scrollable code
-    panels no keyboard could reach.
+    was 3.33:1. This check is what found that, and the thirty-one scrollable
+    code panels no keyboard could reach.
     """
     _open(drive, served, page, width, height)
 
@@ -346,7 +402,7 @@ def test_the_recorded_contrast_exceptions_are_still_real(
     the decision log names — these two stop failing, and this fails instead so
     the exception is removed with them rather than left behind.
     """
-    _open(drive, served, "safety/", 1440, 900)
+    _open(drive, served, "safety/", DESKTOP_WIDTH, DESKTOP_HEIGHT)
 
     waived = {marker for _page, _rule, marker in ACCEPTED}
     fired = {
@@ -365,52 +421,60 @@ def test_the_recorded_contrast_exceptions_are_still_real(
     )
 
 
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(900)
 @pytest.mark.parametrize("page", PAGES)
-def test_exactly_one_nav_link_is_marked_as_the_current_page(
+def test_a_weaver_page_renders_its_chrome(
     drive: cabc.Callable[..., str], served: str, page: str
 ) -> None:
-    """`nav_link` compares each href against one current href, so one can win.
+    """The nav and the icons come from macros, so a miss is silent.
 
-    Two would mean the companion macro handed down the wrong value; none would
-    mean it handed down nothing, which is what an empty string does and what
-    the macro returns for a page outside the nav. All four of these are in it.
+    At most one link may be current, and it has to point at somewhere this
+    page actually is. Three shapes are legitimate and the check allows all
+    three: the page's own href; an ancestor of it, since the three command
+    sub-pages highlight the Commands section they belong to; and a fragment,
+    since the design-language page reuses the nav classes for its own
+    in-page anchors. Two current links would mean the companion macro handed
+    down the wrong value, and none is correct only for a page the sidebar does
+    not list — the three legal pages, where the macro returns an empty string.
+
+    An unmapped icon renders the literal text ``UNKNOWN ICON``, and a macro
+    that generated an empty body renders an ``<svg>`` with nothing in it.
+    Neither shows up in a stylesheet diff. The legal pages are shared content
+    with no icons of their own, so they are checked for rendering none badly
+    rather than for rendering any.
     """
-    _open(drive, served, page, 1440, 900)
-    current = _evaluate(
-        drive,
-        "JSON.stringify([...document.querySelectorAll('[aria-current=\"page\"]')]"
-        ".map((a) => a.getAttribute('href')))",
-    )
-
-    assert len(current) == 1, (
-        f"/weaver/{page} marks {current} as current; exactly one nav link should be"
-    )
-
-
-@pytest.mark.timeout(600)
-@pytest.mark.parametrize("page", PAGES)
-def test_every_icon_renders_its_artwork(
-    drive: cabc.Callable[..., str], served: str, page: str
-) -> None:
-    """The icons are inlined from a generated macro, so a miss is a bare label.
-
-    An unmapped name renders the literal text ``UNKNOWN ICON``, and a macro
-    that generated an empty body would render an ``<svg>`` with nothing in it.
-    Neither shows up in a stylesheet diff and neither is visible in the markup
-    at a glance.
-    """
-    _open(drive, served, page, 1440, 900)
+    _open(drive, served, page, DESKTOP_WIDTH, DESKTOP_HEIGHT)
     report = _evaluate(
         drive,
         "JSON.stringify({"
+        "current: [...document.querySelectorAll('[aria-current=\"page\"]')]"
+        ".map((a) => a.getAttribute('href')),"
+        "listed: [...document.querySelectorAll('.weaver-nav-link')]"
+        ".map((a) => a.getAttribute('href')),"
         "empty: [...document.querySelectorAll('svg')]"
         ".filter((s) => s.children.length === 0).length,"
         "total: document.querySelectorAll('svg').length,"
         "unknown: document.body.textContent.includes('UNKNOWN ICON')})",
     )
 
-    assert report["total"] > 0, f"/weaver/{page} rendered no icons at all"
+    own = f"/weaver/{page}"
+    current = report["current"]
+    assert len(current) <= 1, (
+        f"/weaver/{page} marks {current} as current; at most one link can be"
+    )
+    if own in report["listed"]:
+        assert current == [own], (
+            f"/weaver/{page} is listed in the nav but marks {current} as the "
+            f"current page rather than {[own]}"
+        )
+    else:
+        assert all(href.startswith("#") or own.startswith(href) for href in current), (
+            f"/weaver/{page} marks {current} as current, which is neither this "
+            f"page, an ancestor section of it, nor an anchor within it"
+        )
+
+    if page not in SHARED_CONTENT:
+        assert report["total"] > 0, f"/weaver/{page} rendered no icons at all"
     assert report["empty"] == 0, (
         f"/weaver/{page} has {report['empty']} icons with no artwork in them"
     )
@@ -419,66 +483,67 @@ def test_every_icon_renders_its_artwork(
     )
 
 
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(900)
 @pytest.mark.parametrize("page", PAGES)
-def test_the_sidebar_gives_way_to_a_drawer_at_a_narrow_viewport(
+def test_a_weaver_page_fits_a_phone(
     drive: cabc.Callable[..., str], served: str, page: str
 ) -> None:
-    """The two layouts share no chrome, so each has to be checked at its width.
+    """At 360 the toggle is the navigation and the sidebar is off-canvas.
 
-    At 1440 the sidebar is the navigation and there is no toggle to press. At
-    360 the toggle is the navigation and the sidebar is off-canvas. Getting
-    this backwards leaves a page with no way to navigate at all, on one width
-    or the other.
+    Getting that backwards leaves a page with no way to navigate at all. A
+    page wider than the viewport is the other classic mobile failure: the code
+    panels scroll on purpose and are allowed to, but the document is not, and
+    a stray fixed width makes every line of body text need a scroll to read.
     """
-    measure = (
-        "JSON.stringify((() => {"
-        # The drawer toggle has no markup: `mobile-nav.js` builds it and
-        # gives it this id, so its presence also proves the script ran.
-        "const toggle = document.querySelector('#mobile-nav-toggle');"
-        "const link = document.querySelector('.weaver-nav-link');"
-        "const box = link ? link.getBoundingClientRect() : null;"
-        "return {toggle: toggle ? toggle.getBoundingClientRect().width > 0 : false,"
-        "sidebar: box ? box.width > 0 && box.right > 0 : false};"
-        "})())"
-    )
+    _open(drive, served, page, MOBILE_WIDTH, MOBILE_HEIGHT)
+    narrow = _evaluate(drive, LAYOUT)
 
-    _open(drive, served, page, 1440, 900)
-    wide = _evaluate(drive, measure)
-    _open(drive, served, page, 360, 800)
-    narrow = _evaluate(drive, measure)
-
-    assert wide["sidebar"], f"/weaver/{page} has no sidebar navigation at 1440px"
-    assert not narrow["sidebar"], (
-        f"/weaver/{page} still lays out the sidebar at 360px, where it does not fit"
-    )
     assert narrow["toggle"], (
-        f"/weaver/{page} has no drawer toggle at 360px, so the sidebar it hides "
-        "cannot be opened"
+        f"/weaver/{page} has no drawer toggle at {MOBILE_WIDTH}px, so the "
+        "sidebar it hides cannot be opened"
+    )
+    assert not narrow["sidebar"], (
+        f"/weaver/{page} still lays out the sidebar at {MOBILE_WIDTH}px, "
+        "where it does not fit"
+    )
+    assert narrow["page"] <= narrow["viewport"], (
+        f"/weaver/{page} lays out {narrow['page']}px wide in a "
+        f"{narrow['viewport']}px viewport, so the whole page scrolls sideways"
     )
 
 
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(900)
 @pytest.mark.parametrize("page", PAGES)
-def test_no_page_scrolls_sideways_on_a_phone(
+def test_a_weaver_page_lays_out_its_sidebar_on_a_desktop(
     drive: cabc.Callable[..., str], served: str, page: str
 ) -> None:
-    """A page wider than the viewport is the classic mobile-layout failure.
+    """The wide layout's half of the swap, which shares no chrome with the narrow."""
+    _open(drive, served, page, DESKTOP_WIDTH, DESKTOP_HEIGHT)
+    wide = _evaluate(drive, LAYOUT)
 
-    The code panels scroll on purpose and are allowed to; the document is not.
-    A stray fixed width or an unwrapped heading pushes the whole page over, and
-    every line of body text then needs a horizontal scroll to read.
-    """
-    _open(drive, served, page, 360, 800)
-    overflow = _evaluate(
-        drive,
-        "JSON.stringify({page: document.documentElement.scrollWidth,"
-        "viewport: window.innerWidth})",
+    assert wide["sidebar"], (
+        f"/weaver/{page} has no sidebar navigation at {DESKTOP_WIDTH}px"
     )
 
-    assert overflow["page"] <= overflow["viewport"], (
-        f"/weaver/{page} lays out {overflow['page']}px wide in a "
-        f"{overflow['viewport']}px viewport, so the whole page scrolls sideways"
+
+def test_the_published_tree_holds_exactly_the_pages_checked_here(
+    built_site: Path,
+) -> None:
+    """The page list is taken from the config, so it can drift from the build.
+
+    Parametrization happens at collection, before anything is built, which is
+    why the list cannot simply be read off the published tree. This is what
+    stops that convenience from becoming a gap: a page generated but not
+    listed here would go unchecked, and one listed but not generated would
+    make every other test skip past it.
+    """
+    published = sorted(
+        f"{path.parent.relative_to(built_site).as_posix()}/".removeprefix("./")
+        for path in built_site.rglob("index.html")
+    )
+    assert published == sorted(PAGES), (
+        "config/pages.yaml and the published tree disagree about which Weaver "
+        f"pages exist. Published: {published}. Checked here: {sorted(PAGES)}"
     )
 
 

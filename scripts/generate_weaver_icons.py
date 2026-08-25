@@ -104,7 +104,9 @@ def _resolve(
     Raises
     ------
     KeyError
-        If the name is neither an icon nor an alias.
+        If the name is neither an icon nor an alias, or an alias chain loops.
+        The records themselves are checked by :func:`_records` before this
+        runs, so a missing ``parent`` or ``body`` cannot arise here.
     """
     seen: set[str] = set()
     while name in aliases and name not in icons:
@@ -160,38 +162,74 @@ def _read_document(path: Path, parse: _Parser, absent: str) -> typ.Any:  # noqa:
         raise SystemExit(message) from exc
 
 
-def _entry(document: typ.Any, key: str, path: Path) -> dict[str, dict[str, str]]:  # noqa: ANN401 - the documents are untyped upstream data
-    """Pull a required top-level mapping out of a parsed document, or exit.
+def _records(
+    document: typ.Any,  # noqa: ANN401 - the documents are untyped upstream data
+    key: str,
+    field: str,
+    path: Path,
+    *,
+    required: bool = True,
+) -> dict[str, dict[str, str]]:
+    """Pull a mapping of records out of a parsed document, checking each one.
 
-    The value's shape is checked here rather than left to the first
-    subscript in the renderer, where the failure surfaces as ``'int' object is
-    not subscriptable`` and names neither the key nor the file.
+    Both inputs are mappings of mappings, and every level of that is somebody
+    else's format: the Carbon package's shape is upstream's to change, and the
+    icon mapping is hand-edited. Checking only the outer level leaves the inner
+    one to the first subscript in the renderer, where a scalar where a record
+    was expected surfaces as ``'int' object is not subscriptable`` — a
+    ``TypeError``, which the caller's ``except KeyError`` does not catch — and
+    names neither the entry, nor the field, nor the file.
+
+    So each record is checked here for being a mapping that carries ``field``
+    as a string, which is the only thing the renderer asks of it.
 
     Parameters
     ----------
     document
         A parsed document, of whatever shape the file happened to hold.
     key
-        The key the rest of this script needs.
+        The top-level key holding the records.
+    field
+        The field every record must carry, as a string.
     path
         The file the document came from, for the message.
+    required
+        Whether the key must be present. The Carbon package's ``aliases`` is
+        optional; an icon set with no aliases is not malformed.
 
     Returns
     -------
     dict
-        The mapping at ``key``.
+        The records at ``key``, each one checked.
 
     Raises
     ------
     SystemExit
-        If the document is not a mapping, has no such key, or holds something
-        other than a mapping there.
+        If the document is not a mapping, if a required key is absent or holds
+        something other than a mapping, or if any record is not a mapping
+        carrying ``field`` as a string.
     """
-    entry = document.get(key) if isinstance(document, cabc.Mapping) else None
-    if not isinstance(entry, cabc.Mapping):
+    entries = document.get(key) if isinstance(document, cabc.Mapping) else None
+    if entries is None and not required:
+        return {}
+    if not isinstance(entries, cabc.Mapping):
         message = f"{path} has no top-level {key!r} mapping; its format has changed"
         raise SystemExit(message)
-    return dict(entry)
+
+    broken = sorted(
+        str(name)
+        for name, record in entries.items()
+        if not isinstance(record, cabc.Mapping)
+        or not isinstance(record.get(field), str)
+    )
+    if broken:
+        message = (
+            f"{path}: {len(broken)} of the {len(entries)} entries under {key!r} "
+            f"do not carry a string {field!r}, starting with {broken[:5]}; "
+            f"its format has changed"
+        )
+        raise SystemExit(message)
+    return {str(name): dict(record) for name, record in entries.items()}
 
 
 def render_macro(
@@ -255,18 +293,20 @@ def build_macro() -> str:
     Raises
     ------
     SystemExit
-        If either input file is absent, unreadable, malformed, or has lost the
-        top-level key this script reads; or if the mapping names a Carbon icon
-        the package does not define.
+        If either input file is absent, unreadable, malformed, has lost the
+        top-level key this script reads, or holds a record that is not a
+        mapping carrying the field the renderer needs; or if the mapping names
+        a Carbon icon the package does not define.
     """
     package = _read_document(CARBON, json.loads, "run 'bun install'")
-    icons = _entry(package, "icons", CARBON)
-    aliases = package.get("aliases", {})
+    icons = _records(package, "icons", "body", CARBON)
+    aliases = _records(package, "aliases", "parent", CARBON, required=False)
 
     yaml = YAML(typ="safe")
-    mapping = _entry(
+    mapping = _records(
         _read_document(MAPPING, yaml.load, "it is tracked, so restore it"),
         "icons",
+        "carbon",
         MAPPING,
     )
 

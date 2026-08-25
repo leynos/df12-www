@@ -32,6 +32,18 @@ After this change:
   axe-core misreads those panels' background as `#ffffff` when the rendered
   pixels sample `rgb(15, 36, 64)`, so the ratios it derives are wrong (see the
   Decision Log).
+
+  **Addendum (2026-08-25):** the claim above was true when written and is now
+  historical. The current position is zero *unwaived* direct contrast failures.
+  Two scoped exceptions remain on `safety/`: `text-status-ok` (the "Do" label)
+  at 4.17:1 and `text-status-error` (the "Don't" label) at 2.53:1, both under
+  the 4.5:1 AA threshold for 12px bold text. Both are waived by page and CSS
+  class in `tests/test_weaver_browser.py` and recorded in the Decision Log.
+  These two exceptions are separate from, and additional to, the twenty-eight
+  code-panel findings above, which remain tool false positives rather than real
+  failures. The remedy — lift variants of the status tokens on the dark-surface
+  selector `src/styles/weaver/panels.css` already uses for `text-accent-ink` —
+  is an outstanding decision, not an omission.
 - The page chrome (sidebar, mobile drawer, head) is defined once instead of
   four times, so the legal pages gain the mobile navigation they currently lack.
 
@@ -355,13 +367,13 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   single-line stylesheet for a substring and trust the count; use Python's `re`
   over the file contents instead.
 - **Observation:** the nav index numbers failed WCAG AA the moment a real
-  browser composited them. Evidence: `text-base-content` at `opacity-60` on
-  the sidebar's cream ground composites to `#708499`, measured at 3.33:1
-  against the 4.5:1 that 12px bold text needs. Impact: none of the text-based
-  suites could catch this, since `opacity-60` is a valid utility and the
-  colour token itself is correct in isolation — only a browser compositing
-  the two together shows the failure. Fixed by raising the opacity to 75%,
-  which measures 4.88:1; see the Decision Log.
+  browser composited them. Evidence: `text-base-content` at `opacity-60` on the
+  sidebar's cream ground composites to `#708499`, measured at 3.33:1 against
+  the 4.5:1 that 12px bold text needs. Impact: none of the text-based suites
+  could catch this, since `opacity-60` is a valid utility and the colour token
+  itself is correct in isolation — only a browser compositing the two together
+  shows the failure. Fixed by raising the opacity to 75%, which measures
+  4.88:1; see the Decision Log.
 - **Observation:** 31 `overflow-x-auto` panels across ten templates could not
   be reached by keyboard. Evidence: none of them carried `tabindex="0"`, so a
   keyboard-only visitor had no way to scroll a code block or a wide table that
@@ -370,11 +382,11 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   because which panels actually overflow depends on both the viewport and the
   panel's content; see the Decision Log.
 - **Observation:** the Sempai Engine link inside `pages/how-it-works.jinja`'s
-  prose was distinguished from its surrounding text by colour alone.
-  Evidence: it carried `text-accent-ink` with no other visual marker. Impact:
-  a reader who cannot perceive that colour difference — including anyone
-  relying on a colour-contrast-only rendering — has no way to tell the link
-  from ordinary text; fixed by adding `underline` alongside the colour.
+  prose was distinguished from its surrounding text by colour alone. Evidence:
+  it carried `text-accent-ink` with no other visual marker. Impact: a reader
+  who cannot perceive that colour difference — including anyone relying on a
+  colour-contrast-only rendering — has no way to tell the link from ordinary
+  text; fixed by adding `underline` alongside the colour.
 
 ## Decision log
 
@@ -616,46 +628,46 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   escaping `_` as `_u` before `/` becomes `__`, and by moving the home page's
   stem to `__home`. Rationale: the pages come from the published tree, so a
   directory named with an underscore is an ordinary thing to find there, and
-  the naive `"/" -> "__"` mapping is not injective over such names — `a/b`
-  and `a__b` both flatten to `a__b`. Leaving that in place would let two
-  distinct pages silently overwrite one another's capture and make the diff
-  compare a page against itself, on a collision that only an underscore in a
-  directory name would trigger. Existing snapshot directories must be
-  recaptured under the new stems; they are throwaway and git-ignored, so this
-  costs nothing. Date/Author: 2026-08-24, review batch.
+  the naive `"/" -> "__"` mapping is not injective over such names — `a/b` and
+  `a__b` both flatten to `a__b`. Leaving that in place would let two distinct
+  pages silently overwrite one another's capture and make the diff compare a
+  page against itself, on a collision that only an underscore in a directory
+  name would trigger. Existing snapshot directories must be recaptured under
+  the new stems; they are throwaway and git-ignored, so this costs nothing.
+  Date/Author: 2026-08-24, review batch.
 - **Decision:** serialize port acquisition in `scripts/weaver_snapshot.py`
   behind an advisory `flock` keyed on the port and the user id, rather than
-  relying on the bind probe alone. Rationale: probing a port and then
-  spawning a server on it is check-then-act — two runs can both find the
-  port free, both spawn, and one then answers the other's readiness poll,
-  which the probe alone cannot close. The lock is released as soon as the
-  server answers, so it covers startup and not the capture itself, which
-  takes minutes. Date/Author: 2026-08-24, review batch.
+  relying on the bind probe alone. Rationale: probing a port and then spawning
+  a server on it is check-then-act — two runs can both find the port free, both
+  spawn, and one then answers the other's readiness poll, which the probe alone
+  cannot close. The lock is released as soon as the server answers, so it
+  covers startup and not the capture itself, which takes minutes. Date/Author:
+  2026-08-24, review batch.
 - **Decision:** waive the two `pages/safety.jinja` contrast failures in
   `tests/test_weaver_browser.py` by page and CSS class, rather than xfailing
-  the whole page or changing the palette. Rationale: the palette change —
-  lift variants of the status tokens remapped on the dark-surface selector
+  the whole page or changing the palette. Rationale: the palette change — lift
+  variants of the status tokens remapped on the dark-surface selector
   `src/styles/weaver/panels.css` already uses for `text-accent-ink` — remains
   the user's decision, not one to make inside a test suite. A companion test,
   `test_the_recorded_contrast_exceptions_are_still_real`, fails if the waiver
   ever stops matching what the page does, so it cannot silently outlive the
   defect. Date/Author: 2026-08-24, review batch.
 - **Decision:** raise the nav index span's opacity from 60% to 75% in
-  `templates/weaver/_chrome.jinja`. Rationale: `opacity-60` composited the
-  ink to `#708499` on the sidebar's cream ground, measured at 3.33:1 against
-  the 4.5:1 that 12px text needs; `opacity-75` measures 4.88:1, clearing the
+  `templates/weaver/_chrome.jinja`. Rationale: `opacity-60` composited the ink
+  to `#708499` on the sidebar's cream ground, measured at 3.33:1 against the
+  4.5:1 that 12px text needs; `opacity-75` measures 4.88:1, clearing the
   threshold while still reading as visually dimmed against the current link.
   Date/Author: 2026-08-24, review batch.
 - **Decision:** make all 31 `overflow-x-auto` panels `tabindex="0"`
   uniformly, rather than only the ones axe flagged at the viewports tested.
   Rationale: which panels actually scroll depends on the viewport and on the
-  panel's own content, not on a fixed set the audit happened to catch; a
-  panel that does not overflow today can start to the moment its content
-  changes or the viewport narrows, and a keyboard-unreachable scroll
-  container is a defect whether or not this round's scan found it. Uniform
-  application is also the only version of the rule that is checkable by
-  inspection rather than by re-running the audit after every content change.
-  Date/Author: 2026-08-24, review batch.
+  panel's own content, not on a fixed set the audit happened to catch; a panel
+  that does not overflow today can start to the moment its content changes or
+  the viewport narrows, and a keyboard-unreachable scroll container is a defect
+  whether or not this round's scan found it. Uniform application is also the
+  only version of the rule that is checkable by inspection rather than by
+  re-running the audit after every content change. Date/Author: 2026-08-24,
+  review batch.
 
 ## Outcomes & retrospective
 
@@ -668,6 +680,10 @@ measured directly against computed styles, at 360px and 1440px. axe-core's own
 scan additionally reports twenty-eight findings against code-panel text; these
 are false positives, recorded as such in the Decision Log, not fixes made
 against the design.
+
+**Addendum (2026-08-25):** see the addendum under Purpose. The "zero" above was
+true when written; the current position is zero unwaived direct contrast
+failures, with the two scoped `safety/` exceptions recorded there.
 
 Measured against the pre-migration baseline, eight of the seventeen pages are
 identical in total height and the largest shift anywhere is 1.78%, on
@@ -742,6 +758,10 @@ sub-targets green.
    `src/styles/`. Today there are two: `src/styles/site.css` becomes
    `public/assets/site.css`, and `src/styles/mxd.css` becomes
    `public/mxd/assets/tailwind.css`.
+
+   **Note (2026-08-25):** this describes the pre-migration state. The migration
+   added a third entrypoint, `src/styles/weaver.css`, which `build:css:weaver`
+   compiles to `public/weaver/assets/styles/weaver.css`; see `package.json`.
 3. `build:images` — generates responsive image variants.
 4. `build:pages` — `uv run pages generate --all-sites` renders the Jinja
    templates under `templates/` into HTML, driven by `config/pages.yaml`.
@@ -755,6 +775,9 @@ formatted by `ruff`, JavaScript, TypeScript and **CSS** by Biome
 (80-column wrap).
 
 ### What the Weaver sub-site is today
+
+**Note (2026-08-25):** this section describes the pre-migration state the plan
+started from, not the current, COMPLETE state.
 
 Templates live in `templates/weaver/`:
 
@@ -1189,6 +1212,10 @@ code-panel findings are recorded in the Decision Log as false positives, not
 fixed. The computed-style diff is non-empty and every entry corresponds to a
 logged substitution.
 
+**Addendum (2026-08-25):** see the addendum under Purpose. This go/no-go was
+met with the two scoped `safety/` exceptions recorded there, waived rather than
+fixed; it was not met as a literal zero.
+
 ### Milestone 9 — Documentation and cleanup
 
 `AGENTS.md` currently states, in the Styling section, that "Netsuke and Weaver
@@ -1309,6 +1336,10 @@ part of the green step.
   computed styles, across all seventeen pages at two viewport widths.
   axe-core's twenty-eight code-panel findings are logged as false positives,
   not fixed (see Decision Log).
+
+  **Addendum (2026-08-25):** see the addendum under Purpose. The criterion is
+  now met as zero *unwaived* failures, with the two scoped `safety/` exceptions
+  recorded there.
 - Styling: the final computed-style diff against the Milestone 0 baseline
   contains only entries traceable to a `Decision Log` line.
 
@@ -1353,6 +1384,11 @@ all seventeen published pages, derived from the published-page inventory rather
 than hard-coded (see the Milestone 0 correction to the page count). The axe
 evidence records twenty-eight code-panel findings as false positives, not as
 violations awaiting a fix — see the Decision Log entry for the measured basis.
+
+**Addendum (2026-08-25):** the twenty-eight code-panel findings above are
+unchanged and remain tool false positives. Separately, and additionally, two
+scoped `safety/` contrast exceptions were later waived rather than fixed; see
+the addendum under Purpose.
 
 ## Interfaces and dependencies
 

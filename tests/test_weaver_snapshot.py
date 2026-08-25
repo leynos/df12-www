@@ -810,7 +810,8 @@ def test_a_server_that_died_before_answering_is_not_taken_for_the_responder() ->
     class _Exited:
         """A child that answered nothing because it was never alive."""
 
-        def poll(self) -> int:
+        def poll(self) -> int | None:
+            """Report the exit status `_await_server` asks for."""
             return 1
 
     with pytest.raises(SystemExit) as caught:
@@ -838,6 +839,7 @@ def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder(
         """Alive when asked before the request, exited when asked after it."""
 
         def poll(self) -> int | None:
+            """Report alive, then exited, so the reply lands in between."""
             return next(replies)
 
     monkeypatch.setattr(

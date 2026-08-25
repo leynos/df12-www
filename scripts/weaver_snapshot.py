@@ -247,13 +247,29 @@ def _refuse_occupied_port(port: int) -> None:
             raise SystemExit(message) from exc
 
 
-def _await_server(server: subprocess.Popen[bytes], base: str, port: int) -> None:
+class _Pollable(typ.Protocol):
+    """The one thing waiting on a server needs from the process running it.
+
+    Annotating the parameter as ``subprocess.Popen[bytes]`` overstated it: the
+    wait asks whether the child is still running and nothing else. Narrowing
+    the contract to that is what lets it be checked against a stand-in that
+    reports a chosen sequence of exits, rather than against a real process
+    whose timing a test cannot control.
+    """
+
+    def poll(self) -> int | None:
+        """Return the exit status, or ``None`` while the process runs."""
+        ...  # pragma: no cover - a protocol has no body
+
+
+def _await_server(server: _Pollable, base: str, port: int) -> None:
     """Wait until the spawned server answers, and confirm it is the one that did.
 
     Parameters
     ----------
     server
-        The freshly spawned ``http-server`` process.
+        The freshly spawned ``http-server`` process, or anything that reports
+        whether it is still running.
     base
         The origin it should be listening on.
     port

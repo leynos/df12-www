@@ -340,6 +340,43 @@ def test_the_icon_macro_renders_from_data_without_reading_a_file(
         pytest.param(
             (None, "not: a mapping of icons", "'icons'"), id="mapping-no-icons"
         ),
+        # The nested records are somebody else's format too, and a scalar where
+        # a record was expected raises TypeError rather than KeyError — which
+        # `build_macro`'s handler does not catch.
+        pytest.param(
+            ('{"icons": {"terminal": 5}}', None, "'body'"), id="carbon-icon-scalar"
+        ),
+        pytest.param(
+            ('{"icons": {"terminal": {"width": 32}}}', None, "'body'"),
+            id="carbon-icon-no-body",
+        ),
+        pytest.param(
+            ('{"icons": {"terminal": {"body": 7}}}', None, "'body'"),
+            id="carbon-icon-body-not-a-string",
+        ),
+        pytest.param(
+            ('{"icons": {}, "aliases": {"star": "asterisk"}}', None, "'parent'"),
+            id="carbon-alias-scalar",
+        ),
+        pytest.param(
+            ('{"icons": {}, "aliases": {"star": {"rotate": 1}}}', None, "'parent'"),
+            id="carbon-alias-no-parent",
+        ),
+        pytest.param(
+            ('{"icons": {}, "aliases": [1, 2]}', None, "'aliases'"),
+            id="carbon-aliases-not-a-mapping",
+        ),
+        pytest.param(
+            (None, "icons:\n  fa-ghost: 5\n", "'carbon'"), id="mapping-record-scalar"
+        ),
+        pytest.param(
+            (None, "icons:\n  fa-ghost:\n    note: no carbon here\n", "'carbon'"),
+            id="mapping-record-no-carbon",
+        ),
+        pytest.param(
+            (None, "icons:\n  fa-ghost:\n    carbon: [a, b]\n", "'carbon'"),
+            id="mapping-carbon-not-a-string",
+        ),
     ],
 )
 def test_an_unusable_generator_input_names_the_file(
@@ -405,25 +442,78 @@ def test_an_unmapped_carbon_icon_names_the_mapping(
     assert "no-such-icon" in message, f"expected the icon named in {message!r}"
 
 
+def _minimal_inputs(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, root: Path
+) -> None:
+    """Point the generator at a pair of valid inputs that render an empty macro."""
+    carbon_path = root / "icons.json"
+    carbon_path.write_text('{"icons": {}}', encoding="utf-8")
+    mapping_path = root / "weaver-icons.yaml"
+    mapping_path.write_text("icons: {}", encoding="utf-8")
+    monkeypatch.setattr(generator, "CARBON", carbon_path)
+    monkeypatch.setattr(generator, "MAPPING", mapping_path)
+
+
+class _UnwritablePath(Path):
+    """A path that reads like any other and refuses every write.
+
+    ``main`` reads ``OUTPUT`` before it writes it, so the write handler is only
+    reachable through something that lets the read succeed. Pointing ``OUTPUT``
+    at a directory does not do that: ``Path.exists()`` is true for one and
+    ``read_text()`` raises ``IsADirectoryError``, so the *read* handler fires
+    and the write handler is never entered at all.
+    """
+
+    def write_text(self, *_args: object, **_kwargs: object) -> int:
+        """Fail the way a read-only tree or a full disk would."""
+        message = f"Permission denied: {self}"
+        raise PermissionError(message)
+
+
 def test_an_unwritable_output_reports_the_path_rather_than_an_oserror(
     generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """`main` is the CLI boundary, so its filesystem failures exit with a message."""
-    carbon_path = tmp_path / "icons.json"
-    carbon_path.write_text('{"icons": {}}', encoding="utf-8")
-    mapping_path = tmp_path / "weaver-icons.yaml"
-    mapping_path.write_text("icons: {}", encoding="utf-8")
-    # A directory cannot be opened for writing, so this fails without needing
-    # permissions the test suite may or may not be able to change.
-    output = tmp_path / "_icons.jinja"
-    output.mkdir()
-    monkeypatch.setattr(generator, "CARBON", carbon_path)
-    monkeypatch.setattr(generator, "MAPPING", mapping_path)
+    _minimal_inputs(generator, monkeypatch, tmp_path)
+
+    output = _UnwritablePath(tmp_path / "_icons.jinja")
+    # Existing and readable, and holding something other than what the
+    # generator will produce, so `main` gets past its unchanged short-circuit
+    # and reaches the write.
+    Path(output).write_text("stale", encoding="utf-8")
     monkeypatch.setattr(generator, "OUTPUT", output)
 
     with pytest.raises(SystemExit) as caught:
         generator.main()
 
-    assert str(output) in str(caught.value.code), (
-        f"the message should name the output; got {caught.value.code!r}"
+    message = str(caught.value.code)
+    assert str(output) in message, (
+        f"the message should name the output; got {message!r}"
+    )
+    assert "could not be written" in message, (
+        f"the write handler should be the one that fired; got {message!r}"
+    )
+
+
+def test_an_unreadable_output_is_reported_separately(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The read and the write are distinct failures and say so distinctly."""
+    _minimal_inputs(generator, monkeypatch, tmp_path)
+
+    # A directory exists and cannot be read as text, which is the read handler's
+    # case and not the write handler's.
+    output = tmp_path / "_icons.jinja"
+    output.mkdir()
+    monkeypatch.setattr(generator, "OUTPUT", output)
+
+    with pytest.raises(SystemExit) as caught:
+        generator.main()
+
+    message = str(caught.value.code)
+    assert str(output) in message, (
+        f"the message should name the output; got {message!r}"
+    )
+    assert "could not be read" in message, (
+        f"the read handler should be the one that fired; got {message!r}"
     )

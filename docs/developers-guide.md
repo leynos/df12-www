@@ -910,8 +910,8 @@ whether the sidebar genuinely gives way to the drawer at a narrow viewport.
 It carries the `playwright` marker, so `uv run pytest -m "not playwright"`
 deselects it while iterating on something else. It also degrades to a skip
 rather than a failure when a dependency is absent: `agent-browser` not on
-`PATH`, `node_modules/.bin/http-server` missing (run `bun install`), or `uv`
-or `bun` themselves not on `PATH`.
+`PATH`, `node_modules/.bin/http-server` missing (run `bun install`), or `uv` or
+`bun` themselves not on `PATH`.
 
 `built_site` is a session-scoped fixture in `tests/conftest.py`, shared with
 `tests/test_weaver_build.py`, so `bun run build` runs once for both suites
@@ -922,9 +922,9 @@ a page of prose panels, `commands/act/` for its scrollable code blocks, and
 `how-it-works/` for the figure-heavy explainer — chosen because between them
 they carry every kind of chrome the sub-site has. Each is checked at two
 viewports: 360×800, the narrowest width the design targets and the one that
-puts the sidebar off-canvas behind a toggle, and 1440×900, the width the
-layout was drawn against. The two layouts share almost no chrome, so both have
-to be checked.
+puts the sidebar off-canvas behind a toggle, and 1440×900, the width the layout
+was drawn against. The two layouts share almost no chrome, so both have to be
+checked.
 
 **What each test asserts:**
 
@@ -954,15 +954,15 @@ to be checked.
 **The `ACCEPTED` waiver.** `pages/safety.jinja`'s Operational Guidance panel
 carries two status-token labels whose measured contrast is a recorded,
 outstanding defect rather than something this suite is meant to catch fresh
-each run (see the Decision Log in
-`docs/execplans/weaver-daisy-migration.md`). `ACCEPTED` waives exactly those
-two: it is keyed by page, axe rule, and the CSS class carried on the failing
-node, so it excuses the `text-status-ok` and `text-status-error` labels on
-`safety/` and nothing else — a contrast failure anywhere else on the same page
-still fails the suite. `test_the_recorded_contrast_exceptions_are_still_real`
-asserts the two waived labels still fire; if a future palette change makes
-them pass, that test fails instead, so the waiver cannot quietly outlive the
-defect it was recorded against.
+each run (see the Decision Log in `docs/execplans/weaver-daisy-migration.md`).
+`ACCEPTED` waives exactly those two: it is keyed by page, axe rule, and the CSS
+class carried on the failing node, so it excuses the `text-status-ok` and
+`text-status-error` labels on `safety/` and nothing else — a contrast failure
+anywhere else on the same page still fails the suite.
+`test_the_recorded_contrast_exceptions_are_still_real` asserts the two waived
+labels still fire; if a future palette change makes them pass, that test fails
+instead, so the waiver cannot quietly outlive the defect it was recorded
+against.
 
 Run just this file:
 

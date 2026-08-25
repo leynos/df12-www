@@ -32,6 +32,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -79,6 +80,11 @@ ACCEPTED = {
 }
 
 TOOL_TIMEOUT_SECONDS = 120
+
+# One class token inside an axe target selector. axe escapes the characters
+# Tailwind puts in a class name, so `hover:bg-primary/5` arrives as
+# `.hover\\:bg-primary\\/5` and an escape has to be consumed as a unit.
+CLASS_TOKEN = re.compile(r"\.((?:\\.|[A-Za-z0-9_-])+)")
 
 
 def _free_port() -> int:
@@ -210,11 +216,29 @@ def _violations(drive: cabc.Callable[..., str]) -> list[dict[str, typ.Any]]:
     return payload["data"]["violations"]
 
 
+def _classes(node: dict[str, typ.Any]) -> set[str]:
+    """Return the class names named in an axe failure's target selector.
+
+    A waiver has to match a whole class, not a substring of the selector.
+    `"text-status-ok" in ".text-status-okay"` is true, and so is
+    `"text-status-ok" in '[href$="text-status-ok/"]'`; either would waive a
+    failure nobody decided to accept. Comparing against the parsed tokens
+    makes the match exact.
+    """
+    target = " ".join(str(part) for part in node["target"])
+    return {
+        # `\:` and `\/` are one character each once the selector is read as
+        # a selector rather than as text.
+        re.sub(r"\\(.)", r"\1", token)
+        for token in CLASS_TOKEN.findall(target)
+    }
+
+
 def _accepted(page: str, rule: str, node: dict[str, typ.Any]) -> bool:
     """Say whether one axe failure is a recorded exception for this page."""
-    target = " ".join(str(part) for part in node["target"])
+    classes = _classes(node)
     return any(
-        page == accepted_page and rule == accepted_rule and marker in target
+        page == accepted_page and rule == accepted_rule and marker in classes
         for accepted_page, accepted_rule, marker in ACCEPTED
     )
 
@@ -324,12 +348,12 @@ def test_the_recorded_contrast_exceptions_are_still_real(
     """
     _open(drive, served, "safety/", 1440, 900)
 
+    waived = {marker for _page, _rule, marker in ACCEPTED}
     fired = {
         (violation["id"], marker)
         for violation in _violations(drive)
         for node in violation["nodes"]
-        for marker in ("text-status-ok", "text-status-error")
-        if marker in " ".join(str(part) for part in node["target"])
+        for marker in waived & _classes(node)
     }
     expected = {(rule, marker) for _page, rule, marker in ACCEPTED}
 

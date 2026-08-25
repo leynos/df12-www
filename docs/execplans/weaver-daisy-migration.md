@@ -242,6 +242,44 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       keyboard-unreachable scrollable panels, and a link on `how-it-works/`
       distinguished by colour alone — each fixed as part of this round; see
       Surprises & discoveries and the Decision Log.
+- [x] (2026-08-25) Hardened `scripts/generate_weaver_icons.py`'s `_records`
+      to check that every entry under a required key is itself a mapping
+      carrying the expected field as a string, rather than trusting the
+      outer mapping alone. A scalar or list where a nested record was
+      expected now fails with a message naming the file, the key, and the
+      offending entries, instead of surfacing as an uncaught `TypeError`
+      several frames into rendering.
+- [x] (2026-08-25) Reworked `tests/test_weaver_browser.py`'s `ACCEPTED`
+      waiver match to compare parsed class tokens rather than substrings of
+      an axe target selector, closing the gap where
+      `"text-status-ok" in ".text-status-okay"` (or in a href attribute
+      value) would have waived a failure nobody accepted.
+- [x] (2026-08-25) Corrected
+      `test_an_unwritable_output_reports_the_path_rather_than_an_oserror` in
+      `tests/test_weaver_build.py`: pointing `OUTPUT` at a directory let
+      `Path.exists()` succeed and `read_text()` raise `IsADirectoryError`, so
+      the test exercised the read handler and never reached the write
+      handler it named. A stand-in path object that reads normally and
+      refuses only the write now reaches the intended branch.
+- [x] (2026-08-25) Narrowed `scripts/weaver_snapshot.py`'s server-wait
+      helper to a `_Pollable` protocol — just the `poll()` method the wait
+      actually calls — rather than the full `subprocess.Popen[bytes]` type,
+      so the wait can be exercised against a stand-in that reports a chosen
+      sequence of exits instead of a real process whose timing cannot be
+      controlled in a test.
+- [x] (2026-08-25) Defaulted `scripts/weaver_snapshot.py`'s serve port to
+      `0` (kernel-assigned) so two runs normally contend over nothing, and
+      added a per-run ownership marker file, written under `public/` and
+      fetched back once the server answers and again after the capture, so
+      a run can tell whether the server on its port is genuinely serving
+      this run's tree rather than merely being alive.
+- [x] (2026-08-25) Rebuilt `tests/test_weaver_browser.py`'s page matrix to
+      derive its list from `config/pages.yaml`, covering all seventeen
+      published pages instead of a hand-picked four; added the companion
+      test that checks the config and the published tree agree; and fixed
+      the mobile-overflow defect the wider matrix surfaced with the
+      `@media (max-width: 767px)` block in
+      `src/styles/weaver/site-base.css`.
 
 ## Surprises & discoveries
 
@@ -387,6 +425,38 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   who cannot perceive that colour difference — including anyone relying on a
   colour-contrast-only rendering — has no way to tell the link from ordinary
   text; fixed by adding `underline` alongside the colour.
+- **Observation:** four Weaver pages scrolled the document sideways at the
+  360px viewport the browser suite now checks against every page, rather
+  than the four it previously hand-picked. Evidence: `sempai` laid out at
+  826px, `jacquard` at 416px, `install` at 370px, and `docs` at 376px, all
+  against a 360px viewport. Two causes: content with no space to break at —
+  a command line, a TOML key, a table cell holding a path — sets a minimum
+  width its column cannot meet; and a display heading is wider than its
+  column for a different reason, "Documentation" at `text-5xl` measuring
+  344px against a 296px column. Impact: every line of body text on those
+  four pages needed a horizontal scroll to read at the narrowest width the
+  design targets, and nothing had checked, because the matrix that would
+  have caught it did not exist until this round. Fixed by the
+  `@media (max-width: 767px)` block in
+  `src/styles/weaver/site-base.css`.
+- **Observation:** strengthening the current-link assertion in
+  `test_a_weaver_page_renders_its_chrome` from a bare count to a check of
+  the href it names surfaced three legitimate patterns rather than defects.
+  Evidence: the three command sub-pages mark their parent section current
+  rather than themselves; the design-language page's current link is a
+  fragment, since it reuses the nav classes for its own in-page anchors; and
+  the three legal pages, which the sidebar does not list, mark no link
+  current at all. Impact: the assertion had to learn the real contract — at
+  most one current link, and it must be the page's own href, an ancestor of
+  it, or a fragment — rather than merely counting.
+- **Observation:**
+  `test_an_unwritable_output_reports_the_path_rather_than_an_oserror` never
+  reached the write handler it was written to exercise. Evidence: pointing
+  `OUTPUT` at a directory makes `Path.exists()` true and `read_text()` raise
+  `IsADirectoryError`, so the read handler fired and the assertion passed on
+  the wrong message. Impact: a stand-in path that reads normally and
+  refuses only the write is what actually reaches the write handler; the
+  earlier version was a false positive.
 
 ## Decision log
 
@@ -668,6 +738,53 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   only version of the rule that is checkable by inspection rather than by
   re-running the audit after every content change. Date/Author: 2026-08-24,
   review batch.
+- **Decision:** derive `tests/test_weaver_browser.py`'s page list from
+  `config/pages.yaml` rather than the published tree or a hand-picked few.
+  Rationale: parametrization happens at collection, before the `built_site`
+  fixture has built anything, so the published tree is not available to
+  read from at that point; a hand-picked list leaves exactly the pages
+  nobody would think to pick — the legal pages, the design-language page —
+  unchecked, which is precisely where earlier rounds found defects. A
+  companion test,
+  `test_the_published_tree_holds_exactly_the_pages_checked_here`, asserts
+  the config and the build agree, so the config cannot drift from what is
+  actually published without the suite noticing. Date/Author: 2026-08-25,
+  review batch.
+- **Decision:** allow code, table, and monospace content to break
+  mid-token, and headings to hyphenate, below the tablet breakpoint, rather
+  than making the surrounding panels scroll or shrinking the headings.
+  Rationale: the panels that overflow already imply a mid-token break by
+  scrolling — `overflow-x-auto` on a code block accepts that a line may not
+  read as written — so letting the content itself break where its parent
+  does not scroll is the same concession applied consistently. Shrinking
+  the headings would be a visible design change for a rendering defect. The
+  rule is scoped to `max-width: 767px` so the wide layout, where nothing
+  overflows, is untouched. Date/Author: 2026-08-25, review batch.
+- **Decision:** prove `scripts/weaver_snapshot.py`'s server ownership with
+  a per-run marker file fetched back from the served tree, rather than
+  relying on the child process's liveness, and default the port to `0` so
+  two runs normally have nothing to contend over. Rationale: liveness only
+  says the child is running, not that it is what answered a given request —
+  a request can be answered by another worktree's server, or another run's,
+  that happened to claim the port in the gap between the bind probe and the
+  spawn. Fetching a marker only this run knows the name of closes that gap
+  directly. The startup lock is keyed on the port and the user id, which
+  does not serialize two users against each other on the same port; the
+  marker is what covers that case, since it can tell whose server actually
+  answered regardless of who is holding the lock. Date/Author: 2026-08-25,
+  review batch.
+- **Decision:** decline, a third time, to remove `text-xs` from the Sempai
+  contents nav's Observe Integration link. Rationale: the premise is stale.
+  Commit `16dd6ae1` already resolved the underlying finding — a duplicate
+  font-size utility on that link — by dropping `text-3xs`, so the link now
+  carries `text-xs` alone, exactly as its eight siblings do. Removing it as
+  requested would leave the link with no font-size utility at all, which is
+  the opposite of the stated acceptance criterion of exactly one. A test
+  now asserts that no element in any Weaver template declares two
+  unprefixed font sizes, so the point is settled by the suite rather than
+  by re-litigation. This finding has now arrived three times; recorded so a
+  fourth arrival finds this note first. Date/Author: 2026-08-25, review
+  batch.
 
 ## Outcomes & retrospective
 

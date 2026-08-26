@@ -1,0 +1,29 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`root event state snapshots populated, empty, unavailable, and keyboard-active result states: populated results 1`] = `
+{
+  "meta": "1 result for “film”.",
+  "results": "<li class="search-result" role="presentation" data-result-index="0"><a class="search-result__link" href="/episodic/docs/film/" id="search-results-option-0" aria-selected="false" role="option"><span class="search-result__kind">Upstream document</span><span class="search-result__title">Film design</span><span class="search-result__context">Documentation</span></a></li>",
+}
+`;
+
+exports[`root event state snapshots populated, empty, unavailable, and keyboard-active result states: empty results 1`] = `
+{
+  "meta": "Nothing matched “none”. Every document is still listed by category below.",
+  "results": "",
+}
+`;
+
+exports[`root event state snapshots populated, empty, unavailable, and keyboard-active result states: unavailable results 1`] = `
+{
+  "meta": "Search is unavailable in this build. Every document is listed by category below.",
+  "results": "",
+}
+`;
+
+exports[`root event state snapshots populated, empty, unavailable, and keyboard-active result states: keyboard active results 1`] = `
+{
+  "active": "search-results-option-0",
+  "results": "<li class="search-result is-active" role="presentation" data-result-index="0"><a class="search-result__link is-active" href="/episodic/docs/one/" id="search-results-option-0" aria-selected="true" role="option"><span class="search-result__kind">Upstream document</span><span class="search-result__title">Result one</span><span class="search-result__context">Documentation</span></a></li><li class="search-result" role="presentation" data-result-index="1"><a class="search-result__link" href="/episodic/docs/two/" id="search-results-option-1" aria-selected="false" role="option"><span class="search-result__kind">Upstream document</span><span class="search-result__title">Result two</span><span class="search-result__context">Documentation</span></a></li>",
+}
+`;

@@ -43,6 +43,7 @@ dev = [
     "parse_type",
     "msgspec",
     "jqpy",
+    "hypothesis==6.165.10",
 ]
 
 [tool.ruff]

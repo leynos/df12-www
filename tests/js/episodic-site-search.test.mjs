@@ -7,6 +7,7 @@
  */
 import { describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";
+import fc from "fast-check";
 import { Window } from "happy-dom";
 
 const require = createRequire(import.meta.url);
@@ -162,6 +163,82 @@ describe("index loading", () => {
     await expect(load("/index.json")).resolves.toEqual({ miniSearch: {} });
     expect(calls).toBe(2);
   });
+
+  test("emits bounded cache lifecycle telemetry without index paths", async () => {
+    const events = [];
+    let time = 0;
+    let calls = 0;
+    const load = createIndexCache(
+      async () => {
+        calls += 1;
+        if (calls === 1) {
+          throw new Error("offline");
+        }
+        return { miniSearch: {} };
+      },
+      {
+        now: () => {
+          time += 40;
+          return time;
+        },
+        telemetry: (event) => events.push(event),
+      },
+    );
+
+    const failed = load("/private/index.json");
+    expect(load("/private/index.json")).toBe(failed);
+    await expect(failed).rejects.toThrow("offline");
+    await expect(load("/private/index.json")).resolves.toEqual({ miniSearch: {} });
+
+    expect(events).toEqual([
+      {
+        attempt: "initial",
+        cache_state: "miss",
+        operation: "episodic-search-index",
+        outcome: "requested",
+      },
+      {
+        attempt: "initial",
+        cache_state: "hit",
+        operation: "episodic-search-index",
+        outcome: "requested",
+      },
+      {
+        attempt: "initial",
+        cache_state: "miss",
+        duration_bucket: "under-50ms",
+        operation: "episodic-search-index",
+        outcome: "failure",
+      },
+      {
+        attempt: "initial",
+        cache_state: "evicted",
+        operation: "episodic-search-index",
+        outcome: "evicted",
+      },
+      {
+        attempt: "retry",
+        cache_state: "miss",
+        operation: "episodic-search-index",
+        outcome: "requested",
+      },
+      {
+        attempt: "retry",
+        cache_state: "miss",
+        duration_bucket: "under-50ms",
+        operation: "episodic-search-index",
+        outcome: "success",
+      },
+    ]);
+    for (const event of events) {
+      expect(Object.keys(event).sort()).toEqual(
+        ["attempt", "cache_state", "duration_bucket", "operation", "outcome"]
+          .filter((key) => key in event)
+          .sort(),
+      );
+      expect(JSON.stringify(event)).not.toContain("/private/index.json");
+    }
+  });
 });
 
 describe("network-free search", () => {
@@ -172,6 +249,41 @@ describe("network-free search", () => {
 
     expect(found).toHaveLength(8);
     expect(found.map(({ id }) => id)).toEqual(strict.slice(0, 8).map(({ id }) => id));
+  });
+
+  test("keeps strict-first unique bounded results for arbitrary duplicate inputs", () => {
+    const resultArbitrary = fc.record({
+      id: fc.string({ minLength: 1, maxLength: 8 }),
+      kind: fc.constant("document"),
+      pageTitle: fc.constant("Documentation"),
+      sitePath: fc.webPath(),
+      title: fc.string({ minLength: 1, maxLength: 24 }),
+    });
+
+    fc.assert(
+      fc.property(
+        fc.array(resultArbitrary, { maxLength: 20 }),
+        fc.array(resultArbitrary, { maxLength: 20 }),
+        (strict, loose) => {
+          const found = searchEpisodicIndex(engine({ query: { loose, strict } }), "query");
+          const expected = [];
+          const ids = new Set();
+          for (const candidate of [...strict, ...loose]) {
+            if (!ids.has(candidate.id)) {
+              ids.add(candidate.id);
+              expected.push(candidate.id);
+            }
+          }
+
+          return (
+            found.length <= 8 &&
+            new Set(found.map(({ id }) => id)).size === found.length &&
+            JSON.stringify(found.map(({ id }) => id)) === JSON.stringify(expected.slice(0, 8))
+          );
+        },
+      ),
+      { numRuns: 100 },
+    );
   });
 });
 
@@ -204,6 +316,47 @@ describe("root event state", () => {
     expect(dom.meta.textContent).toBe("1 result for “film”.");
     expect(dom.panel.hidden).toBe(false);
     expect(calls).toBe(1);
+  });
+
+  test("snapshots populated, empty, unavailable, and keyboard-active result states", async () => {
+    const populated = setUp({
+      loaded: engine({ film: { loose: [result("film", "Film design")] } }),
+    });
+    dispatchInput(populated.window, populated.input, "film");
+    await settle();
+    expect({ meta: populated.meta.textContent, results: populated.list.innerHTML }).toMatchSnapshot(
+      "populated results",
+    );
+
+    const empty = setUp({ loaded: engine({ none: { loose: [] } }) });
+    dispatchInput(empty.window, empty.input, "none");
+    await settle();
+    expect({ meta: empty.meta.textContent, results: empty.list.innerHTML }).toMatchSnapshot(
+      "empty results",
+    );
+
+    const unavailable = setUp({ loadIndex: async () => Promise.reject(new Error("offline")) });
+    const warning = console.warn;
+    console.warn = () => {};
+    try {
+      dispatchInput(unavailable.window, unavailable.input, "docs");
+      await settle();
+    } finally {
+      console.warn = warning;
+    }
+    expect({
+      meta: unavailable.meta.textContent,
+      results: unavailable.list.innerHTML,
+    }).toMatchSnapshot("unavailable results");
+
+    const active = setUp({ loaded: engine({ docs: { loose: [result("one"), result("two")] } }) });
+    dispatchInput(active.window, active.input, "docs");
+    await settle();
+    dispatchKey(active.window, active.input, "ArrowDown");
+    expect({
+      active: active.input.getAttribute("aria-activedescendant"),
+      results: active.list.innerHTML,
+    }).toMatchSnapshot("keyboard active results");
   });
 
   test("does not let an older request overwrite a newer query", async () => {

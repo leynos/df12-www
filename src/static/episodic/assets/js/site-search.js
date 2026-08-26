@@ -10,6 +10,7 @@
 (() => {
   const MIN_QUERY_LENGTH = 2;
   const RESULT_LIMIT = 8;
+  const TELEMETRY_OPERATION = "episodic-search-index";
 
   const KIND_LABELS = {
     page: "Page",
@@ -17,26 +18,95 @@
     document: "Upstream document",
   };
 
-  // Cache promises, not only settled values, so roots which share an index
-  // also share an in-flight request. A failure is deliberately evicted so a
-  // subsequent root initialization can retry rather than staying permanently
-  // inert.
-  function createIndexCache(load) {
+  /**
+   * Map a load duration to a bounded telemetry label.
+   *
+   * @param {number} duration Milliseconds elapsed while loading an index.
+   * @returns {string} One of the fixed duration buckets.
+   */
+  function durationBucket(duration) {
+    if (duration < 50) {
+      return "under-50ms";
+    }
+    if (duration < 250) {
+      return "50ms-to-249ms";
+    }
+    if (duration < 1000) {
+      return "250ms-to-999ms";
+    }
+    return "1s-or-more";
+  }
+
+  /**
+   * Emit one fixed-schema, privacy-preserving search-index lifecycle event.
+   *
+   * @param {((event: object) => void) | undefined} telemetry Optional event sink.
+   * @param {string} outcome Fixed event outcome.
+   * @param {string} cacheState Fixed cache-state label.
+   * @param {string} attempt Fixed initial or retry label.
+   * @param {number | undefined} duration Load duration when one exists.
+   * @returns {void}
+   */
+  function emitSearchTelemetry(telemetry, outcome, cacheState, attempt, duration) {
+    if (typeof telemetry !== "function") {
+      return;
+    }
+    const event = {
+      attempt,
+      cache_state: cacheState,
+      operation: TELEMETRY_OPERATION,
+      outcome,
+      ...(duration === undefined ? {} : { duration_bucket: durationBucket(duration) }),
+    };
+    try {
+      telemetry(event);
+    } catch {
+      // Observability is optional: an unavailable sink must not disable search.
+    }
+  }
+
+  /**
+   * Cache index-loader promises and report bounded lifecycle telemetry.
+   *
+   * @param {(path: string) => Promise<object | undefined>} load Index loader.
+   * @param {{now?: () => number, telemetry?: (event: object) => void}} [options]
+   *     Injectable clock and privacy-preserving telemetry sink.
+   * @returns {(path: string) => Promise<object | undefined>} Cached index loader.
+   */
+  function createIndexCache(
+    load,
+    { now = () => globalThis.performance?.now?.() ?? Date.now(), telemetry } = {},
+  ) {
     const cache = new Map();
+    const retries = new Set();
 
     return function loadCached(path) {
-      if (!cache.has(path)) {
+      if (cache.has(path)) {
+        emitSearchTelemetry(telemetry, "requested", "hit", retries.has(path) ? "retry" : "initial");
+      } else {
+        const attempt = retries.has(path) ? "retry" : "initial";
+        const started = now();
+        emitSearchTelemetry(telemetry, "requested", "miss", attempt);
         const pending = Promise.resolve()
           .then(() => load(path))
           .then(
             (loaded) => {
               if (!loaded) {
                 cache.delete(path);
+                retries.add(path);
+                emitSearchTelemetry(telemetry, "failure", "miss", attempt, now() - started);
+                emitSearchTelemetry(telemetry, "evicted", "evicted", attempt);
+              } else {
+                retries.delete(path);
+                emitSearchTelemetry(telemetry, "success", "miss", attempt, now() - started);
               }
               return loaded;
             },
             (error) => {
               cache.delete(path);
+              retries.add(path);
+              emitSearchTelemetry(telemetry, "failure", "miss", attempt, now() - started);
+              emitSearchTelemetry(telemetry, "evicted", "evicted", attempt);
               throw error;
             },
           );
@@ -72,7 +142,12 @@
     };
   }
 
-  const loadEpisodicSearchIndex = createIndexCache((path) => fetchEpisodicSearchIndex(path));
+  // A host may install this optional function before the deferred script runs.
+  // Without it telemetry is a no-op; no query, path, content, or identifier is
+  // ever included in the fixed event schema.
+  const loadEpisodicSearchIndex = createIndexCache((path) => fetchEpisodicSearchIndex(path), {
+    telemetry: globalThis.df12EpisodicSearchTelemetry,
+  });
 
   // Search only consults the already-loaded index. The strict pass gives
   // precise multi-word matches first; the loose pass fills useful fallbacks.
@@ -361,6 +436,8 @@
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {
       createIndexCache,
+      durationBucket,
+      emitSearchTelemetry,
       fetchEpisodicSearchIndex,
       initialiseAllEpisodicSearch,
       initialiseEpisodicSearch,

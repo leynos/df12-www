@@ -42,6 +42,7 @@ bun run build:css     # compile the main, mxd, and Episodic Tailwind entrypoints
 bun run build:images  # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages   # uv run pages generate --all-sites
 bun run build:search  # build Netsuke and Episodic search indices
+bun run check:search  # fail when the committed Episodic index has drifted
 ```
 
 `build:static` runs first because `build:images` reads the source images it
@@ -57,11 +58,13 @@ uv run pages generate --site netsuke  # one sub-site
 `public/episodic/` routes and the upstream-document manifest, writing the
 committed MiniSearch projection at
 `src/static/episodic/assets/search/episodic-search.json`. `build:search`
-regenerates it and immediately runs its `--check` mode; the final
-`build:static` copy publishes that checked projection to
+regenerates it once; `check:search` runs its `--check` mode without rebuilding
+the payload. The final `build:static` copy publishes that projection to
 `public/episodic/assets/search/episodic-search.json`. Run `bun run build` or
 `bun run build:pages && bun run build:search && bun run build:static` after
-changing an Episodic page or its documentation manifest.
+changing an Episodic page or its documentation manifest. Run `bun run
+check:search` in continuous integration (CI) or before committing an index
+update to verify that the committed projection has not drifted.
 
 `scripts/build_episodic_roadmap_data.py` projects the authoritative upstream
 Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It
@@ -559,18 +562,35 @@ it — `doc-search.js` is included on thirteen pages this way.
 
 `src/static/episodic/assets/js/site-search.js` follows the same plain-script
 shape. It exposes five helpers when `module.exports` is available:
+shape. It exposes seven helpers when `module.exports` is available:
 `createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
 for fetching and deserializing the MiniSearch payload,
 `searchEpisodicIndex` for query-time ranking, `initialiseEpisodicSearch` for
-one root, and `initialiseAllEpisodicSearch` for the document. The latter two
-accept injected loader, search, and navigation dependencies so their DOM
-behaviour can be tested without a network request or navigation. Their roots
-must provide the `data-search-root`, `data-search-index`, `data-search-input`,
-`data-search-panel`, `data-search-results`, and `data-search-meta` contract.
-The search helpers are written so the loading boundary stays outside the query
-path: queries only consult an already-loaded index, while initialization owns
-the fetch and failure handling. Failed cache entries are evicted, allowing a
-later root initialization to retry.
+one root, `initialiseAllEpisodicSearch` for the document, `durationBucket` for
+the fixed telemetry duration classes, and `emitSearchTelemetry` for its bounded
+event schema. The initializers accept injected loader, search, and navigation
+dependencies so their DOM behaviour can be tested without a network request or
+navigation. Their roots must provide the `data-search-root`,
+`data-search-index`, `data-search-input`, `data-search-panel`,
+`data-search-results`, and `data-search-meta` contract. The search helpers are
+written so the loading boundary stays outside the query path: queries only
+consult an already-loaded index, while initialization owns the fetch and
+failure handling. Failed cache entries are evicted, allowing a later root
+initialization to retry.
+
+### 6.1. Episodic search telemetry
+
+Search-index observability is optional and privacy-preserving. A production
+host may set `window.df12EpisodicSearchTelemetry` to a function before the
+deferred search script loads; without that function, telemetry is a no-op. The
+sink receives only fixed labels: `operation` (`episodic-search-index`),
+`outcome` (`requested`, `success`, `failure`, or `evicted`), `cache_state`
+(`hit`, `miss`, or `evicted`), `attempt` (`initial` or `retry`), and, for load
+outcomes, a bounded `duration_bucket`. It therefore records cache hits and
+misses, load outcomes, failure eviction, retry outcomes, and coarse duration
+without transmitting search queries, document text, paths, URLs, or persistent
+identifiers. A telemetry sink must treat the event as operational metadata only
+and must not enrich it with page or user data.
 
 An element may still carry an id for the stylesheet or for an ARIA
 relationship; what the convention rules out is _script_ depending on one. The
@@ -591,7 +611,7 @@ per root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
 section of [AGENTS.md](../AGENTS.md); a custom element is its last rung, and
 the site does not use a front-end framework at all.
 
-### 6.1. The config-keys component
+### 6.2. The config-keys component
 
 `config-keys.js` drives the "config keys" browser on the configuration docs page
 (`templates/netsuke/pages/docs-configuration.jinja`), which pairs each key

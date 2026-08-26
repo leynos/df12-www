@@ -6,9 +6,11 @@ import json
 import typing as typ
 from pathlib import Path
 
+import pytest
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 
+import scripts.build_episodic_roadmap_data as roadmap_projector
 from scripts.build_episodic_roadmap_data import main
 from scripts.episodic_roadmap_parser import Task, parse_roadmap
 
@@ -48,6 +50,13 @@ class RoadmapPhaseRecord(typ.TypedDict):
     done_count: int
     total_count: int
     steps: list[RoadmapStepRecord]
+
+
+class RoadmapTotalsRecord(typ.TypedDict):
+    """JSON-compatible aggregate generated roadmap data."""
+
+    done: int
+    total: int
 
 
 def _task_from(markdown: str) -> Task:
@@ -147,25 +156,118 @@ def test_generated_dependency_fields_drive_the_roadmap_task_macro() -> None:
     ], "records.roadmap_task must render each generated requires array"
 
 
+def test_roadmap_task_macro_matches_the_representative_snapshot() -> None:
+    """A fixed nested task fixture keeps the accessible roadmap markup stable."""
+    environment = Environment(
+        autoescape=True,
+        loader=FileSystemLoader(REPO_ROOT / "templates/episodic"),
+    )
+    rendered = environment.from_string(
+        '{% import "records.jinja" as rec %}{{ rec.roadmap_task(task) }}'
+    ).render(
+        task={
+            "id": "7.2.1",
+            "title": "Archive `sample`.",
+            "done": False,
+            "requires": ["1.1.1"],
+            "subtasks": [
+                {"title": "Keep the source.", "done": True},
+                {"title": "Verify the copy.", "done": False},
+            ],
+        }
+    )
+    snapshot = (REPO_ROOT / "tests/snapshots/episodic-roadmap-task.snap").read_text(
+        encoding="utf-8"
+    )
+
+    assert BeautifulSoup(rendered, "html.parser").prettify() == snapshot, (
+        "the representative roadmap task macro must match its stable HTML snapshot"
+    )
+
+
+def _generated_roadmap_payload(
+    output: Path,
+) -> tuple[list[RoadmapPhaseRecord], RoadmapTotalsRecord]:
+    """Render the generated Jinja declarations as JSON-compatible data."""
+    environment = Environment(autoescape=True, loader=FileSystemLoader(output.parent))
+    rendered = environment.from_string(
+        '{% from "roadmap.jinja" import roadmap_phases, roadmap_totals %}'
+        "{{ {'phases': roadmap_phases, 'totals': roadmap_totals} | tojson }}"
+    ).render()
+    payload = json.loads(rendered)
+    return (
+        typ.cast("list[RoadmapPhaseRecord]", payload["phases"]),
+        typ.cast("RoadmapTotalsRecord", payload["totals"]),
+    )
+
+
 def test_projector_generates_and_checks_a_temporary_roadmap(tmp_path: Path) -> None:
-    """The command projects source data, accepts matching output, and detects drift."""
+    """The command projects structured data, checks it, and detects drift."""
     source = tmp_path / "episodic source"
     roadmap = source / "docs" / "roadmap.md"
     roadmap.parent.mkdir(parents=True)
     roadmap.write_text(
-        "## 1. Phase\n\n"
-        "### 1.1. Step\n\n"
+        "## 1. Foundation\n\n"
+        "### 1.1. Core\n\n"
         "- [x] 1.1.1. Complete the first task.\n"
-        "- [ ] 1.1.2. Complete the second task. Requires 1.1.1.\n",
+        "  - [x] Complete a nested task.\n"
+        "- [ ] 1.1.2. Complete the second task. Requires 1.1.1.\n\n"
+        "## 2. Delivery\n\n"
+        "### 2.1. Release\n\n"
+        "- [ ] 2.1.1. Prepare a release.\n"
+        "  - Requires 1.1.1 and 1.1.2. Keep this note.\n"
+        "- [x] 2.1.2. Publish the release.\n",
         encoding="utf-8",
     )
     output = tmp_path / "generated" / "roadmap.jinja"
     arguments = ["--episodic-root", str(source), "--output", str(output)]
 
     assert main(arguments) == 0, "projector must generate a missing output file"
-    rendered = output.read_text(encoding="utf-8")
-    assert '"requires": [\n              "1.1.1"\n            ]' in rendered, (
-        "projector output must contain normalized dependency data"
+    phases, totals = _generated_roadmap_payload(output)
+
+    assert [phase["number"] for phase in phases] == ["1", "2"], (
+        "projector output must preserve ordered phase identifiers"
+    )
+    assert [[step["id"] for step in phase["steps"]] for phase in phases] == [
+        ["1.1"],
+        ["2.1"],
+    ], "projector output must preserve ordered step identifiers"
+    assert [
+        task["id"]
+        for phase in phases
+        for step in phase["steps"]
+        for task in step["tasks"]
+    ] == ["1.1.1", "1.1.2", "2.1.1", "2.1.2"], (
+        "projector output must preserve ordered task identifiers"
+    )
+    assert [
+        task["done"]
+        for phase in phases
+        for step in phase["steps"]
+        for task in step["tasks"]
+    ] == [True, False, False, True], (
+        "projector output must preserve completed and incomplete task states"
+    )
+    assert [phase["state"] for phase in phases] == ["in-progress", "in-progress"], (
+        "projector output must calculate phase delivery states from task completion"
+    )
+    task_by_id = {
+        task["id"]: task
+        for phase in phases
+        for step in phase["steps"]
+        for task in step["tasks"]
+    }
+    assert task_by_id["1.1.2"]["requires"] == ["1.1.1"], (
+        "title dependencies must be normalized into generated requires arrays"
+    )
+    assert task_by_id["2.1.1"]["requires"] == ["1.1.1", "1.1.2"], (
+        "first-note dependencies must be normalized into generated requires arrays"
+    )
+    assert task_by_id["2.1.1"]["notes"] == ["Keep this note."], (
+        "first-note normalization must preserve unrelated note content"
+    )
+    assert totals == {"done": 2, "total": 4}, (
+        "projector output must aggregate completed and total tasks across phases"
     )
     assert main([*arguments, "--check"]) == 0, (
         "projector check must accept a matching generated file"
@@ -174,4 +276,64 @@ def test_projector_generates_and_checks_a_temporary_roadmap(tmp_path: Path) -> N
     output.write_text("stale\n", encoding="utf-8")
     assert main([*arguments, "--check"]) == 1, (
         "projector check must reject output that drifts from its source roadmap"
+    )
+
+
+@pytest.mark.parametrize("failure", ["write", "replace"])
+def test_atomic_projector_write_preserves_output_and_cleans_up(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    failure: str,
+) -> None:
+    """A temporary-write or replace failure keeps the prior generated file intact."""
+    output = tmp_path / "roadmap.jinja"
+    output.write_text("complete prior projection\n", encoding="utf-8")
+    original_open = Path.open
+    original_replace = Path.replace
+
+    if failure == "write":
+
+        class FailingTemporaryStream:
+            """Close the real stream after deterministically rejecting writes."""
+
+            def __init__(self, stream: typ.TextIO) -> None:
+                self.stream = stream
+
+            def __enter__(self) -> typ.Self:
+                return self
+
+            def __exit__(self, *_: object) -> None:
+                self.stream.close()
+
+            def write(self, _: str) -> int:
+                raise OSError
+
+        open_file = typ.cast("typ.Callable[..., typ.TextIO]", original_open)
+
+        def fail_temporary_write(
+            path: Path, *args: object, **kwargs: object
+        ) -> typ.TextIO:
+            stream = open_file(path, *args, **kwargs)
+            if path.name.startswith(f".{output.name}."):
+                return typ.cast("typ.TextIO", FailingTemporaryStream(stream))
+            return stream
+
+        monkeypatch.setattr(Path, "open", fail_temporary_write)
+    else:
+
+        def fail_replacement(path: Path, target: Path) -> Path:
+            if path.name.startswith(f".{output.name}."):
+                raise OSError
+            return original_replace(path, target)
+
+        monkeypatch.setattr(Path, "replace", fail_replacement)
+
+    with pytest.raises(OSError, match=r"^$"):
+        roadmap_projector._write_atomically(output, "new incomplete projection\n")
+
+    assert output.read_text(encoding="utf-8") == "complete prior projection\n", (
+        "an atomic-write failure must leave the prior complete output unchanged"
+    )
+    assert not list(tmp_path.glob(f".{output.name}.*.tmp")), (
+        "an atomic-write failure must clean up its exclusive temporary file"
     )

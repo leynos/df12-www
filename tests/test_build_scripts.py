@@ -40,14 +40,17 @@ def test_build_css_compiles_the_episodic_entrypoint(
     ), "build:css:episodic must publish the configured Episodic Tailwind output"
 
 
-def test_build_search_regenerates_and_checks_the_episodic_index(
+def test_build_search_generates_once_and_the_check_command_detects_drift(
     package_scripts: dict[str, str],
 ) -> None:
-    """The build regenerates the committed Episodic search projection."""
+    """Generation collects one Episodic payload and checking is a separate gate."""
     build_search = package_scripts["build:search"]
     command = "bun run scripts/build-episodic-search-index.mjs"
 
     assert command in build_search, "build:search must regenerate the Episodic index"
-    assert f"{command} --check" in build_search, (
-        "build:search must fail when the Episodic index projection is stale"
+    assert build_search.count(command) == 1, (
+        "build:search must collect the Episodic search payload exactly once"
+    )
+    assert package_scripts["check:search"] == f"{command} --check", (
+        "check:search must retain deterministic Episodic index drift verification"
     )

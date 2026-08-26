@@ -312,6 +312,21 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       reads `config/pages.yaml` through `df12_pages.config.load_site_config`,
       and `_serving` is a context manager that calls `server_close` and joins
       its thread.
+- [x] (2026-08-27) Checked the snapshot's shape before normalizing it.
+      `_normalized_tree` promised a path-naming `SystemExit` for a malformed
+      snapshot and delivered one only for the two levels it indexed by hand;
+      everything below escaped as an uncaught `AttributeError`. `_check_node`
+      now walks the tree first and names the node at fault.
+- [x] (2026-08-27) Gave `exhaustiveTransitionSequences` direct tests. Both
+      drawer suites iterate whatever it returns, so an empty return would have
+      left both passing having asserted nothing.
+- [x] (2026-08-27) Rendered `_icons.jinja` through Jinja rather than only
+      comparing it against its generator, and checked that every icon the
+      templates ask for resolves.
+- [x] (2026-08-27) Had `diff` read both snapshot directories under the lock
+      publication takes, closing the reader half of the ownership protocol.
+- [x] (2026-08-27) Taught the class-attribute scan to read single quotes as
+      well as double, which `_icons.jinja` uses.
 
 ## Surprises & discoveries
 
@@ -512,6 +527,22 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   suggestion to add `white-space: pre-wrap` was declined — the panels are meant
   to scroll, and were made keyboard-reachable for that reason — and the
   measurement became a test of the contract that actually holds.
+
+- **Observation:** the two mobile-navigation suites could have been passing
+  without asserting anything. Evidence: with
+  `exhaustiveTransitionSequences` altered to return an empty array, the Weaver
+  drawer suite still reported 37 tests passing — a loop over no items is not a
+  failure, and nothing else in either suite would have noticed. Impact: the
+  exhaustive-enumeration decision recorded earlier was sound, but its value
+  rested on an untested generator; seven direct tests now pin it.
+- **Observation:** the snapshot read boundary handled two levels of malformed
+  input and no more. Evidence: a tree that is a list, a `styleDiff` that is a
+  list, a `children` that is a string, and a scalar three levels down each
+  surfaced as an uncaught `AttributeError` from inside `_normalize`, naming
+  neither the file nor the node, despite the docstring promising a
+  path-specific `SystemExit`. Impact: an interrupted capture or a snapshot
+  from another tool would have produced a traceback rather than a message
+  saying which file to recapture.
 
 ## Decision log
 
@@ -877,6 +908,29 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   was added, asserting the document does not scroll and the line stays
   reachable — wrapped where the markup asks, scrollable where it does not.
   Date/Author: 2026-08-26, review batch.
+
+- **Decision:** close the reader half of the output-ownership protocol with a
+  lock, rather than building a manifest or generation-pointer scheme.
+  Rationale: the hazard is a torn read — publication's per-file replacements
+  are each atomic, the sequence is not, so a `diff` running through it could
+  take some pages from this run and some from the last. Having the reader take
+  the writer's lock removes that, in three lines, without introducing a
+  generation directory and a pointer for a development tool that one person
+  runs at a time. The two directories are locked in a stable resolved order so
+  two readers cannot deadlock, and a directory named twice is locked once.
+  Publication already preserves the other suffix, so a `capture` and a `shots`
+  run sharing a directory keep each other's results.
+  Date/Author: 2026-08-27, review batch.
+- **Decision:** leave `pages/design-language.jinja` standalone rather than
+  making it extend `doc_page.jinja`.
+  Rationale: its sidebar is an in-page table of contents, not the sub-site
+  navigation, and the shared layout has no block for replacing the sidebar's
+  links — only `sidebar_footer`, the panel beneath them. Adding one for a
+  single page would widen the shared layout's surface to accommodate the page
+  least like the others. The cost is that chrome changes must be made twice,
+  which is now written down in the developers' guide where someone changing
+  the chrome will meet it.
+  Date/Author: 2026-08-27, review batch.
 
 ## Outcomes & retrospective
 

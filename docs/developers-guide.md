@@ -605,6 +605,28 @@ defaults and what overriding each is for:
 
 _Table 4b: the blocks a page is most likely to override._
 
+
+### 4.10. Which Weaver templates use the shared layout
+
+Twelve of the thirteen page templates under `templates/weaver/pages/` extend
+`doc_page.jinja`, as do `home_page.jinja` and `shared_content_page.jinja`.
+Adding a page means extending it too — the sidebar, the mobile drawer, and the
+footer come with it, and a page that builds its own gets none of the fixes
+made to those.
+
+`pages/design-language.jinja` is the exception, and deliberately so. Its
+sidebar is not the sub-site navigation but an in-page table of contents:
+`#overview`, `#foundations`, `#typography`, `#motifs`, `#illustrations`,
+`#components`. The shared layout has no block for replacing the sidebar's
+links — only `sidebar_footer`, which is the panel beneath them — so a page
+wanting a different set of links has to carry its own chrome. That is why the
+browser suite's current-link check accepts a fragment as well as an href: on
+this page the current link is `#overview`, which is correct.
+
+The cost is real and worth stating: a change to the sidebar or the drawer has
+to be made twice, once in `doc_page.jinja` and once here. Anyone touching the
+chrome should grep `design-language.jinja` for the same markup.
+
 ## 5. Template components
 
 Repeated markup belongs in a Jinja macro, and the class list behind it belongs
@@ -927,6 +949,29 @@ reach. The harness answers that by recording every Weaver page's computed
 styles before and after a change and diffing the two, rather than relying on a
 reviewer noticing a drift by eye.
 
+Three things about how it runs are worth knowing before reading its output.
+
+The server binds loopback only. `http-server` defaults its address to
+`0.0.0.0`, which would offer the published tree to every host that can reach
+the machine for as long as a capture runs; `_server_argv` passes
+`-a 127.0.0.1` instead.
+
+The port defaults to `0`, meaning the kernel picks a free one, so two runs in
+two worktrees do not contend. Pass `--port` only to reach the served tree from
+a browser by hand. Where a port is named explicitly, a lock keyed on it
+serializes the probe-and-spawn window, and the run proves the server answering
+is its own by fetching back a marker file it placed under `public/` — once
+when the server comes up and again when the capture finishes.
+
+Output is published rather than written in place. A capture goes to a private
+staging directory and is moved into the destination only once every page has
+succeeded, under a lock keyed on that destination; `diff` takes the same lock
+while reading. So a run that fails partway leaves the previous results
+untouched, two runs writing one directory do not interleave, and a diff never
+observes a directory halfway through being replaced. Publication clears only
+the extension being written, so a `capture` and a `shots` run can share a
+directory.
+
 It is a cyclopts app with three subcommands, invoked bare — there is no
 Makefile target and no console-script entry point:
 
@@ -949,7 +994,6 @@ change, capture again, and diff the two directories. An empty diff confirms the
 change moved nothing it was not meant to; a non-empty one should be read entry
 by entry, since every difference ought to trace back to something the change
 deliberately did.
-
 
 ### 7.2. Property-based tests for the snapshot normalizer
 

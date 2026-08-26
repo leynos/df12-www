@@ -510,8 +510,8 @@ A typical call site, from `templates/weaver/doc_page.jinja`:
 
 ### 4.9. Weaver's shared page layout
 
-`templates/weaver/doc_page.jinja` is the base layout for every Weaver page.
-Both `templates/weaver/home_page.jinja` and
+`templates/weaver/doc_page.jinja` is the base layout for every Weaver page. Both
+`templates/weaver/home_page.jinja` and
 `templates/weaver/shared_content_page.jinja` extend it:
 
 ```jinja
@@ -521,32 +521,32 @@ Both `templates/weaver/home_page.jinja` and
 `doc_page.jinja` defines twelve blocks. A page that extends it inherits each
 block's default content unless it overrides that block.
 
-| Block                   | Default content                 |
-| ----------------------- | ------------------------------- |
-| `page_title`            | empty                           |
-| `extra_head`            | empty                           |
-| `texture_overlay`       | texture overlay `div`           |
-| `nav_subitems_how`      | empty                           |
-| `nav_subitems_commands` | empty                           |
-| `nav_subitems_sempai`   | empty                           |
-| `nav_subitems_jacquard` | empty                           |
-| `sidebar_footer`        | back-link, status dot, version  |
-| `main_class`            | default classes                 |
-| `main_extra_class`      | empty                           |
-| `content`               | empty                           |
-| `page_footer`           | full site footer                |
+| Block                   | Default content                |
+| ----------------------- | ------------------------------ |
+| `page_title`            | empty                          |
+| `extra_head`            | empty                          |
+| `texture_overlay`       | texture overlay `div`          |
+| `nav_subitems_how`      | empty                          |
+| `nav_subitems_commands` | empty                          |
+| `nav_subitems_sempai`   | empty                          |
+| `nav_subitems_jacquard` | empty                          |
+| `sidebar_footer`        | back-link, status dot, version |
+| `main_class`            | default classes                |
+| `main_extra_class`      | empty                          |
+| `content`               | empty                          |
+| `page_footer`           | full site footer               |
 
 _Table 4a: every block `doc_page.jinja` defines, and what it renders by
 default._
 
-`home_page.jinja` overrides only `page_title` and `content`, and inherits
-every other block — the sidebar, footer, and texture overlay on the Weaver
-home page are all the base layout's defaults.
+`home_page.jinja` overrides only `page_title` and `content`, and inherits every
+other block — the sidebar, footer, and texture overlay on the Weaver home page
+are all the base layout's defaults.
 
 `shared_content_page.jinja` — which renders the three legal pages (privacy
 policy, terms of use, code of conduct) — overrides more: `page_title` and
-`content`, as above, plus `texture_overlay`, `main_class`, `sidebar_footer`,
-and `page_footer`. It blanks `texture_overlay`:
+`content`, as above, plus `texture_overlay`, `main_class`, `sidebar_footer`, and
+`page_footer`. It blanks `texture_overlay`:
 
 ```jinja
 {% block texture_overlay %}{% endblock %}
@@ -575,33 +575,33 @@ It shortens `sidebar_footer` to just the optional parent link:
 {% endblock %}
 ```
 
-And it replaces `page_footer` with a short legal-page footer carrying the
-brand line and links to the three legal pages themselves, rather than the
-base layout's full site footer.
+And it replaces `page_footer` with a short legal-page footer carrying the brand
+line and links to the three legal pages themselves, rather than the base
+layout's full site footer.
 
-`main_class` is a sharp edge worth calling out on its own: the block is
-nested inside the `<main class="...">` attribute value, not around the
-`<main>` element itself —
+`main_class` is a sharp edge worth calling out on its own: the block is nested
+inside the `<main class="...">` attribute value, not around the `<main>`
+element itself —
 
 ```jinja
 <main class="{% block main_class %}flex-1 lg:ml-64 grid-bg min-h-screen relative{% block main_extra_class %}{% endblock %}{% endblock %}">
 ```
 
-— so overriding `main_class` replaces the whole class list rather than
-adding to it. A page that wants the default classes plus one more should use
-`main_extra_class` instead, which appends inside the default; only a page
-that wants a genuinely different class list, as `shared_content_page.jinja`
-does, should override `main_class` itself.
+— so overriding `main_class` replaces the whole class list rather than adding
+to it. A page that wants the default classes plus one more should use
+`main_extra_class` instead, which appends inside the default; only a page that
+wants a genuinely different class list, as `shared_content_page.jinja` does,
+should override `main_class` itself.
 
 Table 4b lists the four blocks a page is most likely to override, with their
 defaults and what overriding each is for:
 
-| Block              | Default                                                                 | Overriding it is for                                                                    |
-| ------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `texture_overlay`  | `<div class="texture-overlay"></div>`                                   | removing the paper texture, as `shared_content_page.jinja` does                         |
-| `sidebar_footer`   | back-link, status dot, and version string                               | replacing the sidebar's closing content, such as with a plain parent link               |
-| `main_class`       | `flex-1 lg:ml-64 grid-bg min-h-screen relative` plus `main_extra_class` | swapping the `<main>` element's class list wholesale, such as dropping `grid-bg`        |
-| `page_footer`      | the full site footer                                                    | swapping in a shorter or differently structured footer, such as the legal pages' footer |
+| Block             | Default                                                                 | Overriding it is for                                                                    |
+| ----------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `texture_overlay` | `<div class="texture-overlay"></div>`                                   | removing the paper texture, as `shared_content_page.jinja` does                         |
+| `sidebar_footer`  | back-link, status dot, and version string                               | replacing the sidebar's closing content, such as with a plain parent link               |
+| `main_class`      | `flex-1 lg:ml-64 grid-bg min-h-screen relative` plus `main_extra_class` | swapping the `<main>` element's class list wholesale, such as dropping `grid-bg`        |
+| `page_footer`     | the full site footer                                                    | swapping in a shorter or differently structured footer, such as the legal pages' footer |
 
 _Table 4b: the blocks a page is most likely to override._
 
@@ -644,14 +644,14 @@ The pill-shaped eyebrow above a page or section heading.
 {{ ui.kicker(label, extra='', accent=false, icon='', icon_class='', dot='') }}
 ```
 
-| Parameter    | Purpose                                                                 |                      |
-| ------------ | ----------------------------------------------------------------------- | -------------------- |
-| `label`      | The pill's text. Markup must be passed through `\                       | safe` by the caller. |
-| `extra`      | Additional utility classes, in practice a margin such as `mb-6`.        |                      |
-| `accent`     | Selects the docs hub's indigo-on-boxwood-light colouring.               |                      |
-| `icon`       | An Iconify icon name, such as `carbon:download`.                        |                      |
-| `icon_class` | Utility classes for that icon, typically a colour.                      |                      |
-| `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |                      |
+| Parameter    | Purpose                                                                 |
+| ------------ | ----------------------------------------------------------------------- |
+| `label`      | The pill's text. Markup must be passed through `\| safe` by the caller. |
+| `extra`      | Additional utility classes, in practice a margin such as `mb-6`.        |
+| `accent`     | Selects the docs hub's indigo-on-boxwood-light colouring.               |
+| `icon`       | An Iconify icon name, such as `carbon:download`.                        |
+| `icon_class` | Utility classes for that icon, typically a colour.                      |
+| `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |
 
 _Table 5: the `kicker` macro's parameters._
 
@@ -1101,9 +1101,9 @@ let the document scroll sideways. Below the breakpoint, `pre`, `code`, `th`,
 `td`, and `.font-mono` get `overflow-wrap: anywhere`; `h1`–`h4` get
 `overflow-wrap: break-word` together with `hyphens: auto`.
 
-It exists because four pages laid the document out wider than the 360px
-viewport `tests/test_weaver_browser.py` checks against. Their measured widths
-were `sempai` at 826px, `jacquard` at 416px, `install` at 370px, and `docs` at
+It exists because four pages laid the document out wider than the 360px viewport
+`tests/test_weaver_browser.py` checks against. Their measured widths were
+`sempai` at 826px, `jacquard` at 416px, `install` at 370px, and `docs` at
 376px. There were two causes, both of them content that cannot break at a
 space. A command line, a TOML key, or a table cell holding a path sets a
 minimum width its column cannot meet. A display heading has the same problem

@@ -27,6 +27,7 @@ from pathlib import Path
 if typ.TYPE_CHECKING:
     from types import ModuleType
 
+import jinja2
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -78,6 +79,9 @@ RGB_COLOUR = re.compile(r"\brgba?\(")
 # design-system page prints the palette's hex codes as its own content, which
 # is the page's whole job and not a colour anyone is specifying.
 STYLING_ATTRIBUTE = re.compile(r"""(?:class|style)\s*=\s*(?:"[^"]*"|'[^']*')""")
+
+# `{{ icon('name') }}` as the templates write it, in either quote form.
+ICON_CALL = re.compile(r"""icon\(\s*(?:'([^']+)'|"([^"]+)")""")
 
 
 # `built_site` is a session fixture in tests/conftest.py, shared with
@@ -524,7 +528,10 @@ def test_an_unreadable_output_is_reported_separately(
 # makes a naive search of this markup report duplicates that are not there.
 FONT_SIZE = re.compile(r"^text-(?:[3-9]xs|2xs|xs|sm|base|lg|xl|[2-9]xl)$")
 
-CLASS_ATTRIBUTE = re.compile(r'class\s*=\s*"([^"]*)"', re.DOTALL)
+# Both quote forms. `templates/weaver/_icons.jinja` is single-quoted, so a
+# double-quote-only pattern skips it entirely — and it is generated, which is
+# exactly the kind of file nobody would notice going unchecked.
+CLASS_ATTRIBUTE = re.compile(r"""class\s*=\s*(?:"([^"]*)"|'([^']*)')""", re.DOTALL)
 
 
 def test_no_element_declares_two_font_sizes_at_once() -> None:
@@ -549,9 +556,8 @@ def test_no_element_declares_two_font_sizes_at_once() -> None:
         # one line are both kept.
         text = source.read_text(encoding="utf-8")
         for attribute in CLASS_ATTRIBUTE.finditer(text):
-            sizes = [
-                token for token in attribute.group(1).split() if FONT_SIZE.match(token)
-            ]
+            value = attribute.group(1) or attribute.group(2) or ""
+            sizes = [token for token in value.split() if FONT_SIZE.match(token)]
             if len(sizes) > 1:
                 number = text.count("\n", 0, attribute.start()) + 1
                 where = f"{source.relative_to(REPO_ROOT)}:{number}+{attribute.start()}"
@@ -561,6 +567,55 @@ def test_no_element_declares_two_font_sizes_at_once() -> None:
         "these elements declare more than one font size, so which one applies "
         f"depends on the order the utilities happen to be written in: {offenders}"
     )
+
+
+@pytest.mark.parametrize(
+    ("markup", "expected"),
+    [
+        pytest.param(
+            '<div class="text-xs text-3xs">',
+            ["text-xs", "text-3xs"],
+            id="double-quoted-duplicate",
+        ),
+        pytest.param(
+            "<div class='text-xs text-3xs'>",
+            ["text-xs", "text-3xs"],
+            id="single-quoted-duplicate",
+        ),
+        pytest.param(
+            '<div class="text-sm md:text-base lg:text-lg">',
+            ["text-sm"],
+            id="double-quoted-responsive",
+        ),
+        pytest.param(
+            "<div class='text-sm md:text-base lg:text-lg'>",
+            ["text-sm"],
+            id="single-quoted-responsive",
+        ),
+        pytest.param(
+            '<div class="text-xs text-base-content/82">',
+            ["text-xs"],
+            id="a-colour-token-is-not-a-size",
+        ),
+        pytest.param('<div class="font-mono">', [], id="no-size-at-all"),
+    ],
+)
+def test_the_scan_reads_class_attributes_in_either_quote_form(
+    markup: str, expected: list[str]
+) -> None:
+    """A double-quote-only pattern skipped `_icons.jinja`, which is single-quoted.
+
+    The value is captured by one group or the other depending on which quote
+    the attribute used, so both have to be consulted; taking only the first
+    would read a single-quoted attribute as empty and report no sizes at all.
+    """
+    found = [
+        token
+        for attribute in CLASS_ATTRIBUTE.finditer(markup)
+        for token in (attribute.group(1) or attribute.group(2) or "").split()
+        if FONT_SIZE.match(token)
+    ]
+    assert found == expected, f"expected {expected} in {markup!r}, found {found}"
 
 
 @pytest.mark.parametrize(
@@ -581,4 +636,95 @@ def test_the_font_size_pattern_counts_whole_tokens(classes: str, expected: int) 
     sizes = [token for token in classes.split() if FONT_SIZE.match(token)]
     assert len(sizes) == expected, (
         f"expected {expected} font-size utilities in {classes!r}, found {sizes}"
+    )
+
+
+@pytest.fixture(scope="module")
+def icon_macro() -> typ.Callable[..., str]:
+    """Load `_icons.jinja` through Jinja and return its `icon` macro.
+
+    The generated file is compared against the generator elsewhere, which
+    proves the two agree and nothing more: both could agree on markup Jinja
+    refuses to parse, or on a macro that renders an empty string. Rendering it
+    is what shows it works.
+    """
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(str(WEAVER_TEMPLATES)),
+        autoescape=True,
+    )
+    module = environment.get_template("_icons.jinja").module
+    # The macro is an attribute of the rendered module, which is dynamic, so
+    # the type checker cannot see it; that it exists at all is the first thing
+    # these tests assert.
+    macro = getattr(module, "icon", None)
+    assert macro is not None, (
+        "templates/weaver/_icons.jinja defines no `icon` macro; every call "
+        "site in every Weaver template would render nothing"
+    )
+    return typ.cast("typ.Callable[..., str]", macro)
+
+
+def test_the_generated_macro_renders_an_svg(icon_macro: typ.Callable[..., str]) -> None:
+    """A macro that parses but renders nothing would pass every other check."""
+    rendered = str(icon_macro("terminal"))
+
+    assert rendered.startswith("<svg "), f"expected an <svg> element; got {rendered!r}"
+    assert 'viewBox="0 0 32 32"' in rendered, f"no viewBox in {rendered!r}"
+    assert 'aria-hidden="true"' in rendered, (
+        f"the artwork is decorative and must be hidden from assistive "
+        f"technology; got {rendered!r}"
+    )
+    assert "<path" in rendered or "<circle" in rendered, (
+        f"the icon rendered no artwork at all: {rendered!r}"
+    )
+
+
+def test_the_generated_macro_carries_extra_classes(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """`extra_class` is how a call site sizes or colours one instance."""
+    rendered = str(icon_macro("terminal", extra_class="text-accent-ink w-6"))
+
+    assert "text-accent-ink w-6" in rendered, (
+        f"the per-instance classes were dropped: {rendered!r}"
+    )
+    assert "inline-block" in rendered, (
+        f"the macro's own classes should survive alongside them: {rendered!r}"
+    )
+
+
+def test_an_unmapped_icon_name_is_loud_rather_than_blank(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """A missing icon that rendered nothing would leave a hole nobody noticed."""
+    rendered = str(icon_macro("definitely-not-an-icon"))
+
+    assert "UNKNOWN ICON" in rendered, (
+        f"an unmapped name should say so rather than render empty; got {rendered!r}"
+    )
+    assert "definitely-not-an-icon" in rendered, (
+        f"the message should name the icon asked for; got {rendered!r}"
+    )
+
+
+def test_every_icon_the_templates_ask_for_renders(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """A template naming an icon the macro lacks ships `UNKNOWN ICON` to a page.
+
+    The browser suite catches this on the four pages it loads at a time; this
+    catches it across every template, without a browser.
+    """
+    asked = {
+        match.group(1) or match.group(2)
+        for source in WEAVER_TEMPLATES.rglob("*.jinja")
+        if source.name != "_icons.jinja"
+        for match in ICON_CALL.finditer(source.read_text(encoding="utf-8"))
+    }
+    assert asked, "no icon calls were found at all; has the call syntax changed?"
+
+    missing = sorted(name for name in asked if "UNKNOWN ICON" in str(icon_macro(name)))
+    assert not missing, (
+        f"these icons are used in the templates but absent from the generated "
+        f"macro, so each renders the literal text 'UNKNOWN ICON': {missing}"
     )

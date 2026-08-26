@@ -1138,7 +1138,10 @@ def test_a_finished_capture_replaces_the_previous_one(tmp_path: Path) -> None:
     with weaver_snapshot._staged(out_dir, ".json") as stage:
         (stage / "__home.json").write_text("this run", encoding="utf-8")
 
-    assert (out_dir / "__home.json").read_text(encoding="utf-8") == "this run"
+    assert (out_dir / "__home.json").read_text(encoding="utf-8") == "this run", (
+        "a capture that finished did not replace the previous run's snapshot, "
+        "so the diff would compare the baseline against itself"
+    )
     assert not (out_dir / "gone.json").exists(), (
         "a snapshot from a previous run survived, and would be compared as "
         "though this run had written it"
@@ -1157,3 +1160,154 @@ def test_two_runs_publishing_the_same_directory_contend(tmp_path: Path) -> None:
         "one directory should map to one lock, however often it is asked for"
     )
     assert first != second, f"two directories both locked on {first}"
+
+
+@pytest.mark.parametrize(
+    ("shape", "expected"),
+    [
+        pytest.param(
+            {"tag": "html", "children": ["oops"]},
+            "payload.tree.children[0]",
+            id="child-is-a-string",
+        ),
+        pytest.param([1, 2], "payload.tree", id="tree-is-a-list"),
+        pytest.param("nope", "payload.tree", id="tree-is-a-string"),
+        pytest.param(
+            {"tag": "html", "styleDiff": [1], "children": []},
+            "styleDiff",
+            id="style-diff-is-a-list",
+        ),
+        pytest.param(
+            {"tag": "html", "children": "abc"},
+            "children",
+            id="children-is-a-string",
+        ),
+        pytest.param(
+            {
+                "tag": "html",
+                "children": [{"tag": "a", "children": [{"tag": "b", "children": [7]}]}],
+            },
+            "children[0].children[0].children[0]",
+            id="a-node-three-levels-down",
+        ),
+    ],
+)
+def test_a_snapshot_that_is_not_the_expected_shape_says_where(
+    tmp_path: Path,
+    shape: dict[str, typ.Any] | list[typ.Any] | str,
+    expected: str,
+) -> None:
+    """The normalization reaches for `.get` on every node, so a scalar is fatal.
+
+    Before the shape was checked, each of these surfaced from deep inside the
+    recursion as `'str' object has no attribute 'get'` — an `AttributeError`,
+    which the read boundary did not catch, naming neither the file nor the
+    node. A snapshot from an interrupted capture or a different tool looks
+    exactly like this.
+    """
+    snapshot = tmp_path / "install.json"
+    snapshot.write_text(json.dumps({"payload": {"tree": shape}}), encoding="utf-8")
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot._normalized_tree(snapshot)
+
+    message = str(caught.value.code)
+    assert str(snapshot) in message, (
+        f"the message should name the file; got {message!r}"
+    )
+    assert expected in message, (
+        f"the message should point at {expected!r}; got {message!r}"
+    )
+
+
+def test_a_well_formed_snapshot_is_still_accepted(tmp_path: Path) -> None:
+    """A shape check that rejected valid input would be worse than none."""
+    snapshot = tmp_path / "install.json"
+    snapshot.write_text(
+        json.dumps(
+            {
+                "payload": {
+                    "tree": {
+                        "tag": "html",
+                        "styleDiff": {"color": "rgb(1, 2, 3)"},
+                        "children": [{"tag": "body", "children": []}, {"tag": "div"}],
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    rendered = weaver_snapshot._normalized_tree(snapshot)
+
+    assert "rgba(1, 2, 3, 1.000)" in rendered, (
+        f"the tree should have normalized rather than been rejected; got {rendered!r}"
+    )
+
+
+def test_a_diff_takes_the_same_lock_publication_does(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A reader that started midway would compare two runs against each other.
+
+    Publication replaces file by file. Each replacement is atomic, the
+    sequence of them is not, and a diff running through that sequence would
+    take some pages from this run and some from the last — then report the
+    difference as the branch's work. The reader taking the writer's lock is
+    what closes it.
+    """
+    before = tmp_path / "baseline"
+    after = tmp_path / "current"
+    for directory in (before, after):
+        directory.mkdir()
+        (directory / "__home.json").write_text(
+            json.dumps({"payload": {"tree": {"tag": "html", "children": []}}}),
+            encoding="utf-8",
+        )
+
+    taken: list[Path] = []
+    real = weaver_snapshot._exclusive
+
+    @contextlib.contextmanager
+    def watched(path: Path, contended: str) -> cabc.Iterator[None]:
+        taken.append(path)
+        with real(path, contended):
+            yield
+
+    monkeypatch.setattr(weaver_snapshot, "_exclusive", watched)
+    weaver_snapshot.diff(before, after)
+
+    expected = [
+        weaver_snapshot._output_lock_path(directory.resolve())
+        for directory in sorted((before.resolve(), after.resolve()))
+    ]
+    assert taken == expected, (
+        f"the diff should lock both directories, in a stable order; it took "
+        f"{taken} rather than {expected}"
+    )
+
+
+def test_two_readers_take_a_pair_of_directories_the_same_way_round(
+    tmp_path: Path,
+) -> None:
+    """Opposite orders would let two diffs each hold what the other wants."""
+    first = tmp_path / "aaa"
+    second = tmp_path / "zzz"
+    for directory in (first, second):
+        directory.mkdir()
+
+    assert weaver_snapshot._reading_order(
+        first, second
+    ) == weaver_snapshot._reading_order(second, first), (
+        "the order must not depend on which argument the directory arrived as"
+    )
+
+
+def test_one_directory_named_twice_is_locked_once(tmp_path: Path) -> None:
+    """`flock` on the same file twice from one process would block forever."""
+    same = tmp_path / "snapshots"
+    same.mkdir()
+
+    assert weaver_snapshot._reading_order(same, same) == [same.resolve()], (
+        f"got {weaver_snapshot._reading_order(same, same)!r}"
+    )

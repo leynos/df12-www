@@ -293,6 +293,12 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       traversal can be exercised against a tree a test controls.
       `_prepare_output_dir`'s unguarded `mkdir` and `unlink` gained the same
       treatment.
+      **Correction (2026-08-27):** `_prepare_output_dir` no longer exists
+      under that name. Directory creation is `_ensure_output_dir`, which only
+      creates; removing the previous run's files and publishing this run's are
+      both `_staged`, which does them together at the end under the output
+      lock. The prose above describes the change as it was made; these are the
+      names to look for.
 - [x] (2026-08-26) Gave each run exclusive ownership of its output. Captures
       go to a private staging directory and are published at the end, under a
       lock keyed on the resolved destination, replacing file by file with
@@ -480,31 +486,31 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `OUTPUT` at a directory makes `Path.exists()` true and `read_text()` raise
   `IsADirectoryError`, so the read handler fired and the assertion passed on
   the wrong message. Impact: a stand-in path that reads normally and refuses
-  only write operations is what actually reaches the write handler; the
-  earlier version was a false positive.
+  only write operations is what actually reaches the write handler; the earlier
+  version was a false positive.
 
 - **Observation:** the snapshot server was reachable from the whole network,
-  not just this machine. Evidence: the packaged `http-server@14.1.1`
-  documents `-a` as defaulting to `[0.0.0.0]`; `ss -ltnp` shows it listening
-  on `0.0.0.0:8199`; and this host's own LAN address answered `/weaver/` with
-  HTTP 200 while a capture was running. Impact: an unreleased sub-site,
+  not just this machine. Evidence: the packaged `http-server@14.1.1` documents
+  `-a` as defaulting to `[0.0.0.0]`; `ss -ltnp` shows it listening on
+  `0.0.0.0:8199`; and this host's own LAN address answered `/weaver/` with HTTP
+  200 while a capture was running. Impact: an unreleased sub-site,
   mid-migration, was published to any host that could reach this machine, for
-  the duration of every capture — in exchange for nothing, since every
-  request the script makes is to loopback.
+  the duration of every capture — in exchange for nothing, since every request
+  the script makes is to loopback.
 - **Observation:** the two Weaver copy controls are labelled differently. The
   home page's carries `title="Copy to clipboard"` with no visible text; the
   three on the install page carry the visible word "Copy" and no `title`.
   Evidence: a browser test selecting on `title` found the home page's button
   and none of the install page's. Impact: both shapes have an accessible name,
   so axe is satisfied either way, but a test that selects on how they are
-  labelled silently covers only one page. The suite selects on the handler
-  they share instead.
+  labelled silently covers only one page. The suite selects on the handler they
+  share instead.
 - **Observation:** a `pre` inside a scrolling panel does not wrap, whatever
   `overflow-wrap` says. Evidence: injecting a 300-character unbroken line into
   a bare `pre` on `docs/` at 360px grew that element's `scrollWidth` to 2965px
   while `document.documentElement.scrollWidth` stayed at 360px. Impact: the
-  suggestion to add `white-space: pre-wrap` was declined — the panels are
-  meant to scroll, and were made keyboard-reachable for that reason — and the
+  suggestion to add `white-space: pre-wrap` was declined — the panels are meant
+  to scroll, and were made keyboard-reachable for that reason — and the
   measurement became a test of the contract that actually holds.
 
 ## Decision log
@@ -830,25 +836,23 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   sizes, so the point is settled by the suite rather than by re-litigation.
   This finding has now arrived four times. Recorded so a further arrival finds
   this note first. The fourth arrival, in this round, additionally asked
-  whether this was the fix applied for the horizontal scroll; it was not —
-  the horizontal-scroll fix was the `@media (max-width: 767px)` block in
+  whether this was the fix applied for the horizontal scroll; it was not — the
+  horizontal-scroll fix was the `@media (max-width: 767px)` block in
   `src/styles/weaver/site-base.css`, not any change to this link's classes.
   Date/Author: 2026-08-25, review batch.
 
 - **Decision:** pass `-a 127.0.0.1` to `http-server` rather than accept its
-  default.
-  Rationale: the default is `0.0.0.0`, and the tree being served is an
+  default. Rationale: the default is `0.0.0.0`, and the tree being served is an
   unreleased sub-site mid-migration. Every request this script makes is to
   loopback, so binding wider buys nothing and discloses the lot. A test asserts
-  the flag is present and that pinning it displaced nothing else.
-  Date/Author: 2026-08-26, review batch.
+  the flag is present and that pinning it displaced nothing else. Date/Author:
+  2026-08-26, review batch.
 - **Decision:** walk the published tree with `os.walk(onerror=...)` rather
-  than `Path.rglob`.
-  Rationale: `rglob` swallows an `OSError` on a descendant and yields nothing
-  further beneath it. A directory this process could not read would have
-  shortened the page list silently — the pages under it absent from the
-  capture, absent from the diff, and so reported as "no differences" rather
-  than "not looked at". A short capture that compares clean is the worst
+  than `Path.rglob`. Rationale: `rglob` swallows an `OSError` on a descendant
+  and yields nothing further beneath it. A directory this process could not
+  read would have shortened the page list silently — the pages under it absent
+  from the capture, absent from the diff, and so reported as "no differences"
+  rather than "not looked at". A short capture that compares clean is the worst
   failure this harness has, because it is indistinguishable from success.
   Date/Author: 2026-08-26, review batch.
 - **Decision:** capture into a private staging directory and publish at the
@@ -859,20 +863,19 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   whole one. Publication replaces file by file with `Path.replace`, which is
   atomic per file, and the lock makes the sequence atomic against another run.
   Clearing moved to publication for the same reason: emptying the destination
-  up front destroys the previous results in exchange for nothing.
-  Date/Author: 2026-08-26, review batch.
+  up front destroys the previous results in exchange for nothing. Date/Author:
+  2026-08-26, review batch.
 - **Decision:** decline to set `white-space: pre-wrap` on `pre` at mobile
-  widths, and pin the contract that does hold instead.
-  Rationale: the suggestion assumed long code lines fail to wrap and push the
-  page sideways. Measured, they do not: a 300-character unbroken line in a
-  bare `pre` on `docs/` at 360px takes that element's `scrollWidth` to 2965px
-  while the document stays at 360px, because the panel around it scrolls.
-  Those panels are meant to scroll and were made keyboard-reachable for that
-  purpose in the previous round. Forcing them to wrap would be a site-wide
-  change to how code reads, made on a premise that does not hold. The test the
-  finding asked for was added, asserting the document does not scroll and the
-  line stays reachable — wrapped where the markup asks, scrollable where it
-  does not.
+  widths, and pin the contract that does hold instead. Rationale: the
+  suggestion assumed long code lines fail to wrap and push the page sideways.
+  Measured, they do not: a 300-character unbroken line in a bare `pre` on
+  `docs/` at 360px takes that element's `scrollWidth` to 2965px while the
+  document stays at 360px, because the panel around it scrolls. Those panels
+  are meant to scroll and were made keyboard-reachable for that purpose in the
+  previous round. Forcing them to wrap would be a site-wide change to how code
+  reads, made on a premise that does not hold. The test the finding asked for
+  was added, asserting the document does not scroll and the line stays
+  reachable — wrapped where the markup asks, scrollable where it does not.
   Date/Author: 2026-08-26, review batch.
 
 ## Outcomes & retrospective

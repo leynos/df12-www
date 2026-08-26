@@ -25,6 +25,7 @@ afterwards, including on failure.
 
 from __future__ import annotations
 
+import collections.abc as cabc
 import contextlib
 import difflib
 import fcntl
@@ -46,9 +47,6 @@ import urllib.request
 from pathlib import Path
 
 import cyclopts
-
-if typ.TYPE_CHECKING:
-    import collections.abc as cabc
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PUBLIC_WEAVER = REPO_ROOT / "public" / "weaver"
@@ -1375,6 +1373,56 @@ def _normalize(
     return normalized
 
 
+class _MalformedSnapshotError(ValueError):
+    """A parsed snapshot that is not the shape ``css-view`` writes."""
+
+
+def _check_node(node: typ.Any, where: str) -> None:  # noqa: ANN401 - the document is untyped upstream data
+    """Check one walker node, and everything below it, is the shape assumed.
+
+    The normalization reaches for ``.get`` on every node and ``.items`` on
+    every ``styleDiff``, so anything that is not a mapping surfaces from deep
+    inside the recursion as ``'str' object has no attribute 'get'`` — an
+    ``AttributeError``, which the read boundary was not catching, naming
+    neither the file nor the node. Walking the shape first means the failure
+    can say where in the tree it is.
+
+    Parameters
+    ----------
+    node
+        The node to check.
+    where
+        A breadcrumb naming its position, such as ``payload.tree.children[2]``.
+
+    Raises
+    ------
+    _MalformedSnapshotError
+        If the node, its ``styleDiff``, or any descendant is not the shape the
+        normalization assumes.
+    """
+    if not isinstance(node, cabc.Mapping):
+        message = f"{where} is {type(node).__name__}, not a mapping"
+        raise _MalformedSnapshotError(message)
+
+    style = node.get("styleDiff")
+    if style is not None and not isinstance(style, cabc.Mapping):
+        message = (
+            f"{where}.styleDiff is {type(style).__name__}, not a mapping or absent"
+        )
+        raise _MalformedSnapshotError(message)
+
+    children = node.get("children")
+    if children is None:
+        return
+    # A string is a Sequence, and iterating one yields characters rather than
+    # nodes, so it has to be excluded by name.
+    if isinstance(children, str) or not isinstance(children, cabc.Sequence):
+        message = f"{where}.children is {type(children).__name__}, not a list or absent"
+        raise _MalformedSnapshotError(message)
+    for index, child in enumerate(children):
+        _check_node(child, f"{where}.children[{index}]")
+
+
 def _rendered_tree(payload: dict[str, typ.Any]) -> str:
     """Render a parsed snapshot's tree as stable, comparable text.
 
@@ -1400,9 +1448,13 @@ def _rendered_tree(payload: dict[str, typ.Any]) -> str:
         converts this into a ``SystemExit`` naming the file.
     TypeError
         If either level is not a mapping, for the same reason.
+    _MalformedSnapshotError
+        If the tree is not mappings all the way down, naming the node that is
+        not. :func:`_normalized_tree` converts this the same way.
     """
-    tree = _normalize(payload["payload"]["tree"])
-    return json.dumps(tree, indent=2, sort_keys=True, ensure_ascii=False)
+    tree = payload["payload"]["tree"]
+    _check_node(tree, "payload.tree")
+    return json.dumps(_normalize(tree), indent=2, sort_keys=True, ensure_ascii=False)
 
 
 def _normalized_tree(snapshot: Path) -> str:
@@ -1451,6 +1503,13 @@ def _normalized_tree(snapshot: Path) -> str:
             f"snapshot ({exc!r})"
         )
         raise SystemExit(message) from exc
+    except _MalformedSnapshotError as exc:
+        message = (
+            f"{snapshot} is not the shape css-view writes: {exc}. An "
+            f"interrupted capture, or a snapshot from a different tool, would "
+            f"look like this; recapture it."
+        )
+        raise SystemExit(message) from exc
 
 
 @app.command
@@ -1470,6 +1529,60 @@ def diff(before: Path, after: Path, /, *, context: int = 60) -> None:
     ------
     SystemExit
         With status 1 when any page differs, so this can gate a milestone.
+    """
+    # Read both directories under the same lock publication takes, so a diff
+    # can never observe one of them halfway through being replaced. Without
+    # this the reader is the remaining hole in the ownership protocol: the
+    # writer's per-file replacements are each atomic, but the sequence of them
+    # is not, and a diff that started midway would compare some pages from
+    # this run against some from the last and report the difference as the
+    # branch's work.
+    with contextlib.ExitStack() as reading:
+        for directory in _reading_order(before, after):
+            reading.enter_context(
+                _exclusive(_output_lock_path(directory), f"{directory}")
+            )
+        _diff_locked(before, after, context)
+
+
+def _reading_order(before: Path, after: Path) -> list[Path]:
+    """Order two output directories so two readers cannot deadlock on them.
+
+    Taking them in a consistent order — resolved, then sorted — means two runs
+    reading the same pair take them the same way round rather than each
+    holding what the other wants. A directory named twice is locked once.
+
+    Parameters
+    ----------
+    before
+        The baseline directory.
+    after
+        The directory being checked.
+
+    Returns
+    -------
+    list of Path
+        The distinct resolved directories, in a stable order.
+    """
+    return sorted({before.resolve(), after.resolve()})
+
+
+def _diff_locked(before: Path, after: Path, context: int) -> None:
+    """Compare two snapshot directories, with both already locked for reading.
+
+    Parameters
+    ----------
+    before
+        Directory holding the baseline snapshots.
+    after
+        Directory holding the snapshots to check.
+    context
+        Maximum number of diff lines to print per differing page.
+
+    Raises
+    ------
+    SystemExit
+        With status 1 when any page differs.
     """
     baseline = sorted(before.glob("*.json"))
     if not baseline:

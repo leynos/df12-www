@@ -429,7 +429,6 @@ because the sub-sites' monospace faces read differently at the same weight:
 Episodic and Netsuke stop at semibold, while Stilyagi's lighter face goes to
 full bold.
 
-
 ### 4.7. The Weaver icon generator
 
 `scripts/generate_weaver_icons.py` is unrelated to syntax highlighting, but
@@ -451,7 +450,6 @@ idempotence contract as the Pygments generators. A drift test in the suite
 fails if the committed macro does not match what the generator would produce
 from the current mapping, so `templates/weaver/_icons.jinja` must never be
 hand-edited — change `config/weaver-icons.yaml` and rerun the generator instead.
-
 
 ### 4.8. Weaver's chrome macros
 
@@ -506,7 +504,6 @@ A typical call site, from `templates/weaver/doc_page.jinja`:
 {{ chrome.nav_link('/weaver/why-weaver/', '01', 'Philosophy', here) }}
 {{ chrome.nav_link('/weaver/install/', '', 'Install', here, variant='install') }}
 ```
-
 
 ### 4.9. Weaver's shared page layout
 
@@ -604,7 +601,6 @@ defaults and what overriding each is for:
 | `page_footer`     | the full site footer                                                    | swapping in a shorter or differently structured footer, such as the legal pages' footer |
 
 _Table 4b: the blocks a page is most likely to override._
-
 
 ### 4.10. Which Weaver templates use the shared layout
 
@@ -1035,7 +1031,6 @@ Run just this file:
 ```bash
 uv run pytest tests/test_weaver_snapshot_properties.py -v
 ```
-
 
 ### 7.3. Browser-driven checks against the served pages
 

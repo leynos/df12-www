@@ -77,14 +77,22 @@
       "linter": { "enabled": false }
     },
     {
-      // The Pygments blocks in these two stylesheets are written by
+      // The Pygments blocks in these stylesheets are written by
       // scripts/generate_*_pygments_css.py, which emits one rule per line.
       // Formatting them here would put the formatter and the generator in a
       // loop, each undoing the other on the next run.
       "includes": [
         "src/static/stilyagi/assets/styles/syntax.css",
-        "src/static/netsuke/assets/css/himotoshi.css"
+        "src/static/netsuke/assets/css/himotoshi.css",
+        "src/static/episodic/assets/styles/syntax.css"
       ],
+      "formatter": { "enabled": false }
+    },
+    {
+      // Episodic's MiniSearch builder owns this committed index. Formatting
+      // its JSON would make the checked-in projection differ from the source
+      // generator even when the indexed content has not changed.
+      "includes": ["src/static/episodic/assets/search/episodic-search.json"],
       "formatter": { "enabled": false }
     },
     {

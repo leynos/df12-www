@@ -1,0 +1,156 @@
+{% import "components.jinja" as ui %}
+{% from "data/roadmap.jinja" import roadmap_phases, roadmap_totals %}
+{#
+  Phase completion is derived, never written down. The upstream roadmap is
+  authoritative for delivery state, and a hardcoded count in the chrome would
+  go stale the day a phase lands - on the one site whose argument is that you
+  can tell what is built from what is promised.
+#}
+{% set phases_complete = roadmap_phases | selectattr("state", "equalto", "available") | list | length %}
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>{% block title %}Episodic{% endblock %}</title>
+    <meta name="description" content="{% block description %}Episodic turns heterogeneous source material into reviewable podcast audio, with automated checks and human editorial approval.{% endblock %}" />
+    {#
+      Order is the cascade contract: tokens define the vocabulary, motifs state
+      each shared pattern once, and the component sheets refine them. A
+      component rule of equal specificity must come after the motif it
+      overrides, so nothing here may be reordered casually.
+    #}
+    <link rel="stylesheet" href="/episodic/assets/styles/tailwind.css" />
+    <link rel="stylesheet" href="/episodic/assets/styles/syntax.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="/episodic/">
+          <span class="brand__word">EPISODIC</span>
+          <span class="brand__descriptor">Agentic podcast production</span>
+        </a>
+
+        {#
+          Native popover: the menu opens with no JavaScript. Above the
+          navigation breakpoint the stylesheet lays the list out inline and
+          hides the button, because author styles outrank the user-agent rule
+          that hides a closed popover.
+        #}
+        <nav class="primary-nav" aria-label="Primary">
+          <button class="nav-toggle" type="button" popovertarget="episodic-nav">
+            <span class="nav-toggle__bars" aria-hidden="true"></span>
+            Menu
+          </button>
+          <ul class="primary-nav__list" id="episodic-nav" popover>
+            {% for link in nav_links %}
+            <li>
+              <a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+            </li>
+            {% endfor %}
+            {% if parent_link %}
+            <li class="primary-nav__parent">
+              <a href="{{ parent_link.href }}">{{ parent_link.label }}</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+
+      {#
+        Shared policy pages render through a generator that carries no
+        template variables, so these values are absent there. Guarding each
+        item means the rail drops it rather than printing a naked label.
+      #}
+      {#
+        The single authoritative statement of delivery state. The version moved
+        to the colophon: a reader deciding whether to trust the site needs the
+        maturity and the tally, and a version number for something with no
+        release is noise at the top of every page.
+      #}
+      <p class="status-rail">
+        {% if site_status %}
+        <span class="status-rail__item"><span class="status-rail__key">Maturity</span> {{ site_status }}</span>
+        {% endif %}
+        <span class="status-rail__item status-rail__item--wide">
+          {{ roadmap_totals.done }} of {{ roadmap_totals.total }} roadmap tasks complete
+          ({{ phases_complete }} of {{ roadmap_phases | length }} phases). Not a released product.
+        </span>
+      </p>
+    </header>
+
+    {% block breadcrumbs %}{% endblock %}
+
+    <main id="main-content" class="site-main {% block main_class %}{% endblock %}">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      {{ ui.signal_rule() }}
+      <div class="site-footer__grid">
+        <div class="site-footer__statement">
+          <span class="brand__word">EPISODIC</span>
+          {#
+            Two claims, one per line. The break is explicit because the
+            natural wrap fell mid-clause and left "a person" stranded, which
+            is the half of the sentence that matters most here.
+          #}
+          <p>Automation with evidence.<br />The editorial decision stays with a person.</p>
+          <p class="site-footer__meta">A <a href="{{ parent_link.href if parent_link else '/' }}">df12 Productions</a> project, built in Edinburgh.{% if site_version %} Version {{ site_version }}.{% endif %}</p>
+          {#
+            Legal sits with the colophon rather than in a column of its own.
+            Every link is kept; what goes is a quarter of the footer grid spent
+            on three destinations nobody navigates to by browsing.
+          #}
+          <ul class="site-footer__legal">
+            <li><a href="/episodic/privacy-policy/">Privacy policy</a></li>
+            <li><a href="/episodic/terms-of-use/">Terms of use</a></li>
+            <li><a href="/episodic/code-of-conduct/">Code of Conduct</a></li>
+          </ul>
+          {#
+            The df12 sign-off, in the house form: the accent falls on
+            "worlds." on every sibling site, each in its own signal colour.
+            Episodic's is amber.
+          #}
+          <p class="site-footer__signoff">
+            &copy; {{ generated_at.year }} df12 Productions. Serious tools, playful <span class="accent">worlds.</span>
+          </p>
+        </div>
+        <div class="site-footer__column">
+          <h2>Using Episodic</h2>
+          <ul>
+            <li><a href="/episodic/workflow/">The production workflow</a></li>
+            <li><a href="/episodic/workflow/content/">Content and provenance</a></li>
+            <li><a href="/episodic/workflow/quality/">Quality and human review</a></li>
+            <li><a href="/episodic/workflow/audio/">Audio production</a></li>
+            <li><a href="/episodic/docs/getting-started/">Getting started</a></li>
+            <li><a href="/episodic/docs/api/">API reference</a></li>
+            <li><a href="/episodic/docs/">Documentation index</a></li>
+          </ul>
+        </div>
+        <div class="site-footer__column">
+          <h2>The project</h2>
+          <ul>
+            <li><a href="/episodic/architecture/">Platform architecture</a></li>
+            <li><a href="/episodic/interfaces/">Interfaces and their maturity</a></li>
+            <li><a href="/episodic/hosting/">Nile Valley hosting contract</a></li>
+            <li><a href="/episodic/roadmap/">Delivery roadmap</a></li>
+            <li><a href="/episodic/contributing/">Contributing to Episodic</a></li>
+            {% if repository_url is defined and repository_url %}
+            <li><a href="{{ repository_url }}">Episodic source repository</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    {#
+      Scripts are opt-in per page and always deferred. No page depends on one:
+      the subsite's content and navigation are complete without JavaScript.
+    #}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

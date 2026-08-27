@@ -1,0 +1,122 @@
+{% set page_eyebrow = "Hosting contract" %}
+{% set page_title = "What Episodic supplies, and what Nile Valley expects" %}
+{% set page_lede = "The deployable contract between the application and the platform that runs it. A working chart is not a deployed environment, and this page keeps the two apart." %}
+{% set page_trail = [{"label": "Hosting contract"}] %}
+{% set page_sections = [
+  {"id": "runtime", "title": "The runtime contract"},
+  {"id": "ownership", "title": "Who owns what"},
+  {"id": "chart", "title": "Chart values"},
+  {"id": "gitops", "title": "How a change reaches a cluster"},
+  {"id": "local", "title": "Exercising it locally"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/architecture.jinja" import runtime_contract, ownership %}
+
+{% set chart_values = [
+  {"name": "config", "purpose": "Non-secret environment variables rendered into a ConfigMap.", "default": "Empty"},
+  {"name": "existingSecretName", "purpose": "Reuses an operator-managed Kubernetes Secret rather than creating one.", "default": "Unset"},
+  {"name": "secretEnvFromKeys", "purpose": "Maps environment variable names to Secret keys. Object entries, so an explicit optional: false survives.", "default": "Empty"},
+  {"name": "allowMissingSecret", "purpose": "Fallback optional flag applied to Secret keys that do not state their own.", "default": "false"},
+  {"name": "externalSecret", "purpose": "Renders External Secrets Operator resources instead of consuming a Secret directly.", "default": "Disabled"},
+  {"name": "container.livenessProbe", "purpose": "Defaults to GET /health/live on the http port.", "default": "Enabled"},
+  {"name": "container.readinessProbe", "purpose": "Defaults to GET /health/ready on the http port.", "default": "Enabled"},
+  {"name": "ingress", "purpose": "Optional. The platform supplies the controller, certificates, and DNS.", "default": "Disabled"},
+  {"name": "podDisruptionBudget", "purpose": "Optional. Off unless a deployment needs availability guarantees.", "default": "Disabled"}
+] %}
+
+{% block sections %}
+  {{ ui.section_open(1, "runtime", "The runtime contract",
+     "Six facts the platform depends on. Change any of them and a deployment stops working.") }}
+    {{ rec.contract_table(
+      "Episodic runtime contract",
+      "hosting-runtime",
+      runtime_contract,
+      ["item", "value", "note"],
+      ["Item", "Value", "Note"]) }}
+    <p>
+      Readiness returning <code>503</code> is deliberate rather than a failure
+      state. It is how the application tells the platform to withhold traffic
+      while a dependency is unreachable, without being restarted for it.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "ownership", "Who owns what",
+     "The boundary is the point of this page.") }}
+    {{ rec.contract_table(
+      "Application and platform ownership",
+      "hosting-ownership",
+      ownership,
+      ["concern", "owner", "detail"],
+      ["Concern", "Owned by", "Detail"]) }}
+    <aside class="callout callout--status" aria-labelledby="hosting-state">
+      <h3 id="hosting-state">What is delivered {{ ui.status_badge("in-progress") }}</h3>
+      <p>
+        The application side of this contract exists: the image builds, the
+        chart renders, the probes work, and the local preview runs. Production
+        GitOps provisioning and environment promotion are roadmap phase 6, and
+        none of its 16 tasks is complete. A rendered chart proves the contract,
+        not the deployment.
+      </p>
+    </aside>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "chart", "Chart values",
+     "Names as the chart spells them, following the Nile Valley example chart conventions.") }}
+    {{ rec.contract_table(
+      "Selected values from charts/episodic",
+      "hosting-values",
+      chart_values,
+      ["name", "purpose", "default"],
+      ["Value", "Purpose", "Default"]) }}
+    <p>
+      The pod runs as a non-root user with a read-only root filesystem, all
+      capabilities dropped, privilege escalation disabled, and the default
+      seccomp profile. Those are chart defaults rather than deployment-time
+      choices, so a permissive deployment takes deliberate effort.
+    </p>
+    <p class="section__note">
+      No credential, database URL, Vault path, cluster identifier, or production
+      hostname appears anywhere on this site. Values shown here are structural.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "gitops", "How a change reaches a cluster",
+     "Continuous integration does not deploy anything. It publishes intent.") }}
+    <ol class="sequence">
+      <li>A change merges and application automation builds an image.</li>
+      <li>The image is published to the registry under an immutable tag.</li>
+      <li>Automation writes the desired Helm state - chart version and values - into the GitOps repository.</li>
+      <li>FluxCD, running inside the cluster, observes the change.</li>
+      <li>Flux reconciles the declared state, pulling the image and applying the release.</li>
+      <li>Secret material is synchronised into the cluster from the shared Vault appliance. Git holds references, never values.</li>
+    </ol>
+    <p>
+      The distinction matters for incident response. Nothing outside the
+      cluster holds credentials for it, and rolling back is a commit rather
+      than a pipeline rerun.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "local", "Exercising it locally",
+     "The same chart and image, in k3d, before any of it reaches the platform.") }}
+    {% call ui.code_block("Local Kubernetes preview") %}
+      {% highlight 'make', 'episodic-syntax' %}
+      make local-k8s-up      # create or update the preview
+      make local-k8s-status  # inspect it
+      make local-k8s-logs    # read its logs
+      make local-k8s-down    # tear it down
+      {% endhighlight %}
+    {% endcall %}
+    <p>
+      The targets drive a Cyclopts command that provisions a k3d cluster and
+      installs the chart. Running it is the cheapest way to find out whether a
+      change to the runtime contract breaks the deployment, and it needs no
+      access to any shared environment.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/architecture/">See the component catalogue</a>
+      ·
+      <a class="text-link" href="/episodic/docs/getting-started/">Prepare the checkout first</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

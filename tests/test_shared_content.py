@@ -6,7 +6,7 @@ import typing as typ
 
 from bs4 import BeautifulSoup
 
-from df12_pages.config import SharedContentConfig
+from df12_pages.config import SharedContentConfig, SharedContentPageChrome
 from df12_pages.shared_content import SharedContentGenerator
 
 if typ.TYPE_CHECKING:
@@ -36,6 +36,39 @@ def test_shared_content_uses_parent_relative_stylesheet_by_default(
     assert [heading.get_text(strip=True) for heading in soup.find_all("h1")] == [
         "Privacy Policy"
     ]
+
+
+def test_shared_content_exposes_subsite_template_vars(tmp_path: Path) -> None:
+    """Sub-site shared pages receive the same globals as their content pages."""
+    source = tmp_path / "privacy-policy.md"
+    source.write_text("# Privacy Policy\n\nBody copy.\n", encoding="utf-8")
+    template = tmp_path / "shared_content_page.jinja"
+    template.write_text(
+        '<a href="{{ repository_url }}">Episodic source repository</a>\n',
+        encoding="utf-8",
+    )
+    config = SharedContentConfig(
+        key="privacy-policy",
+        label="Privacy Policy",
+        source=str(source),
+        output_slug="privacy-policy",
+    )
+
+    output_path = SharedContentGenerator(
+        config,
+        tmp_path,
+        templates_dir=tmp_path,
+        page_chrome=SharedContentPageChrome(
+            template_vars={"repository_url": "https://github.com/leynos/episodic"}
+        ),
+    ).run()
+
+    soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
+    repository_link = soup.find("a")
+    assert repository_link is not None, "shared page must render the repository link"
+    assert repository_link.get("href") == "https://github.com/leynos/episodic", (
+        "shared page must retain the configured repository URL"
+    )
 
 
 def test_structured_shared_content_renders_toc_sections_and_cards(

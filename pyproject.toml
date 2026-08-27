@@ -23,7 +23,7 @@ dependencies = [
 [project.scripts]
 pages = "df12_pages:main"
 
-[project.entry-points."pygments>=2.20.0"]
+[project.entry-points."pygments.lexers"]
 netsuke = "df12_pages.highlighting:NetsukeLexer"
 netsuke-console = "df12_pages.highlighting:NetsukeConsoleLexer"
 
@@ -43,6 +43,7 @@ dev = [
     "parse_type",
     "msgspec",
     "jqpy",
+    "hypothesis==6.165.10",
 ]
 
 [tool.ruff]

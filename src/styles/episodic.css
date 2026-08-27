@@ -1,0 +1,137 @@
+/* Episodic subsite stylesheet — the Tailwind 4 + daisyUI 5 entry.
+ *
+ * Compiled by the shared df12 build into
+ * public/episodic/assets/styles/tailwind.css, alongside the main and mxd
+ * Tailwind entrypoints. The palette is declared once, as the daisyUI
+ * "episodic" theme plus
+ * the brand tokens under @theme; every semantic partial consumes those
+ * variables and never restates a colour literal.
+ *
+ * Tailwind's preflight is deliberately not imported. The subsite carries its
+ * own element defaults in site-base.css - the reset it was designed on - and
+ * preflight would strip the list markers and heading rhythm the content
+ * pages rely on.
+ *
+ * Layering: the partials sit in the base layer, so a Tailwind utility
+ * in a template always wins over a semantic class on the same element.
+ * Partial order preserves the old link order - motifs before the component
+ * sheets, so a component rule of equal specificity wins over the motif
+ * default it refines.
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+@import "./episodic/site-base.css" layer(base);
+@import "./episodic/motifs.css" layer(base);
+@import "./episodic/chrome.css" layer(base);
+@import "./episodic/marks.css" layer(components);
+@import "./episodic/shell.css" layer(components);
+@import "./episodic/content.css" layer(base);
+@import "./episodic/records.css" layer(components);
+@import "./episodic/tables.css" layer(components);
+@import "./episodic/reference.css" layer(components);
+@import "./episodic/docs.css" layer(components);
+@import "./episodic/search.css" layer(components);
+
+@source "../../templates/episodic/**/*.jinja";
+@source "../static/episodic/assets/js/site-search.js";
+
+@plugin "daisyui" {
+  themes: episodic --default;
+  /* The subsite's semantic vocabulary predates daisyUI and owns these
+     names: its breadcrumbs, hero, status gauge, and roadmap steps are not
+     the daisyUI components of the same name, and the daisyUI versions
+     restyle them the moment the scanner sees the class in a template. */
+  exclude: breadcrumbs, hero, status, steps;
+  logs: false;
+}
+
+/* The subsite palette as a daisyUI theme. Signal colours match the
+ * standalone reference sheet (src/app.css) and `make check-palette` fails
+ * when the two drift apart. The base ramp is the subsite's own four-step
+ * surface scale, deliberately narrower-stepped than the reference sheet's -
+ * elevation is felt rather than seen. */
+@plugin "daisyui/theme" {
+  name: "episodic";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #0b0d0e; /* surface-0 — page ground              */
+  --color-base-200: #111416; /* surface-1 — panels                   */
+  --color-base-300: #171a1d; /* surface-2 — raised panels, wells     */
+  --color-base-content: #e6e7e9; /* ink-1                            */
+
+  --color-primary: #ff5148; /* signal red                             */
+  --color-primary-content: #0b0d0e;
+  --color-secondary: #a4a7ad; /* aluminium                            */
+  --color-secondary-content: #0b0d0e;
+  --color-accent: #3bc8ef; /* cyan                                    */
+  --color-accent-content: #0b0d0e;
+  --color-neutral: #2a2e33; /* warm grey                              */
+  --color-neutral-content: #e6e7e9;
+
+  --color-info: #3bc8ef;
+  --color-info-content: #0b0d0e;
+  --color-success: #3ad07a;
+  --color-success-content: #0b0d0e;
+  --color-warning: #ffb520;
+  --color-warning-content: #0b0d0e;
+  --color-error: #ff5148;
+  --color-error-content: #0b0d0e;
+
+  --radius-selector: 0.25rem;
+  --radius-field: 0.2rem;
+  --radius-box: 0.35rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* Brand tokens that sit outside daisyUI's semantic slots. */
+@theme {
+  /* Economica carries the logotype: condensed, flat-terminalled, and built
+     to be set tight and large. */
+  --font-display: "Economica", "Arial Narrow", sans-serif;
+  /* Anek Latin carries the editorial voice — headings, prose, UI labels. */
+  --font-sans: "Anek Latin", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Text, levels two to four. Level one is --color-base-content. All four
+     clear 4.5:1 against every surface they sit on - level four measures
+     4.88:1 against the lightest, so quiet never means unreadable. */
+  --color-ink-2: #b8bbc0;
+  --color-ink-3: #969ba2;
+  --color-ink-4: #82888f;
+
+  /* Ornament sits below the text scale and is used only for indices and
+     separators carrying aria-hidden, which convey nothing a reader needs. */
+  --color-ornament: #6e747b;
+
+  /* Borders, weakest to strongest. A border should define an edge without
+     being the first thing noticed. */
+  --color-edge-soft: rgba(255, 255, 255, 0.055);
+  --color-edge: rgba(255, 255, 255, 0.1);
+  --color-edge-strong: rgba(255, 255, 255, 0.2);
+
+  /* Signals carry meaning and nothing else. Amber is attention, green is
+     success, red is failure, cyan is information and focus. */
+  --color-signal-amber: #ffb520;
+  --color-signal-green: #3ad07a;
+  --color-signal-red: #ff5148;
+  --color-signal-cyan: #3bc8ef;
+  --color-signal-violet: #b77aff;
+  --color-timber: #6b4a31;
+
+  /* The two surfaces the daisyUI base ramp cannot express: the step above
+     base-300, and the inset wells that sit below the page ground. */
+  --color-surface-raised: #1e2226;
+  --color-surface-inset: #08090a;
+}

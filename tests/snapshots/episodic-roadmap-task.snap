@@ -1,0 +1,55 @@
+<li class="task" data-done="no">
+ <span class="task__state">
+  <span aria-hidden="true" class="task__mark">
+   ☐
+  </span>
+  <span class="visually-hidden">
+   Not started
+  </span>
+ </span>
+ <span aria-hidden="true" class="task__id">
+  7.2.1
+ </span>
+ <span class="task__title">
+  Archive
+  <code>
+   sample
+  </code>
+  .
+ </span>
+ <span class="task__requires">
+  Requires 1.1.1
+ </span>
+ <ul class="task-list task-list--nested">
+  <li class="task" data-done="yes">
+   <span class="task__state">
+    <span aria-hidden="true" class="task__mark">
+     ☑
+    </span>
+    <span class="visually-hidden">
+     Complete
+    </span>
+   </span>
+   <span aria-hidden="true" class="task__id">
+   </span>
+   <span class="task__title">
+    Keep the source.
+   </span>
+  </li>
+  <li class="task" data-done="no">
+   <span class="task__state">
+    <span aria-hidden="true" class="task__mark">
+     ☐
+    </span>
+    <span class="visually-hidden">
+     Not started
+    </span>
+   </span>
+   <span aria-hidden="true" class="task__id">
+   </span>
+   <span class="task__title">
+    Verify the copy.
+   </span>
+  </li>
+ </ul>
+</li>

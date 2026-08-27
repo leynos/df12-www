@@ -102,6 +102,23 @@ flaky network-dependent tests.
 This workflow lets GitHub stay the source of truth for docs while providing a
 checked-in configuration record that guarantees reproducible builds.
 
+## Template Variables and Site Chrome
+
+Sub-site `template_vars` are a small, explicit injection point for values that
+need to be shared across every page in that sub-site. `df12_pages/config/loader.py`
+normalizes the YAML mapping into `SubSiteConfig.template_vars`, and the CLI
+passes that mapping into each relevant renderer:
+
+- `ContentPageGenerator` updates the Jinja environment globals for regular
+  sub-site content pages.
+- `SubSiteHomePageBuilder` updates the globals for the sub-site homepage.
+- `SharedContentGenerator` updates the globals for shared-content pages through
+  `SharedContentPageChrome.template_vars`.
+
+That keeps the template context consistent across the Episodic boundary: the
+same site-wide values are available to pages rendered from Jinja templates and
+to shared Markdown pages wrapped in the sub-site chrome.
+
 ## Styling & Semantic Classes
 
 ### DaisyUI-First Abstraction

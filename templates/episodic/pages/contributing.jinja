@@ -1,0 +1,109 @@
+{% set page_eyebrow = "Contributing" %}
+{% set page_title = "What a reviewable change to Episodic looks like" %}
+{% set page_lede = "The project gates hard on architecture, types, and documentation. Knowing which gates apply before starting saves the rework." %}
+{% set page_trail = [{"label": "Contributing"}] %}
+{% set page_sections = [
+  {"id": "maturity", "title": "What stage the project is at"},
+  {"id": "paths", "title": "By kind of change"},
+  {"id": "gates", "title": "The gates"},
+  {"id": "conventions", "title": "Conventions that catch people out"},
+  {"id": "conduct", "title": "Conduct and reporting"}
+] %}
+{% extends "pages/_page.jinja" %}
+{% from "data/status.jinja" import source_base %}
+
+{% set contribution_paths = [
+  ["A bug in implemented behaviour", "Reproduce it against the current checkout, then add a failing test before the fix. Ingestion, profiles, bindings, and intake are the areas with behaviour to break."],
+  ["A new capability", "Find the roadmap task it belongs to first. Work without a roadmap home tends to cross a phase boundary and stall in review."],
+  ["An architectural change", "Open a decision record. The import boundaries are enforced in continuous integration, so a change that crosses them fails before review."],
+  ["Documentation", "The documentation set has a style guide and a spelling policy, both enforced. Prose is gated like code."],
+  ["Infrastructure or the chart", "Exercise the local k3d preview. A chart change that has not been rendered is a guess."]
+] %}
+
+{% block sections %}
+  {{ ui.section_open(1, "maturity", "What stage the project is at",
+     "Early. That changes what kind of contribution is useful.") }}
+    <p>
+      Phase 1 of 6 is complete and the foundations are settled: the domain
+      model, the persistence layer, the ingestion path, and the service
+      scaffolding. Phases 2 and 4 are in progress. Everything from audio
+      onwards is unimplemented design.
+    </p>
+    <p>
+      Contributions that harden what exists are easier to land than
+      contributions that start something new, because the new thing usually has
+      a roadmap task describing how it was meant to be approached.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(2, "paths", "By kind of change",
+     "Five routes, each with the thing that most often goes wrong.") }}
+    {{ ui.table_open("Contribution paths", "contribution-paths") }}
+    <thead>
+      <tr><th scope="col">Change</th><th scope="col">Start with</th></tr>
+    </thead>
+    <tbody>
+      {% for kind, guidance in contribution_paths %}
+      <tr><th scope="row">{{ kind }}</th><td>{{ guidance }}</td></tr>
+      {% endfor %}
+    </tbody>
+    {{ ui.table_close() }}
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(3, "gates", "The gates",
+     "Every one runs before a change is reviewable. Running them locally is faster than discovering them in continuous integration.") }}
+    {% call ui.code_block("Commit gates from the Episodic repository") %}
+      {% highlight 'make', 'episodic-syntax' %}
+      make check-fmt        # formatting
+      make lint             # linters, including the hexagonal boundary check
+      make typecheck        # strict type checking
+      make test             # pytest, behavioural scenarios, and CrossHair contracts
+      make check-migrations # schema drift between models and migrations
+      make markdownlint     # Markdown lint and the en-GB-oxendict spelling policy
+      make nixie            # Mermaid diagram validation
+      {% endhighlight %}
+    {% endcall %}
+    <ul class="claim-list">
+      <li><strong>Architecture.</strong> Import boundaries are a lint rule. A domain module that imports a framework fails the build.</li>
+      <li><strong>Complexity.</strong> Cyclomatic complexity limits are enforced rather than advisory.</li>
+      <li><strong>Types.</strong> Type checking runs in strict mode.</li>
+      <li><strong>Diagrams.</strong> Every Mermaid block is rendered to prove it compiles. A broken diagram fails the build, not the reader.</li>
+    </ul>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(4, "conventions", "Conventions that catch people out",
+     "Three that are not obvious from reading the code.") }}
+    <p>
+      <strong>Spelling is British with Oxford endings</strong> - organize,
+      analyse, colour, centre - enforced in Markdown prose. American spellings
+      are correct only inside code identifiers and API surfaces.
+    </p>
+    <p>
+      <strong>Acronyms are expanded on first use</strong>, including ones that
+      feel universal. The documentation set is read by people evaluating the
+      platform, not only by people building it.
+    </p>
+    <p>
+      <strong>Behavioural tests use pytest-bdd.</strong> New user-visible
+      behaviour is expected to arrive with a scenario, not only a unit test.
+    </p>
+  {{ ui.section_close() }}
+
+  {{ ui.section_open(5, "conduct", "Conduct and reporting",
+     "Read before contributing, not after something goes wrong.") }}
+    <p>
+      Participation in the Episodic community is governed by the df12
+      Productions Code of Conduct, which is based on the Contributor Covenant
+      and includes the routes for reporting a concern.
+    </p>
+    <p class="section__more">
+      <a class="text-link" href="/episodic/code-of-conduct/">Read the Code of Conduct</a>
+      ·
+      <a class="text-link" href="{{ source_base }}AGENTS.md">Contributor guidelines</a>
+      ·
+      <a class="text-link" href="{{ source_base }}docs/developers-guide.md">Developers' guide</a>
+      ·
+      <a class="text-link" href="/episodic/roadmap/">Find a roadmap task</a>
+    </p>
+  {{ ui.section_close() }}
+{% endblock %}

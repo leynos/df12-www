@@ -1,0 +1,113 @@
+/* Client-side search: the input, its results panel, and result records.
+ *
+ * The control is hidden until MiniSearch loads, so it never appears inert
+ * to a reader without JavaScript.
+ */
+
+/* Hidden until MiniSearch loads, so the control never appears inert. */
+.search {
+  position: relative;
+  max-width: 34rem;
+  margin-bottom: var(--space-5);
+}
+
+.search[hidden] {
+  display: none;
+}
+
+.search__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-ink-4);
+  font-size: var(--label-key);
+  letter-spacing: var(--track-1);
+  text-transform: uppercase;
+}
+
+/* Inputs are inset: darker than their surroundings, so the surface reads as
+ * something that receives content rather than something raised above it. */
+.search__input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-field);
+  background: var(--color-surface-inset);
+  color: var(--color-base-content);
+  font-size: 0.85rem;
+}
+
+.search__input::placeholder {
+  color: var(--color-ink-4);
+}
+
+.search__panel {
+  position: absolute;
+  z-index: 30;
+  top: 100%;
+  right: 0;
+  left: 0;
+  margin-top: var(--space-2);
+  border: 1px solid var(--color-edge-strong);
+  border-radius: var(--radius-field);
+  background: var(--color-base-300);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 60%);
+}
+
+.search__panel[hidden] {
+  display: none;
+}
+
+.search__results {
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.search-result + .search-result {
+  border-top: 1px solid var(--color-edge-soft);
+}
+
+.search-result__link {
+  display: grid;
+  padding: var(--space-3);
+  gap: 0.15rem;
+  text-decoration: none;
+}
+
+.search-result.is-active,
+.search-result:hover {
+  background: var(--color-surface-raised);
+}
+
+.search-result__kind {
+  color: var(--color-signal-amber);
+  font-size: var(--label-micro);
+  letter-spacing: var(--track-2);
+  text-transform: uppercase;
+}
+
+.search-result__title {
+  color: var(--color-base-content);
+}
+
+.search-result__context {
+  color: var(--color-ink-3);
+  font-size: var(--label-note);
+}
+
+.search-result__excerpt {
+  color: var(--color-ink-3);
+  font-size: 0.9rem;
+}
+
+.search__meta {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-edge-soft);
+  margin: 0;
+  background: var(--color-base-200);
+  color: var(--color-ink-4);
+  font-size: var(--label-note);
+
+  /* A status paragraph inside a results panel, not prose. */
+  --flow-measure: none;
+}

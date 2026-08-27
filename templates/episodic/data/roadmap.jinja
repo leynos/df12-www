@@ -1,0 +1,1733 @@
+{#
+  GENERATED FILE - do not edit by hand.
+
+  Projected from the upstream Episodic roadmap, which is authoritative
+  for delivery state. Regenerate with `make site-data` after the
+  upstream roadmap changes; `make check-site-data` fails when this file drifts.
+
+  Source: leynos/episodic docs/roadmap.md
+#}
+{% set roadmap_phases = [
+  {
+    "number": "1",
+    "title": "Canonical content foundation",
+    "anchor": "1-canonical-content-foundation",
+    "summary": "This phase lands the Text Encoding Initiative (TEI) oriented domain model, multi-source ingestion stack, and reusable reference-document system. Success is observable when canonical TEI documents persist with full provenance after ingesting heterogeneous sources, and series profiles, episode templates, and reference documents are retrievable via the public Application Programming Interface (API) with optimistic locking and change history.",
+    "state": "available",
+    "done_count": 17,
+    "total_count": 17,
+    "steps": [
+      {
+        "id": "1.1",
+        "title": "Relational schema and persistence layer",
+        "anchor": "11-relational-schema-and-persistence-layer",
+        "summary": "Design and implement the database schema and data access patterns. Completion enables persistent storage of all canonical entities.",
+        "done_count": 3,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "1.1.1",
+            "title": "Design the relational schema covering core entities.",
+            "done": true,
+            "notes": [
+              "Define TEI headers, canonical episodes, and approval states.",
+              "Define ingestion jobs and source documents.",
+              "Define series profiles and episode templates."
+            ]
+          },
+          {
+            "id": "1.1.2",
+            "title": "Introduce migration tooling with Alembic.",
+            "done": true,
+            "notes": [
+              "Configure Alembic for version-controlled schema migrations.",
+              "Wire migration checks into CI to block divergent schemas."
+            ]
+          },
+          {
+            "id": "1.1.3",
+            "title": "Implement the repository and unit-of-work layers.",
+            "done": true,
+            "notes": [
+              "Define repository interfaces for each aggregate root.",
+              "Implement Postgres-backed repositories with SQLAlchemy.",
+              "Add integration tests validating transactional boundaries."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1.2",
+        "title": "Multi-source ingestion service",
+        "anchor": "12-multi-source-ingestion-service",
+        "summary": "Build the ingestion pipeline that normalizes heterogeneous inputs into canonical TEI. Completion enables content acquisition from diverse sources.",
+        "done_count": 3,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "1.2.1",
+            "title": "Build the multi-source ingestion service.",
+            "done": true,
+            "notes": [
+              "Accept Really Simple Syndication (RSS) feeds, briefs, transcripts, press releases, and research notes.",
+              "Apply document classifiers and quality scores."
+            ]
+          },
+          {
+            "id": "1.2.2",
+            "title": "Implement source weighting heuristics and conflict resolution.",
+            "done": true,
+            "notes": [
+              "Define priority rules when sources conflict.",
+              "Normalize inputs into TEI fragments and merge into canonical episodes."
+            ]
+          },
+          {
+            "id": "1.2.3",
+            "title": "Capture provenance metadata automatically in TEI headers.",
+            "done": true,
+            "notes": [
+              "Record source priorities, ingestion timestamps, and reviewer identities.",
+              "Validate with integration and Behaviour-Driven Development (BDD) tests."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1.3",
+        "title": "Reusable reference documents",
+        "anchor": "13-reusable-reference-documents",
+        "summary": "Define and implement the reference-document model for reusable content across series and episodes. Completion enables shared style guides, character profiles, and research briefs.",
+        "done_count": 4,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "1.3.1",
+            "title": "Define the reusable reference-document model.",
+            "done": true,
+            "notes": [
+              "Define ReferenceDocument, ReferenceDocumentRevision, and ReferenceBinding entities.",
+              "Define repository contracts independent of ingestion-job scope.",
+              "Include series-aligned host and guest profile documents."
+            ]
+          },
+          {
+            "id": "1.3.2",
+            "title": "Publish approved Entity-Relationship (ER) diagram and glossary.",
+            "done": true,
+            "notes": [
+              "Document all three entities with field definitions.",
+              "Obtain stakeholder approval for model definitions."
+            ]
+          },
+          {
+            "id": "1.3.3",
+            "title": "Document repository and API contract acceptance criteria.",
+            "done": true,
+            "notes": [
+              "Define repository method signatures and behaviours.",
+              "Define API endpoint contracts for reference operations."
+            ]
+          },
+          {
+            "id": "1.3.4",
+            "title": "Implement Representational State Transfer (REST) endpoints for reusable reference documents.",
+            "done": true,
+            "requires": [
+              "1.3.1"
+            ],
+            "notes": [
+              "Implement create, get, list, and update for ReferenceDocument.",
+              "Implement revision and binding workflows.",
+              "Implement optimistic locking and change history retrieval.",
+              "Implement series-aligned host and guest profile access."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1.4",
+        "title": "Series profiles, episode templates, and binding resolution",
+        "anchor": "14-series-profiles-episode-templates-and-binding-resolution",
+        "summary": "Define configuration entities and implement binding resolution for reusable content. Completion enables downstream generators to retrieve structured briefs.",
+        "done_count": 3,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "1.4.1",
+            "title": "Define series profile and episode template models.",
+            "done": true,
+            "notes": [
+              "Define fields for tone descriptors, segment ordering, and audio preferences.",
+              "Define change history and versioning semantics."
+            ]
+          },
+          {
+            "id": "1.4.2",
+            "title": "Implement REST endpoints for series profiles and episode templates.",
+            "done": true,
+            "notes": [
+              "Implement create, get, list, and update operations.",
+              "Implement change history retrieval.",
+              "Publish REST API specification."
+            ]
+          },
+          {
+            "id": "1.4.3",
+            "title": "Implement reference-binding resolution.",
+            "done": true,
+            "requires": [
+              "1.3.1"
+            ],
+            "notes": [
+              "Enable ingestion runs, profiles, and templates to reuse pinned revisions.",
+              "Preserve provenance snapshots in ingestion records.",
+              "Support effective_from_episode_id for revisions applying from specific episodes onwards.",
+              "Scope: repository and API behaviour only."
+            ],
+            "completed_on": "2026-03-28",
+            "completion_note": "Architectural Decision Record (ADR) 001, the resolver service, brief/API integration, ingestion provenance snapshotting, behavioural coverage, and documentation alignment are all in place."
+          }
+        ]
+      },
+      {
+        "id": "1.5",
+        "title": "Service scaffolding and hexagonal boundaries",
+        "anchor": "15-service-scaffolding-and-hexagonal-boundaries",
+        "summary": "Scaffold the application services with consistent architecture patterns. Completion enables feature development within enforced boundaries.",
+        "done_count": 4,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "1.5.1",
+            "title": "Scaffold Falcon 4.2.x HTTP services running on Granian.",
+            "done": true,
+            "notes": [
+              "Configure baseline routing and health check endpoints.",
+              "Wire dependency injection hooks for port adapters.",
+              "Implement the typed ApiDependencies composition seam and the /health/live plus /health/ready operator contract."
+            ],
+            "subtasks": [
+              {
+                "title": "Integrate the Granian runtime for Falcon deployment.",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "1.5.2",
+            "title": "Scaffold Celery workers with RabbitMQ integration.",
+            "done": true,
+            "notes": [
+              "Define queue bindings and routing keys for task dispatch.",
+              "Configure concurrency pools for I/O-bound and CPU-bound workloads."
+            ]
+          },
+          {
+            "id": "1.5.3",
+            "title": "Define hexagonal architecture boundaries and port contracts.",
+            "done": true,
+            "notes": [
+              "Document domain, port, and adapter responsibilities.",
+              "Define allowed dependency directions between layers."
+            ]
+          },
+          {
+            "id": "1.5.4",
+            "title": "Implement architectural enforcement checks for hexagonal boundaries.",
+            "done": true,
+            "notes": [
+              "Added make check-architecture and wired the Hecate-backed gate into make lint.",
+              "Added architecture tests and BDD fixtures for dependency-direction checks.",
+              "Added port contract tests for the current concrete adapters.",
+              "CI exposes architecture enforcement as a named gate."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "number": "2",
+    "title": "Intelligent content generation and quality assurance (QA)",
+    "anchor": "2-intelligent-content-generation-and-quality-assurance-qa",
+    "summary": "This phase orchestrates Large Language Model (LLM) based draft generation, enrichment, and multi-layer review. It automates compliance checks against brand and regulatory guidance, instruments cost accounting, and exposes generation runs via the API. Success is observable when generated scripts achieve defined quality thresholds, pass brand guideline checks, and cost ledgers report per-episode spend with budget breach alerts.",
+    "state": "in-progress",
+    "done_count": 12,
+    "total_count": 29,
+    "steps": [
+      {
+        "id": "2.1",
+        "title": "LLM adapter and guardrails",
+        "anchor": "21-llm-adapter-and-guardrails",
+        "summary": "Implement the inference boundary with retry semantics, token budgeting, and content guardrails. Completion enables controlled LLM invocation from orchestration code.",
+        "done_count": 2,
+        "total_count": 2,
+        "tasks": [
+          {
+            "id": "2.1.1",
+            "title": "Implement the `LLMPort` adapter with retry and token budgeting.",
+            "done": true,
+            "notes": [
+              "Define retry policy for transient provider failures.",
+              "Enforce token budgets pre-flight and post-call.",
+              "Return provider-agnostic usage metadata."
+            ]
+          },
+          {
+            "id": "2.1.2",
+            "title": "Implement guardrail prompts aligned to content templates.",
+            "done": true,
+            "notes": [
+              "Derive guardrail text from series profile and episode template inputs.",
+              "Include guardrails in outbound LLM requests.",
+              "Validate guardrail placement with behavioural tests."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "2.2",
+        "title": "QA evaluators and script checks",
+        "anchor": "22-qa-evaluators-and-script-checks",
+        "summary": "Implement internal quality evaluators that score generated scripts before editorial approval. The initial implementation keeps Pedante, Bromide, Chiltern, Anthem, and Caesura inside LangGraph as structured Large Language Model (LLM) calls that return typed findings and normalized usage metrics per invocation; Chrono is a non-LLM runtime estimator. Later iterations may replace individual evaluators with more cost-effective or service-oriented approaches without changing the orchestration contract.",
+        "done_count": 2,
+        "total_count": 7,
+        "tasks": [
+          {
+            "id": "2.2.1",
+            "title": "Implement Pedante for factuality and accuracy checks.",
+            "done": true,
+            "notes": [
+              "Return structured findings for unsupported claims and likely inaccuracies.",
+              "Return normalized usage metrics for LangGraph cost accounting."
+            ]
+          },
+          {
+            "id": "2.2.2",
+            "title": "Implement Bromide to detect overused tropes, cliches, and snowclones.",
+            "notes": [
+              "Identify formulaic phrasing and repeated narrative patterns in draft scripts.",
+              "Return structured findings with suggested rewrites."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.2.3",
+            "title": "Implement Chiltern to flag pronunciation gaps.",
+            "notes": [
+              "Detect frequently mispronounced words and terminology lacking attached pronunciation guidance.",
+              "Cover domain-specific and internal terminology as well as public names."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.2.4",
+            "title": "Implement Anthem for brand-guideline evaluation.",
+            "notes": [
+              "Lint textual output for vocabulary and forbidden topics.",
+              "Validate tone against brand tone descriptors.",
+              "Record pass/fail outcomes linked to the canonical episode."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.2.5",
+            "title": "Implement Caesura to detect false endings in scripts.",
+            "notes": [
+              "Flag cases where the episode appears to wrap up but continues for another four minutes or more.",
+              "Return structured findings identifying the suspected false-ending boundary."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.2.6",
+            "title": "Implement Chrono for runtime estimation.",
+            "done": true,
+            "notes": [
+              "Estimate anticipated runtime for written dialogue using an initial naive local heuristic.",
+              "Record estimator metadata so later implementations remain comparable."
+            ]
+          },
+          {
+            "id": "2.2.7",
+            "title": "Persist QA artefacts linked to canonical episodes.",
+            "notes": [
+              "Store evaluator findings, runtime estimates, rubric scores, and compliance results.",
+              "Enable retrieval via API and CLI filtered by evaluator and compliance status."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2.3",
+        "title": "Content enrichment and TEI body generation",
+        "anchor": "23-content-enrichment-and-tei-body-generation",
+        "summary": "Enrich canonical TEI bodies with structured metadata sourced from templates. Completion enables rich episode content with chapter markers and guest details.",
+        "done_count": 3,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "2.3.1",
+            "title": "Generate show notes from template expansions.",
+            "done": true,
+            "notes": [
+              "Extract key topics and timestamps from generated content.",
+              "Format as structured metadata within TEI body."
+            ]
+          },
+          {
+            "id": "2.3.2",
+            "title": "Generate chapter markers aligned to script segments.",
+            "done": true,
+            "notes": [
+              "Define chapter boundaries based on segment transitions.",
+              "Include timing metadata for podcast player compatibility."
+            ]
+          },
+          {
+            "id": "2.3.3",
+            "title": "Generate guest bios from reference document bindings.",
+            "done": true,
+            "notes": [
+              "Retrieve guest profile reference documents.",
+              "Format biographical summaries within TEI body."
+            ]
+          },
+          {
+            "id": "2.3.4",
+            "title": "Generate sponsor reads from template-defined placements.",
+            "notes": [
+              "Retrieve sponsor content from template configuration.",
+              "Insert at defined segment positions."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2.4",
+        "title": "LangGraph orchestration and cost accounting",
+        "anchor": "24-langgraph-orchestration-and-cost-accounting",
+        "summary": "Implement resumable orchestration with idempotency, queue routing, and cost metering. Completion enables reliable, auditable generation workflows.",
+        "done_count": 4,
+        "total_count": 5,
+        "tasks": [
+          {
+            "id": "2.4.1",
+            "title": "Implement structured-output planning and tool-calling execution.",
+            "done": true,
+            "notes": [
+              "Define model tiering for cost control.",
+              "Implement tool-calling patterns for enrichment steps.",
+              "Added issue #72 property-based coverage for orchestration DTOs, planner format errors, model-tier boundaries, and LangGraph invariants."
+            ]
+          },
+          {
+            "id": "2.4.2",
+            "title": "Add LangGraph suspend-and-resume orchestration.",
+            "done": true,
+            "requires": [
+              "2.1.1"
+            ],
+            "notes": [
+              "Implement checkpoint persistence for resumable workflows.",
+              "Define idempotency keys for each workflow step."
+            ]
+          },
+          {
+            "id": "2.4.3",
+            "title": "Configure Celery queue routing for workload isolation.",
+            "done": true,
+            "notes": [
+              "Route I/O-bound tasks to high-concurrency pools.",
+              "Route CPU-bound tasks to prefork pools."
+            ]
+          },
+          {
+            "id": "2.4.4",
+            "title": "Instrument cost accounting with per-call usage metering.",
+            "done": true,
+            "notes": [
+              "Record token counts and model identifiers per LLM call.",
+              "Attribute evaluator-node usage to underlying provider calls inside LangGraph.",
+              "Pin provider pricing snapshots used to price each call, with room for future SLA4OAI based helper-service pricing snapshots.",
+              "Aggregate run totals with hierarchical ledger entries."
+            ]
+          },
+          {
+            "id": "2.4.5",
+            "title": "Extend architecture enforcement to orchestration code.",
+            "notes": [
+              "Validate LangGraph nodes depend on ports only.",
+              "Validate Celery tasks depend on ports only.",
+              "Audit checkpoint payload boundaries."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2.5",
+        "title": "Pricing catalogue and budget enforcement",
+        "anchor": "25-pricing-catalogue-and-budget-enforcement",
+        "summary": "Implement price snapshots, discovery, metering, and budget reservation for LangGraph nodes. Completion enables current internal metering and preserves the future path to standalone evaluator services with explicit pricing contracts.",
+        "done_count": 0,
+        "total_count": 5,
+        "tasks": [
+          {
+            "id": "2.5.1",
+            "title": "Add immutable pricing snapshots for provider and helper pricing inputs.",
+            "notes": [
+              "Persist model pricing inputs used for LLM and Text-to-Speech (TTS) billing.",
+              "Preserve room for future helper-service pricing documents.",
+              "Version snapshots so historical run costs remain reproducible."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.5.2",
+            "title": "Add `PricingCataloguePort` for pricing-source discovery.",
+            "notes": [
+              "Load pinned provider rate cards for internal LangGraph billing.",
+              "Support future OpenAPI info.x-sla discovery and SLA4OAI plan ingestion for standalone evaluator services.",
+              "Persist pricing snapshots for historical reference."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.5.3",
+            "title": "Add `PricingEngine` with concurrency-safe metering.",
+            "notes": [
+              "Implement MeteringPort for usage recording.",
+              "Price individual calls deterministically with quota and overage handling."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.5.4",
+            "title": "Extend `CostLedgerPort` storage for evaluator-node and provider calls.",
+            "notes": [
+              "Record workflow node names, operation identifiers, and usage metrics.",
+              "Record pricing snapshot identifiers and model metadata."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.5.5",
+            "title": "Extend `BudgetPort` APIs for reservation workflow.",
+            "notes": [
+              "Reserve estimated spend for generation and evaluator calls before invocation.",
+              "Commit actual spend on success.",
+              "Release reservation on failure or timeout.",
+              "Key reservations by idempotency key."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2.6",
+        "title": "Generation runs and checkpoints",
+        "anchor": "26-generation-runs-and-checkpoints",
+        "summary": "Define the generation-run domain model and implement API endpoints. Completion enables real-time visibility into generation progress.",
+        "done_count": 1,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "2.6.1",
+            "title": "Define `GenerationRunPort` and implement domain model.",
+            "done": true,
+            "requires": [
+              "2.4.2"
+            ],
+            "notes": [
+              "Define GenerationRun, GenerationEvent, and Checkpoint entities.",
+              "Use frozen dataclasses with UUIDv7 identifiers.",
+              "Implement append-only event log with monotonic sequence numbers.",
+              "Define checkpoint lifecycle (created, responded)."
+            ]
+          },
+          {
+            "id": "2.6.2",
+            "title": "Implement repository contracts and Alembic migrations.",
+            "notes": [
+              "Define repository interfaces for generation-run aggregates.",
+              "Add integration tests validating event ordering."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.6.3",
+            "title": "Implement REST endpoints for generation runs.",
+            "requires": [
+              "2.6.1"
+            ],
+            "notes": [
+              "Implement /v1/episodes/{episode_id}/generation-runs (POST, GET).",
+              "Implement /v1/generation-runs/{run_id} (GET).",
+              "Implement /v1/generation-runs/{run_id}/events (GET) with pagination.",
+              "Implement /v1/generation-runs/{run_id}/checkpoint (POST) for checkpoint submission.",
+              "Enforce idempotency-key support for run creation.",
+              "Validate hexagonal boundary tests passing."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "2.7",
+        "title": "Script projection and editing",
+        "anchor": "27-script-projection-and-editing",
+        "summary": "Implement structured script projection for editing without direct TEI manipulation. Completion enables user-friendly script review and patching.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "2.7.1",
+            "title": "Define `ScriptProjectionPort` and projection schema.",
+            "notes": [
+              "Translate canonical TEI into segment-and-speaker-turn JSON structure.",
+              "Define versioning for optimistic locking."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.7.2",
+            "title": "Implement script projection read endpoint.",
+            "notes": [
+              "Implement /v1/episodes/{episode_id}/script (GET).",
+              "Return versioned projection with segment and turn structure."
+            ],
+            "done": false
+          },
+          {
+            "id": "2.7.3",
+            "title": "Implement script projection patch endpoint.",
+            "requires": [
+              "2.7.2"
+            ],
+            "notes": [
+              "Implement /v1/episodes/{episode_id}/script (PATCH).",
+              "Apply domain patches with expected_version enforcement.",
+              "Validate round-trip projection-to-TEI fidelity."
+            ],
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "number": "3",
+    "title": "Audio synthesis and delivery",
+    "anchor": "3-audio-synthesis-and-delivery",
+    "summary": "This phase produces production-ready audio with narration, music, and compliance-checked levels, and provides reliable preview and delivery workflows. Success is observable when end-to-end renders produce master files with embedded chapter markers, quality automation rejects mixes violating loudness thresholds, and audio runs are accessible via REST endpoints with signed download URLs. The phase keeps canonical TEI P5 as the source of truth for script, speaker turns, pronunciation guidance, and render provenance; TTS requests are projections of TEI-backed data rather than a parallel script schema.",
+    "state": "planned",
+    "done_count": 0,
+    "total_count": 24,
+    "steps": [
+      {
+        "id": "3.1",
+        "title": "Speech capability contracts",
+        "anchor": "31-speech-capability-contracts",
+        "summary": "Define the provider-neutral speech boundary before binding to any one TTS engine. Completion answers whether the audio graph can express the behaviours needed by Inworld, Chatterbox, ElevenLabs v3, and future engines without leaking provider parameter names into the domain model.",
+        "done_count": 0,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "3.1.1",
+            "title": "Define the `TTSPort` request and result contracts.",
+            "notes": [
+              "Represent TEI-derived episode, segment, speaker-turn, and text revision identifiers.",
+              "Include voice references, language hints, output preferences, execution mode, text normalization, verbatim requirements, and idempotency keys.",
+              "Return provider-agnostic audio artefacts, transcripts, timings, warnings, usage metadata, and provider request identifiers."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.1.2",
+            "title": "Define the `DialogueSpeechPort` contract for multi-speaker conversation rendering.",
+            "requires": [
+              "3.1.1"
+            ],
+            "notes": [
+              "Accept ordered TEI speaker turns and voice assignments.",
+              "Return combined dialogue artefacts with turn-level alignment when available.",
+              "Mark results that are less editable than per-segment stems."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.1.3",
+            "title": "Implement the TTS capability registry and selector.",
+            "requires": [
+              "3.1.1"
+            ],
+            "notes": [
+              "Store provider, model, maximum text length, execution modes, voice reference kinds, cue kinds, controls, output formats, timing support, pronunciation strategies, and dialogue support.",
+              "Reject incompatible requests before synthesis instead of silently dropping requirements.",
+              "Select fallback providers when required capabilities are available elsewhere."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.1.4",
+            "title": "Implement configurable voice persona support.",
+            "requires": [
+              "3.1.1"
+            ],
+            "notes": [
+              "Define voice persona configuration for provider voice IDs, managed voice profiles, and consented reference-audio clips.",
+              "Map personas to provider-specific identifiers only inside adapters.",
+              "Support per-speaker voice assignment and voice-preview reuse."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "title": "Pronunciation repository and speech markup",
+        "anchor": "32-pronunciation-repository-and-speech-markup",
+        "summary": "Build the pronunciation system as a reusable repository connected to TEI annotations, QA findings, and audio feedback. Completion answers whether mispronunciation fixes can be captured once, audited, and rendered through multiple providers with different pronunciation surfaces.",
+        "done_count": 0,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "3.2.1",
+            "title": "Define `PronunciationRepositoryPort` and pronunciation entry models.",
+            "notes": [
+              "Scope entries to organizations, series, episodes, speakers, and segments.",
+              "Record surface forms, match policy, locale, accent, lifecycle state, provenance, reviewer identity, and TEI revision hashes.",
+              "Support IPA, spelling substitution, acronym expansion, textual notes, and provider dictionary references as separate realizations."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.2.2",
+            "title": "Implement pronunciation-pack resolution.",
+            "requires": [
+              "3.2.1"
+            ],
+            "notes": [
+              "Merge entries from broad scopes into segment-level packs with deterministic override rules.",
+              "Attach pack hashes to speech render requests for reproducibility.",
+              "Expose unsupported strategy diagnostics when a selected provider cannot honour required guidance."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.2.3",
+            "title": "Connect Chiltern findings and audio feedback to pronunciation proposals.",
+            "requires": [
+              "3.2.1"
+            ],
+            "notes": [
+              "Let Chiltern identify missing guidance using the repository.",
+              "Let audio feedback create proposed entries for mispronounced terms.",
+              "Trigger partial regeneration for affected TEI speaker turns after approval."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.2.4",
+            "title": "Define provider-neutral performance cues in TEI-backed speech markup.",
+            "requires": [
+              "3.1.1"
+            ],
+            "notes": [
+              "Represent pauses, breaths, laughs, whispers, affect, pacing, and emphasis without storing provider-specific tags as canonical text.",
+              "Compile cues at the adapter edge according to capability descriptors."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "title": "Initial TTS provider adapters",
+        "anchor": "33-initial-tts-provider-adapters",
+        "summary": "Implement concrete adapters that prove the speech contracts support different vendor shapes. Completion answers whether the system can mix direct segment TTS, reference-audio voice cloning, and dialogue rendering whilst preserving TEI-backed traceability.",
+        "done_count": 0,
+        "total_count": 6,
+        "tasks": [
+          {
+            "id": "3.3.1",
+            "title": "Implement the Inworld TTS adapter.",
+            "requires": [
+              "3.1.3",
+              "3.2.2"
+            ],
+            "notes": [
+              "Support approved segment rendering through TTSPort.",
+              "Map IPA guidance, pause controls, steering cues, streaming output, output formats, and timestamps where supported.",
+              "Define retry policy for transient provider failures.",
+              "Verify transcripts when the render path is not guaranteed to be verbatim."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.3.2",
+            "title": "Implement the Inworld realtime dialogue adapter.",
+            "requires": [
+              "3.1.2",
+              "3.3.1"
+            ],
+            "notes": [
+              "Open session-scoped render contexts for ordered host turns.",
+              "Capture streamed audio, transcripts, provider events, and session metadata.",
+              "Require explicit opt-in because session-based rendering can be less verbatim than direct TTS."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.3.3",
+            "title": "Implement the Chatterbox via FAL adapter.",
+            "requires": [
+              "3.1.3",
+              "3.2.2"
+            ],
+            "notes": [
+              "Map reference-audio voice personas to FAL audio_url inputs.",
+              "Compile supported non-verbal cues into Chatterbox text tags.",
+              "Map expressiveness, randomness, guidance, and seed controls.",
+              "Reject provider voice IDs, word timings, and native pronunciation dictionaries unless a later capability descriptor proves support."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.3.4",
+            "title": "Implement the ElevenLabs v3 via FAL TTS adapter.",
+            "requires": [
+              "3.1.3",
+              "3.2.2"
+            ],
+            "notes": [
+              "Map provider voice IDs, stability, language code, timestamps, and text normalization.",
+              "Compile supported bracket-style performance cues at the adapter edge.",
+              "Return provider request IDs and word timing metadata when requested."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.3.5",
+            "title": "Implement the ElevenLabs v3 via FAL dialogue adapter.",
+            "requires": [
+              "3.1.2",
+              "3.2.2"
+            ],
+            "notes": [
+              "Map TEI speaker turns to dialogue blocks with per-turn voice IDs.",
+              "Apply provider pronunciation dictionary locators when approved entries have matching references.",
+              "Mark combined dialogue output as less editable unless turn-level alignment is returned."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.3.6",
+            "title": "Add adapter contract scenarios across capability combinations.",
+            "requires": [
+              "3.3.1",
+              "3.3.2",
+              "3.3.3",
+              "3.3.4",
+              "3.3.5"
+            ],
+            "notes": [
+              "Cover direct TTS, dialogue rendering, reference-audio voices, provider-managed voices, pronunciation strategies, timing requirements, streaming, queue execution, and unsupported-feature failures.",
+              "Success: every adapter either fulfils requested capabilities or returns a stable unsupported-capability diagnostic."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "title": "Mixing engine and loudness compliance",
+        "anchor": "34-mixing-engine-and-loudness-compliance",
+        "summary": "Build the audio mixing engine with stem management and loudness normalization. Completion enables broadcast-quality audio production.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "3.4.1",
+            "title": "Integrate background music and sound effect stem management.",
+            "notes": [
+              "Define asset catalogue schema for music beds and effects.",
+              "Implement bed selection based on template configuration.",
+              "Schedule mixes relative to script beats and segment transitions."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.4.2",
+            "title": "Build the mixing engine for narration and stem combination.",
+            "notes": [
+              "Implement ducking for voice-over-music transitions.",
+              "Implement fades and scene transitions.",
+              "Support stem isolation for post-production flexibility."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.4.3",
+            "title": "Enforce loudness normalization to broadcast standards.",
+            "notes": [
+              "Target -16 Loudness Units Full Scale (LUFS) ±1 Loudness Unit (LU) integrated loudness per European Broadcasting Union (EBU) R128.",
+              "Implement peak limiting across stereo channels.",
+              "Reject mixes violating thresholds with actionable diagnostics."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "title": "Audio runs, previews, and feedback",
+        "anchor": "35-audio-runs-previews-and-feedback",
+        "summary": "Define the audio-run domain model and implement run lifecycle endpoints. Completion enables audio workflow tracking and iterative refinement.",
+        "done_count": 0,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "3.5.1",
+            "title": "Define `AudioRunPort` and implement domain model.",
+            "requires": [
+              "3.1.1",
+              "3.4.2"
+            ],
+            "notes": [
+              "Define AudioRun, PreviewAsset, StemAsset, and AudioFeedback entities.",
+              "Use frozen dataclasses with UUIDv7 identifiers.",
+              "Link preview assets to audio runs with signed storage Uniform Resource Identifiers (URIs).",
+              "Classify stem assets by type (narration, music, sound effects (SFX), ambience).",
+              "Define feedback actions (approve, reject, regenerate segment)."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.5.2",
+            "title": "Implement repository contracts and Alembic migrations.",
+            "notes": [
+              "Define repository interfaces for audio-run aggregates.",
+              "Add integration tests validating asset linking."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.5.3",
+            "title": "Implement REST endpoints for audio runs.",
+            "requires": [
+              "3.5.1"
+            ],
+            "notes": [
+              "Implement /v1/episodes/{episode_id}/audio-runs (POST, GET).",
+              "Implement /v1/audio-runs/{audio_run_id} (GET).",
+              "Implement /v1/audio-runs/{audio_run_id}/previews (GET) with signed URLs.",
+              "Implement /v1/audio-runs/{audio_run_id}/feedback (POST) for segment-level actions.",
+              "Implement /v1/episodes/{episode_id}/stems (GET, POST) with multipart or upload-reference attachment.",
+              "Enforce idempotency-key support for run creation.",
+              "Validate hexagonal boundary tests passing."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.5.4",
+            "title": "Generate shareable previews via `PreviewPublisherPort`.",
+            "notes": [
+              "Store preview artefacts in object storage.",
+              "Generate signed URLs with configurable expiry."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "title": "Voice preview and export jobs",
+        "anchor": "36-voice-preview-and-export-jobs",
+        "summary": "Implement standalone voice preview synthesis and export job workflows. Completion enables persona testing and deliverable packaging.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "3.6.1",
+            "title": "Define `VoicePreviewPort` and implement synthesis endpoints.",
+            "requires": [
+              "3.1.1",
+              "3.1.4",
+              "3.3.1",
+              "3.3.3",
+              "3.3.4"
+            ],
+            "notes": [
+              "Implement /v1/voice-previews (POST) accepting text and voice configuration.",
+              "Implement /v1/voice-previews/{preview_id} (GET) returning status and signed audio URL.",
+              "Ensure synthesis does not modify episode state.",
+              "Enforce idempotency-key support."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.6.2",
+            "title": "Define `ExportJobPort` and implement export endpoints.",
+            "requires": [
+              "3.4.2",
+              "3.4.3"
+            ],
+            "notes": [
+              "Implement /v1/episodes/{episode_id}/exports (POST, GET).",
+              "Implement /v1/exports/{export_id} (GET) returning status and download URLs.",
+              "Support export types: master audio, stems bundle, TEI bundle, combined stems-plus-TEI bundle.",
+              "Include manifest hash for integrity verification.",
+              "Store export artefacts in object storage with signed URLs."
+            ],
+            "done": false
+          },
+          {
+            "id": "3.6.3",
+            "title": "Publish final masters to Content Delivery Network (CDN) endpoints.",
+            "notes": [
+              "Configure CDN distribution for audio assets.",
+              "Support optional RSS feed publication."
+            ],
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "number": "4",
+    "title": "Client and interface experience",
+    "anchor": "4-client-and-interface-experience",
+    "summary": "This phase delivers API-first access backed by approval workflows and client tooling, enables editorial collaboration and notifications, and provides real-time event streaming for agentic workflows. Success is observable when editorial teams complete end-to-end approvals via API, Command-Line Interface (CLI), and web console, audit trails capture every transition, and WebSocket streaming delivers real-time events with backpressure control.",
+    "state": "in-progress",
+    "done_count": 4,
+    "total_count": 19,
+    "steps": [
+      {
+        "id": "4.1",
+        "title": "REST API surfaces and version prefix",
+        "anchor": "41-rest-api-surfaces-and-version-prefix",
+        "summary": "Finalize REST API surfaces with consistent contracts and version routing. Completion enables stable API consumption by clients.",
+        "done_count": 2,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "4.1.1",
+            "title": "Introduce `/v1` as the target API prefix.",
+            "done": true,
+            "notes": [
+              "Route TUI-facing and vertical-slice endpoints under /v1.",
+              "Treat existing unversioned routes as pre-v0.1.0 implementation details that do not require compatibility preservation.",
+              "Document version routing in the developers' guide."
+            ]
+          },
+          {
+            "id": "4.1.2",
+            "title": "Finalize REST surfaces for previous phase artefacts.",
+            "done": true,
+            "notes": [
+              "Implement pagination, filtering, and role enforcement.",
+              "Ensure consistent error contracts across all endpoints."
+            ]
+          },
+          {
+            "id": "4.1.3",
+            "title": "Integrate request correlation across HTTP, tasks, and outbound provider calls.",
+            "requires": [
+              "1.5.1",
+              "1.5.2"
+            ],
+            "notes": [
+              "Add falcon-correlate as an application dependency once a pinned release or Git revision is selected.",
+              "Wire CorrelationIDMiddlewareASGI into the Falcon composition root before authorization middleware so denial, error, and resource logs share the same request identifier.",
+              "Expose runtime configuration for the correlation header name, trusted proxy or ingress source ranges, incoming-ID validation, and response-header echoing.",
+              "Configure Celery correlation propagation in the worker composition root so published tasks and worker-side logs inherit the active request correlation ID.",
+              "Wrap owned httpx.AsyncClient instances, including the OpenAI-compatible LLM adapter client, with falcon-correlate transport support so provider calls receive the active correlation header.",
+              "Add Falcon ASGI, Celery eager-mode, and outbound httpx.MockTransport tests proving generated IDs are visible on req.context, response headers, task context, and provider request headers.",
+              "Document the operator-facing header contract and local debugging workflow in the users' guide and developers' guide."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "title": "Episode and approval workflow endpoints",
+        "anchor": "42-episode-and-approval-workflow-endpoints",
+        "summary": "Implement episode lifecycle endpoints and the editorial approval state machine. Completion enables structured approval workflows with audit trails.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "4.2.1",
+            "title": "Implement editorial approval state machine.",
+            "requires": [
+              "1.1.1"
+            ],
+            "notes": [
+              "Define configurable approval stages.",
+              "Implement Service Level Agreement (SLA) timers for stage transitions.",
+              "Enable audit logging for all state changes."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.2.2",
+            "title": "Implement episode REST endpoints.",
+            "requires": [
+              "4.2.1"
+            ],
+            "notes": [
+              "Implement /v1/episodes (POST, GET) with lifecycle filtering.",
+              "Implement /v1/episodes/{episode_id} (GET, PATCH).",
+              "Implement /v1/episodes/{episode_id}/tei (GET, PUT) with versioned envelope and optimistic locking.",
+              "Implement /v1/episodes/{episode_id}/approval-events (GET, POST) with audit preservation."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.2.3",
+            "title": "Integrate notification channels for approval events.",
+            "notes": [
+              "Support email, Slack, and webhook notifications.",
+              "Trigger on approvals, rejections, and automated compliance alerts."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "title": "Source-to-script REST vertical slice",
+        "anchor": "43-source-to-script-rest-vertical-slice",
+        "summary": "This step answers whether an integration client can drive the narrowest useful source-to-script workflow through JSON/REST: submit show source material, provide presenter context, trigger draft generation without QA, and retrieve the resulting TEI-P5 XML. It validates the /v1 resource contract before the full approval, QA, audio, and export surfaces land.",
+        "done_count": 1,
+        "total_count": 2,
+        "tasks": [
+          {
+            "id": "4.3.1",
+            "title": "Implement source and presenter-profile intake for script generation.",
+            "done": true,
+            "requires": [
+              "1.3.4",
+              "1.4.3",
+              "4.1.1"
+            ],
+            "notes": [
+              "Implemented POST /v1/uploads with idempotency keys, content-type allowlists, size limits, content hashes, upload metadata, and filesystem object-store runtime wiring. The resumable POST /v1/uploads/init flow is deferred until an object-store adapter can use pre-signed upload URLs.",
+              "Implemented /v1/ingestion-jobs and /v1/ingestion-jobs/{job_id}/sources with pollable job status and source attachment by upload_id or source_uri.",
+              "Uses reusable reference documents with kind=host_profile and kind=guest_profile as the presenter-profile contract.",
+              "Success: a client can upload a research paper, attach it to an ingestion job, create or bind presenter profile revisions, and observe JSON status until the source context is ready for generation."
+            ]
+          },
+          {
+            "id": "4.3.2",
+            "title": "Implement no-QA generation runs and TEI-P5 retrieval.",
+            "requires": [
+              "2.1.1",
+              "2.4.2",
+              "4.3.1"
+            ],
+            "notes": [
+              "Implement /v1/episodes/{episode_id}/generation-runs creation with quality_mode=draft_without_qa, skip_qa_rationale, actor metadata, and Idempotency-Key enforcement.",
+              "Implement /v1/generation-runs/{run_id} and /v1/generation-runs/{run_id}/events as JSON polling surfaces for the draft generation lifecycle.",
+              "Persist the generated script into the canonical episode TEI with QA marked as skipped for the run, and the resulting TEI revision.",
+              "Implement GET /v1/episodes/{episode_id}/tei as both a JSON metadata envelope and an Accept: application/tei+xml file download for draft TEI output without requiring approval endpoints.",
+              "Success: a client can trigger draft generation from uploaded source and presenter context, poll completion over REST, and download a TEI-P5 XML file without using the QA, audio, or export-job pipelines."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "title": "Iterative generation and duration-based refinement",
+        "anchor": "44-iterative-generation-and-duration-based-refinement",
+        "summary": "This step answers whether a single generation run can complete a generation, quality gate, and refinement cycle end-to-end: the run should trigger Chrono on the generated draft, then route short or long drafts back into the same agent loop for targeted redraft. This prepares the implementation for QA-gated generation workflows beyond the initial draft-only slice. Implementations must define single-writer ownership for run state, ordered event publication, and shutdown-safe cancellation before adding new loop transitions. Concurrency model: one graph runner owns mutation for a run, repository writes are guarded by sequence numbers and idempotency keys, and cancellation, shutdown, duplicate-event handling, and resume replay must be deterministic. Property-testing guidance: use Hypothesis to exercise routing, duration-class, and iteration-cap invariants across generated run states.",
+        "done_count": 0,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "4.4.1",
+            "title": "Add QA-gated mode branching and Graph route plumbing.",
+            "requires": [
+              "2.1.1",
+              "2.2.6",
+              "2.4.2",
+              "4.3.2"
+            ],
+            "notes": [
+              "Extend run creation and run state validation for quality_mode=qa_gated.",
+              "Preserve draft_without_qa as a direct route to draft persistence.",
+              "Route qa_gated runs into the full evaluation branch in the Content Generation Graph.",
+              "Add Hypothesis property-based tests proving quality-mode routing reaches distinct terminal states without ambiguous branch ownership.",
+              "Success: draft_without_qa and qa_gated requests reach deterministic, distinct graph branches with clear terminal states."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.4.2",
+            "title": "Invoke Chrono in-loop and emit duration-based QA findings.",
+            "requires": [
+              "2.2.6",
+              "4.4.1"
+            ],
+            "notes": [
+              "After each generation attempt, run generated TEI through Chrono and record estimated_seconds, estimator identity, and policy check outcome.",
+              "Compare against minimum/maximum duration thresholds from configuration.",
+              "Emit a signed QA finding artefact and generation event for short/long-draft outcomes that can drive a refinement turn.",
+              "Add Hypothesis property-based tests for short, in-range, and long Chrono duration outcomes across generated TEI segment shapes."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.4.3",
+            "title": "Trigger targeted redraft from duration outcomes.",
+            "requires": [
+              "4.4.2",
+              "2.4.2"
+            ],
+            "notes": [
+              "Build refinement prompts from Chrono failure summaries and prior run context.",
+              "Route failed duration checks back to the Generate node with an explicit iteration reason and cap-adjusted retry count.",
+              "Enforce max_iterations from generation configuration and route exhausted runs to Escalate.",
+              "Add Hypothesis transition tests proving pass, redraft, cancel, and Escalate outcomes terminate within the configured max_iterations cap.",
+              "Define state sequencing and cancellation behaviour for mid-iteration shutdowns before the next Generate node is scheduled.",
+              "Success: failed duration checks cause fresh generation attempts rather than blind approval, while iteration caps prevent loops."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.4.4",
+            "title": "Persist iterative quality context and resume points.",
+            "requires": [
+              "2.6.1",
+              "2.5.5",
+              "4.4.3"
+            ],
+            "notes": [
+              "Extend iteration metadata to include generation hash, prior draft summary, QA outcome snapshot, and refinement instructions.",
+              "Persist per-iteration event details so run history explains why redrafts were triggered.",
+              "Persist escalation checkpoints for human-in-the-loop recovery when the iteration cap is reached.",
+              "Store sequence numbers and idempotency keys so duplicate node completions, duplicate event delivery, and resume replay do not double-write state.",
+              "Add concrete interleaving tests for cancellation mid-iteration, worker shutdown after Chrono before redraft, duplicate message delivery, duplicate event delivery, and checkpoint resume."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "title": "WebSocket event streaming",
+        "anchor": "45-websocket-event-streaming",
+        "summary": "Implement real-time event streaming for generation runs. Completion enables live workflow observation and checkpoint intervention.",
+        "done_count": 0,
+        "total_count": 2,
+        "tasks": [
+          {
+            "id": "4.5.1",
+            "title": "Define `RunEventBusPort` and implement WebSocket streaming for generation runs.",
+            "requires": [
+              "2.6.1"
+            ],
+            "notes": [
+              "Implement /ws/runs/{run_id} via Falcon-Pachinko.",
+              "Use msgspec tagged-union message dispatch.",
+              "Implement room-based broadcast keyed by run_id.",
+              "Handle client.hello, run.subscribe, run.ack, and checkpoint.submit client messages.",
+              "Send server.welcome, run.event, run.checkpoint, run.complete, and server.error server messages.",
+              "Enforce authentication timeout.",
+              "Publish AsyncAPI specification.",
+              "Note: Scope covers generation runs only; audio runs use REST polling."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.5.2",
+            "title": "Implement WebSocket backpressure and reconnection.",
+            "requires": [
+              "4.5.1"
+            ],
+            "notes": [
+              "Implement acknowledgement-gated outbound buffering with bounded ring buffer.",
+              "Implement event compaction under acknowledgement lag.",
+              "Implement sequence-based replay on reconnection.",
+              "Send backpressure close code (4000) when client falls behind.",
+              "Provide REST fallback via resume_unavailable error."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "title": "CLI and web console",
+        "anchor": "46-cli-and-web-console",
+        "summary": "Extend command-line tooling and ship the initial web console. Completion enables operator and editorial self-service.",
+        "done_count": 0,
+        "total_count": 2,
+        "tasks": [
+          {
+            "id": "4.6.1",
+            "title": "Extend CLI client for approval workflows.",
+            "notes": [
+              "Support approval actions (submit, approve, reject).",
+              "Support diff viewing between episode versions.",
+              "Support audio preview downloads."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.6.2",
+            "title": "Ship initial web console for editorial workflows.",
+            "notes": [
+              "Implement series profile and template management views.",
+              "Implement approval queue dashboard.",
+              "Implement real-time generation progress view."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "4.7",
+        "title": "API documentation and specifications",
+        "anchor": "47-api-documentation-and-specifications",
+        "summary": "Publish OpenAPI and AsyncAPI specifications for all API surfaces. Completion enables client SDK generation and contract validation.",
+        "done_count": 1,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "4.7.1",
+            "title": "Publish TUI API design document.",
+            "done": true,
+            "notes": [
+              "Document REST endpoint specifications.",
+              "Document WebSocket message schemas.",
+              "Document authentication, error, and pagination conventions."
+            ]
+          },
+          {
+            "id": "4.7.2",
+            "title": "Generate OpenAPI specification from endpoint definitions.",
+            "notes": [
+              "Validate specification against implemented endpoints.",
+              "Publish specification for client SDK generation."
+            ],
+            "done": false
+          },
+          {
+            "id": "4.7.3",
+            "title": "Generate AsyncAPI specification from WebSocket schemas.",
+            "notes": [
+              "Validate specification against implemented message handlers.",
+              "Complete contract review with TUI repository maintainers."
+            ],
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "number": "5",
+    "title": "Security, compliance, and operations",
+    "anchor": "5-security-compliance-and-operations",
+    "summary": "This phase hardens the platform, automates ongoing operations, and implements budget enforcement with cost visibility. Success is observable when the security posture is reviewed quarterly with no critical findings, automated dashboards report green for deployments and latency Service Level Objectives (SLOs), and cost dashboards report per-organization spend with budget breach alerts.",
+    "state": "planned",
+    "done_count": 0,
+    "total_count": 15,
+    "steps": [
+      {
+        "id": "5.1",
+        "title": "Role-Based Access Control (RBAC), tenancy isolation, and secrets rotation",
+        "anchor": "51-role-based-access-control-rbac-tenancy-isolation-and-secrets-rotation",
+        "summary": "Implement fine-grained access control, tenant boundaries, and credential lifecycle management. Completion enables secure multi-tenant operation.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "5.1.1",
+            "title": "Implement fine-grained RBAC across all services.",
+            "notes": [
+              "Define role hierarchy and permission boundaries.",
+              "Implement RBAC middleware for API endpoints.",
+              "Add integration tests for permission enforcement."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.1.2",
+            "title": "Implement tenancy isolation for multi-organization support.",
+            "notes": [
+              "Define tenant boundaries at data and service levels.",
+              "Implement tenant context propagation.",
+              "Validate cross-tenant access prevention."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.1.3",
+            "title": "Implement automated secrets rotation.",
+            "notes": [
+              "Define rotation schedule for service credentials.",
+              "Implement zero-downtime credential rollover.",
+              "Document emergency rotation procedures."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "title": "Runtime security and policy enforcement",
+        "anchor": "52-runtime-security-and-policy-enforcement",
+        "summary": "Add security scanning, dependency auditing, and policy-as-code controls. Completion enables proactive vulnerability management.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "5.2.1",
+            "title": "Add runtime security scanning for container images.",
+            "notes": [
+              "Integrate image scanning into CI/CD pipelines.",
+              "Define vulnerability severity thresholds for deployment gates."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.2.2",
+            "title": "Add dependency auditing with automated alerts.",
+            "notes": [
+              "Monitor dependencies for known vulnerabilities.",
+              "Configure alerting for critical and high severity findings."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.2.3",
+            "title": "Implement policy-as-code enforcement in CI/CD.",
+            "notes": [
+              "Define infrastructure and security policies as code.",
+              "Gate deployments on policy compliance."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "title": "Disaster recovery and backup verification",
+        "anchor": "53-disaster-recovery-and-backup-verification",
+        "summary": "Implement GitOps-driven recovery drills and backup validation. Completion enables confident incident response.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "5.3.1",
+            "title": "Roll out GitOps-driven disaster recovery drills.",
+            "notes": [
+              "Define drill scenarios and success criteria.",
+              "Schedule regular drill execution.",
+              "Document lessons learned and improvement actions."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.3.2",
+            "title": "Implement automated backup verification.",
+            "notes": [
+              "Define verification schedule and success criteria.",
+              "Implement automated restore testing.",
+              "Alert on verification failures."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.3.3",
+            "title": "Publish incident runbooks.",
+            "notes": [
+              "Document common failure scenarios and resolution steps.",
+              "Define escalation paths and communication templates."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "title": "Observability, SLIs, and compliance automation",
+        "anchor": "54-observability-slis-and-compliance-automation",
+        "summary": "Expand monitoring with synthetic probes and customer-facing SLIs; automate compliance evidence collection. Completion enables operational excellence and audit readiness.",
+        "done_count": 0,
+        "total_count": 4,
+        "tasks": [
+          {
+            "id": "5.4.1",
+            "title": "Expand observability with synthetic monitoring.",
+            "notes": [
+              "Define synthetic probes for critical user journeys.",
+              "Configure alerting on probe failures."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.4.2",
+            "title": "Define and instrument customer-facing SLIs and SLAs.",
+            "notes": [
+              "Define Service Level Indicators (SLIs) for availability and latency.",
+              "Implement SLI instrumentation in services.",
+              "Configure SLO (Service Level Objective) breach alerting."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.4.3",
+            "title": "Certify compliance checkpoints.",
+            "notes": [
+              "Conduct SOC 2 Type II readiness assessment.",
+              "Conduct General Data Protection Regulation (GDPR) Data Protection Impact Assessment (DPIA).",
+              "Document compliance status and remediation plans."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.4.4",
+            "title": "Integrate automated compliance evidence collection.",
+            "notes": [
+              "Define evidence collection requirements per framework.",
+              "Implement automated evidence gathering.",
+              "Configure evidence retention and access controls."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "title": "Budget enforcement and cost dashboards",
+        "anchor": "55-budget-enforcement-and-cost-dashboards",
+        "summary": "Implement budget controls and cost visibility for operators. Completion enables cost management and financial accountability.",
+        "done_count": 0,
+        "total_count": 2,
+        "tasks": [
+          {
+            "id": "5.5.1",
+            "title": "Implement budget enforcement services.",
+            "notes": [
+              "Define per-user and per-organization budget caps.",
+              "Implement budget enforcement in request path.",
+              "Configure alerting on budget threshold approach."
+            ],
+            "done": false
+          },
+          {
+            "id": "5.5.2",
+            "title": "Deliver cost dashboards for operators.",
+            "notes": [
+              "Display token usage by model and service.",
+              "Display per-task and per-episode spend.",
+              "Display budget breach trends and alerts.",
+              "Enable drill-down from organization to individual runs."
+            ],
+            "done": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "number": "6",
+    "title": "Platform foundations",
+    "anchor": "6-platform-foundations",
+    "summary": "This phase establishes the foundational infrastructure, deployment automation, and architectural patterns that underpin the platform. Success is observable when services deploy reliably across environments via GitOps, hexagonal boundaries enforce clean architecture, and observability instruments all layers with logging, metrics, and distributed tracing.",
+    "state": "planned",
+    "done_count": 0,
+    "total_count": 16,
+    "steps": [
+      {
+        "id": "6.1",
+        "title": "Infrastructure provisioning",
+        "anchor": "61-infrastructure-provisioning",
+        "summary": "Provision the compute, storage, and messaging infrastructure that underpins the platform. Completion enables service deployments and data persistence.",
+        "done_count": 0,
+        "total_count": 6,
+        "tasks": [
+          {
+            "id": "6.1.1",
+            "title": "Bootstrap the Kubernetes control plane on DigitalOcean Kubernetes Service (DOKS).",
+            "notes": [
+              "Configure node pools for sandbox, staging, and production.",
+              "Enable cluster autoscaling with defined min/max bounds."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.1.2",
+            "title": "Deploy CloudNativePG Postgres cluster with high-availability configuration.",
+            "notes": [
+              "Configure synchronous replication and automated failover.",
+              "Define backup schedule and retention policy."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.1.3",
+            "title": "Deploy Valkey cache (Redis-compatible) via the Valkey operator.",
+            "notes": [
+              "Configure memory limits and eviction policy.",
+              "Enable persistence for session and rate-limit data."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.1.4",
+            "title": "Deploy RabbitMQ operator with queue definitions for background tasks.",
+            "notes": [
+              "Define exchanges and routing keys for Celery workers.",
+              "Configure message durability and dead-letter handling."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.1.5",
+            "title": "Provision object storage buckets for audio assets and binary artefacts.",
+            "notes": [
+              "Configure lifecycle policies for temporary uploads.",
+              "Enable versioning for canonical audio masters."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.1.6",
+            "title": "Deploy Traefik ingress controller and cert-manager with Let's Encrypt issuers.",
+            "notes": [
+              "Configure TLS termination and automatic certificate renewal.",
+              "Define ingress routes for HTTP and WebSocket traffic."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "title": "GitOps and secrets management",
+        "anchor": "62-gitops-and-secrets-management",
+        "summary": "Establish declarative deployment pipelines and secure credential handling. Completion enables repeatable, auditable deployments across environments.",
+        "done_count": 0,
+        "total_count": 3,
+        "tasks": [
+          {
+            "id": "6.2.1",
+            "title": "Create the GitOps repository via the bootstrap script.",
+            "notes": [
+              "Generate repository structure with FluxCD sources.",
+              "Define deployment templates for core services."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.2.2",
+            "title": "Configure FluxCD with Kustomization overlays for environment promotion.",
+            "notes": [
+              "Define sandbox → staging → production promotion gates.",
+              "Configure image automation for tagged releases."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.2.3",
+            "title": "Configure secret management using SOPS (Secrets OPerationS) and age encryption.",
+            "notes": [
+              "Define key distribution and rotation procedures.",
+              "Document emergency access and recovery steps."
+            ],
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "title": "Observability and documentation",
+        "anchor": "63-observability-and-documentation",
+        "summary": "Instrument monitoring, logging, and tracing; publish operational documentation. Completion enables incident response and onboarding.",
+        "done_count": 0,
+        "total_count": 7,
+        "tasks": [
+          {
+            "id": "6.3.1",
+            "title": "Instrument clusterwide logging with Loki.",
+            "notes": [
+              "Configure log aggregation from all service pods.",
+              "Define log retention and archival policies."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.3.2",
+            "title": "Instrument clusterwide metrics with Prometheus.",
+            "notes": [
+              "Configure service discovery for metric scraping.",
+              "Define alert rules for resource exhaustion and error rates."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.3.3",
+            "title": "Instrument distributed tracing with Tempo.",
+            "notes": [
+              "Configure trace propagation across HTTP and message boundaries.",
+              "Define trace sampling rate and retention policy."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.3.4",
+            "title": "Define alert routing rules for on-call responders.",
+            "notes": [
+              "Configure escalation paths and notification channels.",
+              "Document alert triage procedures."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.3.5",
+            "title": "Document access controls and networking policies.",
+            "notes": [
+              "Define network policy rules for pod-to-pod communication.",
+              "Document role-based access control (RBAC) for cluster operators."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.3.6",
+            "title": "Document disaster recovery expectations and restore procedures.",
+            "notes": [
+              "Define Recovery Point Objective (RPO) and Recovery Time Objective (RTO) targets.",
+              "Document backup verification and restore runbook."
+            ],
+            "done": false
+          },
+          {
+            "id": "6.3.7",
+            "title": "Publish the infrastructure design document.",
+            "notes": [
+              "Cover DOKS, GitOps, secrets, and observability baselines.",
+              "Obtain stakeholder approval for infrastructure baseline."
+            ],
+            "done": false
+          }
+        ]
+      }
+    ]
+  }
+] %}
+{% set roadmap_totals = {
+  "done": 33,
+  "total": 120
+} %}

@@ -35,6 +35,8 @@ ignore = [
   '--netsuke-vermillion',
   # Pygments/OpenTofu API names that predate the en-GB policy.
   'background_color',
+  # Public Episodic search API names use the project's established spelling.
+  'initialise(?:All)?EpisodicSearch',
   # Deliberate fixture: an error-message example demonstrating a mistyped
   # variable reference.
   'var\.iamge_id',

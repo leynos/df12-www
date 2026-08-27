@@ -1,0 +1,76 @@
+{#
+  Design principles.
+
+  These are commitments about how the platform is built, not features it has
+  shipped. The `enforced` field says where the principle is already load
+  bearing, so the page can separate a principle from its delivery without
+  restating a status.
+#}
+{% set principles = [
+  {
+    "key": "provenance",
+    "name": "Provenance survives transformation",
+    "statement": "Every transformation stays traceable to its inputs. Source material is retained whether it was preferred or rejected, because an audit that only keeps the winners is not an audit.",
+    "enforced": "TEI headers capture source priorities, ingestion timestamps, and reviewer identities on every canonical episode.",
+    "status": "available",
+    "evidence": {
+      "label": "Roadmap task 1.2.3, provenance metadata",
+      "path": "docs/roadmap.md"
+    }
+  },
+  {
+    "key": "selection-not-truth",
+    "name": "A score is a selection rule, not a truth claim",
+    "statement": "Source weighting decides which material takes precedence. It does not establish that the material is correct, and the site does not describe it as though it did.",
+    "enforced": "Weighting coefficients are configurable per series profile, and the conflict-resolution matrix is documented rather than implicit.",
+    "status": "available",
+    "evidence": {
+      "label": "Users' guide, source weighting",
+      "path": "docs/users-guide.md"
+    }
+  },
+  {
+    "key": "bounded-automation",
+    "name": "Automation is bounded and metered",
+    "statement": "Model calls are explicit, budgeted, and interruptible. A run that cannot afford its next step stops rather than quietly spending more.",
+    "enforced": "Usage is normalized per call against pinned pricing snapshots; budget reservation wraps billable calls.",
+    "status": "in-progress",
+    "evidence": {
+      "label": "Cost management in LangGraph agentic systems",
+      "path": "docs/cost-management-in-langgraph-agentic-systems.md"
+    }
+  },
+  {
+    "key": "fail-closed",
+    "name": "Uncertainty fails closed",
+    "statement": "Malformed structured output, invalid timing, and stale revisions stop the run. Publishing something plausible is worse than publishing nothing.",
+    "enforced": "Chapter-marker starts are validated against segment transitions; optimistic locking refuses stale writes; idempotency conflicts return 409.",
+    "status": "available",
+    "evidence": {
+      "label": "ADR 008: Chapter-marker TEI representation",
+      "path": "docs/adr/adr-008-chapter-marker-tei-representation.md"
+    }
+  },
+  {
+    "key": "human-boundary",
+    "name": "Approval is an operating boundary",
+    "statement": "The system may draft, compare, estimate, and flag. Deciding what reaches an audience is reserved for a person, and there is no automated path around it.",
+    "enforced": "Checkpoints are designed to suspend the generation graph and preserve state across a review period. The approval surface is not built.",
+    "status": "planned",
+    "evidence": {
+      "label": "ADR 007: Durable generation checkpoints",
+      "path": "docs/adr/adr-007-durable-generation-checkpoints.md"
+    }
+  },
+  {
+    "key": "boundaries",
+    "name": "Boundaries are enforced, not agreed",
+    "statement": "Hexagonal architecture only holds if something checks it. Import rules are a lint gate in continuous integration rather than a convention in a style guide.",
+    "enforced": "The architecture check runs as part of the standard lint target.",
+    "status": "available",
+    "evidence": {
+      "label": "ADR 014: Hexagonal architecture enforcement",
+      "path": "docs/adr/adr-014-hexagonal-architecture-enforcement.md"
+    }
+  }
+] %}

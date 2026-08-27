@@ -4,7 +4,8 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Netsuke and Stilyagi sub-sites is generated, the shared Jinja macros and the
+Episodic, Netsuke, and Stilyagi sub-sites is generated, the shared Jinja
+macros and the
 component classes they pair with, the convention used for browser-side
 components, the cascade quirks introduced by the Netsuke and Weaver sub-sites'
 use of the Tailwind Play content delivery network (CDN), and how accessibility
@@ -14,7 +15,8 @@ is checked. It does not restate deployment or OpenTofu guidance, which lives in
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
 [df12 Pages App Design](df12-pages-app-design.md). For Tailwind and daisyUI
-conventions used by the main site and the mxd sub-site, see the
+conventions used by the main site, the mxd sub-site, and the Episodic
+sub-site, see the
 [Tailwind v4 guide](tailwind-v4-guide.md) and the
 [daisyUI v5 guide](daisyui-v5-guide.md). Documentation formatting itself
 follows the [documentation style guide](documentation-style-guide.md).
@@ -34,12 +36,13 @@ rationale for a specific change lives in its execution plan under
 depends on the last:
 
 ```bash
-bun run build         # build:static, build:css, build:images, build:pages, build:search
+bun run build         # build assets, pages, search indices, then refresh copied assets
 bun run build:static  # copy src/static/ verbatim (scripts/copy-static.ts)
-bun run build:css     # compile src/styles/site.css and src/styles/mxd.css with Tailwind
+bun run build:css     # compile the main, mxd, and Episodic Tailwind entrypoints
 bun run build:images  # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages   # uv run pages generate --all-sites
-bun run build:search  # build the Netsuke search index (scripts/build-netsuke-search-index.mjs)
+bun run build:search  # build Netsuke and Episodic search indices
+bun run check:search  # fail when the committed Episodic index has drifted
 ```
 
 `build:static` runs first because `build:images` reads the source images it
@@ -50,6 +53,27 @@ directly:
 uv run pages generate --all-sites     # main site plus every sub-site
 uv run pages generate --site netsuke  # one sub-site
 ```
+
+`scripts/build-episodic-search-index.mjs` then reads the rendered
+`public/episodic/` routes and the upstream-document manifest, writing the
+committed MiniSearch projection at
+`src/static/episodic/assets/search/episodic-search.json`. `build:search`
+regenerates it once; `check:search` runs its `--check` mode without rebuilding
+the payload. The final `build:static` copy publishes that projection to
+`public/episodic/assets/search/episodic-search.json`. Run `bun run build` or
+`bun run build:pages && bun run build:search && bun run build:static` after
+changing an Episodic page or its documentation manifest. Run `bun run
+check:search` in continuous integration (CI) or before committing an index
+update to verify that the committed projection has not drifted.
+
+`scripts/build_episodic_roadmap_data.py` projects the authoritative upstream
+Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It
+uses `scripts/episodic_roadmap_parser.py` to turn the Markdown into phase,
+step, and task records, and `make site-data` runs it with
+`--episodic-root $(EPISODIC_SOURCE)` before rebuilding the committed template.
+`EPISODIC_SOURCE` defaults to `../episodic`; override it when the authoritative
+checkout lives elsewhere. `make check-site-data` reruns the same projection
+with `--check` and fails when the committed file drifts.
 
 `bun run dev` (or `make dev`, which builds once first) watches `src/**/*`,
 `df12_pages/**/*`, `config/**/*`, `scripts/**/*`, and `pyproject.toml` with
@@ -166,14 +190,17 @@ reviewed; see section 6.
 because the files are written by something other than a person, and every one
 carries its reasoning in the file:
 
-| Excluded                                                                                      | Why                                                                                                                                                                                                                                         |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/cassettes/`                                                                            | Betamax writes these HTTP recordings. A format gate over them would fail the moment anyone re-recorded a cassette.                                                                                                                          |
-| `reference/`                                                                                  | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
-| `src/static/**/vendor`, `public/netsuke/assets/vendor`                                        | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
-| `src/static/netsuke/assets/css/himotoshi.css`, `src/static/stilyagi/assets/styles/syntax.css` | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
-| `**/*.svg`                                                                                    | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
-| `**/*.css` (linter only)                                                                      | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
+| Excluded                                                 | Why                                                                                                                                                                                                                                         |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/cassettes/`                                       | Betamax writes these HTTP recordings. A format gate over them would fail the moment anyone re-recorded a cassette.                                                                                                                          |
+| `reference/`                                             | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
+| `src/static/**/vendor`, `public/netsuke/assets/vendor`   | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
+| `src/static/episodic/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/netsuke/assets/css/himotoshi.css`            | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/stilyagi/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/episodic/assets/search/episodic-search.json` | Episodic's MiniSearch builder owns the serialized index. Reformatting it would make the committed projection differ from its generator.                                                                                                     |
+| `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
+| `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
 
 _Table 1: The trees `biome.jsonc` holds out of scope, and why each is written
 by something other than a person._
@@ -195,13 +222,15 @@ anyone rebuilds from a clean tree.
 
 Every published file has a source elsewhere in the repository:
 
-| Published under `public/`                    | Comes from                                            |
-| -------------------------------------------- | ----------------------------------------------------- |
-| `**/*.html`                                  | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`, `mxd/assets/tailwind.css` | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`             | `scripts/generate-image-variants.ts`                  |
-| `netsuke/assets/search/*.json`               | `scripts/build-netsuke-search-index.mjs`              |
-| everything else                              | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`                  | Comes from                                            |
+| ------------------------------------------ | ----------------------------------------------------- |
+| `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`                          | Tailwind compiling `src/styles/`                      |
+| `mxd/assets/tailwind.css`                  | Tailwind compiling `src/styles/`                      |
+| `episodic/assets/styles/tailwind.css`      | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
+| `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
+| everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 _Table 2: Published paths under `public/` and the source that generates them._
 
@@ -220,22 +249,24 @@ local or in CI — discards it silently.
 ## 4. The Pygments CSS generators
 
 This is the source of truth for how build-time syntax highlighting is wired
-together on the Netsuke and Stilyagi sub-sites, referenced from the
+together on the Episodic, Netsuke, and Stilyagi sub-sites, referenced from the
 [Netsuke update execution plan](execplans/netsuke-update.md).
 
 ### 4.1. Styles, lexers, and the highlight tag
 
-Code blocks on both sub-sites are highlighted at build time by the Jinja tag
-`{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
-`df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
-`pygments.highlight` with the named lexer, and wraps the result in a
-`<div class="hm-syntax">` (or the named class, when a second argument is given)
-using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
-syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
-must be wrapped in `{% raw %}` inside the tag.
+Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
+build time by the Jinja tag `{% highlight '<lexer>'[, '<class>'] %} ... {%
+endhighlight %}`, implemented in `df12_pages/jinja_highlight.py`. The tag
+dedents its body, runs it through `pygments.highlight` with the named lexer,
+and wraps the result in a `<div class="hm-syntax">` (or the named class, when
+a second argument is given) using `pygments.formatters.html.HtmlFormatter`.
+Source text containing Jinja syntax of its own — every `Netsukefile` example
+with `{{ ins }}` placeholders — must be wrapped in `{% raw %}` inside the tag.
 
-Two Pygments styles supply the colours:
+Three Pygments styles supply the colours:
 
+- `EpisodicStyle` in `df12_pages/episodic_highlighting.py`, for the Episodic
+  sub-site.
 - `HimotoshiStyle` in `df12_pages/highlighting.py`, for the Netsuke sub-site.
   The module also defines `NetsukeLexer` (YAML with embedded Jinja, for
   `Netsukefile` manifests) and `NetsukeConsoleLexer` (`$`-prompted shell
@@ -244,22 +275,25 @@ Two Pygments styles supply the colours:
 - `StilyagiStyle` in `df12_pages/stilyagi_highlighting.py`, for the Stilyagi
   sub-site.
 
-Both styles and the two custom lexers are registered with Pygments through the
-`pygments.lexers` and `pygments.styles` entry points in `pyproject.toml`, so
-`get_lexer_by_name("netsuke")` and `get_style_by_name("stilyagi")` resolve
-anywhere in the pipeline without an explicit import.
+`EpisodicStyle` is imported directly by the Episodic generator. The Netsuke
+custom lexers and the `HimotoshiStyle` and `StilyagiStyle` classes are
+registered with Pygments through the `pygments.lexers` and `pygments.styles`
+entry points in `pyproject.toml`, so `get_lexer_by_name("netsuke")` and
+`get_style_by_name("stilyagi")` resolve anywhere in the pipeline without an
+explicit import.
 
 ### 4.2. The shared helper and the division of responsibility
 
 `scripts/pygments_css.py` provides
 `token_rules(formatter, style, css_class, prefix, bold_weight)`, the single
 translation from a Pygments `Style` to CSS rules, shared by
-`scripts/generate_himotoshi_pygments_css.py` and
+`scripts/generate_episodic_pygments_css.py`,
+`scripts/generate_himotoshi_pygments_css.py`, and
 `scripts/generate_stilyagi_pygments_css.py`. The generated `:root` variables
-and token rules are shared output. Himotoshi's site-specific chrome remains in
-its generator; Stilyagi's layout rules for `.code-scroll`, `.stilyagi-syntax`,
-and `.stilyagi-syntax pre` are handwritten above the `BEGIN` marker in
-`syntax.css`.
+and token rules are shared output. Site-specific chrome stays at each site's
+established boundary: Himotoshi's remains in its generator, while Stilyagi's
+layout rules for `.code-scroll`, `.stilyagi-syntax`, and `.stilyagi-syntax pre`
+are handwritten above the `BEGIN` marker in `syntax.css`.
 
 The module exports two functions. Everything else in it is private and may be
 reshaped freely.
@@ -312,7 +346,7 @@ uninteresting rather than obviously wrong. This exact defect shipped on
 twenty-one Netsuke pages — comments, strings, numbers, and keyword constants
 all rendering at body colour — before it was found; see the addendum to the
 [Netsuke update execution plan](execplans/netsuke-update.md). `token_rules`
-exists specifically to close this gap for both sub-sites, and
+exists specifically to close this gap for all three sub-sites, and
 `scripts/pygments_css.py`'s module docstring documents the same risk for
 Stilyagi.
 
@@ -333,30 +367,35 @@ long as the style declares parents before children.
   added inside the marked block by hand; it is why that rule is now emitted by
   `generate_himotoshi_pygments_css.py` itself, alongside the generated token
   rules.
-- Rerun the relevant generator after any change to `HimotoshiStyle` or
-  `StilyagiStyle`.
+- Rerun the relevant generator after any change to `EpisodicStyle`,
+  `HimotoshiStyle`, or `StilyagiStyle`.
 - The generators write to the tracked source under `src/static/` —
-  `src/static/netsuke/assets/css/himotoshi.css` and
-  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`. Writing
-  to `public/` would lose the change on the next clean build.
+  `src/static/episodic/assets/styles/syntax.css`,
+  `src/static/netsuke/assets/css/himotoshi.css`, and
+  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`.
+  Writing to `public/` would lose the change on the next clean build.
 - A test asserts the committed marked block matches what the generator would
   produce (`test_committed_stylesheet_matches_the_generator` in each test
   module below). A stale stylesheet fails the commit gates.
-- Both generated stylesheets are excluded from the Biome formatter, in the
-  `**/*.css` overrides in `biome.jsonc`. `token_rules` emits one rule per line,
-  which the formatter would expand; the next generator run would collapse it
-  again, and the two would undo each other on alternate runs — with the test
-  above failing on whichever ran last. Formatting is the generator's output
-  shape, so if it needs to change, change `scripts/pygments_css.py` and
-  regenerate. Do not remove the exclusion to tidy a diff.
+- All three generated stylesheets are excluded from the Biome formatter, in the
+  `src/static/stilyagi/assets/styles/syntax.css`,
+  `src/static/netsuke/assets/css/himotoshi.css`, and
+  `src/static/episodic/assets/styles/syntax.css` override in `biome.jsonc`.
+  `token_rules` emits one rule per line, which the formatter would expand; the
+  next generator run would collapse it again, and the tools would undo each
+  other on alternate runs — with the test above failing on whichever ran last.
+  Formatting is the generator's output shape, so if it needs to change, change
+  `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to
+  tidy a diff.
 
 ### 4.5. Regenerating and verifying
 
 ```bash
+uv run python scripts/generate_episodic_pygments_css.py
 uv run python scripts/generate_himotoshi_pygments_css.py
 uv run python scripts/generate_stilyagi_pygments_css.py
-uv run pytest tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py
-bunx biome check src/static/netsuke/assets/css src/static/stilyagi/assets/styles
+uv run pytest tests/test_episodic_highlight.py tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py
+bunx biome check src/static/episodic/assets/styles src/static/netsuke/assets/css src/static/stilyagi/assets/styles
 ```
 
 Each script is idempotent: rerunning it without changing the corresponding
@@ -373,6 +412,7 @@ block outright, so a run restores it without needing the previous content.
 
 | Site     | Style            | Lexers                                             | Wrapper class     | Variable prefix      | Bold weight | Stylesheet                                     |
 | -------- | ---------------- | -------------------------------------------------- | ----------------- | -------------------- | ----------- | ---------------------------------------------- |
+| Episodic | `EpisodicStyle`  | `bash`, `console`, `json`, `make`, `xml`           | `episodic-syntax` | `--episodic-syntax-` | `600`       | `src/static/episodic/assets/styles/syntax.css` |
 | Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/static/netsuke/assets/css/himotoshi.css`  |
 | Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
 
@@ -381,10 +421,11 @@ in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
 The lexer list reflects what the templates currently use, not the full set
-Pygments supports; `toml` and `powershell` are stock Pygments lexers used
-unmodified. The bold weight differs because the two sub-sites' monospace faces
-read differently at the same weight: Netsuke's mono face reads heavy, so its
-bold stops at semibold, while Stilyagi's lighter face goes to full bold.
+Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`,
+and `xml` are stock Pygments lexers used unmodified. The bold weight differs
+because the sub-sites' monospace faces read differently at the same weight:
+Episodic and Netsuke stop at semibold, while Stilyagi's lighter face goes to
+full bold.
 
 ## 5. Template components
 
@@ -395,8 +436,9 @@ a component class with no macro still leaves every call site restating the
 wrapper element. The "Reach for the cheapest layer that works" ladder in the
 "Styling" section of [AGENTS.md](../AGENTS.md) sets out when each is warranted.
 
-`templates/netsuke/components.jinja` holds the Netsuke sub-site's shared
-macros. Import it as `ui`:
+`templates/episodic/components.jinja` and `templates/netsuke/components.jinja`
+hold the Episodic and Netsuke sub-sites' shared macros. Import the one for the
+sub-site you're editing as `ui`:
 
 ```jinja
 {% extends "doc_page.jinja" %}
@@ -412,6 +454,9 @@ back in:
 
 That escaping is a wart of the current template shape rather than of the macro;
 narrowing the raw regions is tracked separately.
+
+Stilyagi centralizes its chrome in `templates/stilyagi/_layout.jinja`, which
+every page extends.
 
 ### 5.1. `ui.kicker`
 
@@ -515,6 +560,38 @@ so that restyling cannot break a selector, and an early return when the root
 element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
+`src/static/episodic/assets/js/site-search.js` follows the same plain-script
+shape. It exposes five helpers when `module.exports` is available:
+shape. It exposes seven helpers when `module.exports` is available:
+`createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
+for fetching and deserializing the MiniSearch payload,
+`searchEpisodicIndex` for query-time ranking, `initialiseEpisodicSearch` for
+one root, `initialiseAllEpisodicSearch` for the document, `durationBucket` for
+the fixed telemetry duration classes, and `emitSearchTelemetry` for its bounded
+event schema. The initializers accept injected loader, search, and navigation
+dependencies so their DOM behaviour can be tested without a network request or
+navigation. Their roots must provide the `data-search-root`,
+`data-search-index`, `data-search-input`, `data-search-panel`,
+`data-search-results`, and `data-search-meta` contract. The search helpers are
+written so the loading boundary stays outside the query path: queries only
+consult an already-loaded index, while initialization owns the fetch and
+failure handling. Failed cache entries are evicted, allowing a later root
+initialization to retry.
+
+### 6.1. Episodic search telemetry
+
+Search-index observability is optional and privacy-preserving. A production
+host may set `window.df12EpisodicSearchTelemetry` to a function before the
+deferred search script loads; without that function, telemetry is a no-op. The
+sink receives only fixed labels: `operation` (`episodic-search-index`),
+`outcome` (`requested`, `success`, `failure`, or `evicted`), `cache_state`
+(`hit`, `miss`, or `evicted`), `attempt` (`initial` or `retry`), and, for load
+outcomes, a bounded `duration_bucket`. It therefore records cache hits and
+misses, load outcomes, failure eviction, retry outcomes, and coarse duration
+without transmitting search queries, document text, paths, URLs, or persistent
+identifiers. A telemetry sink must treat the event as operational metadata only
+and must not enrich it with page or user data.
+
 An element may still carry an id for the stylesheet or for an ARIA
 relationship; what the convention rules out is _script_ depending on one. The
 Netsuke navbar is the worked example: `#navbar` and `#navbar-mobile-menu` are
@@ -534,7 +611,7 @@ per root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
 section of [AGENTS.md](../AGENTS.md); a custom element is its last rung, and
 the site does not use a front-end framework at all.
 
-### 6.1. The config-keys component
+### 6.2. The config-keys component
 
 `config-keys.js` drives the "config keys" browser on the configuration docs page
 (`templates/netsuke/pages/docs-configuration.jinja`), which pairs each key

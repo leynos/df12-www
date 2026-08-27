@@ -9,14 +9,15 @@ PYTEST_FILTER ?=
 TYPOS_VERSION ?= 1.48.0
 TYPOS := uv tool run typos@$(TYPOS_VERSION)
 NODE_MODULES_STAMP := node_modules/.install-stamp
+EPISODIC_SOURCE ?= ../episodic
 
 ifeq ($(strip $(SKIP_PLAYWRIGHT)),1)
 PYTEST_FILTER += -m 'not playwright'
 endif
 
-.PHONY: help all clean build build-release lint fmt check-fmt docs-check \
-        markdownlint nixie spelling test typecheck $(TOOLS) $(VENV_TOOLS) \
-	dev
+.PHONY: help all clean build build-release lint fmt check-fmt check-site-data \
+        docs-check markdownlint nixie site-data spelling test typecheck $(TOOLS) \
+        $(VENV_TOOLS) dev
 
 .DEFAULT_GOAL := all
 
@@ -27,6 +28,12 @@ all: build check-fmt lint test test-js typecheck docs-check spelling
 
 build: uv .venv ## Build virtual-env and install deps
 	$(UV_ENV) uv sync --group dev
+
+site-data: ## Regenerate committed Episodic data from its authoritative roadmap
+	uv run scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)"
+
+check-site-data: ## Check the committed Episodic roadmap projection for drift
+	uv run scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)" --check
 
 # Biome, Tailwind, and the test runner all live in node_modules, so every
 # target that shells out to bun has to depend on this. `bun` is order-only:

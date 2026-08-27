@@ -296,9 +296,9 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       `_prepare_output_dir`'s unguarded `mkdir` and `unlink` gained the same
       treatment.
       **Correction (2026-08-27):** `_prepare_output_dir` no longer exists
-      under that name. Directory creation is `_ensure_output_dir`, which only
-      creates; removing the previous run's files and publishing this run's are
-      both `_staged`, which does them together at the end under the output
+      under that name. `_ensure_output_dir` only creates the output
+      directory. `_staged` removes the previous run's files and publishes the
+      current run's files, doing both together at the end under the output
       lock. The prose above describes the change as it was made; these are the
       names to look for.
 - [x] (2026-08-26) Gave each run exclusive ownership of its output. Captures
@@ -522,8 +522,8 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `OUTPUT` at a directory makes `Path.exists()` true and `read_text()` raise
   `IsADirectoryError`, so the read handler fired and the assertion passed on
   the wrong message. Impact: a stand-in path that reads normally and refuses
-  only write operations is what actually reaches the write handler; the earlier
-  version was a false positive.
+  only write operations reach the write handler; the earlier version was a
+  false positive.
 
 - **Observation:** the snapshot server was reachable from the whole network,
   not just this machine. Evidence: the packaged `http-server@14.1.1` documents
@@ -933,7 +933,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   suggestion assumed long code lines fail to wrap and push the page sideways.
   Measured, they do not: a 300-character unbroken line in a bare `pre` on
   `docs/` at 360px takes that element's `scrollWidth` to 2965px while the
-  document stays at 360px, because the panel around it scrolls. Those panels
+  document stays at 360px because the panel around it scrolls. Those panels
   are meant to scroll and were made keyboard-reachable for that purpose in the
   previous round. Forcing them to wrap would be a site-wide change to how code
   reads, made on a premise that does not hold. The test the finding asked for
@@ -1350,6 +1350,12 @@ Do the same for the four `transparenttextures.com` PNG files — `cream-paper`,
 of each and record it in the `Artefacts and notes` section; these patterns are
 CC BY 3.0 and need attribution somewhere in the repository.
 
+**Correction (2026-08-27):** "these patterns are CC BY 3.0" was an assumption
+carried into the plan rather than something checked. Transparent Textures
+publishes no licence statement, and Subtle Patterns names no variant. The
+source and the per-pattern authors are confirmed; the licence is not. See
+`Artefacts and notes`.
+
 Go/no-go: diff against the Milestone 2 capture. Font metrics may shift by a
 hair if the self-hosted subset differs from Google's; a sub-pixel difference in
 `width` on text nodes is acceptable and should be recorded as a surprise, but a
@@ -1717,15 +1723,29 @@ each anticipated artefact lives.
   `src/static/weaver/assets/fonts/IBMPlex-OFL.txt` and
   `PlayfairDisplay-OFL.txt`, added alongside the faces in commit `5638a120`.
 
-The texture attributions are the one genuine gap, and it is recorded rather
-than closed. `src/static/weaver/assets/textures/` holds `cream-paper.png`,
-`cubes.png` and `diagmonds-light.png`. They predate this migration — it moved
-them from `public/` into `src/` and dropped two more that had been returning
-404 since the site's first commit — and no upstream source or licence for the
-three survivors is recorded anywhere in the repository. This plan cannot supply
-one it does not have, and inventing an attribution would be worse than
-recording its absence. Whoever added them should confirm the source and add a
-licence file beside them, as the fonts have.
+The texture attributions are the one genuine gap. Half of it closes on
+evidence; the other half does not, and is tracked rather than guessed at.
+
+`src/static/weaver/assets/textures/` holds `cream-paper.png`, `cubes.png` and
+`diagmonds-light.png`. Their **source is established**: commit `5638a120`
+vendored them, and its diff shows the exact URLs they replaced —
+`https://www.transparenttextures.com/patterns/cream-paper.png`, `…/cubes.png`
+and `…/diagmonds-light.png`. That site names an author per pattern:
+`cream-paper` by Devin Holmes, `cubes` by Sander Ottens, and
+`diagmonds-light` by INS.
+
+Their **licence is not established**. Transparent Textures publishes no
+licence statement, and Subtle Patterns, which it is built from, says only that
+entries are "licensed under Creative Commons" without naming the variant.
+Which variant it is decides the obligation: BY wants a credit, BY-SA would
+reach the work it is used in, and NC would not permit this use at all. Nothing
+in this repository or upstream settles it, so no attribution is written here —
+one naming the wrong licence is worse than none, because it reads as though
+somebody had checked.
+
+Tracked as issue #94, which records the confirmed origins and authors, the
+research the licence needs, and what would close it — including replacing the
+textures if nothing can be established.
 
 **Correction (2026-08-21):** the transcripts and tables anticipated above were
 not produced as a standalone artefact; the axe and computed-style evidence

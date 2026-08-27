@@ -358,6 +358,12 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       message naming the contract it checks, and covered the drawer toggle's
       `weaver-brand-mark` class — assigned at runtime, so neither a source
       grep nor a test that only looked for the toggle would catch its loss.
+- [x] (2026-08-27) Stopped `make dev` rebuilding in response to its own
+      output. `build:search` rewrote the Episodic index under `src/`, which the
+      watcher watches, so the watcher rebuilt, so it rewrote it again. The
+      write is now skipped when the content is unchanged, the watcher ignores
+      the generated index as a second guard, and a test rebuilds an
+      already-built tree and asserts nothing under a watched root moved.
 
 ## Surprises & discoveries
 
@@ -597,8 +603,21 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   Evidence: closing a listening socket that never accepted a connection does
   not enter `TIME_WAIT`, so removing `SO_REUSEADDR` from the probe left the
   test passing. Impact: the test now makes the state before relying on it, and
-  asserts the precondition — that a bare socket cannot bind that port —
-  before asserting the probe can.
+  asserts the precondition — that a bare socket cannot bind that port — before
+  asserting the probe can.
+
+- **Observation:** `make dev` never settled. Evidence: left running for five
+  minutes with nobody touching the tree, the watcher ran eleven builds and
+  wrote `src/static/episodic/assets/search/episodic-search.json` ten times,
+  logging 355 file events. The chain is short — `bun run build` runs
+  `build:search`, which writes that file; the file is under `src/`, which the
+  `dev` script watches; so the watcher rebuilds. Impact: the documented
+  development workflow rebuilt continuously, burning a CPU and republishing
+  the site every thirty seconds, and any edit landed in the middle of a build
+  already in flight. Introduced by the Episodic import on `main`, not by this
+  branch, whose build steps write only into `public/`. After the fix the same
+  five minutes produce one build — the `--initial` one — and then silence,
+  while a real edit still triggers exactly one rebuild.
 
 ## Decision log
 
@@ -1018,14 +1037,27 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - **Decision:** make publication failure-atomic by moving the previous run's
   files aside rather than deleting them, and put them back on any failure.
   Rationale: raised a third time, and this time about the failure path rather
-  than the reader, which the lock had already covered. Deleting and then
-  moving is not atomic: a rename that fails partway leaves the destination
-  holding some files from each run with the originals already gone — the worst
-  state, because it still looks like a directory of snapshots. Every step is
-  now a rename within one filesystem, and the rollback is the same operation
+  than the reader, which the lock had already covered. Deleting and then moving
+  is not atomic: a rename that fails partway leaves the destination holding
+  some files from each run with the originals already gone — the worst state,
+  because it still looks like a directory of snapshots. Every step is now a
+  rename within one filesystem, and the rollback is the same operation
   reversed. This is what the earlier objection to a manifest scheme was
   missing: transactional publication did not need a generation pointer, only
-  somewhere to put the old files while the new ones land.
+  somewhere to put the old files while the new ones land. Date/Author:
+  2026-08-27, review batch.
+
+- **Decision:** fix the dev-watcher loop here rather than deferring it, and
+  fix it by not rewriting unchanged content rather than by ignoring the file.
+  Rationale: the defect is `main`'s, but it makes the workflow this branch's
+  own documentation describes unusable, and the fix is a few lines. Not
+  writing is the honest repair: the payload is already deliberately free of a
+  build timestamp so that a rebuild is not a spurious change, and writing it
+  regardless gave that property away. The watcher ignore is kept as a second,
+  independent guard, so a future step that writes unconditionally cannot loop
+  either — but it is the belt, not the braces. A test asserts the general
+  invariant, that a build rewrites nothing under a watched root, rather than
+  the specific file, since the next occurrence will be a different one.
   Date/Author: 2026-08-27, review batch.
 
 ## Outcomes & retrospective

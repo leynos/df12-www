@@ -4,12 +4,12 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Episodic, Netsuke, and Stilyagi sub-sites are generated, the shared Jinja macros
-and the component classes they pair with, the convention used for browser-side
-components, the cascade quirks introduced by the Netsuke sub-site's use of the
-Tailwind Play content delivery network (CDN), and how accessibility is checked.
-It does not restate deployment or OpenTofu guidance, which lives in
-[`AGENTS.md`](../AGENTS.md).
+Episodic, Netsuke, and Stilyagi sub-sites are generated, the shared Jinja
+macros and the component classes they pair with, the convention used for
+browser-side components, the cascade quirks introduced by the Netsuke
+sub-site's use of the Tailwind Play content delivery network (CDN), and how
+accessibility is checked. It does not restate deployment or OpenTofu guidance,
+which lives in [`AGENTS.md`](../AGENTS.md).
 
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
@@ -78,6 +78,17 @@ and task records, and `make site-data` runs it with
 `chokidar`, reruns `bun run build` on any change, and serves `public/` on port
 8080 with caching disabled. `DF12_PORT` overrides the port, which matters when
 several worktrees are served at once.
+
+Because the watcher reruns the whole build, **no build step may write into a
+directory it watches** — the build would trigger the watcher, which would rerun
+the build, for as long as it was left running. The Episodic search index is the
+one generated file that lives under `src/`, and
+`scripts/build-episodic-search-index.mjs` skips its write when the content is
+unchanged for exactly this reason; the watcher also ignores that directory as a
+second guard. `test_a_build_does_not_rewrite_anything_the_dev_watcher_watches`
+rebuilds an already-built tree and fails if anything under a watched root
+moved, so a new step that writes into one is caught rather than discovered by
+leaving `make dev` running.
 
 A plain `http-server public/` — invoked directly, or via `bun run serve`, which
 builds once and then serves without watching — has **no watcher**. Editing a
@@ -741,9 +752,9 @@ The harness also supplies the traces both drawer suites run over. It exports
 that set up to `depth`, each one prefixed by the opening `toggle` because a
 closed drawer ignores almost everything and such a trace proves nothing about
 the focus trap. Traces run from two transitions long up to `depth`, and the
-count is the sum of `TRANSITIONS.length ** k` for k from 1 to `depth - 1`:
-258 at depth 4, 1554 at depth 5. Growth is exponential, so the depth is the
-budget — each trace builds a fresh DOM.
+count is the sum of `TRANSITIONS.length ** k` for k from 1 to `depth - 1`: 258
+at depth 4, 1554 at depth 5. Growth is exponential, so the depth is the budget
+— each trace builds a fresh DOM.
 
 It replaced `generatedTransitionSequences(seed, …)`, which sampled the space
 randomly. For a state machine this small the space is finite and enumerable,
@@ -778,20 +789,20 @@ it — `doc-search.js` is included on thirteen pages this way.
 
 `src/static/episodic/assets/js/site-search.js` follows the same plain-script
 shape. It exposes seven helpers when `module.exports` is available:
-`createIndexCache` for shared in-flight index loads,
-`fetchEpisodicSearchIndex` for fetching and deserializing the MiniSearch
-payload, `searchEpisodicIndex` for query-time
-ranking, `initialiseEpisodicSearch` for one root, `initialiseAllEpisodicSearch`
-for the document, `durationBucket` for the fixed telemetry duration classes, and
-`emitSearchTelemetry` for its bounded event schema. The initializers accept
-injected loader, search, and navigation dependencies so their DOM behaviour can
-be tested without a network request or navigation. Their roots must provide the
-`data-search-root`, `data-search-index`, `data-search-input`,
-`data-search-panel`, `data-search-results`, and `data-search-meta` contract.
-The search helpers are written so the loading boundary stays outside the query
-path: queries only consult an already-loaded index, while initialization owns
-the fetch and failure handling. Failed cache entries are evicted, allowing a
-later root initialization to retry.
+`createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
+for fetching and deserializing the MiniSearch payload, `searchEpisodicIndex`
+for query-time ranking, `initialiseEpisodicSearch` for one root,
+`initialiseAllEpisodicSearch` for the document, `durationBucket` for the fixed
+telemetry duration classes, and `emitSearchTelemetry` for its bounded event
+schema. The initializers accept injected loader, search, and navigation
+dependencies so their DOM behaviour can be tested without a network request or
+navigation. Their roots must provide the `data-search-root`,
+`data-search-index`, `data-search-input`, `data-search-panel`,
+`data-search-results`, and `data-search-meta` contract. The search helpers are
+written so the loading boundary stays outside the query path: queries only
+consult an already-loaded index, while initialization owns the fetch and
+failure handling. Failed cache entries are evicted, allowing a later root
+initialization to retry.
 
 ### 6.1. Episodic search telemetry
 

@@ -505,7 +505,44 @@ def _server_argv(port: int) -> list[str]:
     ]
 
 
-def _resolve_port(port: int) -> int:
+# How a port is obtained when none was named. Injected rather than called
+# directly so the decision about *which* port to serve on can be exercised
+# without binding one, and so the one function that touches the network stays
+# at the edge where the command composes its dependencies.
+type PortAllocator = cabc.Callable[[], int]
+
+
+def _allocate_port() -> int:
+    """Ask the kernel for a loopback port nothing is listening on.
+
+    This is the environmental half, and the only part of port selection that
+    can fail for reasons outside this process.
+
+    Returns
+    -------
+    int
+        A port that was free a moment ago. The bind probe and the startup lock
+        in :func:`_start_server` handle the gap between then and now.
+
+    Raises
+    ------
+    SystemExit
+        If a port cannot be obtained at all, which means the machine has no
+        ephemeral ports left or loopback is unavailable.
+    """
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+            probe.bind(("127.0.0.1", 0))
+            return int(probe.getsockname()[1])
+    except OSError as exc:
+        message = (
+            f"no loopback port could be obtained ({exc}); pass --port to name "
+            f"one explicitly"
+        )
+        raise SystemExit(message) from exc
+
+
+def _resolve_port(port: int, allocate: PortAllocator = _allocate_port) -> int:
     """Turn a requested port into the one to serve on.
 
     Zero means "whatever the kernel has spare", which is the default and the
@@ -517,17 +554,16 @@ def _resolve_port(port: int) -> int:
     ----------
     port
         The requested port, or ``0``.
+    allocate
+        How to obtain a port when none was named. Injected so the decision can
+        be tested without a socket.
 
     Returns
     -------
     int
         A port to serve on.
     """
-    if port:
-        return port
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
-        probe.bind(("127.0.0.1", 0))
-        return probe.getsockname()[1]
+    return port or allocate()
 
 
 @contextlib.contextmanager
@@ -637,13 +673,16 @@ def _start_server(port: int, marker: str) -> subprocess.Popen[bytes]:
 
 
 @contextlib.contextmanager
-def _served(port: int) -> cabc.Iterator[str]:
+def _served(port: int, allocate: PortAllocator = _allocate_port) -> cabc.Iterator[str]:
     """Serve ``public/`` locally for the duration of the context.
 
     Parameters
     ----------
     port
         TCP port to listen on, or ``0`` to be given a free one.
+    allocate
+        How to obtain that free one. The default binds a loopback socket; a
+        caller with its own port source can pass one instead.
 
     Yields
     ------
@@ -663,7 +702,7 @@ def _served(port: int) -> cabc.Iterator[str]:
         message = "node_modules/.bin/http-server is missing; run 'bun install'"
         raise SystemExit(message)
 
-    resolved = _resolve_port(port)
+    resolved = _resolve_port(port, allocate)
     base = f"http://127.0.0.1:{resolved}"
     with _ownership_marker() as marker:
         server = _start_server(resolved, marker)

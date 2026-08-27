@@ -34,7 +34,6 @@ import json
 import os
 import re
 import shutil
-import socket
 import subprocess
 import typing as typ
 from pathlib import Path
@@ -172,20 +171,6 @@ TOOL_TIMEOUT_SECONDS = 120
 CLASS_TOKEN = re.compile(r"\.((?:\\.|[A-Za-z0-9_-])+)")
 
 
-def _free_port() -> int:
-    """Ask the kernel for a port nothing is listening on.
-
-    Returns
-    -------
-    int
-        A port that was free a moment ago. The server's own bind probe and
-        startup lock handle the gap between then and now.
-    """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
-        probe.bind(("127.0.0.1", 0))
-        return probe.getsockname()[1]
-
-
 @pytest.fixture(scope="session")
 def served(built_site: Path) -> cabc.Iterator[str]:
     """Serve the published tree and yield its origin.
@@ -212,7 +197,10 @@ def served(built_site: Path) -> cabc.Iterator[str]:
         pytest.skip(f"{harness.HTTP_SERVER} is missing; run 'bun install'")
 
     assert built_site.is_dir(), f"expected the built sub-site at {built_site}"
-    with harness._served(_free_port()) as base:
+    # `0` asks the harness for a free port, which is the same code path the
+    # commands take by default. A second allocator here would be a second
+    # thing to keep correct.
+    with harness._served(0) as base:
         yield base
 
 
@@ -698,8 +686,6 @@ def test_the_capture_command_writes_one_snapshot_per_page(
             "scripts/weaver_snapshot.py",
             "capture",
             str(out_dir),
-            "--port",
-            str(_free_port()),
         ],
         cwd=REPO_ROOT,
         capture_output=True,

@@ -11,7 +11,9 @@ Status: COMPLETE
 The Weaver sub-site (published at `/weaver/`) is the last large sub-site still
 served by the **Tailwind Play CDN** — a browser script,
 `https://cdn.tailwindcss.com`, that compiles Tailwind v3 utilities at page load
-from an inline JavaScript configuration block repeated in three templates.
+from an inline JavaScript configuration block repeated in four templates
+(`doc_page.jinja`, `home_page.jinja`, `shared_content_page.jinja`, and
+`pages/design-language.jinja`) whose copies are not identical.
 Every colour in the markup is spelled as a bespoke utility
 (`text-weaver-indigo`, `bg-weaver-cream`) or an arbitrary value
 (`shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]`), and a 370-line hand-written
@@ -327,6 +329,20 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       publication takes, closing the reader half of the ownership protocol.
 - [x] (2026-08-27) Taught the class-attribute scan to read single quotes as
       well as double, which `_icons.jinja` uses.
+- [x] (2026-08-27) Separated choosing a serve port from obtaining one.
+      `_allocate_port` is the only function that touches the network;
+      `_resolve_port` decides and delegates, and takes the allocator as an
+      argument so the decision can be checked without a socket. A machine with
+      no free port now says so and names `--port` rather than raising an
+      `OSError` from inside a helper.
+- [x] (2026-08-27) Gave `capture` and `shots` command-level tests. Their
+      helpers were covered one by one and `capture` end to end through a real
+      browser, but nothing checked that either command wired its helpers
+      together correctly — one that resolved the wrong tool, served the wrong
+      port, or staged the wrong suffix would have passed everything.
+- [x] (2026-08-27) Deleted `_free_port` from `tests/test_weaver_browser.py`,
+      which duplicated the harness's own allocator. Both paths now take a port
+      the same way.
 
 ## Surprises & discoveries
 
@@ -529,20 +545,20 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   measurement became a test of the contract that actually holds.
 
 - **Observation:** the two mobile-navigation suites could have been passing
-  without asserting anything. Evidence: with
-  `exhaustiveTransitionSequences` altered to return an empty array, the Weaver
-  drawer suite still reported 37 tests passing — a loop over no items is not a
-  failure, and nothing else in either suite would have noticed. Impact: the
-  exhaustive-enumeration decision recorded earlier was sound, but its value
-  rested on an untested generator; seven direct tests now pin it.
+  without asserting anything. Evidence: with `exhaustiveTransitionSequences`
+  altered to return an empty array, the Weaver drawer suite still reported 37
+  tests passing — a loop over no items is not a failure, and nothing else in
+  either suite would have noticed. Impact: the exhaustive-enumeration decision
+  recorded earlier was sound, but its value rested on an untested generator;
+  seven direct tests now pin it.
 - **Observation:** the snapshot read boundary handled two levels of malformed
   input and no more. Evidence: a tree that is a list, a `styleDiff` that is a
   list, a `children` that is a string, and a scalar three levels down each
   surfaced as an uncaught `AttributeError` from inside `_normalize`, naming
-  neither the file nor the node, despite the docstring promising a
-  path-specific `SystemExit`. Impact: an interrupted capture or a snapshot
-  from another tool would have produced a traceback rather than a message
-  saying which file to recapture.
+  neither the file nor the node, despite the docstring promising a path-specific
+  `SystemExit`. Impact: an interrupted capture or a snapshot from another tool
+  would have produced a traceback rather than a message saying which file to
+  recapture.
 
 ## Decision log
 
@@ -916,20 +932,49 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   take some pages from this run and some from the last. Having the reader take
   the writer's lock removes that, in three lines, without introducing a
   generation directory and a pointer for a development tool that one person
-  runs at a time. The two directories are locked in a stable resolved order so
+  runs at a time. The two directories are locked in a stable resolved order, so
   two readers cannot deadlock, and a directory named twice is locked once.
   Publication already preserves the other suffix, so a `capture` and a `shots`
-  run sharing a directory keep each other's results.
-  Date/Author: 2026-08-27, review batch.
+  run sharing a directory keep each other's results. Date/Author: 2026-08-27,
+  review batch.
 - **Decision:** leave `pages/design-language.jinja` standalone rather than
-  making it extend `doc_page.jinja`.
-  Rationale: its sidebar is an in-page table of contents, not the sub-site
-  navigation, and the shared layout has no block for replacing the sidebar's
-  links — only `sidebar_footer`, the panel beneath them. Adding one for a
-  single page would widen the shared layout's surface to accommodate the page
-  least like the others. The cost is that chrome changes must be made twice,
-  which is now written down in the developers' guide where someone changing
-  the chrome will meet it.
+  making it extend `doc_page.jinja`. Rationale: its sidebar is an in-page table
+  of contents, not the sub-site navigation, and the shared layout has no block
+  for replacing the sidebar's links — only `sidebar_footer`, the panel beneath
+  them. Adding one for a single page would widen the shared layout's surface to
+  accommodate the page least like the others. The cost is that chrome changes
+  must be made twice, which is now written down in the developers' guide where
+  someone changing the chrome will meet it. Date/Author: 2026-08-27, review
+  batch.
+
+- **Decision:** hold the per-file publication protocol, and record the
+  remaining exposure rather than build a generation pointer.
+  Rationale: raised twice. The hazard is a reader observing the destination
+  midway through publication. The only reader is `diff`, and it now takes the
+  writer's lock, so within this tool the window is closed. What a manifest or
+  generation-pointer scheme would additionally buy is atomicity against a
+  reader that does not take the lock — a third-party process — which does not
+  exist and which nothing in this repository would create. Per-extension
+  generation directories plus an atomically switched pointer is a substantial
+  protocol, and its cost falls on everyone reading the script thereafter. If
+  the tool ever grows a reader that cannot take the lock, this is the change
+  to make; until then it is machinery for a hazard nobody can reach.
+  Date/Author: 2026-08-27, review batch.
+- **Decision:** decline to hyphenate "the thirteen page templates".
+  Rationale: the hyphen would change the meaning rather than clarify it.
+  "Thirteen page templates" is thirteen templates, each of which is a page
+  template; "thirteen-page templates" would be templates thirteen pages long,
+  which is not a thing this repository has. The count reads as a count because
+  it is one.
+  Date/Author: 2026-08-27, review batch.
+- **Decision:** keep `tests/js/mobile-nav-traces.test.mjs` opening with a
+  block comment rather than a JSDoc `@file` tag.
+  Rationale: all twelve of its neighbours in `tests/js/` open with the same
+  `/* ... */` form, and TypeDoc's entry points are `scripts/` and
+  `src/styles/plugins/`, so nothing under `tests/js/` is documented by it.
+  Converting one file would make it the odd one out in its own directory for
+  no gate's benefit. Should the convention change, it should change for all
+  thirteen at once.
   Date/Author: 2026-08-27, review batch.
 
 ## Outcomes & retrospective
@@ -1634,10 +1679,39 @@ partials are in place and the diff is empty.
 
 ## Artefacts and notes
 
-To be filled during execution: the Milestone 2 diff transcript (the critical
-proof that the compiled pipeline matches the CDN), the axe violation table with
-before and after ratios, the icon mapping table, and the texture licence
-attributions.
+This section was written before execution, anticipating a standalone
+collection of transcripts and tables. It reads as a list of things still
+owed; the corrections below record where each of them actually ended up.
+
+**Correction (2026-08-27):** nothing here is outstanding, and this is where
+each anticipated artefact lives.
+
+- The Milestone 2 diff transcript, and every computed-style comparison after
+  it, are recorded inline in `Progress` and `Decision Log` at the milestone
+  each belongs to, rather than gathered here.
+- The axe evidence is likewise inline: the measured ratios in the contrast
+  decisions above, and the twenty-eight code-panel findings recorded as tool
+  false positives with the basis for calling them that.
+- The icon mapping is not reproduced here because it is generated and
+  checked. `config/weaver-icons.yaml` is the mapping;
+  `templates/weaver/_icons.jinja` is generated from it by
+  `scripts/generate_weaver_icons.py`; and
+  `tests/test_weaver_build.py` fails if the two disagree, if the generated
+  macro fails to render, or if any template names an icon it lacks. A table
+  copied into this document would be a fourth copy that nothing checks.
+- The font licences are vendored with the fonts:
+  `src/static/weaver/assets/fonts/IBMPlex-OFL.txt` and
+  `PlayfairDisplay-OFL.txt`, added alongside the faces in commit `5638a120`.
+
+The texture attributions are the one genuine gap, and it is recorded rather
+than closed. `src/static/weaver/assets/textures/` holds `cream-paper.png`,
+`cubes.png` and `diagmonds-light.png`. They predate this migration — it moved
+them from `public/` into `src/` and dropped two more that had been returning
+404 since the site's first commit — and no upstream source or licence for the
+three survivors is recorded anywhere in the repository. This plan cannot
+supply one it does not have, and inventing an attribution would be worse than
+recording its absence. Whoever added them should confirm the source and add a
+licence file beside them, as the fonts have.
 
 **Correction (2026-08-21):** the transcripts and tables anticipated above were
 not produced as a standalone artefact; the axe and computed-style evidence

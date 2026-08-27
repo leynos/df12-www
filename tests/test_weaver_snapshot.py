@@ -927,6 +927,62 @@ def test_an_unnamed_port_is_asked_for_rather_than_assumed() -> None:
     )
 
 
+def test_choosing_a_port_is_separable_from_obtaining_one() -> None:
+    """The decision is pure; only the allocator touches the network.
+
+    Splitting them is what lets the decision be checked without a socket — and
+    what keeps the one function that can fail for reasons outside this process
+    at the edge, where the command composes it.
+    """
+    allocated = 4321
+    asked: list[int] = []
+
+    def allocator() -> int:
+        asked.append(allocated)
+        return allocated
+
+    assert weaver_snapshot._resolve_port(0, allocator) == allocated, (
+        "an unnamed port should come from the allocator it was given"
+    )
+    assert asked == [allocated], (
+        f"the allocator should be called exactly once; got {asked}"
+    )
+
+    asked.clear()
+    assert weaver_snapshot._resolve_port(PORT, allocator) == PORT, (
+        "a named port should be honoured without allocating anything"
+    )
+    assert asked == [], (
+        "a named port should not have asked the allocator for one at all"
+    )
+
+
+def test_a_machine_with_no_free_port_says_so(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The one environmental failure in port selection should not be a traceback."""
+
+    class _Refusing:
+        """A socket that cannot be bound, as an exhausted machine's would be."""
+
+        def __enter__(self) -> _Refusing:
+            return self
+
+        def __exit__(self, *_exc: object) -> None:
+            return None
+
+        def bind(self, _address: tuple[str, int]) -> None:
+            message = "Address family not supported"
+            raise OSError(message)
+
+    monkeypatch.setattr(weaver_snapshot.socket, "socket", lambda *_a, **_k: _Refusing())
+
+    with pytest.raises(SystemExit) as caught:
+        weaver_snapshot._allocate_port()
+
+    assert "--port" in str(caught.value.code), (
+        f"the message should name the way out; got {caught.value.code!r}"
+    )
+
+
 def test_the_ownership_marker_is_served_and_then_removed(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1194,7 +1250,7 @@ def test_two_runs_publishing_the_same_directory_contend(tmp_path: Path) -> None:
 )
 def test_a_snapshot_that_is_not_the_expected_shape_says_where(
     tmp_path: Path,
-    shape: dict[str, typ.Any] | list[typ.Any] | str,
+    shape: dict[str, object] | list[object] | str,
     expected: str,
 ) -> None:
     """The normalization reaches for `.get` on every node, so a scalar is fatal.
@@ -1310,4 +1366,130 @@ def test_one_directory_named_twice_is_locked_once(tmp_path: Path) -> None:
 
     assert weaver_snapshot._reading_order(same, same) == [same.resolve()], (
         f"got {weaver_snapshot._reading_order(same, same)!r}"
+    )
+
+
+@contextlib.contextmanager
+def _driven(
+    monkeypatch: pytest.MonkeyPatch, pages: list[str], tools: dict[str, str]
+) -> cabc.Iterator[dict[str, typ.Any]]:
+    """Run a command with every outward seam replaced, and record what it did.
+
+    The commands are the part nobody had exercised: their helpers are covered
+    one by one, and `capture` end to end through a real browser, but nothing
+    checked that a command wires its helpers together in the right order with
+    the right arguments. A command that resolved the wrong tool, served the
+    wrong port, or staged the wrong suffix would pass every existing test.
+
+    Yields
+    ------
+    dict
+        ``argv`` — every command the run would have executed; ``served`` — the
+        ports the server was asked for, and whether it was stopped; ``staged``
+        — the (directory, suffix) pairs staged.
+    """
+    record: dict[str, typ.Any] = {"argv": [], "served": [], "staged": [], "closed": []}
+
+    @contextlib.contextmanager
+    def served(port: int, *_args: object, **_kwargs: object) -> cabc.Iterator[str]:
+        record["served"].append(port)
+        try:
+            yield "http://127.0.0.1:9999"
+        finally:
+            record["closed"].append(port)
+
+    @contextlib.contextmanager
+    def staged(out_dir: Path, suffix: str) -> cabc.Iterator[Path]:
+        record["staged"].append((out_dir, suffix))
+        staging = out_dir / ".staging"
+        staging.mkdir(parents=True, exist_ok=True)
+        yield staging
+
+    monkeypatch.setattr(weaver_snapshot, "_served", served)
+    monkeypatch.setattr(weaver_snapshot, "_staged", staged)
+    monkeypatch.setattr(weaver_snapshot, "_page_paths", lambda: list(pages))
+    monkeypatch.setattr(weaver_snapshot, "_tool", lambda name: tools[name])
+    monkeypatch.setattr(
+        weaver_snapshot, "_run_tool", lambda argv: record["argv"].append(list(argv))
+    )
+    yield record
+
+
+def test_the_shots_command_wires_its_helpers_together(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`shots` is a public command and had no test of its own at all."""
+    pages = ["", "install/"]
+    with _driven(
+        monkeypatch, pages, {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
+        weaver_snapshot.shots(tmp_path / "out", port=8123)
+
+    assert run["served"] == [8123], (
+        f"the port the caller named should reach the server; got {run['served']}"
+    )
+    assert run["closed"] == [8123], "the server should be stopped on the way out"
+    assert run["staged"] == [(tmp_path / "out", ".png")], (
+        f"screenshots should stage as .png; got {run['staged']}"
+    )
+
+    executables = {argv[0] for argv in run["argv"]}
+    assert executables == {"/usr/bin/agent-browser"}, (
+        f"every command should be the resolved browser; got {executables}"
+    )
+
+    shots = [argv[2] for argv in run["argv"] if argv[1] == "screenshot"]
+    expected = [
+        f"{tmp_path / 'out' / '.staging'}/{weaver_snapshot._slug(page)}@{width}.png"
+        for width in weaver_snapshot.SCREENSHOT_WIDTHS
+        for page in pages
+    ]
+    assert shots == expected, (
+        f"expected one screenshot per page at every width, into the staging "
+        f"directory; got {shots}"
+    )
+
+
+def test_the_capture_command_wires_its_helpers_together(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The same for `capture`, whose only other coverage needs a real browser."""
+    pages = ["", "commands/act/"]
+    with _driven(monkeypatch, pages, {"bun": "/usr/bin/bun"}) as run:
+        weaver_snapshot.capture(tmp_path / "out", port=8124)
+
+    assert run["served"] == [8124], f"the named port should be served; got {run}"
+    assert run["closed"] == [8124], f"and then stopped; got {run}"
+    assert run["staged"] == [(tmp_path / "out", ".json")], (
+        f"captures should stage as .json; got {run['staged']}"
+    )
+
+    outputs = [argv[argv.index("--output") + 1] for argv in run["argv"]]
+    expected = [
+        f"{tmp_path / 'out' / '.staging'}/{weaver_snapshot._slug(page)}.json"
+        for page in pages
+    ]
+    assert outputs == expected, (
+        f"expected one snapshot per page, into the staging directory; got {outputs}"
+    )
+    assert all(argv[0] == "/usr/bin/bun" for argv in run["argv"]), (
+        f"every command should run through the resolved bun; got {run['argv']}"
+    )
+
+
+def test_a_command_stops_its_server_even_when_a_page_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A browser that fails on page two must not strand the server on port one."""
+    with _driven(monkeypatch, ["", "install/"], {"bun": "/usr/bin/bun"}) as run:
+
+        def refuse(_argv: cabc.Sequence[str]) -> None:
+            raise subprocess.CalledProcessError(1, "bun")
+
+        monkeypatch.setattr(weaver_snapshot, "_run_tool", refuse)
+        with pytest.raises(subprocess.CalledProcessError):
+            weaver_snapshot.capture(tmp_path / "out", port=8125)
+
+    assert run["closed"] == [8125], (
+        f"the server should be stopped however the run ends; got {run['closed']}"
     )

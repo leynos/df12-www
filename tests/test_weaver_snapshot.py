@@ -1575,12 +1575,11 @@ def test_the_port_probe_binds_the_way_the_server_will() -> None:
 
     # Precondition: this is the state the probe has to tolerate. Without it
     # the test would pass on a port that is simply free.
-    bare = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        with pytest.raises(OSError, match="in use"):
-            bare.bind(("127.0.0.1", port))
-    finally:
-        bare.close()
+    with (
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM) as bare,
+        pytest.raises(OSError, match="in use"),
+    ):
+        bare.bind(("127.0.0.1", port))
 
     weaver_snapshot._refuse_occupied_port(port)
 
@@ -1655,7 +1654,7 @@ def test_an_existing_lock_file_is_not_truncated(tmp_path: Path) -> None:
 
 
 def test_a_failed_publication_leaves_the_destination_as_it_was(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
 ) -> None:
     """Deleting then moving is not atomic: a failure halfway loses both runs.
 

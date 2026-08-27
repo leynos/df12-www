@@ -757,13 +757,13 @@ at depth 4, 1554 at depth 5. Growth is exponential, so the depth is the budget
 — each trace builds a fresh DOM.
 
 It replaced `generatedTransitionSequences(seed, …)`, which sampled the space
-randomly. For a state machine this small the space is finite and enumerable,
+randomly. For a state machine this small, the space is finite and enumerable,
 and enumerating it turns the claim from "these traces held" into "no trace of
 this length breaks the invariants", which is what the suites are for. It also
 removes the seed, and with it the question of what the run happened not to draw.
 
 `tests/js/mobile-nav-traces.test.mjs` tests the generator itself, because both
-suites iterate whatever it returns: an empty return would leave them passing
+suites iterate whatever it returns. An empty return would leave them passing
 having asserted nothing, and a loop over no items is not a failure.
 
 Bun tests under `tests/js/` cover these pure functions, and they `require` the

@@ -1460,6 +1460,9 @@ def _check_node(node: typ.Any, where: str) -> None:  # noqa: ANN401 - the docume
         raise _MalformedSnapshotError(message)
     for index, child in enumerate(children):
         _check_node(child, f"{where}.children[{index}]")
+    # Explicit, to match the early return above: a node with no children and a
+    # node whose children all check out leave this function the same way.
+    return
 
 
 def _rendered_tree(payload: dict[str, typ.Any]) -> str:

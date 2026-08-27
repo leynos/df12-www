@@ -10,29 +10,31 @@ extension guidance belongs in the [developers' guide](developers-guide.md).
 
 For any task, begin with the document that matches it:
 
-Example: to verify a fresh checkout, start with [Getting started](/episodic/docs/getting-started/)
-and expect the local site to serve on `http://127.0.0.1:8080/episodic/`.
+Example: to verify a fresh checkout, start with
+[Getting started](/episodic/docs/getting-started/) and expect the local site to
+serve on `http://127.0.0.1:8080/episodic/`.
 
-| Task | Read |
-| ---- | ---- |
+| Task                                               | Read                                               |
+| -------------------------------------------------- | -------------------------------------------------- |
 | Bring up a development checkout and verify it runs | [Getting started](/episodic/docs/getting-started/) |
-| Understand the HTTP surface | [API reference](/episodic/docs/api/) |
-| Prepare source material for intake | [Workflow: content](/episodic/workflow/content/) |
-| Review evaluator output and guardrails | [Workflow: quality](/episodic/workflow/quality/) |
-| Confirm hosting and deployment expectations | [Hosting](/episodic/hosting/) |
-| Check delivery progress | [Roadmap](/episodic/roadmap/) |
+| Understand the HTTP surface                        | [API reference](/episodic/docs/api/)               |
+| Prepare source material for intake                 | [Workflow: content](/episodic/workflow/content/)   |
+| Review evaluator output and guardrails             | [Workflow: quality](/episodic/workflow/quality/)   |
+| Confirm hosting and deployment expectations        | [Hosting](/episodic/hosting/)                      |
+| Check delivery progress                            | [Roadmap](/episodic/roadmap/)                      |
 
 The companion site starts at [Episodic](/episodic/). Its available routes are
-the overview and [why](/episodic/why/); the [workflow](/episodic/workflow/),
-[content](/episodic/workflow/content/), [quality](/episodic/workflow/quality/),
+the overview and [why](/episodic/why/); the
+[workflow](/episodic/workflow/), [content](/episodic/workflow/content/), [quality](/episodic/workflow/quality/),
 and [audio](/episodic/workflow/audio/) sections; the
 [architecture](/episodic/architecture/) and [interfaces](/episodic/interfaces/)
-references; the [documentation](/episodic/docs/), [getting-started](/episodic/docs/getting-started/),
-and [API](/episodic/docs/api/) pages; plus the [roadmap](/episodic/roadmap/),
-[contributing](/episodic/contributing/), and [hosting](/episodic/hosting/) pages.
-The shared [terms](/episodic/terms-of-use/),
-[privacy policy](/episodic/privacy-policy/), and
-[code of conduct](/episodic/code-of-conduct/) complete the public route set.
+references; the
+[documentation](/episodic/docs/), [getting-started](/episodic/docs/getting-started/),
+and [API](/episodic/docs/api/) pages; plus the
+[roadmap](/episodic/roadmap/), [contributing](/episodic/contributing/), and
+[hosting](/episodic/hosting/) pages. The shared
+[terms](/episodic/terms-of-use/), [privacy policy](/episodic/privacy-policy/),
+and [code of conduct](/episodic/code-of-conduct/) complete the public route set.
 
 ### Documentation search
 
@@ -64,4 +66,5 @@ Do not assume the following are available just because they are designed:
 - the system stops at the draft and evaluation surfaces documented above.
 
 For implementation detail rather than usage guidance, switch to the
-[developers' guide](developers-guide.md) or the [df12 Pages App Design](df12-pages-app-design.md).
+[developers' guide](developers-guide.md) or the
+[df12 Pages App Design](df12-pages-app-design.md).

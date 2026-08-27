@@ -134,22 +134,21 @@ compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 theme), `src/styles/episodic.css` for Episodic (the `episodic` theme), and
 `src/styles/weaver.css` for Weaver (the `weaver` theme).
 
-Weaver's entrypoint is the one to read first when adding a sub-site
-stylesheet, and Episodic's follows the same shape. It declares the theme, then
-imports partials named for what they style — `weaver/chrome.css`,
-`weaver/panels.css`, `weaver/content.css` and so on — with element defaults in
-`layer(base)` beside Tailwind's preflight and everything else in
-`layer(components)`. The layering is deliberate: an unlayered declaration
-beats every layered one regardless of specificity, so a sub-site stylesheet
-left unlayered silently outranks the utilities in the markup. In the
-components layer a utility still wins, which is what anyone writing
-`class="mt-8"` expects.
+Weaver's entrypoint is the one to read first when adding a sub-site stylesheet,
+and Episodic's follows the same shape. It declares the theme, then imports
+partials named for what they style — `weaver/chrome.css`, `weaver/panels.css`,
+`weaver/content.css` and so on — with element defaults in `layer(base)` beside
+Tailwind's preflight and everything else in `layer(components)`. The layering
+is deliberate: an unlayered declaration beats every layered one regardless of
+specificity, so a sub-site stylesheet left unlayered silently outranks the
+utilities in the markup. In the components layer a utility still wins, which is
+what anyone writing `class="mt-8"` expects.
 
 Netsuke and Stilyagi still carry hand-crafted stylesheets and neither uses
 daisyUI. Netsuke loads the **Tailwind Play CDN** at runtime and extends the
 default theme through `/netsuke/assets/js/tailwind-config.js`; Stilyagi uses
-neither. The Play CDN is not the compiled build: it injects its utilities into
-a `<style>` tag after the stylesheet link, which is why handwritten rules on
+neither. The Play CDN is not the compiled build: it injects its utilities into a
+`<style>` tag after the stylesheet link, which is why handwritten rules on
 Netsuke sometimes need the doubled selector described below. Their colour
 tokens live in their own stylesheets, and the accessibility rules below apply
 to them just the same.
@@ -158,19 +157,18 @@ Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
 build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which
 runs Pygments and emits token classes. The colours come from a Pygments `Style`
 (`EpisodicStyle`, `HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is
-generated, not handwritten — rerun
-`scripts/generate_episodic_pygments_css.py`,
+generated, not handwritten — rerun `scripts/generate_episodic_pygments_css.py`,
 `scripts/generate_himotoshi_pygments_css.py`, and
 `scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
 edit the marked block by hand.
 
-Weaver's icons are generated the same way. `config/weaver-icons.yaml` maps
-each Font Awesome name the sub-site used to a Carbon replacement, and
+Weaver's icons are generated the same way. `config/weaver-icons.yaml` maps each
+Font Awesome name the sub-site used to a Carbon replacement, and
 `scripts/generate_weaver_icons.py` inlines the SVG into
-`templates/weaver/_icons.jinja`. Add a row, rerun the generator, commit
-both; a test fails if the two disagree. Weaver's code samples are marked up
-by hand rather than run through Pygments, and their `.token-*` colours live
-in `src/styles/weaver/code.css`.
+`templates/weaver/_icons.jinja`. Add a row, rerun the generator, commit both; a
+test fails if the two disagree. Weaver's code samples are marked up by hand
+rather than run through Pygments, and their `.token-*` colours live in
+`src/styles/weaver/code.css`.
 
 Stilyagi's palette is split by role rather than by hue: `--press-red` paints
 fills, borders, and stamps, while red *type* uses `--accent-text`, which each

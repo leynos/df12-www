@@ -13,9 +13,9 @@ served by the **Tailwind Play CDN** — a browser script,
 `https://cdn.tailwindcss.com`, that compiles Tailwind v3 utilities at page load
 from an inline JavaScript configuration block repeated in four templates
 (`doc_page.jinja`, `home_page.jinja`, `shared_content_page.jinja`, and
-`pages/design-language.jinja`) whose copies are not identical.
-Every colour in the markup is spelled as a bespoke utility
-(`text-weaver-indigo`, `bg-weaver-cream`) or an arbitrary value
+`pages/design-language.jinja`) whose copies are not identical. Every colour in
+the markup is spelled as a bespoke utility (`text-weaver-indigo`,
+`bg-weaver-cream`) or an arbitrary value
 (`shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]`), and a 370-line hand-written
 stylesheet sits outside Tailwind's cascade layers entirely.
 
@@ -948,34 +948,32 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   batch.
 
 - **Decision:** hold the per-file publication protocol, and record the
-  remaining exposure rather than build a generation pointer.
-  Rationale: raised twice. The hazard is a reader observing the destination
-  midway through publication. The only reader is `diff`, and it now takes the
-  writer's lock, so within this tool the window is closed. What a manifest or
+  remaining exposure rather than build a generation pointer. Rationale: raised
+  twice. The hazard is a reader observing the destination midway through
+  publication. The only reader is `diff`, and it now takes the writer's lock,
+  so within this tool the window is closed. What a manifest or
   generation-pointer scheme would additionally buy is atomicity against a
   reader that does not take the lock — a third-party process — which does not
   exist and which nothing in this repository would create. Per-extension
   generation directories plus an atomically switched pointer is a substantial
   protocol, and its cost falls on everyone reading the script thereafter. If
-  the tool ever grows a reader that cannot take the lock, this is the change
-  to make; until then it is machinery for a hazard nobody can reach.
-  Date/Author: 2026-08-27, review batch.
+  the tool ever grows a reader that cannot take the lock, this is the change to
+  make; until then it is machinery for a hazard nobody can reach. Date/Author:
+  2026-08-27, review batch.
 - **Decision:** decline to hyphenate "the thirteen page templates".
   Rationale: the hyphen would change the meaning rather than clarify it.
   "Thirteen page templates" is thirteen templates, each of which is a page
   template; "thirteen-page templates" would be templates thirteen pages long,
   which is not a thing this repository has. The count reads as a count because
-  it is one.
-  Date/Author: 2026-08-27, review batch.
+  it is one. Date/Author: 2026-08-27, review batch.
 - **Decision:** keep `tests/js/mobile-nav-traces.test.mjs` opening with a
-  block comment rather than a JSDoc `@file` tag.
-  Rationale: all twelve of its neighbours in `tests/js/` open with the same
-  `/* ... */` form, and TypeDoc's entry points are `scripts/` and
-  `src/styles/plugins/`, so nothing under `tests/js/` is documented by it.
-  Converting one file would make it the odd one out in its own directory for
-  no gate's benefit. Should the convention change, it should change for all
-  thirteen at once.
-  Date/Author: 2026-08-27, review batch.
+  block comment rather than a JSDoc `@file` tag. Rationale: all twelve of its
+  neighbours in `tests/js/` open with the same `/* ... */` form, and TypeDoc's
+  entry points are `scripts/` and `src/styles/plugins/`, so nothing under
+  `tests/js/` is documented by it. Converting one file would make it the odd
+  one out in its own directory for no gate's benefit. Should the convention
+  change, it should change for all thirteen at once. Date/Author: 2026-08-27,
+  review batch.
 
 ## Outcomes & retrospective
 
@@ -1679,9 +1677,9 @@ partials are in place and the diff is empty.
 
 ## Artefacts and notes
 
-This section was written before execution, anticipating a standalone
-collection of transcripts and tables. It reads as a list of things still
-owed; the corrections below record where each of them actually ended up.
+This section was written before execution, anticipating a standalone collection
+of transcripts and tables. It reads as a list of things still owed; the
+corrections below record where each of them actually ended up.
 
 **Correction (2026-08-27):** nothing here is outstanding, and this is where
 each anticipated artefact lives.
@@ -1695,10 +1693,10 @@ each anticipated artefact lives.
 - The icon mapping is not reproduced here because it is generated and
   checked. `config/weaver-icons.yaml` is the mapping;
   `templates/weaver/_icons.jinja` is generated from it by
-  `scripts/generate_weaver_icons.py`; and
-  `tests/test_weaver_build.py` fails if the two disagree, if the generated
-  macro fails to render, or if any template names an icon it lacks. A table
-  copied into this document would be a fourth copy that nothing checks.
+  `scripts/generate_weaver_icons.py`; and `tests/test_weaver_build.py` fails if
+  the two disagree, if the generated macro fails to render, or if any template
+  names an icon it lacks. A table copied into this document would be a fourth
+  copy that nothing checks.
 - The font licences are vendored with the fonts:
   `src/static/weaver/assets/fonts/IBMPlex-OFL.txt` and
   `PlayfairDisplay-OFL.txt`, added alongside the faces in commit `5638a120`.
@@ -1708,8 +1706,8 @@ than closed. `src/static/weaver/assets/textures/` holds `cream-paper.png`,
 `cubes.png` and `diagmonds-light.png`. They predate this migration — it moved
 them from `public/` into `src/` and dropped two more that had been returning
 404 since the site's first commit — and no upstream source or licence for the
-three survivors is recorded anywhere in the repository. This plan cannot
-supply one it does not have, and inventing an attribution would be worse than
+three survivors is recorded anywhere in the repository. This plan cannot supply
+one it does not have, and inventing an attribution would be worse than
 recording its absence. Whoever added them should confirm the source and add a
 licence file beside them, as the fonts have.
 

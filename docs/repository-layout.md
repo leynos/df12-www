@@ -118,9 +118,9 @@ Build-time scripts outside the Python package:
 ### `src/`
 
 Frontend source files. `styles/` contains one Tailwind CSS entry point per
-compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css`
-and `weaver.css` for those sub-sites — plus any plugins. Each is compiled to
-its own file under `public/`: `public/assets/site.css`,
+compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css` and
+`weaver.css` for those sub-sites — plus any plugins. Each is compiled to its
+own file under `public/`: `public/assets/site.css`,
 `public/mxd/assets/tailwind.css`, `public/episodic/assets/styles/tailwind.css`,
 and `public/weaver/assets/styles/weaver.css`.
 
@@ -141,9 +141,8 @@ build output and are overwritten on the next build.
 Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `episodic/`,
 `netsuke/`, `weaver/`, `stilyagi/`) holds the templates for that sub-site's
 design system. Episodic and Netsuke keep shared macros in `components.jinja`,
-and Stilyagi centralizes its chrome in `_layout.jinja` that every page
-extends. These are distinct from the main-site templates in
-`df12_pages/templates/`.
+and Stilyagi centralizes its chrome in `_layout.jinja` that every page extends.
+These are distinct from the main-site templates in `df12_pages/templates/`.
 
 ### `tests/`
 

@@ -4,9 +4,8 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Episodic, Netsuke, and Stilyagi sub-sites is generated, the shared Jinja
-macros and the
-component classes they pair with, the convention used for browser-side
+Episodic, Netsuke, and Stilyagi sub-sites is generated, the shared Jinja macros
+and the component classes they pair with, the convention used for browser-side
 components, the cascade quirks introduced by the Netsuke sub-site's use of the
 Tailwind Play content delivery network (CDN), and how accessibility is checked.
 It does not restate deployment or OpenTofu guidance, which lives in
@@ -15,9 +14,8 @@ It does not restate deployment or OpenTofu guidance, which lives in
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
 [df12 Pages App Design](df12-pages-app-design.md). For Tailwind and daisyUI
-conventions used by the main site, the mxd sub-site, and the Episodic
-sub-site, see the
-[Tailwind v4 guide](tailwind-v4-guide.md) and the
+conventions used by the main site, the mxd sub-site, and the Episodic sub-site,
+see the [Tailwind v4 guide](tailwind-v4-guide.md) and the
 [daisyUI v5 guide](daisyui-v5-guide.md). Documentation formatting itself
 follows the [documentation style guide](documentation-style-guide.md).
 
@@ -65,14 +63,14 @@ regenerates it once; `check:search` runs its `--check` mode without rebuilding
 the payload. The final `build:static` copy publishes that projection to
 `public/episodic/assets/search/episodic-search.json`. Run `bun run build` or
 `bun run build:pages && bun run build:search && bun run build:static` after
-changing an Episodic page or its documentation manifest. Run `bun run
-check:search` in continuous integration (CI) or before committing an index
-update to verify that the committed projection has not drifted.
+changing an Episodic page or its documentation manifest. Run
+`bun run check:search` in continuous integration (CI) or before committing an
+index update to verify that the committed projection has not drifted.
 
 `scripts/build_episodic_roadmap_data.py` projects the authoritative upstream
-Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It
-uses `scripts/episodic_roadmap_parser.py` to turn the Markdown into phase,
-step, and task records, and `make site-data` runs it with
+Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It uses
+`scripts/episodic_roadmap_parser.py` to turn the Markdown into phase, step,
+and task records, and `make site-data` runs it with
 `--episodic-root $(EPISODIC_SOURCE)` before rebuilding the committed template.
 
 `bun run dev` (or `make dev`, which builds once first) watches `src/**/*`,
@@ -257,13 +255,14 @@ together on the Episodic, Netsuke, and Stilyagi sub-sites, referenced from the
 ### 4.1. Styles, lexers, and the highlight tag
 
 Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
-build time by the Jinja tag `{% highlight '<lexer>'[, '<class>'] %} ... {%
-endhighlight %}`, implemented in `df12_pages/jinja_highlight.py`. The tag
-dedents its body, runs it through `pygments.highlight` with the named lexer,
-and wraps the result in a `<div class="hm-syntax">` (or the named class, when
-a second argument is given) using `pygments.formatters.html.HtmlFormatter`.
-Source text containing Jinja syntax of its own — every `Netsukefile` example
-with `{{ ins }}` placeholders — must be wrapped in `{% raw %}` inside the tag.
+build time by the Jinja tag
+`{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
+`df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
+`pygments.highlight` with the named lexer, and wraps the result in a
+`<div class="hm-syntax">` (or the named class, when a second argument is given)
+using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
+syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
+must be wrapped in `{% raw %}` inside the tag.
 
 Three Pygments styles supply the colours:
 
@@ -374,8 +373,8 @@ long as the style declares parents before children.
 - The generators write to the tracked source under `src/static/` —
   `src/static/episodic/assets/styles/syntax.css`,
   `src/static/netsuke/assets/css/himotoshi.css`, and
-  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`.
-  Writing to `public/` would lose the change on the next clean build.
+  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`. Writing
+  to `public/` would lose the change on the next clean build.
 - A test asserts the committed marked block matches what the generator would
   produce (`test_committed_stylesheet_matches_the_generator` in each test
   module below). A stale stylesheet fails the commit gates.
@@ -387,8 +386,8 @@ long as the style declares parents before children.
   next generator run would collapse it again, and the tools would undo each
   other on alternate runs — with the test above failing on whichever ran last.
   Formatting is the generator's output shape, so if it needs to change, change
-  `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to
-  tidy a diff.
+  `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to tidy
+  a diff.
 
 ### 4.5. Regenerating and verifying
 
@@ -423,8 +422,8 @@ in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
 The lexer list reflects what the templates currently use, not the full set
-Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`,
-and `xml` are stock Pygments lexers used unmodified. The bold weight differs
+Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`, and
+`xml` are stock Pygments lexers used unmodified. The bold weight differs
 because the sub-sites' monospace faces read differently at the same weight:
 Episodic and Netsuke stop at semibold, while Stilyagi's lighter face goes to
 full bold.
@@ -757,22 +756,21 @@ element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
 `src/static/episodic/assets/js/site-search.js` follows the same plain-script
-shape. It exposes five helpers when `module.exports` is available:
-shape. It exposes seven helpers when `module.exports` is available:
-`createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
-for fetching and deserializing the MiniSearch payload,
-`searchEpisodicIndex` for query-time ranking, `initialiseEpisodicSearch` for
-one root, `initialiseAllEpisodicSearch` for the document, `durationBucket` for
-the fixed telemetry duration classes, and `emitSearchTelemetry` for its bounded
-event schema. The initializers accept injected loader, search, and navigation
-dependencies so their DOM behaviour can be tested without a network request or
-navigation. Their roots must provide the `data-search-root`,
-`data-search-index`, `data-search-input`, `data-search-panel`,
-`data-search-results`, and `data-search-meta` contract. The search helpers are
-written so the loading boundary stays outside the query path: queries only
-consult an already-loaded index, while initialization owns the fetch and
-failure handling. Failed cache entries are evicted, allowing a later root
-initialization to retry.
+shape. It exposes five helpers when `module.exports` is available: shape. It
+exposes seven helpers when `module.exports` is available: `createIndexCache`
+for shared in-flight index loads, `fetchEpisodicSearchIndex` for fetching and
+deserializing the MiniSearch payload, `searchEpisodicIndex` for query-time
+ranking, `initialiseEpisodicSearch` for one root, `initialiseAllEpisodicSearch`
+for the document, `durationBucket` for the fixed telemetry duration classes, and
+`emitSearchTelemetry` for its bounded event schema. The initializers accept
+injected loader, search, and navigation dependencies so their DOM behaviour can
+be tested without a network request or navigation. Their roots must provide the
+`data-search-root`, `data-search-index`, `data-search-input`,
+`data-search-panel`, `data-search-results`, and `data-search-meta` contract.
+The search helpers are written so the loading boundary stays outside the query
+path: queries only consult an already-loaded index, while initialization owns
+the fetch and failure handling. Failed cache entries are evicted, allowing a
+later root initialization to retry.
 
 ### 6.1. Episodic search telemetry
 

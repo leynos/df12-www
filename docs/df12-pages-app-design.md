@@ -105,9 +105,10 @@ checked-in configuration record that guarantees reproducible builds.
 ## Template Variables and Site Chrome
 
 Sub-site `template_vars` are a small, explicit injection point for values that
-need to be shared across every page in that sub-site. `df12_pages/config/loader.py`
-normalizes the YAML mapping into `SubSiteConfig.template_vars`, and the CLI
-passes that mapping into each relevant renderer:
+need to be shared across every page in that sub-site.
+`df12_pages/config/loader.py` normalizes the YAML mapping into
+`SubSiteConfig.template_vars`, and the CLI passes that mapping into each
+relevant renderer:
 
 - `ContentPageGenerator` updates the Jinja environment globals for regular
   sub-site content pages.

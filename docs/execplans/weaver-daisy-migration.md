@@ -348,6 +348,16 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       both report a `scrollWidth` past their `clientWidth` while offering no
       way to reach what they clip, so neither the computed value nor the
       measurement was sufficient alone.
+- [x] (2026-08-27) Hardened the snapshot harness against four things it was
+      taking on trust: the port probe now binds with `SO_REUSEADDR` as the
+      server does, the lock file is opened with `O_NOFOLLOW` and checked to be
+      a regular file this user owns, the ownership marker is read only as far
+      as the comparison needs, and publication moves the previous run's files
+      aside rather than deleting them, putting them back if anything fails.
+- [x] (2026-08-27) Gave every assertion in `tests/test_weaver_snapshot.py` a
+      message naming the contract it checks, and covered the drawer toggle's
+      `weaver-brand-mark` class — assigned at runtime, so neither a source
+      grep nor a test that only looked for the toggle would catch its loss.
 
 ## Surprises & discoveries
 
@@ -575,6 +585,20 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   been clipped. It now requires a computed `auto` or `scroll`, sets
   `scrollLeft` and checks that it moved, and restores it; under the same
   mutation it fails and names the overflow chain that clipped the line.
+
+- **Observation:** the port probe was stricter than the server it stands in
+  for. Evidence: `http-server` sets `SO_REUSEADDR` and the probe did not, so a
+  port whose last connection is still in `TIME_WAIT` fails the probe and binds
+  fine for the server — reproduced by establishing a connection, closing it
+  from the listening side, and binding the same port with and without the
+  option. Impact: a capture was refused for up to a minute after the previous
+  one on the same port, for no reason the operator could see.
+- **Observation:** the first version of the test for that could not fail.
+  Evidence: closing a listening socket that never accepted a connection does
+  not enter `TIME_WAIT`, so removing `SO_REUSEADDR` from the probe left the
+  test passing. Impact: the test now makes the state before relying on it, and
+  asserts the precondition — that a bare socket cannot bind that port —
+  before asserting the probe can.
 
 ## Decision log
 
@@ -933,8 +957,8 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   suggestion assumed long code lines fail to wrap and push the page sideways.
   Measured, they do not: a 300-character unbroken line in a bare `pre` on
   `docs/` at 360px takes that element's `scrollWidth` to 2965px while the
-  document stays at 360px because the panel around it scrolls. Those panels
-  are meant to scroll and were made keyboard-reachable for that purpose in the
+  document stays at 360px because the panel around it scrolls. Those panels are
+  meant to scroll and were made keyboard-reachable for that purpose in the
   previous round. Forcing them to wrap would be a site-wide change to how code
   reads, made on a premise that does not hold. The test the finding asked for
   was added, asserting the document does not scroll and the line stays
@@ -990,6 +1014,19 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   one out in its own directory for no gate's benefit. Should the convention
   change, it should change for all thirteen at once. Date/Author: 2026-08-27,
   review batch.
+
+- **Decision:** make publication failure-atomic by moving the previous run's
+  files aside rather than deleting them, and put them back on any failure.
+  Rationale: raised a third time, and this time about the failure path rather
+  than the reader, which the lock had already covered. Deleting and then
+  moving is not atomic: a rename that fails partway leaves the destination
+  holding some files from each run with the originals already gone — the worst
+  state, because it still looks like a directory of snapshots. Every step is
+  now a rename within one filesystem, and the rollback is the same operation
+  reversed. This is what the earlier objection to a manifest scheme was
+  missing: transactional publication did not need a generation pointer, only
+  somewhere to put the old files while the new ones land.
+  Date/Author: 2026-08-27, review batch.
 
 ## Outcomes & retrospective
 
@@ -1731,17 +1768,17 @@ evidence; the other half does not, and is tracked rather than guessed at.
 vendored them, and its diff shows the exact URLs they replaced —
 `https://www.transparenttextures.com/patterns/cream-paper.png`, `…/cubes.png`
 and `…/diagmonds-light.png`. That site names an author per pattern:
-`cream-paper` by Devin Holmes, `cubes` by Sander Ottens, and
-`diagmonds-light` by INS.
+`cream-paper` by Devin Holmes, `cubes` by Sander Ottens, and `diagmonds-light`
+by INS.
 
-Their **licence is not established**. Transparent Textures publishes no
-licence statement, and Subtle Patterns, which it is built from, says only that
-entries are "licensed under Creative Commons" without naming the variant.
-Which variant it is decides the obligation: BY wants a credit, BY-SA would
-reach the work it is used in, and NC would not permit this use at all. Nothing
-in this repository or upstream settles it, so no attribution is written here —
-one naming the wrong licence is worse than none, because it reads as though
-somebody had checked.
+Their **licence is not established**. Transparent Textures publishes no licence
+statement, and Subtle Patterns, which it is built from, says only that entries
+are "licensed under Creative Commons" without naming the variant. Which variant
+it is decides the obligation: BY wants a credit, BY-SA would reach the work it
+is used in, and NC would not permit this use at all. Nothing in this repository
+or upstream settles it, so no attribution is written here — one naming the
+wrong licence is worse than none, because it reads as though somebody had
+checked.
 
 Tracked as issue #94, which records the confirmed origins and authors, the
 research the licence needs, and what would close it — including replacing the

@@ -61,6 +61,20 @@ describe("initial state", () => {
     expect(dom.toggle.getAttribute("aria-label")).toBe("Open navigation menu");
   });
 
+  test("the toggle is the brand mark, and carries no glyph markup of its own", () => {
+    /* The button *is* the brand mark: the glyph and the block of indigo both
+       come from `.weaver-brand-mark` in weaver/chrome.css. Before that it
+       carried a Font Awesome `<i>`, which rendered as an empty box once the
+       CDN went away — visible on the page and invisible to a test that only
+       checked the toggle existed. The class is assigned at runtime, so a
+       source grep would not catch its loss either. */
+    expect(dom.toggle.className).toBe("weaver-brand-mark");
+    expect(dom.toggle.querySelector("i")).toBeNull();
+    expect(dom.toggle.querySelector("svg")).toBeNull();
+    expect(dom.toggle.innerHTML.trim()).toBe("");
+    expect(dom.toggle.textContent.trim()).toBe("");
+  });
+
   test("the toggle points at the nav it controls, naming it if need be", () => {
     expect(dom.nav.id).toBe("sidebar-nav");
     expect(dom.toggle.getAttribute("aria-controls")).toBe("sidebar-nav");

@@ -102,7 +102,7 @@ flaky network-dependent tests.
 This workflow lets GitHub stay the source of truth for docs while providing a
 checked-in configuration record that guarantees reproducible builds.
 
-## Template Variables and Site Chrome
+## Template variables and site chrome
 
 Sub-site `template_vars` are a small, explicit injection point for values that
 need to be shared across every page in that sub-site.

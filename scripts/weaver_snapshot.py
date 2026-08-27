@@ -37,6 +37,7 @@ import re
 import secrets
 import shutil
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
@@ -231,6 +232,71 @@ def _startup_lock(port: int) -> cabc.Iterator[None]:
 
 
 @contextlib.contextmanager
+def _lock_file(path: Path) -> cabc.Iterator[typ.IO[bytes]]:
+    """Open a lock file in a shared temp directory without trusting it.
+
+    The lock's path is predictable — it has to be, since two runs find each
+    other by computing the same name — and the system temp directory is
+    writable by everyone. So the file at that path may not be the one this
+    process expects: another user can create it first, or leave a symlink
+    there pointing at something of ours. Opening it with ``open("w")`` would
+    follow that link and truncate whatever it found.
+
+    ``O_NOFOLLOW`` refuses a symlink outright, ``O_CREAT`` without ``O_TRUNC``
+    leaves an existing file's contents alone, and the mode denies everyone but
+    the owner. What is opened is then checked to be a regular file this user
+    owns, because winning the race is not the same as being handed the right
+    file.
+
+    Parameters
+    ----------
+    path
+        The lock file to open, creating it if absent.
+
+    Yields
+    ------
+    IO
+        The open file, for :func:`fcntl.flock`. Nothing is written to it; the
+        lock is the ``flock``, not the contents.
+
+    Raises
+    ------
+    SystemExit
+        If the path is a symlink, is not a regular file, belongs to another
+        user, or cannot be opened.
+    """
+    try:
+        descriptor = os.open(
+            path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600
+        )
+    except OSError as exc:
+        message = (
+            f"the lock file {path} could not be opened ({exc}). If it is a "
+            f"symlink or belongs to another user, remove it; nothing but this "
+            f"script should be writing there."
+        )
+        raise SystemExit(message) from exc
+
+    try:
+        status = os.fstat(descriptor)
+        if not stat.S_ISREG(status.st_mode):
+            message = f"the lock file {path} is not a regular file; remove it"
+            raise SystemExit(message)
+        if status.st_uid != os.getuid():
+            message = (
+                f"the lock file {path} belongs to uid {status.st_uid} rather "
+                f"than this user; remove it, or pass --port to use another"
+            )
+            raise SystemExit(message)
+        with os.fdopen(descriptor, "rb+") as handle:
+            descriptor = -1
+            yield handle
+    finally:
+        if descriptor != -1:
+            os.close(descriptor)
+
+
+@contextlib.contextmanager
 def _exclusive(path: Path, contended: str) -> cabc.Iterator[None]:
     """Hold an exclusive advisory lock on ``path`` for the duration.
 
@@ -253,7 +319,7 @@ def _exclusive(path: Path, contended: str) -> cabc.Iterator[None]:
     SystemExit
         If the lock is still held after :data:`LOCK_TIMEOUT_SECONDS`.
     """
-    with path.open("w", encoding="utf-8") as handle:
+    with _lock_file(path) as handle:
         deadline = time.monotonic() + LOCK_TIMEOUT_SECONDS
         while True:
             try:
@@ -292,6 +358,69 @@ def _output_lock_path(out_dir: Path) -> Path:
     """
     digest = hashlib.sha256(str(out_dir).encode("utf-8")).hexdigest()[:16]
     return Path(tempfile.gettempdir()) / f"weaver-snapshot-{os.getuid()}-{digest}.lock"
+
+
+type Mover = cabc.Callable[[Path, Path], object]
+
+
+def _publish(
+    staging: Path, destination: Path, suffix: str, move: Mover = Path.replace
+) -> None:
+    """Move a finished capture into place, or leave the destination as it was.
+
+    Deleting the previous run's files and then moving this run's in is not
+    failure-atomic: a rename that fails partway leaves the destination holding
+    some of each, with the originals already gone. That is the worst state to
+    be in, because it still looks like a directory of snapshots.
+
+    So the previous files are moved aside rather than deleted, and put back if
+    anything goes wrong. Every step is a rename within one filesystem, which
+    is atomic per file, and the rollback is the same operation in reverse.
+    Only the extension being written is touched, so a ``capture`` and a
+    ``shots`` run can share a directory.
+
+    Parameters
+    ----------
+    staging
+        The directory this run captured into.
+    destination
+        Where the results belong.
+    suffix
+        File extension being published, including the leading dot.
+    move
+        How to move one file onto another, atomically. Injected so a failure
+        partway through can be provoked without a full disk.
+
+    Raises
+    ------
+    OSError
+        If publication fails, after the destination has been put back as it
+        was. The caller turns this into a ``SystemExit`` naming the directory.
+    """
+    aside = staging / "replaced"
+    aside.mkdir(exist_ok=True)
+
+    rescued: list[tuple[Path, Path]] = []
+    published: list[Path] = []
+    try:
+        for stale in sorted(destination.glob(f"*{suffix}")):
+            moved = aside / stale.name
+            move(stale, moved)
+            rescued.append((moved, stale))
+        for captured in sorted(staging.glob(f"*{suffix}")):
+            landed = destination / captured.name
+            move(captured, landed)
+            published.append(landed)
+    except OSError:
+        # Undo this run's half-publication first, so putting the previous
+        # files back cannot be blocked by a file this run had just landed.
+        for landed in published:
+            with contextlib.suppress(OSError):
+                landed.unlink()
+        for moved, original in rescued:
+            with contextlib.suppress(OSError):
+                move(moved, original)
+        raise
 
 
 @contextlib.contextmanager
@@ -346,10 +475,7 @@ def _staged(out_dir: Path, suffix: str) -> cabc.Iterator[Path]:
 
     try:
         with _exclusive(_output_lock_path(destination), f"the output {destination}"):
-            for stale in destination.glob(f"*{suffix}"):
-                stale.unlink(missing_ok=True)
-            for captured in sorted(staging.glob(f"*{suffix}")):
-                captured.replace(destination / captured.name)
+            _publish(staging, destination, suffix)
     except OSError as exc:
         message = f"{destination} could not be published to ({exc})"
         raise SystemExit(message) from exc
@@ -377,6 +503,11 @@ def _refuse_occupied_port(port: int) -> None:
         If the port cannot be bound.
     """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        # `http-server` sets SO_REUSEADDR, so it will bind a port left in
+        # TIME_WAIT by the previous run. Without it here the probe is stricter
+        # than the thing it is standing in for, and a capture refuses to start
+        # for a minute after the last one on a port nothing is actually using.
+        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             probe.bind(("127.0.0.1", port))
         except OSError as exc:
@@ -614,7 +745,10 @@ def _confirm_ownership(base: str, marker: str, port: int, when: str) -> None:
     """
     try:
         with urllib.request.urlopen(f"{base}/{marker}", timeout=5) as response:  # noqa: S310 - literal loopback URL
-            served = response.read().decode("utf-8").strip()
+            # Whatever is on that port is not necessarily ours, so its
+            # response is not necessarily small. One byte past the marker is
+            # enough to tell a match from anything longer.
+            served = response.read(len(marker) + 1).decode("utf-8", "replace").strip()
     except (urllib.error.URLError, OSError) as exc:
         message = (
             f"the server on port {port} did not serve this run's marker "

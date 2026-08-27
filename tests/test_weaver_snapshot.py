@@ -81,7 +81,11 @@ def test_colour_notations_canonicalize_to_the_same_rgba(
     notation: str, expected: str
 ) -> None:
     """Equivalent colours should compare equal whatever notation they wear."""
-    assert weaver_snapshot._canonical_value(notation) == expected
+    assert weaver_snapshot._canonical_value(notation) == expected, (
+        f"{notation!r} should canonicalize to {expected!r}, so that two ways "
+        f"of writing one colour compare equal; got "
+        f"{weaver_snapshot._canonical_value(notation)!r}"
+    )
 
 
 def test_distinct_colours_stay_distinct() -> None:
@@ -93,7 +97,10 @@ def test_distinct_colours_stay_distinct() -> None:
     """
     v3_green = weaver_snapshot._canonical_value("rgb(34, 197, 94)")
     v4_green = weaver_snapshot._canonical_value("oklch(0.723 0.219 149.579)")
-    assert v3_green != v4_green
+    assert v3_green != v4_green, (
+        "Tailwind v4 redefined green-500 in OKLCH, which is a real change to "
+        "the page; canonicalizing must not collapse it into the v3 value"
+    )
 
 
 def test_placeholder_shadow_layers_are_dropped() -> None:
@@ -110,9 +117,15 @@ def test_placeholder_shadow_layers_are_dropped() -> None:
     normalize = weaver_snapshot._canonical_shadow
     assert normalize(weaver_snapshot._canonical_value(v3)) == normalize(
         weaver_snapshot._canonical_value(v4)
+    ), (
+        "v3 and v4 pad a shadow with different numbers of transparent layers; "
+        "dropping the layers that paint nothing is what makes the two equal"
     )
     assert normalize(weaver_snapshot._canonical_value(v3)) == (
         "rgba(0, 0, 0, 0.050) 0px 1px 2px 0px"
+    ), (
+        "only the placeholder layers should go; the one layer that actually "
+        "paints must survive intact"
     )
 
 
@@ -121,7 +134,10 @@ def test_a_real_shadow_change_survives_normalization() -> None:
     normalize = weaver_snapshot._canonical_shadow
     two_px = normalize("rgba(25, 60, 110, 1.000) 2px 2px 0px 0px")
     four_px = normalize("rgba(25, 60, 110, 1.000) 4px 4px 0px 0px")
-    assert two_px != four_px
+    assert two_px != four_px, (
+        "dropping placeholder layers must not also hide a shadow that moved; "
+        "2px and 4px offsets are a visible difference"
+    )
 
 
 def _node(**style: str) -> dict[str, typ.Any]:
@@ -134,7 +150,10 @@ def test_tailwind_internal_properties_are_ignored() -> None:
     normalized = weaver_snapshot._normalize(
         _node(**{"--tw-text-opacity": "1", "color": "rgb(1, 2, 3)"})
     )
-    assert normalized["styleDiff"] == {"color": "rgba(1, 2, 3, 1.000)"}
+    assert normalized["styleDiff"] == {"color": "rgba(1, 2, 3, 1.000)"}, (
+        "`--tw-*` variables are Tailwind's plumbing and change between "
+        f"versions without the page changing; got {normalized['styleDiff']!r}"
+    )
 
 
 def test_animated_opacity_is_ignored_but_static_opacity_is_not() -> None:
@@ -142,10 +161,16 @@ def test_animated_opacity_is_ignored_but_static_opacity_is_not() -> None:
     animated = weaver_snapshot._normalize(
         _node(**{"animation-name": "pulse", "opacity": "0.694981"})
     )
-    assert "opacity" not in animated["styleDiff"]
+    assert "opacity" not in animated["styleDiff"], (
+        "a node mid-animation reports whatever opacity the sample caught, "
+        f"which differs run to run; got {animated['styleDiff']!r}"
+    )
 
     static = weaver_snapshot._normalize(_node(opacity="0.5"))
-    assert static["styleDiff"]["opacity"] == "0.5"
+    assert static["styleDiff"]["opacity"] == "0.5", (
+        "a static opacity is a real declaration and must survive; got "
+        f"{static['styleDiff']!r}"
+    )
 
 
 def test_normalization_recurses_into_children() -> None:
@@ -153,7 +178,10 @@ def test_normalization_recurses_into_children() -> None:
     tree = _node(color="rgb(1, 2, 3)")
     tree["children"] = [_node(**{"--tw-ring-offset-width": "0px"})]
     normalized = weaver_snapshot._normalize(tree)
-    assert normalized["children"][0]["styleDiff"] == {}
+    assert normalized["children"][0]["styleDiff"] == {}, (
+        "normalization has to reach every node, not just the root; the child's "
+        f"`--tw-*` property survived as {normalized['children'][0]['styleDiff']!r}"
+    )
 
 
 def test_canonical_style_leaves_its_argument_alone() -> None:
@@ -260,7 +288,10 @@ def test_bounding_boxes_are_rounded_not_discarded() -> None:
     node = _node()
     node["bbox"] = {"x": 0.0, "y": jittered_y, "width": 640.0, "height": height}
     normalized = weaver_snapshot._normalize(node)
-    assert normalized["bbox"]["y"] == settled_y
+    assert normalized["bbox"]["y"] == settled_y, (
+        f"subpixel jitter should round away, or every capture differs from "
+        f"the last; {jittered_y} normalized to {normalized['bbox']['y']}"
+    )
 
     # The other half of the docstring's promise, which nothing checked: a
     # rounding that also swallowed real movement would make the whole
@@ -270,7 +301,10 @@ def test_bounding_boxes_are_rounded_not_discarded() -> None:
     assert (
         weaver_snapshot._normalize(shifted)["bbox"]["y"] != normalized["bbox"]["y"]
     ), "a one-pixel shift must survive normalization, or diffs mean nothing"
-    assert normalized["bbox"]["height"] == height
+    assert normalized["bbox"]["height"] == height, (
+        f"a whole-number dimension should pass through untouched; {height} "
+        f"became {normalized['bbox']['height']}"
+    )
 
 
 def test_invisible_border_colours_are_ignored() -> None:
@@ -278,7 +312,10 @@ def test_invisible_border_colours_are_ignored() -> None:
     normalized = weaver_snapshot._normalize(
         _node(**{"border-top-color": "rgb(229, 231, 235)"})
     )
-    assert normalized["styleDiff"] == {}
+    assert normalized["styleDiff"] == {}, (
+        "a colour on an edge of zero width paints nothing, so it is not a "
+        f"difference a reader could see; got {normalized['styleDiff']!r}"
+    )
 
 
 def test_drawn_border_colours_are_kept() -> None:
@@ -291,7 +328,12 @@ def test_drawn_border_colours_are_kept() -> None:
             }
         )
     )
-    assert normalized["styleDiff"]["border-top-color"] == "rgba(229, 231, 235, 1.000)"
+    assert normalized["styleDiff"]["border-top-color"] == (
+        "rgba(229, 231, 235, 1.000)"
+    ), (
+        "the same colour on an edge that is drawn is a real difference and "
+        f"must be kept; got {normalized['styleDiff']!r}"
+    )
 
 
 def test_a_logical_border_width_keeps_its_physical_colour() -> None:
@@ -304,7 +346,10 @@ def test_a_logical_border_width_keeps_its_physical_colour() -> None:
             }
         )
     )
-    assert "border-top-color" in normalized["styleDiff"]
+    assert "border-top-color" in normalized["styleDiff"], (
+        "`border-block-start-width` draws the same edge as `border-top-width`, "
+        f"so its colour is visible too; got {normalized['styleDiff']!r}"
+    )
 
 
 def test_root_only_declarations_are_not_repeated_down_the_tree() -> None:
@@ -321,12 +366,22 @@ def test_root_only_declarations_are_not_repeated_down_the_tree() -> None:
     root["children"] = [child]
 
     normalized = weaver_snapshot._normalize(root)
-    assert normalized["styleDiff"] == {"color-scheme": "light"}
-    assert normalized["children"][0]["styleDiff"] == {}
+    assert normalized["styleDiff"] == {"color-scheme": "light"}, (
+        f"the node that declares it should report it; got {normalized['styleDiff']!r}"
+    )
+    assert normalized["children"][0]["styleDiff"] == {}, (
+        "a child inheriting the root's value is not declaring anything, and "
+        "reporting it on every node buries the ones that differ; got "
+        f"{normalized['children'][0]['styleDiff']!r}"
+    )
     # A node that genuinely departs from its parent still reports.
     assert normalized["children"][0]["children"][0]["styleDiff"] == {
         "color-scheme": "dark"
-    }
+    }, (
+        "de-duplicating against the parent must not silence a node that "
+        "genuinely departs from it; got "
+        f"{normalized['children'][0]['children'][0]['styleDiff']!r}"
+    )
 
 
 def test_a_shadow_of_only_transparent_layers_becomes_none() -> None:
@@ -1493,3 +1548,180 @@ def test_a_command_stops_its_server_even_when_a_page_fails(
     assert run["closed"] == [8125], (
         f"the server should be stopped however the run ends; got {run['closed']}"
     )
+
+
+def test_the_port_probe_binds_the_way_the_server_will() -> None:
+    """A stricter probe refuses a port the server would have taken.
+
+    `http-server` sets SO_REUSEADDR, so it binds a port whose last connection
+    is still in TIME_WAIT. Without the same option the probe fails where the
+    server would succeed, and a capture is refused for a minute after the last
+    one on a port nothing is really using.
+
+    The state has to be produced rather than assumed: closing a listening
+    socket that never accepted anything does not enter TIME_WAIT. A connection
+    has to be made and closed from the listening side first.
+    """
+    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(1)
+    port = listener.getsockname()[1]
+    client = socket.create_connection(("127.0.0.1", port))
+    accepted, _peer = listener.accept()
+    accepted.close()  # the listening side closes first, so its end waits
+    client.close()
+    listener.close()
+
+    # Precondition: this is the state the probe has to tolerate. Without it
+    # the test would pass on a port that is simply free.
+    bare = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        with pytest.raises(OSError, match="in use"):
+            bare.bind(("127.0.0.1", port))
+    finally:
+        bare.close()
+
+    weaver_snapshot._refuse_occupied_port(port)
+
+
+def test_a_symlink_where_the_lock_belongs_is_refused(tmp_path: Path) -> None:
+    """The lock's path is predictable and its directory is world-writable.
+
+    Another user can put a symlink there first. `open("w")` would follow it and
+    truncate whatever it pointed at — something of ours, chosen by them.
+    """
+    victim = tmp_path / "something-of-ours.txt"
+    victim.write_text("must survive", encoding="utf-8")
+    lock = tmp_path / "port.lock"
+    lock.symlink_to(victim)
+
+    with pytest.raises(SystemExit) as caught, weaver_snapshot._lock_file(lock):
+        pass  # pragma: no cover - the open must not succeed
+
+    assert str(lock) in str(caught.value.code), (
+        f"the message should name the lock; got {caught.value.code!r}"
+    )
+    assert victim.read_text(encoding="utf-8") == "must survive", (
+        "the symlink was followed and its target truncated"
+    )
+
+
+def test_a_lock_path_that_is_not_a_regular_file_is_refused(tmp_path: Path) -> None:
+    """Winning the race is not the same as being handed the right file.
+
+    A FIFO rather than a directory, because `os.open` refuses a directory
+    itself and the check under test is the one after the open succeeds.
+    """
+    lock = tmp_path / "port.lock"
+    os.mkfifo(lock)
+
+    with pytest.raises(SystemExit) as caught, weaver_snapshot._lock_file(lock):
+        pass  # pragma: no cover - the open must not succeed
+
+    assert "regular file" in str(caught.value.code), (
+        f"the message should say what is wrong with it; got {caught.value.code!r}"
+    )
+
+
+def test_a_lock_belonging_to_another_user_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A file another user got there first with is not this run's lock."""
+    lock = tmp_path / "port.lock"
+    lock.write_text("", encoding="utf-8")
+    somebody_else = os.getuid() + 1
+    monkeypatch.setattr(weaver_snapshot.os, "getuid", lambda: somebody_else)
+
+    with pytest.raises(SystemExit) as caught, weaver_snapshot._lock_file(lock):
+        pass  # pragma: no cover - the open must not succeed
+
+    assert "belongs to uid" in str(caught.value.code), (
+        f"the message should say whose it is; got {caught.value.code!r}"
+    )
+
+
+def test_an_existing_lock_file_is_not_truncated(tmp_path: Path) -> None:
+    """Opening for writing would empty a file this process did not create."""
+    lock = tmp_path / "port.lock"
+    lock.write_text("a previous run left this", encoding="utf-8")
+
+    with weaver_snapshot._lock_file(lock):
+        pass
+
+    assert lock.read_text(encoding="utf-8") == "a previous run left this", (
+        "the lock file was truncated; the lock is the flock, not the contents"
+    )
+
+
+def test_a_failed_publication_leaves_the_destination_as_it_was(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Deleting then moving is not atomic: a failure halfway loses both runs.
+
+    The previous files are moved aside rather than deleted, so a rename that
+    fails partway can be undone. Without that the destination ends up holding
+    some of each with the originals already gone — the worst state, because it
+    still looks like a directory of snapshots.
+    """
+    destination = tmp_path / "out"
+    destination.mkdir()
+    (destination / "one.json").write_text("previous one", encoding="utf-8")
+    (destination / "two.json").write_text("previous two", encoding="utf-8")
+    (destination / "kept.png").write_text("a screenshot run's", encoding="utf-8")
+
+    staging = tmp_path / "staging"
+    staging.mkdir()
+    (staging / "one.json").write_text("this one", encoding="utf-8")
+    (staging / "two.json").write_text("this two", encoding="utf-8")
+
+    moves = {"n": 0}
+    # Two rescues, then one publication, then the disk fills.
+    breaks_on = 4
+
+    def failing(source: Path, target: Path) -> object:
+        moves["n"] += 1
+        # Exactly one operation fails. A rename back into the directory the
+        # file just left needs no new space, so a real ENOSPC would not block
+        # the rollback either, and a mover that failed forever would test the
+        # fake rather than the code.
+        if moves["n"] == breaks_on:
+            message = "no space left on device"
+            raise OSError(message)
+        return source.replace(target)
+
+    with pytest.raises(OSError, match="no space left"):
+        weaver_snapshot._publish(staging, destination, ".json", failing)
+
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "a failed publication left this run's file in place of the previous one"
+    )
+    assert (destination / "two.json").read_text(encoding="utf-8") == "previous two", (
+        "a failed publication lost the previous run's snapshot"
+    )
+    assert (destination / "kept.png").exists(), (
+        "the other extension should not have been touched at all"
+    )
+
+
+def test_a_publication_that_succeeds_replaces_everything(tmp_path: Path) -> None:
+    """The rollback path must not have cost the ordinary one its job."""
+    destination = tmp_path / "out"
+    destination.mkdir()
+    (destination / "one.json").write_text("previous", encoding="utf-8")
+    (destination / "gone.json").write_text("a page that no longer exists", "utf-8")
+    (destination / "kept.png").write_text("a screenshot run's", encoding="utf-8")
+
+    staging = tmp_path / "staging"
+    staging.mkdir()
+    (staging / "one.json").write_text("this run", encoding="utf-8")
+
+    weaver_snapshot._publish(staging, destination, ".json")
+
+    assert (destination / "one.json").read_text(encoding="utf-8") == "this run", (
+        "a publication that succeeded did not replace the previous snapshot"
+    )
+    assert not (destination / "gone.json").exists(), (
+        "a snapshot from a previous run survived this one"
+    )
+    assert (destination / "kept.png").exists(), "the other extension was touched"

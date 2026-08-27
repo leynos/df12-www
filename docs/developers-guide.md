@@ -4,7 +4,7 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Episodic, Netsuke, and Stilyagi sub-sites is generated, the shared Jinja macros
+Episodic, Netsuke, and Stilyagi sub-sites are generated, the shared Jinja macros
 and the component classes they pair with, the convention used for browser-side
 components, the cascade quirks introduced by the Netsuke sub-site's use of the
 Tailwind Play content delivery network (CDN), and how accessibility is checked.
@@ -734,6 +734,27 @@ and a fake DOM with hand-written focus bookkeeping would largely be testing
 itself. Prefer the fake DOM used by `config-keys.test.mjs` when the behaviour
 under test is a decision; reach for the harness when it is an interaction.
 
+The harness also supplies the traces both drawer suites run over. It exports
+`TRANSITIONS`, the six things that can happen to an open drawer — `toggle`,
+`tab`, `shift-tab`, `escape`, `wide`, `narrow` — and
+`exhaustiveTransitionSequences({ depth = 4 })`, which returns every trace over
+that set up to `depth`, each one prefixed by the opening `toggle` because a
+closed drawer ignores almost everything and such a trace proves nothing about
+the focus trap. Traces run from two transitions long up to `depth`, and the
+count is the sum of `TRANSITIONS.length ** k` for k from 1 to `depth - 1`:
+258 at depth 4, 1554 at depth 5. Growth is exponential, so the depth is the
+budget — each trace builds a fresh DOM.
+
+It replaced `generatedTransitionSequences(seed, …)`, which sampled the space
+randomly. For a state machine this small the space is finite and enumerable,
+and enumerating it turns the claim from "these traces held" into "no trace of
+this length breaks the invariants", which is what the suites are for. It also
+removes the seed, and with it the question of what the run happened not to draw.
+
+`tests/js/mobile-nav-traces.test.mjs` tests the generator itself, because both
+suites iterate whatever it returns: an empty return would leave them passing
+having asserted nothing, and a loop over no items is not a failure.
+
 Bun tests under `tests/js/` cover these pure functions, and they `require` the
 **built** copy from `public/`, not the source under `src/static/`:
 
@@ -756,10 +777,10 @@ element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
 `src/static/episodic/assets/js/site-search.js` follows the same plain-script
-shape. It exposes five helpers when `module.exports` is available: shape. It
-exposes seven helpers when `module.exports` is available: `createIndexCache`
-for shared in-flight index loads, `fetchEpisodicSearchIndex` for fetching and
-deserializing the MiniSearch payload, `searchEpisodicIndex` for query-time
+shape. It exposes seven helpers when `module.exports` is available:
+`createIndexCache` for shared in-flight index loads,
+`fetchEpisodicSearchIndex` for fetching and deserializing the MiniSearch
+payload, `searchEpisodicIndex` for query-time
 ranking, `initialiseEpisodicSearch` for one root, `initialiseAllEpisodicSearch`
 for the document, `durationBucket` for the fixed telemetry duration classes, and
 `emitSearchTelemetry` for its bounded event schema. The initializers accept

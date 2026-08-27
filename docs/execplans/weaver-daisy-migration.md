@@ -343,6 +343,11 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - [x] (2026-08-27) Deleted `_free_port` from `tests/test_weaver_browser.py`,
       which duplicated the harness's own allocator. Both paths now take a port
       the same way.
+- [x] (2026-08-27) Made the long-code-line assertion scroll a panel rather
+      than infer that one could be scrolled. `overflow-x: hidden` and `clip`
+      both report a `scrollWidth` past their `clientWidth` while offering no
+      way to reach what they clip, so neither the computed value nor the
+      measurement was sufficient alone.
 
 ## Surprises & discoveries
 
@@ -559,6 +564,17 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `SystemExit`. Impact: an interrupted capture or a snapshot from another tool
   would have produced a traceback rather than a message saying which file to
   recapture.
+
+- **Observation:** the assertion added for the long-code-line contract was
+  itself unable to catch the defect it described. Evidence: it accepted any
+  ancestor whose computed `overflow-x` was not `visible` and treated an excess
+  `scrollWidth` as scrollability, and both hold for `overflow-x: hidden`.
+  Forcing every code panel to `hidden` at mobile widths — which clips the line
+  away with no way to read it — left the assertion passing. Impact: the test
+  read as a guarantee of reachability and guaranteed only that something had
+  been clipped. It now requires a computed `auto` or `scroll`, sets
+  `scrollLeft` and checks that it moved, and restores it; under the same
+  mutation it fails and names the overflow chain that clipped the line.
 
 ## Decision log
 

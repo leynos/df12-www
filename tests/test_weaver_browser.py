@@ -628,7 +628,10 @@ def test_a_long_code_line_scrolls_its_panel_and_not_the_page(
     what puts every line of body text out of reach.
 
     A three-hundred-character line is injected rather than waited for, so the
-    guarantee is tested rather than the current content.
+    guarantee is tested rather than the current content, and the panel is made
+    to scroll rather than assumed able to: `overflow-x: hidden` reports a
+    `scrollWidth` past its `clientWidth` exactly as `auto` does, while
+    offering no way to reach what it clips.
     """
     _open(drive, served, page, MOBILE_WIDTH, MOBILE_HEIGHT)
     result = _evaluate(
@@ -638,13 +641,32 @@ def test_a_long_code_line_scrolls_its_panel_and_not_the_page(
         "if (!pre) return {found: false};"
         "pre.textContent = 'weaver observe get-definition --overrides '"
         " + 'x'.repeat(300);"
+        # Walk out from the `pre` looking for an ancestor that *does* scroll,
+        # rather than one that merely has a non-visible `overflow-x`. Both
+        # `hidden` and `clip` satisfy "not visible" and both report a
+        # `scrollWidth` past their `clientWidth` while clipping the line away
+        # with no way to reach it, so neither the computed value nor the
+        # measurement is sufficient on its own. Asking the element to scroll
+        # and seeing whether it moves is.
+        "const overflows = [];"
         "let scroller = pre;"
-        "while (scroller && getComputedStyle(scroller).overflowX === 'visible')"
-        " scroller = scroller.parentElement;"
+        "let scrolls = false;"
+        "while (scroller) {"
+        "  const overflowX = getComputedStyle(scroller).overflowX;"
+        "  overflows.push(overflowX);"
+        "  if (overflowX === 'auto' || overflowX === 'scroll') {"
+        "    const start = scroller.scrollLeft;"
+        "    scroller.scrollLeft = scroller.scrollWidth;"
+        "    if (scroller.scrollLeft > start) { scrolls = true; }"
+        "    scroller.scrollLeft = start;"
+        "    if (scrolls) break;"
+        "  }"
+        "  scroller = scroller.parentElement;"
+        "}"
         "return {found: true, page: document.documentElement.scrollWidth,"
         " viewport: window.innerWidth,"
         " wrapped: pre.scrollWidth <= pre.clientWidth + 1,"
-        " scrollable: !!scroller && scroller.scrollWidth > scroller.clientWidth};"
+        " scrollable: scrolls, overflows: overflows.slice(0, 6)};"
         "})())",
     )
 
@@ -656,10 +678,13 @@ def test_a_long_code_line_scrolls_its_panel_and_not_the_page(
     # A panel may answer a long line either way: by wrapping it, where the
     # markup asks for `whitespace-pre-wrap`, or by scrolling it, which is the
     # default and why these panels are keyboard-reachable. What it may not do
-    # is clip the line away with no means of reading it.
+    # is clip the line away with no means of reading it — which is why
+    # `scrollable` above is the result of actually scrolling something, not of
+    # inferring that something could be scrolled.
     assert result["wrapped"] or result["scrollable"], (
-        f"/weaver/{page}'s code panel neither wrapped the long line nor gave "
-        f"anything to scroll it with, so the end of it cannot be read"
+        f"/weaver/{page}'s code panel neither wrapped the long line nor "
+        f"scrolled when asked to, so the end of it cannot be read. The "
+        f"overflow-x values out from the panel were {result['overflows']}"
     )
 
 

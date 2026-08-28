@@ -21,6 +21,10 @@ SRGB_LINEAR_CUTOFF = 0.0031308
 # optional alpha.
 COLOUR_COMPONENTS = 3
 
+# What 100% means for Oklab's `a` and `b` axes, and for OKLCH's chroma, per
+# CSS Color 4. Lightness uses the ordinary 0-1 mapping and hue is an angle.
+OKLAB_AXIS_SCALE = 0.4
+
 
 def _srgb_channel(value: float) -> int:
     """Convert one linear-light channel to an 8-bit sRGB value.
@@ -116,9 +120,17 @@ def _canonical_colour(match: re.Match[str]) -> str:
     if name.startswith("rgb"):
         red, green, blue = (round(value(i, 255.0)) for i in range(COLOUR_COMPONENTS))
     elif name == "oklab":
-        red, green, blue = _oklab_to_rgb(value(0), value(1), value(2))
+        # CSS Color 4 scales a percentage differently per component: for
+        # lightness 100% is 1.0, but for `a` and `b` 100% is 0.4 (and -100% is
+        # -0.4). Reading them all as 1.0 would put a percentage-written colour
+        # two and a half times too far from grey.
+        red, green, blue = _oklab_to_rgb(
+            value(0), value(1, OKLAB_AXIS_SCALE), value(2, OKLAB_AXIS_SCALE)
+        )
     else:  # oklch
-        chroma, hue = value(1), math.radians(value(2))
+        # Chroma takes the same 0.4 scale as `a` and `b`; hue is an angle and
+        # is never a percentage.
+        chroma, hue = value(1, OKLAB_AXIS_SCALE), math.radians(value(2))
         red, green, blue = _oklab_to_rgb(
             value(0), chroma * math.cos(hue), chroma * math.sin(hue)
         )

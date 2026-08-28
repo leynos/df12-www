@@ -8,16 +8,18 @@ next run to trip over.
 from __future__ import annotations
 
 import contextlib
+import errno
 import fcntl
 import os
 import socket
-from pathlib import Path
+import typing as typ
 
 import pytest
 
 from tests.support.weaver_harness import load
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+if typ.TYPE_CHECKING:
+    from pathlib import Path
 
 # Stands in for whatever goes wrong between taking a lock and the work
 # finishing. Named so a `pytest.raises` block stays one statement.
@@ -328,15 +330,23 @@ def test_the_port_probe_binds_the_way_the_server_will() -> None:
     # the test would pass on a port that is simply free.
     with (
         socket.socket(socket.AF_INET, socket.SOCK_STREAM) as bare,
-        pytest.raises(OSError, match="in use"),
+        # `OSError` unqualified, because the assertion below is on the
+        # errno rather than the message, which the C library localizes.
+        pytest.raises(OSError) as refused,  # noqa: PT011 - checked by errno below
     ):
         bare.bind(("127.0.0.1", port))
+
+    # `EADDRINUSE` rather than the message, which the C library localizes.
+    assert refused.value.errno == errno.EADDRINUSE, (
+        f"expected the port to be refused as in use; got errno "
+        f"{refused.value.errno} ({refused.value})"
+    )
 
     serving._refuse_occupied_port(port)
 
 
 def test_a_kernel_assigned_port_leaves_no_lock_file_behind(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A lock keyed on an ephemeral port is one file per run, for ever.
 
@@ -346,12 +356,12 @@ def test_a_kernel_assigned_port_leaves_no_lock_file_behind(
     directory that no later run will ever look at again.
     """
     locks: list[int] = []
-    monkeypatch.setattr(
-        serving,
-        "_startup_lock",
-        lambda port: locks.append(port) or contextlib.nullcontext(),
-    )
-    monkeypatch.setattr(serving, "_refuse_occupied_port", lambda _port: None)
+
+    def record(port: int) -> contextlib.AbstractContextManager[None]:
+        locks.append(port)
+        return contextlib.nullcontext()
+
+    monkeypatch.setattr(serving, "_startup_lock", record)
 
     def stop_before_spawning(_port: int) -> None:
         raise SystemExit(_MID_START_FAILURE)
@@ -373,7 +383,7 @@ def test_the_default_port_is_treated_as_unnamed(
     """`_served` decides from what the caller asked for, not what it resolved to."""
     seen: dict[str, object] = {}
 
-    def start(port: int, marker: str, *, named: bool) -> object:
+    def start(_port: int, _marker: str, *, named: bool) -> object:
         seen["named"] = named
         message = "far enough"
         raise SystemExit(message)

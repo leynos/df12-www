@@ -35,10 +35,46 @@ FONT_SIZE = re.compile(r"^text-(?:[3-9]xs|2xs|xs|sm|base|lg|xl|[2-9]xl)$")
 CLASS_ATTRIBUTE = re.compile(r"""class\s*=\s*(?:"([^"]*)"|'([^']*)')""", re.DOTALL)
 
 
-# Directories `bun run dev` watches, from the `dev` script in `package.json`.
-# A build step that writes into one of these makes the watcher rebuild in
-# response to its own output.
+# What `bun run dev` watches, from the `dev` script in `package.json`. A build
+# step that writes to any of it makes the watcher rebuild in response to its own
+# output, and keep doing so.
 WATCHED_ROOTS = ("src", "df12_pages", "config", "scripts")
+
+# The watcher's glob list names one file as well as the four directories, and a
+# build step that rewrote it would loop exactly as one writing into `src/`
+# does. `pyproject.toml` is not a plausible build output today, which is
+# precisely why it would go unnoticed if it ever became one.
+WATCHED_FILES = ("pyproject.toml",)
+
+
+def _watched_candidates() -> list[Path]:
+    """List every file `bun run dev` would rebuild in response to.
+
+    Returns
+    -------
+    list of Path
+        Files beneath the watched roots, plus each watched file that exists.
+
+    Notes
+    -----
+    The watcher's own ignore patterns are deliberately *not* applied here.
+    One of them covers the generated Episodic search index, and that ignore
+    is the second guard against the rebuild loop rather than the first — the
+    first is that the build no longer rewrites the file. A snapshot that
+    honoured the ignore would stop watching the thing the primary fix is
+    responsible for. `__pycache__` and `.pyc` are excluded because they are
+    artefacts of running the tests, not of running the build.
+    """
+    candidates = [
+        path
+        for root in WATCHED_ROOTS
+        for path in sorted((REPO_ROOT / root).rglob("*"))
+        if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+    ]
+    candidates.extend(
+        path for name in WATCHED_FILES if (path := REPO_ROOT / name).is_file()
+    )
+    return candidates
 
 
 def test_no_element_declares_two_font_sizes_at_once() -> None:
@@ -171,13 +207,10 @@ def test_a_build_does_not_rewrite_anything_the_dev_watcher_watches(
     assert built_site.is_dir(), "the session fixture should have built the tree"
 
     def snapshot() -> dict[Path, tuple[int, float]]:
-        seen: dict[Path, tuple[int, float]] = {}
-        for root in WATCHED_ROOTS:
-            for path in sorted((REPO_ROOT / root).rglob("*")):
-                if path.is_file() and "__pycache__" not in path.parts:
-                    stats = path.stat()
-                    seen[path] = (stats.st_size, stats.st_mtime)
-        return seen
+        return {
+            path: (path.stat().st_size, path.stat().st_mtime)
+            for path in _watched_candidates()
+        }
 
     # `or pytest.skip(...)` rather than an `if`, because the skip's `NoReturn`
     # is what narrows this to `str` for the call below.
@@ -197,6 +230,48 @@ def test_a_build_does_not_rewrite_anything_the_dev_watcher_watches(
         "`bun run dev` rebuilds in response to its own output and never "
         f"settles: {touched}"
     )
+
+
+def test_every_path_the_dev_watcher_watches_is_a_snapshot_candidate() -> None:
+    """The invariant is only as wide as the set of files it looks at.
+
+    The four directories were covered from the start; `pyproject.toml` was
+    named in the watcher's glob list and absent from the snapshot, so a build
+    step that rewrote it would have looped with nothing to say so.
+    """
+    candidates = _watched_candidates()
+    assert candidates, "the watched roots produced no files at all"
+
+    assert REPO_ROOT / "pyproject.toml" in candidates, (
+        "`pyproject.toml` is watched by `bun run dev` but is not among the "
+        "files the repeat-build invariant compares"
+    )
+
+    covered = {
+        root
+        for root in WATCHED_ROOTS
+        if any(path.is_relative_to(REPO_ROOT / root) for path in candidates)
+    }
+    assert covered == set(WATCHED_ROOTS), (
+        f"these watched roots contributed no files: {set(WATCHED_ROOTS) - covered}"
+    )
+
+
+def test_the_watched_set_matches_what_the_dev_script_names() -> None:
+    """The lists here are a transcription, and a transcription can drift."""
+    package = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    watched = set(re.findall(r"'([^']+)'", package["scripts"]["dev"].split(" -i ")[0]))
+
+    for root in WATCHED_ROOTS:
+        assert f"{root}/**/*" in watched, (
+            f"{root!r} is in WATCHED_ROOTS but the dev script does not watch it; "
+            f"the script watches {sorted(watched)}"
+        )
+    for name in WATCHED_FILES:
+        assert name in watched, (
+            f"{name!r} is in WATCHED_FILES but the dev script does not watch it; "
+            f"the script watches {sorted(watched)}"
+        )
 
 
 def test_the_dev_watcher_also_ignores_the_generated_search_index() -> None:

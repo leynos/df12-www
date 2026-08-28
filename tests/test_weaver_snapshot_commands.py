@@ -13,20 +13,11 @@ import typing as typ
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
-from pathlib import Path
+    from pathlib import Path
 
 import pytest
 
 from tests.support.weaver_harness import load, write_snapshot
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-# Stands in for whatever goes wrong between taking a lock and the work
-# finishing. Named so a `pytest.raises` block stays one statement.
-_MID_START_FAILURE = "the port was occupied"
-
-# A port number for the messages these tests read back. Nothing binds it.
-PORT = 8099
 
 commands = load("weaver_snapshot")
 paths = load("weaver_snapshot_paths")
@@ -145,7 +136,7 @@ def test_one_directory_named_twice_is_locked_once(tmp_path: Path) -> None:
 
 @contextlib.contextmanager
 def _driven(
-    monkeypatch: pytest.MonkeyPatch, pages: list[str], tools: dict[str, str]
+    monkeypatch: pytest.MonkeyPatch, pages: list[str], tool_paths: dict[str, str]
 ) -> cabc.Iterator[dict[str, typ.Any]]:
     """Run a command with every outward seam replaced, and record what it did.
 
@@ -155,12 +146,24 @@ def _driven(
     the right arguments. A command that resolved the wrong tool, served the
     wrong port, or staged the wrong suffix would pass every existing test.
 
+    Parameters
+    ----------
+    monkeypatch
+        Used to replace each seam for the duration.
+    pages
+        What `_page_paths` should report.
+    tool_paths
+        Resolved executable path per tool name, as `_tool` would return.
+
     Yields
     ------
     dict
-        ``argv`` — every command the run would have executed; ``served`` — the
-        ports the server was asked for, and whether it was stopped; ``staged``
-        — the (directory, suffix) pairs staged.
+        ``argv`` — every command the run would have executed;
+        ``served`` — the ports the server was asked for;
+        ``closed`` — the ports whose server was stopped again, one entry per
+        stop, so a run that started a server and never stopped it is visible
+        as a `served` entry with no matching `closed` one;
+        ``staged`` — the (directory, suffix) pairs staged.
     """
     record: dict[str, typ.Any] = {"argv": [], "served": [], "staged": [], "closed": []}
 
@@ -182,7 +185,7 @@ def _driven(
     monkeypatch.setattr(commands, "_served", served)
     monkeypatch.setattr(commands, "_staged", staged)
     monkeypatch.setattr(commands, "_page_paths", lambda: list(pages))
-    monkeypatch.setattr(commands, "_tool", lambda name: tools[name])
+    monkeypatch.setattr(commands, "_tool", lambda name: tool_paths[name])
     monkeypatch.setattr(
         commands, "_run_tool", lambda argv: record["argv"].append(list(argv))
     )

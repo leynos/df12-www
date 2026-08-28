@@ -24,9 +24,6 @@ from tests.support.weaver_harness import load
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-# Stands in for whatever goes wrong between taking a lock and the work
-# finishing. Named so a `pytest.raises` block stays one statement.
-_MID_START_FAILURE = "the port was occupied"
 
 # A port number for the messages these tests read back. Nothing binds it.
 PORT = 8099
@@ -96,6 +93,12 @@ def _serving(directory: Path) -> cabc.Iterator[str]:
         server.shutdown()
         server.server_close()
         serving.join(timeout=10)
+        # `join` returns on timeout as readily as on success, so the thread
+        # has to be asked whether it actually stopped. A live one still holds
+        # the port the next test will be handed.
+        assert not serving.is_alive(), (
+            "the serving thread did not stop, so its port is still held"
+        )
 
 
 def test_another_worktree_s_server_on_the_port_is_refused(tmp_path: Path) -> None:

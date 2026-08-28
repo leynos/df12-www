@@ -225,5 +225,10 @@ def _output_lock_path(out_dir: Path) -> Path:
     Path
         The lock file's path.
     """
-    digest = hashlib.sha256(str(out_dir).encode("utf-8")).hexdigest()[:16]
+    # Resolved first: two runs naming one directory differently — a relative
+    # path against an absolute one, or a route through a symlink — would
+    # otherwise take two different locks over the same files and not serialize
+    # at all. Both callers already pass a resolved path; this makes the
+    # function answer for that rather than assume it.
+    digest = hashlib.sha256(str(out_dir.resolve()).encode("utf-8")).hexdigest()[:16]
     return Path(tempfile.gettempdir()) / f"weaver-snapshot-{os.getuid()}-{digest}.lock"

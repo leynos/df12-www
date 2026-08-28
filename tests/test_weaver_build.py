@@ -80,6 +80,15 @@ RGB_COLOUR = re.compile(r"\brgba?\(")
 # is the page's whole job and not a colour anyone is specifying.
 STYLING_ATTRIBUTE = re.compile(r"""(?:class|style)\s*=\s*(?:"[^"]*"|'[^']*')""")
 
+# A Font Awesome class inside a `class` attribute, in either quote form. The
+# family suffixes (`fa-solid`, `fa-brands`, …) and the bare `fa`, `fas`, `far`
+# and `fab` shorthands are one alternation rather than two patterns, because
+# the same attribute may carry either and a second pattern would be a second
+# thing to keep in step.
+FONT_AWESOME = re.compile(
+    r"""class\s*=\s*["'][^"']*\bfa(?:-(?:solid|regular|brands|fw)|[srb])?\b"""
+)
+
 
 def _weaver_sources() -> list[Path]:
     """List the files that must not contain a colour literal.
@@ -262,9 +271,40 @@ def test_no_font_awesome_markup_remains() -> None:
     offenders = {
         str(path.relative_to(REPO_ROOT))
         for path in sources
-        if re.search(
-            r"""class\s*=\s*["'][^"']*\bfa(?:-(?:solid|regular|brands|fw)|[srb]?)\b""",
-            path.read_text(encoding="utf-8"),
-        )
+        if FONT_AWESOME.search(path.read_text(encoding="utf-8"))
     }
     assert not offenders, f"Font Awesome classes remain in: {offenders}"
+
+
+@pytest.mark.parametrize(
+    ("markup", "detected"),
+    [
+        pytest.param('<i class="fa-solid fa-bars"></i>', True, id="long-form"),
+        pytest.param('<i class="fas fa-terminal"></i>', True, id="shorthand"),
+        pytest.param("<i class='fa-brands fa-github'></i>", True, id="single-quoted"),
+        pytest.param('<i class="fa"></i>', True, id="bare-fa"),
+        pytest.param('<span class="fa-fw"></span>', True, id="fixed-width"),
+        # The pattern has to tell a Font Awesome class from a word that merely
+        # starts with the same letters, or every `fade`, `fallback` and
+        # `family` utility on the site reads as a leftover glyph.
+        pytest.param('<div class="fade-in"></div>', False, id="fade-is-not-fa"),
+        pytest.param('<div class="font-mono fallback"></div>', False, id="fallback"),
+        pytest.param('<div class="text-xs"></div>', False, id="ordinary-utility"),
+        # `fa` outside a class attribute is somebody's prose or a variable.
+        pytest.param("<p>The fa-solid family</p>", False, id="not-an-attribute"),
+        pytest.param('data-icon="fa-solid"', False, id="different-attribute"),
+    ],
+)
+def test_the_font_awesome_pattern_tells_a_glyph_from_a_word(
+    markup: str,
+    *,
+    detected: bool,
+) -> None:
+    """The scan is only as good as its ability to avoid a false positive.
+
+    A pattern that matched `fade-in` would report the whole sub-site as
+    carrying Font Awesome, and the test would be turned off rather than fixed.
+    """
+    assert bool(FONT_AWESOME.search(markup)) is detected, (
+        f"expected {'a match' if detected else 'no match'} in {markup!r}"
+    )

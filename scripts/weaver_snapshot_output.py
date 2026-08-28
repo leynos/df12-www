@@ -12,7 +12,6 @@ from __future__ import annotations
 import collections.abc as cabc
 import contextlib
 import shutil
-import sys
 import tempfile
 from pathlib import Path
 
@@ -20,6 +19,17 @@ from weaver_snapshot_locking import _exclusive, _output_lock_path
 from weaver_snapshot_paths import _ensure_output_dir
 
 type Mover = cabc.Callable[[Path, Path], object]
+
+
+class _InconsistentDestinationError(OSError):
+    """Publication failed and the rollback could not put the old files back.
+
+    Raised only when the destination is left holding neither run's results in
+    full. It is an ``OSError`` so an ordinary caller still sees a filesystem
+    failure, and distinct so :func:`_staged` can tell that the staging
+    directory now holds the only copy of the previous run's files and must not
+    be swept away with the rest.
+    """
 
 
 def _publish(
@@ -90,19 +100,23 @@ def _publish(
             except OSError as exc:
                 failures.append(f"{original} could not be restored ({exc})")
         if failures:
-            # The rollback itself failed, so the destination is neither the
-            # previous run's nor this one's. Saying so is the only useful
-            # thing left; the staging directory is kept for the same reason.
-            print(
-                f"WARNING: {destination} is in an inconsistent state after a "
-                f"failed publication. " + "; ".join(failures),
-                file=sys.stderr,
+            # The rollback itself failed, so the destination holds neither
+            # run's results in full and the previous run's files are still in
+            # the staging directory. Raising a distinct type is what stops
+            # `_staged` deleting them along with everything else.
+            message = (
+                f"{destination} is in an inconsistent state after a failed "
+                f"publication, and the previous run's files are in {aside}. "
+                + "; ".join(failures)
             )
+            raise _InconsistentDestinationError(message) from None
         raise
 
 
 @contextlib.contextmanager
-def _staged(out_dir: Path, suffix: str) -> cabc.Iterator[Path]:
+def _staged(
+    out_dir: Path, suffix: str, move: Mover = Path.replace
+) -> cabc.Iterator[Path]:
     """Capture into a private directory, and publish it only if everything worked.
 
     Writing straight into ``out_dir`` gives a run no exclusive claim on it. Two
@@ -123,6 +137,9 @@ def _staged(out_dir: Path, suffix: str) -> cabc.Iterator[Path]:
         Where the results should end up.
     suffix
         File extension being written, including the leading dot.
+    move
+        How to move one file onto another. Forwarded to :func:`_publish`, so
+        a publication failure can be provoked without a full disk.
 
     Yields
     ------
@@ -153,9 +170,19 @@ def _staged(out_dir: Path, suffix: str) -> cabc.Iterator[Path]:
 
     try:
         with _exclusive(_output_lock_path(destination), f"the output {destination}"):
-            _publish(staging, destination, suffix)
+            _publish(staging, destination, suffix, move)
+    except _InconsistentDestinationError as exc:
+        # The staging directory holds the only copy of the previous run's
+        # files, so it is deliberately left where it is. Sweeping it up here
+        # would turn a recoverable mess into an unrecoverable one.
+        message = (
+            f"{exc} The staging directory has been kept; its `replaced/` "
+            f"holds the previous run's files."
+        )
+        raise SystemExit(message) from exc
     except OSError as exc:
+        shutil.rmtree(staging, ignore_errors=True)
         message = f"{destination} could not be published to ({exc})"
         raise SystemExit(message) from exc
-    finally:
+    else:
         shutil.rmtree(staging, ignore_errors=True)

@@ -12,23 +12,19 @@ import contextlib
 import json
 import os
 import typing as typ
-from pathlib import Path
 
 import pytest
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
+    from pathlib import Path
 
 from tests.support.weaver_harness import load
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # Stands in for whatever goes wrong between taking a lock and the work
 # finishing. Named so a `pytest.raises` block stays one statement.
 _MID_START_FAILURE = "the port was occupied"
 
-# A port number for the messages these tests read back. Nothing binds it.
-PORT = 8099
 
 commands = load("weaver_snapshot")
 locking = load("weaver_snapshot_locking")
@@ -340,7 +336,9 @@ def test_a_publication_that_succeeds_replaces_everything(tmp_path: Path) -> None
     destination = tmp_path / "out"
     destination.mkdir()
     (destination / "one.json").write_text("previous", encoding="utf-8")
-    (destination / "gone.json").write_text("a page that no longer exists", "utf-8")
+    (destination / "gone.json").write_text(
+        "a page that no longer exists", encoding="utf-8"
+    )
     (destination / "kept.png").write_text("a screenshot run's", encoding="utf-8")
 
     staging = tmp_path / "staging"
@@ -398,39 +396,85 @@ def test_a_cancelled_publication_still_restores_the_destination(
     )
 
 
-def test_a_rollback_that_cannot_finish_says_so(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """Silence would leave the operator believing the destination is intact.
-
-    If the rollback itself fails the destination is neither the previous run's
-    nor this one's, and there is nothing left to do about it but say which
-    files are in that state.
-    """
+def _seeded(tmp_path: Path) -> Path:
+    """Return a destination holding one snapshot from a previous run."""
     destination = tmp_path / "out"
     destination.mkdir()
     (destination / "one.json").write_text("previous one", encoding="utf-8")
+    return destination
 
-    staging = tmp_path / "staging"
-    staging.mkdir()
-    (staging / "one.json").write_text("this one", encoding="utf-8")
 
+def _staged_run(destination: Path, move: cabc.Callable[[Path, Path], object]) -> Path:
+    """Capture one page and publish it with `move`, returning the staging path.
+
+    `_staged` chooses the staging directory itself, so a test that looks
+    inside it afterwards has to capture the path on the way through.
+    """
+    seen: list[Path] = []
+    with output._staged(destination, ".json", move) as staging:
+        seen.append(staging)
+        (staging / "one.json").write_text("this run", encoding="utf-8")
+    return seen[0]
+
+
+def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> None:
+    """When the rollback fails too, staging holds the only previous results.
+
+    The destination then holds neither run in full, and the previous run's
+    files are in the staging directory's `replaced/`. Sweeping that up with
+    the rest of the staging directory — which is what happens to every other
+    failure — would turn a recoverable mess into an unrecoverable one.
+    """
+    destination = _seeded(tmp_path)
     moves = {"n": 0}
 
     def hopeless(source: Path, target: Path) -> object:
         moves["n"] += 1
+        # The rescue succeeds; the publication and then the rollback do not.
         if moves["n"] == 1:
             return source.replace(target)
         message = "the filesystem went away"
         raise OSError(message)
 
-    with pytest.raises(OSError, match="filesystem went away"):
-        output._publish(staging, destination, ".json", hopeless)
+    staging: list[Path] = []
+    with pytest.raises(SystemExit) as caught:
+        staging.append(_staged_run(destination, hopeless))
 
-    warning = capsys.readouterr().err
-    assert "inconsistent state" in warning, (
-        f"a failed rollback should be reported, not swallowed; stderr was {warning!r}"
+    message = str(caught.value.code)
+    assert "inconsistent state" in message, f"got {message!r}"
+    kept = next(tmp_path.glob(".out-*"))
+    assert kept.is_dir(), (
+        "the staging directory was swept away, taking the previous run's only "
+        "surviving copy with it"
     )
-    assert str(destination) in warning, (
-        f"the warning should name the directory; got {warning!r}"
+    assert (kept / "replaced" / "one.json").read_text(encoding="utf-8") == (
+        "previous one"
+    ), f"the previous run's file is not recoverable from {kept}"
+
+
+def test_an_ordinary_publication_failure_still_cleans_up(tmp_path: Path) -> None:
+    """A rollback that worked leaves nothing to keep, so staging goes."""
+    destination = _seeded(tmp_path)
+    moves = {"n": 0}
+    # Rescue, then a failed publication, then a rollback that works.
+    publication = 2
+
+    def fails_once(source: Path, target: Path) -> object:
+        moves["n"] += 1
+        if moves["n"] == publication:
+            message = "no space left on device"
+            raise OSError(message)
+        return source.replace(target)
+
+    with pytest.raises(SystemExit) as caught:
+        _staged_run(destination, fails_once)
+
+    assert "could not be published" in str(caught.value.code), (
+        f"expected the ordinary publication message; got {caught.value.code!r}"
+    )
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "the rollback should have restored the previous run"
+    )
+    assert not list(tmp_path.glob(".out-*")), (
+        "a recoverable failure should not leave a staging directory behind"
     )

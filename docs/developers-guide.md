@@ -827,7 +827,7 @@ stay, while `mobile-nav.js` addresses the same elements as `[data-mobile-nav]`,
 are resolved within the root rather than from the document, so the root is the
 only thing a page has to get right.
 
-The convention's limits are worth naming, because they decide when to leave it.
+The convention's limits are worth naming because they decide when to leave it.
 A module is a file plus a `data-` prefix, so nothing enforces one instance per
 root, nothing provides a lifecycle beyond first run, and nothing tells CSS that
 a script has upgraded the markup — `config-keys.js` has to add an `is-enhanced`
@@ -843,7 +843,7 @@ The Weaver drawer and its copy controls report through the same optional hook
 model as Episodic search. A production host may set
 `window.df12WeaverNavTelemetry` to a function before the deferred scripts run;
 without it, `src/static/weaver/assets/js/telemetry.js` is a no-op and nothing
-is collected. A sink that throws is caught and ignored, because observability
+is collected. A sink that throws is caught and ignored because observability
 must not be able to break the drawer or the button it was watching.
 
 Every event has the same shape, and the whole of what may leave the page is
@@ -856,7 +856,7 @@ declared as three frozen vocabularies at the top of that file:
 | `outcome`   | `initialized`, `opened`, `closed`, `focus-restored`, `copied`, `failed`                                                 |
 | `reason`    | `toggle`, `backdrop`, `nav-link`, `escape`, `breakpoint`, `saved-element`, `toggle-fallback`, `unavailable`, `rejected` |
 
-_Table 8: every field a Weaver chrome telemetry event may carry._
+_Table 7: every field a Weaver chrome telemetry event may carry._
 
 `reason` is present only where an outcome has more than one cause worth
 separating: which of the five things closed the drawer, whether focus went back
@@ -1084,7 +1084,7 @@ deliberately did.
 
 ### 7.2. Property-based tests for the snapshot normalizer
 
-`tests/test_weaver_snapshot_properties.py` complements the example-based the
+`tests/test_weaver_snapshot_properties.py` complements the example-based
 `tests/test_weaver_snapshot_*.py` suites with
 [Hypothesis](https://hypothesis.readthedocs.io/) (`hypothesis` is a `dev`
 dependency-group entry in `pyproject.toml`). Rather than asserting what the
@@ -1125,25 +1125,33 @@ uv run pytest tests/test_weaver_snapshot_properties.py -v
 
 ### 7.3. Browser-driven checks against the served pages
 
-`tests/test_weaver_browser.py` is the one Weaver suite that watches a real
-Chromium rather than reading text. The build tests read the delivered markup
-and the compiled stylesheet as strings, and the snapshot tests exercise the
-harness that drives a browser without ever starting one; this suite serves
-`public/` and drives `agent-browser` over it, so it can observe served
+`tests/test_weaver_browser.py` and `tests/test_weaver_browser_interaction.py`
+are the two Weaver suites that watch a real Chromium rather than reading text.
+The former checks what every published page looks like once it has loaded;
+the latter checks what happens when something acts on one — a copy-button
+click, a resize past the mobile breakpoint, the drawer opening, the `capture`
+command run end to end. The build tests read the delivered markup and the
+compiled stylesheet as strings, and the snapshot tests exercise the harness
+that drives a browser without ever starting one; these two suites serve
+`public/` and drive `agent-browser` over it, so they can observe served
 responses, composited colours, and the laid-out result rather than the markup
 that describes them — whether a declared stylesheet actually 404s, what a
 translucent panel's colour composites to once the cascade has had its say, and
 whether the sidebar genuinely gives way to the drawer at a narrow viewport.
 
-It carries the `playwright` marker, so `uv run pytest -m "not playwright"`
-deselects it while iterating on something else. It also degrades to a skip
+Both carry the `playwright` marker, so `uv run pytest -m "not playwright"`
+deselects them while iterating on something else. Both also degrade to a skip
 rather than a failure when a dependency is absent: `agent-browser` not on
 `PATH`, `node_modules/.bin/http-server` missing (run `bun install`), or `uv` or
 `bun` themselves not on `PATH`.
 
-`built_site` is a session-scoped fixture in `tests/conftest.py`, shared with
-the build suites, so `bun run build` runs once for all of them rather than once
-per module.
+`built_site`, `served`, and `drive` are session-scoped fixtures in
+`tests/conftest.py`, shared with the build suites and between the two browser
+suites, so `bun run build` runs once for all of them rather than once per
+module. The page list, the viewports, the axe waivers, and the helpers that
+read state back out of the browser — the request log, axe's report, the
+result of an evaluated expression — live in `tests/support/weaver_browser.py`,
+so both suites drive the browser the same way over the same matrix.
 
 **The matrix.** The page list is derived from `config/pages.yaml` — the same
 file the generator itself reads — rather than hard-coded or drawn from the
@@ -1160,7 +1168,7 @@ one that puts the sidebar off-canvas behind a toggle, and 1440×900, the width
 the layout was drawn against. The two layouts share almost no chrome, so both
 have to be checked.
 
-**What each test asserts:**
+**What `test_weaver_browser.py` asserts, per page:**
 
 - `test_a_weaver_page_is_self_contained` — every request the page makes comes
   from the local origin and none fails, and the page actually fetched a
@@ -1176,16 +1184,13 @@ have to be checked.
 - `test_a_weaver_page_lays_out_its_sidebar_on_a_desktop` — the sidebar lays
   out at 1440px, the wide layout's half of the same swap.
 
-Three further tests are not parametrized per page:
+Two further tests in this file are not parametrized per page:
 
 - `test_the_recorded_contrast_exceptions_are_still_real` — the two waived
   `safety/` labels still fail exactly as recorded (see below).
 - `test_the_published_tree_holds_exactly_the_pages_checked_here` — the
   companion test named above: the published tree and `config/pages.yaml` name
   exactly the same pages.
-- `test_the_capture_command_writes_one_snapshot_per_page` — runs
-  `scripts/weaver_snapshot.py capture` end to end and checks it writes one
-  non-empty snapshot per published page.
 
 **The current-link contract.** At most one sidebar link may carry
 `aria-current="page"`, and where one does, it has to point at somewhere the
@@ -1214,14 +1219,39 @@ labels still fire; if a future palette change makes them pass, that test fails
 instead, so the waiver cannot quietly outlive the defect it was recorded
 against.
 
-Run just this file:
+**What `test_weaver_browser_interaction.py` asserts:**
+
+- `test_a_copy_control_hands_the_clipboard_what_it_shows` — the home page's
+  install-command button, and the install page's unlabelled buttons, hand a
+  stubbed `navigator.clipboard` exactly the text each sits beside.
+- `test_a_long_code_line_scrolls_its_panel_and_not_the_page` — on `docs/`,
+  `commands/act/`, and `sempai/`, a three-hundred-character line injected into
+  a code panel either wraps or scrolls that panel, and never widens the
+  document itself.
+- `test_the_capture_command_writes_one_snapshot_per_page` — runs
+  `scripts/weaver_snapshot.py capture` end to end and checks it writes one
+  non-empty snapshot per published page.
+- `test_the_drawer_opens_on_a_published_page` — on `privacy-policy/` and the
+  home page, opening the drawer sets its ARIA state, shows the backdrop, moves
+  focus inside it, and locks the body's vertical scroll without touching the
+  horizontal.
+- `test_a_copy_control_reports_its_outcome_and_not_its_contents` — the copy
+  telemetry event carries only the fixed `component`/`operation`/`outcome`
+  schema, never the copied text or anything identifying the page.
+
+Run either file on its own:
 
 ```bash
 uv run pytest tests/test_weaver_browser.py -v
+uv run pytest tests/test_weaver_browser_interaction.py -v
 ```
 
-It takes roughly 130 seconds for the file's 122 tests, including the build, on
-the machine it was written on.
+Together they cover every published page at two viewports for the
+self-containment, accessibility, chrome, and layout checks, plus the smaller,
+non-parametrized batteries described above — 121 cases in the page-level suite
+and 9 in the interaction one. Expect the pair to take between three and four
+minutes including the build, most of it in the page-level suite, since axe
+runs once per page per viewport.
 
 ### 7.4. Mobile overflow below the tablet breakpoint
 

@@ -3,8 +3,10 @@
 The copy controls are inline `onclick` handlers, so nothing between the markup
 and a real click exercises them. The code panels are meant to scroll rather
 than wrap, and the guarantee worth pinning is that a long line scrolls its
-panel and not the document. And `capture` is a command an operator types,
-exercised here end to end rather than through its seams.
+panel and not the document. The drawer is a UI flow that the fake DOM cannot
+speak for, and its telemetry seam only exists once the page has loaded the
+script and the markup that calls it. And `capture` is a command an operator
+types, exercised here end to end rather than through its seams.
 """
 
 from __future__ import annotations
@@ -57,8 +59,11 @@ _DRAWER_STATE = (
     # rather than pushing it down.
     " navDisplay: nav ? getComputedStyle(nav).display : 'absent',"
     " navPosition: nav ? getComputedStyle(nav).position : 'absent',"
-    " focusInDrawer: sidebar.contains(active),"
-    " active: active.tagName + '#' + (active.id || ''),"
+    # A page without a sidebar, or with nothing focused, is a failure to
+    # report rather than one to throw on: `contains` on null and `.tagName`
+    # on null both abort the probe before it can say what it found.
+    " focusInDrawer: Boolean(sidebar && active && sidebar.contains(active)),"
+    " active: active ? active.tagName + '#' + (active.id || '') : 'none',"
     " bodyOverflowY: body.overflowY,"
     # The *inline* declarations as well as the computed ones. The body already
     # carries `overflow-x: hidden` from a class, so a script setting both axes
@@ -123,6 +128,13 @@ def test_a_copy_control_hands_the_clipboard_what_it_shows(
             f"/weaver/{page}'s copy control passed {copied['copied']} rather "
             f"than {[expected]}"
         )
+    # Equal lengths first: `zip` would otherwise stop at the shorter list, so
+    # a control that never reached `writeText` would leave its pair unchecked
+    # rather than failing.
+    assert len(copied["copied"]) == len(copied["shown"]), (
+        f"/weaver/{page} has {len(copied['shown'])} copy controls but only "
+        f"{len(copied['copied'])} reached the clipboard: {copied}"
+    )
     for text, beside in zip(copied["copied"], copied["shown"], strict=True):
         assert text in beside, (
             f"/weaver/{page} copies {text!r} from a control sitting beside "
@@ -369,7 +381,7 @@ def test_a_copy_control_reports_its_outcome_and_not_its_contents(
     assert seen["copied"], "the control copied nothing, so it did not run"
     assert seen["events"] == [
         {
-            "component": "weaver-mobile-nav",
+            "component": "weaver-copy-button",
             "operation": "clipboard",
             "outcome": "copied",
         }

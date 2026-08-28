@@ -8,20 +8,9 @@ reporting the colours that genuinely moved.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from tests.support.weaver_harness import load
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-# Stands in for whatever goes wrong between taking a lock and the work
-# finishing. Named so a `pytest.raises` block stays one statement.
-_MID_START_FAILURE = "the port was occupied"
-
-# A port number for the messages these tests read back. Nothing binds it.
-PORT = 8099
 
 colour = load("weaver_snapshot_colour")
 
@@ -145,3 +134,35 @@ def test_transparent_shadow_layers_are_dropped_whatever_their_geometry() -> None
         "dropping the transparent layer must leave the visible one intact; "
         f"expected {visible!r}, got {kept!r}"
     )
+
+
+@pytest.mark.parametrize(
+    ("percentage", "number"),
+    [
+        # 100% on the `a` and `b` axes is 0.4, not 1.0 — CSS Color 4. Reading
+        # them as 1.0 put a percentage-written colour two and a half times too
+        # far from grey.
+        ("oklab(0.5 100% 0%)", "oklab(0.5 0.4 0)"),
+        ("oklab(0.5 -100% 50%)", "oklab(0.5 -0.4 0.2)"),
+        ("oklab(50% 25% -25%)", "oklab(0.5 0.1 -0.1)"),
+        # Chroma takes the same scale; hue is an angle and never a percentage.
+        ("oklch(0.5 100% 120)", "oklch(0.5 0.4 120)"),
+        ("oklch(50% 50% 240)", "oklch(0.5 0.2 240)"),
+    ],
+)
+def test_a_percentage_axis_means_what_the_specification_says(
+    percentage: str, number: str
+) -> None:
+    """A colour written in percentages is the same colour written in numbers."""
+    assert colour._canonical_value(percentage) == colour._canonical_value(number), (
+        f"{percentage!r} and {number!r} are one colour written two ways, but "
+        f"they canonicalize to {colour._canonical_value(percentage)!r} and "
+        f"{colour._canonical_value(number)!r}"
+    )
+
+
+def test_a_percentage_lightness_still_maps_to_one() -> None:
+    """Only the axes take the 0.4 scale; lightness keeps the ordinary mapping."""
+    assert colour._canonical_value("oklch(100% 0 0)") == colour._canonical_value(
+        "oklch(1 0 0)"
+    ), "100% lightness is 1.0, and scaling it with the axes would darken white"

@@ -16,6 +16,9 @@ const telemetry = require("../../public/weaver/assets/js/telemetry.js");
 const ALLOWED_FIELDS = ["component", "operation", "outcome", "reason"];
 
 let events;
+/* Bun supplies a `navigator`, and later tests in the run may want it. These
+   tests replace it, so the original is captured once and put back. */
+const REAL_NAVIGATOR = globalThis.navigator;
 
 beforeEach(() => {
   events = [];
@@ -24,7 +27,7 @@ beforeEach(() => {
 
 afterEach(() => {
   globalThis.df12WeaverNavTelemetry = undefined;
-  globalThis.navigator = undefined;
+  globalThis.navigator = REAL_NAVIGATOR;
 });
 
 describe("the hook", () => {
@@ -78,6 +81,9 @@ describe("the event schema", () => {
       for (const reason of [undefined, ...Object.values(telemetry.REASONS)]) {
         events.length = 0;
         telemetry.emit(telemetry.OPERATIONS.drawer, outcome, reason);
+        /* Without this the loop below is vacuous: a version that emitted
+           nothing at all would satisfy every field check it makes. */
+        expect(events.length).toBe(1);
         for (const event of events) {
           expect(Object.keys(event).sort()).toEqual(
             ALLOWED_FIELDS.filter((f) => f in event).sort(),
@@ -112,7 +118,7 @@ describe("the copy seam", () => {
 
     expect(written).toEqual(["cargo install weaver"]);
     expect(events).toEqual([
-      { component: "weaver-mobile-nav", operation: "clipboard", outcome: "copied" },
+      { component: "weaver-copy-button", operation: "clipboard", outcome: "copied" },
     ]);
     expect(JSON.stringify(events)).not.toContain("cargo");
   });
@@ -130,7 +136,7 @@ describe("the copy seam", () => {
 
     expect(events).toEqual([
       {
-        component: "weaver-mobile-nav",
+        component: "weaver-copy-button",
         operation: "clipboard",
         outcome: "failed",
         reason: "rejected",
@@ -146,7 +152,7 @@ describe("the copy seam", () => {
     expect(await telemetry.copy("cargo install weaver")).toBe(false);
 
     expect(events[0]).toEqual({
-      component: "weaver-mobile-nav",
+      component: "weaver-copy-button",
       operation: "clipboard",
       outcome: "failed",
       reason: "unavailable",
@@ -163,5 +169,29 @@ describe("the copy seam", () => {
     /* The copy still happens; only the reporting is optional. */
     expect(written).toEqual(["cargo install weaver"]);
     expect(events).toEqual([]);
+  });
+});
+
+describe("the component label", () => {
+  test("names the surface the event came from, not the module it lives in", () => {
+    /* The copy controls sit on the install and home pages, not inside the
+       navigation, so labelling their events `weaver-mobile-nav` would place
+       them somewhere they cannot have happened. */
+    telemetry.emit(telemetry.OPERATIONS.drawer, telemetry.OUTCOMES.opened);
+    telemetry.emit(telemetry.OPERATIONS.clipboard, telemetry.OUTCOMES.copied);
+
+    expect(events.map((e) => [e.operation, e.component])).toEqual([
+      ["drawer", "weaver-mobile-nav"],
+      ["clipboard", "weaver-copy-button"],
+    ]);
+  });
+
+  test("cannot disagree with the operation, because it is derived from it", () => {
+    for (const operation of Object.values(telemetry.OPERATIONS)) {
+      events.length = 0;
+      telemetry.emit(operation, telemetry.OUTCOMES.failed);
+      expect(events).toHaveLength(1);
+      expect(events[0].component).toBe(telemetry.COMPONENTS[operation]);
+    }
   });
 });

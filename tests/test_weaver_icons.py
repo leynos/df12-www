@@ -212,8 +212,9 @@ def _minimal_inputs(
     monkeypatch.setattr(generator, "MAPPING", mapping_path)
 
 
-# The macro published by a run whose inputs are empty: header and footer with
-# no icon entries between them. Enough to tell "replaced" from "unchanged".
+# What the output holds before a run starts: not a macro at all, just a marker
+# distinctive enough to tell "still there" from "replaced" without comparing
+# against whatever the generator would produce.
 STALE = "a previous macro, which must survive a failed publication"
 
 

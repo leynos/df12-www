@@ -37,13 +37,15 @@ function setUp({ links = ["/install", "/docs"], telemetry = false } = {}) {
   /* The drawer reports through `telemetry.js` when the page loaded it, and
      works the same when it did not. Both are worth exercising, so the script
      is only present when a test asks for it. */
+  /* The sink is installed either way, so a test asserting the drawer stays
+     silent has something that would catch it if it did not. Only the script
+     that reports through it is conditional. `evaluateScript` runs a script
+     through `new Function`, so its `globalThis` is this process's rather than
+     the happy-dom window's; in a browser the two are the same object, and
+     here `afterEach` takes the sink away again. */
   const events = [];
+  globalThis.df12WeaverNavTelemetry = (event) => events.push(event);
   if (telemetry) {
-    /* `evaluateScript` runs the script through `new Function`, so its
-       `globalThis` is this process's, not the happy-dom window's. In a real
-       browser the two are the same object; here the sink goes where the
-       script will look for it, and `afterEach` takes it away again. */
-    globalThis.df12WeaverNavTelemetry = (event) => events.push(event);
     evaluateScript(window, TELEMETRY);
   }
   evaluateScript(window, SCRIPT);
@@ -405,10 +407,12 @@ afterEach(() => {
 
 describe("telemetry", () => {
   test("says nothing at all when the page did not load the hook", () => {
+    /* A sink is installed; `telemetry.js` is not. The drawer has nothing to
+       report through, so it must report nothing — and the sink is there to
+       catch it if some future change reaches past the module. */
     const dom = setUp();
     click(dom.window, dom.toggle);
     pressKey(dom.window, dom.document, "Escape");
-    /* No sink, no `telemetry.js`, and the drawer still works. */
     expect(dom.isOpen()).toBe(false);
     expect(dom.events).toEqual([]);
   });

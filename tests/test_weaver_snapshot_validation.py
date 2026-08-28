@@ -9,20 +9,14 @@ the normalization.
 from __future__ import annotations
 
 import json
-from pathlib import Path
+import typing as typ
 
 import pytest
 
 from tests.support.weaver_harness import load
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-# Stands in for whatever goes wrong between taking a lock and the work
-# finishing. Named so a `pytest.raises` block stays one statement.
-_MID_START_FAILURE = "the port was occupied"
-
-# A port number for the messages these tests read back. Nothing binds it.
-PORT = 8099
+if typ.TYPE_CHECKING:
+    from pathlib import Path
 
 normalize = load("weaver_snapshot_normalize")
 

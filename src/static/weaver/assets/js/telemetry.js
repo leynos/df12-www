@@ -1,4 +1,5 @@
-/* Optional, privacy-preserving telemetry for the Weaver sub-site's chrome.
+/**
+ * @file Optional, privacy-preserving telemetry for the Weaver sub-site's chrome.
  *
  * Modelled on the Episodic search hook in
  * `src/static/episodic/assets/js/site-search.js`: a host may install a
@@ -19,13 +20,25 @@
 (() => {
   "use strict";
 
-  /* The one component these events describe. */
-  const COMPONENT = "weaver-mobile-nav";
+  /* Which surface an event came from. The drawer and the copy controls are
+     separate things in separate places — the controls sit on the install and
+     home pages, not inside the navigation — so labelling a copy event
+     `weaver-mobile-nav` would tell a reader it happened somewhere it cannot. */
+  const COMPONENTS = {
+    drawer: "weaver-mobile-nav",
+    clipboard: "weaver-copy-button",
+  };
 
-  /* What was being done. */
+  /* What was being done. Each operation belongs to exactly one component, so
+     the component is derived rather than passed and cannot disagree with it. */
   const OPERATIONS = {
     drawer: "drawer",
     clipboard: "clipboard",
+  };
+
+  const COMPONENT_FOR = {
+    [OPERATIONS.drawer]: COMPONENTS.drawer,
+    [OPERATIONS.clipboard]: COMPONENTS.clipboard,
   };
 
   /* How it turned out. */
@@ -81,7 +94,7 @@
       return;
     }
     const event = {
-      component: COMPONENT,
+      component: COMPONENT_FOR[operation],
       operation,
       outcome,
       ...(reason === undefined ? {} : { reason }),
@@ -120,11 +133,11 @@
     return true;
   }
 
-  globalThis.df12WeaverTelemetry = { emit, COMPONENT, OPERATIONS, OUTCOMES, REASONS };
+  globalThis.df12WeaverTelemetry = { emit, COMPONENTS, OPERATIONS, OUTCOMES, REASONS };
   globalThis.df12WeaverCopy = copy;
 
   /* Exported for the Bun tests, which require the built copy under public/. */
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = { emit, copy, COMPONENT, OPERATIONS, OUTCOMES, REASONS };
+    module.exports = { emit, copy, COMPONENTS, OPERATIONS, OUTCOMES, REASONS };
   }
 })();

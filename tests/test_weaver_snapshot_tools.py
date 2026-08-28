@@ -19,15 +19,6 @@ if typ.TYPE_CHECKING:
 
 from tests.support.weaver_harness import load
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-# Stands in for whatever goes wrong between taking a lock and the work
-# finishing. Named so a `pytest.raises` block stays one statement.
-_MID_START_FAILURE = "the port was occupied"
-
-# A port number for the messages these tests read back. Nothing binds it.
-PORT = 8099
-
 paths = load("weaver_snapshot_paths")
 tools = load("weaver_snapshot_tools")
 
@@ -115,15 +106,27 @@ def test_capture_drives_one_tool_run_per_page() -> None:
 
 
 def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None:
-    """A tool that exits non-zero must not leave a partial snapshot passing."""
+    """A tool that exits non-zero must not leave a partial snapshot passing.
+
+    Raising is half of it. The other half is stopping: a loop that swallowed
+    the first failure and carried on would produce a directory missing one
+    page, which compares clean against a baseline that has it.
+    """
+    attempted: list[str] = []
 
     def explode(argv: cabc.Sequence[str]) -> None:
+        attempted.append(argv[-1])
         raise subprocess.CalledProcessError(1, list(argv))
 
     with pytest.raises(subprocess.CalledProcessError):
         tools._capture_pages(
             ["", "install/"], Path("/out"), "http://x", "/usr/bin/bun", explode
         )
+
+    assert len(attempted) == 1, (
+        f"the run should stop at the first failure, but it attempted "
+        f"{len(attempted)} pages: {attempted}"
+    )
 
 
 def test_shots_closes_its_session_even_when_a_page_fails() -> None:
@@ -174,8 +177,9 @@ def test_every_page_is_shot_at_every_width() -> None:
     )
 
     shots = [argv[2] for argv in calls if argv[1] == "screenshot"]
+    out_dir = Path("/out")
     expected = [
-        f"/out/{slug}@{width}.png"
+        str(out_dir / f"{slug}@{width}.png")
         for width in tools.SCREENSHOT_WIDTHS
         for slug in (paths._slug(""), paths._slug("install/"))
     ]

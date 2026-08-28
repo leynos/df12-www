@@ -1099,9 +1099,12 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   already does this — `scripts/build_episodic_roadmap_data.py` imports
   `scripts/episodic_roadmap_parser.py` as a bare name, which works because a
   script run by path has its own directory on `sys.path`. A package would have
-  needed either `python -m` with a path fiddle or a `__main__.py` that cannot
-  use relative imports, and would have changed the documented invocation, the
-  Makefile, and every test that loads the harness. Siblings changed the
+  needed `python -m` with a path fiddle. A `__main__.py` can use
+  package-relative imports perfectly well when the package is invoked that
+  way; what it cannot do is use them under the direct-path invocation this
+  harness documents, because running a directory supplies no package context.
+  Either route would have changed the documented invocation, the Makefile, and
+  every test that loads the harness. Siblings changed the
   invocation not at all. Date/Author: 2026-08-28, review batch.
 - **Decision:** take the startup lock only for a port the caller named.
   Rationale: the lock serializes contention, and a port the kernel has just
@@ -1111,24 +1114,22 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   mechanism was built for. Date/Author: 2026-08-28, review batch.
 
 - **Decision:** put the Weaver telemetry in its own script rather than inside
-  `mobile-nav.js`, and route the inline copy handlers through it.
-  Rationale: `mobile-nav.js` returns early on a page without the drawer's
-  markup, and the install page's three copy buttons need the seam whether or
-  not the drawer is there. A separate file also keeps the privacy argument
-  readable: the vocabularies are the first thing in it and `emit` is the only
-  function that calls the sink, so a maintainer can check what may leave the
-  page by reading about a hundred lines. The copy controls call
-  `df12WeaverCopy('…')`, which passes the text to the clipboard and never to
-  the sink.
-  Date/Author: 2026-08-28, review batch.
-- **Decision:** drop an event whose operation, outcome or reason is outside
-  the declared vocabulary, rather than emitting it.
-  Rationale: the schema is the promise. Widening it at runtime for a caller
-  that passed something unrecognized would mean the table in the developers'
-  guide describes the schema rather than being it, and the thing most likely
-  to arrive that way is exactly what must not — a path, a label, an
-  identifier. A caller passing one is a bug in the caller.
-  Date/Author: 2026-08-28, review batch.
+  `mobile-nav.js`, and route the inline copy handlers through it. Rationale:
+  `mobile-nav.js` returns early on a page without the drawer's markup, and the
+  install page's three copy buttons need the seam whether or not the drawer is
+  there. A separate file also keeps the privacy argument readable: the
+  vocabularies are the first thing in it and `emit` is the only function that
+  calls the sink, so a maintainer can check what may leave the page by reading
+  about a hundred lines. The copy controls call `df12WeaverCopy('…')`, which
+  passes the text to the clipboard and never to the sink. Date/Author:
+  2026-08-28, review batch.
+- **Decision:** drop an event whose operation, outcome, or reason is outside
+  the declared vocabulary, rather than emitting it. Rationale: the schema is
+  the promise. Widening it at runtime for a caller that passed something
+  unrecognized would mean the table in the developers' guide describes the
+  schema rather than being it, and the thing most likely to arrive that way is
+  exactly what must not — a path, a label, an identifier. A caller passing one
+  is a bug in the caller. Date/Author: 2026-08-28, review batch.
 
 ## Outcomes & retrospective
 

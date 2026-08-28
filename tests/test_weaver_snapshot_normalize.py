@@ -8,20 +8,10 @@ normalized away and ships. These fix both edges.
 from __future__ import annotations
 
 import typing as typ
-from pathlib import Path
 
 import pytest
 
 from tests.support.weaver_harness import load
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-# Stands in for whatever goes wrong between taking a lock and the work
-# finishing. Named so a `pytest.raises` block stays one statement.
-_MID_START_FAILURE = "the port was occupied"
-
-# A port number for the messages these tests read back. Nothing binds it.
-PORT = 8099
 
 normalize = load("weaver_snapshot_normalize")
 

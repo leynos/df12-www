@@ -28,6 +28,14 @@
   /* Signal that JS is available so CSS can safely hide the nav */
   document.documentElement.classList.add("has-mobile-nav");
 
+  /* Optional telemetry, from `telemetry.js`. Absent on a page that did not
+     load it, and a no-op there unless a host installed a sink; either way the
+     drawer behaves the same. See that file for the whole event schema. */
+  var telemetry = globalThis.df12WeaverTelemetry;
+  function report(outcome, reason) {
+    telemetry?.emit(telemetry.OPERATIONS.drawer, outcome, reason);
+  }
+
   /* ---- hamburger button ---- */
   var btn = document.createElement("button");
   btn.id = "mobile-nav-toggle";
@@ -129,11 +137,12 @@
       }
     };
     document.addEventListener("keydown", focusTrapHandler);
+    report(telemetry?.OUTCOMES.opened);
   }
 
   /* Close the drawer, unlock the page, remove the trap, and return focus to
      whatever held it before the drawer opened. */
-  function close() {
+  function close(reason) {
     sidebar.classList.remove("mobile-nav-open");
     btn.setAttribute("aria-expanded", "false");
     btn.setAttribute("aria-label", "Open navigation menu");
@@ -161,6 +170,11 @@
         ? savedFocus
         : btn;
     restoreTo.focus();
+    report(telemetry?.OUTCOMES.closed, reason);
+    report(
+      telemetry?.OUTCOMES.focusRestored,
+      restoreTo === btn ? telemetry?.REASONS.toggleFallback : telemetry?.REASONS.savedElement,
+    );
     savedFocus = null;
   }
 
@@ -171,22 +185,22 @@
 
   /* ---- event listeners ---- */
   btn.addEventListener("click", () => {
-    if (isOpen()) close();
+    if (isOpen()) close(telemetry?.REASONS.toggle);
     else open();
   });
 
-  backdrop.addEventListener("click", close);
+  backdrop.addEventListener("click", () => close(telemetry?.REASONS.backdrop));
 
   /* Close drawer when a nav link is clicked (same-page anchors, etc.) */
   var navLinks = nav.querySelectorAll("a");
   for (const navLink of navLinks) {
     navLink.addEventListener("click", () => {
-      if (isOpen()) close();
+      if (isOpen()) close(telemetry?.REASONS.navLink);
     });
   }
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && isOpen()) close();
+    if (e.key === "Escape" && isOpen()) close(telemetry?.REASONS.escape);
   });
 
   var mql = window.matchMedia("(min-width: 1024px)");
@@ -194,8 +208,10 @@
   /* Close the drawer once the viewport is wide enough for the full sidebar,
      so the page is never left scroll-locked behind an invisible drawer. */
   function onBreakpoint() {
-    if (mql.matches && isOpen()) close();
+    if (mql.matches && isOpen()) close(telemetry?.REASONS.breakpoint);
   }
   if (mql.addEventListener) mql.addEventListener("change", onBreakpoint);
   else mql.addListener(onBreakpoint); /* Safari <14 */
+
+  report(telemetry?.OUTCOMES.initialized);
 })();

@@ -40,7 +40,7 @@
                                         {#- Wired the same way as the three copy buttons on the install
                                             page: an inline handler, because no Weaver page loads a
                                             copy-button script. Until now this one only looked the part. -#}
-                                        <button class="text-base-content/82 hover:text-white transition-colors" title="Copy to clipboard" onclick="navigator.clipboard.writeText('cargo install weaver')">
+                                        <button class="text-base-content/82 hover:text-white transition-colors" title="Copy to clipboard" onclick="df12WeaverCopy('cargo install weaver')">
                                             {{ icon('copy') }}
                                         </button>
                                     </div>

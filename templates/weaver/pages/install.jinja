@@ -99,7 +99,7 @@
                         <div class="bg-neutral rounded-xs p-4 shadow-lg border border-base-content/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-code-string">cargo install weaver</code>
-                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('cargo install weaver')">
+                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="df12WeaverCopy('cargo install weaver')">
                                     {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>
@@ -117,7 +117,7 @@
                         <div class="bg-neutral rounded-xs p-4 shadow-lg border border-base-content/20 max-w-2xl code-container group">
                             <div class="flex justify-between items-start">
                                 <code class="font-mono text-sm text-code-string">weaver --capabilities</code>
-                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('weaver --capabilities')">
+                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="df12WeaverCopy('weaver --capabilities')">
                                     {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>
@@ -155,7 +155,7 @@
                                 <code class="font-mono text-sm text-code-text">
                                     <span class="text-code-string">weaver</span> observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1
                                 </code>
-                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="navigator.clipboard.writeText('weaver observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1')">
+                                <button class="copy-btn text-xs text-code-dim hover:text-white bg-white/10 px-2 py-1 rounded-sm" onclick="df12WeaverCopy('weaver observe get-definition --uri file:///path/to/project/src/main.rs --position 1:1')">
                                     {{ icon('copy', 'mr-1') }} Copy
                                 </button>
                             </div>

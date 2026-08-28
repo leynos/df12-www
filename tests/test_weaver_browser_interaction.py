@@ -46,10 +46,17 @@ _DRAWER_STATE = (
     "if (!toggle) return {toggle: false};"
     "const backdrop = document.getElementById('mobile-nav-backdrop');"
     "const sidebar = document.getElementById('sidebar');"
+    "const nav = sidebar ? sidebar.querySelector('nav') : null;"
     "const active = document.activeElement;"
     "const body = getComputedStyle(document.body);"
     "return {toggle: true, expanded: toggle.getAttribute('aria-expanded'),"
     " backdrop: backdrop ? getComputedStyle(backdrop).display : 'absent',"
+    # The drawer is the nav inside the sidebar, not the sidebar itself:
+    # `.has-mobile-nav #sidebar nav` hides it, and `#sidebar.mobile-nav-open
+    # nav` is what brings it back — as a fixed overlay, so it covers the page
+    # rather than pushing it down.
+    " navDisplay: nav ? getComputedStyle(nav).display : 'absent',"
+    " navPosition: nav ? getComputedStyle(nav).position : 'absent',"
     " focusInDrawer: sidebar.contains(active),"
     " active: active.tagName + '#' + (active.id || ''),"
     " bodyOverflowY: body.overflowY,"
@@ -97,9 +104,9 @@ def test_a_copy_control_hands_the_clipboard_what_it_shows(
         "const shown = [];"
         # The two pages label their controls differently — `title` on the home
         # page, visible text on the install page — so they are found by the
-        # handler they share rather than by how they are labelled.
+        # seam they share rather than by how they are labelled.
         "for (const button of document.querySelectorAll("
-        "'button[onclick*=clipboard]')) {"
+        "'button[onclick*=df12WeaverCopy]')) {"
         "  shown.push(button.closest('div').textContent.replace(/\\s+/g,' ').trim());"
         "  button.click();"
         "}"
@@ -276,6 +283,10 @@ def test_the_drawer_opens_on_a_published_page(
     assert before["backdrop"] == "none", (
         f"the backdrop should be hidden while closed; got {before['backdrop']!r}"
     )
+    assert before["navDisplay"] == "none", (
+        "the navigation should be hidden while the drawer is closed; got "
+        f"{before['navDisplay']!r}"
+    )
 
     drive("eval", "document.getElementById('mobile-nav-toggle').click()")
     after = _evaluate(drive, _DRAWER_STATE)
@@ -286,6 +297,18 @@ def test_the_drawer_opens_on_a_published_page(
     assert after["backdrop"] != "none", (
         "the backdrop should be shown, or the drawer does not read as modal; "
         f"display was {after['backdrop']!r}"
+    )
+    # The two declarations `#sidebar.mobile-nav-open nav` exists to make. A
+    # selector that stopped matching would leave the toggle flipping ARIA and
+    # the backdrop appearing over a navigation still set to `display: none`,
+    # which reads as a drawer that opens onto nothing.
+    assert after["navDisplay"] not in ("none", "absent"), (
+        "opening the drawer should render the navigation; its display was "
+        f"{after['navDisplay']!r}, so the drawer opens onto nothing"
+    )
+    assert after["navPosition"] == "fixed", (
+        "the drawer should overlay the page rather than push it down; the "
+        f"navigation's position was {after['navPosition']!r}"
     )
     assert after["focusInDrawer"], (
         "focus should enter the drawer, or a keyboard user tabs through the "
@@ -304,3 +327,59 @@ def test_the_drawer_opens_on_a_published_page(
         f"opening the drawer set the horizontal axis inline too, to "
         f"{after['inlineOverflowX']!r}, displacing the class that clips it"
     )
+
+
+@pytest.mark.timeout(600)
+def test_a_copy_control_reports_its_outcome_and_not_its_contents(
+    drive: cabc.Callable[..., str], served: str
+) -> None:
+    """The copy controls are inline handlers, so the seam has to be real markup.
+
+    A unit test can prove `df12WeaverCopy` emits the right event; only a page
+    can prove the buttons actually call it, and that `telemetry.js` is served
+    and loaded before they are pressed. What the event may contain is asserted
+    here too, against the copied text itself: the string the button copies is
+    distinctive, so if any field carried it this would say so.
+    """
+    _open(drive, served, "install/", DESKTOP_WIDTH, DESKTOP_HEIGHT)
+    seen = _evaluate(
+        drive,
+        # Returned as a promise rather than a JSON string: `agent-browser`
+        # awaits one and reports the resolved value, whereas `JSON.stringify`
+        # of a pending promise is `{}`.
+        "(() => {"
+        "const events = [];"
+        "globalThis.df12WeaverNavTelemetry = (event) => events.push(event);"
+        "const copied = [];"
+        "Object.defineProperty(navigator, 'clipboard', {configurable: true,"
+        " value: {writeText: (text) => { copied.push(text);"
+        " return Promise.resolve(); }}});"
+        "const button = document.querySelector('button[onclick*=df12WeaverCopy]');"
+        "if (!button) return {seam: false};"
+        "button.click();"
+        "return new Promise((resolve) => setTimeout(() => resolve("
+        " {seam: true, events, copied}), 0));"
+        "})()",
+    )
+
+    assert seen["seam"], (
+        "no copy control on /weaver/install/ routes through `df12WeaverCopy`, "
+        "so the inline handlers have no telemetry seam at all"
+    )
+    assert seen["copied"], "the control copied nothing, so it did not run"
+    assert seen["events"] == [
+        {
+            "component": "weaver-mobile-nav",
+            "operation": "clipboard",
+            "outcome": "copied",
+        }
+    ], f"expected one fixed-schema copy event; got {seen['events']}"
+
+    # The copied text is distinctive, and nothing in the event may carry it —
+    # nor anything else about this page.
+    payload = json.dumps(seen["events"])
+    for forbidden in (*seen["copied"], "install", "/weaver/", served):
+        assert forbidden not in payload, (
+            f"the telemetry event carried {forbidden!r}, which is page or "
+            f"clipboard content: {payload}"
+        )

@@ -837,7 +837,57 @@ per root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
 section of [AGENTS.md](../AGENTS.md); a custom element is its last rung, and
 the site does not use a front-end framework at all.
 
-### 6.2. The config-keys component
+### 6.2. Weaver chrome telemetry
+
+The Weaver drawer and its copy controls report through the same optional hook
+model as Episodic search. A production host may set
+`window.df12WeaverNavTelemetry` to a function before the deferred scripts run;
+without it, `src/static/weaver/assets/js/telemetry.js` is a no-op and nothing
+is collected. A sink that throws is caught and ignored, because observability
+must not be able to break the drawer or the button it was watching.
+
+Every event has the same shape, and the whole of what may leave the page is
+declared as three frozen vocabularies at the top of that file:
+
+| Field       | Values                                                                                                                  |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `component` | `weaver-mobile-nav`                                                                                                     |
+| `operation` | `drawer`, `clipboard`                                                                                                   |
+| `outcome`   | `initialized`, `opened`, `closed`, `focus-restored`, `copied`, `failed`                                                 |
+| `reason`    | `toggle`, `backdrop`, `nav-link`, `escape`, `breakpoint`, `saved-element`, `toggle-fallback`, `unavailable`, `rejected` |
+
+_Table 8: every field a Weaver chrome telemetry event may carry._
+
+`reason` is present only where an outcome has more than one cause worth
+separating: which of the five things closed the drawer, whether focus went back
+to where it came from or fell back to the toggle, and whether a clipboard write
+found no API or was refused one. An `operation`, `outcome` or `reason` outside
+those lists is dropped rather than emitted, so the table is the schema rather
+than a description of it.
+
+What it therefore records is that a drawer was built, opened, and closed for a
+stated cause; where focus went afterwards; and whether a copy succeeded. What
+it cannot record — because there is nowhere in the schema to put it — is a URL,
+a page path, a navigation label, the copied text, or anything identifying a
+person or persisting between visits. A sink must treat the event as operational
+metadata and must not enrich it with page or user data.
+
+**The inspection point for a maintainer is
+`src/static/weaver/assets/js/telemetry.js`.** It is about a hundred lines, the
+vocabularies are the first thing in it, and `emit` is the only function that
+calls the sink. Reading those two things is the whole of the privacy argument;
+`tests/js/weaver-telemetry.test.mjs` is the enforcement, and it tries to get
+page data, clipboard contents and identifiers into an event rather than only
+checking the happy path.
+
+The copy controls need a seam because they are inline `onclick` handlers in the
+templates. They call `df12WeaverCopy('…')`, which writes to the clipboard and
+reports the outcome; the text is passed to the clipboard and never to the sink.
+`telemetry.js` is loaded before `mobile-nav.js` and defines the API
+unconditionally, because `mobile-nav.js` returns early on a page without the
+drawer's markup while the install page's copy buttons still need it.
+
+### 6.3. The config-keys component
 
 `config-keys.js` drives the "config keys" browser on the configuration docs page
 (`templates/netsuke/pages/docs-configuration.jinja`), which pairs each key
@@ -968,15 +1018,15 @@ over `!important`, which would also outrank a later, deliberate override.
 ### 7.1. Verifying a styling change against Weaver
 
 `scripts/weaver_snapshot.py` is the command surface; the work sits in eight
-siblings beside it, none over 400 lines, named for what they do:
-`_paths` (the published tree, the page list, and each page's filename stem),
-`_locking` (advisory locks and lock-file hygiene), `_output` (staging and
-failure-atomic publication), `_ownership` (proving whose server answered),
-`_serving` (ports, the server, and its lifecycle), `_tools` (the argv handed to
-css-view and agent-browser), `_colour` (one colour written one way), and
-`_normalize` (reducing a captured tree to what a reader could see). They are
-plain modules rather than a package, so a script run by path finds them on
-`sys.path` and the invocation below is unchanged.
+siblings beside it, none over 400 lines, named for what they do: `_paths` (the
+published tree, the page list, and each page's filename stem), `_locking`
+(advisory locks and lock-file hygiene), `_output` (staging and failure-atomic
+publication), `_ownership` (proving whose server answered), `_serving` (ports,
+the server, and its lifecycle), `_tools` (the argv handed to css-view and
+agent-browser), `_colour` (one colour written one way), and `_normalize`
+(reducing a captured tree to what a reader could see). They are plain modules
+rather than a package, so a script run by path finds them on `sys.path` and the
+invocation below is unchanged.
 
 `scripts/weaver_snapshot.py` exists because a cascade change on a compiled
 Tailwind sheet is easy to get subtly wrong: nothing errors, a selector simply
@@ -1034,15 +1084,14 @@ deliberately did.
 
 ### 7.2. Property-based tests for the snapshot normalizer
 
-`tests/test_weaver_snapshot_properties.py` complements the example-based
-the `tests/test_weaver_snapshot_*.py` suites with
+`tests/test_weaver_snapshot_properties.py` complements the example-based the
+`tests/test_weaver_snapshot_*.py` suites with
 [Hypothesis](https://hypothesis.readthedocs.io/) (`hypothesis` is a `dev`
 dependency-group entry in `pyproject.toml`). Rather than asserting what the
 normalizer in `scripts/weaver_snapshot_normalize.py` does to worked-example
-inputs, it
-asserts invariants that must hold for every input Hypothesis can generate —
-colour notations, style-diff shapes, and walker trees nobody thought to write
-by hand.
+inputs, it asserts invariants that must hold for every input Hypothesis can
+generate — colour notations, style-diff shapes, and walker trees nobody thought
+to write by hand.
 
 Four families of property are checked:
 
@@ -1093,8 +1142,8 @@ rather than a failure when a dependency is absent: `agent-browser` not on
 `bun` themselves not on `PATH`.
 
 `built_site` is a session-scoped fixture in `tests/conftest.py`, shared with
-the build suites, so `bun run build` runs once for all of them
-rather than once per module.
+the build suites, so `bun run build` runs once for all of them rather than once
+per module.
 
 **The matrix.** The page list is derived from `config/pages.yaml` — the same
 file the generator itself reads — rather than hard-coded or drawn from the

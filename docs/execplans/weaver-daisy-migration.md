@@ -380,6 +380,16 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - [x] (2026-08-28) Covered the drawer in a real browser on
       `/weaver/privacy-policy/` at 360px — ARIA, the backdrop, focus entering
       the drawer, and the scroll lock being inline `overflow-y` alone.
+- [x] (2026-08-28) Asserted what `#sidebar.mobile-nav-open nav` exists to do:
+      the opened navigation has a rendered display and `position: fixed`. A
+      selector that stopped matching would leave the toggle flipping ARIA and
+      the backdrop appearing over a drawer still set to `display: none`.
+- [x] (2026-08-28) Added optional, privacy-preserving telemetry for the Weaver
+      chrome, on the hook model Episodic search already uses. A host may
+      install `df12WeaverNavTelemetry`; without it nothing is collected.
+- [x] (2026-08-28) Made the icon macro's publication failure-atomic: written
+      to a unique temporary file beside the target and moved into place with a
+      rename, so a failure anywhere leaves the previous macro intact.
 
 ## Surprises & discoveries
 
@@ -639,9 +649,9 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   vertical axis cannot fail. Evidence: the body already carries
   `overflow-x: hidden` from a class, so a script setting `style.overflow` and
   one setting `style.overflowY` produce the same *computed* `overflow-x`.
-  Replacing the one with the other left the assertion passing. Impact: the
-  test reads the inline declarations instead, where the difference is visible
-  — and under the same mutation it now fails, naming the axis that was set.
+  Replacing the one with the other left the assertion passing. Impact: the test
+  reads the inline declarations instead, where the difference is visible — and
+  under the same mutation it now fails, naming the axis that was set.
 
 ## Decision log
 
@@ -1085,22 +1095,39 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   Date/Author: 2026-08-27, review batch.
 
 - **Decision:** split the harness into sibling modules under `scripts/`
-  rather than a `scripts/weaver_snapshot/` package.
-  Rationale: the repository already does this —
-  `scripts/build_episodic_roadmap_data.py` imports
+  rather than a `scripts/weaver_snapshot/` package. Rationale: the repository
+  already does this — `scripts/build_episodic_roadmap_data.py` imports
   `scripts/episodic_roadmap_parser.py` as a bare name, which works because a
   script run by path has its own directory on `sys.path`. A package would have
   needed either `python -m` with a path fiddle or a `__main__.py` that cannot
-  use relative imports, and would have changed the documented invocation,
-  the Makefile, and every test that loads the harness. Siblings changed the
-  invocation not at all.
-  Date/Author: 2026-08-28, review batch.
+  use relative imports, and would have changed the documented invocation, the
+  Makefile, and every test that loads the harness. Siblings changed the
+  invocation not at all. Date/Author: 2026-08-28, review batch.
 - **Decision:** take the startup lock only for a port the caller named.
   Rationale: the lock serializes contention, and a port the kernel has just
   handed out cannot be contended — nothing else was given it. Keying a lock
   file on it bought nothing and left one behind in the shared temp directory
   for every run ever made. Named ports keep their lock, which is the case the
-  mechanism was built for.
+  mechanism was built for. Date/Author: 2026-08-28, review batch.
+
+- **Decision:** put the Weaver telemetry in its own script rather than inside
+  `mobile-nav.js`, and route the inline copy handlers through it.
+  Rationale: `mobile-nav.js` returns early on a page without the drawer's
+  markup, and the install page's three copy buttons need the seam whether or
+  not the drawer is there. A separate file also keeps the privacy argument
+  readable: the vocabularies are the first thing in it and `emit` is the only
+  function that calls the sink, so a maintainer can check what may leave the
+  page by reading about a hundred lines. The copy controls call
+  `df12WeaverCopy('…')`, which passes the text to the clipboard and never to
+  the sink.
+  Date/Author: 2026-08-28, review batch.
+- **Decision:** drop an event whose operation, outcome or reason is outside
+  the declared vocabulary, rather than emitting it.
+  Rationale: the schema is the promise. Widening it at runtime for a caller
+  that passed something unrecognised would mean the table in the developers'
+  guide describes the schema rather than being it, and the thing most likely
+  to arrive that way is exactly what must not — a path, a label, an
+  identifier. A caller passing one is a bug in the caller.
   Date/Author: 2026-08-28, review batch.
 
 ## Outcomes & retrospective
@@ -1885,9 +1912,9 @@ New files:
   the semantic partials, imported into `layer(base)` or `layer(components)`.
   **Correction (2026-08-28):** eleven partials shipped, not six —
   `callouts.css`, `chrome.css`, `code.css`, `content.css`,
-  `design-language.css`, `figures.css`, `fonts.css`, `motion.css`,
-  `pages.css`, `panels.css`, and `site-base.css`. The compiled artefact's
-  path is `public/weaver/assets/styles/weaver.css`, reached from a page as
+  `design-language.css`, `figures.css`, `fonts.css`, `motion.css`, `pages.css`,
+  `panels.css`, and `site-base.css`. The compiled artefact's path is
+  `public/weaver/assets/styles/weaver.css`, reached from a page as
   `/weaver/assets/styles/weaver.css`.
 - `templates/weaver/_chrome.jinja` — Jinja macros for the shared page
   furniture. At minimum:
@@ -1902,13 +1929,13 @@ New files:
 - `scripts/generate_weaver_icons.py` — reads the mapping and
   `@iconify-json/carbon`, writes `templates/weaver/_icons.jinja`.
 - `scripts/weaver_snapshot.py` — the validation harness, a Cyclopts CLI with
-  `capture`, `shots`, and `diff` subcommands.
-  **Correction (2026-08-28):** it grew past the repository's 400-line ceiling
-  and was decomposed. The command surface keeps the name; the work sits in
+  `capture`, `shots`, and `diff` subcommands. **Correction (2026-08-28):** it
+  grew past the repository's 400-line ceiling and was decomposed. The command
+  surface keeps the name; the work sits in
   `weaver_snapshot_{paths,locking,output,ownership,serving,tools,colour,normalize}.py`
   beside it. They are plain sibling modules rather than a package, following
-  `scripts/build_episodic_roadmap_data.py` and its parser, so the invocation
-  is unchanged.
+  `scripts/build_episodic_roadmap_data.py` and its parser, so the invocation is
+  unchanged.
 - `tests/test_weaver_build.py` — the three build-invariant tests.
 - `tests/test_weaver_icons.py` — the icon generator: drift against its source,
   the boundary errors it reports, and the macro rendered through Jinja.

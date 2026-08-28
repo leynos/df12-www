@@ -212,34 +212,83 @@ def _minimal_inputs(
     monkeypatch.setattr(generator, "MAPPING", mapping_path)
 
 
-class _UnwritablePath(Path):
-    """A path that reads like any other and refuses every write.
-
-    ``main`` reads ``OUTPUT`` before it writes it, so the write handler is only
-    reachable through something that lets the read succeed. Pointing ``OUTPUT``
-    at a directory does not do that: ``Path.exists()`` is true for one and
-    ``read_text()`` raises ``IsADirectoryError``, so the *read* handler fires
-    and the write handler is never entered at all.
-    """
-
-    def write_text(self, *_args: object, **_kwargs: object) -> int:
-        """Fail the way a read-only tree or a full disk would."""
-        message = f"Permission denied: {self}"
-        raise PermissionError(message)
+# The macro published by a run whose inputs are empty: header and footer with
+# no icon entries between them. Enough to tell "replaced" from "unchanged".
+STALE = "a previous macro, which must survive a failed publication"
 
 
-def test_an_unwritable_output_reports_the_path_rather_than_an_oserror(
+def _published(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> Path:
+    """Return the output path, seeded with content the run will replace."""
+    output = tmp_path / "_icons.jinja"
+    output.write_text(STALE, encoding="utf-8")
+    monkeypatch.setattr(generator, "OUTPUT", output)
+    return output
+
+
+def _leftovers(directory: Path) -> list[str]:
+    """Name any temporary file the publication left beside the output."""
+    return sorted(
+        path.name
+        for path in directory.iterdir()
+        if path.name.startswith(".") and path.name.endswith(".tmp")
+    )
+
+
+def test_a_failure_writing_the_temporary_file_leaves_the_previous_macro(
     generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """`main` is the CLI boundary, so its filesystem failures exit with a message."""
-    _minimal_inputs(generator, monkeypatch, tmp_path)
+    """The committed macro is what the next build renders, so a partial one is fatal.
 
-    output = _UnwritablePath(tmp_path / "_icons.jinja")
-    # Existing and readable, and holding something other than what the
-    # generator will produce, so `main` gets past its unchanged short-circuit
-    # and reaches the write.
-    Path(output).write_text("stale", encoding="utf-8")
-    monkeypatch.setattr(generator, "OUTPUT", output)
+    A write that stops partway would leave a truncated macro where a valid one
+    was, and a truncated macro that still parses is worse than one that does
+    not. Nothing is written to the real path until the whole thing is on disk.
+    """
+    _minimal_inputs(generator, monkeypatch, tmp_path)
+    output = _published(generator, monkeypatch, tmp_path)
+
+    real = generator.tempfile.NamedTemporaryFile
+
+    def fails_midway(*args: object, **kwargs: object) -> object:
+        handle = real(*args, **kwargs)
+
+        def refuse(_text: str) -> int:
+            message = "No space left on device"
+            raise OSError(message)
+
+        handle.write = refuse
+        return handle
+
+    monkeypatch.setattr(generator.tempfile, "NamedTemporaryFile", fails_midway)
+
+    with pytest.raises(SystemExit) as caught:
+        generator.main()
+
+    message = str(caught.value.code)
+    assert str(output) in message, (
+        f"the message should name the output; got {message!r}"
+    )
+    assert output.read_text(encoding="utf-8") == STALE, (
+        "a failed write replaced or truncated the previous macro"
+    )
+    assert _leftovers(tmp_path) == [], (
+        f"a partial macro was left beside the real one: {_leftovers(tmp_path)}"
+    )
+
+
+def test_a_failure_replacing_the_output_leaves_the_previous_macro(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The rename is the moment of publication, and it can fail too."""
+    _minimal_inputs(generator, monkeypatch, tmp_path)
+    output = _published(generator, monkeypatch, tmp_path)
+
+    def refuse(_self: Path, _target: object) -> Path:
+        message = "Permission denied"
+        raise PermissionError(message)
+
+    monkeypatch.setattr(Path, "replace", refuse)
 
     with pytest.raises(SystemExit) as caught:
         generator.main()
@@ -249,7 +298,36 @@ def test_an_unwritable_output_reports_the_path_rather_than_an_oserror(
         f"the message should name the output; got {message!r}"
     )
     assert "could not be written" in message, (
-        f"the write handler should be the one that fired; got {message!r}"
+        f"the publication handler should be the one that fired; got {message!r}"
+    )
+    monkeypatch.undo()
+    assert output.read_text(encoding="utf-8") == STALE, (
+        "a failed rename left the previous macro changed"
+    )
+    assert _leftovers(tmp_path) == [], (
+        f"the temporary file outlived the failed rename: {_leftovers(tmp_path)}"
+    )
+
+
+def test_a_successful_publication_replaces_the_whole_file(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Wholly replaced, not appended to, and nothing left behind."""
+    _minimal_inputs(generator, monkeypatch, tmp_path)
+    output = _published(generator, monkeypatch, tmp_path)
+
+    assert generator.main() == 0, "a successful run should report success"
+
+    published = output.read_text(encoding="utf-8")
+    assert STALE not in published, (
+        "the previous macro survived inside the new one, so the file was not "
+        f"replaced but added to; it now reads {published[:120]!r}"
+    )
+    assert published == generator.build_macro(), (
+        "the published file should be exactly what the generator produced"
+    )
+    assert _leftovers(tmp_path) == [], (
+        f"a temporary file outlived a successful publication: {_leftovers(tmp_path)}"
     )
 
 

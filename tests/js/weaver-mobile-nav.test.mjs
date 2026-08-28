@@ -6,7 +6,7 @@
  * puts it back where it was. See `helpers/mobile-nav-harness.mjs` for why
  * these run against a real DOM rather than the fake used elsewhere.
  */
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import {
   click,
@@ -17,52 +17,11 @@ import {
   pressTab,
   stubLayout,
 } from "./helpers/mobile-nav-harness.mjs";
+import { setUp } from "./helpers/weaver-drawer.mjs";
 
+/* The two tests below build their own window, to check the guards that
+   run before the harness would have anything to hand back. */
 const SCRIPT = "public/weaver/assets/js/mobile-nav.js";
-const TELEMETRY = "public/weaver/assets/js/telemetry.js";
-
-/* Build a page with the sidebar markup `templates/weaver/` renders, load the
-   drawer into it, and hand back the parts a test needs to drive. */
-function setUp({ links = ["/install", "/docs"], telemetry = false } = {}) {
-  const window = new Window({ url: "https://weaver.example/docs/" });
-  const { document } = window;
-  document.body.innerHTML = `
-    <a href="/elsewhere" id="outside">Outside</a>
-    <aside id="sidebar">
-      <div data-mobile-nav-header><h1>WEAVER</h1></div>
-      <nav>${links.map((href) => `<a href="${href}">${href}</a>`).join("")}</nav>
-    </aside>`;
-  stubLayout(window);
-  const media = installMatchMedia(window);
-  /* The drawer reports through `telemetry.js` when the page loaded it, and
-     works the same when it did not. Both are worth exercising, so the script
-     is only present when a test asks for it. */
-  /* The sink is installed either way, so a test asserting the drawer stays
-     silent has something that would catch it if it did not. Only the script
-     that reports through it is conditional. `evaluateScript` runs a script
-     through `new Function`, so its `globalThis` is this process's rather than
-     the happy-dom window's; in a browser the two are the same object, and
-     here `afterEach` takes the sink away again. */
-  const events = [];
-  globalThis.df12WeaverNavTelemetry = (event) => events.push(event);
-  if (telemetry) {
-    evaluateScript(window, TELEMETRY);
-  }
-  evaluateScript(window, SCRIPT);
-
-  const sidebar = document.getElementById("sidebar");
-  return {
-    window,
-    document,
-    media,
-    sidebar,
-    nav: sidebar.querySelector("nav"),
-    toggle: document.getElementById("mobile-nav-toggle"),
-    backdrop: document.getElementById("mobile-nav-backdrop"),
-    isOpen: () => sidebar.classList.contains("mobile-nav-open"),
-    events,
-  };
-}
 
 describe("initial state", () => {
   let dom;
@@ -393,113 +352,5 @@ describe("markup the drawer declines to enhance", () => {
     installMatchMedia(window);
     evaluateScript(window, SCRIPT);
     expect(window.document.getElementById("mobile-nav-toggle")).toBeNull();
-  });
-});
-
-afterEach(() => {
-  /* `telemetry.js` and the sink both live on the process global while a test
-     runs, since that is where `evaluateScript` puts a script's `globalThis`.
-     Leaving them there would let one test's sink collect another's events. */
-  globalThis.df12WeaverNavTelemetry = undefined;
-  globalThis.df12WeaverTelemetry = undefined;
-  globalThis.df12WeaverCopy = undefined;
-});
-
-describe("telemetry", () => {
-  test("says nothing at all when the page did not load the hook", () => {
-    /* A sink is installed; `telemetry.js` is not. The drawer has nothing to
-       report through, so it must report nothing — and the sink is there to
-       catch it if some future change reaches past the module. */
-    const dom = setUp();
-    click(dom.window, dom.toggle);
-    pressKey(dom.window, dom.document, "Escape");
-    expect(dom.isOpen()).toBe(false);
-    expect(dom.events).toEqual([]);
-  });
-
-  test("reports that the drawer was built", () => {
-    const dom = setUp({ telemetry: true });
-    expect(dom.events).toEqual([
-      { component: "weaver-mobile-nav", operation: "drawer", outcome: "initialized" },
-    ]);
-  });
-
-  test("reports opening", () => {
-    const dom = setUp({ telemetry: true });
-    dom.events.length = 0;
-    click(dom.window, dom.toggle);
-    expect(dom.events).toEqual([
-      { component: "weaver-mobile-nav", operation: "drawer", outcome: "opened" },
-    ]);
-  });
-
-  test("attributes each close to what caused it", () => {
-    const closes = [
-      ["toggle", (dom) => click(dom.window, dom.toggle)],
-      ["backdrop", (dom) => click(dom.window, dom.backdrop)],
-      ["nav-link", (dom) => click(dom.window, dom.nav.querySelector("a"))],
-      ["escape", (dom) => pressKey(dom.window, dom.document, "Escape")],
-      ["breakpoint", (dom) => dom.media.cross(true)],
-    ];
-    for (const [reason, act] of closes) {
-      const dom = setUp({ telemetry: true });
-      click(dom.window, dom.toggle);
-      dom.events.length = 0;
-      act(dom);
-
-      expect(dom.isOpen()).toBe(false);
-      const closed = dom.events.filter((e) => e.outcome === "closed");
-      expect(closed).toEqual([
-        { component: "weaver-mobile-nav", operation: "drawer", outcome: "closed", reason },
-      ]);
-    }
-  });
-
-  test("reports where focus went when the drawer closed", () => {
-    /* Nothing held focus before opening, so it falls back to the toggle. */
-    const fallback = setUp({ telemetry: true });
-    click(fallback.window, fallback.toggle);
-    fallback.events.length = 0;
-    pressKey(fallback.window, fallback.document, "Escape");
-    expect(fallback.events.filter((e) => e.outcome === "focus-restored")).toEqual([
-      {
-        component: "weaver-mobile-nav",
-        operation: "drawer",
-        outcome: "focus-restored",
-        reason: "toggle-fallback",
-      },
-    ]);
-
-    /* Something did hold it, so focus goes back there. */
-    const restored = setUp({ telemetry: true });
-    restored.document.getElementById("outside").focus();
-    click(restored.window, restored.toggle);
-    restored.events.length = 0;
-    pressKey(restored.window, restored.document, "Escape");
-    expect(restored.events.filter((e) => e.outcome === "focus-restored")).toEqual([
-      {
-        component: "weaver-mobile-nav",
-        operation: "drawer",
-        outcome: "focus-restored",
-        reason: "saved-element",
-      },
-    ]);
-  });
-
-  test("carries no page, label or identifier in any drawer event", () => {
-    const dom = setUp({ telemetry: true, links: ["/weaver/install/", "/weaver/docs/"] });
-    click(dom.window, dom.toggle);
-    click(dom.window, dom.nav.querySelector("a"));
-
-    expect(dom.events.length).toBeGreaterThan(0);
-    const payload = JSON.stringify(dom.events);
-    for (const forbidden of ["/weaver/", "install", "docs", "weaver.example", "https://"]) {
-      expect(payload).not.toContain(forbidden);
-    }
-    for (const event of dom.events) {
-      expect(Object.keys(event).sort()).toEqual(
-        ["component", "operation", "outcome", "reason"].filter((f) => f in event).sort(),
-      );
-    }
   });
 });

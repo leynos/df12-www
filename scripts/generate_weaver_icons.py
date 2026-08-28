@@ -29,6 +29,7 @@ import typing as typ
 from pathlib import Path
 
 from ruamel.yaml import YAML, YAMLError
+from weaver_icons_template import _SVG_ATTRS, _SVG_CLASS, FOOTER, HEADER
 
 # How a file's text becomes a document. Passing it in rather than branching on
 # the file type keeps the read-and-report path in one place for both inputs.
@@ -38,50 +39,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 MAPPING = REPO_ROOT / "config" / "weaver-icons.yaml"
 CARBON = REPO_ROOT / "node_modules" / "@iconify-json" / "carbon" / "icons.json"
 OUTPUT = REPO_ROOT / "templates" / "weaver" / "_icons.jinja"
-
-HEADER = """{#
-  GENERATED FILE - do not edit.
-
-  Written by scripts/generate_weaver_icons.py from config/weaver-icons.yaml
-  and the @iconify-json/carbon package. Change the mapping, rerun the
-  generator, and commit both; tests/test_weaver_build.py fails if this file
-  and the mapping disagree.
-
-  `icon(name)` takes a Font Awesome name without its `fa-` prefix, so a
-  template that used to read
-
-      <i class="fa-solid fa-terminal"></i>
-
-  now reads
-
-      {{ icon('terminal') }}
-
-  The `extra_class` argument carries per-instance utilities, as the `<i>` did.
-  The default size of 1em with a -0.125em baseline shift matches how a
-  font-rendered glyph sat in its line, so the substitution does not move text
-  around it.
-#}
-{%- macro icon(name, extra_class='') -%}
-{%- set paths = {
-"""
-
-# The <svg> attributes, split so this file stays inside the line limit; the
-# generated template joins them onto one line.
-_SVG_CLASS = 'class="inline-block align-[-0.125em] w-[1em] h-[1em] {{ extra_class }}"'
-_SVG_ATTRS = (
-    'viewBox="0 0 32 32" fill="currentColor" aria-hidden="true" focusable="false"'
-)
-
-FOOTER = """} -%}
-{%- set body = paths.get(name) -%}
-{%- if body -%}
-<svg __SVG__>{{ body | safe }}</svg>
-{%- else -%}
-{#- An unmapped name is a mistake in the caller, not something to hide. -#}
-{{- ('UNKNOWN ICON: ' ~ name) -}}
-{%- endif -%}
-{%- endmacro -%}
-"""
 
 
 def _resolve(

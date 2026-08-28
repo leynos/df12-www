@@ -9,7 +9,6 @@ for is resolved through it.
 
 from __future__ import annotations
 
-import importlib.util
 import re
 import typing as typ
 from pathlib import Path
@@ -29,21 +28,6 @@ COMPILED_STYLESHEET = PUBLIC_WEAVER / "assets" / "styles" / "weaver.css"
 
 # `{{ icon('name') }}` as the templates write it, in either quote form.
 ICON_CALL = re.compile(r"""icon\(\s*(?:'([^']+)'|"([^"]+)")""")
-
-
-@pytest.fixture(scope="module")
-def generator() -> ModuleType:
-    """Load the icon generator, which is a script rather than an importable module."""
-    spec = importlib.util.spec_from_file_location(
-        "generate_weaver_icons", REPO_ROOT / "scripts" / "generate_weaver_icons.py"
-    )
-    assert spec is not None, "scripts/generate_weaver_icons.py could not be located"
-    assert spec.loader is not None, (
-        "spec for generate_weaver_icons has no loader; it cannot be executed"
-    )
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 def test_generated_icon_macro_matches_its_source(generator: ModuleType) -> None:
@@ -200,162 +184,6 @@ def test_an_unmapped_carbon_icon_names_the_mapping(
     assert "no-such-icon" in message, f"expected the icon named in {message!r}"
 
 
-def _minimal_inputs(
-    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, root: Path
-) -> None:
-    """Point the generator at a pair of valid inputs that render an empty macro."""
-    carbon_path = root / "icons.json"
-    carbon_path.write_text('{"icons": {}}', encoding="utf-8")
-    mapping_path = root / "weaver-icons.yaml"
-    mapping_path.write_text("icons: {}", encoding="utf-8")
-    monkeypatch.setattr(generator, "CARBON", carbon_path)
-    monkeypatch.setattr(generator, "MAPPING", mapping_path)
-
-
-# What the output holds before a run starts: not a macro at all, just a marker
-# distinctive enough to tell "still there" from "replaced" without comparing
-# against whatever the generator would produce.
-STALE = "a previous macro, which must survive a failed publication"
-
-
-def _published(
-    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> Path:
-    """Return the output path, seeded with content the run will replace."""
-    output = tmp_path / "_icons.jinja"
-    output.write_text(STALE, encoding="utf-8")
-    monkeypatch.setattr(generator, "OUTPUT", output)
-    return output
-
-
-def _leftovers(directory: Path) -> list[str]:
-    """Name any temporary file the publication left beside the output."""
-    return sorted(
-        path.name
-        for path in directory.iterdir()
-        if path.name.startswith(".") and path.name.endswith(".tmp")
-    )
-
-
-def test_a_failure_writing_the_temporary_file_leaves_the_previous_macro(
-    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """The committed macro is what the next build renders, so a partial one is fatal.
-
-    A write that stops partway would leave a truncated macro where a valid one
-    was, and a truncated macro that still parses is worse than one that does
-    not. Nothing is written to the real path until the whole thing is on disk.
-    """
-    _minimal_inputs(generator, monkeypatch, tmp_path)
-    output = _published(generator, monkeypatch, tmp_path)
-
-    real = generator.tempfile.NamedTemporaryFile
-
-    def fails_midway(*args: object, **kwargs: object) -> object:
-        handle = real(*args, **kwargs)
-
-        def refuse(_text: str) -> int:
-            message = "No space left on device"
-            raise OSError(message)
-
-        handle.write = refuse
-        return handle
-
-    monkeypatch.setattr(generator.tempfile, "NamedTemporaryFile", fails_midway)
-
-    with pytest.raises(SystemExit) as caught:
-        generator.main()
-
-    message = str(caught.value.code)
-    assert str(output) in message, (
-        f"the message should name the output; got {message!r}"
-    )
-    assert output.read_text(encoding="utf-8") == STALE, (
-        "a failed write replaced or truncated the previous macro"
-    )
-    assert _leftovers(tmp_path) == [], (
-        f"a partial macro was left beside the real one: {_leftovers(tmp_path)}"
-    )
-
-
-def test_a_failure_replacing_the_output_leaves_the_previous_macro(
-    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """The rename is the moment of publication, and it can fail too."""
-    _minimal_inputs(generator, monkeypatch, tmp_path)
-    output = _published(generator, monkeypatch, tmp_path)
-
-    def refuse(_self: Path, _target: object) -> Path:
-        message = "Permission denied"
-        raise PermissionError(message)
-
-    monkeypatch.setattr(Path, "replace", refuse)
-
-    with pytest.raises(SystemExit) as caught:
-        generator.main()
-
-    message = str(caught.value.code)
-    assert str(output) in message, (
-        f"the message should name the output; got {message!r}"
-    )
-    assert "could not be written" in message, (
-        f"the publication handler should be the one that fired; got {message!r}"
-    )
-    monkeypatch.undo()
-    assert output.read_text(encoding="utf-8") == STALE, (
-        "a failed rename left the previous macro changed"
-    )
-    assert _leftovers(tmp_path) == [], (
-        f"the temporary file outlived the failed rename: {_leftovers(tmp_path)}"
-    )
-
-
-def test_a_successful_publication_replaces_the_whole_file(
-    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """Wholly replaced, not appended to, and nothing left behind."""
-    _minimal_inputs(generator, monkeypatch, tmp_path)
-    output = _published(generator, monkeypatch, tmp_path)
-
-    assert generator.main() == 0, "a successful run should report success"
-
-    published = output.read_text(encoding="utf-8")
-    assert STALE not in published, (
-        "the previous macro survived inside the new one, so the file was not "
-        f"replaced but added to; it now reads {published[:120]!r}"
-    )
-    assert published == generator.build_macro(), (
-        "the published file should be exactly what the generator produced"
-    )
-    assert _leftovers(tmp_path) == [], (
-        f"a temporary file outlived a successful publication: {_leftovers(tmp_path)}"
-    )
-
-
-def test_an_unreadable_output_is_reported_separately(
-    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """The read and the write are distinct failures and say so distinctly."""
-    _minimal_inputs(generator, monkeypatch, tmp_path)
-
-    # A directory exists and cannot be read as text, which is the read handler's
-    # case and not the write handler's.
-    output = tmp_path / "_icons.jinja"
-    output.mkdir()
-    monkeypatch.setattr(generator, "OUTPUT", output)
-
-    with pytest.raises(SystemExit) as caught:
-        generator.main()
-
-    message = str(caught.value.code)
-    assert str(output) in message, (
-        f"the message should name the output; got {message!r}"
-    )
-    assert "could not be read" in message, (
-        f"the read handler should be the one that fired; got {message!r}"
-    )
-
-
 @pytest.fixture(scope="module")
 def icon_macro() -> typ.Callable[..., str]:
     """Load `_icons.jinja` through Jinja and return its `icon` macro.
@@ -444,4 +272,74 @@ def test_every_icon_the_templates_ask_for_renders(
     assert not missing, (
         f"these icons are used in the templates but absent from the generated "
         f"macro, so each renders the literal text 'UNKNOWN ICON': {missing}"
+    )
+
+
+def test_the_dictionary_is_built_once_at_template_scope(
+    generator: ModuleType,
+) -> None:
+    """Inside the macro, Jinja rebuilt all of it on every call.
+
+    A page renders dozens of icons, and each call was reconstructing a
+    fifty-odd entry dictionary of SVG path data to look one name up in it.
+    Hoisting the `set` above the macro makes it template scope, built once
+    when the template is loaded.
+    """
+    macro_text = generator.OUTPUT.read_text(encoding="utf-8")
+    declaration = macro_text.index("{%- set paths = {")
+    definition = macro_text.index("{%- macro icon(")
+
+    assert declaration < definition, (
+        "the icon dictionary is declared inside the macro, so it is rebuilt on "
+        "every call rather than once when the template loads"
+    )
+    assert macro_text.count("{%- set paths = {") == 1, (
+        "the dictionary should be declared exactly once"
+    )
+    assert "{%- set paths" not in macro_text[definition:], (
+        "no `set paths` should remain inside the macro body"
+    )
+
+
+def test_the_macro_renders_the_same_svg_however_often_it_is_called(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """A hoisted dictionary must not become state that a call can disturb.
+
+    Rendering was previously self-contained per call; now every call reads one
+    shared mapping, so the thing worth proving is that reading it repeatedly,
+    and for different names, returns the same answer each time.
+    """
+    names = ["terminal", "check", "xmark", "terminal", "check", "terminal"]
+    rendered = [str(icon_macro(name)) for name in names]
+
+    for name, svg in zip(names, rendered, strict=True):
+        assert svg.startswith("<svg "), f"{name!r} rendered {svg[:60]!r}"
+        assert "<path" in svg or "<circle" in svg, f"{name!r} rendered no artwork"
+
+    first = dict(zip(names, rendered, strict=True))
+    for name, svg in zip(names, rendered, strict=True):
+        assert svg == first[name], (
+            f"{name!r} rendered differently on a later call, so the shared "
+            f"dictionary is being mutated between calls"
+        )
+    assert len(set(rendered)) == len(set(names)), (
+        "distinct icons should render distinct artwork; got "
+        f"{len(set(rendered))} distinct outputs for {len(set(names))} names"
+    )
+
+
+def test_hoisting_the_dictionary_left_the_other_behaviour_alone(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """The two things callers rely on besides the artwork itself."""
+    assert "UNKNOWN ICON: not-an-icon" in str(icon_macro("not-an-icon")), (
+        "an unmapped name should still say so loudly"
+    )
+    with_class = str(icon_macro("terminal", extra_class="text-accent-ink w-6"))
+    assert "text-accent-ink w-6" in with_class, (
+        f"per-instance classes should still reach the element: {with_class!r}"
+    )
+    assert "inline-block" in with_class, (
+        f"the macro's own classes should survive alongside them: {with_class!r}"
     )

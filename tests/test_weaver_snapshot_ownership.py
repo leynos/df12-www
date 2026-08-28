@@ -151,3 +151,62 @@ def test_a_server_that_returns_the_wrong_marker_is_refused(tmp_path: Path) -> No
     assert "another server" in str(caught.value.code), (
         f"expected the mismatch to be reported; got {caught.value.code!r}"
     )
+
+
+def test_an_ownership_check_reads_only_as_far_as_the_comparison_needs() -> None:
+    """Whatever is on that port may serve a great deal; this reads a marker."""
+    asked: list[tuple[str, int]] = []
+    marker = "weaver-snapshot-0123456789abcdef.txt"
+
+    def fetch(url: str, limit: int) -> str:
+        asked.append((url, limit))
+        return marker
+
+    ownership._confirm_ownership(
+        "http://127.0.0.1:9999", marker, PORT, "on starting", fetch
+    )
+
+    assert asked == [(f"http://127.0.0.1:9999/{marker}", len(marker) + 1)], (
+        f"expected one bounded read of the marker's own URL; got {asked}"
+    )
+
+
+def test_a_server_that_answers_with_something_else_is_refused() -> None:
+    """A tree that happens to serve that path is still not this run's."""
+    marker = "weaver-snapshot-0123456789abcdef.txt"
+
+    def fetch(_url: str, _limit: int) -> str:
+        return "<!doctype html><title>somebody else</title>"
+
+    with pytest.raises(SystemExit) as caught:
+        ownership._confirm_ownership(
+            "http://127.0.0.1:9999", marker, PORT, "on starting", fetch
+        )
+
+    assert "another server" in str(caught.value.code), (
+        f"expected the mismatch to be reported; got {caught.value.code!r}"
+    )
+
+
+def test_a_server_that_does_not_answer_at_all_is_refused() -> None:
+    """Nothing on the port is as disqualifying as the wrong thing on it."""
+
+    def refuse(_url: str, _limit: int) -> str:
+        message = "connection refused"
+        raise OSError(message)
+
+    with pytest.raises(SystemExit) as caught:
+        ownership._confirm_ownership(
+            "http://127.0.0.1:9999",
+            "marker.txt",
+            PORT,
+            "after the capture",
+            fetch=refuse,
+        )
+
+    message = str(caught.value.code)
+    assert str(PORT) in message, f"the message should name the port; got {message!r}"
+    assert "after the capture" in message, (
+        f"the message should say when the check ran, since the two failures "
+        f"mean different things; got {message!r}"
+    )

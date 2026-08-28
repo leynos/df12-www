@@ -14,9 +14,10 @@ import hashlib
 import os
 import stat
 import tempfile
-import time
 import typing as typ
 from pathlib import Path
+
+from weaver_snapshot_clock import SYSTEM_CLOCK, Clock
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -25,6 +26,10 @@ if typ.TYPE_CHECKING:
 # start takes under a second, so anything near this means the holder was
 # killed mid-start rather than that it is merely slow.
 LOCK_TIMEOUT_SECONDS = 30
+
+# How long to wait between attempts at the lock. Short, because the thing being
+# waited for is another run's startup, which takes well under a second.
+LOCK_POLL_SECONDS = 0.05
 
 
 def _lock_path(port: int) -> Path:
@@ -52,7 +57,7 @@ def _lock_path(port: int) -> Path:
 
 
 @contextlib.contextmanager
-def _startup_lock(port: int) -> cabc.Iterator[None]:
+def _startup_lock(port: int, clock: Clock = SYSTEM_CLOCK) -> cabc.Iterator[None]:
     """Hold an exclusive lock on a port's startup for the duration.
 
     Probing a port and then spawning a server on it is check-then-act: two
@@ -96,7 +101,7 @@ def _startup_lock(port: int) -> cabc.Iterator[None]:
         which means another run has been starting for far longer than a
         healthy start takes.
     """
-    with _exclusive(_lock_path(port), f"the startup lock for port {port}"):
+    with _exclusive(_lock_path(port), f"the startup lock for port {port}", clock):
         yield
 
 
@@ -166,7 +171,9 @@ def _lock_file(path: Path) -> cabc.Iterator[typ.IO[bytes]]:
 
 
 @contextlib.contextmanager
-def _exclusive(path: Path, contended: str) -> cabc.Iterator[None]:
+def _exclusive(
+    path: Path, contended: str, clock: Clock = SYSTEM_CLOCK
+) -> cabc.Iterator[None]:
     """Hold an exclusive advisory lock on ``path`` for the duration.
 
     Parameters
@@ -177,6 +184,9 @@ def _exclusive(path: Path, contended: str) -> cabc.Iterator[None]:
     contended
         What is being locked, for the message a waiting run eventually gives up
         with.
+    clock
+        How to measure the timeout and wait between attempts. Injected so the
+        giving-up behaviour can be checked without waiting for it.
 
     Yields
     ------
@@ -189,20 +199,20 @@ def _exclusive(path: Path, contended: str) -> cabc.Iterator[None]:
         If the lock is still held after :data:`LOCK_TIMEOUT_SECONDS`.
     """
     with _lock_file(path) as handle:
-        deadline = time.monotonic() + LOCK_TIMEOUT_SECONDS
+        deadline = clock.monotonic() + LOCK_TIMEOUT_SECONDS
         while True:
             try:
                 fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 break
             except OSError as exc:
-                if time.monotonic() >= deadline:
+                if clock.monotonic() >= deadline:
                     message = (
                         f"another run has held {contended} ({path}) for over "
                         f"{LOCK_TIMEOUT_SECONDS}s; it may have been killed "
                         f"partway. Remove the lock file if no run is active."
                     )
                     raise SystemExit(message) from exc
-                time.sleep(0.05)
+                clock.sleep(LOCK_POLL_SECONDS)
         try:
             yield
         finally:

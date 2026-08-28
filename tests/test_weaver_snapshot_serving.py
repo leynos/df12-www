@@ -28,8 +28,12 @@ _MID_START_FAILURE = "the port was occupied"
 # A port number for the messages these tests read back. Nothing binds it.
 PORT = 8099
 
+# The bound  puts on each of its waits.
+STOP_TIMEOUT = 10
+
 locking = load("weaver_snapshot_locking")
 paths = load("weaver_snapshot_paths")
+process = load("weaver_snapshot_process")
 serving = load("weaver_snapshot_serving")
 
 
@@ -76,59 +80,6 @@ def test_the_snapshot_port_refuses_to_borrow_someone_else_s_server() -> None:
 
     assert str(port) in str(caught.value.code), (
         f"the message should name the occupied port; got {caught.value.code!r}"
-    )
-
-
-def test_a_server_that_died_before_answering_is_not_taken_for_the_responder() -> None:
-    """Something else answered on the port, and capturing it would be wrong."""
-
-    class _Exited:
-        """A child that answered nothing because it was never alive."""
-
-        def poll(self) -> int | None:
-            """Report the exit status `_await_server` asks for."""
-            return 1
-
-    with pytest.raises(SystemExit) as caught:
-        serving._await_server(_Exited(), "http://127.0.0.1:8099", 8099)
-
-    assert "8099" in str(caught.value.code), (
-        f"the message should name the port; got {caught.value.code!r}"
-    )
-
-
-def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """A reply proves something is listening, not that it is this run's server.
-
-    The bind probe and the startup lock make this unreachable between two runs
-    of this script, but nothing stops an unrelated server from claiming the
-    port in the moment between the probe and the spawn. The ownership check is
-    what turns that into a refusal rather than a snapshot of someone else's
-    pages.
-    """
-    replies = iter([None, 0])
-
-    class _DiesAfterReplying:
-        """Alive when asked before the request, exited when asked after it."""
-
-        def poll(self) -> int | None:
-            """Report alive, then exited, so the reply lands in between."""
-            return next(replies)
-
-    monkeypatch.setattr(
-        serving.urllib.request,
-        "urlopen",
-        lambda *_args, **_kwargs: contextlib.nullcontext(),
-    )
-
-    with pytest.raises(SystemExit) as caught:
-        serving._await_server(_DiesAfterReplying(), "http://127.0.0.1:8099", 8099)
-
-    message = str(caught.value.code)
-    assert "another server" in message, (
-        f"the message should say the reply was not this run's; got {message!r}"
     )
 
 

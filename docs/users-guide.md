@@ -1,10 +1,11 @@
 # Users' guide
 
-This guide is for readers who need to use Episodic as it exists today:
-operators, integrators, and other people who need the supported workflows
-without changing the implementation. It covers the user-facing surfaces that
-are currently documented in this repository. Maintainer-only build and
-extension guidance belongs in the [developers' guide](developers-guide.md).
+This guide is for readers who need to use the published sub-sites as they exist
+today: operators, integrators, and other people who need the supported
+workflows without changing the implementation. It covers the user-facing
+surfaces that are currently documented in this repository. Maintainer-only
+build and extension guidance belongs in the
+[developers' guide](developers-guide.md).
 
 ## 1. Where to start
 
@@ -64,6 +65,49 @@ Do not assume the following are available just because they are designed:
 - audio delivery, preview, and export are still roadmap work,
 - approval flows are not part of the current contract, and
 - the system stops at the draft and evaluation surfaces documented above.
+
+## 4. Weaver
+
+Weaver's documentation begins at [/weaver/](/weaver/). Two pages answer most
+first questions: [Install](/weaver/install/) for getting the tool, and
+[Commands](/weaver/commands/) for what it does once installed.
+
+### 4.1. Finding your way around
+
+The sidebar on the left is the navigation for the whole sub-site. The page you
+are reading is highlighted in it, and screen readers announce it as the current
+page.
+
+Below 1024 pixels wide there is no room for a sidebar, so it becomes a drawer.
+In that layout the sidebar is hidden and a square indigo button — the Weaver
+mark — appears at the top left. Pressing it opens the navigation over the page.
+
+The drawer closes four ways, and any of them will do:
+
+- pressing the button again,
+- pressing `Escape`,
+- clicking or tapping the dimmed area beside the drawer, or
+- following any link in it.
+
+While the drawer is open, focus moves into it, so the next `Tab` takes you
+through the navigation rather than through the page behind it. Closing the
+drawer puts focus back where it was before you opened it; if nothing in
+particular held it, focus returns to the button, which is where you left off.
+
+The page behind the drawer does not scroll vertically while it is open, so
+dismissing the drawer leaves you where you were rather than somewhere further
+down. The drawer itself scrolls if the navigation is longer than the screen.
+
+### 4.2. Copying commands
+
+The install page and the home page show commands with a **Copy** control beside
+them. Pressing it puts that command on the clipboard, ready to paste into a
+terminal.
+
+There is no on-screen confirmation: the page does not change, and nothing is
+announced. If you are unsure whether the copy worked, paste it and look. A
+browser may also refuse the clipboard on an insecure connection or without
+permission, and that refusal is likewise silent.
 
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the

@@ -390,6 +390,22 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - [x] (2026-08-28) Made the icon macro's publication failure-atomic: written
       to a unique temporary file beside the target and moved into place with a
       rename, so a failure anywhere leaves the previous macro intact.
+- [x] (2026-08-28) Hoisted the generated icon dictionary above the macro. It
+      was declared inside, so Jinja rebuilt all fifty-three entries of SVG
+      path data on every `icon()` call, and a page renders dozens.
+- [x] (2026-08-28) Put the harness's environmental waits behind seams: a
+      `Clock` protocol for the lock's timeout and the readiness poll, an HTTP
+      probe and fetch for readiness and the ownership check, and a launcher
+      for the server process. Retry counts, timing, readiness, ownership
+      failure and launch argv are now checked without a socket, a sleep, a
+      request or a child process.
+- [x] (2026-08-28) Covered `_stop` directly, including the escalation to
+      `kill` and the one timeout it is allowed to suppress; and
+      `templates/weaver/_chrome.jinja`, whose four link states and two
+      `current_href` cases the browser suite could not all reach.
+- [x] (2026-08-28) Gave the users' guide a Weaver section, and tests that hold
+      its routes, its breakpoint and its controls against the sources that
+      decide them.
 
 ## Surprises & discoveries
 
@@ -1100,12 +1116,12 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `scripts/episodic_roadmap_parser.py` as a bare name, which works because a
   script run by path has its own directory on `sys.path`. A package would have
   needed `python -m` with a path fiddle. A `__main__.py` can use
-  package-relative imports perfectly well when the package is invoked that
-  way; what it cannot do is use them under the direct-path invocation this
-  harness documents, because running a directory supplies no package context.
-  Either route would have changed the documented invocation, the Makefile, and
-  every test that loads the harness. Siblings changed the
-  invocation not at all. Date/Author: 2026-08-28, review batch.
+  package-relative imports perfectly well when the package is invoked that way;
+  what it cannot do is use them under the direct-path invocation this harness
+  documents, because running a directory supplies no package context. Either
+  route would have changed the documented invocation, the Makefile, and every
+  test that loads the harness. Siblings changed the invocation not at all.
+  Date/Author: 2026-08-28, review batch.
 - **Decision:** take the startup lock only for a port the caller named.
   Rationale: the lock serializes contention, and a port the kernel has just
   handed out cannot be contended — nothing else was given it. Keying a lock
@@ -1131,6 +1147,23 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   exactly what must not — a path, a label, an identifier. A caller passing one
   is a bug in the caller. Date/Author: 2026-08-28, review batch.
 
+- **Decision:** tell readers plainly that a Weaver copy control gives no
+  confirmation. Rationale: it does not. There is no toast and no live region —
+  Netsuke has both, Weaver has neither — so a reader who presses Copy and
+  watches for a change sees nothing, and cannot tell success from a browser
+  refusing the clipboard on an insecure origin. Writing "you will see a
+  confirmation" would be false, and writing nothing leaves the reader to guess.
+  The users' guide says there is none and suggests pasting to check; a test
+  fails if a live region ever appears, so the guide is corrected rather than
+  left wrong. Date/Author: 2026-08-28, review batch.
+- **Decision:** pass a clock rather than patching `time`.
+  Rationale: both waits are loops over the clock — the lock's deadline and the
+  readiness poll — and their logic is about attempts and deadlines, not about
+  time. Injecting makes the loops ordinary code to check: how many attempts,
+  how long between them, what the deadline does. Patching the module would test
+  the same behaviour while leaving the signature claiming a dependency it no
+  longer honestly has. Date/Author: 2026-08-28, review batch.
+
 ## Outcomes & retrospective
 
 The Weaver sub-site now builds the way every compiled sub-site does: one
@@ -1143,9 +1176,10 @@ scan additionally reports twenty-eight findings against code-panel text; these
 are false positives, recorded as such in the Decision Log, not fixes made
 against the design.
 
-**Addendum (2026-08-25):** see the addendum under Purpose. The "zero" above was
-true when written; the current position is zero unwaived direct contrast
-failures, with the two scoped `safety/` exceptions recorded there.
+**Addendum (2026-08-25):** the statement above is historical. See the addendum
+under Purpose. The "zero" above was true when written; the current position is
+zero unwaived direct contrast failures, with the two scoped `safety/`
+exceptions recorded there.
 
 Measured against the pre-migration baseline, eight of the seventeen pages are
 identical in total height and the largest shift anywhere is 1.78%, on
@@ -1680,9 +1714,9 @@ code-panel findings are recorded in the Decision Log as false positives, not
 fixed. The computed-style diff is non-empty and every entry corresponds to a
 logged substitution.
 
-**Addendum (2026-08-25):** see the addendum under Purpose. This go/no-go was
-met with the two scoped `safety/` exceptions recorded there, waived rather than
-fixed; it was not met as a literal zero.
+**Addendum (2026-08-25):** the statement above is historical. See the addendum
+under Purpose. This go/no-go was met with the two scoped `safety/` exceptions
+recorded there, waived rather than fixed; it was not met as a literal zero.
 
 ### Milestone 9 — Documentation and cleanup
 
@@ -1805,9 +1839,9 @@ part of the green step.
   axe-core's twenty-eight code-panel findings are logged as false positives,
   not fixed (see Decision Log).
 
-  **Addendum (2026-08-25):** see the addendum under Purpose. The criterion is
-  now met as zero *unwaived* failures, with the two scoped `safety/` exceptions
-  recorded there.
+  **Addendum (2026-08-25):** the criterion above is historical. See the
+  addendum under Purpose. The criterion is now met as zero *unwaived* failures,
+  with the two scoped `safety/` exceptions recorded there.
 - Styling: the final computed-style diff against the Milestone 0 baseline
   contains only entries traceable to a `Decision Log` line.
 

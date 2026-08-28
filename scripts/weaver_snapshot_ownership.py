@@ -12,7 +12,6 @@ from __future__ import annotations
 import contextlib
 import secrets
 import typing as typ
-import urllib.error
 import urllib.request
 
 from weaver_snapshot_paths import REPO_ROOT
@@ -46,7 +45,39 @@ def _ownership_marker() -> cabc.Iterator[str]:
         marker.unlink(missing_ok=True)
 
 
-def _confirm_ownership(base: str, marker: str, port: int, when: str) -> None:
+# How the ownership check reads the marker back. Takes the URL and a byte
+# ceiling, and returns what was served.
+type Fetch = cabc.Callable[[str, int], str]
+
+
+def _fetch(url: str, limit: int) -> str:
+    """Read at most ``limit`` bytes from a URL, as text.
+
+    Parameters
+    ----------
+    url
+        A loopback URL to request.
+    limit
+        How much to read. Whatever is on the port is not necessarily ours, so
+        its response is not necessarily small.
+
+    Returns
+    -------
+    str
+        The decoded body, undecodable bytes replaced.
+
+    Raises
+    ------
+    OSError
+        If the request fails.
+    """
+    with urllib.request.urlopen(url, timeout=5) as response:  # noqa: S310 - literal loopback URL
+        return response.read(limit).decode("utf-8", "replace")
+
+
+def _confirm_ownership(
+    base: str, marker: str, port: int, when: str, fetch: Fetch = _fetch
+) -> None:
     """Check that the server on this port is serving this run's ``public/``.
 
     Parameters
@@ -60,6 +91,9 @@ def _confirm_ownership(base: str, marker: str, port: int, when: str) -> None:
     when
         What was happening, for the message: the check runs once before the
         capture and once after, and the two failures mean different things.
+    fetch
+        How to read the marker back. Injected so a server that is not this
+        run's can be simulated without one.
 
     Raises
     ------
@@ -68,12 +102,10 @@ def _confirm_ownership(base: str, marker: str, port: int, when: str) -> None:
         case whatever is on the port is not this run's server.
     """
     try:
-        with urllib.request.urlopen(f"{base}/{marker}", timeout=5) as response:  # noqa: S310 - literal loopback URL
-            # Whatever is on that port is not necessarily ours, so its
-            # response is not necessarily small. One byte past the marker is
-            # enough to tell a match from anything longer.
-            served = response.read(len(marker) + 1).decode("utf-8", "replace").strip()
-    except (urllib.error.URLError, OSError) as exc:
+        # One byte past the marker is enough to tell a match from anything
+        # longer, and whatever is on that port may serve a great deal more.
+        served = fetch(f"{base}/{marker}", len(marker) + 1).strip()
+    except OSError as exc:
         message = (
             f"the server on port {port} did not serve this run's marker "
             f"{when} ({exc}), so it is serving some other tree; the snapshot "

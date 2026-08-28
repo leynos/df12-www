@@ -837,7 +837,68 @@ per root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
 section of [AGENTS.md](../AGENTS.md); a custom element is its last rung, and
 the site does not use a front-end framework at all.
 
-### 6.2. Weaver chrome telemetry
+### 6.2. The Weaver mobile drawer
+
+`src/static/weaver/assets/js/mobile-nav.js` turns the sidebar into a drawer
+below the tablet breakpoint. It builds its own controls rather than expecting
+them in the markup, so a page supplies three hooks and gets the rest.
+
+**What a page must provide.** The script returns early — silently, leaving the
+page exactly as it was — unless it finds all three:
+
+| Hook                       | What it is                                  |
+| -------------------------- | ------------------------------------------- |
+| `#sidebar`                 | the element that becomes the drawer         |
+| a `nav` inside it          | the links; given `id="sidebar-nav"` if bare |
+| `[data-mobile-nav-header]` | where the toggle is placed                  |
+
+The early return is why `shared_content_page.jinja` had to grow the header
+hook: the legal pages had a sidebar and a nav but no header, so they shipped
+without mobile navigation at all and nothing said so.
+
+**What the script adds.** A `button#mobile-nav-toggle` inside the header and a
+`div#mobile-nav-backdrop` after the sidebar. The button carries no markup of
+its own: it wears `.weaver-brand-mark`, which supplies the indigo block, the
+glyph, and the centring from `src/styles/weaver/chrome.css`. Its accessible
+name is an `aria-label` that changes with its state, and `aria-controls` points
+at the nav's id.
+
+**The two classes that drive the CSS.** `has-mobile-nav` goes on `<html>` as
+soon as the script runs, and is what lets the stylesheet hide the nav — without
+it a reader with JavaScript disabled would be left with a navigation nothing
+can open. `mobile-nav-open` goes on `#sidebar` while the drawer is open, and is
+the selector for both the drawer itself (`#sidebar.mobile-nav-open nav`, which
+is `display: block; position: fixed`) and the backdrop
+(`#sidebar.mobile-nav-open ~ #mobile-nav-backdrop`).
+
+**One breakpoint, written twice.** The stylesheet's drawer rules sit in
+`@media (max-width: 1023px)`; the script watches
+`matchMedia("(min-width: 1024px)")` and closes the drawer when that starts
+matching, so the page is never left scroll-locked behind a drawer that the
+layout has just hidden. The two are the same boundary and have to move together.
+
+**Scroll locking is vertical only.** Opening the drawer saves
+`document.body.style.overflowY` and sets it to `hidden`; closing restores what
+was saved. It must be `overflowY` and not `overflow`: the body already carries
+`overflow-x: hidden` from a class, and setting both inline replaces that
+declaration for as long as the drawer is open, letting the page jump sideways.
+Because the computed value is the same either way, only the inline declaration
+distinguishes them — which is what `tests/test_weaver_browser_interaction.py`
+asserts.
+
+**Focus.** Opening saves `document.activeElement` and moves focus to the first
+focusable element in the nav, or to the nav itself if it has none. A `keydown`
+handler traps `Tab` inside the drawer while it is open. Closing restores the
+saved element — unless it was `<body>`, is no longer connected, or cannot take
+focus, in which case focus goes to the toggle. `<body>` is the common case:
+someone who opened the drawer by tapping it had nothing focused, and returning
+focus to `<body>` would strand it on a hidden nav link.
+
+**Four ways to close**, each reported with its own telemetry reason: the
+toggle, the backdrop, any link in the nav, and `Escape`. The breakpoint
+crossing is a fifth, and is the one a reader does not initiate.
+
+### 6.3. Weaver chrome telemetry
 
 The Weaver drawer and its copy controls report through the same optional hook
 model as Episodic search. A production host may set
@@ -887,7 +948,7 @@ reports the outcome; the text is passed to the clipboard and never to the sink.
 unconditionally, because `mobile-nav.js` returns early on a page without the
 drawer's markup while the install page's copy buttons still need it.
 
-### 6.3. The config-keys component
+### 6.4. The config-keys component
 
 `config-keys.js` drives the "config keys" browser on the configuration docs page
 (`templates/netsuke/pages/docs-configuration.jinja`), which pairs each key
@@ -1127,17 +1188,17 @@ uv run pytest tests/test_weaver_snapshot_properties.py -v
 
 `tests/test_weaver_browser.py` and `tests/test_weaver_browser_interaction.py`
 are the two Weaver suites that watch a real Chromium rather than reading text.
-The former checks what every published page looks like once it has loaded;
-the latter checks what happens when something acts on one — a copy-button
-click, a resize past the mobile breakpoint, the drawer opening, the `capture`
-command run end to end. The build tests read the delivered markup and the
-compiled stylesheet as strings, and the snapshot tests exercise the harness
-that drives a browser without ever starting one; these two suites serve
-`public/` and drive `agent-browser` over it, so they can observe served
-responses, composited colours, and the laid-out result rather than the markup
-that describes them — whether a declared stylesheet actually 404s, what a
-translucent panel's colour composites to once the cascade has had its say, and
-whether the sidebar genuinely gives way to the drawer at a narrow viewport.
+The former checks what every published page looks like once it has loaded; the
+latter checks what happens when something acts on one — a copy-button click, a
+resize past the mobile breakpoint, the drawer opening, the `capture` command
+run end to end. The build tests read the delivered markup and the compiled
+stylesheet as strings, and the snapshot tests exercise the harness that drives
+a browser without ever starting one; these two suites serve `public/` and drive
+`agent-browser` over it, so they can observe served responses, composited
+colours, and the laid-out result rather than the markup that describes them —
+whether a declared stylesheet actually 404s, what a translucent panel's colour
+composites to once the cascade has had its say, and whether the sidebar
+genuinely gives way to the drawer at a narrow viewport.
 
 Both carry the `playwright` marker, so `uv run pytest -m "not playwright"`
 deselects them while iterating on something else. Both also degrade to a skip
@@ -1149,9 +1210,9 @@ rather than a failure when a dependency is absent: `agent-browser` not on
 `tests/conftest.py`, shared with the build suites and between the two browser
 suites, so `bun run build` runs once for all of them rather than once per
 module. The page list, the viewports, the axe waivers, and the helpers that
-read state back out of the browser — the request log, axe's report, the
-result of an evaluated expression — live in `tests/support/weaver_browser.py`,
-so both suites drive the browser the same way over the same matrix.
+read state back out of the browser — the request log, axe's report, the result
+of an evaluated expression — live in `tests/support/weaver_browser.py`, so both
+suites drive the browser the same way over the same matrix.
 
 **The matrix.** The page list is derived from `config/pages.yaml` — the same
 file the generator itself reads — rather than hard-coded or drawn from the
@@ -1250,8 +1311,8 @@ Together they cover every published page at two viewports for the
 self-containment, accessibility, chrome, and layout checks, plus the smaller,
 non-parametrized batteries described above — 121 cases in the page-level suite
 and 9 in the interaction one. Expect the pair to take between three and four
-minutes including the build, most of it in the page-level suite, since axe
-runs once per page per viewport.
+minutes including the build, most of it in the page-level suite, since axe runs
+once per page per viewport.
 
 ### 7.4. Mobile overflow below the tablet breakpoint
 

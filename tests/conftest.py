@@ -25,6 +25,7 @@ from tests.support.weaver_harness import load
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
+    from types import ModuleType
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_WEAVER = REPO_ROOT / "public" / "weaver"
@@ -123,3 +124,14 @@ def drive() -> cabc.Iterator[cabc.Callable[..., str]]:
             check=False,
             timeout=TOOL_TIMEOUT_SECONDS,
         )
+
+
+@pytest.fixture(scope="module")
+def generator() -> ModuleType:
+    """Load the icon generator the way running the script by path would.
+
+    It imports `weaver_icons_template` as a bare name, which works because a
+    script run by path has its own directory on `sys.path`; the shared loader
+    reproduces that.
+    """
+    return load("generate_weaver_icons")

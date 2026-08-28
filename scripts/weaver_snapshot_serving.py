@@ -10,15 +10,15 @@ from __future__ import annotations
 import collections.abc as cabc
 import contextlib
 import socket
-import subprocess
-import time
 import typing as typ
-import urllib.error
-import urllib.request
 
 from weaver_snapshot_locking import _startup_lock
 from weaver_snapshot_ownership import _confirm_ownership, _ownership_marker
-from weaver_snapshot_paths import HTTP_SERVER, REPO_ROOT
+from weaver_snapshot_paths import HTTP_SERVER
+from weaver_snapshot_process import Launcher, _await_server, _launch, _stop
+
+if typ.TYPE_CHECKING:
+    import subprocess
 
 
 def _refuse_occupied_port(port: int) -> None:
@@ -55,92 +55,6 @@ def _refuse_occupied_port(port: int) -> None:
                 f"public/ ({exc}). Stop that server, or pass --port."
             )
             raise SystemExit(message) from exc
-
-
-class _Pollable(typ.Protocol):
-    """The one thing waiting on a server needs from the process running it.
-
-    Annotating the parameter as ``subprocess.Popen[bytes]`` overstated it: the
-    wait asks whether the child is still running and nothing else. Narrowing
-    the contract to that is what lets it be checked against a stand-in that
-    reports a chosen sequence of exits, rather than against a real process
-    whose timing a test cannot control.
-    """
-
-    def poll(self) -> int | None:
-        """Return the exit status, or ``None`` while the process runs."""
-        ...  # pragma: no cover - a protocol has no body
-
-
-def _await_server(server: _Pollable, base: str, port: int) -> None:
-    """Wait until the spawned server answers, and confirm it is the one that did.
-
-    Parameters
-    ----------
-    server
-        The freshly spawned ``http-server`` process, or anything that reports
-        whether it is still running.
-    base
-        The origin it should be listening on.
-    port
-        The port, for the messages.
-
-    Raises
-    ------
-    SystemExit
-        If the child exits while starting, if it does not answer within
-        roughly ten seconds, or if it is no longer running once something on
-        its port has answered — in which case the answer came from something
-        else, and this run must not snapshot it.
-    """
-    # Poll rather than sleeping a fixed interval, so a slow start does not
-    # silently yield a directory full of failed captures.
-    for _ in range(50):
-        # A server that has already exited will never answer, and anything
-        # that does answer on its port is not it.
-        if (status := server.poll()) is not None:
-            message = (
-                f"http-server exited with status {status} while starting on "
-                f"port {port}; it may have lost a race to bind it"
-            )
-            raise SystemExit(message)
-        try:
-            with urllib.request.urlopen(f"{base}/weaver/", timeout=1):  # noqa: S310 - literal loopback URL
-                break
-        except (urllib.error.URLError, OSError):
-            time.sleep(0.2)
-    else:
-        message = f"http-server did not come up on port {port}"
-        raise SystemExit(message)
-
-    # The request succeeded, but that alone does not say who answered it. If
-    # the child has exited by now, something else on the port did, and the
-    # capture would silently be of that.
-    if (status := server.poll()) is not None:
-        message = (
-            f"port {port} answered, but this run's http-server had already "
-            f"exited with status {status}; the reply came from another server"
-        )
-        raise SystemExit(message)
-
-
-def _stop(server: subprocess.Popen[bytes]) -> None:
-    """Stop a served process, escalating if it will not stand down.
-
-    Parameters
-    ----------
-    server
-        The process to stop.
-    """
-    server.terminate()
-    try:
-        server.wait(timeout=10)
-    except subprocess.TimeoutExpired:
-        # A server that will not stand down still holds the port, and the
-        # next run's bind probe would refuse to start because of it.
-        server.kill()
-        with contextlib.suppress(subprocess.TimeoutExpired):
-            server.wait(timeout=10)
 
 
 def _server_argv(port: int) -> list[str]:
@@ -236,7 +150,11 @@ def _resolve_port(port: int, allocate: PortAllocator = _allocate_port) -> int:
 
 
 def _start_server(
-    port: int, marker: str, *, named: bool = True
+    port: int,
+    marker: str,
+    *,
+    named: bool = True,
+    launch: Launcher = _launch,
 ) -> subprocess.Popen[bytes]:
     """Acquire the port and return a server already answering on it, as itself.
 
@@ -250,6 +168,9 @@ def _start_server(
         Whether the caller asked for this port by number. A kernel-assigned
         one needs no startup lock, and keying a lock file on it would leave
         one behind per run.
+    launch
+        How to start the server process. Injected so the argv a start would
+        use can be checked without a child process.
 
     Returns
     -------
@@ -268,12 +189,7 @@ def _start_server(
     # shared temp directory for every run ever made.
     with _startup_lock(port) if named else contextlib.nullcontext():
         _refuse_occupied_port(port)
-        server = subprocess.Popen(  # noqa: S603 - fixed argv, no shell, no user input
-            _server_argv(port),
-            cwd=REPO_ROOT,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+        server = launch(_server_argv(port))
         try:
             base = f"http://127.0.0.1:{port}"
             _await_server(server, base, port)

@@ -364,6 +364,22 @@ Stop and escalate when any of these is reached. Do not improvise past them.
       write is now skipped when the content is unchanged, the watcher ignores
       the generated index as a second guard, and a test rebuilds an
       already-built tree and asserts nothing under a watched root moved.
+- [x] (2026-08-28) Brought every file this branch owns under the 400-line
+      ceiling. The harness became nine sibling modules and its suite eight,
+      cut by span rather than retyped; the build and browser suites split
+      along their own seams. 446 tests pass, against 440 before, the six new
+      being this round's additions.
+- [x] (2026-08-28) Stopped the startup lock leaving a file per run. It is
+      keyed on the port, so a kernel-assigned one produced a lock nothing
+      would look at again; it is taken only for a port somebody named, which
+      is the only case that can contend.
+- [x] (2026-08-28) Widened publication's rollback from `OSError` to
+      `BaseException`, so a Ctrl-C between two renames restores the
+      destination, and made a rollback that cannot finish say so on stderr
+      rather than leave the operator believing the directory is intact.
+- [x] (2026-08-28) Covered the drawer in a real browser on
+      `/weaver/privacy-policy/` at 360px — ARIA, the backdrop, focus entering
+      the drawer, and the scroll lock being inline `overflow-y` alone.
 
 ## Surprises & discoveries
 
@@ -618,6 +634,14 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   steps write only into `public/`. After the fix the same five minutes produce
   one build — the `--initial` one — and then silence, while a real edit still
   triggers exactly one rebuild.
+
+- **Observation:** the obvious way to assert the drawer locks only the
+  vertical axis cannot fail. Evidence: the body already carries
+  `overflow-x: hidden` from a class, so a script setting `style.overflow` and
+  one setting `style.overflowY` produce the same *computed* `overflow-x`.
+  Replacing the one with the other left the assertion passing. Impact: the
+  test reads the inline declarations instead, where the difference is visible
+  — and under the same mutation it now fails, naming the axis that was set.
 
 ## Decision log
 
@@ -1059,6 +1083,25 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   invariant, that a build rewrites nothing under a watched root, rather than
   the specific file, since the next occurrence will be a different one.
   Date/Author: 2026-08-27, review batch.
+
+- **Decision:** split the harness into sibling modules under `scripts/`
+  rather than a `scripts/weaver_snapshot/` package.
+  Rationale: the repository already does this —
+  `scripts/build_episodic_roadmap_data.py` imports
+  `scripts/episodic_roadmap_parser.py` as a bare name, which works because a
+  script run by path has its own directory on `sys.path`. A package would have
+  needed either `python -m` with a path fiddle or a `__main__.py` that cannot
+  use relative imports, and would have changed the documented invocation,
+  the Makefile, and every test that loads the harness. Siblings changed the
+  invocation not at all.
+  Date/Author: 2026-08-28, review batch.
+- **Decision:** take the startup lock only for a port the caller named.
+  Rationale: the lock serializes contention, and a port the kernel has just
+  handed out cannot be contended — nothing else was given it. Keying a lock
+  file on it bought nothing and left one behind in the shared temp directory
+  for every run ever made. Named ports keep their lock, which is the case the
+  mechanism was built for.
+  Date/Author: 2026-08-28, review batch.
 
 ## Outcomes & retrospective
 
@@ -1840,6 +1883,12 @@ New files:
   in the sub-site containing a colour literal.
 - `src/styles/weaver/{site-base,chrome,panels,callouts,figures,content}.css` —
   the semantic partials, imported into `layer(base)` or `layer(components)`.
+  **Correction (2026-08-28):** eleven partials shipped, not six —
+  `callouts.css`, `chrome.css`, `code.css`, `content.css`,
+  `design-language.css`, `figures.css`, `fonts.css`, `motion.css`,
+  `pages.css`, `panels.css`, and `site-base.css`. The compiled artefact's
+  path is `public/weaver/assets/styles/weaver.css`, reached from a page as
+  `/weaver/assets/styles/weaver.css`.
 - `templates/weaver/_chrome.jinja` — Jinja macros for the shared page
   furniture. At minimum:
   `{% macro nav_link(href, index, label, current_href, variant='') %}`,
@@ -1854,15 +1903,35 @@ New files:
   `@iconify-json/carbon`, writes `templates/weaver/_icons.jinja`.
 - `scripts/weaver_snapshot.py` — the validation harness, a Cyclopts CLI with
   `capture`, `shots`, and `diff` subcommands.
-- `tests/test_weaver_build.py` — the three build-invariant tests plus the
-  icon-generator drift test.
+  **Correction (2026-08-28):** it grew past the repository's 400-line ceiling
+  and was decomposed. The command surface keeps the name; the work sits in
+  `weaver_snapshot_{paths,locking,output,ownership,serving,tools,colour,normalize}.py`
+  beside it. They are plain sibling modules rather than a package, following
+  `scripts/build_episodic_roadmap_data.py` and its parser, so the invocation
+  is unchanged.
+- `tests/test_weaver_build.py` — the three build-invariant tests.
+- `tests/test_weaver_icons.py` — the icon generator: drift against its source,
+  the boundary errors it reports, and the macro rendered through Jinja.
+- `tests/test_weaver_conventions.py` — one font size per element, and the
+  invariant that no build step writes into a directory `make dev` watches.
+- `tests/test_weaver_snapshot_{colour,normalize,validation,output,serving,ownership,tools,commands}.py`
+  — the harness, split along the same seams as the modules they exercise.
+- `tests/test_weaver_snapshot_properties.py` — Hypothesis properties over the
+  normalization.
 - `tests/test_weaver_browser.py` — drives `agent-browser` over a served
-  `public/weaver/` to check self-containment, contrast, and layout at two
-  viewports; marked `playwright` and skipped when its tool dependencies are
-  absent.
-- `tests/conftest.py` — the session-scoped `built_site` fixture, shared
-  between `tests/test_weaver_build.py` and `tests/test_weaver_browser.py` so
-  `bun run build` runs once for both.
+  `public/weaver/` to check self-containment, contrast, chrome, and layout on
+  every published page at two viewports; marked `playwright` and skipped when
+  its tool dependencies are absent.
+- `tests/test_weaver_browser_interaction.py` — the copy controls, a long line
+  in a code panel, the drawer opening on a shared-content page, and `capture`
+  end to end.
+- `tests/support/weaver_harness.py` — loads a harness module the way running
+  the script by path would.
+- `tests/support/weaver_browser.py` — the page list, viewports, axe waivers,
+  and the helpers that read state back out of the browser.
+- `tests/conftest.py` — the session-scoped `built_site`, `served` and `drive`
+  fixtures, shared across the Weaver suites so one build and one browser
+  session serve them all.
 
 Modified files:
 

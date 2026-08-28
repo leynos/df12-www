@@ -967,6 +967,17 @@ over `!important`, which would also outrank a later, deliberate override.
 
 ### 7.1. Verifying a styling change against Weaver
 
+`scripts/weaver_snapshot.py` is the command surface; the work sits in eight
+siblings beside it, none over 400 lines, named for what they do:
+`_paths` (the published tree, the page list, and each page's filename stem),
+`_locking` (advisory locks and lock-file hygiene), `_output` (staging and
+failure-atomic publication), `_ownership` (proving whose server answered),
+`_serving` (ports, the server, and its lifecycle), `_tools` (the argv handed to
+css-view and agent-browser), `_colour` (one colour written one way), and
+`_normalize` (reducing a captured tree to what a reader could see). They are
+plain modules rather than a package, so a script run by path finds them on
+`sys.path` and the invocation below is unchanged.
+
 `scripts/weaver_snapshot.py` exists because a cascade change on a compiled
 Tailwind sheet is easy to get subtly wrong: nothing errors, a selector simply
 stops matching what it used to, and the only symptom is an element that has
@@ -1024,10 +1035,11 @@ deliberately did.
 ### 7.2. Property-based tests for the snapshot normalizer
 
 `tests/test_weaver_snapshot_properties.py` complements the example-based
-`tests/test_weaver_snapshot.py` with
+the `tests/test_weaver_snapshot_*.py` suites with
 [Hypothesis](https://hypothesis.readthedocs.io/) (`hypothesis` is a `dev`
 dependency-group entry in `pyproject.toml`). Rather than asserting what the
-normalizer in `scripts/weaver_snapshot.py` does to worked-example inputs, it
+normalizer in `scripts/weaver_snapshot_normalize.py` does to worked-example
+inputs, it
 asserts invariants that must hold for every input Hypothesis can generate —
 colour notations, style-diff shapes, and walker trees nobody thought to write
 by hand.
@@ -1081,7 +1093,7 @@ rather than a failure when a dependency is absent: `agent-browser` not on
 `bun` themselves not on `PATH`.
 
 `built_site` is a session-scoped fixture in `tests/conftest.py`, shared with
-`tests/test_weaver_build.py`, so `bun run build` runs once for both suites
+the build suites, so `bun run build` runs once for all of them
 rather than once per module.
 
 **The matrix.** The page list is derived from `config/pages.yaml` — the same

@@ -1124,7 +1124,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - **Decision:** drop an event whose operation, outcome or reason is outside
   the declared vocabulary, rather than emitting it.
   Rationale: the schema is the promise. Widening it at runtime for a caller
-  that passed something unrecognised would mean the table in the developers'
+  that passed something unrecognized would mean the table in the developers'
   guide describes the schema rather than being it, and the thing most likely
   to arrive that way is exactly what must not — a path, a label, an
   identifier. A caller passing one is a bug in the caller.

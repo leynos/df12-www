@@ -10,23 +10,16 @@
  * Scripts are read from `src/static/`, the hand-crafted source of truth, so
  * the DOM suites need no build step to run.
  */
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+import { click as domClick, pressKey as domPressKey, evaluateScript } from "./dom.mjs";
 
-const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const SCRIPT_DIR = join("src", "static", "stilyagi", "assets", "js");
 
 /* Evaluate a Stilyagi widget script (`design`, `docs`, or `roadmap`) against
    the global window, as a classic `<script>` tag would. The document is
    already loaded, so each module's `onReady` wiring runs synchronously. */
 export function evaluateStilyagiScript(name) {
-  const source = readFileSync(join(REPO_ROOT, SCRIPT_DIR, `${name}.js`), "utf8");
-  /* The module under test is a classic browser script with no export
-     surface, so running it is the only way to exercise it. The source is
-     read from this repository, never from anything external. */
-  const run = new Function("window", "document", "navigator", source);
-  run(window, window.document, window.navigator);
+  evaluateScript(window, join(SCRIPT_DIR, `${name}.js`));
 }
 
 /* Mount markup and evaluate the widget script that enhances it. `before`
@@ -49,23 +42,22 @@ export function reset() {
 
 /* Click `target`, bubbling so delegated handlers see it. */
 export function click(target) {
-  target.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
+  domClick(window, target);
 }
 
 /* Press a key on `target`, returning the event so a test can assert on
    whether the handler took it over. */
 export function pressKey(target, key) {
-  const event = new window.KeyboardEvent("keydown", { key, bubbles: true, cancelable: true });
-  target.dispatchEvent(event);
-  return event;
+  return domPressKey(window, target, key);
 }
 
-/* Pointer enter/leave. These do not bubble in a browser, and the widgets
-   listen directly on the element, so they are dispatched the same way. */
+/* Dispatch a non-bubbling `mouseenter`, as the browser would; the widgets
+   listen directly on the element rather than delegating. */
 export function hover(target) {
   target.dispatchEvent(new window.MouseEvent("mouseenter"));
 }
 
+/* Dispatch the matching non-bubbling `mouseleave`. */
 export function unhover(target) {
   target.dispatchEvent(new window.MouseEvent("mouseleave"));
 }
@@ -104,6 +96,8 @@ export function installIntersectionObserver() {
   return handle;
 }
 
+/* Put the real `IntersectionObserver` constructor back; called from
+   `reset`. */
 function restoreIntersectionObserver() {
   if (realIntersectionObserver !== null) {
     window.IntersectionObserver = realIntersectionObserver;
@@ -120,6 +114,7 @@ function restoreIntersectionObserver() {
  * assert on.
  * --------------------------------------------------------------------- */
 
+/* Build one `.phase` block of the roadmap fixture. */
 function phase(index, { open = false, flavour = "later" } = {}) {
   return `
     <div class="phase ${flavour} ${open ? "open" : "closed"}">
@@ -151,6 +146,7 @@ export const ROADMAP_FIXTURE = `
     ${phase(2)}
   </div>`;
 
+/* Build one namespace chip of the filter bar. */
 function chip(ns, { active = false, label = ns } = {}) {
   return `<button
       type="button"
@@ -161,6 +157,8 @@ function chip(ns, { active = false, label = ns } = {}) {
     >${label}</button>`;
 }
 
+/* Build one catalogue row, with its `data-search` haystack precomputed the
+   way the widget's search filter expects. */
 function ruleRow(ns, id, text) {
   return `<tr role="row" data-ns="${ns}" data-search="${id.toLowerCase()} ${text}">
       <td role="cell" class="id">${id}</td>
@@ -228,6 +226,7 @@ export const RAIL_FIXTURE = `
     </div>
   </div>`;
 
+/* Build one IR tree node, with its label, byte range, and pressed state. */
 function treeNode(region, label, range, { pressed = false } = {}) {
   return `<div
       role="button"
@@ -266,6 +265,7 @@ export const INSPECTOR_FIXTURE = `
     </div>
   </section>`;
 
+/* Build one planner rule switch, declaring the capabilities it requires. */
 function ruleToggle(code, caps, { checked = false } = {}) {
   return `<div
       role="switch"
@@ -279,6 +279,7 @@ function ruleToggle(code, caps, { checked = false } = {}) {
     </div>`;
 }
 
+/* Build one planner provider card, with its loaded/skipped tag. */
 function provider(name, label, { loaded = false } = {}) {
   return `<div data-provider="${name}" class="provider ${loaded ? "loaded" : "skipped"}">
       <div class="pname">${label}</div>

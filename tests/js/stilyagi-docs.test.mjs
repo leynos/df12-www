@@ -9,6 +9,7 @@
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";
+import fc from "fast-check";
 import {
   CATALOGUE_FIXTURE,
   click,
@@ -157,6 +158,31 @@ describe("the catalogue filter in the document", () => {
     expect(visibleCodes()).toEqual(["MD201", "MD401", "PYDOC101"]);
     expect(emptyRow().hidden).toBe(true);
   });
+
+  test("row visibility always agrees with matchesFilter", () => {
+    // The pure function is the oracle: whatever chip and query the reader
+    // lands on, each row's `hidden` must be its answer negated, and the
+    // empty row must show exactly when nothing survives.
+    const queryArbitrary = fc.oneof(
+      fc.constantFrom("", "heading", "link", "docstring", " MD201 ", "no such rule"),
+      fc.string({ maxLength: 12 }),
+    );
+    fc.assert(
+      fc.property(fc.constantFrom("all", "md", "pydoc"), queryArbitrary, (namespace, query) => {
+        mount(CATALOGUE_FIXTURE, "docs");
+        if (namespace !== "all") click(chip(namespace));
+        type(query);
+
+        let visible = 0;
+        for (const row of rows()) {
+          const show = matchesFilter(row.dataset.ns, row.dataset.search, namespace, query);
+          expect(row.hidden).toBe(!show);
+          if (show) visible += 1;
+        }
+        expect(emptyRow().hidden).toBe(visible !== 0);
+      }),
+    );
+  });
 });
 
 describe("the suppression tabs in the document", () => {
@@ -225,6 +251,27 @@ describe("the suppression tabs in the document", () => {
 
     pressKey(tab("py"), "ArrowUp");
     expectSelected("md");
+  });
+
+  test("any arrow-key sequence keeps exactly one tab selected and focused", () => {
+    // Modular arithmetic over the tab count is the oracle: selection,
+    // the roving tabindex, panel visibility, and focus must all agree
+    // with it after every keystroke, however long the sequence.
+    const keyArbitrary = fc.constantFrom("ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp");
+    fc.assert(
+      fc.property(fc.array(keyArbitrary, { maxLength: 16 }), (keys) => {
+        mount(TABS_FIXTURE, "docs");
+        tab("md").focus();
+        let index = 0;
+        for (const key of keys) {
+          pressKey(document.activeElement, key);
+          const step = key === "ArrowRight" || key === "ArrowDown" ? 1 : -1;
+          index = (index + step + tabs().length) % tabs().length;
+          expectSelected(tabs()[index].dataset.tab);
+          expect(document.activeElement).toBe(tabs()[index]);
+        }
+      }),
+    );
   });
 
   test("arrow keys pressed outside the tabs are ignored", () => {

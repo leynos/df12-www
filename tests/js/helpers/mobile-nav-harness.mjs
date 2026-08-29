@@ -19,35 +19,12 @@
  * wrapper hands the module the same three globals a classic script would
  * find on the window it was loaded into.
  */
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { pressKey } from "./dom.mjs";
 
-const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-
-/* Load a shipped script into a window, as a classic `<script>` would. */
-export function evaluateScript(window, relativePath) {
-  const source = readFileSync(join(REPO_ROOT, relativePath), "utf8");
-  /* The module under test is a classic browser script with no export
-     surface, so running it is the only way to exercise it. The source comes
-     from the repository's own build output, never from anything external. */
-  const run = new Function("window", "document", "navigator", source);
-  run(window, window.document, window.navigator);
-}
-
-/* Press a key on `target`, returning the event so a test can assert on
-   whether the handler took it over. Bubbles, because both modules listen
-   above the element that receives the keystroke. */
-export function pressKey(window, target, key, { shiftKey = false } = {}) {
-  const event = new window.KeyboardEvent("keydown", {
-    key,
-    shiftKey,
-    bubbles: true,
-    cancelable: true,
-  });
-  target.dispatchEvent(event);
-  return event;
-}
+/* The DOM primitives shared with the Stilyagi harness live in `dom.mjs`;
+   they are re-exported here so this module remains the single import the
+   mobile-nav suites reach for. */
+export { click, evaluateScript, pressKey } from "./dom.mjs";
 
 export const TRANSITIONS = ["toggle", "tab", "shift-tab", "escape", "wide", "narrow"];
 
@@ -89,11 +66,6 @@ export function pressTab(window, orderedStops, { shiftKey = false } = {}) {
   const nextIndex = (currentIndex + direction + orderedStops.length) % orderedStops.length;
   orderedStops[nextIndex].focus();
   return event;
-}
-
-/* Click `target`, bubbling so document-level handlers see it. */
-export function click(window, target) {
-  target.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
 }
 
 /* A matchMedia stand-in whose `matches` the test controls, so a breakpoint

@@ -7,6 +7,7 @@
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";
+import fc from "fast-check";
 import { click, mount, pressKey, ROADMAP_FIXTURE, reset } from "./helpers/stilyagi.mjs";
 
 const require = createRequire(import.meta.url);
@@ -82,5 +83,21 @@ describe("the accordion in the document", () => {
     const event = pressKey(heads()[0], "ArrowDown");
     expect(event.defaultPrevented).toBe(false);
     expectOnlyOpen(1);
+  });
+
+  test("any activation sequence stays in step with nextOpenIndex", () => {
+    // The pure function is the oracle: after every click the markup must
+    // show exactly the phase it names open, and never more than one.
+    fc.assert(
+      fc.property(fc.array(fc.integer({ min: 0, max: 2 }), { maxLength: 12 }), (activations) => {
+        mount(ROADMAP_FIXTURE, "roadmap");
+        let open = 1; // the fixture ships with phase 1 open
+        for (const index of activations) {
+          click(heads()[index]);
+          open = nextOpenIndex(open, index);
+          expectOnlyOpen(open);
+        }
+      }),
+    );
   });
 });

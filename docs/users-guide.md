@@ -72,11 +72,10 @@ Weaver's documentation begins at [/weaver/](/weaver/). Two pages answer most
 first questions: [Install](/weaver/install/) for getting the tool, and
 [Commands](/weaver/commands/) for what it does once installed.
 
-### 4.1. Finding your way around
+### 4.1. Navigating the sub-site
 
-The sidebar on the left is the navigation for the whole sub-site. The page you
-are reading is highlighted in it, and screen readers announce it as the current
-page.
+The sidebar on the left is the navigation for the whole sub-site. The current
+page is highlighted in it, and screen readers announce it as such.
 
 Below 1024 pixels wide there is no room for a sidebar, so it becomes a drawer.
 In that layout the sidebar is hidden and a square indigo button — the Weaver
@@ -89,14 +88,15 @@ The drawer closes four ways, and any of them will do:
 - clicking or tapping the dimmed area beside the drawer, or
 - following any link in it.
 
-While the drawer is open, focus moves into it, so the next `Tab` takes you
-through the navigation rather than through the page behind it. Closing the
-drawer puts focus back where it was before you opened it; if nothing in
-particular held it, focus returns to the button, which is where you left off.
+While the drawer is open, focus moves into it, so the next `Tab` moves through
+the navigation rather than through the page behind it. Closing the drawer
+restores focus to wherever it was before the drawer opened; if nothing in
+particular held it, focus returns to the button that opened the drawer.
 
 The page behind the drawer does not scroll vertically while it is open, so
-dismissing the drawer leaves you where you were rather than somewhere further
-down. The drawer itself scrolls if the navigation is longer than the screen.
+dismissing the drawer leaves the page at the same position rather than
+somewhere further down. The drawer itself scrolls if the navigation is longer
+than the screen.
 
 ### 4.2. Copying commands
 
@@ -105,7 +105,7 @@ them. Pressing it puts that command on the clipboard, ready to paste into a
 terminal.
 
 There is no on-screen confirmation: the page does not change, and nothing is
-announced. If you are unsure whether the copy worked, paste it and look. A
+announced. Pasting the command is the way to verify that the copy worked. A
 browser may also refuse the clipboard on an insecure connection or without
 permission, and that refusal is likewise silent.
 

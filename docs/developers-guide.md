@@ -937,7 +937,7 @@ declared as three frozen vocabularies at the top of that file:
 
 | Field       | Values                                                                                                                  |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `component` | `weaver-mobile-nav`                                                                                                     |
+| `component` | `weaver-mobile-nav`, `weaver-copy-button`                                                                               |
 | `operation` | `drawer`, `clipboard`                                                                                                   |
 | `outcome`   | `initialized`, `opened`, `closed`, `focus-restored`, `copied`, `failed`                                                 |
 | `reason`    | `toggle`, `backdrop`, `nav-link`, `escape`, `breakpoint`, `saved-element`, `toggle-fallback`, `unavailable`, `rejected` |
@@ -1103,16 +1103,51 @@ over `!important`, which would also outrank a later, deliberate override.
 
 ### 7.1. Verifying a styling change against Weaver
 
-`scripts/weaver_snapshot.py` is the command surface; the work sits in eight
+`scripts/weaver_snapshot.py` is the command surface; the work sits in ten
 siblings beside it, none over 400 lines, named for what they do: `_paths` (the
 published tree, the page list, and each page's filename stem), `_locking`
 (advisory locks and lock-file hygiene), `_output` (staging and failure-atomic
 publication), `_ownership` (proving whose server answered), `_serving` (ports,
 the server, and its lifecycle), `_tools` (the argv handed to css-view and
-agent-browser), `_colour` (one colour written one way), and `_normalize`
-(reducing a captured tree to what a reader could see). They are plain modules
-rather than a package, so a script run by path finds them on `sys.path` and the
-invocation below is unchanged.
+agent-browser), `_colour` (one colour written one way), `_normalize` (reducing
+a captured tree to what a reader could see), `_clock` (the passage of time, as
+something a caller can supply), and `_process` (starting, polling, and
+stopping the server child). They are plain modules rather than a package, so a
+script run by path finds them on `sys.path` and the invocation below is
+unchanged.
+
+Every outward dependency the harness has — the clock, the readiness probe, the
+process launcher, the marker fetch, the file mover, the port allocator — is a
+parameter with a production default, bound at the function that needs it. A
+caller that does not care never sees the parameter; a test supplies a
+stand-in and so exercises retry pacing, timeout escalation, and failure paths
+without a real sleep, socket, or child process.
+
+`_clock` names that pattern for time specifically: a `Clock` protocol with
+`monotonic` and `sleep`, and `SYSTEM_CLOCK`, the real one, which is what
+production always uses. The lock's timeout and the server's readiness poll are
+both loops over a clock rather than over `time` directly, so a test can check
+how many attempts are made and how long is waited between them without sitting
+through it.
+
+`_process` is the half of serving that is about the child rather than the
+port: the `Probe` and `Launcher` types, with `_probe_url` and `_launch` as
+their production defaults, a readiness poll (`_await_server`) that tries fifty
+times at 0.2 seconds apart — roughly ten seconds — before giving up, and a
+shutdown (`_stop`) that asks the process to terminate and, if it has not gone
+within a ten-second wait, kills it and waits up to ten seconds more. Both
+loopback requests it makes — the readiness probe and, via `_ownership`, the
+marker fetch — go through an opener that refuses HTTP redirects
+(`_RefuseRedirects`, built into `_NO_REDIRECTS`): every request here is to the
+server this run just started, so a redirect is not a route to follow but proof
+that whatever answered is not that server, and the run should fail rather than
+trust content from wherever the redirect points.
+
+The startup lock in `scripts/weaver_snapshot_serving.py`'s `_start_server`
+covers exactly the probe, the spawn, and the wait for readiness; it is
+released before the ownership check that confirms the server answering is
+this run's, which stops the server and fails the run if that confirmation does
+not come back.
 
 `scripts/weaver_snapshot.py` exists because a cascade change on a compiled
 Tailwind sheet is easy to get subtly wrong: nothing errors, a selector simply

@@ -34,7 +34,7 @@
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-3xl font-light">
-                        The change commands &ndash; <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">patches apply</span>, <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols rename</span>, and <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols move</span> &ndash; share one mutation engine. Every edit is staged in memory, formatted, validated by the Double-Lock harness (syntactic + semantic checks), and only then atomically committed to disk. No proposal cycle, no human approval gate &ndash; the locks <em>are</em> the safety gate.
+                        The change commands &ndash; <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">patches apply</span>, <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols rename</span>, and <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols move</span> &ndash; share one mutation engine. For supported edits, the Double-Lock harness applies the parser-backed syntactic check and the language-server semantic check before the change is committed to disk. No proposal cycle, no human approval gate &ndash; the locks <em>are</em> the safety gate.
                     </p>
                 </div>
 
@@ -57,7 +57,7 @@
                         <div class="lg:col-span-1">
                             <h2 class="font-serif text-2xl text-base-content mb-4">Synopsis</h2>
                             <p class="text-sm text-base-content/88 mb-6 leading-relaxed">
-                                Every actuator accepts two selector entry points: direct (<code class="font-mono text-xs bg-primary/10 px-1">--uri</code> + <code class="font-mono text-xs bg-primary/10 px-1">--position</code>, or an inline <code class="font-mono text-xs bg-primary/10 px-1">--query</code>) and a typed stream via <code class="font-mono text-xs bg-primary/10 px-1">--selectors &lt;path|-&gt;</code>. The daemon plans the edit in memory, runs both locks, and writes to disk only on success. Failures leave the filesystem untouched.
+                                <span class="font-mono text-xs bg-primary/10 px-1">patches apply</span> accepts a patch file with <code class="font-mono text-xs bg-primary/10 px-1">--file</code> or standard input. <span class="font-mono text-xs bg-primary/10 px-1">symbols rename</span> and <span class="font-mono text-xs bg-primary/10 px-1">symbols move</span> use selector entry points: direct (<code class="font-mono text-xs bg-primary/10 px-1">--uri</code> + <code class="font-mono text-xs bg-primary/10 px-1">--position</code>, or an inline <code class="font-mono text-xs bg-primary/10 px-1">--query</code>) and a typed stream via <code class="font-mono text-xs bg-primary/10 px-1">--selectors &lt;path|-&gt;</code>. For edits supported by the parser and language-server integration, the daemon plans in memory, runs both locks, and writes to disk only on success. Failures leave the filesystem untouched.
                             </p>
 
                             <div class="bg-base-100 border border-base-content p-4 relative mb-6">

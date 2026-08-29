@@ -93,7 +93,7 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   `partials/` chrome), invalidating this plan's per-file targets.
   Severity: medium. Likelihood: high.
   Mitigation: this plan specifies content per *page* (URL), not per template
-  line; the mapping section names current files but the copy briefs are
+  line; the mapping section names current files, but the copy briefs are
   file-structure-independent.
 - Risk: sixteen PNG illustrations embed the observe/act/verify story
   (e.g. `assets/observe/observe-hero-outline.png`,
@@ -271,11 +271,18 @@ content pages under `templates/weaver/pages/`. All weaver chrome currently
 loads the Tailwind Play CDN; a migration to compiled Tailwind v4 + daisyUI
 (mirroring the mxd sub-site) is planned but unexecuted.
 
-**The Weaver repository** (worktree surveyed:
-`/data/leynos/Projects/weaver.worktrees/sempai-query-pipeline-rfc`) holds the
-authoritative planning documents. Branch `sempai-query-pipeline-rfc` sits on
-parent `mutation-vertical-slice`; both are documentation-only. Together they
-define the planned surface this refresh must document.
+**The Weaver repository** holds the authoritative planning documents. Set
+`WEAVER_REPO` to the root of the local Weaver worktree before running the
+survey commands below; in the shared `/data/leynos/Projects` layout, you can
+derive it from the df12-www root with:
+
+```sh
+export WEAVER_REPO="$(realpath ../weaver.worktrees/sempai-query-pipeline-rfc)"
+```
+
+Branch `sempai-query-pipeline-rfc` sits on parent `mutation-vertical-slice`;
+both are documentation-only. Together they define the planned surface this
+refresh must document.
 
 Vocabulary used throughout (from ADR 007): a **capability** is a public
 abstraction such as `definition.get`, `symbol.rename`, `symbol.move`, or
@@ -494,7 +501,7 @@ sections that remain accurate.
 
 **Roadmap (`/weaver/roadmap/`, `pages/roadmap.jinja`).** Rebuild from
 `docs/roadmap.md` phases 12–20: near term — command-surface reset (ADR 007),
-introspection and discoverability (phase 13), code-reading loop (14); mid
+introspection and discoverability (phase 13), code-reading loop (14); mid-
 term — Sempai query slice (15), safe change loop (16), graph slices (17);
 long term — agent workflow and assurance (19: profiles, jobs, delivery
 sinks, feedback). Mark what is already built (CLI/daemon architecture, LSP
@@ -540,8 +547,7 @@ Stages B–E (after the migration lands; all from the repository root):
 
 ```sh
 # Re-survey upstream before writing copy
-git -C /data/leynos/Projects/weaver.worktrees/sempai-query-pipeline-rfc \
-  log --oneline -5
+git -C "$WEAVER_REPO" log --oneline -5
 
 # Regenerate and inspect the weaver site after each page rewrite
 bun run build:static

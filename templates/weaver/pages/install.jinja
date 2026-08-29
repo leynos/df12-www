@@ -179,7 +179,7 @@
                         <div>
                             <div class="inline-block border border-base-100/30 px-2 py-1 mb-4 text-3xs font-mono uppercase tracking-widest text-base-100/80">Workflow</div>
                             <h2 class="font-serif text-4xl text-white">Your First Weave</h2>
-                            <p class="text-base-100/70 mt-2 max-w-xl">Execute the standard Observe → Act → Verify loop on a sample project.</p>
+                            <p class="text-base-100/70 mt-2 max-w-xl">Execute the standard definitions, patches, and diagnostics workflow on a sample project.</p>
                         </div>
                         <div class="hidden md:block">
                             {{ icon('arrow-right-long', 'text-4xl text-accent-ink opacity-50') }}
@@ -187,41 +187,41 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <!-- Observe Card -->
+                        <!-- Definitions Card -->
                         <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center text-white font-bold text-xs">1</div>
-                                <h3 class="font-mono font-bold text-white">OBSERVE</h3>
+                                <h3 class="font-mono font-bold text-white">DEFINITIONS GET</h3>
                             </div>
                             <p class="text-xs text-base-100/70 mb-4 h-10">Jump to a symbol definition to understand the code before editing.</p>
                             <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-code-string border border-white/5">
-                                $ weaver observe get-definition \<br>
+                                $ weaver definitions get \<br>
                                 &nbsp;&nbsp;--uri file:///path/to/project/src/main.rs \<br>
                                 &nbsp;&nbsp;--position 10:5
                             </div>
                         </div>
 
-                        <!-- Act Card -->
+                        <!-- Patches Card -->
                         <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center text-white font-bold text-xs">2</div>
-                                <h3 class="font-mono font-bold text-white">ACT</h3>
+                                <h3 class="font-mono font-bold text-white">PATCHES APPLY</h3>
                             </div>
                             <p class="text-xs text-base-100/70 mb-4 h-10">Apply a patch through Double-Lock validation.</p>
                             <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-code-string border border-white/5">
-                                $ weaver act apply-patch &lt; fix.diff
+                                $ weaver patches apply &lt; fix.diff
                             </div>
                         </div>
 
-                        <!-- Verify Card -->
+                        <!-- Diagnostics Card -->
                         <div class="bg-white/5 border border-white/10 p-6 rounded-xs hover:bg-white/10 transition-colors">
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center text-white font-bold text-xs">3</div>
-                                <h3 class="font-mono font-bold text-white">VERIFY</h3>
+                                <h3 class="font-mono font-bold text-white">DIAGNOSTICS LIST</h3>
                             </div>
-                            <p class="text-xs text-base-100/70 mb-4 h-10">Pull diagnostics to confirm no regressions.</p>
+                            <p class="text-xs text-base-100/70 mb-4 h-10">List diagnostics to confirm no regressions.</p>
                             <div class="bg-black/30 p-3 rounded-sm font-mono text-xs text-code-string border border-white/5">
-                                $ weaver verify diagnostics \<br>
+                                $ weaver diagnostics list \<br>
                                 &nbsp;&nbsp;--uri file:///path/to/project/src/main.rs
                             </div>
                         </div>

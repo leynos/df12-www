@@ -93,9 +93,9 @@
  * prose description. At phone widths three columns leave the prose a
  * ribbon a few characters wide, so below 768px each row becomes a small
  * card instead: the command and its source share the first line, and the
- * description runs full width beneath them. The heading row disappears —
- * with the columns dissolved it would be labelling positions that no
- * longer exist.
+ * description runs full width beneath them. The heading row is visually
+ * hidden — with the columns dissolved it would be labelling positions that
+ * no longer exist, but its labels remain available to assistive technology.
  *
  * The `!important` on the border and padding overrides is the same story
  * as the full-bleed figures above: the markup sets `border-r` and `p-3`
@@ -104,7 +104,15 @@
  */
 @media (max-width: 767px) {
   .command-table thead {
-    display: none;
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    margin: -1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .command-table tr {

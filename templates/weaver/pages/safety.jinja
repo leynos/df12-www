@@ -259,7 +259,7 @@
                                     <div class="w-8 h-8 rounded-full bg-accent-deep flex items-center justify-center shrink-0 text-white font-bold text-xs">04</div>
                                     <div>
                                         <h4 class="font-bold font-mono text-sm mb-1 text-white">Quiet Telemetry</h4>
-                                        <p class="text-xs text-base-100/70">The daemon is local and single-user: no network endpoint, no remote authentication. Logs and metrics carry bounded opaque workspace identifiers &mdash; never raw paths, source contents, or patch bodies.</p>
+                                        <p class="text-xs text-base-100/70">The daemon is local and single-user: no remotely reachable endpoint, no remote authentication. The prototype's loopback-only TCP compatibility path remains same-host IPC, not a remote service. Logs and metrics carry bounded opaque workspace identifiers &mdash; never raw paths, source contents, or patch bodies.</p>
                                     </div>
                                 </div>
                             </div>

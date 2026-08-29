@@ -130,7 +130,7 @@
                             </div>
                             <h3 class="font-serif text-2xl text-base-content mb-3 group-hover:text-accent-ink transition-colors">Fast</h3>
                             <p class="font-sans text-base-content/88 leading-relaxed mb-6">
-                                Keep state in a resident daemon instead of re-parsing on every call. Rust binaries stream JSONL over Unix domain sockets for low-friction automation.
+                                Keep state in a resident daemon instead of re-parsing on every call. Rust binaries stream JSONL over local IPC: Unix domain sockets by default on Unix, with loopback-only TCP retained for non-Unix prototype compatibility.
                             </p>
                             <a href="/weaver/how-it-works/#daemon" class="inline-flex items-center font-mono text-xs font-bold text-base-content uppercase tracking-wider group-hover:underline decoration-accent underline-offset-4">
                                 Daemon Specs {{ icon('arrow-right', 'ml-2 text-3xs') }}

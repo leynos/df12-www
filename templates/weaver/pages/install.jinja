@@ -254,13 +254,13 @@
                         <div class="border border-base-content/20 bg-white p-6 rounded-xs">
                             <h3 class="font-serif text-xl text-base-content flex items-center gap-2">
                                 {{ icon('server', 'text-ink-muted') }}
-                                Non-Unix / Windows Mode
+                                Windows Prototype Compatibility
                             </h3>
                             <p class="text-sm text-base-content/88 mt-2 mb-4">
-                                Unix domain sockets are not supported on Windows. Switch to TCP mode in <code>weaver.toml</code>.
+                                The current non-Unix prototype defaults to loopback TCP at <code>tcp://127.0.0.1:9779</code>. This is a same-host compatibility path, not a remote endpoint. Keep the host on IPv4 or IPv6 loopback; non-loopback binding is outside the planned 0.1.0 local-only model.
                             </p>
                             <div class="bg-neutral p-4 rounded-xs text-xs font-mono text-code-text">
-                                <span class="text-code-muted"># weaver.toml — switch to TCP transport</span><br>
+                                <span class="text-code-muted"># Optional explicit Windows prototype endpoint (loopback only)</span><br>
                                 daemon_socket = { transport = <span class="text-code-string">"tcp"</span>, host = <span class="text-code-string">"127.0.0.1"</span>, port = <span class="text-code-warn">9779</span> }
                             </div>
                         </div>

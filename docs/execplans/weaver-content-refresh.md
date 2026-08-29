@@ -233,6 +233,14 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   shipping a centrally contradictory image; regeneration is queued as
   follow-on work.
   Date/Author: 2026-08-17, Claude.
+- Decision: retain TCP only as a loopback transport for the current non-Unix
+  prototype; describe the 0.1.0 target as local and per-user, with no remotely
+  reachable endpoint.
+  Rationale: the upstream users' guide and design document retain loopback TCP
+  for non-Unix compatibility, while RFCs 0001 and 0002 plus ADR 008 reject a
+  public, remote, or multi-user daemon service. The distinction preserves both
+  contracts without presenting TCP as remote access.
+  Date/Author: 2026-08-29, Codex (per review instruction + upstream sources).
 
 ## Outcomes & retrospective
 
@@ -392,8 +400,9 @@ state (caches, language-server pool, mutation coordinator); language servers
 keyed by full execution identity so unrelated repositories never share a
 process; explicit rustup toolchain resolution with structured `unavailable`
 guidance; concurrency without a daemon-wide mutex, with bounded admission and
-structured retryable overload results; local-first security (no network
-endpoint, no raw paths in logs). Label as planned.
+structured retryable overload results; local-first security (no remotely
+reachable endpoint, loopback-only prototype TCP compatibility, no raw paths
+in logs). Label as planned.
 
 **Commands index (`/weaver/commands/`, `pages/commands.jinja`).** The
 biggest rewrite. Replace the three-domain table with the ADR 007 grammar:

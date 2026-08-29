@@ -275,11 +275,15 @@
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold">1</td>
                                         <td class="p-4 font-mono text-base-content">Built-in defaults</td>
-                                        <td class="p-4 text-base-content/80">Unix socket, <code>info</code> filter, <code>json</code> format, no overrides.</td>
+                                        <td class="p-4 text-base-content/80">Unix socket on Unix; loopback TCP on non-Unix prototype builds; <code>info</code> filter, <code>json</code> format, no overrides.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+
+                        <p class="mb-8 text-sm text-base-content/80">
+                            The 0.1.0 target remains one local, per-user daemon with no remotely reachable endpoint. Unix targets default to a Unix domain socket. The current prototype retains <code class="font-mono text-xs bg-primary/10 px-1">tcp://127.0.0.1:9779</code> for non-Unix compatibility; TCP must stay on an IPv4 or IPv6 loopback address and is not a remote-service transport.
+                        </p>
 
                         <!-- TOML example -->
                         <div tabindex="0" class="bg-neutral p-6 rounded-xs shadow-lg overflow-x-auto border border-base-content/20 mb-8 paper-panel">
@@ -290,7 +294,7 @@
 <pre class="font-mono text-sm text-code-text leading-relaxed">
 <span class="text-code-muted"># Top-level keys (no [section] headers)</span>
 
-<span class="text-code-muted"># Daemon transport (Unix socket or TCP)</span>
+<span class="text-code-muted"># Prototype TCP compatibility (loopback-only; not remote)</span>
 daemon_socket = { transport = <span class="text-code-string">"tcp"</span>, host = <span class="text-code-string">"127.0.0.1"</span>, port = <span class="text-code-warn">9779</span> }
 
 <span class="text-code-muted"># Logging</span>
@@ -346,7 +350,7 @@ string "yes", expected a boolean
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_DAEMON_SOCKET</td>
                                         <td class="p-4 font-mono text-ink-muted text-xs">--daemon-socket</td>
-                                        <td class="p-4 text-base-content/80">Daemon transport endpoint (<code>unix://</code> or <code>tcp://</code>).</td>
+                                        <td class="p-4 text-base-content/80">Local daemon endpoint. <code>unix://</code> is the Unix default; prototype <code>tcp://</code> compatibility must use loopback.</td>
                                     </tr>
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_LOG_FILTER</td>
@@ -441,7 +445,7 @@ string "yes", expected a boolean
                                         </tr>
                                         <tr class="hover:bg-base-100/30">
                                             <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--daemon-socket &lt;ENDPOINT&gt;</td>
-                                            <td class="p-3 text-xs text-base-content/80">Override the daemon transport. Accepts <code>unix://</code> or <code>tcp://</code> URIs.</td>
+                                            <td class="p-3 text-xs text-base-content/80">Override the local daemon endpoint. <code>unix://</code> is the Unix default; prototype <code>tcp://</code> compatibility must use loopback.</td>
                                         </tr>
                                         <tr class="hover:bg-base-100/30">
                                             <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--log-filter &lt;FILTER&gt;</td>
@@ -531,14 +535,14 @@ string "yes", expected a boolean
                             <div class="relative">
                                 <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">1</div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Start</h3>
-                                <p class="text-sm text-base-content/88 mb-3"><code class="font-mono text-xs bg-primary/10 px-1">weaver daemon start</code> verifies the configured socket is free, spawns <code class="font-mono text-xs bg-primary/10 px-1">weaverd</code> (overridable via <code class="font-mono text-xs bg-primary/10 px-1">WEAVERD_BIN</code>), and waits for the health snapshot to report <code>ready</code>. The daemon daemonises itself, creates runtime artefacts, and binds the socket.</p>
+                                <p class="text-sm text-base-content/88 mb-3"><code class="font-mono text-xs bg-primary/10 px-1">weaver daemon start</code> verifies the configured local endpoint is free, spawns <code class="font-mono text-xs bg-primary/10 px-1">weaverd</code> (overridable via <code class="font-mono text-xs bg-primary/10 px-1">WEAVERD_BIN</code>), and waits for the health snapshot to report <code>ready</code>. The daemon daemonises itself, creates runtime artefacts, and binds the Unix socket or loopback-only prototype TCP endpoint.</p>
                                 <code class="bg-primary/5 px-2 py-1 rounded-sm text-xs font-mono text-base-content">Auto-start: routed commands start the daemon automatically if it is not running (30&nbsp;s timeout).</code>
                             </div>
 
                             <div class="relative">
                                 <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-ink-muted text-white flex items-center justify-center text-xs font-bold">2</div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Serve</h3>
-                                <p class="text-sm text-base-content/88 mb-3">The daemon accepts concurrent client connections and runs a JSONL request dispatch loop, routing read, query, and change commands to the appropriate capability handlers. Language servers are initialised lazily on first use.</p>
+                                <p class="text-sm text-base-content/88 mb-3">The daemon accepts concurrent same-host client connections and runs a JSONL request dispatch loop, routing read, query, and change commands to the appropriate capability handlers. Language servers are initialised lazily on first use.</p>
                             </div>
 
                             <div class="relative">

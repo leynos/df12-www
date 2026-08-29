@@ -275,6 +275,7 @@ def test_a_machine_with_no_free_port_says_so(monkeypatch: pytest.MonkeyPatch) ->
 
         def __exit__(self, *_exc: object) -> None:
             """Have nothing to close."""
+            return
 
         def bind(self, _address: tuple[str, int]) -> None:
             """Refuse the bind, as a machine out of ports would."""

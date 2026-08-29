@@ -28,6 +28,14 @@
   /* Signal that JS is available so CSS can safely hide the nav */
   document.documentElement.classList.add("has-mobile-nav");
 
+  /* Optional telemetry, from `telemetry.js`. Absent on a page that did not
+     load it, and a no-op there unless a host installed a sink; either way the
+     drawer behaves the same. See that file for the whole event schema. */
+  var telemetry = globalThis.df12WeaverTelemetry;
+  function report(outcome, reason) {
+    telemetry?.emit(telemetry.OPERATIONS.drawer, outcome, reason);
+  }
+
   /* ---- hamburger button ---- */
   var btn = document.createElement("button");
   btn.id = "mobile-nav-toggle";
@@ -35,7 +43,11 @@
   btn.setAttribute("aria-controls", nav.id || "sidebar-nav");
   btn.setAttribute("aria-label", "Open navigation menu");
   if (!nav.id) nav.id = "sidebar-nav";
-  btn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+  /* The button *is* the brand mark: the glyph and the block of indigo
+     both come from `.weaver-brand-mark` in weaver/chrome.css, so this
+     file carries no markup of its own. `aria-label` above says what the
+     button does, and is kept in step with its state below. */
+  btn.className = "weaver-brand-mark";
   header.style.position = "relative";
   header.appendChild(btn);
 
@@ -51,7 +63,7 @@
     sidebar.style.setProperty("--mobile-header-height", `${h}px`);
   }
 
-  var previousBodyOverflow = "";
+  var previousBodyOverflowY = "";
   var savedFocus = null;
   var focusTrapHandler = null;
 
@@ -70,9 +82,15 @@
     sidebar.classList.add("mobile-nav-open");
     btn.setAttribute("aria-expanded", "true");
     btn.setAttribute("aria-label", "Close navigation menu");
-    btn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-    previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    /* Lock the vertical axis only.
+     *
+     * `style.overflow` would set both axes, momentarily replacing the
+     * `overflow-x: hidden` the body carries as a class — the clip that
+     * keeps the page from scrolling sideways — and then removing both on
+     * close. The horizontal clip should never be disturbed: the drawer
+     * only ever needed to stop the page scrolling underneath it. */
+    previousBodyOverflowY = document.body.style.overflowY;
+    document.body.style.overflowY = "hidden";
     setHeaderHeight();
 
     /* Save focus and move it into the nav */
@@ -119,16 +137,16 @@
       }
     };
     document.addEventListener("keydown", focusTrapHandler);
+    report(telemetry?.OUTCOMES.opened);
   }
 
   /* Close the drawer, unlock the page, remove the trap, and return focus to
      whatever held it before the drawer opened. */
-  function close() {
+  function close(reason) {
     sidebar.classList.remove("mobile-nav-open");
     btn.setAttribute("aria-expanded", "false");
     btn.setAttribute("aria-label", "Open navigation menu");
-    btn.innerHTML = '<i class="fa-solid fa-bars"></i>';
-    document.body.style.overflow = previousBodyOverflow;
+    document.body.style.overflowY = previousBodyOverflowY;
 
     /* Remove focus trap */
     if (focusTrapHandler) {
@@ -136,12 +154,27 @@
       focusTrapHandler = null;
     }
 
-    /* Restore focus */
-    if (savedFocus && typeof savedFocus.focus === "function") {
-      savedFocus.focus();
-    } else {
-      btn.focus();
-    }
+    /* Restore focus.
+     *
+     * `<body>` is not a focus holder worth returning to. It is what
+     * `document.activeElement` reports when nothing is focused, which is the
+     * usual case for someone who opened the drawer by tapping it: the saved
+     * element is the body, `body.focus()` does nothing, and focus is left on
+     * a nav link inside a drawer that has just been hidden. Falling back to
+     * the toggle puts it somewhere the reader can see and use. */
+    var restoreTo =
+      savedFocus &&
+      savedFocus !== document.body &&
+      savedFocus.isConnected &&
+      typeof savedFocus.focus === "function"
+        ? savedFocus
+        : btn;
+    restoreTo.focus();
+    report(telemetry?.OUTCOMES.closed, reason);
+    report(
+      telemetry?.OUTCOMES.focusRestored,
+      restoreTo === btn ? telemetry?.REASONS.toggleFallback : telemetry?.REASONS.savedElement,
+    );
     savedFocus = null;
   }
 
@@ -152,22 +185,22 @@
 
   /* ---- event listeners ---- */
   btn.addEventListener("click", () => {
-    if (isOpen()) close();
+    if (isOpen()) close(telemetry?.REASONS.toggle);
     else open();
   });
 
-  backdrop.addEventListener("click", close);
+  backdrop.addEventListener("click", () => close(telemetry?.REASONS.backdrop));
 
   /* Close drawer when a nav link is clicked (same-page anchors, etc.) */
   var navLinks = nav.querySelectorAll("a");
   for (const navLink of navLinks) {
     navLink.addEventListener("click", () => {
-      if (isOpen()) close();
+      if (isOpen()) close(telemetry?.REASONS.navLink);
     });
   }
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && isOpen()) close();
+    if (e.key === "Escape" && isOpen()) close(telemetry?.REASONS.escape);
   });
 
   var mql = window.matchMedia("(min-width: 1024px)");
@@ -175,8 +208,10 @@
   /* Close the drawer once the viewport is wide enough for the full sidebar,
      so the page is never left scroll-locked behind an invisible drawer. */
   function onBreakpoint() {
-    if (mql.matches && isOpen()) close();
+    if (mql.matches && isOpen()) close(telemetry?.REASONS.breakpoint);
   }
   if (mql.addEventListener) mql.addEventListener("change", onBreakpoint);
   else mql.addListener(onBreakpoint); /* Safari <14 */
+
+  report(telemetry?.OUTCOMES.initialized);
 })();

@@ -4,20 +4,18 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Episodic, Netsuke, and Stilyagi sub-sites is generated, the shared Jinja
-macros and the
-component classes they pair with, the convention used for browser-side
-components, the cascade quirks introduced by the Netsuke and Weaver sub-sites'
-use of the Tailwind Play content delivery network (CDN), and how accessibility
-is checked. It does not restate deployment or OpenTofu guidance, which lives in
-[`AGENTS.md`](../AGENTS.md).
+Episodic, Netsuke, and Stilyagi sub-sites are generated, the shared Jinja
+macros and the component classes they pair with, the convention used for
+browser-side components, the cascade quirks introduced by the Netsuke
+sub-site's use of the Tailwind Play content delivery network (CDN), and how
+accessibility is checked. It does not restate deployment or OpenTofu guidance,
+which lives in [`AGENTS.md`](../AGENTS.md).
 
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
 [df12 Pages App Design](df12-pages-app-design.md). For Tailwind and daisyUI
-conventions used by the main site, the mxd sub-site, and the Episodic
-sub-site, see the
-[Tailwind v4 guide](tailwind-v4-guide.md) and the
+conventions used by the main site, the mxd sub-site, and the Episodic sub-site,
+see the [Tailwind v4 guide](tailwind-v4-guide.md) and the
 [daisyUI v5 guide](daisyui-v5-guide.md). Documentation formatting itself
 follows the [documentation style guide](documentation-style-guide.md).
 
@@ -36,13 +34,16 @@ rationale for a specific change lives in its execution plan under
 depends on the last:
 
 ```bash
-bun run build         # build assets, pages, search indices, then refresh copied assets
-bun run build:static  # copy src/static/ verbatim (scripts/copy-static.ts)
-bun run build:css     # compile the main, mxd, and Episodic Tailwind entrypoints
-bun run build:images  # generate responsive image variants (scripts/generate-image-variants.ts)
-bun run build:pages   # uv run pages generate --all-sites
-bun run build:search  # build Netsuke and Episodic search indices
-bun run check:search  # fail when the committed Episodic index has drifted
+bun run build              # build:static, build:css, build:images, build:pages, build:search, build:static
+bun run build:static       # copy src/static/ verbatim (scripts/copy-static.ts)
+bun run build:css          # compile the main, mxd, Episodic and Weaver Tailwind entrypoints
+bun run build:css:mxd      # just the mxd entrypoint, for iterating on one sub-site
+bun run build:css:episodic # just the Episodic entrypoint
+bun run build:css:weaver   # just the Weaver entrypoint
+bun run build:images       # generate responsive image variants (scripts/generate-image-variants.ts)
+bun run build:pages        # uv run pages generate --all-sites
+bun run build:search       # build the Netsuke and Episodic search indices
+bun run check:search       # fail when the committed Episodic index has drifted
 ```
 
 `build:static` runs first because `build:images` reads the source images it
@@ -62,24 +63,32 @@ regenerates it once; `check:search` runs its `--check` mode without rebuilding
 the payload. The final `build:static` copy publishes that projection to
 `public/episodic/assets/search/episodic-search.json`. Run `bun run build` or
 `bun run build:pages && bun run build:search && bun run build:static` after
-changing an Episodic page or its documentation manifest. Run `bun run
-check:search` in continuous integration (CI) or before committing an index
-update to verify that the committed projection has not drifted.
+changing an Episodic page or its documentation manifest. Run
+`bun run check:search` in continuous integration (CI) or before committing an
+index update to verify that the committed projection has not drifted.
 
 `scripts/build_episodic_roadmap_data.py` projects the authoritative upstream
-Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It
-uses `scripts/episodic_roadmap_parser.py` to turn the Markdown into phase,
-step, and task records, and `make site-data` runs it with
+Episodic `docs/roadmap.md` into `templates/episodic/data/roadmap.jinja`. It uses
+`scripts/episodic_roadmap_parser.py` to turn the Markdown into phase, step,
+and task records, and `make site-data` runs it with
 `--episodic-root $(EPISODIC_SOURCE)` before rebuilding the committed template.
-`EPISODIC_SOURCE` defaults to `../episodic`; override it when the authoritative
-checkout lives elsewhere. `make check-site-data` reruns the same projection
-with `--check` and fails when the committed file drifts.
 
 `bun run dev` (or `make dev`, which builds once first) watches `src/**/*`,
 `df12_pages/**/*`, `config/**/*`, `scripts/**/*`, and `pyproject.toml` with
 `chokidar`, reruns `bun run build` on any change, and serves `public/` on port
 8080 with caching disabled. `DF12_PORT` overrides the port, which matters when
 several worktrees are served at once.
+
+Because the watcher reruns the whole build, **no build step may write into a
+directory it watches** — the build would trigger the watcher, which would rerun
+the build, for as long as it was left running. The Episodic search index is the
+one generated file that lives under `src/`, and
+`scripts/build-episodic-search-index.mjs` skips its write when the content is
+unchanged for exactly this reason; the watcher also ignores that directory as a
+second guard. `test_a_build_does_not_rewrite_anything_the_dev_watcher_watches`
+rebuilds an already-built tree and fails if anything under a watched root
+moved, so a new step that writes into one is caught rather than discovered by
+leaving `make dev` running.
 
 A plain `http-server public/` — invoked directly, or via `bun run serve`, which
 builds once and then serves without watching — has **no watcher**. Editing a
@@ -222,15 +231,17 @@ anyone rebuilds from a clean tree.
 
 Every published file has a source elsewhere in the repository:
 
-| Published under `public/`                  | Comes from                                            |
-| ------------------------------------------ | ----------------------------------------------------- |
-| `**/*.html`                                | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`                          | Tailwind compiling `src/styles/`                      |
-| `mxd/assets/tailwind.css`                  | Tailwind compiling `src/styles/`                      |
-| `episodic/assets/styles/tailwind.css`      | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`           | `scripts/generate-image-variants.ts`                  |
-| `netsuke/assets/search/*.json`             | `scripts/build-netsuke-search-index.mjs`              |
-| everything else                            | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`             | Comes from                                            |
+| ------------------------------------- | ----------------------------------------------------- |
+| `**/*.html`                           | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`                     | Tailwind compiling `src/styles/`                      |
+| `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                      |
+| `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                      |
+| `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
+| `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |
+| `episodic/assets/search/*.json`       | `scripts/build-episodic-search-index.mjs`             |
+| everything else                       | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 _Table 2: Published paths under `public/` and the source that generates them._
 
@@ -255,13 +266,14 @@ together on the Episodic, Netsuke, and Stilyagi sub-sites, referenced from the
 ### 4.1. Styles, lexers, and the highlight tag
 
 Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
-build time by the Jinja tag `{% highlight '<lexer>'[, '<class>'] %} ... {%
-endhighlight %}`, implemented in `df12_pages/jinja_highlight.py`. The tag
-dedents its body, runs it through `pygments.highlight` with the named lexer,
-and wraps the result in a `<div class="hm-syntax">` (or the named class, when
-a second argument is given) using `pygments.formatters.html.HtmlFormatter`.
-Source text containing Jinja syntax of its own — every `Netsukefile` example
-with `{{ ins }}` placeholders — must be wrapped in `{% raw %}` inside the tag.
+build time by the Jinja tag
+`{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
+`df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
+`pygments.highlight` with the named lexer, and wraps the result in a
+`<div class="hm-syntax">` (or the named class, when a second argument is given)
+using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
+syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
+must be wrapped in `{% raw %}` inside the tag.
 
 Three Pygments styles supply the colours:
 
@@ -372,8 +384,8 @@ long as the style declares parents before children.
 - The generators write to the tracked source under `src/static/` —
   `src/static/episodic/assets/styles/syntax.css`,
   `src/static/netsuke/assets/css/himotoshi.css`, and
-  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`.
-  Writing to `public/` would lose the change on the next clean build.
+  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`. Writing
+  to `public/` would lose the change on the next clean build.
 - A test asserts the committed marked block matches what the generator would
   produce (`test_committed_stylesheet_matches_the_generator` in each test
   module below). A stale stylesheet fails the commit gates.
@@ -385,8 +397,8 @@ long as the style declares parents before children.
   next generator run would collapse it again, and the tools would undo each
   other on alternate runs — with the test above failing on whichever ran last.
   Formatting is the generator's output shape, so if it needs to change, change
-  `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to
-  tidy a diff.
+  `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to tidy
+  a diff.
 
 ### 4.5. Regenerating and verifying
 
@@ -421,11 +433,205 @@ in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
 The lexer list reflects what the templates currently use, not the full set
-Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`,
-and `xml` are stock Pygments lexers used unmodified. The bold weight differs
+Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`, and
+`xml` are stock Pygments lexers used unmodified. The bold weight differs
 because the sub-sites' monospace faces read differently at the same weight:
 Episodic and Netsuke stop at semibold, while Stilyagi's lighter face goes to
 full bold.
+
+### 4.7. The Weaver icon generator
+
+`scripts/generate_weaver_icons.py` is unrelated to syntax highlighting, but
+follows the same "generated, never handwritten" convention as the Pygments
+generators above. It reads the checked-in mapping at
+`config/weaver-icons.yaml`, which pairs each Font Awesome icon name the Weaver
+sub-site used to reference with a Carbon icon identifier, pulls that icon's
+path data out of the `@iconify-json/carbon` package, and writes
+`templates/weaver/_icons.jinja`: a Jinja macro that inlines the SVG directly
+into the page, so a published Weaver page fetches no icon assets over the
+network.
+
+```bash
+uv run python scripts/generate_weaver_icons.py
+```
+
+It reports `_icons.jinja updated` or `_icons.jinja unchanged`, the same
+idempotence contract as the Pygments generators. A drift test in the suite
+fails if the committed macro does not match what the generator would produce
+from the current mapping, so `templates/weaver/_icons.jinja` must never be
+hand-edited — change `config/weaver-icons.yaml` and rerun the generator instead.
+
+### 4.8. Weaver's chrome macros
+
+`templates/weaver/_chrome.jinja` holds two macros shared across every Weaver
+page, imported as `chrome`:
+
+```jinja
+{% import '_chrome.jinja' as chrome %}
+```
+
+`chrome.current_href(nav_links)` returns the `href` of whichever entry in
+`nav_links` the page generator has flagged `current`, or `''` when none is —
+which simply means no sidebar link is highlighted, the case for a page that
+sits outside the nav.
+
+`chrome.nav_link(href, index, label, current_href, variant='')` renders one
+sidebar `<a>`. Every link carries the base classes
+`weaver-nav-link block px-4 py-2 text-sm`. When `href` matches `current_href`,
+the macro also sets `aria-current="page"`; a link that is not current gets no
+`aria-current` attribute at all. It then appends one further class string,
+verbatim from `_chrome.jinja`, depending on state and `variant`:
+
+```text
+current:  weaver-nav-link--current font-semibold bg-primary text-base-100 rounded-xs border border-base-content shadow-block
+default:  font-medium text-base-content hover:bg-primary/5 transition-colors border border-transparent
+install:  font-medium text-neutral hover:bg-accent/5 transition-colors border border-transparent font-mono
+```
+
+| Parameter      | Purpose                                                                               |
+| -------------- | ------------------------------------------------------------------------------------- |
+| `href`         | The link target, compared against `current_href` to decide state.                     |
+| `index`        | The two-digit section number before the label, or `''` for unnumbered resource links. |
+| `label`        | The link text.                                                                        |
+| `current_href` | The href of the page being rendered, typically `chrome.current_href(nav_links)`.      |
+| `variant`      | `'install'` selects the monospaced install-link style instead of the default.         |
+
+_Table 4: the `nav_link` macro's parameters._
+
+`index` also switches how the label is prefixed: a truthy `index` renders it in
+a small monospaced span before the label (dimmed to 75% opacity unless the link
+is current); an empty `index` on the `'install'` variant instead prefixes a bare
+`>` and a space when the link is not current; any other combination prefixes
+nothing. The dimming stops at 75%, not 60%: on the sidebar's cream ground,
+`opacity-60` composites the ink to `#708499`, 3.33:1 against the 4.5:1 that
+12px text needs, while `opacity-75` measures 4.88:1.
+
+A typical call site, from `templates/weaver/doc_page.jinja`:
+
+```jinja
+{%- set here = chrome.current_href(nav_links) -%}
+{{ chrome.nav_link('/weaver/', '00', 'Home', here) }}
+{{ chrome.nav_link('/weaver/why-weaver/', '01', 'Philosophy', here) }}
+{{ chrome.nav_link('/weaver/install/', '', 'Install', here, variant='install') }}
+```
+
+### 4.9. Weaver's shared page layout
+
+`templates/weaver/doc_page.jinja` is the base layout for every Weaver page. Both
+`templates/weaver/home_page.jinja` and
+`templates/weaver/shared_content_page.jinja` extend it:
+
+```jinja
+{% extends "doc_page.jinja" %}
+```
+
+`doc_page.jinja` defines twelve blocks. A page that extends it inherits each
+block's default content unless it overrides that block.
+
+| Block                   | Default content                |
+| ----------------------- | ------------------------------ |
+| `page_title`            | empty                          |
+| `extra_head`            | empty                          |
+| `texture_overlay`       | texture overlay `div`          |
+| `nav_subitems_how`      | empty                          |
+| `nav_subitems_commands` | empty                          |
+| `nav_subitems_sempai`   | empty                          |
+| `nav_subitems_jacquard` | empty                          |
+| `sidebar_footer`        | back-link, status dot, version |
+| `main_class`            | default classes                |
+| `main_extra_class`      | empty                          |
+| `content`               | empty                          |
+| `page_footer`           | full site footer               |
+
+_Table 4a: every block `doc_page.jinja` defines, and what it renders by
+default._
+
+`home_page.jinja` overrides only `page_title` and `content`, and inherits every
+other block — the sidebar, footer, and texture overlay on the Weaver home page
+are all the base layout's defaults.
+
+`shared_content_page.jinja` — which renders the three legal pages (privacy
+policy, terms of use, code of conduct) — overrides more: `page_title` and
+`content`, as above, plus `texture_overlay`, `main_class`, `sidebar_footer`, and
+`page_footer`. It blanks `texture_overlay`:
+
+```jinja
+{% block texture_overlay %}{% endblock %}
+```
+
+It replaces `main_class` outright rather than extending it:
+
+```jinja
+{% block main_class %}flex-1 lg:ml-64 min-h-screen relative{% endblock %}
+```
+
+This drops `grid-bg` — the legal pages want plain ground, not ruled paper —
+and, because the replacement supplies no nested block, it also drops
+`main_extra_class`. A legal page that needed `main_extra_class` would have to
+reinstate that nested block itself.
+
+It shortens `sidebar_footer` to just the optional parent link:
+
+```jinja
+{% block sidebar_footer %}
+            {% if parent_link %}
+            <div class="p-6 border-t border-base-content/10 hidden lg:block">
+                <a href="{{ parent_link.href }}" class="font-mono text-xs text-base-content/82 hover:text-accent-ink transition-colors">{{ parent_link.label }}</a>
+            </div>
+            {% endif %}
+{% endblock %}
+```
+
+And it replaces `page_footer` with a short legal-page footer carrying the brand
+line and links to the three legal pages themselves, rather than the base
+layout's full site footer.
+
+`main_class` is a sharp edge worth calling out on its own: the block is nested
+inside the `<main class="...">` attribute value, not around the `<main>`
+element itself —
+
+```jinja
+<main class="{% block main_class %}flex-1 lg:ml-64 grid-bg min-h-screen relative{% block main_extra_class %}{% endblock %}{% endblock %}">
+```
+
+— so overriding `main_class` replaces the whole class list rather than adding
+to it. A page that wants the default classes plus one more should use
+`main_extra_class` instead, which appends inside the default; only a page that
+wants a genuinely different class list, as `shared_content_page.jinja` does,
+should override `main_class` itself.
+
+Table 4b lists the four blocks a page is most likely to override, with their
+defaults and what overriding each is for:
+
+| Block             | Default                                                                 | Overriding it is for                                                                    |
+| ----------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `texture_overlay` | `<div class="texture-overlay"></div>`                                   | removing the paper texture, as `shared_content_page.jinja` does                         |
+| `sidebar_footer`  | back-link, status dot, and version string                               | replacing the sidebar's closing content, such as with a plain parent link               |
+| `main_class`      | `flex-1 lg:ml-64 grid-bg min-h-screen relative` plus `main_extra_class` | swapping the `<main>` element's class list wholesale, such as dropping `grid-bg`        |
+| `page_footer`     | the full site footer                                                    | swapping in a shorter or differently structured footer, such as the legal pages' footer |
+
+_Table 4b: the blocks a page is most likely to override._
+
+### 4.10. Which Weaver templates use the shared layout
+
+Twelve of the thirteen page templates under `templates/weaver/pages/` extend
+`doc_page.jinja`, as do `home_page.jinja` and `shared_content_page.jinja`.
+Adding a page means extending it too — the sidebar, the mobile drawer, and the
+footer come with it, and a page that builds its own gets none of the fixes made
+to those.
+
+`pages/design-language.jinja` is the exception, and deliberately so. Its
+sidebar is not the sub-site navigation but an in-page table of contents:
+`#overview`, `#foundations`, `#typography`, `#motifs`, `#illustrations`,
+`#components`. The shared layout has no block for replacing the sidebar's links
+— only `sidebar_footer`, which is the panel beneath them — so a page wanting a
+different set of links has to carry its own chrome. That is why the browser
+suite's current-link check accepts a fragment as well as an href: on this page
+the current link is `#overview`, which is correct.
+
+The cost is real and worth stating: a change to the sidebar or the drawer has
+to be made twice, once in `doc_page.jinja` and once here. Anyone touching the
+chrome should grep `design-language.jinja` for the same markup.
 
 ## 5. Template components
 
@@ -475,7 +681,7 @@ The pill-shaped eyebrow above a page or section heading.
 | `icon_class` | Utility classes for that icon, typically a colour.                      |
 | `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |
 
-_Table 4: the `kicker` macro's parameters._
+_Table 5: the `kicker` macro's parameters._
 
 Three call sites show the range:
 
@@ -500,7 +706,7 @@ default.
 | `.hm-kicker--accent`  | Pairs with `--section` for the docs hub's indigo.      |
 | `.hm-kicker__dot`     | The roadmap's leading status dot.                      |
 
-_Table 5: the kicker component class and its modifiers._
+_Table 6: the kicker component class and its modifiers._
 
 **Normative:** a new variant is a new modifier on `.hm-kicker`, not a fresh
 class list at the call site and not a utility string passed through `extra`.
@@ -539,6 +745,27 @@ and a fake DOM with hand-written focus bookkeeping would largely be testing
 itself. Prefer the fake DOM used by `config-keys.test.mjs` when the behaviour
 under test is a decision; reach for the harness when it is an interaction.
 
+The harness also supplies the traces both drawer suites run over. It exports
+`TRANSITIONS`, the six things that can happen to an open drawer — `toggle`,
+`tab`, `shift-tab`, `escape`, `wide`, `narrow` — and
+`exhaustiveTransitionSequences({ depth = 4 })`, which returns every trace over
+that set up to `depth`, each one prefixed by the opening `toggle` because a
+closed drawer ignores almost everything and such a trace proves nothing about
+the focus trap. Traces run from two transitions long up to `depth`, and the
+count is the sum of `TRANSITIONS.length ** k` for k from 1 to `depth - 1`: 258
+at depth 4, 1554 at depth 5. Growth is exponential, so the depth is the budget
+— each trace builds a fresh DOM.
+
+It replaced `generatedTransitionSequences(seed, …)`, which sampled the space
+randomly. For a state machine this small, the space is finite and enumerable,
+and enumerating it turns the claim from "these traces held" into "no trace of
+this length breaks the invariants", which is what the suites are for. It also
+removes the seed, and with it the question of what the run happened not to draw.
+
+`tests/js/mobile-nav-traces.test.mjs` tests the generator itself, because both
+suites iterate whatever it returns. An empty return would leave them passing
+having asserted nothing, and a loop over no items is not a failure.
+
 Bun tests under `tests/js/` cover these pure functions, and they `require` the
 **built** copy from `public/`, not the source under `src/static/`:
 
@@ -561,14 +788,13 @@ element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
 `src/static/episodic/assets/js/site-search.js` follows the same plain-script
-shape. It exposes five helpers when `module.exports` is available:
 shape. It exposes seven helpers when `module.exports` is available:
 `createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
-for fetching and deserializing the MiniSearch payload,
-`searchEpisodicIndex` for query-time ranking, `initialiseEpisodicSearch` for
-one root, `initialiseAllEpisodicSearch` for the document, `durationBucket` for
-the fixed telemetry duration classes, and `emitSearchTelemetry` for its bounded
-event schema. The initializers accept injected loader, search, and navigation
+for fetching and deserializing the MiniSearch payload, `searchEpisodicIndex`
+for query-time ranking, `initialiseEpisodicSearch` for one root,
+`initialiseAllEpisodicSearch` for the document, `durationBucket` for the fixed
+telemetry duration classes, and `emitSearchTelemetry` for its bounded event
+schema. The initializers accept injected loader, search, and navigation
 dependencies so their DOM behaviour can be tested without a network request or
 navigation. Their roots must provide the `data-search-root`,
 `data-search-index`, `data-search-input`, `data-search-panel`,
@@ -601,7 +827,7 @@ stay, while `mobile-nav.js` addresses the same elements as `[data-mobile-nav]`,
 are resolved within the root rather than from the document, so the root is the
 only thing a page has to get right.
 
-The convention's limits are worth naming, because they decide when to leave it.
+The convention's limits are worth naming because they decide when to leave it.
 A module is a file plus a `data-` prefix, so nothing enforces one instance per
 root, nothing provides a lifecycle beyond first run, and nothing tells CSS that
 a script has upgraded the markup — `config-keys.js` has to add an `is-enhanced`
@@ -611,7 +837,118 @@ per root, `connectedCallback`, and `:defined`. See the ladder in the "Styling"
 section of [AGENTS.md](../AGENTS.md); a custom element is its last rung, and
 the site does not use a front-end framework at all.
 
-### 6.2. The config-keys component
+### 6.2. The Weaver mobile drawer
+
+`src/static/weaver/assets/js/mobile-nav.js` turns the sidebar into a drawer
+below the tablet breakpoint. It builds its own controls rather than expecting
+them in the markup, so a page supplies three hooks and gets the rest.
+
+**What a page must provide.** The script returns early — silently, leaving the
+page exactly as it was — unless it finds all three:
+
+| Hook                       | What it is                                  |
+| -------------------------- | ------------------------------------------- |
+| `#sidebar`                 | the element that becomes the drawer         |
+| a `nav` inside it          | the links; given `id="sidebar-nav"` if bare |
+| `[data-mobile-nav-header]` | where the toggle is placed                  |
+
+The early return is why `shared_content_page.jinja` had to grow the header
+hook: the legal pages had a sidebar and a nav but no header, so they shipped
+without mobile navigation at all and nothing said so.
+
+**What the script adds.** A `button#mobile-nav-toggle` inside the header and a
+`div#mobile-nav-backdrop` after the sidebar. The button carries no markup of
+its own: it wears `.weaver-brand-mark`, which supplies the indigo block, the
+glyph, and the centring from `src/styles/weaver/chrome.css`. Its accessible
+name is an `aria-label` that changes with its state, and `aria-controls` points
+at the nav's id.
+
+**The two classes that drive the CSS.** `has-mobile-nav` goes on `<html>` as
+soon as the script runs, and is what lets the stylesheet hide the nav — without
+it a reader with JavaScript disabled would be left with a navigation nothing
+can open. `mobile-nav-open` goes on `#sidebar` while the drawer is open, and is
+the selector for both the drawer itself (`#sidebar.mobile-nav-open nav`, which
+is `display: block; position: fixed`) and the backdrop
+(`#sidebar.mobile-nav-open ~ #mobile-nav-backdrop`).
+
+**One breakpoint, written twice.** The stylesheet's drawer rules sit in
+`@media (max-width: 1023px)`; the script watches
+`matchMedia("(min-width: 1024px)")` and closes the drawer when that starts
+matching, so the page is never left scroll-locked behind a drawer that the
+layout has just hidden. The two are the same boundary and have to move together.
+
+**Scroll locking is vertical only.** Opening the drawer saves
+`document.body.style.overflowY` and sets it to `hidden`; closing restores what
+was saved. It must be `overflowY` and not `overflow`: the body already carries
+`overflow-x: hidden` from a class, and setting both inline replaces that
+declaration for as long as the drawer is open, letting the page jump sideways.
+Because the computed value is the same either way, only the inline declaration
+distinguishes them — which is what `tests/test_weaver_browser_interaction.py`
+asserts.
+
+**Focus.** Opening saves `document.activeElement` and moves focus to the first
+focusable element in the nav, or to the nav itself if it has none. A `keydown`
+handler traps `Tab` inside the drawer while it is open. Closing restores the
+saved element — unless it was `<body>`, is no longer connected, or cannot take
+focus, in which case focus goes to the toggle. `<body>` is the common case:
+someone who opened the drawer by tapping it had nothing focused, and returning
+focus to `<body>` would strand it on a hidden nav link.
+
+**Four ways to close**, each reported with its own telemetry reason: the
+toggle, the backdrop, any link in the nav, and `Escape`. The breakpoint
+crossing is a fifth, and is the one a reader does not initiate.
+
+### 6.3. Weaver chrome telemetry
+
+The Weaver drawer and its copy controls report through the same optional hook
+model as Episodic search. A production host may set
+`window.df12WeaverNavTelemetry` to a function before the deferred scripts run;
+without it, `src/static/weaver/assets/js/telemetry.js` is a no-op and nothing
+is collected. A sink that throws is caught and ignored because observability
+must not be able to break the drawer or the button it was watching.
+
+Every event has the same shape, and the whole of what may leave the page is
+declared as three frozen vocabularies at the top of that file:
+
+| Field       | Values                                                                                                                  |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `component` | `weaver-mobile-nav`                                                                                                     |
+| `operation` | `drawer`, `clipboard`                                                                                                   |
+| `outcome`   | `initialized`, `opened`, `closed`, `focus-restored`, `copied`, `failed`                                                 |
+| `reason`    | `toggle`, `backdrop`, `nav-link`, `escape`, `breakpoint`, `saved-element`, `toggle-fallback`, `unavailable`, `rejected` |
+
+_Table 7: every field a Weaver chrome telemetry event may carry._
+
+`reason` is present only where an outcome has more than one cause worth
+separating: which of the five things closed the drawer, whether focus went back
+to where it came from or fell back to the toggle, and whether a clipboard write
+found no API or was refused one. An `operation`, `outcome` or `reason` outside
+those lists is dropped rather than emitted, so the table is the schema rather
+than a description of it.
+
+What it therefore records is that a drawer was built, opened, and closed for a
+stated cause; where focus went afterwards; and whether a copy succeeded. What
+it cannot record — because there is nowhere in the schema to put it — is a URL,
+a page path, a navigation label, the copied text, or anything identifying a
+person or persisting between visits. A sink must treat the event as operational
+metadata and must not enrich it with page or user data.
+
+**The inspection point for a maintainer is
+`src/static/weaver/assets/js/telemetry.js`.** It is about a hundred lines, the
+vocabularies are the first thing in it, and `emit` is the only function that
+calls the sink. Reading those two things is the whole of the privacy argument;
+`tests/js/weaver-telemetry.test.mjs` is the enforcement, and it tries to get
+page data, clipboard contents and identifiers into an event rather than only
+checking the happy path.
+
+The copy controls need a seam because they are inline `onclick` handlers in the
+templates. They call `df12WeaverCopy('…')`, which writes to the clipboard and
+reports the outcome; the text is passed to the clipboard and never to the sink.
+`telemetry.js` is loaded before `mobile-nav.js` and defines the API
+unconditionally, because `mobile-nav.js` returns early on a page without the
+drawer's markup while the install page's copy buttons still need it.
+
+### 6.4. The config-keys component
 
 `config-keys.js` drives the "config keys" browser on the configuration docs page
 (`templates/netsuke/pages/docs-configuration.jinja`), which pairs each key
@@ -686,15 +1023,26 @@ restyled by it.
 
 ## 7. Styling and the cascade
 
-The Netsuke and Weaver sub-sites still load the
+The Netsuke sub-site still loads the
 [Tailwind Play CDN](https://tailwindcss.com) script
 (`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
-stylesheet, and use its utilities in their markup alongside their own
-hand-crafted stylesheets. Netsuke additionally extends the default theme through
-`/netsuke/assets/js/tailwind-config.js`; Weaver takes the defaults. Of the
-three hand-styled sub-sites, only Stilyagi uses neither Tailwind nor daisyUI.
-This differs from the main site and the mxd sub-site, which compile Tailwind v4
-ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md) for that path.
+stylesheet, and uses its utilities in its markup alongside its own hand-crafted
+stylesheet; it extends the default theme through
+`/netsuke/assets/js/tailwind-config.js`. Stilyagi uses neither Tailwind nor
+daisyUI. This differs from the main site, mxd, and Weaver, which compile
+Tailwind v4 ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md)
+for that path.
+
+Weaver was in Netsuke's position until recently, and moving it off the Play CDN
+is the worked example of what that migration costs. The doubled-selector idiom
+below exists because the CDN's injected `<style>` is unlayered; the compiled
+build has no such tie to break, because its utilities sit in `@layer utilities`
+and a sub-site's own rules sit in `@layer components`, where they lose to a
+utility by construction rather than by source order. The inversion is the trap:
+a handwritten stylesheet that was _left_ unlayered under the compiled build
+stops losing those arguments and starts winning them, silently. See
+`src/styles/weaver.css` for the arrangement and
+`docs/execplans/weaver-daisy-migration.md` for what the change turned up.
 
 The Play CDN script scans the rendered document for utility classes in use and
 injects the utilities it finds into a `<style>` element it appends to
@@ -728,6 +1076,265 @@ this sub-site, for example
 further down the same file. Prefer raising specificity by doubling the class
 over `!important`, which would also outrank a later, deliberate override.
 
+### 7.1. Verifying a styling change against Weaver
+
+`scripts/weaver_snapshot.py` is the command surface; the work sits in eight
+siblings beside it, none over 400 lines, named for what they do: `_paths` (the
+published tree, the page list, and each page's filename stem), `_locking`
+(advisory locks and lock-file hygiene), `_output` (staging and failure-atomic
+publication), `_ownership` (proving whose server answered), `_serving` (ports,
+the server, and its lifecycle), `_tools` (the argv handed to css-view and
+agent-browser), `_colour` (one colour written one way), and `_normalize`
+(reducing a captured tree to what a reader could see). They are plain modules
+rather than a package, so a script run by path finds them on `sys.path` and the
+invocation below is unchanged.
+
+`scripts/weaver_snapshot.py` exists because a cascade change on a compiled
+Tailwind sheet is easy to get subtly wrong: nothing errors, a selector simply
+stops matching what it used to, and the only symptom is an element that has
+quietly moved, resized, or changed colour somewhere the change was not meant to
+reach. The harness answers that by recording every Weaver page's computed
+styles before and after a change and diffing the two, rather than relying on a
+reviewer noticing a drift by eye.
+
+Three things about how it runs are worth knowing before reading its output.
+
+The server binds loopback only. `http-server` defaults its address to
+`0.0.0.0`, which would offer the published tree to every host that can reach
+the machine for as long as a capture runs; `_server_argv` passes `-a 127.0.0.1`
+instead.
+
+The port defaults to `0`, meaning the kernel picks a free one, so two runs in
+two worktrees do not contend. Pass `--port` only to reach the served tree from
+a browser by hand. Where a port is named explicitly, a lock keyed on it
+serializes the probe-and-spawn window, and the run proves the server answering
+is its own by fetching back a marker file it placed under `public/` — once when
+the server comes up and again when the capture finishes.
+
+Output is published rather than written in place. A capture goes to a private
+staging directory and is moved into the destination only once every page has
+succeeded, under a lock keyed on that destination; `diff` takes the same lock
+while reading. So a run that fails partway leaves the previous results
+untouched, two runs writing one directory do not interleave, and a diff never
+observes a directory halfway through being replaced. Publication clears only
+the extension being written, so a `capture` and a `shots` run can share a
+directory.
+
+It is a cyclopts app with three subcommands, invoked bare — there is no
+Makefile target and no console-script entry point:
+
+```bash
+uv run python scripts/weaver_snapshot.py capture <out-dir>
+uv run python scripts/weaver_snapshot.py shots <out-dir>
+uv run python scripts/weaver_snapshot.py diff <before> <after>
+```
+
+`capture` serves `public/` and records every published Weaver page's computed
+styles as JSON, via `bun x css-view --mode walker`. `shots` screenshots each
+page at 360, 768, and 1440 CSS pixels with `agent-browser`, for the cases a
+style diff cannot catch on its own — a wrong icon glyph, a texture that failed
+to load. `diff` normalizes both snapshot trees and prints a unified diff per
+page, exiting non-zero when any page differs; that exit status is what makes it
+usable as a gate rather than merely informative.
+
+The typical loop is to capture a baseline before touching anything, make the
+change, capture again, and diff the two directories. An empty diff confirms the
+change moved nothing it was not meant to; a non-empty one should be read entry
+by entry, since every difference ought to trace back to something the change
+deliberately did.
+
+### 7.2. Property-based tests for the snapshot normalizer
+
+`tests/test_weaver_snapshot_properties.py` complements the example-based
+`tests/test_weaver_snapshot_*.py` suites with
+[Hypothesis](https://hypothesis.readthedocs.io/) (`hypothesis` is a `dev`
+dependency-group entry in `pyproject.toml`). Rather than asserting what the
+normalizer in `scripts/weaver_snapshot_normalize.py` does to worked-example
+inputs, it asserts invariants that must hold for every input Hypothesis can
+generate — colour notations, style-diff shapes, and walker trees nobody thought
+to write by hand.
+
+Four families of property are checked:
+
+- **Idempotence.** Normalizing an already-normalized colour, shadow, or
+  walker tree changes nothing, since a snapshot is only ever compared against
+  another snapshot.
+- **Structure preservation.** Normalizing a walker tree never adds, drops,
+  or reorders a node; only the incidental values within it change.
+- **Totality of removal.** Every `--tw-*` custom property is stripped from a
+  style diff, and no transparent shadow layer survives normalization, whatever
+  else the value contains.
+- **Injectivity of the slug.** No two distinct page paths produce the same
+  snapshot filename stem, since one capture would otherwise overwrite another
+  and the diff would compare a page against itself. The generated alphabet
+  includes `_`, which is what makes the property able to reach the collision at
+  all: the stem uses `__` as its separator.
+
+Every test shares a module-level `SETTINGS` object, applied via `@SETTINGS`
+beside each `@given`. It pins `max_examples=200` and sets `deadline=None`, and
+it suppresses Hypothesis's `too_slow` and `data_too_large` health checks. This
+suite runs inside the commit gate (`make test`), where a health check flagging
+one slow-but-valid example, or an unpinned example count happening to pick a
+different case on a different run, would fail the gate on a finding rather than
+a genuine defect.
+
+Run just this file:
+
+```bash
+uv run pytest tests/test_weaver_snapshot_properties.py -v
+```
+
+### 7.3. Browser-driven checks against the served pages
+
+`tests/test_weaver_browser.py` and `tests/test_weaver_browser_interaction.py`
+are the two Weaver suites that watch a real Chromium rather than reading text.
+The former checks what every published page looks like once it has loaded; the
+latter checks what happens when something acts on one — a copy-button click, a
+resize past the mobile breakpoint, the drawer opening, the `capture` command
+run end to end. The build tests read the delivered markup and the compiled
+stylesheet as strings, and the snapshot tests exercise the harness that drives
+a browser without ever starting one; these two suites serve `public/` and drive
+`agent-browser` over it, so they can observe served responses, composited
+colours, and the laid-out result rather than the markup that describes them —
+whether a declared stylesheet actually 404s, what a translucent panel's colour
+composites to once the cascade has had its say, and whether the sidebar
+genuinely gives way to the drawer at a narrow viewport.
+
+Both carry the `playwright` marker, so `uv run pytest -m "not playwright"`
+deselects them while iterating on something else. Both also degrade to a skip
+rather than a failure when a dependency is absent: `agent-browser` not on
+`PATH`, `node_modules/.bin/http-server` missing (run `bun install`), or `uv` or
+`bun` themselves not on `PATH`.
+
+`built_site`, `served`, and `drive` are session-scoped fixtures in
+`tests/conftest.py`, shared with the build suites and between the two browser
+suites, so `bun run build` runs once for all of them rather than once per
+module. The page list, the viewports, the axe waivers, and the helpers that
+read state back out of the browser — the request log, axe's report, the result
+of an evaluated expression — live in `tests/support/weaver_browser.py`, so both
+suites drive the browser the same way over the same matrix.
+
+**The matrix.** The page list is derived from `config/pages.yaml` — the same
+file the generator itself reads — rather than hard-coded or drawn from the
+published tree, so all seventeen published pages are covered, and a page added
+to the config is covered automatically, without anyone remembering to add it
+here. The config has to be read this way because parametrization happens at
+collection, before the session-scoped `built_site` fixture has built anything;
+a companion test,
+`test_the_published_tree_holds_exactly_the_pages_checked_here`, asserts that
+the config and the published tree agree, so a config that has drifted from the
+build fails loudly rather than leaving a page silently unchecked. Most tests
+run at two viewports: 360×800, the narrowest width the design targets and the
+one that puts the sidebar off-canvas behind a toggle, and 1440×900, the width
+the layout was drawn against. The two layouts share almost no chrome, so both
+have to be checked.
+
+**What `test_weaver_browser.py` asserts, per page:**
+
+- `test_a_weaver_page_is_self_contained` — every request the page makes comes
+  from the local origin and none fails, and the page actually fetched a
+  stylesheet, a font, and a script, so the first half of that check cannot pass
+  vacuously on a page that fetched nothing.
+- `test_a_weaver_page_meets_wcag_aa` — axe reports no unwaived violation
+  against WCAG 2.0 A and AA.
+- `test_a_weaver_page_renders_its_chrome` — the current-link and icon
+  contracts described below.
+- `test_a_weaver_page_fits_a_phone` — at 360px the drawer toggle is present,
+  the sidebar does not lay out, and the document's scroll width does not exceed
+  the viewport.
+- `test_a_weaver_page_lays_out_its_sidebar_on_a_desktop` — the sidebar lays
+  out at 1440px, the wide layout's half of the same swap.
+
+Two further tests in this file are not parametrized per page:
+
+- `test_the_recorded_contrast_exceptions_are_still_real` — the two waived
+  `safety/` labels still fail exactly as recorded (see below).
+- `test_the_published_tree_holds_exactly_the_pages_checked_here` — the
+  companion test named above: the published tree and `config/pages.yaml` name
+  exactly the same pages.
+
+**The current-link contract.** At most one sidebar link may carry
+`aria-current="page"`, and where one does, it has to point at somewhere the
+page actually is. Three shapes are legitimate: the page's own href; an ancestor
+of it, since the three command sub-pages highlight the Commands section they
+belong to; and a fragment, since the design-language page reuses the nav
+classes for its own in-page anchors. A page the sidebar does not list — the
+three legal pages — has no current link at all, which is also correct: the
+chrome macro returns an empty string for them rather than guessing.
+
+**The icon check.** Every rendered `<svg>` must have a body, and no page may
+contain the literal text `UNKNOWN ICON`. The count of icons on a page is only
+asserted to be non-zero outside `SHARED_CONTENT`, since the three legal pages
+carry the sub-site's chrome but no illustration of their own.
+
+**The `ACCEPTED` waiver.** `pages/safety.jinja`'s Operational Guidance panel
+carries two status-token labels whose measured contrast is a recorded,
+outstanding defect rather than something this suite is meant to catch fresh
+each run (see the Decision Log in `docs/execplans/weaver-daisy-migration.md`).
+`ACCEPTED` waives exactly those two: it is keyed by page, axe rule, and the CSS
+class carried on the failing node, so it excuses the `text-status-ok` and
+`text-status-error` labels on `safety/` and nothing else — a contrast failure
+anywhere else on the same page still fails the suite.
+`test_the_recorded_contrast_exceptions_are_still_real` asserts the two waived
+labels still fire; if a future palette change makes them pass, that test fails
+instead, so the waiver cannot quietly outlive the defect it was recorded
+against.
+
+**What `test_weaver_browser_interaction.py` asserts:**
+
+- `test_a_copy_control_hands_the_clipboard_what_it_shows` — the home page's
+  install-command button, and the install page's unlabelled buttons, hand a
+  stubbed `navigator.clipboard` exactly the text each sits beside.
+- `test_a_long_code_line_scrolls_its_panel_and_not_the_page` — on `docs/`,
+  `commands/act/`, and `sempai/`, a three-hundred-character line injected into
+  a code panel either wraps or scrolls that panel, and never widens the
+  document itself.
+- `test_the_capture_command_writes_one_snapshot_per_page` — runs
+  `scripts/weaver_snapshot.py capture` end to end and checks it writes one
+  non-empty snapshot per published page.
+- `test_the_drawer_opens_on_a_published_page` — on `privacy-policy/` and the
+  home page, opening the drawer sets its ARIA state, shows the backdrop, moves
+  focus inside it, and locks the body's vertical scroll without touching the
+  horizontal.
+- `test_a_copy_control_reports_its_outcome_and_not_its_contents` — the copy
+  telemetry event carries only the fixed `component`/`operation`/`outcome`
+  schema, never the copied text or anything identifying the page.
+
+Run either file on its own:
+
+```bash
+uv run pytest tests/test_weaver_browser.py -v
+uv run pytest tests/test_weaver_browser_interaction.py -v
+```
+
+Together they cover every published page at two viewports for the
+self-containment, accessibility, chrome, and layout checks, plus the smaller,
+non-parametrized batteries described above — 121 cases in the page-level suite
+and 9 in the interaction one. Expect the pair to take between three and four
+minutes including the build, most of it in the page-level suite, since axe runs
+once per page per viewport.
+
+### 7.4. Mobile overflow below the tablet breakpoint
+
+`src/styles/weaver/site-base.css` carries a `@media (max-width: 767px)` block
+that lets certain content break mid-token, and headings hyphenate, rather than
+let the document scroll sideways. Below the breakpoint, `pre`, `code`, `th`,
+`td`, and `.font-mono` get `overflow-wrap: anywhere`; `h1`–`h4` get
+`overflow-wrap: break-word` together with `hyphens: auto`.
+
+It exists because four pages laid the document out wider than the 360px viewport
+`tests/test_weaver_browser.py` checks against. Their measured widths were
+`sempai` at 826px, `jacquard` at 416px, `install` at 370px, and `docs` at
+376px. There were two causes, both of them content that cannot break at a
+space. A command line, a TOML key, or a table cell holding a path sets a
+minimum width its column cannot meet. A display heading has the same problem
+for a different reason: "Documentation" at `text-5xl` is 344px on its own,
+against a 296px column.
+
+The rule is deliberately scoped below the tablet breakpoint, so the wide layout
+— where nothing overflows and a mid-token break would be gratuitous — is
+untouched.
+
 ## 8. Accessibility checks
 
 Colour choices must meet WCAG 2.2 AA — 4.5:1 for body text, 3:1 for large text
@@ -752,6 +1359,10 @@ report, and none is checked into the repository. Before treating a new audit
 finding as a regression, check the change under review actually altered the
 colour or markup in question, since an audit run against a wider page surface
 than the change touched can surface pairings the change did not introduce.
+
+The Weaver sub-site's pages are additionally checked with axe over WCAG 2.0 A
+and AA by the browser suite; see §7.3, "Browser-driven checks against the
+served pages".
 
 ### 8.1. Focus indicators
 

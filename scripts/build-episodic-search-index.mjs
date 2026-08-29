@@ -18,7 +18,6 @@
  * by the site's static-assets build step. That makes it a committed generated
  * file, and `--check` fails when it drifts from the content it describes.
  *
- * @file
  * @module scripts/build-episodic-search-index
  */
 
@@ -87,19 +86,31 @@ async function main() {
     2,
   )}\n`;
 
+  const current = await readFile(OUTPUT_PATH, "utf8").catch((error) => {
+    if (error?.code === "ENOENT") {
+      return "";
+    }
+    throw error;
+  });
+
   if (check) {
-    const current = await readFile(OUTPUT_PATH, "utf8").catch((error) => {
-      if (error?.code === "ENOENT") {
-        return "";
-      }
-      throw error;
-    });
     if (current !== payload) {
       console.error(`${OUTPUT_PATH} is stale. Run \`bun run build:search\` to regenerate it.`);
       process.exitCode = 1;
       return;
     }
     console.log(`${OUTPUT_PATH} matches the rendered site (${documents.length} records).`);
+    return;
+  }
+
+  /* Skip the write when nothing changed, rather than rewriting identical
+     content. The payload is already deliberately free of a build timestamp so
+     that a rebuild is not a spurious change; writing it anyway gave that away
+     again, because the file lives under `src/`, which `bun run dev` watches.
+     Each build rewrote it, the watcher saw a change, and it rebuilt — for as
+     long as it was left running. */
+  if (current === payload) {
+    console.log(`${OUTPUT_PATH} is already current (${documents.length} records indexed)`);
     return;
   }
 

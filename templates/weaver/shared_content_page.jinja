@@ -1,89 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} — Weaver</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'weaver-cream': '#F3EFD9',
-                        'weaver-indigo': '#193C6E',
-                        'weaver-vermilion': '#E8502B',
-                        'weaver-dark': '#0F2440',
-                        'weaver-faded': '#4A6FA5',
-                    },
-                    fontFamily: {
-                        'serif': ['"Playfair Display"', 'serif'],
-                        'sans': ['"IBM Plex Sans"', 'sans-serif'],
-                        'mono': ['"IBM Plex Mono"', 'monospace'],
-                    },
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../{{ stylesheet or 'assets/styles/weaver-site.css' }}">
-</head>
-<body class="bg-weaver-cream relative overflow-x-hidden selection:bg-weaver-vermilion selection:text-white">
+{#
+  The generated legal pages: privacy policy, terms of use, code of conduct.
 
-    <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
+  This used to be a fourth standalone copy of the page chrome, and the copy
+  had drifted. Its sidebar was missing `id="sidebar"` and the
+  `data-mobile-nav-header` hook, so `mobile-nav.js` returned early and the
+  legal pages had no navigation at all below 1024px. Its nav listed the same
+  ten links in a different style, and its brand linked with a relative `../`
+  where every other page uses a root-relative href.
 
-        <!-- Sidebar Navigation -->
-        <aside class="w-full lg:w-64 bg-weaver-cream border-r-2 border-weaver-indigo/20 flex-shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
-            <div>
-                <div class="p-8 border-b-2 border-weaver-indigo/20">
-                    <a href="../" class="block">
-                        <h1 class="font-serif text-3xl font-bold tracking-tight text-weaver-indigo">WEAVER</h1>
-                        <p class="font-mono text-xs mt-2 text-weaver-indigo/70">AI CODEBASE TOOLING</p>
-                    </a>
-                </div>
-                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    {% for link in nav_links %}
-                    <a href="{{ link.href }}" class="block px-4 py-2 text-sm font-medium text-weaver-indigo hover:bg-weaver-indigo/5 transition-colors border border-transparent">
-                        {{ link.label }}
-                    </a>
-                    {% endfor %}
-                </nav>
-            </div>
+  Extending the shared layout fixes all four at once. What stays different is
+  deliberate: these pages carry no paper texture and no grid background, and
+  their footer is the short legal one rather than the full site footer.
+#}
+{% extends "doc_page.jinja" %}
+
+{% block page_title %}{{ title }} — Weaver{% endblock %}
+
+{% block texture_overlay %}{% endblock %}
+
+{#- This overrides doc_page.jinja's `main_class` outright rather than extending
+    it, which also drops the `main_extra_class` block nested inside it there.
+    That is intentional: the legal pages want the plain ground rather than the
+    ruled paper, and none of them uses `main_extra_class`. A page that needed it
+    would have to reinstate the nested block here. -#}
+{% block main_class %}flex-1 lg:ml-64 min-h-screen relative{% endblock %}
+
+{% block sidebar_footer %}
             {% if parent_link %}
-            <div class="p-6 border-t border-weaver-indigo/10 hidden lg:block">
-                <a href="{{ parent_link.href }}" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">{{ parent_link.label }}</a>
+            <div class="p-6 border-t border-base-content/10 hidden lg:block">
+                <a href="{{ parent_link.href }}" class="font-mono text-xs text-base-content/82 hover:text-accent-ink transition-colors">{{ parent_link.label }}</a>
             </div>
             {% endif %}
-        </aside>
+{% endblock %}
 
-        <!-- Main Content -->
-        <main class="flex-1 lg:ml-64 min-h-screen relative">
+{% block content %}
             <section class="py-20 px-8 lg:px-16">
                 <div class="max-w-3xl mx-auto">
-                    <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-2 block">Legal</span>
-                    <h1 class="font-serif text-4xl text-weaver-indigo mb-10">{{ title }}</h1>
+                    <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">Legal</span>
+                    <h1 class="font-serif text-4xl text-base-content mb-10">{{ title }}</h1>
 
-                    <article class="prose prose-indigo max-w-none font-sans text-weaver-indigo/80 leading-relaxed space-y-6">
+                    <article class="prose prose-indigo max-w-none font-sans text-base-content/80 leading-relaxed space-y-6">
                         {{ body_html | safe }}
                     </article>
                 </div>
             </section>
+{% endblock %}
 
-            <footer class="bg-weaver-cream border-t border-weaver-indigo/20 p-8 lg:p-16">
-                <div class="max-w-3xl mx-auto flex flex-col md:flex-row justify-between items-center">
-                    <div>
-                        <p class="font-mono text-xs text-weaver-indigo/60">&copy; 2026 df12 Productions</p>
-                        <p class="font-mono text-xs text-weaver-indigo/60 mt-1">Serious tools, <span class="text-weaver-vermilion">playful worlds.</span></p>
-                    </div>
-                    <nav class="flex space-x-6 mt-4 md:mt-0" aria-label="Legal">
-                        <a href="/weaver/privacy-policy/" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">Privacy Policy</a>
-                        <a href="/weaver/terms-of-use/" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">Terms of Use</a>
-                        <a href="/weaver/code-of-conduct/" class="font-mono text-xs text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">Code of Conduct</a>
-                    </nav>
-                </div>
-            </footer>
-        </main>
-    </div>
-
-</body>
-</html>
+{% block page_footer %}
+    <footer class="bg-base-100 border-t border-base-content/20 p-8 lg:p-16 relative lg:ml-64">
+        <div class="max-w-3xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <p class="font-mono text-xs text-base-content/82">&copy; 2026 df12 Productions</p>
+                <p class="font-mono text-xs text-base-content/82 mt-1">Serious tools, <span class="text-accent-ink">playful worlds.</span></p>
+            </div>
+            <nav class="flex space-x-6 mt-4 md:mt-0" aria-label="Legal">
+                <a href="/weaver/privacy-policy/" class="font-mono text-xs text-base-content/82 hover:text-accent-ink transition-colors">Privacy Policy</a>
+                <a href="/weaver/terms-of-use/" class="font-mono text-xs text-base-content/82 hover:text-accent-ink transition-colors">Terms of Use</a>
+                <a href="/weaver/code-of-conduct/" class="font-mono text-xs text-base-content/82 hover:text-accent-ink transition-colors">Code of Conduct</a>
+            </nav>
+        </div>
+    </footer>
+{% endblock %}

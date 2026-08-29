@@ -1,38 +1,41 @@
 # Users' guide
 
-This guide is for readers who need to use Episodic as it exists today:
-operators, integrators, and other people who need the supported workflows
-without changing the implementation. It covers the user-facing surfaces that
-are currently documented in this repository. Maintainer-only build and
-extension guidance belongs in the [developers' guide](developers-guide.md).
+This guide is for readers who need to use the published sub-sites as they exist
+today: operators, integrators, and other people who need the supported
+workflows without changing the implementation. It covers the user-facing
+surfaces that are currently documented in this repository. Maintainer-only
+build and extension guidance belongs in the
+[developers' guide](developers-guide.md).
 
 ## 1. Where to start
 
 For any task, begin with the document that matches it:
 
-Example: to verify a fresh checkout, start with [Getting started](/episodic/docs/getting-started/)
-and expect the local site to serve on `http://127.0.0.1:8080/episodic/`.
+Example: to verify a fresh checkout, start with
+[Getting started](/episodic/docs/getting-started/) and expect the local site to
+serve on `http://127.0.0.1:8080/episodic/`.
 
-| Task | Read |
-| ---- | ---- |
+| Task                                               | Read                                               |
+| -------------------------------------------------- | -------------------------------------------------- |
 | Bring up a development checkout and verify it runs | [Getting started](/episodic/docs/getting-started/) |
-| Understand the HTTP surface | [API reference](/episodic/docs/api/) |
-| Prepare source material for intake | [Workflow: content](/episodic/workflow/content/) |
-| Review evaluator output and guardrails | [Workflow: quality](/episodic/workflow/quality/) |
-| Confirm hosting and deployment expectations | [Hosting](/episodic/hosting/) |
-| Check delivery progress | [Roadmap](/episodic/roadmap/) |
+| Understand the HTTP surface                        | [API reference](/episodic/docs/api/)               |
+| Prepare source material for intake                 | [Workflow: content](/episodic/workflow/content/)   |
+| Review evaluator output and guardrails             | [Workflow: quality](/episodic/workflow/quality/)   |
+| Confirm hosting and deployment expectations        | [Hosting](/episodic/hosting/)                      |
+| Check delivery progress                            | [Roadmap](/episodic/roadmap/)                      |
 
 The companion site starts at [Episodic](/episodic/). Its available routes are
-the overview and [why](/episodic/why/); the [workflow](/episodic/workflow/),
-[content](/episodic/workflow/content/), [quality](/episodic/workflow/quality/),
+the overview and [why](/episodic/why/); the
+[workflow](/episodic/workflow/), [content](/episodic/workflow/content/), [quality](/episodic/workflow/quality/),
 and [audio](/episodic/workflow/audio/) sections; the
 [architecture](/episodic/architecture/) and [interfaces](/episodic/interfaces/)
-references; the [documentation](/episodic/docs/), [getting-started](/episodic/docs/getting-started/),
-and [API](/episodic/docs/api/) pages; plus the [roadmap](/episodic/roadmap/),
-[contributing](/episodic/contributing/), and [hosting](/episodic/hosting/) pages.
-The shared [terms](/episodic/terms-of-use/),
-[privacy policy](/episodic/privacy-policy/), and
-[code of conduct](/episodic/code-of-conduct/) complete the public route set.
+references; the
+[documentation](/episodic/docs/), [getting-started](/episodic/docs/getting-started/),
+and [API](/episodic/docs/api/) pages; plus the
+[roadmap](/episodic/roadmap/), [contributing](/episodic/contributing/), and
+[hosting](/episodic/hosting/) pages. The shared
+[terms](/episodic/terms-of-use/), [privacy policy](/episodic/privacy-policy/),
+and [code of conduct](/episodic/code-of-conduct/) complete the public route set.
 
 ### Documentation search
 
@@ -63,5 +66,49 @@ Do not assume the following are available just because they are designed:
 - approval flows are not part of the current contract, and
 - the system stops at the draft and evaluation surfaces documented above.
 
+## 4. Weaver
+
+Weaver's documentation begins at [/weaver/](/weaver/). Two pages answer most
+first questions: [Install](/weaver/install/) for getting the tool, and
+[Commands](/weaver/commands/) for what it does once installed.
+
+### 4.1. Finding your way around
+
+The sidebar on the left is the navigation for the whole sub-site. The page you
+are reading is highlighted in it, and screen readers announce it as the current
+page.
+
+Below 1024 pixels wide there is no room for a sidebar, so it becomes a drawer.
+In that layout the sidebar is hidden and a square indigo button — the Weaver
+mark — appears at the top left. Pressing it opens the navigation over the page.
+
+The drawer closes four ways, and any of them will do:
+
+- pressing the button again,
+- pressing `Escape`,
+- clicking or tapping the dimmed area beside the drawer, or
+- following any link in it.
+
+While the drawer is open, focus moves into it, so the next `Tab` takes you
+through the navigation rather than through the page behind it. Closing the
+drawer puts focus back where it was before you opened it; if nothing in
+particular held it, focus returns to the button, which is where you left off.
+
+The page behind the drawer does not scroll vertically while it is open, so
+dismissing the drawer leaves you where you were rather than somewhere further
+down. The drawer itself scrolls if the navigation is longer than the screen.
+
+### 4.2. Copying commands
+
+The install page and the home page show commands with a **Copy** control beside
+them. Pressing it puts that command on the clipboard, ready to paste into a
+terminal.
+
+There is no on-screen confirmation: the page does not change, and nothing is
+announced. If you are unsure whether the copy worked, paste it and look. A
+browser may also refuse the clipboard on an insecure connection or without
+permission, and that refusal is likewise silent.
+
 For implementation detail rather than usage guidance, switch to the
-[developers' guide](developers-guide.md) or the [df12 Pages App Design](df12-pages-app-design.md).
+[developers' guide](developers-guide.md) or the
+[df12 Pages App Design](df12-pages-app-design.md).

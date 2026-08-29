@@ -1,0 +1,345 @@
+"""The generated icon macro, and the generator that writes it.
+
+``templates/weaver/_icons.jinja`` is generated from ``config/weaver-icons.yaml``
+and the ``@iconify-json/carbon`` package. Comparing it against its generator
+proves the two agree and nothing more — both could agree on markup Jinja
+refuses to parse — so it is also rendered, and every icon the templates ask
+for is resolved through it.
+"""
+
+from __future__ import annotations
+
+import re
+import typing as typ
+from pathlib import Path
+
+import jinja2
+import pytest
+
+if typ.TYPE_CHECKING:
+    from types import ModuleType
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+PUBLIC_WEAVER = REPO_ROOT / "public" / "weaver"
+WEAVER_TEMPLATES = REPO_ROOT / "templates" / "weaver"
+WEAVER_STYLES = REPO_ROOT / "src" / "styles"
+COMPILED_STYLESHEET = PUBLIC_WEAVER / "assets" / "styles" / "weaver.css"
+
+
+# `{{ icon('name') }}` as the templates write it, in either quote form.
+ICON_CALL = re.compile(r"""icon\(\s*(?:'([^']+)'|"([^"]+)")""")
+
+
+def test_generated_icon_macro_matches_its_source(generator: ModuleType) -> None:
+    """The committed icon macro should be what the generator produces.
+
+    ``templates/weaver/_icons.jinja`` is generated from
+    ``config/weaver-icons.yaml`` and the ``@iconify-json/carbon`` package. A
+    hand-edit there, or a mapping change without a regeneration, would survive
+    unnoticed otherwise.
+    """
+    if not generator.CARBON.is_file():  # pragma: no cover - environment guard
+        pytest.skip("@iconify-json/carbon is not installed; run 'bun install'")
+
+    expected = generator.build_macro()
+    actual = generator.OUTPUT.read_text(encoding="utf-8")
+    assert actual == expected, (
+        "templates/weaver/_icons.jinja is out of date; run "
+        "'uv run python scripts/generate_weaver_icons.py'"
+    )
+
+
+def test_the_icon_macro_renders_from_data_without_reading_a_file(
+    generator: ModuleType,
+) -> None:
+    """The rendering is pure, so a handful of literal icons is enough to check it."""
+    macro = generator.render_macro(
+        {
+            "terminal": {"body": "<path d='M0 0'/>"},
+            "star": {"body": "<path d='M1 1'/>"},
+        },
+        {"asterisk": {"parent": "star"}},
+        {
+            "fa-terminal": {"carbon": "carbon:terminal"},
+            "fa-star": {"carbon": "carbon:asterisk"},
+        },
+    )
+
+    assert "'terminal': '<path d=\\'M0 0\\'/>'" in macro, (
+        f"the mapped icon should carry its escaped body; got {macro!r}"
+    )
+    assert "'star': '<path d=\\'M1 1\\'/>'" in macro, (
+        f"an alias should resolve to its parent's body; got {macro!r}"
+    )
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        pytest.param(("{ not json", None, "malformed"), id="carbon-malformed"),
+        pytest.param(('{"aliases": {}}', None, "'icons'"), id="carbon-no-icons"),
+        pytest.param((None, "icons: [1, 2]", "'icons'"), id="mapping-not-a-mapping"),
+        pytest.param(
+            (None, "not: a mapping of icons", "'icons'"), id="mapping-no-icons"
+        ),
+        # The nested records are somebody else's format too, and a scalar where
+        # a record was expected raises TypeError rather than KeyError — which
+        # `build_macro`'s handler does not catch.
+        pytest.param(
+            ('{"icons": {"terminal": 5}}', None, "'body'"), id="carbon-icon-scalar"
+        ),
+        pytest.param(
+            ('{"icons": {"terminal": {"width": 32}}}', None, "'body'"),
+            id="carbon-icon-no-body",
+        ),
+        pytest.param(
+            ('{"icons": {"terminal": {"body": 7}}}', None, "'body'"),
+            id="carbon-icon-body-not-a-string",
+        ),
+        pytest.param(
+            ('{"icons": {}, "aliases": {"star": "asterisk"}}', None, "'parent'"),
+            id="carbon-alias-scalar",
+        ),
+        pytest.param(
+            ('{"icons": {}, "aliases": {"star": {"rotate": 1}}}', None, "'parent'"),
+            id="carbon-alias-no-parent",
+        ),
+        pytest.param(
+            ('{"icons": {}, "aliases": [1, 2]}', None, "'aliases'"),
+            id="carbon-aliases-not-a-mapping",
+        ),
+        pytest.param(
+            (None, "icons:\n  fa-ghost: 5\n", "'carbon'"), id="mapping-record-scalar"
+        ),
+        pytest.param(
+            (None, "icons:\n  fa-ghost:\n    note: no carbon here\n", "'carbon'"),
+            id="mapping-record-no-carbon",
+        ),
+        pytest.param(
+            (None, "icons:\n  fa-ghost:\n    carbon: [a, b]\n", "'carbon'"),
+            id="mapping-carbon-not-a-string",
+        ),
+    ],
+)
+def test_an_unusable_generator_input_names_the_file(
+    generator: ModuleType,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    case: tuple[str | None, str | None, str],
+) -> None:
+    """A traceback out of json or ruamel names neither the file nor the fix."""
+    carbon, mapping, expected = case
+    carbon_path = tmp_path / "icons.json"
+    carbon_path.write_text(carbon or '{"icons": {}}', encoding="utf-8")
+    mapping_path = tmp_path / "weaver-icons.yaml"
+    mapping_path.write_text(mapping or "icons: {}", encoding="utf-8")
+    monkeypatch.setattr(generator, "CARBON", carbon_path)
+    monkeypatch.setattr(generator, "MAPPING", mapping_path)
+
+    with pytest.raises(SystemExit) as caught:
+        generator.build_macro()
+
+    message = str(caught.value.code)
+    at_fault = carbon_path if carbon is not None else mapping_path
+    assert str(at_fault) in message, (
+        f"the message should name {at_fault}; got {message!r}"
+    )
+    assert expected in message, f"expected {expected!r} in {message!r}"
+
+
+def test_an_absent_carbon_package_names_the_command_that_installs_it(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """The one failure with a known fix should say what the fix is."""
+    monkeypatch.setattr(generator, "CARBON", tmp_path / "absent.json")
+
+    with pytest.raises(SystemExit) as caught:
+        generator.build_macro()
+
+    assert "bun install" in str(caught.value.code), (
+        f"the message should name the fix; got {caught.value.code!r}"
+    )
+
+
+def test_an_unmapped_carbon_icon_names_the_mapping(
+    generator: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A mapping naming an icon the package lacks is an editing mistake, not a crash."""
+    carbon_path = tmp_path / "icons.json"
+    carbon_path.write_text('{"icons": {"terminal": {"body": ""}}}', encoding="utf-8")
+    mapping_path = tmp_path / "weaver-icons.yaml"
+    mapping_path.write_text(
+        "icons:\n  fa-ghost:\n    carbon: carbon:no-such-icon\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(generator, "CARBON", carbon_path)
+    monkeypatch.setattr(generator, "MAPPING", mapping_path)
+
+    with pytest.raises(SystemExit) as caught:
+        generator.build_macro()
+
+    message = str(caught.value.code)
+    assert str(mapping_path) in message, (
+        f"the message should name the mapping; got {message!r}"
+    )
+    assert "no-such-icon" in message, f"expected the icon named in {message!r}"
+
+
+@pytest.fixture(scope="module")
+def icon_macro() -> typ.Callable[..., str]:
+    """Load `_icons.jinja` through Jinja and return its `icon` macro.
+
+    The generated file is compared against the generator elsewhere, which
+    proves the two agree and nothing more: both could agree on markup Jinja
+    refuses to parse, or on a macro that renders an empty string. Rendering it
+    is what shows it works.
+    """
+    environment = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(str(WEAVER_TEMPLATES)),
+        autoescape=True,
+    )
+    module = environment.get_template("_icons.jinja").module
+    # The macro is an attribute of the rendered module, which is dynamic, so
+    # the type checker cannot see it; that it exists at all is the first thing
+    # these tests assert.
+    macro = getattr(module, "icon", None)
+    assert macro is not None, (
+        "templates/weaver/_icons.jinja defines no `icon` macro; every call "
+        "site in every Weaver template would render nothing"
+    )
+    return typ.cast("typ.Callable[..., str]", macro)
+
+
+def test_the_generated_macro_renders_an_svg(icon_macro: typ.Callable[..., str]) -> None:
+    """A macro that parses but renders nothing would pass every other check."""
+    rendered = str(icon_macro("terminal"))
+
+    assert rendered.startswith("<svg "), f"expected an <svg> element; got {rendered!r}"
+    assert 'viewBox="0 0 32 32"' in rendered, f"no viewBox in {rendered!r}"
+    assert 'aria-hidden="true"' in rendered, (
+        f"the artwork is decorative and must be hidden from assistive "
+        f"technology; got {rendered!r}"
+    )
+    assert "<path" in rendered or "<circle" in rendered, (
+        f"the icon rendered no artwork at all: {rendered!r}"
+    )
+
+
+def test_the_generated_macro_carries_extra_classes(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """`extra_class` is how a call site sizes or colours one instance."""
+    rendered = str(icon_macro("terminal", extra_class="text-accent-ink w-6"))
+
+    assert "text-accent-ink w-6" in rendered, (
+        f"the per-instance classes were dropped: {rendered!r}"
+    )
+    assert "inline-block" in rendered, (
+        f"the macro's own classes should survive alongside them: {rendered!r}"
+    )
+
+
+def test_an_unmapped_icon_name_is_loud_rather_than_blank(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """A missing icon that rendered nothing would leave a hole nobody noticed."""
+    rendered = str(icon_macro("definitely-not-an-icon"))
+
+    assert "UNKNOWN ICON" in rendered, (
+        f"an unmapped name should say so rather than render empty; got {rendered!r}"
+    )
+    assert "definitely-not-an-icon" in rendered, (
+        f"the message should name the icon asked for; got {rendered!r}"
+    )
+
+
+def test_every_icon_the_templates_ask_for_renders(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """A template naming an icon the macro lacks ships `UNKNOWN ICON` to a page.
+
+    The browser suite catches this on the four pages it loads at a time; this
+    catches it across every template, without a browser.
+    """
+    asked = {
+        match.group(1) or match.group(2)
+        for source in WEAVER_TEMPLATES.rglob("*.jinja")
+        if source.name != "_icons.jinja"
+        for match in ICON_CALL.finditer(source.read_text(encoding="utf-8"))
+    }
+    assert asked, "no icon calls were found at all; has the call syntax changed?"
+
+    missing = sorted(name for name in asked if "UNKNOWN ICON" in str(icon_macro(name)))
+    assert not missing, (
+        f"these icons are used in the templates but absent from the generated "
+        f"macro, so each renders the literal text 'UNKNOWN ICON': {missing}"
+    )
+
+
+def test_the_dictionary_is_built_once_at_template_scope(
+    generator: ModuleType,
+) -> None:
+    """Inside the macro, Jinja rebuilt all of it on every call.
+
+    A page renders dozens of icons, and each call was reconstructing a
+    fifty-odd entry dictionary of SVG path data to look one name up in it.
+    Hoisting the `set` above the macro makes it template scope, built once
+    when the template is loaded.
+    """
+    macro_text = generator.OUTPUT.read_text(encoding="utf-8")
+    declaration = macro_text.index("{%- set paths = {")
+    definition = macro_text.index("{%- macro icon(")
+
+    assert declaration < definition, (
+        "the icon dictionary is declared inside the macro, so it is rebuilt on "
+        "every call rather than once when the template loads"
+    )
+    assert macro_text.count("{%- set paths = {") == 1, (
+        "the dictionary should be declared exactly once"
+    )
+    assert "{%- set paths" not in macro_text[definition:], (
+        "no `set paths` should remain inside the macro body"
+    )
+
+
+def test_the_macro_renders_the_same_svg_however_often_it_is_called(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """A hoisted dictionary must not become state that a call can disturb.
+
+    Rendering was previously self-contained per call; now every call reads one
+    shared mapping, so the thing worth proving is that reading it repeatedly,
+    and for different names, returns the same answer each time.
+    """
+    names = ["terminal", "check", "xmark", "terminal", "check", "terminal"]
+    rendered = [str(icon_macro(name)) for name in names]
+
+    for name, svg in zip(names, rendered, strict=True):
+        assert svg.startswith("<svg "), f"{name!r} rendered {svg[:60]!r}"
+        assert "<path" in svg or "<circle" in svg, f"{name!r} rendered no artwork"
+
+    first = dict(zip(names, rendered, strict=True))
+    for name, svg in zip(names, rendered, strict=True):
+        assert svg == first[name], (
+            f"{name!r} rendered differently on a later call, so the shared "
+            f"dictionary is being mutated between calls"
+        )
+    assert len(set(rendered)) == len(set(names)), (
+        "distinct icons should render distinct artwork; got "
+        f"{len(set(rendered))} distinct outputs for {len(set(names))} names"
+    )
+
+
+def test_hoisting_the_dictionary_left_the_other_behaviour_alone(
+    icon_macro: typ.Callable[..., str],
+) -> None:
+    """The two things callers rely on besides the artwork itself."""
+    assert "UNKNOWN ICON: not-an-icon" in str(icon_macro("not-an-icon")), (
+        "an unmapped name should still say so loudly"
+    )
+    with_class = str(icon_macro("terminal", extra_class="text-accent-ink w-6"))
+    assert "text-accent-ink w-6" in with_class, (
+        f"per-instance classes should still reach the element: {with_class!r}"
+    )
+    assert "inline-block" in with_class, (
+        f"the macro's own classes should survive alongside them: {with_class!r}"
+    )

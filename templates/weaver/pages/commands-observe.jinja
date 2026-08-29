@@ -1,49 +1,40 @@
 {% extends "doc_page.jinja" %}
+{% from '_icons.jinja' import icon %}
 
 {% block page_title %}Command: Observe - Weaver AI Codebase Tooling{% endblock %}
 
 {% block extra_head %}
-    <style>
-        .code-block-shadow { box-shadow: 4px 4px 0px 0px rgba(25,60,110,0.1); }
-
-        /* Custom syntax highlighting for the JSONL examples */
-        .token-key { color: #8BE9FD; }
-        .token-string { color: #F1FA8C; }
-        .token-number { color: #BD93F9; }
-        .token-boolean { color: #FF79C6; }
-        .token-comment { color: #6272A4; font-style: italic; }
-    </style>
 {% endblock %}
 
 {% block nav_subitems_commands %}
                     <!-- Sub-navigation for Commands -->
-                    <div class="ml-4 pl-4 border-l border-weaver-indigo/20 space-y-1 my-2">
-                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono font-bold text-weaver-vermilion bg-weaver-vermilion/5 -ml-4 pl-4 border-l-2 border-weaver-vermilion">/observe</a>
-                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">/act</a>
-                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-weaver-indigo/80 hover:text-weaver-vermilion transition-colors">/verify</a>
+                    <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
+                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono font-bold text-accent-ink bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/observe</a>
+                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/act</a>
+                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/verify</a>
                     </div>
 {% endblock %}
 
 {% block content %}
 
             <!-- Header Section -->
-            <section id="observe-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-weaver-indigo/20">
+            <section id="observe-header" class="relative pt-16 pb-12 px-8 lg:px-16 border-b border-base-content/20">
                 <div class="masthead-frame mx-auto">
                     <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
                         <div class="masthead-eyebrow self-start">
-                            <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-weaver-indigo/60 hover:text-weaver-vermilion transition-colors">COMMANDS</a>
-                            <span class="text-weaver-indigo/40">/</span>
-                            <span class="font-mono text-xs tracking-widest uppercase text-weaver-indigo font-bold">OBSERVE</span>
+                            <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-base-content/82 hover:text-accent-ink transition-colors">COMMANDS</a>
+                            <span class="text-base-content/75">/</span>
+                            <span class="font-mono text-xs tracking-widest uppercase text-base-content font-bold">OBSERVE</span>
                         </div>
                     </div>
 
-                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-weaver-indigo leading-[1.1] mb-6">
+                    <h1 class="font-serif text-5xl lg:text-7xl font-bold text-base-content leading-none mb-6">
                         Perception & <br>
-                        <span class="text-weaver-vermilion italic font-light">Structure</span>.
+                        <span class="text-accent-ink italic font-light">Structure</span>.
                     </h1>
 
-                    <p class="font-sans text-lg text-weaver-indigo/80 leading-relaxed max-w-3xl font-light">
-                        The <span class="font-mono text-sm bg-weaver-indigo/10 px-1 rounded">observe</span> command is the sensory organ of the Weaver agent. It fuses raw file content with semantic metadata from Tree-sitter and LSP servers to produce a high-fidelity, structured representation of the codebase.
+                    <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-3xl font-light">
+                        The <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">observe</span> command is the sensory organ of the Weaver agent. It fuses raw file content with semantic metadata from Tree-sitter and LSP servers to produce a high-fidelity, structured representation of the codebase.
                     </p>
                 </div>
 
@@ -58,85 +49,85 @@
             </section>
 
             <!-- Usage & Syntax Section -->
-            <section class="py-12 px-8 lg:px-16 border-b border-weaver-indigo/20 bg-white/40">
+            <section class="py-12 px-8 lg:px-16 border-b border-base-content/20 bg-white/40">
                 <div class="max-w-6xl mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
                         <!-- Left: Synopsis -->
                         <div class="lg:col-span-1">
-                            <h2 class="font-serif text-2xl text-weaver-indigo mb-4">Synopsis</h2>
-                            <p class="text-sm text-weaver-indigo/70 mb-6 leading-relaxed">
-                                Each <code class="font-mono text-xs bg-weaver-indigo/10 px-1">observe</code> operation queries code structure and relationships via the daemon. The daemon speaks JSONL internally; the CLI either forwards the inner payload in JSON mode or renders recognised responses for humans when stdout is a TTY.
+                            <h2 class="font-serif text-2xl text-base-content mb-4">Synopsis</h2>
+                            <p class="text-sm text-base-content/88 mb-6 leading-relaxed">
+                                Each <code class="font-mono text-xs bg-primary/10 px-1">observe</code> operation queries code structure and relationships via the daemon. The daemon speaks JSONL internally; the CLI either forwards the inner payload in JSON mode or renders recognised responses for humans when stdout is a TTY.
                             </p>
 
-                            <div class="bg-weaver-cream border border-weaver-indigo p-4 relative mb-6">
-                                <div class="absolute -top-3 left-4 bg-weaver-cream px-2 text-xs font-mono text-weaver-vermilion font-bold">SYNTAX</div>
-                                <code class="font-mono text-sm text-weaver-indigo block break-all">
+                            <div class="bg-base-100 border border-base-content p-4 relative mb-6">
+                                <div class="absolute -top-3 left-4 bg-base-100 px-2 text-xs font-mono text-accent-ink font-bold">SYNTAX</div>
+                                <code class="font-mono text-sm text-base-content block break-all">
                                     weaver observe &lt;OPERATION&gt; [ARG ...]
                                 </code>
                             </div>
 
-                            <div class="flex items-center gap-2 text-xs font-mono text-weaver-indigo/60">
-                                <i class="fa-solid fa-info-circle"></i>
+                            <div class="flex items-center gap-2 text-xs font-mono text-base-content/82">
+                                {{ icon('info-circle') }}
                                 <span>Language inferred from file extension</span>
                             </div>
                         </div>
 
                         <!-- Right: Operations Table -->
                         <div class="lg:col-span-2">
-                            <h2 class="font-serif text-2xl text-weaver-indigo mb-4">Operations</h2>
-                            <div class="overflow-hidden border border-weaver-indigo/20 rounded-sm shadow-sm bg-weaver-cream">
+                            <h2 class="font-serif text-2xl text-base-content mb-4">Operations</h2>
+                            <div class="overflow-hidden border border-base-content/20 rounded-xs shadow-xs bg-base-100">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
-                                        <tr class="bg-weaver-indigo text-weaver-cream font-mono text-xs uppercase tracking-wider">
-                                            <th class="p-3 border-r border-weaver-cream/20 w-40">Operation</th>
-                                            <th class="p-3 border-r border-weaver-cream/20 w-24">Source</th>
-                                            <th class="p-3 border-r border-weaver-cream/20 w-28">Status</th>
+                                        <tr class="bg-primary text-base-100 font-mono text-xs uppercase tracking-wider">
+                                            <th class="p-3 border-r border-base-100/20 w-40">Operation</th>
+                                            <th class="p-3 border-r border-base-100/20 w-24">Source</th>
+                                            <th class="p-3 border-r border-base-100/20 w-28">Status</th>
                                             <th class="p-3">Description</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-weaver-indigo/10">
-                                        <tr class="hover:bg-weaver-indigo/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-weaver-vermilion border-r border-weaver-indigo/10">get-definition</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">LSP</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo border-r border-weaver-indigo/10">Current</td>
-                                            <td class="p-3 text-sm text-weaver-indigo/80">Jump to definition. Requires <span class="font-mono text-xs bg-weaver-indigo/10 px-1">--uri</span> and <span class="font-mono text-xs bg-weaver-indigo/10 px-1">--position</span>.</td>
+                                    <tbody class="divide-y divide-base-content/10">
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">get-definition</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
+                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Current</td>
+                                            <td class="p-3 text-sm text-base-content/80">Jump to definition. Requires <span class="font-mono text-xs bg-primary/10 px-1">--uri</span> and <span class="font-mono text-xs bg-primary/10 px-1">--position</span>.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-indigo/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-weaver-vermilion border-r border-weaver-indigo/10">find-references</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">LSP</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo border-r border-weaver-indigo/10">Current</td>
-                                            <td class="p-3 text-sm text-weaver-indigo/80">Find all usages of a symbol. Same flags as <code>get-definition</code>.</td>
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">find-references</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
+                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Current</td>
+                                            <td class="p-3 text-sm text-base-content/80">Find all usages of a symbol. Same flags as <code>get-definition</code>.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-indigo/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-weaver-vermilion border-r border-weaver-indigo/10">call-hierarchy</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">LSP</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo border-r border-weaver-indigo/10">Current</td>
-                                            <td class="p-3 text-sm text-weaver-indigo/80">Incoming/outgoing call graph. Returns nodes and edges.</td>
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">call-hierarchy</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">LSP</td>
+                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Current</td>
+                                            <td class="p-3 text-sm text-base-content/80">Incoming/outgoing call graph. Returns nodes and edges.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-indigo/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-weaver-vermilion border-r border-weaver-indigo/10">query</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">Tree-sitter</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo border-r border-weaver-indigo/10">Current</td>
-                                            <td class="p-3 text-sm text-weaver-indigo/80">AST-aware structural query via <span class="font-mono text-xs bg-weaver-indigo/10 px-1">--pattern</span> and <span class="font-mono text-xs bg-weaver-indigo/10 px-1">--path</span>.</td>
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">query</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Tree-sitter</td>
+                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Current</td>
+                                            <td class="p-3 text-sm text-base-content/80">AST-aware structural query via <span class="font-mono text-xs bg-primary/10 px-1">--pattern</span> and <span class="font-mono text-xs bg-primary/10 px-1">--path</span>.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-indigo/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-weaver-vermilion border-r border-weaver-indigo/10">grep</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">Tree-sitter</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo border-r border-weaver-indigo/10">Current</td>
-                                            <td class="p-3 text-sm text-weaver-indigo/80">Shipped alias of <code>query</code>. Same <span class="font-mono text-xs bg-weaver-indigo/10 px-1">--pattern</span> and <span class="font-mono text-xs bg-weaver-indigo/10 px-1">--path</span> contract.</td>
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">grep</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Tree-sitter</td>
+                                            <td class="p-3 font-mono text-xs text-base-content border-r border-base-content/10">Current</td>
+                                            <td class="p-3 text-sm text-base-content/80">Shipped alias of <code>query</code>. Same <span class="font-mono text-xs bg-primary/10 px-1">--pattern</span> and <span class="font-mono text-xs bg-primary/10 px-1">--path</span> contract.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-indigo/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-weaver-vermilion border-r border-weaver-indigo/10">get-card</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">Jacquard</td>
-                                            <td class="p-3 font-mono text-xs border-r border-weaver-indigo/10"><span class="status-pill status-pill-planned">Planned</span></td>
-                                            <td class="p-3 text-sm text-weaver-indigo/80">Structured symbol card (signature, docstring, locals). Progressive detail levels.</td>
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">get-card</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Jacquard</td>
+                                            <td class="p-3 font-mono text-xs border-r border-base-content/10"><span class="status-pill status-pill-planned">Planned</span></td>
+                                            <td class="p-3 text-sm text-base-content/80">Structured symbol card (signature, docstring, locals). Progressive detail levels.</td>
                                         </tr>
-                                        <tr class="hover:bg-weaver-indigo/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-weaver-vermilion border-r border-weaver-indigo/10">graph-slice</td>
-                                            <td class="p-3 font-mono text-xs text-weaver-indigo/60 border-r border-weaver-indigo/10">Jacquard</td>
-                                            <td class="p-3 font-mono text-xs border-r border-weaver-indigo/10"><span class="status-pill status-pill-planned">Planned</span></td>
-                                            <td class="p-3 text-sm text-weaver-indigo/80">Budgeted subgraph rooted at a symbol, with typed edges.</td>
+                                        <tr class="hover:bg-primary/5 transition-colors">
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">graph-slice</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Jacquard</td>
+                                            <td class="p-3 font-mono text-xs border-r border-base-content/10"><span class="status-pill status-pill-planned">Planned</span></td>
+                                            <td class="p-3 text-sm text-base-content/80">Budgeted subgraph rooted at a symbol, with typed edges.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -147,32 +138,32 @@
             </section>
 
             <!-- Example Scenarios -->
-            <section class="py-16 px-8 lg:px-16 border-b border-weaver-indigo/20">
+            <section class="py-16 px-8 lg:px-16 border-b border-base-content/20">
                 <div class="max-w-6xl mx-auto">
-                    <h2 class="font-serif text-3xl text-weaver-indigo mb-10">Integration Examples</h2>
+                    <h2 class="font-serif text-3xl text-base-content mb-10">Integration Examples</h2>
 
                     <div class="space-y-12">
 
                         <!-- Scenario 1: get-definition -->
                         <div class="relative group">
-                            <div class="absolute -left-4 top-0 bottom-0 w-1 bg-weaver-indigo opacity-30 group-hover:opacity-100 transition-opacity"></div>
-                            <h3 class="font-serif text-xl text-weaver-indigo mb-4 pl-4">1. Jump to Definition</h3>
-                            <p class="text-sm text-weaver-indigo/70 mb-4 pl-4 max-w-2xl">
+                            <div class="absolute -left-4 top-0 bottom-0 w-1 bg-primary opacity-30 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 class="font-serif text-xl text-base-content mb-4 pl-4">1. Jump to Definition</h3>
+                            <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
                                 Point at any symbol with a URI and cursor position. Weaver starts the appropriate language server, resolves the definition, and returns the location as structured JSON.
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
                                 <!-- Command Input -->
-                                <div class="bg-weaver-dark rounded-sm p-4 border border-weaver-indigo/20">
+                                <div class="bg-neutral rounded-xs p-4 border border-base-content/20">
                                     <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
-                                        <span class="text-xs font-mono text-weaver-cream/50">TERMINAL</span>
+                                        <span class="text-xs font-mono text-base-100/70">TERMINAL</span>
                                         <div class="flex gap-1">
-                                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                            <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                            <div class="w-2 h-2 rounded-full bg-status-error"></div>
+                                            <div class="w-2 h-2 rounded-full bg-status-warn"></div>
+                                            <div class="w-2 h-2 rounded-full bg-status-ok"></div>
                                         </div>
                                     </div>
-                                    <code class="font-mono text-sm text-green-400">
+                                    <code class="font-mono text-sm text-code-string">
                                         $ weaver observe get-definition \<br>
                                         &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/main.rs \<br>
@@ -181,9 +172,9 @@
                                 </div>
 
                                 <!-- JSON Output -->
-                                <div class="bg-[#282A36] rounded-sm p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">CLI JSON Output</div>
-<pre class="text-gray-300">
+                                <div tabindex="0" class="bg-code-surface rounded-xs p-4 border border-base-content/20 font-mono text-xs overflow-x-auto shadow-inner relative">
+                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">CLI JSON Output</div>
+<pre class="text-code-text">
 <span class="token-comment">// raw payload forwarded by the CLI</span>
 [<span class="token-string">{"uri":"file:///src/auth.rs","line":42,"column":17}</span>]
 </pre>
@@ -193,24 +184,24 @@
 
                         <!-- Scenario 2: find-references -->
                         <div class="relative group">
-                            <div class="absolute -left-4 top-0 bottom-0 w-1 bg-weaver-vermilion opacity-30 group-hover:opacity-100 transition-opacity"></div>
-                            <h3 class="font-serif text-xl text-weaver-indigo mb-4 pl-4">2. Find All References</h3>
-                            <p class="text-sm text-weaver-indigo/70 mb-4 pl-4 max-w-2xl">
+                            <div class="absolute -left-4 top-0 bottom-0 w-1 bg-accent opacity-30 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 class="font-serif text-xl text-base-content mb-4 pl-4">2. Find All References</h3>
+                            <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
                                 Same shape, different operation. Finds every call-site, import, and usage of the symbol at the given position — useful for impact analysis before a refactor.
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
                                 <!-- Command Input -->
-                                <div class="bg-weaver-dark rounded-sm p-4 border border-weaver-indigo/20">
+                                <div class="bg-neutral rounded-xs p-4 border border-base-content/20">
                                     <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
-                                        <span class="text-xs font-mono text-weaver-cream/50">TERMINAL</span>
+                                        <span class="text-xs font-mono text-base-100/70">TERMINAL</span>
                                         <div class="flex gap-1">
-                                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                            <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                            <div class="w-2 h-2 rounded-full bg-status-error"></div>
+                                            <div class="w-2 h-2 rounded-full bg-status-warn"></div>
+                                            <div class="w-2 h-2 rounded-full bg-status-ok"></div>
                                         </div>
                                     </div>
-                                    <code class="font-mono text-sm text-green-400">
+                                    <code class="font-mono text-sm text-code-string">
                                         $ weaver observe find-references \<br>
                                         &nbsp;&nbsp;--output json \<br>
                                         &nbsp;&nbsp;--uri file:///src/auth.rs \<br>
@@ -219,9 +210,9 @@
                                 </div>
 
                                 <!-- JSON Output -->
-                                <div class="bg-[#282A36] rounded-sm p-4 border border-weaver-indigo/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-[10px] text-white/30 uppercase tracking-widest">CLI JSON Output</div>
-<pre class="text-gray-300">
+                                <div tabindex="0" class="bg-code-surface rounded-xs p-4 border border-base-content/20 font-mono text-xs overflow-x-auto shadow-inner relative">
+                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">CLI JSON Output</div>
+<pre class="text-code-text">
 <span class="token-comment">// raw payload forwarded by the CLI</span>
 {<span class="token-key">"references"</span>:[{<span class="token-key">"uri"</span>:<span class="token-string">"file:///src/main.rs"</span>,<span class="token-key">"line"</span>:<span class="token-number">10</span>,<span class="token-key">"column"</span>:<span class="token-number">5</span>},{<span class="token-key">"uri"</span>:<span class="token-string">"file:///tests/auth_test.rs"</span>,<span class="token-key">"line"</span>:<span class="token-number">7</span>,<span class="token-key">"column"</span>:<span class="token-number">12</span>}]}
 </pre>
@@ -234,31 +225,27 @@
             </section>
 
             <!-- Provenance & Architecture Diagram -->
-            <section class="py-16 px-8 lg:px-16 bg-weaver-cream border-b border-weaver-indigo/20 relative overflow-hidden">
-                <!-- Seigaiha Pattern Background -->
-                <div class="absolute right-0 bottom-0 w-1/2 h-full opacity-5 pointer-events-none"
-                     style="background-image: url('https://www.transparenttextures.com/patterns/seigaiha.png'); mask-image: linear-gradient(to right, transparent, black);">
-                </div>
+            <section class="py-16 px-8 lg:px-16 bg-base-100 border-b border-base-content/20 relative overflow-hidden">
 
                 <div class="max-w-6xl mx-auto relative z-10">
                     <div class="flex flex-col md:flex-row justify-between md:items-end mb-12">
                         <div>
-                            <span class="font-mono text-xs text-weaver-vermilion font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
-                            <h2 class="font-serif text-3xl text-weaver-indigo">Semantic Fusion Engine</h2>
-                            <p class="text-weaver-indigo/70 mt-2 max-w-xl">How Weaver constructs the "truth" about your code.</p>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">ARCHITECTURE</span>
+                            <h2 class="font-serif text-3xl text-base-content">Semantic Fusion Engine</h2>
+                            <p class="text-base-content/88 mt-2 max-w-xl">How Weaver constructs the "truth" about your code.</p>
                         </div>
                     </div>
 
                     <!-- Diagram Container -->
-                    <div class="bg-white border-2 border-weaver-indigo p-8 relative shadow-[8px_8px_0px_0px_rgba(25,60,110,0.1)] figure-fullbleed">
+                    <div class="bg-white border-2 border-base-content p-8 relative shadow-panel figure-fullbleed">
                         <!-- Technical Labels -->
-                        <div class="absolute top-2 left-2 z-20 text-[10px] font-mono text-weaver-indigo border border-weaver-indigo px-1 bg-weaver-cream/90 figure-fullbleed-label">FIG 3.1: DATA FUSION</div>
+                        <div class="absolute top-2 left-2 z-20 text-3xs font-mono text-base-content border border-base-content px-1 bg-base-100/90 figure-fullbleed-label">FIG 3.1: DATA FUSION</div>
 
                         <div class="relative figure-fullbleed-img">
                             <img
                                 src="/weaver/assets/observe/observe-data-fusion.png"
                                 alt="Illustration of raw source text, syntax trees, and language server metadata fusing into a structured semantic stream."
-                                class="block w-full h-auto rounded-[2px] border border-weaver-indigo/10 bg-weaver-cream"
+                                class="block w-full h-auto rounded-[2px] border border-base-content/10 bg-base-100"
                             >
                         </div>
                     </div>
@@ -268,14 +255,14 @@
             <!-- Bottom CTA Navigation -->
             <section class="py-16 px-8 lg:px-16">
                 <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-weaver-indigo/5 border border-weaver-indigo/10 rounded-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-8 bg-primary/5 border border-base-content/10 rounded-xs">
                         <div>
-                            <h3 class="font-serif text-xl text-weaver-indigo mb-2">Ready to take action?</h3>
-                            <p class="text-sm text-weaver-indigo/70">Now that the agent can see, learn how it manipulates the world.</p>
+                            <h3 class="font-serif text-xl text-base-content mb-2">Ready to take action?</h3>
+                            <p class="text-sm text-base-content/88">Now that the agent can see, learn how it manipulates the world.</p>
                         </div>
-                        <a href="/weaver/commands/act/" class="group flex items-center gap-3 px-6 py-3 bg-weaver-indigo text-weaver-cream font-mono text-xs font-bold uppercase tracking-wider hover:bg-weaver-vermilion transition-colors shadow-md">
+                        <a href="/weaver/commands/act/" class="group flex items-center gap-3 px-6 py-3 bg-primary text-base-100 font-mono text-xs font-bold uppercase tracking-wider hover:bg-accent transition-colors shadow-md">
                             Next: Act Command
-                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            {{ icon('arrow-right', 'group-hover:translate-x-1 transition-transform') }}
                         </a>
                     </div>
                 </div>

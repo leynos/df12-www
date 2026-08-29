@@ -1,0 +1,187 @@
+/* The page furniture: the paper ground, the sidebar, and its drawer.
+ *
+ * The drawer is the one piece of this stylesheet with real behaviour.
+ * `mobile-nav.js` adds `has-mobile-nav` to the root element once it is
+ * running, which is the signal that lets these rules hide the nav in the
+ * knowledge that something can reopen it; without script the nav stays
+ * visible.
+ */
+
+.grid-bg {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-primary) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-primary) 5%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 40px 40px;
+}
+
+/* The same ruled paper at a finer pitch, for the diagram sections on the
+   command pages. Kept as its own class rather than folded into `.grid-bg`:
+   that one is worn by `<main>` on every doc page, so changing its pitch or
+   weight to suit two sections would repaint the whole site. */
+.grid-bg-fine {
+  background-image:
+    linear-gradient(to right, var(--color-grid-fine) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid-fine) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.texture-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url("/weaver/assets/textures/cream-paper.png");
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 50;
+}
+
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#sidebar nav {
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+/* Was `#sidebar nav a.bg-weaver-indigo.text-weaver-cream`, which found the
+   current link by the colour utilities it happened to carry and would have
+   stopped matching the moment those were renamed. The macro in
+   templates/weaver/_chrome.jinja now marks the link by its role. */
+.weaver-nav-link--current {
+  font-family: "IBM Plex Mono", monospace;
+  box-shadow: 2px 2px 0 var(--color-primary);
+}
+
+/* ---- Mobile hamburger navigation ---- */
+
+/* Hold the scrollbar's place while the drawer is open.
+ *
+ * Opening the drawer locks the page with `overflow-y: hidden`, which takes
+ * the scrollbar away — and with it about fifteen pixels of layout viewport,
+ * so the whole page reflows wider and then snaps back on close. It is visible
+ * as the menu being wider than the page it covers.
+ *
+ * daisyUI reserves a gutter for exactly this, but scopes it to its own
+ * components: `:root:has(.modal-open, .modal[open], …, .drawer:not(.drawer-open) > .drawer-toggle:checked)`.
+ * This drawer is hand-rolled and matches none of those selectors, so it needs
+ * to say so itself. The gutter replaces the scrollbar rather than adding to
+ * it, so the layout viewport does not move. */
+:root:has(#sidebar.mobile-nav-open) {
+  scrollbar-gutter: stable;
+}
+
+/* Hide toggle button by default (visible only in mobile media query) */
+#mobile-nav-toggle {
+  display: none;
+}
+
+#mobile-nav-backdrop {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  #sidebar {
+    position: sticky;
+    top: 0;
+    height: auto;
+    z-index: 40;
+    border-right: none;
+  }
+
+  .has-mobile-nav #sidebar nav {
+    display: none;
+  }
+
+  #sidebar.mobile-nav-open nav {
+    display: block;
+    position: fixed;
+    top: var(--mobile-header-height, 5rem);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-base-100);
+    z-index: 41;
+    overflow-y: auto;
+    max-height: none;
+    padding: 1.5rem;
+    border-top: 2px solid color-mix(in oklab, var(--color-primary) 20%, transparent);
+  }
+
+  /* The toggle wears `.weaver-brand-mark`, which supplies the indigo block,
+     the glyph, and the centring; what is left here is where it sits and how
+     big it is. */
+  #mobile-nav-toggle {
+    /* `display` has to be restated here, not left to `.weaver-brand-mark`:
+       the rule above hides the button by default, and an id selector outranks
+       a class whatever the order. */
+    display: flex;
+    position: absolute;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.125rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 42;
+  }
+
+  #mobile-nav-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  #mobile-nav-backdrop {
+    display: none;
+  }
+
+  #sidebar.mobile-nav-open ~ #mobile-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: color-mix(in oklab, var(--color-neutral) 30%, transparent);
+    z-index: 39;
+  }
+}
+
+/* Structured shared-content pages (legal pages: TOC, sections, badge cards) */
+
+/* The brand mark: 織, "weave", on a block of indigo. The page's paper texture
+   sits over the top of it, which is where the grain comes from.
+
+   The glyph is generated content rather than markup, so the one definition
+   serves both the footer and the drawer's toggle button — one of which is
+   built by `mobile-nav.js` at runtime and cannot reach a Jinja macro. It is
+   also the right register for it: a logo is not a word in the sentence, and
+   a screen reader announcing "shiki" mid-footer would be noise. Both callers
+   carry their own accessible name.
+
+   Sizing is left to the caller: the footer wants 2rem, the toggle 2.5rem. */
+.weaver-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: var(--color-primary-content);
+  border: 0;
+  line-height: 1;
+}
+
+.weaver-brand-mark::before {
+  content: "\7e54";
+  font-family: var(--font-kanji);
+}

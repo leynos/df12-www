@@ -11,42 +11,17 @@ import { Window } from "happy-dom";
 import {
   click,
   evaluateScript,
-  generatedTransitionSequences,
+  exhaustiveTransitionSequences,
   installMatchMedia,
   pressKey,
   pressTab,
   stubLayout,
 } from "./helpers/mobile-nav-harness.mjs";
+import { setUp } from "./helpers/weaver-drawer.mjs";
 
+/* The two tests below build their own window, to check the guards that
+   run before the harness would have anything to hand back. */
 const SCRIPT = "public/weaver/assets/js/mobile-nav.js";
-
-/* Build a page with the sidebar markup `templates/weaver/` renders, load the
-   drawer into it, and hand back the parts a test needs to drive. */
-function setUp({ links = ["/install", "/docs"] } = {}) {
-  const window = new Window({ url: "https://weaver.example/docs/" });
-  const { document } = window;
-  document.body.innerHTML = `
-    <a href="/elsewhere" id="outside">Outside</a>
-    <aside id="sidebar">
-      <div data-mobile-nav-header><h1>WEAVER</h1></div>
-      <nav>${links.map((href) => `<a href="${href}">${href}</a>`).join("")}</nav>
-    </aside>`;
-  stubLayout(window);
-  const media = installMatchMedia(window);
-  evaluateScript(window, SCRIPT);
-
-  const sidebar = document.getElementById("sidebar");
-  return {
-    window,
-    document,
-    media,
-    sidebar,
-    nav: sidebar.querySelector("nav"),
-    toggle: document.getElementById("mobile-nav-toggle"),
-    backdrop: document.getElementById("mobile-nav-backdrop"),
-    isOpen: () => sidebar.classList.contains("mobile-nav-open"),
-  };
-}
 
 describe("initial state", () => {
   let dom;
@@ -59,6 +34,20 @@ describe("initial state", () => {
     expect(dom.isOpen()).toBe(false);
     expect(dom.toggle.getAttribute("aria-expanded")).toBe("false");
     expect(dom.toggle.getAttribute("aria-label")).toBe("Open navigation menu");
+  });
+
+  test("the toggle is the brand mark, and carries no glyph markup of its own", () => {
+    /* The button *is* the brand mark: the glyph and the block of indigo both
+       come from `.weaver-brand-mark` in weaver/chrome.css. Before that it
+       carried a Font Awesome `<i>`, which rendered as an empty box once the
+       CDN went away — visible on the page and invisible to a test that only
+       checked the toggle existed. The class is assigned at runtime, so a
+       source grep would not catch its loss either. */
+    expect(dom.toggle.className).toBe("weaver-brand-mark");
+    expect(dom.toggle.querySelector("i")).toBeNull();
+    expect(dom.toggle.querySelector("svg")).toBeNull();
+    expect(dom.toggle.innerHTML.trim()).toBe("");
+    expect(dom.toggle.textContent.trim()).toBe("");
   });
 
   test("the toggle points at the nav it controls, naming it if need be", () => {
@@ -98,11 +87,30 @@ describe("opening and closing", () => {
   });
 
   test("opening locks page scrolling and closing gives it back", () => {
-    dom.document.body.style.overflow = "auto";
+    dom.document.body.style.overflowY = "auto";
     click(dom.window, dom.toggle);
-    expect(dom.document.body.style.overflow).toBe("hidden");
+    expect(dom.document.body.style.overflowY).toBe("hidden");
     click(dom.window, dom.toggle);
-    expect(dom.document.body.style.overflow).toBe("auto");
+    expect(dom.document.body.style.overflowY).toBe("auto");
+  });
+
+  test("the lock never touches the horizontal axis", () => {
+    // The body carries `overflow-x: hidden` as a class, and that clip is what
+    // keeps the page from scrolling sideways. Locking with `style.overflow`
+    // would set both axes, replacing that clip for the duration of the drawer
+    // and then removing both on close. The drawer only ever needed to stop the
+    // page scrolling underneath it, so it must leave the horizontal axis
+    // exactly as it found it.
+    //
+    // Starting from no inline value is what gives the assertion teeth. Seeding
+    // `overflowX = "hidden"` first made the expected value identical to the
+    // seeded one, so a drawer that wrote `hidden` itself — exactly the bug this
+    // guards — would have passed. Empty is a value only the drawer can spoil.
+    expect(dom.document.body.style.overflowX).toBe("");
+    click(dom.window, dom.toggle);
+    expect(dom.document.body.style.overflowX).toBe("");
+    click(dom.window, dom.toggle);
+    expect(dom.document.body.style.overflowX).toBe("");
   });
 
   test("opening moves focus to the first item in the nav", () => {
@@ -126,6 +134,39 @@ describe("opening and closing", () => {
     dom.toggle.focus();
     click(dom.window, dom.toggle);
     expect(dom.document.activeElement).not.toBe(dom.toggle);
+    pressKey(dom.window, dom.document.body, "Escape");
+    expect(dom.isOpen()).toBe(false);
+    expect(dom.document.activeElement).toBe(dom.toggle);
+  });
+
+  /* The two tests below are the only ones that can tell the restore apart
+     from its fallback. Everywhere else in this file the drawer is opened
+     either with nothing focused — so the saved element is `<body>`, which the
+     restore declines — or with the toggle focused, which is what it falls
+     back to anyway. Both paths converge on the toggle, so `isConnected` could
+     be deleted from mobile-nav.js and the rest of the suite would stay green. */
+  test("closing returns focus to whatever held it before opening", () => {
+    const outside = dom.document.getElementById("outside");
+    outside.focus();
+    click(dom.window, dom.toggle);
+    expect(dom.document.activeElement).not.toBe(outside);
+
+    pressKey(dom.window, dom.document.body, "Escape");
+    expect(dom.isOpen()).toBe(false);
+    expect(dom.document.activeElement).toBe(outside);
+  });
+
+  test("a saved element removed while open gives the toggle the focus", () => {
+    const outside = dom.document.getElementById("outside");
+    outside.focus();
+    click(dom.window, dom.toggle);
+
+    // Whatever held focus is gone by the time the drawer closes — a route
+    // change, or a menu that unmounted behind the backdrop. Focusing it would
+    // put the caret nowhere, so the toggle takes it instead.
+    outside.remove();
+    expect(outside.isConnected).toBe(false);
+
     pressKey(dom.window, dom.document.body, "Escape");
     expect(dom.isOpen()).toBe(false);
     expect(dom.document.activeElement).toBe(dom.toggle);
@@ -248,7 +289,10 @@ describe("focus trap with nothing focusable in the nav", () => {
 
 describe("bounded navigation state machine", () => {
   const menuSizes = [0, 1, 3, 6];
-  const sequences = generatedTransitionSequences(1217);
+  /* Every trace up to this length, not a sample of them — see the harness for
+     why exhaustive enumeration suits a state machine this small better than a
+     generator library would. */
+  const sequences = exhaustiveTransitionSequences({ depth: 4 });
 
   for (const menuSize of menuSizes) {
     test(`preserves state and focus invariants with ${menuSize} nav items`, () => {

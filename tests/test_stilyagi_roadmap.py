@@ -55,7 +55,7 @@ def roadmap(tmp_path_factory: pytest.TempPathFactory) -> BeautifulSoup:
         tmp_path_factory.mktemp("out"),
         templates_dir=Path(STILYAGI_TEMPLATES).resolve(),
         nav_links=[],
-        stylesheet="assets/styles/stilyagi-site.css",
+        stylesheet="/stilyagi/assets/styles/stilyagi.css",
     )
     output_path = generator.run()
     return BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")

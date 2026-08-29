@@ -81,14 +81,18 @@ describe("the harness returns the globals it borrowed", () => {
        `tearDown`; the cleanup must still restore the true pre-sentinel
        state rather than leaving the file-level `afterEach` to reinstate
        the sentinels. */
+    /* Earlier suites in the same process may have left these as own
+       properties holding `undefined`; the promise is the exact descriptor
+       state from before the sentinels, whatever it was. */
+    const before = GLOBALS.map((name) => Object.getOwnPropertyDescriptor(globalThis, name));
     expect(() =>
       withSentinels(() => {
         setUp({ telemetry: true });
         throw new Error("the scenario failed");
       }),
     ).toThrow("the scenario failed");
-    for (const name of GLOBALS) {
-      expect(Object.getOwnPropertyDescriptor(globalThis, name)).toBeUndefined();
-    }
+    GLOBALS.forEach((name, index) => {
+      expect(Object.getOwnPropertyDescriptor(globalThis, name)).toEqual(before[index]);
+    });
   });
 });

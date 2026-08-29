@@ -5,7 +5,7 @@
   margin: 0 auto;
   padding: calc(var(--unit) * 4) calc(var(--unit) * 4) calc(var(--unit) * 6);
 }
-.timeline {
+.slice-timeline {
   border-top: var(--rule-weight-2) solid var(--ink);
   margin-top: calc(var(--unit) * 3);
 }
@@ -417,12 +417,12 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
-.pacing .card {
+.pacing .pacing-card {
   border: 1px solid var(--ink);
   padding: 14px 16px;
   background: var(--paper);
 }
-.pacing .card .tt {
+.pacing .pacing-card .tt {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.16em;
@@ -431,7 +431,7 @@
   text-transform: uppercase;
   margin-bottom: 6px;
 }
-.pacing .card .body-t {
+.pacing .pacing-card .body-t {
   font-family: var(--font-editorial);
   font-size: 0.98rem;
   line-height: 1.45;

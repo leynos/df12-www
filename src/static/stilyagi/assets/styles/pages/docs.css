@@ -369,13 +369,13 @@
   font-size: 1.4rem;
   margin: 0 0 14px;
 }
-.suppress .tabs {
+.suppress .syntax-tabs {
   display: flex;
   gap: 0;
   border-bottom: var(--rule-weight-2) solid var(--ink);
   margin-bottom: 14px;
 }
-.suppress .tab {
+.suppress .syntax-tab {
   font-family: var(--font-sans);
   font-size: 0.72rem;
   letter-spacing: 0.14em;
@@ -389,7 +389,7 @@
   border-bottom: 3px solid transparent;
   margin-bottom: -3px;
 }
-.suppress .tab.active {
+.suppress .syntax-tab.active {
   color: var(--accent-text);
   border-bottom-color: var(--press-red);
   background: var(--paper-shade);

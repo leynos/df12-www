@@ -481,7 +481,7 @@
   margin: 0 0 10px;
   line-height: 1.05;
 }
-.adr-card .status {
+.adr-card .adr-status {
   font-family: var(--font-sans);
   font-size: 0.68rem;
   letter-spacing: 0.16em;
@@ -492,7 +492,7 @@
   display: inline-block;
   margin-bottom: 10px;
 }
-.adr-card .status.prov {
+.adr-card .adr-status.prov {
   background: var(--jazz-ochre);
   color: var(--ink);
 }

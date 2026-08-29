@@ -1,0 +1,295 @@
+/* =================================================================
+   STILYAGI DESIGN LANGUAGE · base — graph-paper substrate + reading
+   defaults.  Agitprop rigour · jazz-age swagger · university-press
+   authority.
+
+   Imported in layer(base), beside Tailwind's preflight; the colour
+   tokens live in the entrypoint's theme blocks and everything here
+   consumes them.  The non-colour tokens — geometry, the modular type
+   scale, motion — stay on :root because nothing needs a utility
+   minted for them.
+   ================================================================= */
+:root {
+  /* ---------- FOCUS ------------------------------------------------ */
+  /* One ring for every control the keyboard can reach, so a walkthrough
+     reads the same from the masthead to the roadmap.
+
+     It is deliberately not the hover cue: hover moves the ground under a
+     control, focus draws a rule around it, and a control that is both shows
+     both.  Ink is the ring because the offset puts it outside the control,
+     on the page rather than on the fill — 15.21:1 on paper, 13.44:1 on
+     paper-shade, 11.69:1 on paper-deep, all far past the 3:1 that WCAG
+     2.2 asks of a non-text indicator.  Dark panels re-point it to paper
+     below, for the few rings that are drawn inside a control instead. */
+  --focus-ring-width: 3px;
+  --focus-ring-color: var(--color-ink);
+  --focus-ring-offset: 2px;
+
+  /* ---------- TYPE scale — double-stranded modular ----------------- */
+  --t-caption: 0.78rem;
+  --t-body: 1.0625rem; /* 17px at root 16 — trade-book */
+  --t-lede: 1.25rem;
+  --t-h4: 1.15rem;
+  --t-h3: 1.5rem;
+  --t-h2: 2.25rem;
+  --t-h1: clamp(2.6rem, 5vw + 1rem, 5.5rem);
+  --t-cover: clamp(3.5rem, 8vw + 1rem, 8rem);
+
+  /* Tracking */
+  --track-label: 0.08em;
+  --track-caption: 0.12em;
+  --track-cover: 0.24em;
+
+  /* ---------- GEOMETRY -------------------------------------------- */
+  --unit: 8px;
+  --col: 72ch; /* editorial measure */
+  --rule-weight: 2px;
+  --rule-weight-2: 4px;
+  --rule-weight-3: 8px;
+  --grid-pitch: 24px;
+
+  /* ---------- MOTION ---------------------------------------------- */
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --tempo-fast: 140ms;
+  --tempo: 260ms;
+}
+
+/* The focus treatment, declared once for everything focusable rather than
+   control by control — a component that forgets to opt in cannot exist.
+   :focus-visible is the browser's own judgement about whether the reader is
+   navigating by keyboard, so a pointer user sees none of this.
+
+   Individual controls override the offset where an outward ring would be
+   clipped by a scroller or overlap a neighbouring row; they do not override
+   the width or the colour. */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+/* Anchor links are the one place the site moves the whole viewport, which is
+   exactly the motion the preference is about. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+body {
+  margin: 0;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  font-family: var(--font-editorial);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  font-feature-settings: "onum", "liga", "kern";
+  -webkit-font-smoothing: antialiased;
+
+  /* The ruled-paper signature. Never remove. */
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-rule-faint) 22%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-rule-faint) 22%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: var(--grid-pitch) var(--grid-pitch);
+}
+::selection {
+  background: var(--color-press-red);
+  color: var(--color-paper);
+}
+a {
+  color: var(--color-fg-link);
+  /* Preflight strips the UA underline; the hand-written sheets relied on
+     it, so it is restored here.  Chrome and components that want a bare
+     link already say text-decoration: none themselves. */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--color-fg-link-hover);
+}
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* Preflight zeroes the UA's block margin on pre, which the hand-written
+   sheets relied on for the rhythm around every code block. */
+pre {
+  margin-block: 1em;
+}
+
+/* Preflight gives form controls `font: inherit`, which drags the body's
+   1.55 line-height into them; the hand-written sheets sized every field
+   against the UA's `normal`.  The components that want a different
+   line-height say so themselves. */
+button,
+input,
+select,
+textarea {
+  line-height: normal;
+}
+
+/* Preflight unstyles every list; the prose relies on the reading defaults —
+   footnote numbering, bulleted arguments in the manifesto, the rendered
+   Markdown on the legal pages.  Restore them for content, at the UA's own
+   values; the chrome that wants a bare list (the nav, the colophon) already
+   resets these explicitly. */
+ul {
+  list-style: disc;
+  margin-block: 1em;
+  padding-inline-start: 40px;
+}
+ol {
+  list-style: decimal;
+  margin-block: 1em;
+  padding-inline-start: 40px;
+}
+
+/* =================================================================
+   Typography — four voices, each with a fixed job
+   Display shouts · Editorial argues · Sans labels · Mono testifies
+   ================================================================= */
+.display,
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+h1 {
+  font-size: var(--t-h1);
+  margin: 0 0 0.3em;
+}
+h2 {
+  font-size: var(--t-h2);
+  margin: 0 0 0.4em;
+  letter-spacing: 0.015em;
+}
+
+h3,
+h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 0.5em;
+  color: var(--color-ink);
+}
+h3 {
+  font-size: var(--t-h3);
+}
+h4 {
+  font-size: var(--t-h4);
+}
+
+.editorial {
+  font-family: var(--font-editorial);
+}
+.sans {
+  font-family: var(--font-sans);
+}
+.mono,
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
+  font-feature-settings: "ss02";
+}
+
+p {
+  margin: 0 0 1em;
+}
+p + p {
+  text-indent: 1.8em;
+} /* trade-book continuation */
+p.lede {
+  font-size: var(--t-lede);
+  text-indent: 0;
+}
+p.lede::first-line {
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+}
+
+.caption {
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--color-fg2);
+}
+
+blockquote {
+  margin: 2em 0;
+  padding: 0 0 0 2em;
+  border-left: var(--rule-weight-3) solid var(--color-press-red);
+  font-style: italic;
+  font-size: var(--t-lede);
+}
+blockquote footer {
+  margin-top: 0.5em;
+  font-style: normal;
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--color-fg2);
+}
+
+hr.scholar {
+  border: 0;
+  border-top: var(--rule-weight) solid var(--color-ink);
+  margin: 2.5em auto;
+  width: 8ch;
+}
+
+/* =================================================================
+   Ink grounds — re-point the inheriting type tokens
+   Red, magenta, sage, and secondary greys tuned for paper all fall below
+   the 4.5:1 body-text floor against ink, so every dark panel switches
+   them here rather than at each call site.
+
+   The focus ring is deliberately not in this list.  These tokens follow the
+   ground an element's *contents* sit on; a ring follows the ground it is
+   painted on, and at the shared positive offset that is the page outside
+   the control, not the fill inside it.  A focusable element with an ink
+   fill — the active RsDoc chip, a hovered ghost button — still needs the
+   ink ring, because its ring lands on the paper around it.  The three
+   scrollers that draw their ring inside themselves set the paper ring in
+   their own rules, beside the offset that makes it necessary.
+   ================================================================= */
+.ink-panel,
+.agitprop,
+pre.code,
+.personas,
+.term,
+.layer-rust,
+.boundary .layer-card.rust,
+.code-scroll,
+.config-grid pre,
+.colophon-sec,
+.ns-rsdoc,
+.filter-chip.ns-rsdoc.active,
+.provider.loaded .ptag,
+.btn.ghost:hover {
+  --color-accent-text: var(--color-press-red-on-ink);
+  --color-fg2: var(--color-fg2-on-ink);
+  --color-signal-sage: var(--color-signal-sage-on-ink);
+  --color-signal-sage-text: var(--color-signal-sage-on-ink);
+  --color-signal-rust-text: var(--color-signal-rust-on-ink);
+  --color-jazz-magenta: var(--color-jazz-magenta-on-ink);
+  --color-jazz-magenta-text: var(--color-jazz-magenta-on-ink);
+}

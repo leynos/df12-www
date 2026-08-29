@@ -1,0 +1,665 @@
+/* =================================================================
+   STILYAGI · motifs, components, and layout
+   Imported in layer(components); pairs with site-base.css and the
+   theme blocks in the entrypoint. Every class here exists because
+   the design language has named it.
+   ================================================================= */
+
+/* ----------------------------------------------------------------
+   LAYOUT PRIMITIVES
+   ---------------------------------------------------------------- */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: calc(var(--unit) * 6) calc(var(--unit) * 4);
+}
+section.chapter {
+  padding: calc(var(--unit) * 8) 0 calc(var(--unit) * 6);
+  border-top: var(--rule-weight) solid var(--color-ink);
+}
+section.chapter > .chapter-label {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--t-caption);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  padding: 4px 10px 3px;
+  margin-bottom: calc(var(--unit) * 2);
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--unit) * 4);
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--unit) * 3);
+}
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: calc(var(--unit) * 3);
+}
+@media (max-width: 800px) {
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+.measure {
+  max-width: var(--col);
+}
+.stack > * + * {
+  margin-top: calc(var(--unit) * 2);
+}
+.stack-lg > * + * {
+  margin-top: calc(var(--unit) * 4);
+}
+.centered {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.relative {
+  position: relative;
+}
+.columns-2 {
+  column-count: 2;
+  column-gap: calc(var(--unit) * 5);
+  column-rule: 1px solid var(--color-border-soft);
+}
+.columns-2 > * {
+  break-inside: avoid;
+}
+
+/* ----------------------------------------------------------------
+   MOTIF · manicule (☞) — the house bullet
+   Typographic, not decorative. One colour per list.
+   ---------------------------------------------------------------- */
+.manicule-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 1em 0;
+}
+.manicule-list > li {
+  position: relative;
+  padding: 0.15em 0 0.8em 2.2em;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+.manicule-list > li:last-child {
+  border-bottom: 0;
+}
+.manicule-list > li::before {
+  content: "☞";
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  font-size: 1.35em;
+  line-height: 1;
+  color: var(--color-ink);
+  transform: translateY(0.05em);
+}
+.manicule-list.red > li::before {
+  color: var(--color-accent-text);
+}
+/* The manicule is a glyph, so it takes the type-safe hues rather than the
+   fills: cyan and ochre manage under 2:1 against paper, magenta 3.80:1. */
+.manicule-list.magenta > li::before {
+  color: var(--color-jazz-magenta-text);
+}
+.manicule-list.cyan > li::before {
+  color: var(--color-jazz-cyan-text);
+}
+.manicule-list.ochre > li::before {
+  color: var(--color-jazz-ochre-text);
+}
+
+/* ----------------------------------------------------------------
+   MOTIF · halftone dot wash
+   ---------------------------------------------------------------- */
+.halftone {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-ink) 85%, transparent) 1px,
+    transparent 1.4px
+  );
+  background-size: 6px 6px;
+}
+.halftone-red {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-press-red) 85%, transparent) 1px,
+    transparent 1.4px
+  );
+  background-size: 6px 6px;
+}
+.halftone-cyan {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-jazz-cyan) 85%, transparent) 1px,
+    transparent 1.4px
+  );
+  background-size: 6px 6px;
+}
+.halftone-ochre {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-jazz-ochre) 85%, transparent) 1px,
+    transparent 1.4px
+  );
+  background-size: 6px 6px;
+}
+.halftone-magenta {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-jazz-magenta) 85%, transparent) 1px,
+    transparent 1.4px
+  );
+  background-size: 6px 6px;
+}
+
+/* ----------------------------------------------------------------
+   MOTIF · cross-hatch engraving (for frames)
+   ---------------------------------------------------------------- */
+.hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-ink) 65%, transparent) 0 1px,
+    transparent 1px 5px
+  );
+}
+.hatch-red {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-press-red) 75%, transparent) 0 1px,
+    transparent 1px 5px
+  );
+}
+
+/* ----------------------------------------------------------------
+   MOTIF · hazard stripe
+   ---------------------------------------------------------------- */
+.hazard-corner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-ink) 0 10px,
+    var(--color-press-red) 10px 20px
+  );
+}
+.hazard-corner.tl {
+  top: 0;
+  left: 0;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.hazard-corner.tr {
+  top: 0;
+  right: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.hazard-corner.bl {
+  bottom: 0;
+  left: 0;
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+.hazard-corner.br {
+  bottom: 0;
+  right: 0;
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+}
+
+.hazard-rule {
+  height: 14px;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-ink) 0 10px,
+    var(--color-press-red) 10px 20px
+  );
+}
+
+/* ----------------------------------------------------------------
+   MOTIF · rubber-stamp verdict
+   A judgement. One per artefact, maximum.
+   ---------------------------------------------------------------- */
+.stamp {
+  display: inline-block;
+  position: relative;
+  padding: 6px 18px 4px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: 0.06em;
+  color: var(--color-accent-text);
+  border: 4px solid var(--color-press-red);
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  background:
+    radial-gradient(
+      circle at 10% 30%,
+      color-mix(in srgb, var(--color-stamp-fleck) 25%, transparent) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 60% 70%,
+      color-mix(in srgb, var(--color-stamp-fleck) 25%, transparent) 0 1.5px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      color-mix(in srgb, var(--color-stamp-fleck) 25%, transparent) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 35% 85%,
+      color-mix(in srgb, var(--color-stamp-fleck) 25%, transparent) 0 1px,
+      transparent 3px
+    );
+  mix-blend-mode: multiply;
+  filter: contrast(1.05);
+}
+.stamp.small {
+  font-size: 1.1rem;
+  padding: 3px 10px 2px;
+  border-width: 3px;
+}
+.stamp.ink {
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+/* ----------------------------------------------------------------
+   MOTIF · splatter (cover / poster only)
+   ---------------------------------------------------------------- */
+.splatter {
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  opacity: 0.9;
+  background-image:
+    radial-gradient(ellipse 90px 40px at 12% 18%, var(--color-jazz-magenta) 0 55%, transparent 70%),
+    radial-gradient(ellipse 60px 25px at 10% 28%, var(--color-jazz-magenta) 0 55%, transparent 70%),
+    radial-gradient(ellipse 80px 35px at 88% 22%, var(--color-jazz-ochre) 0 55%, transparent 70%),
+    radial-gradient(ellipse 50px 20px at 92% 31%, var(--color-jazz-ochre) 0 55%, transparent 70%),
+    radial-gradient(ellipse 100px 42px at 82% 78%, var(--color-jazz-cyan) 0 55%, transparent 70%),
+    radial-gradient(ellipse 55px 22px at 75% 84%, var(--color-jazz-cyan) 0 55%, transparent 70%),
+    radial-gradient(ellipse 70px 30px at 18% 82%, var(--color-jazz-magenta) 0 55%, transparent 70%);
+  filter: blur(0.4px);
+  mask-image: radial-gradient(circle at center, black 40%, transparent 78%);
+}
+
+/* ----------------------------------------------------------------
+   COMPONENTS
+   ---------------------------------------------------------------- */
+
+/* Panel — the workhorse frame */
+.panel {
+  position: relative;
+  background: var(--color-paper);
+  border: var(--rule-weight) solid var(--color-ink);
+  padding: calc(var(--unit) * 3);
+}
+.panel > .panel-label {
+  position: absolute;
+  top: calc(var(--unit) * -1.5);
+  left: calc(var(--unit) * 2);
+  background: var(--color-paper);
+  padding: 0 calc(var(--unit) * 1);
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+.panel.heavy {
+  border-width: var(--rule-weight-2);
+}
+.panel.red {
+  border-color: var(--color-press-red);
+}
+.panel.red > .panel-label {
+  color: var(--color-accent-text);
+}
+
+/* Agitprop panel — verdicts, posters */
+.agitprop {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: calc(var(--unit) * 4);
+  position: relative;
+  border-left: var(--rule-weight-3) solid var(--color-press-red);
+}
+.agitprop h2,
+.agitprop h3,
+.agitprop h4 {
+  color: var(--color-paper);
+}
+.agitprop .accent {
+  color: var(--color-accent-text);
+}
+
+/* Punch-card — corner-cut semantic. TR = standard · TL = blocked */
+.punchcard {
+  position: relative;
+  background: var(--color-paper-shade);
+  border: var(--rule-weight) solid var(--color-ink);
+  padding: calc(var(--unit) * 3);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+}
+.punchcard.blocked {
+  clip-path: polygon(18px 0, 100% 0, 100% 100%, 0 100%, 0 18px);
+  border-color: var(--color-press-red);
+}
+
+/* Pull-quote */
+.pullquote {
+  border-top: var(--rule-weight) solid var(--color-press-red);
+  border-bottom: var(--rule-weight) solid var(--color-press-red);
+  padding: calc(var(--unit) * 3) 0;
+  margin: calc(var(--unit) * 4) 0;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 1.7rem;
+  line-height: 1.25;
+  text-align: center;
+}
+.pullquote cite {
+  display: block;
+  margin-top: 1em;
+  font-style: normal;
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+/* Code / IR block */
+pre.code {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: calc(var(--unit) * 2.5) calc(var(--unit) * 3);
+  border-left: var(--rule-weight-3) solid var(--color-press-red);
+  overflow-x: auto;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+pre.code .tok-kw {
+  color: var(--color-jazz-cyan);
+}
+pre.code .tok-str {
+  color: var(--color-jazz-ochre);
+}
+pre.code .tok-com {
+  /* The one-off grey here managed 4.12:1 on the ink ground; --fg2-on-ink is
+     the token that already names secondary type there, at 7.62:1. */
+  color: var(--color-fg2-on-ink);
+  font-style: italic;
+}
+/* The ink-ground block in colors-and-type.css re-points --jazz-magenta for
+   pre.code, so this resolves to --jazz-magenta-on-ink. */
+pre.code .tok-nm {
+  color: var(--color-jazz-magenta);
+}
+
+/* .code-scroll itself is hand-written, apart from the generated Pygments
+   block in syntax.css; the wrapper is a scroller, so it is in the tab order and needs
+   a ring. The ring is drawn inside, over the block's own ink ground, so it is
+   paper: 15.21:1 there. */
+.code-scroll:focus-visible {
+  --focus-ring-color: var(--color-paper);
+  outline-offset: -3px;
+}
+
+kbd {
+  background: var(--color-paper-shade);
+  border: 1px solid var(--color-ink);
+  border-bottom-width: 2px;
+  border-radius: 2px;
+  padding: 1px 6px;
+  font-size: 0.85em;
+}
+
+/* Buttons — agitprop block, ghost rule */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform var(--tempo-fast) var(--ease),
+    box-shadow var(--tempo-fast) var(--ease);
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--color-press-red);
+}
+.btn:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 var(--color-press-red);
+}
+.btn.red {
+  background: var(--color-press-red);
+}
+.btn.red:hover {
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--color-ink);
+  border: var(--rule-weight) solid var(--color-ink);
+}
+.btn.ghost:hover {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  box-shadow: none;
+}
+
+/* Chips */
+.chip {
+  display: inline-block;
+  padding: 3px 10px 2px;
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--color-paper-shade);
+  border: 1px solid var(--color-ink);
+  color: var(--color-ink);
+}
+.chip.red {
+  background: var(--color-press-red);
+  color: var(--color-paper);
+  border-color: var(--color-press-red);
+}
+.chip.cyan {
+  background: var(--color-jazz-cyan);
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+.chip.ochre {
+  background: var(--color-jazz-ochre);
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+.chip.magenta {
+  background: var(--color-jazz-magenta-solid);
+  color: var(--color-paper);
+  border-color: var(--color-jazz-magenta-solid);
+}
+
+/* Scholarly table */
+table.scholar {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+  font-family: var(--font-editorial);
+}
+table.scholar caption {
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: var(--t-caption);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  color: var(--color-ink-soft);
+}
+table.scholar th,
+table.scholar td {
+  padding: 10px 14px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+table.scholar thead th {
+  border-top: var(--rule-weight) solid var(--color-ink);
+  border-bottom: var(--rule-weight) solid var(--color-ink);
+  background: transparent;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+}
+table.scholar tbody tr:last-child td {
+  border-bottom: var(--rule-weight) solid var(--color-ink);
+}
+
+/* Footnotes */
+.footnotes {
+  border-top: var(--rule-weight) solid var(--color-ink);
+  margin-top: calc(var(--unit) * 4);
+  padding-top: calc(var(--unit) * 2);
+  font-size: 0.9rem;
+  color: var(--color-ink-soft);
+}
+.footnotes ol {
+  padding-left: 1.6em;
+}
+.footnotes sup {
+  color: var(--color-press-red-ink);
+}
+
+/* Callouts */
+.callout {
+  border: var(--rule-weight) solid var(--color-ink);
+  padding: calc(var(--unit) * 2) calc(var(--unit) * 3);
+  background: var(--color-paper);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: calc(var(--unit) * 2);
+  align-items: start;
+}
+.callout .callout-mark {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--color-accent-text);
+}
+.callout.warning {
+  border-color: var(--color-press-red);
+  border-left-width: var(--rule-weight-3);
+}
+.callout.note {
+  border-color: var(--color-ink);
+  border-left-width: var(--rule-weight-3);
+}
+.callout.ok {
+  border-color: var(--color-signal-sage);
+  border-left-width: var(--rule-weight-3);
+}
+
+/* Field / input */
+.field {
+  display: grid;
+  gap: 6px;
+  font-family: var(--font-sans);
+}
+.field > label {
+  font-size: var(--t-caption);
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  font-weight: 600;
+}
+.field > input,
+.field > textarea,
+.field > select {
+  font-family: var(--font-editorial);
+  font-size: 1rem;
+  padding: 8px 10px;
+  border: var(--rule-weight) solid var(--color-ink);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border-radius: 0;
+  transition:
+    border-color var(--tempo-fast) var(--ease),
+    box-shadow var(--tempo-fast) var(--ease);
+}
+/* The pressed-print cue: the rule around the field turns red and throws a
+   hard shadow down and to the right. */
+.field > input:focus,
+.field > textarea:focus,
+.field > select:focus {
+  border-color: var(--color-press-red);
+  box-shadow: 3px 3px 0 var(--color-press-red);
+}
+/* The cue above is a colour change on an existing 2px rule, which is a weak
+   thing to navigate by; the shared ring says plainly which field has the
+   caret.  The shadow falls down and to the right, so the ring is pulled in
+   tight against the border rather than sitting out in it. */
+.field > input:focus-visible,
+.field > textarea:focus-visible,
+.field > select:focus-visible {
+  outline-offset: 1px;
+}
+
+/* Form mini-help */
+.field .help {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--color-ink-soft);
+}
+
+/* Reveal on scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity var(--tempo) var(--ease),
+    transform var(--tempo) var(--ease);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Reduced motion ----------------------------------------- */
+/* The shared components animate to draw the eye, never to convey meaning,
+   so honouring the preference costs nothing: the reveal still resolves to
+   its visible state, the controls still show their hover and focus
+   treatments — they simply arrive rather than travel. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .btn,
+  .field > input,
+  .field > textarea,
+  .field > select {
+    transition: none;
+  }
+  .reveal {
+    transform: none;
+  }
+}

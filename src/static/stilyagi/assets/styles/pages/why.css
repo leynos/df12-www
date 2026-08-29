@@ -190,21 +190,21 @@
   gap: calc(var(--unit) * 2);
   margin-top: calc(var(--unit) * 3);
 }
-.valueset .card {
+.valueset .tenet-card {
   border: var(--rule-weight) solid var(--ink);
   padding: calc(var(--unit) * 3);
   background: var(--paper);
   position: relative;
   min-height: 180px;
 }
-.valueset .card .vs-num {
+.valueset .tenet-card .vs-num {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.18em;
   color: var(--accent-text);
   font-weight: 700;
 }
-.valueset .card h3 {
+.valueset .tenet-card h3 {
   font-family: var(--font-display);
   font-weight: 900;
   text-transform: uppercase;
@@ -213,7 +213,7 @@
   letter-spacing: 0;
   line-height: 1.05;
 }
-.valueset .card p {
+.valueset .tenet-card p {
   font-family: var(--font-editorial);
   font-size: 0.96rem;
   line-height: 1.45;

@@ -28,7 +28,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # A port number for the messages these tests read back. Nothing binds it.
 PORT = 8099
 
-serving = load("weaver_snapshot_serving")
 ownership = load("weaver_snapshot_ownership")
 
 
@@ -85,18 +84,18 @@ def _serving(directory: Path) -> cabc.Iterator[str]:
         http.server.SimpleHTTPRequestHandler, directory=str(directory)
     )
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    serving = threading.Thread(target=server.serve_forever, daemon=True)
-    serving.start()
+    loop = threading.Thread(target=server.serve_forever, daemon=True)
+    loop.start()
     try:
         yield f"http://127.0.0.1:{server.server_address[1]}"
     finally:
         server.shutdown()
         server.server_close()
-        serving.join(timeout=10)
+        loop.join(timeout=10)
         # `join` returns on timeout as readily as on success, so the thread
         # has to be asked whether it actually stopped. A live one still holds
         # the port the next test will be handed.
-        assert not serving.is_alive(), (
+        assert not loop.is_alive(), (
             "the serving thread did not stop, so its port is still held"
         )
 

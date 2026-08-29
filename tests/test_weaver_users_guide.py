@@ -50,13 +50,11 @@ def test_the_guide_has_a_weaver_section() -> None:
     )
 
 
+# A link may point at a section (`/weaver/install/#quick-start`), and the
+# fragment is resolved by the browser, not the filesystem; carried into the
+# path check it would report a published page as missing.
 def _page(route: str) -> str:
-    """Return the route's path, with any fragment or query dropped.
-
-    A link may point at a section (`/weaver/install/#quick-start`), and the
-    fragment is resolved by the browser, not the filesystem; carried into the
-    path check it would report a published page as missing.
-    """
+    """Return the route's path, with any fragment or query dropped."""
     return route.split("#", 1)[0].split("?", 1)[0]
 
 

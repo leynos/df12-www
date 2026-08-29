@@ -145,6 +145,67 @@ class _Stoppably:
         return 0
 
 
+def test_the_whole_startup_sequence_runs_with_the_lock_held(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Probe, spawn, and readiness wait are the check-then-act; all under lock.
+
+    Asserting only the probe would let the spawn or the readiness wait drift
+    outside the lock unnoticed, and either would reopen the interleaving the
+    lock exists to remove: two runs both finding the port free, or one run's
+    readiness poll answered by the other's server.
+    """
+    lock = tmp_path / "port.lock"
+    monkeypatch.setattr(locking, "_lock_path", lambda _port: lock)
+
+    held: dict[str, bool] = {}
+
+    def observed(stage: str) -> None:
+        """Record whether the startup lock is held at this stage."""
+        # An exclusive lock cannot be taken twice, so failing to take it here
+        # is how holding it is observed.
+        with lock.open("r+", encoding="utf-8") as rival:
+            try:
+                fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                held[stage] = True
+            else:
+                fcntl.flock(rival, fcntl.LOCK_UN)
+                held[stage] = False
+
+    child = _Stoppably()
+
+    def launch(_argv: object) -> _Stoppably:
+        """Observe the lock at the spawn, then hand back the stand-in."""
+        observed("launch")
+        return child
+
+    monkeypatch.setattr(
+        serving, "_refuse_occupied_port", lambda _port: observed("probe")
+    )
+    monkeypatch.setattr(
+        serving, "_await_server", lambda *_a, **_k: observed("readiness")
+    )
+    monkeypatch.setattr(
+        serving, "_confirm_ownership", lambda *_a, **_k: observed("confirm")
+    )
+
+    server = serving._start_server(8099, "weaver-snapshot-deadbeef.txt", launch=launch)
+
+    assert server is child, "the started server should be handed back as-is"
+    assert held == {
+        "probe": True,
+        "launch": True,
+        "readiness": True,
+        "confirm": False,
+    }, (
+        "the probe, the spawn, and the readiness wait must all run under the "
+        "startup lock, and only the ownership fetch after its release; "
+        f"observed {held!r}"
+    )
+    assert not child.stopped, "a clean start should not stop its own server"
+
+
 def test_ownership_is_confirmed_after_the_startup_lock_is_released(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

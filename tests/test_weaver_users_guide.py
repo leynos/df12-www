@@ -58,13 +58,24 @@ def test_every_weaver_route_the_guide_links_to_is_published(
     linked = sorted({match.group(1) for match in WEAVER_LINK.finditer(weaver_section)})
     assert linked, "the Weaver section links to no Weaver pages at all"
 
+    def page(route: str) -> str:
+        """Return the route's path, with any fragment or query dropped.
+
+        A link may point at a section (`/weaver/install/#quick-start`), and
+        the fragment is resolved by the browser, not the filesystem; carried
+        into the path check it would report a published page as missing.
+        """
+        return route.split("#", 1)[0].split("?", 1)[0]
+
     missing = [
         route
         for route in linked
-        if not (built_site / route.removeprefix("/weaver/").strip("/") / "index.html")
+        if not (
+            built_site / page(route).removeprefix("/weaver/").strip("/") / "index.html"
+        )
         .resolve()
         .is_file()
-        and route.strip("/") != "weaver"
+        and page(route).strip("/") != "weaver"
     ]
     assert not missing, (
         f"the users' guide links to Weaver pages that the build does not "
@@ -153,11 +164,10 @@ def test_the_guide_describes_the_copy_controls_that_exist(
 
     # The guide promises no confirmation. If one is ever added — a toast, or a
     # live region — the guide is wrong and should be corrected rather than
-    # left saying nothing happens.
-    markup = "\n".join(
-        source.read_text(encoding="utf-8")
-        for source in sorted(WEAVER_TEMPLATES.rglob("*.jinja"))
-    )
+    # left saying nothing happens. Only the templates carrying a copy control
+    # are held to that: a live region elsewhere in the chrome would announce
+    # something else entirely.
+    markup = "\n".join(source.read_text(encoding="utf-8") for source in controls)
     assert "aria-live" not in markup, (
         "a live region has appeared in the Weaver templates, so a copy may now "
         "announce itself; the users' guide says it does not and needs updating"

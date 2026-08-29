@@ -50,6 +50,16 @@ def test_the_guide_has_a_weaver_section() -> None:
     )
 
 
+def _page(route: str) -> str:
+    """Return the route's path, with any fragment or query dropped.
+
+    A link may point at a section (`/weaver/install/#quick-start`), and the
+    fragment is resolved by the browser, not the filesystem; carried into the
+    path check it would report a published page as missing.
+    """
+    return route.split("#", 1)[0].split("?", 1)[0]
+
+
 @pytest.mark.timeout(600)
 def test_every_weaver_route_the_guide_links_to_is_published(
     built_site: Path, weaver_section: str
@@ -58,28 +68,54 @@ def test_every_weaver_route_the_guide_links_to_is_published(
     linked = sorted({match.group(1) for match in WEAVER_LINK.finditer(weaver_section)})
     assert linked, "the Weaver section links to no Weaver pages at all"
 
-    def page(route: str) -> str:
-        """Return the route's path, with any fragment or query dropped.
-
-        A link may point at a section (`/weaver/install/#quick-start`), and
-        the fragment is resolved by the browser, not the filesystem; carried
-        into the path check it would report a published page as missing.
-        """
-        return route.split("#", 1)[0].split("?", 1)[0]
-
     missing = [
         route
         for route in linked
         if not (
-            built_site / page(route).removeprefix("/weaver/").strip("/") / "index.html"
+            built_site / _page(route).removeprefix("/weaver/").strip("/") / "index.html"
         )
         .resolve()
         .is_file()
-        and page(route).strip("/") != "weaver"
+        and _page(route).strip("/") != "weaver"
     ]
     assert not missing, (
         f"the users' guide links to Weaver pages that the build does not "
         f"publish: {missing}"
+    )
+
+
+@pytest.mark.parametrize(
+    ("route", "path"),
+    [
+        ("/weaver/install/#quick-start", "/weaver/install/"),
+        ("/weaver/commands/?format=html", "/weaver/commands/"),
+        ("/weaver/?utm_source=guide#top", "/weaver/"),
+        ("/weaver/commands/act/", "/weaver/commands/act/"),
+    ],
+)
+def test_a_fragment_or_query_does_not_change_the_route(route: str, path: str) -> None:
+    """The browser resolves fragments and queries; the filesystem must not see them."""
+    assert _page(route) == path, f"{route!r} should normalize to {path!r}"
+
+
+@pytest.mark.timeout(600)
+@pytest.mark.parametrize(
+    "route", ["/weaver/install/#quick-start", "/weaver/commands/?format=html"]
+)
+def test_a_route_with_a_fragment_still_resolves_to_its_page(
+    built_site: Path, route: str
+) -> None:
+    """The published-page check must accept a link that points at a section.
+
+    These routes carry the components the guide's links happen not to use
+    today, so the stripping is exercised against the built tree rather than
+    waiting for a fragment-bearing link to appear and fail.
+    """
+    resolved = (
+        built_site / _page(route).removeprefix("/weaver/").strip("/") / "index.html"
+    ).resolve()
+    assert resolved.is_file(), (
+        f"{route} should resolve to a published page at {resolved}"
     )
 
 

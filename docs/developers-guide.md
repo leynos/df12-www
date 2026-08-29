@@ -36,10 +36,11 @@ depends on the last:
 ```bash
 bun run build              # build:static, build:css, build:images, build:pages, build:search, build:static
 bun run build:static       # copy src/static/ verbatim (scripts/copy-static.ts)
-bun run build:css          # compile the main, mxd, Episodic and Weaver Tailwind entrypoints
+bun run build:css          # compile the main, mxd, Episodic, Weaver and Stilyagi Tailwind entrypoints
 bun run build:css:mxd      # just the mxd entrypoint, for iterating on one sub-site
 bun run build:css:episodic # just the Episodic entrypoint
 bun run build:css:weaver   # just the Weaver entrypoint
+bun run build:css:stilyagi # just the Stilyagi entrypoint
 bun run build:images       # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages        # uv run pages generate --all-sites
 bun run build:search       # build the Netsuke and Episodic search indices
@@ -1092,10 +1093,12 @@ The Netsuke sub-site still loads the
 (`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
 stylesheet, and uses its utilities in its markup alongside its own hand-crafted
 stylesheet; it extends the default theme through
-`/netsuke/assets/js/tailwind-config.js`. Stilyagi uses neither Tailwind nor
-daisyUI. This differs from the main site, mxd, and Weaver, which compile
-Tailwind v4 ahead of time; see the [Tailwind v4 guide](tailwind-v4-guide.md)
-for that path.
+`/netsuke/assets/js/tailwind-config.js`. This differs from the main site,
+mxd, Weaver, and Stilyagi, which compile Tailwind v4 ahead of time; see the
+[Tailwind v4 guide](tailwind-v4-guide.md) for that path. Stilyagi's only
+remaining hand-crafted stylesheet is the generated Pygments block at
+`src/static/stilyagi/assets/styles/syntax.css`, and even that is `@import`ed
+into `src/styles/stilyagi.css` rather than linked on its own.
 
 Weaver was in Netsuke's position until recently, and moving it off the Play CDN
 is the worked example of what that migration costs. The doubled-selector idiom

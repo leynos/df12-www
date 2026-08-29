@@ -1,6 +1,6 @@
 """Tests for the Stilyagi focus indicator.
 
-The sub-site draws one focus ring, declared once in ``colors-and-type.css``
+The sub-site draws one focus ring, declared once in ``site-base.css``
 and tuned per control only where an outward ring would be clipped. Two things
 can quietly remove it, and both have happened:
 

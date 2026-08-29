@@ -397,7 +397,7 @@ pre.code .tok-com {
   color: var(--color-fg2-on-ink);
   font-style: italic;
 }
-/* The ink-ground block in colors-and-type.css re-points --jazz-magenta for
+/* The ink-ground block in site-base.css re-points --jazz-magenta for
    pre.code, so this resolves to --jazz-magenta-on-ink. */
 pre.code .tok-nm {
   color: var(--color-jazz-magenta);

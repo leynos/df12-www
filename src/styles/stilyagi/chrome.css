@@ -645,7 +645,7 @@ sup.ref {
 }
 
 /* The nav underline sweeps in from the left; with reduced motion it simply
-   appears. See the shared guard in motifs-and-components.css. */
+   appears. See the shared guard in motifs.css. */
 @media (prefers-reduced-motion: reduce) {
   .site-mast nav a::after {
     transition: none;

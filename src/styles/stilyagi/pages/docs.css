@@ -166,7 +166,7 @@
   cursor: pointer;
 }
 /* The select, the chips beside it, and the search box below all take the
-   shared ring from colors-and-type.css; each carried its own red 2px rule
+   shared ring from site-base.css; each carried its own red 2px rule
    before, which was a fourth spelling of the same idea. */
 .search-box {
   margin-left: auto;

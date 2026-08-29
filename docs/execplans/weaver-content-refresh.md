@@ -6,8 +6,9 @@ This ExecPlan (execution plan) is a living document. The sections
 proceeds.
 
 Status: COMPLETE (content refresh executed 2026-08-17 on top of
-`weaver-daisy-migration` at the user's direction; follow-on illustration
-regeneration remains open — see `Outcomes & retrospective`)
+`weaver-daisy-migration` at the user's direction; final review addendum and
+validation recorded 2026-08-29; follow-on illustration regeneration remains
+open — see `Outcomes & retrospective`)
 
 ## Purpose / big picture
 
@@ -45,9 +46,11 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   execution starts only after the migration lands on `main` (or the user
   directs otherwise), at which point Stage B reconciles this plan with the
   final migrated template structure.
-- Nothing under `public/` is tracked; never edit generated output. All
-  content changes go into `templates/weaver/pages/*.jinja`, the weaver chrome
-  templates, and `config/pages.yaml`.
+- Nothing under `public/` is tracked; never edit generated output. Content
+  changes go into `templates/weaver/pages/*.jinja`, the Weaver chrome
+  templates, and `config/pages.yaml`. Presentation fixes required to keep that
+  content usable belong in `src/styles/weaver/`; rendered contracts belong in
+  `tests/`.
 - Public-facing prose must follow the `df12-copy` voice skill and
   `en-gb-oxendict` (British English, Oxford spelling).
 - The site must remain honest about status. RFC 0003 acceptance criterion 16
@@ -64,9 +67,10 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
 
 ## Tolerances (exception triggers)
 
-- Scope: content execution touches only the weaver templates, weaver static
-  assets, weaver YAML config, and weaver-referencing copy in the main-site
-  YAML (homepage card, reference-library entry). Anything beyond that: stop
+- Scope: content execution touches only the Weaver templates, Weaver static
+  assets and styles, Weaver YAML config, Weaver-referencing copy in the
+  main-site YAML (homepage card, reference-library entry), and focused tests
+  or plan updates needed to verify those surfaces. Anything beyond that: stop
   and escalate.
 - Source conflict: if two authoritative Weaver documents contradict each
   other on a user-visible claim and the precedence rules in `Source
@@ -137,6 +141,15 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   gates pass (`check-fmt lint typecheck`, `test-js`, `make test`);
   browser-validated every page with agent-browser (desktop screenshots,
   console clean) and a css-view/JS probe at a 390px viewport.
+- [x] (2026-08-29) Reconciled all work after the original completion commit:
+  Architecture Decisions, responsive command tables, sticky and full-bleed
+  panels, the recomposed hero, configuration and copy corrections, spelling
+  and contrast repairs, daemon-transport clarification, and selector-stream
+  completion preservation.
+- [x] (2026-08-29) Added rendered behavioural coverage at the 767/768px
+  boundary for all three command tables, plus generated command,
+  documentation, navigation, and image-asset contracts. Re-ran the complete
+  repository and rendered-page gates.
 
 ## Surprises & discoveries
 
@@ -155,6 +168,14 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   against a 390px viewport; element bisection via agent-browser eval.
   Impact: fixed with `break-all` and `min-w-0`; one instance predated
   this refresh, so the same probe is worth running on other sub-sites.
+- Observation: the existing browser suite proved page loading,
+  self-containment, accessibility, navigation state, and whole-document fit,
+  but did not pin the new command-table layout or refreshed rendered copy.
+  Evidence: review against the pull-request diff after the original COMPLETE
+  marker; removing the responsive rules would not fail an existing test.
+  Impact: added non-vacuous browser assertions for every affected page on
+  both sides of the 768px breakpoint, plus representative content and asset
+  contracts.
 
 - Observation: the Weaver branches are documentation-only; no code
   implements the new surface yet ("`Engine::compile_dsl` and
@@ -241,10 +262,19 @@ retired `observe`/`act`/`verify` public grammar except in an explicit
   public, remote, or multi-user daemon service. The distinction preserves both
   contracts without presenting TCP as remote access.
   Date/Author: 2026-08-29, Codex (per review instruction + upstream sources).
+- Decision: keep command-table headings in the accessibility tree on narrow
+  screens while visually dissolving the three-column header and presenting
+  each body row as a two-column card.
+  Rationale: the source/input value remains meaningfully paired with the
+  command, while the description needs the full row width. Browser tests at
+  767px and 768px make the breakpoint and accessible hiding contract
+  observable.
+  Date/Author: 2026-08-29, Codex (per review instruction).
 
 ## Outcomes & retrospective
 
-Executed 2026-08-17. All thirteen weaver pages now document the planned
+Executed 2026-08-17 and reconciled at the pull-request tip on 2026-08-29. All
+thirteen Weaver pages now document the planned
 0.1.0 surface: the ADR 007 noun-verb grammar with `--json` as the single
 machine switch, the RFC 0003 selector pipeline (three query front doors,
 versioned selector streams, typed `--selectors` handoff), the RFC 0002
@@ -252,7 +282,11 @@ multi-workspace daemon, and the shared mutation engine with its
 Double-Lock, stale-refusal, and idempotency guarantees. Site-internal
 contradictions (Discord, language support, hardcoded version) are
 resolved, and the retired grammar survives only in explicit
-"superseded" framing. Gates and browser validation pass on every page.
+"superseded" framing. The docs hub now carries a live Architecture Decisions
+section; responsive command tables retain accessible headings; and the
+Jacquard, Sempai, architecture, and home-page layouts use the final sticky,
+full-bleed, and hero treatments. Gates and browser validation pass on every
+page, with focused rendered contracts for the new surface.
 
 Remaining follow-ons: regenerate the withdrawn commands pipeline
 illustration (and audit the other plates) for the selector-pipeline
@@ -260,6 +294,60 @@ story; decide whether `design-language` joins the nav; re-run Stage B's
 upstream drift check when the Weaver RFCs move from Proposed to
 Accepted; and rebase/merge once `weaver-daisy-migration` lands on
 `main`.
+
+## Final completion addendum (2026-08-29)
+
+The original COMPLETE marker landed in `8304c69`. Later review and visual
+validation materially improved the delivered presentation without changing
+the upstream content model. The post-completion work comprises:
+
+- the Architecture Decisions library on `/weaver/docs/`, with consistent
+  Proposed status labelling for RFC and ADR entries;
+- responsive card layouts for the Read, Change, and Verification command
+  tables, including visually hidden accessible headings below 768px;
+- sticky and full-bleed treatments across Jacquard, Sempai, and the
+  architecture page, plus the final full-bleed loom hero and desktop frosted
+  text panel;
+- final command-input, quick-start, configuration-status, spelling-overlay,
+  contrast, portable-path, and grammar corrections from review;
+- one consistent daemon transport contract: Unix sockets by default on Unix,
+  loopback-only TCP for non-Unix prototype compatibility, and no remotely
+  reachable target endpoint; and
+- a schema-aware `jq` selector filter which retains all non-selector JSONL
+  records, including `weaver.selector-stream-end.v1`.
+
+The configuration labels and main-site Weaver descriptions remain aligned
+with Read, Change, Verification, and the noun-verb surface. No generated file
+under `public/` is tracked. The original scope tolerance is reconciled above:
+Weaver-scoped stylesheet fixes and rendered browser tests are part of making
+the refreshed content usable and verifiable, not a generator or application
+architecture expansion.
+
+Final acceptance evidence includes the generic all-page mobile, desktop,
+accessibility, and self-containment suite and the focused
+`tests/test_weaver_content_refresh_browser.py` contract. The latter exercises
+all three command pages at 767px and 768px and asserts heading visibility,
+grid and table-row display, track count, source/input alignment, description
+spanning, and document fit. It also asserts the published command grammar,
+`--json`, selector and completion schemas, command navigation, Architecture
+Decisions links, and local image assets. The transport wording has an
+additional focused contradiction test in `tests/test_weaver_transport_docs.py`.
+
+The remaining follow-ons are unchanged: regenerate the withdrawn selector
+pipeline illustration, decide whether `design-language` joins the navigation,
+and re-check the site when the Proposed Weaver RFCs and ADRs advance. The
+upstream roadmap does not yet mark those proposed surface phases complete, so
+this refresh does not check them off locally.
+
+## Conformance basis
+
+The content contract remains Weaver ADR 007, RFCs 0002 and 0003, and ADRs
+008–012 as surveyed on 2026-08-17, with RFC 0001 and ADR 008 defining the
+local, per-user daemon boundary. Repository generation, styling, and
+accessibility rules come from `AGENTS.md`. Stages C–E implement those sources;
+the generated-page and browser tests named in the final addendum provide the
+acceptance boundary. No post-completion change introduces a new upstream
+requirement, public interface, dependency, or persistent format.
 
 ## Context and orientation
 
@@ -573,10 +661,11 @@ make nixie          # if any Markdown changed
 Expected: all gates exit 0; `pages generate` reports the weaver pages
 written; the mobile-nav behavioural test passes against rebuilt output.
 
-## Validation and acceptance
+## Verification plan
 
-This is a documentation/content task; Red-Green-Refactor with a test
-framework does not apply to prose. The observable substitutes are:
+The content refresh introduces no algorithmic invariant or proof obligation.
+Its obligations are finite generated-page contracts, verified at the real
+Jinja, CSS, static-asset, and browser boundary:
 
 - Grep-based red/green for the grammar reset: before Stage C,
   `grep -rn 'observe get-definition\|act apply-patch\|--capabilities' \
@@ -586,11 +675,30 @@ framework does not apply to prose. The observable substitutes are:
   the rendered pages contain the RFC 0003 canonical pipeline on the home
   page, the noun-verb table on the commands page, and the ADR 011 input
   matrix on the Sempai page.
+- Responsive-table check:
+  `uv run pytest tests/test_weaver_content_refresh_browser.py -v` opens Read,
+  Change, and Verification at 767px and 768px. It verifies the accessible
+  hidden heading, grid-to-table transition, column alignment and spanning,
+  and document fit.
+- Rendered-content check: the same browser module verifies the command nav,
+  noun-verb grammar, `--json`, selector and completion schemas, Architecture
+  Decisions links, and local homepage assets.
+- Transport-consistency check:
+  `uv run pytest tests/test_weaver_transport_docs.py -v` rejects supported TCP
+  wording combined with an absolute denial of network endpoints.
 - Consistency: no page contradicts another on language support, Discord, or
   version claims.
-- Gates: `make check-fmt lint typecheck`, `make test-js`,
-  `make markdownlint`, `make nixie` all pass.
+- Gates: `make check-fmt`, `make lint`, `make typecheck`, `make test`,
+  `make test-js`, `make markdownlint`, and `make nixie` all pass.
 - Editorial: prose passes a df12-copy voice review and is en-GB-oxendict.
+
+The browser checks are non-vacuous: they require a table, at least one body
+row, exactly three cells, two concrete grid tracks below the breakpoint, and
+loaded images with non-zero intrinsic width. Removing the media query,
+renaming a published label or schema, dropping a documentation link, or
+breaking an asset request causes a named assertion to fail. Browser computed
+styles and image completion are treated as the real rendering engine's
+observable interface, not reproduced by a mock.
 
 Acceptance for Stage A alone: this file exists at
 `docs/execplans/weaver-content-refresh.md`, passes the Markdown gates, and a
@@ -630,3 +738,12 @@ JS tests, the Makefile gates listed above, and — as an external gating
 dependency — completion of the Weaver daisyUI/Tailwind migration described
 in `docs/execplans/incorporate-sub-sites.md` Phase 7. Editorial dependencies:
 the `df12-copy` and `en-gb-oxendict` skills at copywriting time.
+
+## Revision note (2026-08-29)
+
+Reconciled the COMPLETE plan with every later pull-request change because the
+previous outcome and scope stopped at the original content execution. Added
+the final delivery addendum, stylesheet and test tolerances, conformance basis,
+and rendered verification evidence. Completion status remains unchanged; only
+the illustration regeneration, navigation decision, and upstream RFC/ADR
+drift check remain open.

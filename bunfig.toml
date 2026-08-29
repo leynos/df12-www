@@ -1,0 +1,4 @@
+# Bun configuration. The test preload gives every suite a global DOM; see
+# tests/js/happydom.ts for the rationale.
+[test]
+preload = ["./tests/js/happydom.ts"]

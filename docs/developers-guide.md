@@ -745,7 +745,32 @@ and a fake DOM with hand-written focus bookkeeping would largely be testing
 itself. Prefer the fake DOM used by `config-keys.test.mjs` when the behaviour
 under test is a decision; reach for the harness when it is an interaction.
 
-The harness also supplies the traces both drawer suites run over. It exports
+Underneath both approaches sits a global preload: `bunfig.toml`'s
+`[test].preload` loads `tests/js/happydom.ts`, which calls
+`GlobalRegistrator.register()` from the `@happy-dom/global-registrator`
+development dependency. That gives every suite under `tests/js` a real global
+`document`, `window`, and event machinery before a single test runs, so a
+suite can assert against `document` directly without constructing one.
+Suites that need an isolated window — the mobile-nav harnesses above — still
+build their own `Window` rather than touching the global one; the two
+coexist without interference.
+
+The Stilyagi widgets are tested against that global document.
+`tests/js/helpers/stilyagi.mjs` mounts template-faithful fixtures — one per
+widget, mirroring the markup in `templates/stilyagi/pages/design.jinja`,
+`docs.jinja`, and `roadmap.jinja` — into `document.body`, then evaluates the
+matching widget script read straight from `src/static/stilyagi/assets/js/`,
+so these suites need no build step to run. Its fixtures must stay in step
+with the templates they mirror. The widgets attach listeners only inside
+`body`, which the harness relies on for isolation: its `reset` clears
+`document.body` and restores any patched globals — including the
+controllable `IntersectionObserver` stub it installs for the docs page's
+section rail — between tests. The primitives both harnesses share — evaluating
+a script against a window, dispatching a click, pressing a key — live in
+`tests/js/helpers/dom.mjs`.
+
+`mobile-nav-harness.mjs` also supplies the traces both drawer suites run
+over. It exports
 `TRANSITIONS`, the six things that can happen to an open drawer — `toggle`,
 `tab`, `shift-tab`, `escape`, `wide`, `narrow` — and
 `exhaustiveTransitionSequences({ depth = 4 })`, which returns every trace over

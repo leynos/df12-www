@@ -16,9 +16,18 @@ const telemetry = require("../../public/weaver/assets/js/telemetry.js");
 const ALLOWED_FIELDS = ["component", "operation", "outcome", "reason"];
 
 let events;
-/* Bun supplies a `navigator`, and later tests in the run may want it. These
-   tests replace it, so the original is captured once and put back. */
-const REAL_NAVIGATOR = globalThis.navigator;
+/* happy-dom (registered globally in `happydom.ts`) exposes `navigator` as a
+   readonly accessor, so plain assignment throws. These tests swap it through
+   `defineProperty` and put the original accessor back afterwards. */
+const REAL_NAVIGATOR_DESCRIPTOR = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+
+const setNavigator = (value) => {
+  Object.defineProperty(globalThis, "navigator", {
+    value,
+    configurable: true,
+    writable: true,
+  });
+};
 
 beforeEach(() => {
   events = [];
@@ -27,7 +36,7 @@ beforeEach(() => {
 
 afterEach(() => {
   globalThis.df12WeaverNavTelemetry = undefined;
-  globalThis.navigator = REAL_NAVIGATOR;
+  Object.defineProperty(globalThis, "navigator", REAL_NAVIGATOR_DESCRIPTOR);
 });
 
 describe("the hook", () => {
@@ -112,7 +121,7 @@ describe("the event schema", () => {
 describe("the copy seam", () => {
   test("reports success without reporting what was copied", async () => {
     const written = [];
-    globalThis.navigator = { clipboard: { writeText: async (t) => written.push(t) } };
+    setNavigator({ clipboard: { writeText: async (t) => written.push(t) } });
 
     expect(await telemetry.copy("cargo install weaver")).toBe(true);
 
@@ -124,13 +133,13 @@ describe("the copy seam", () => {
   });
 
   test("reports a refusal as a bounded reason", async () => {
-    globalThis.navigator = {
+    setNavigator({
       clipboard: {
         writeText: async () => {
           throw new Error("NotAllowedError: /weaver/install/ denied");
         },
       },
-    };
+    });
 
     expect(await telemetry.copy("weaver --capabilities")).toBe(false);
 
@@ -147,7 +156,7 @@ describe("the copy seam", () => {
   });
 
   test("reports an absent clipboard rather than throwing", async () => {
-    globalThis.navigator = {};
+    setNavigator({});
 
     expect(await telemetry.copy("cargo install weaver")).toBe(false);
 
@@ -162,7 +171,7 @@ describe("the copy seam", () => {
   test("copies nothing anywhere when no sink is installed", async () => {
     globalThis.df12WeaverNavTelemetry = undefined;
     const written = [];
-    globalThis.navigator = { clipboard: { writeText: async (t) => written.push(t) } };
+    setNavigator({ clipboard: { writeText: async (t) => written.push(t) } });
 
     expect(await telemetry.copy("cargo install weaver")).toBe(true);
 

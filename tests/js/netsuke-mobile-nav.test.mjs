@@ -37,7 +37,9 @@ beforeAll(() => {
   });
   expect(`${result.stdout ?? ""}${result.stderr ?? ""}`).not.toContain("Traceback");
   expect(result.status).toBe(0);
-});
+  // Site generation takes seconds; the default five-second hook timeout is
+  // not enough on a cold uv cache.
+}, 120000);
 
 /* Build a page with the navbar markup `templates/netsuke/` renders, load the
    menu into it, and hand back the parts a test needs to drive. */

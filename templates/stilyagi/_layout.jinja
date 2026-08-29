@@ -13,15 +13,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{% block title %}Stilyagi{% endblock %}</title>
     <meta name="description" content="{% block description %}{% endblock %}" />
-    {#- The compiled Tailwind + daisyUI sheet carries the theme and the
-        shared component layers.  The hand-written sheets stay linked while
-        the per-page migration is in flight: their unlayered rules win every
-        argument against the layered compiled ones, so any visual change is
-        the compiled sheet disagreeing with the originals. -#}
+    {#- The compiled Tailwind + daisyUI sheet: the theme, the shared
+        component layers, and the migrated per-page partials.  Pages whose
+        hand-written stylesheet has not yet migrated still link it through
+        page_stylesheet below; unlayered, it wins its arguments with the
+        compiled layers exactly as it used to win them on source order. -#}
     <link rel="stylesheet" href="/stilyagi/assets/styles/stilyagi.css" />
-    <link rel="stylesheet" href="/stilyagi/assets/styles/colors-and-type.css" />
-    <link rel="stylesheet" href="/stilyagi/assets/styles/motifs-and-components.css" />
-    <link rel="stylesheet" href="/stilyagi/assets/styles/stilyagi-site.css" />
     {% block page_stylesheet %}{% endblock %}
   </head>
   <body>

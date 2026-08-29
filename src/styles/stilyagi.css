@@ -30,9 +30,17 @@
  * layer lower, beside the preflight — they describe an element before
  * any class touches it. */
 @import "./stilyagi/site-base.css" layer(base);
+/* Old-name aliases for the hand-written per-page sheets still in flight;
+ * deleted with the last per-page migration. */
+@import "./stilyagi/compat.css" layer(base);
 
 @import "./stilyagi/motifs.css" layer(components);
 @import "./stilyagi/chrome.css" layer(components);
+
+/* Per-page partials.  They import after the shared components for the same
+ * reason the per-page <link> used to come after the shared ones: where a
+ * page tunes a shared component, the page's rule wins the source-order tie. */
+@import "./stilyagi/pages/legal.css" layer(components);
 
 @source "../../templates/stilyagi/**/*.jinja";
 

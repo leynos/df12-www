@@ -10,7 +10,7 @@ import pytest
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 
-import scripts.build_episodic_roadmap_data as roadmap_projector
+import scripts.atomic_write as atomic_writer
 from scripts.build_episodic_roadmap_data import main
 from scripts.episodic_roadmap_parser import Task, parse_roadmap
 
@@ -288,16 +288,20 @@ def test_atomic_projector_write_preserves_output_and_cleans_up(
     """A temporary-write or replace failure keeps the prior generated file intact."""
     output = tmp_path / "roadmap.jinja"
     output.write_text("complete prior projection\n", encoding="utf-8")
-    original_open = Path.open
     original_replace = Path.replace
 
     if failure == "write":
+        real_temporary_file = atomic_writer.tempfile.NamedTemporaryFile
 
         class FailingTemporaryStream:
             """Close the real stream after deterministically rejecting writes."""
 
-            def __init__(self, stream: typ.TextIO) -> None:
+            def __init__(self, stream: typ.IO[bytes]) -> None:
                 self.stream = stream
+
+            @property
+            def name(self) -> str:
+                return str(self.stream.name)
 
             def __enter__(self) -> typ.Self:
                 return self
@@ -305,35 +309,30 @@ def test_atomic_projector_write_preserves_output_and_cleans_up(
             def __exit__(self, *_: object) -> None:
                 self.stream.close()
 
-            def write(self, _: str) -> int:
+            def write(self, _: bytes) -> int:
                 raise OSError
 
-        open_file = typ.cast("typ.Callable[..., typ.TextIO]", original_open)
+        def fail_temporary_write(*args: typ.Any, **kwargs: typ.Any) -> object:  # noqa: ANN401 - forwarded verbatim to the real factory
+            return FailingTemporaryStream(real_temporary_file(*args, **kwargs))
 
-        def fail_temporary_write(
-            path: Path, *args: object, **kwargs: object
-        ) -> typ.TextIO:
-            stream = open_file(path, *args, **kwargs)
-            if path.name.startswith(f".{output.name}."):
-                return typ.cast("typ.TextIO", FailingTemporaryStream(stream))
-            return stream
-
-        monkeypatch.setattr(Path, "open", fail_temporary_write)
+        monkeypatch.setattr(
+            atomic_writer.tempfile, "NamedTemporaryFile", fail_temporary_write
+        )
     else:
 
         def fail_replacement(path: Path, target: Path) -> Path:
-            if path.name.startswith(f".{output.name}."):
+            if path.name.startswith(f".{output.name}-"):
                 raise OSError
             return original_replace(path, target)
 
         monkeypatch.setattr(Path, "replace", fail_replacement)
 
     with pytest.raises(OSError, match=r"^$"):
-        roadmap_projector._write_atomically(output, "new incomplete projection\n")
+        atomic_writer.atomic_write(output, "new incomplete projection\n")
 
     assert output.read_text(encoding="utf-8") == "complete prior projection\n", (
         "an atomic-write failure must leave the prior complete output unchanged"
     )
-    assert not list(tmp_path.glob(f".{output.name}.*.tmp")), (
+    assert not list(tmp_path.glob(f".{output.name}-*.tmp")), (
         "an atomic-write failure must clean up its exclusive temporary file"
     )

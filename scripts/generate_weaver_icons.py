@@ -21,13 +21,12 @@ carry the artwork themselves and fetch nothing.
 from __future__ import annotations
 
 import collections.abc as cabc
-import contextlib
 import json
 import sys
-import tempfile
 import typing as typ
 from pathlib import Path
 
+from atomic_write import atomic_write
 from ruamel.yaml import YAML, YAMLError
 from weaver_icons_template import _SVG_ATTRS, _SVG_CLASS, FOOTER, HEADER
 
@@ -285,19 +284,16 @@ def _publish_macro(macro: str, output: Path) -> None:
     parse. The file is generated, so it can always be regenerated; but only if
     the failure is visible, and a truncated file that still parses is not.
 
-    So the macro is written to a unique temporary file beside the target and
-    moved into place with a rename, which is atomic within one filesystem.
-    Until that rename the old contents are untouched, and after it they are
-    wholly replaced. The temporary file is removed on every path that does not
-    end in a successful rename.
+    So the macro goes through :func:`atomic_write` — a unique temporary file
+    beside the target, moved into place with a rename. Until that rename the
+    old contents are untouched, and after it they are wholly replaced.
 
     Parameters
     ----------
     macro
         The complete contents to publish.
     output
-        The file to replace. Its parent holds the temporary file, so the two
-        are on one filesystem and the rename cannot become a copy.
+        The file to replace.
 
     Raises
     ------
@@ -305,37 +301,11 @@ def _publish_macro(macro: str, output: Path) -> None:
         If the temporary file cannot be created, written, closed, or moved
         into place, with a message naming ``output``.
     """
-    handle = None
-    temporary: Path | None = None
     try:
-        handle = tempfile.NamedTemporaryFile(  # noqa: SIM115 - closed below, before the rename
-            "w",
-            encoding="utf-8",
-            dir=output.parent,
-            prefix=f".{output.name}-",
-            suffix=".tmp",
-            delete=False,
-        )
-        temporary = Path(handle.name)
-        handle.write(macro)
-        # Closed before the rename rather than after: a rename that beat the
-        # flush would publish a file the buffer had not finished filling.
-        handle.close()
-        handle = None
-        temporary.replace(output)
-        temporary = None
+        atomic_write(output, macro)
     except OSError as exc:
         message = f"{output} could not be written ({exc}); it is unchanged"
         raise SystemExit(message) from exc
-    finally:
-        if handle is not None:
-            with contextlib.suppress(OSError):
-                handle.close()
-        if temporary is not None:
-            # The rename did not happen, so this is a partial macro nobody
-            # should find beside the real one.
-            with contextlib.suppress(OSError):
-                temporary.unlink()
 
 
 def main() -> int:

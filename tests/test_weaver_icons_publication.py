@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.support.weaver_harness import load
 from tests.support.weaver_icons import _minimal_inputs
 
 if typ.TYPE_CHECKING:
@@ -66,19 +67,22 @@ def test_a_failure_writing_the_temporary_file_leaves_the_previous_macro(
     _minimal_inputs(generator, monkeypatch, tmp_path)
     output = _published(generator, monkeypatch, tmp_path)
 
-    real = generator.tempfile.NamedTemporaryFile
+    # The temporary file is opened by the shared writer, not the generator,
+    # so the failure is provoked where the write now happens.
+    writer = load("atomic_write")
+    real = writer.tempfile.NamedTemporaryFile
 
     def fails_midway(*args: object, **kwargs: object) -> object:
         handle = real(*args, **kwargs)
 
-        def refuse(_text: str) -> int:
+        def refuse(_data: object) -> int:
             message = "No space left on device"
             raise OSError(message)
 
         handle.write = refuse
         return handle
 
-    monkeypatch.setattr(generator.tempfile, "NamedTemporaryFile", fails_midway)
+    monkeypatch.setattr(writer.tempfile, "NamedTemporaryFile", fails_midway)
 
     with pytest.raises(SystemExit) as caught:
         generator.main()

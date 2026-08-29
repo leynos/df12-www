@@ -14,11 +14,12 @@ import dataclasses as dc
 import json
 import sys
 from pathlib import Path
-from uuid import uuid4
 
 if __package__:
+    from .atomic_write import atomic_write
     from .episodic_roadmap_parser import Phase, load_roadmap
 else:
+    from atomic_write import atomic_write
     from episodic_roadmap_parser import Phase, load_roadmap
 
 BANNER = (
@@ -171,21 +172,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{args.output} matches the upstream roadmap.")
         return 0
 
-    _write_atomically(args.output, rendered)
+    atomic_write(args.output, rendered)
     print(f"Wrote {args.output}")
     return 0
-
-
-def _write_atomically(output: Path, payload: str) -> None:
-    """Replace ``output`` only after a complete projection has been written."""
-    output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = output.with_name(f".{output.name}.{uuid4().hex}.tmp")
-    try:
-        with temporary.open("x", encoding="utf-8") as stream:
-            stream.write(payload)
-        temporary.replace(output)
-    finally:
-        temporary.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

@@ -8,23 +8,19 @@
 import { afterEach, describe, expect, test } from "bun:test";
 
 import { click, pressKey } from "./helpers/mobile-nav-harness.mjs";
-import { setUp } from "./helpers/weaver-drawer.mjs";
+import { setUp, tearDown } from "./helpers/weaver-drawer.mjs";
 
-afterEach(() => {
-  /* `telemetry.js` and the sink both live on the process global while a test
-     runs, since that is where `evaluateScript` puts a script's `globalThis`.
-     Leaving them there would let one test's sink collect another's events. */
-  globalThis.df12WeaverNavTelemetry = undefined;
-  globalThis.df12WeaverTelemetry = undefined;
-  globalThis.df12WeaverCopy = undefined;
-});
+/* `telemetry.js` and the sink both live on the process global while a test
+   runs, since that is where `evaluateScript` puts a script's `globalThis`.
+   Leaving them there would let one test's sink collect another's events. */
+afterEach(tearDown);
 
 describe("telemetry", () => {
   test("says nothing at all when the page did not load the hook", () => {
     /* A sink is installed; `telemetry.js` is not. The drawer has nothing to
        report through, so it must report nothing — and the sink is there to
        catch it if some future change reaches past the module. */
-    const dom = setUp();
+    const dom = setUp({ telemetry: false });
     click(dom.window, dom.toggle);
     pressKey(dom.window, dom.document, "Escape");
     expect(dom.isOpen()).toBe(false);

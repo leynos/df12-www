@@ -11,9 +11,35 @@ import { evaluateScript, installMatchMedia, stubLayout } from "./mobile-nav-harn
 const SCRIPT = "public/weaver/assets/js/mobile-nav.js";
 const TELEMETRY = "public/weaver/assets/js/telemetry.js";
 
+/* What the touched globals held before the first `setUp` of the current
+   test. `evaluateScript` runs the shipped scripts against this process's
+   `globalThis`, so whatever `setUp` installs there outlives the test — and
+   the test file — unless something puts the old values back. */
+let saved = null;
+
+/* Restore every global `setUp` touches to its pre-setup value. Register this
+   with `afterEach` in every file that imports `setUp`, or the file's sinks
+   and telemetry API leak into whichever test file the runner loads next. */
+export function tearDown() {
+  if (saved === null) {
+    return;
+  }
+  globalThis.df12WeaverNavTelemetry = saved.nav;
+  globalThis.df12WeaverTelemetry = saved.telemetry;
+  globalThis.df12WeaverCopy = saved.copy;
+  saved = null;
+}
+
 /* Build a page with the sidebar markup `templates/weaver/` renders, load the
    drawer into it, and hand back the parts a test needs to drive. */
 export function setUp({ links = ["/install", "/docs"], telemetry = false } = {}) {
+  if (saved === null) {
+    saved = {
+      nav: globalThis.df12WeaverNavTelemetry,
+      telemetry: globalThis.df12WeaverTelemetry,
+      copy: globalThis.df12WeaverCopy,
+    };
+  }
   const window = new Window({ url: "https://weaver.example/docs/" });
   const { document } = window;
   document.body.innerHTML = `

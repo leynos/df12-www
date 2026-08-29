@@ -8,16 +8,16 @@
 
 .poster-board {
   position: relative;
-  border: var(--rule-weight-2) solid var(--ink);
+  border: var(--rule-weight-2) solid var(--color-ink);
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--paper-highlight) 28%, transparent),
+      color-mix(in srgb, var(--color-paper-highlight) 28%, transparent),
       transparent
     ),
-    var(--paper);
+    var(--color-paper);
   padding: calc(var(--unit) * 2);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
 
 .poster-board::before,
@@ -26,7 +26,11 @@
   position: absolute;
   width: 110px;
   height: 18px;
-  background: repeating-linear-gradient(135deg, var(--ink) 0 10px, var(--press-red) 10px 20px);
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-ink) 0 10px,
+    var(--color-press-red) 10px 20px
+  );
 }
 
 .poster-board::before {
@@ -41,14 +45,14 @@
 .poster-showcase {
   position: relative;
   overflow: hidden;
-  border: var(--rule-weight) solid var(--ink);
+  border: var(--rule-weight) solid var(--color-ink);
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--paper-highlight) 16%, transparent),
+      color-mix(in srgb, var(--color-paper-highlight) 16%, transparent),
       transparent
     ),
-    var(--paper);
+    var(--color-paper);
   padding: 20px 24px 24px;
   display: grid;
   grid-template-rows: 1fr auto;
@@ -61,8 +65,8 @@
   /* Lets the annotation size itself against the rendered artwork, so the
      typed line keeps its proportions on the drawn sheet at any width. */
   container-type: inline-size;
-  border: var(--rule-weight-2) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight-2) solid var(--color-ink);
+  background: var(--color-paper);
   padding: 0;
   overflow: hidden;
 }
@@ -89,12 +93,12 @@
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
   pointer-events: none;
 }
 
 .poster-hero-copy .accent {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
 }
 
@@ -114,7 +118,7 @@
 }
 
 .poster-title .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 .poster-annotation {
@@ -135,7 +139,7 @@
      keeping the line clear of the platen just above that handover. */
   font-size: clamp(8px, 1.03cqw, 12px);
   line-height: 1.6;
-  color: var(--ink);
+  color: var(--color-ink);
   pointer-events: none;
 }
 
@@ -148,7 +152,7 @@
 }
 
 .poster-tile {
-  border: var(--rule-weight) solid var(--ink);
+  border: var(--rule-weight) solid var(--color-ink);
   padding: 18px 10px;
   text-align: center;
   font-family: var(--font-sans);
@@ -156,20 +160,20 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 700;
-  background: var(--paper);
+  background: var(--color-paper);
 }
 
 .poster-tile.red {
-  background: color-mix(in srgb, var(--press-red) 14%, transparent);
+  background: color-mix(in srgb, var(--color-press-red) 14%, transparent);
 }
 .poster-tile.cyan {
-  background: color-mix(in srgb, var(--jazz-cyan) 16%, transparent);
+  background: color-mix(in srgb, var(--color-jazz-cyan) 16%, transparent);
 }
 .poster-tile.ochre {
-  background: color-mix(in srgb, var(--jazz-ochre) 18%, transparent);
+  background: color-mix(in srgb, var(--color-jazz-ochre) 18%, transparent);
 }
 .poster-tile.magenta {
-  background: color-mix(in srgb, var(--jazz-magenta) 16%, transparent);
+  background: color-mix(in srgb, var(--color-jazz-magenta) 16%, transparent);
 }
 
 .section-flag {
@@ -184,7 +188,7 @@
 .section-flag::after {
   content: "";
   height: 2px;
-  background: var(--ink);
+  background: var(--color-ink);
 }
 
 .section-flag h2 {
@@ -194,7 +198,7 @@
 }
 
 .section-flag h2 .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 .explore-grid {
@@ -212,11 +216,11 @@
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--paper-highlight) 22%, transparent),
+      color-mix(in srgb, var(--color-paper-highlight) 22%, transparent),
       transparent
     ),
-    var(--paper);
-  border: var(--rule-weight) solid var(--ink);
+    var(--color-paper);
+  border: var(--rule-weight) solid var(--color-ink);
   position: relative;
 }
 
@@ -227,29 +231,29 @@
    fills fall under 2:1 as type on paper, so a card that took its fill
    for both would be unreadable. */
 .tool-card.red {
-  --accent-color: var(--press-red);
-  --accent-color-text: var(--press-red-text);
+  --accent-color: var(--color-press-red);
+  --accent-color-text: var(--color-press-red-text);
 }
 .tool-card.sage {
-  --accent-color: var(--signal-sage);
-  --accent-color-text: var(--signal-sage-text);
+  --accent-color: var(--color-signal-sage);
+  --accent-color-text: var(--color-signal-sage-text);
 }
 .tool-card.cyan {
-  --accent-color: var(--jazz-cyan);
-  --accent-color-text: var(--jazz-cyan-text);
+  --accent-color: var(--color-jazz-cyan);
+  --accent-color-text: var(--color-jazz-cyan-text);
 }
 .tool-card.ochre {
-  --accent-color: var(--jazz-ochre);
-  --accent-color-text: var(--jazz-ochre-text);
+  --accent-color: var(--color-jazz-ochre);
+  --accent-color-text: var(--color-jazz-ochre-text);
 }
 .tool-card.magenta {
-  --accent-color: var(--jazz-magenta);
-  --accent-color-text: var(--jazz-magenta-text);
+  --accent-color: var(--color-jazz-magenta);
+  --accent-color-text: var(--color-jazz-magenta-text);
 }
 /* Ink is already the darkest thing on the page; it needs no counterpart. */
 .tool-card.ink {
-  --accent-color: var(--ink);
-  --accent-color-text: var(--ink);
+  --accent-color: var(--color-ink);
+  --accent-color-text: var(--color-ink);
 }
 
 .tool-card::before {
@@ -259,7 +263,7 @@
   left: -1px;
   right: -1px;
   height: 4px;
-  background: var(--accent-color, var(--press-red));
+  background: var(--accent-color, var(--color-press-red));
 }
 
 .tool-card .eyebrow {
@@ -268,20 +272,20 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent-color-text, var(--press-red-text));
+  color: var(--accent-color-text, var(--color-press-red-text));
 }
 
 .tool-art {
   min-height: 108px;
   aspect-ratio: 1672 / 941;
-  border: var(--rule-weight) solid var(--ink);
+  border: var(--rule-weight) solid var(--color-ink);
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--paper-highlight) 18%, transparent),
+      color-mix(in srgb, var(--color-paper-highlight) 18%, transparent),
       transparent
     ),
-    var(--paper-shade);
+    var(--color-paper-shade);
   overflow: hidden;
   display: grid;
   place-items: center;
@@ -318,7 +322,7 @@
 
 .tool-emblem .rule {
   height: 2px;
-  background: var(--ink);
+  background: var(--color-ink);
 }
 
 .tool-card h3 {
@@ -341,18 +345,18 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--accent-color-text, var(--press-red-text));
+  color: var(--accent-color-text, var(--color-press-red-text));
 }
 
 .tool-card a:hover {
-  color: var(--ink);
+  color: var(--color-ink);
 }
 
 .value-band {
   margin-top: calc(var(--unit) * 7);
-  background: var(--paper-shade);
-  border-top: var(--rule-weight-2) solid var(--ink);
-  border-bottom: var(--rule-weight-2) solid var(--ink);
+  background: var(--color-paper-shade);
+  border-top: var(--rule-weight-2) solid var(--color-ink);
+  border-bottom: var(--rule-weight-2) solid var(--color-ink);
 }
 
 .value-grid {
@@ -365,7 +369,7 @@
 
 .value-card {
   padding: calc(var(--unit) * 4);
-  border-right: var(--rule-weight) solid var(--ink);
+  border-right: var(--rule-weight) solid var(--color-ink);
 }
 
 .value-card:last-child {
@@ -378,7 +382,7 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 .value-card h3 {
@@ -399,14 +403,14 @@
 }
 
 .pipeline-frame {
-  border: var(--rule-weight-2) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight-2) solid var(--color-ink);
+  background: var(--color-paper);
   padding: calc(var(--unit) * 2);
 }
 
 .pipeline-frame img {
   width: 100%;
-  border: var(--rule-weight) solid var(--ink);
+  border: var(--rule-weight) solid var(--color-ink);
   display: block;
 }
 
@@ -416,15 +420,15 @@
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 
 .command-rail {
   margin-top: calc(var(--unit) * 7);
-  border: var(--rule-weight-2) solid var(--ink);
+  border: var(--rule-weight-2) solid var(--color-ink);
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--ink) 6%, transparent), transparent 28%),
-    var(--paper);
+    linear-gradient(90deg, color-mix(in srgb, var(--color-ink) 6%, transparent), transparent 28%),
+    var(--color-paper);
   padding: calc(var(--unit) * 4);
   display: grid;
   grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.1fr);
@@ -439,7 +443,7 @@
 }
 
 .command-label .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 /* Sits under the rail's heading, where a reader who has just been told
@@ -452,18 +456,18 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--color-ink);
   text-decoration: none;
-  border-bottom: var(--rule-weight) solid var(--press-red);
+  border-bottom: var(--rule-weight) solid var(--color-press-red);
   padding-bottom: 3px;
 }
 
 .command-source:hover {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 .command-source .manicule {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-size: 1rem;
 }
 
@@ -474,8 +478,8 @@
 }
 
 .command-step {
-  border: var(--rule-weight) solid var(--ink);
-  background: color-mix(in srgb, var(--paper-highlight) 36%, transparent);
+  border: var(--rule-weight) solid var(--color-ink);
+  background: color-mix(in srgb, var(--color-paper-highlight) 36%, transparent);
   padding: calc(var(--unit) * 2);
 }
 
@@ -484,7 +488,7 @@
   margin-bottom: 10px;
   font-family: var(--font-mono);
   font-size: 0.95rem;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 .command-step p {
@@ -504,8 +508,8 @@
   display: grid;
   gap: 12px;
   padding: calc(var(--unit) * 2);
-  border: var(--rule-weight) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight) solid var(--color-ink);
+  background: var(--color-paper);
 }
 
 .reading-room .eyebrow {
@@ -514,7 +518,7 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 .reading-room h3 {
@@ -537,11 +541,11 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--color-ink);
 }
 
 .reading-room a:hover {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 /* =================================================================
@@ -560,7 +564,7 @@
 
   @keyframes prose-inking {
     from {
-      color: var(--ink);
+      color: var(--color-ink);
     }
   }
 
@@ -635,7 +639,7 @@
 
   .value-card {
     border-right: 0;
-    border-bottom: var(--rule-weight) solid var(--ink);
+    border-bottom: var(--rule-weight) solid var(--color-ink);
   }
 
   .value-card:last-child {
@@ -682,9 +686,9 @@
     /* A paper-coloured halo lifts the title off the busy artwork the
        tighter mobile crop puts behind it. */
     text-shadow:
-      0 0 6px var(--paper),
-      0 0 18px var(--paper),
-      2px 2px 0 var(--paper);
+      0 0 6px var(--color-paper),
+      0 0 18px var(--color-paper),
+      2px 2px 0 var(--color-paper);
   }
 
   .poster-hero-copy {
@@ -694,9 +698,9 @@
     font-size: 0.62rem;
     gap: 10px;
     text-shadow:
-      0 0 4px var(--paper),
-      0 0 10px var(--paper),
-      1px 1px 0 var(--paper);
+      0 0 4px var(--color-paper),
+      0 0 10px var(--color-paper),
+      1px 1px 0 var(--color-paper);
   }
 
   .poster-tiles {

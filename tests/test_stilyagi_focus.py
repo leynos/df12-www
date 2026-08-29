@@ -181,7 +181,7 @@ def served_docs_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
         root / "stilyagi",
         templates_dir=STILYAGI_TEMPLATES,
         nav_links=[],
-        stylesheet="assets/styles/stilyagi-site.css",
+        stylesheet="/stilyagi/assets/styles/stilyagi.css",
     )
     generator.run()
     return root

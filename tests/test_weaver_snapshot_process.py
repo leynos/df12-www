@@ -113,7 +113,10 @@ def test_the_launcher_is_given_the_argv_the_run_would_use() -> None:
     """What a start would run, checked without starting anything."""
     launched: list[cabc.Sequence[str]] = []
 
-    def launch(argv: cabc.Sequence[str]) -> object:
+    def launch(argv: cabc.Sequence[str]) -> typ.NoReturn:
+        # `NoReturn` rather than `object`: a `Launcher` promises a process,
+        # and a stand-in returning less would not satisfy the alias. This one
+        # never returns at all, which any return type accepts.
         launched.append(list(argv))
         message = "far enough"
         raise SystemExit(message)

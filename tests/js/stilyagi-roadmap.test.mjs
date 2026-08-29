@@ -1,4 +1,5 @@
-/* Tests for the Stilyagi roadmap accordion.
+/**
+ * @file Tests for the Stilyagi roadmap accordion.
  *
  * `nextOpenIndex` decides which phase is open after a header is activated.
  * Only one phase is open at a time, and activating the open one closes it.

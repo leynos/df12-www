@@ -1,4 +1,5 @@
-/* Tests for the Stilyagi docs page's widgets.
+/**
+ * @file Tests for the Stilyagi docs page's widgets.
  *
  * `matchesFilter` is the catalogue's whole decision: given a row's namespace
  * and its precomputed searchable text, plus the selected chip and the search

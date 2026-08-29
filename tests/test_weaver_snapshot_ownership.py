@@ -181,6 +181,7 @@ def test_an_ownership_check_reads_only_as_far_as_the_comparison_needs() -> None:
     marker = "weaver-snapshot-0123456789abcdef.txt"
 
     def fetch(url: str, limit: int) -> str:
+        """Record the ask and answer with the marker."""
         asked.append((url, limit))
         return marker
 
@@ -198,6 +199,7 @@ def test_a_server_that_answers_with_something_else_is_refused() -> None:
     marker = "weaver-snapshot-0123456789abcdef.txt"
 
     def fetch(_url: str, _limit: int) -> str:
+        """Answer with somebody else's page."""
         return "<!doctype html><title>somebody else</title>"
 
     with pytest.raises(SystemExit) as caught:
@@ -214,6 +216,7 @@ def test_a_server_that_does_not_answer_at_all_is_refused() -> None:
     """Nothing on the port is as disqualifying as the wrong thing on it."""
 
     def refuse(_url: str, _limit: int) -> str:
+        """Refuse the connection outright."""
         message = "connection refused"
         raise OSError(message)
 
@@ -250,6 +253,7 @@ def test_a_server_that_redirects_the_marker_is_refused_unfollowed() -> None:
         """Serves the correct marker, as an attacker's server would."""
 
         def do_GET(self) -> None:
+            """Serve the marker, recording that the request arrived."""
             foreign_hits.append(self.path)
             body = marker.encode("utf-8")
             self.send_response(200)
@@ -261,6 +265,7 @@ def test_a_server_that_redirects_the_marker_is_refused_unfollowed() -> None:
 
         class _Redirecting(_Quiet):
             def do_GET(self) -> None:
+                """Answer with a redirect to the foreign server."""
                 self.send_response(302)
                 self.send_header("Location", f"{foreign}{self.path}")
                 self.end_headers()
@@ -286,6 +291,7 @@ def test_the_readiness_probe_refuses_a_redirect() -> None:
 
     class _Redirecting(_Quiet):
         def do_GET(self) -> None:
+            """Answer with a redirect off the loopback."""
             self.send_response(302)
             self.send_header("Location", "http://192.0.2.1/weaver/")
             self.end_headers()

@@ -297,22 +297,28 @@ def test_atomic_projector_write_preserves_output_and_cleans_up(
             """Close the real stream after deterministically rejecting writes."""
 
             def __init__(self, stream: typ.IO[bytes]) -> None:
+                """Wrap the real stream so its write can be refused."""
                 self.stream = stream
 
             @property
             def name(self) -> str:
+                """Name the real temporary file."""
                 return str(self.stream.name)
 
             def __enter__(self) -> typ.Self:
+                """Hand the wrapper back, as the real handle would itself."""
                 return self
 
             def __exit__(self, *_: object) -> None:
+                """Close the real stream."""
                 self.stream.close()
 
             def write(self, _: bytes) -> int:
+                """Refuse the write, the way a full disk would."""
                 raise OSError
 
         def fail_temporary_write(*args: typ.Any, **kwargs: typ.Any) -> object:  # noqa: ANN401 - forwarded verbatim to the real factory
+            """Wrap the real factory so the returned stream refuses writes."""
             return FailingTemporaryStream(real_temporary_file(*args, **kwargs))
 
         monkeypatch.setattr(
@@ -321,6 +327,7 @@ def test_atomic_projector_write_preserves_output_and_cleans_up(
     else:
 
         def fail_replacement(path: Path, target: Path) -> Path:
+            """Refuse only the temporary file's rename."""
             if path.name.startswith(f".{output.name}-"):
                 raise OSError
             return original_replace(path, target)

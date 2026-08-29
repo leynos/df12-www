@@ -69,6 +69,9 @@ class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
         newurl: str,
     ) -> typ.NoReturn:
         """Refuse the redirect, whatever it points at."""
+        # The signature is the base class's; the status line's reason phrase
+        # is not needed to refuse, so it is consumed rather than suppressed.
+        del msg
         reason = f"redirected to {newurl}, which is not the server being checked"
         raise urllib.error.HTTPError(req.full_url, code, reason, headers, fp)
 

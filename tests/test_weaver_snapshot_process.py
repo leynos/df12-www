@@ -39,6 +39,7 @@ class _FakeClock:
     """A clock that records what it was asked to wait for and never waits."""
 
     def __init__(self, times: cabc.Iterator[float] | None = None) -> None:
+        """Store the scripted times and start with no sleeps recorded."""
         self.slept: list[float] = []
         self._times = times
 
@@ -65,6 +66,7 @@ def test_the_readiness_poll_retries_until_the_server_answers() -> None:
     answers_on = 3
 
     def probe(url: str) -> None:
+        """Refuse until the scripted attempt, recording each ask."""
         attempts.append(url)
         if len(attempts) < answers_on:
             message = "connection refused"
@@ -90,6 +92,7 @@ def test_a_server_that_never_answers_gives_up_after_a_bounded_wait() -> None:
     attempts: list[str] = []
 
     def never(url: str) -> None:
+        """Refuse every time, recording each ask."""
         attempts.append(url)
         message = "connection refused"
         raise OSError(message)
@@ -114,6 +117,7 @@ def test_the_launcher_is_given_the_argv_the_run_would_use() -> None:
     launched: list[cabc.Sequence[str]] = []
 
     def launch(argv: cabc.Sequence[str]) -> typ.NoReturn:
+        """Record the argv and stop the start right there."""
         # `NoReturn` rather than `object`: a `Launcher` promises a process,
         # and a stand-in returning less would not satisfy the alias. This one
         # never returns at all, which any return type accepts.
@@ -138,16 +142,20 @@ def test_stopping_a_server_that_stands_down_does_not_kill_it() -> None:
 
     class _Obedient:
         def __init__(self) -> None:
+            """Start with nothing recorded."""
             self.calls: list[str] = []
             self.waits: list[int | None] = []
 
         def terminate(self) -> None:
+            """Record the request to stop."""
             self.calls.append("terminate")
 
         def kill(self) -> None:
+            """Record the escalation."""
             self.calls.append("kill")
 
         def wait(self, timeout: int | None = None) -> int:
+            """Record the bounded wait and stand down."""
             self.calls.append("wait")
             self.waits.append(timeout)
             return 0
@@ -168,16 +176,20 @@ def test_a_server_that_will_not_stand_down_is_killed() -> None:
 
     class _Stubborn:
         def __init__(self) -> None:
+            """Start with nothing recorded."""
             self.calls: list[str] = []
             self.waits: list[int | None] = []
 
         def terminate(self) -> None:
+            """Record the request to stop."""
             self.calls.append("terminate")
 
         def kill(self) -> None:
+            """Record the escalation."""
             self.calls.append("kill")
 
         def wait(self, timeout: int | None = None) -> int:
+            """Time out on the first wait, then stand down."""
             self.calls.append("wait")
             self.waits.append(timeout)
             if len(self.waits) == 1:
@@ -205,15 +217,19 @@ def test_only_the_final_wait_may_time_out_silently() -> None:
 
     class _Unkillable:
         def __init__(self) -> None:
+            """Start with nothing recorded."""
             self.calls: list[str] = []
 
         def terminate(self) -> None:
+            """Record the request to stop."""
             self.calls.append("terminate")
 
         def kill(self) -> None:
+            """Record the escalation."""
             self.calls.append("kill")
 
         def wait(self, timeout: int | None = None) -> int:
+            """Time out on every wait."""
             self.calls.append("wait")
             raise subprocess.TimeoutExpired("http-server", timeout or 0)
 

@@ -138,6 +138,7 @@ def test_a_diff_takes_the_same_lock_publication_does(
 
     @contextlib.contextmanager
     def watched(path: Path, contended: str) -> cabc.Iterator[None]:
+        """Record the lock taken, then take it for real."""
         taken.append(path)
         with real(path, contended):
             yield
@@ -181,6 +182,7 @@ def test_a_failed_publication_leaves_the_destination_as_it_was(
     breaks_on = 4
 
     def failing(source: Path, target: Path) -> object:
+        """Move for real until the scripted failure, then refuse."""
         moves["n"] += 1
         # Exactly one operation fails. A rename back into the directory the
         # file just left needs no new space, so a real ENOSPC would not block
@@ -254,6 +256,7 @@ def test_a_cancelled_publication_still_restores_the_destination(
     interrupt_on = 4
 
     def interrupted(source: Path, target: Path) -> object:
+        """Move for real until the scripted interrupt."""
         moves["n"] += 1
         if moves["n"] == interrupt_on:
             raise KeyboardInterrupt
@@ -303,6 +306,7 @@ def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> No
     moves = {"n": 0}
 
     def hopeless(source: Path, target: Path) -> object:
+        """Let the rescue through, then fail everything after it."""
         moves["n"] += 1
         # The rescue succeeds; the publication and then the rollback do not.
         if moves["n"] == 1:
@@ -349,7 +353,8 @@ def test_a_lock_refused_at_publication_still_cleans_up_staging(
     destination = _seeded(tmp_path)
 
     @contextlib.contextmanager
-    def held(path: Path, contended: str) -> cabc.Iterator[None]:
+    def held(_path: Path, contended: str) -> cabc.Iterator[None]:
+        """Refuse the lock the way a held one is refused."""
         message = f"another run has held {contended}"
         raise SystemExit(message)
         yield  # pragma: no cover - the lock is never granted
@@ -375,6 +380,7 @@ def test_an_ordinary_publication_failure_still_cleans_up(tmp_path: Path) -> None
     publication = 2
 
     def fails_once(source: Path, target: Path) -> object:
+        """Fail only the publication move; rescue and rollback work."""
         moves["n"] += 1
         if moves["n"] == publication:
             message = "no space left on device"

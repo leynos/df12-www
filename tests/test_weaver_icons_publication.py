@@ -73,9 +73,11 @@ def test_a_failure_writing_the_temporary_file_leaves_the_previous_macro(
     real = writer.tempfile.NamedTemporaryFile
 
     def fails_midway(*args: object, **kwargs: object) -> object:
+        """Hand back a real handle whose write refuses."""
         handle = real(*args, **kwargs)
 
         def refuse(_data: object) -> int:
+            """Refuse the write, the way a full disk would."""
             message = "No space left on device"
             raise OSError(message)
 
@@ -107,6 +109,7 @@ def test_a_failure_replacing_the_output_leaves_the_previous_macro(
     output = _published(generator, monkeypatch, tmp_path)
 
     def refuse(_self: Path, _target: object) -> Path:
+        """Refuse the rename, the way a permissions change would."""
         message = "Permission denied"
         raise PermissionError(message)
 

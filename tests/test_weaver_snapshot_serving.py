@@ -95,6 +95,7 @@ def test_the_port_is_probed_with_the_startup_lock_held(
     held: list[bool] = []
 
     def probe(_port: int) -> None:
+        """Observe whether the lock is held, then stop the start."""
         # An exclusive lock cannot be taken twice, so failing to take it here
         # is how holding it is observed.
         with lock.open("r+", encoding="utf-8") as rival:
@@ -123,6 +124,7 @@ class _Stoppably:
     """A launched child that records whether it was told to stand down."""
 
     def __init__(self) -> None:
+        """Start not yet stopped."""
         self.stopped = False
 
     def poll(self) -> int | None:
@@ -139,6 +141,7 @@ class _Stoppably:
 
     def wait(self, timeout: int | None = None) -> int:
         """Stand down immediately."""
+        del timeout
         return 0
 
 
@@ -158,6 +161,7 @@ def test_ownership_is_confirmed_after_the_startup_lock_is_released(
     held: list[bool] = []
 
     def confirm(_base: str, _marker: str, _port: int, _when: str) -> None:
+        """Observe whether the lock is still held at confirmation."""
         # An exclusive lock cannot be taken twice, so taking it here is how
         # its release is observed.
         with lock.open("r+", encoding="utf-8") as rival:
@@ -192,6 +196,7 @@ def test_a_server_that_fails_the_ownership_check_is_stopped(
     """A child that answered as somebody else must not be left on the port."""
 
     def refuse(_base: str, _marker: str, _port: int, _when: str) -> None:
+        """Refuse the way a foreign server on the port is refused."""
         message = "another server has it"
         raise SystemExit(message)
 
@@ -238,6 +243,7 @@ def test_choosing_a_port_is_separable_from_obtaining_one() -> None:
     asked: list[int] = []
 
     def allocator() -> int:
+        """Hand out the fixed port, recording the ask."""
         asked.append(allocated)
         return allocated
 
@@ -264,12 +270,14 @@ def test_a_machine_with_no_free_port_says_so(monkeypatch: pytest.MonkeyPatch) ->
         """A socket that cannot be bound, as an exhausted machine's would be."""
 
         def __enter__(self) -> _Refusing:
+            """Hand the socket stand-in back."""
             return self
 
         def __exit__(self, *_exc: object) -> None:
-            return None
+            """Have nothing to close."""
 
         def bind(self, _address: tuple[str, int]) -> None:
+            """Refuse the bind, as a machine out of ports would."""
             message = "Address family not supported"
             raise OSError(message)
 
@@ -401,12 +409,14 @@ def test_a_kernel_assigned_port_leaves_no_lock_file_behind(
     locks: list[int] = []
 
     def record(port: int) -> contextlib.AbstractContextManager[None]:
+        """Record the port the lock was asked for."""
         locks.append(port)
         return contextlib.nullcontext()
 
     monkeypatch.setattr(serving, "_startup_lock", record)
 
     def stop_before_spawning(_port: int) -> None:
+        """Stop the start before anything is spawned."""
         raise SystemExit(_MID_START_FAILURE)
 
     monkeypatch.setattr(serving, "_refuse_occupied_port", stop_before_spawning)
@@ -427,6 +437,7 @@ def test_the_default_port_is_treated_as_unnamed(
     seen: dict[str, object] = {}
 
     def start(_port: int, _marker: str, *, named: bool) -> object:
+        """Record how the port was classified and stop there."""
         seen["named"] = named
         message = "far enough"
         raise SystemExit(message)

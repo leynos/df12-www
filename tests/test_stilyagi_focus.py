@@ -145,7 +145,7 @@ class TestFocusRingTokens:
         Below it the chips are hidden and a native select drives the filter, so
         a focus check on the chip is only meaningful at a wider viewport.
         """
-        docs_css = (STYLES / "pages" / "docs.css").read_text(encoding="utf-8")
+        docs_css = (STYLE_SOURCES / "pages" / "docs.css").read_text(encoding="utf-8")
         assert f"@media (width <= {CHIP_ROW_MIN_WIDTH}px)" in docs_css
         assert ".filter-chip {\n    display: none;\n  }" in docs_css
 

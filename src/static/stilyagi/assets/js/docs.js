@@ -94,7 +94,7 @@
 
   /** Swap the Markdown and Python suppression examples. */
   function initSuppressionTabs() {
-    const tablist = document.querySelector('.suppress .tabs[role="tablist"]');
+    const tablist = document.querySelector('.suppress .syntax-tabs[role="tablist"]');
     if (!tablist) return;
 
     const tabs = [...tablist.querySelectorAll('[role="tab"][data-tab]')];

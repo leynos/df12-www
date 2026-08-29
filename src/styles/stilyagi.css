@@ -19,6 +19,21 @@
  * font rather than styling an element cannot lose a cascade argument. */
 @import "./stilyagi/fonts.css";
 
+/* The sub-site's own rules, split by concern and placed in layers.
+ *
+ * The layering is load-bearing: compiled Tailwind puts utilities in
+ * @layer utilities, and per CSS Cascade Level 5 an unlayered declaration
+ * beats every layered one regardless of specificity.  Left unlayered,
+ * these rules would win arguments the hand-written sheets used to lose.
+ * In the components layer a utility in the markup still wins, which is
+ * what anyone writing `class="mt-8"` expects.  Element defaults go a
+ * layer lower, beside the preflight — they describe an element before
+ * any class touches it. */
+@import "./stilyagi/site-base.css" layer(base);
+
+@import "./stilyagi/motifs.css" layer(components);
+@import "./stilyagi/chrome.css" layer(components);
+
 @source "../../templates/stilyagi/**/*.jinja";
 
 @plugin "daisyui" {

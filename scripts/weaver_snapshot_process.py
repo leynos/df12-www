@@ -14,6 +14,7 @@ from __future__ import annotations
 import contextlib
 import subprocess
 import typing as typ
+import urllib.error
 import urllib.request
 
 from weaver_snapshot_clock import SYSTEM_CLOCK, Clock
@@ -21,6 +22,7 @@ from weaver_snapshot_paths import REPO_ROOT
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
+    import email.message
 
 
 # How the readiness poll asks whether the server is answering yet. Raises when
@@ -30,7 +32,7 @@ type Probe = cabc.Callable[[str], None]
 
 # How a server process is started. Returns something that can be polled,
 # terminated and waited on — a `subprocess.Popen` in production.
-type Launcher = cabc.Callable[[cabc.Sequence[str]], "subprocess.Popen[bytes]"]
+type Launcher = cabc.Callable[[cabc.Sequence[str]], "ServerProcess"]
 
 
 # How many times the readiness poll asks before giving up, and how long it
@@ -45,6 +47,38 @@ READINESS_POLL_SECONDS = 0.2
 STOP_TIMEOUT_SECONDS = 10
 
 
+class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
+    """Treat a redirect as a failure rather than following it.
+
+    Every request this harness makes is to the loopback server it just
+    started, and the answer only means anything if it came from that exact
+    URL. The default opener follows a ``Location`` header wherever it points,
+    so whatever holds the port could send the request to a server of its
+    choosing — and the readiness poll or the ownership check would then be
+    trusting that server's content instead. A redirect is therefore proof
+    enough that the thing answering is not ``http-server`` serving this tree.
+    """
+
+    def redirect_request(  # noqa: PLR0913 - the base class fixed this signature
+        self,
+        req: urllib.request.Request,
+        fp: typ.IO[bytes],
+        code: int,
+        msg: str,
+        headers: email.message.Message,
+        newurl: str,
+    ) -> typ.NoReturn:
+        """Refuse the redirect, whatever it points at."""
+        reason = f"redirected to {newurl}, which is not the server being checked"
+        raise urllib.error.HTTPError(req.full_url, code, reason, headers, fp)
+
+
+# One opener for every loopback request the harness makes. `build_opener`
+# swaps its default redirect handler for the refusing one above; everything
+# else about it is the default opener.
+_NO_REDIRECTS = urllib.request.build_opener(_RefuseRedirects())
+
+
 def _probe_url(url: str) -> None:
     """Ask a URL for a response, raising if it does not give one.
 
@@ -56,9 +90,11 @@ def _probe_url(url: str) -> None:
     Raises
     ------
     OSError
-        If the request fails, which the readiness poll reads as "not yet".
+        If the request fails — including by answering with a redirect, which
+        only something other than this run's server would do. The readiness
+        poll reads either as "not yet".
     """
-    with urllib.request.urlopen(url, timeout=1):  # noqa: S310 - literal loopback URL
+    with _NO_REDIRECTS.open(url, timeout=1):
         return
 
 
@@ -117,6 +153,16 @@ class _Pollable(typ.Protocol):
     def poll(self) -> int | None:
         """Return the exit status, or ``None`` while the process runs."""
         ...  # pragma: no cover - a protocol has no body
+
+
+class ServerProcess(_Stoppable, _Pollable, typ.Protocol):
+    """Everything serving a snapshot consumes from the process running one.
+
+    `_await_server` polls it and `_stop` terminates, kills and waits on it;
+    nothing asks for more. Naming that union is what lets a launcher return a
+    stand-in in tests, while a real `subprocess.Popen[bytes]` satisfies it in
+    production without being named in the signature.
+    """
 
 
 def _await_server(

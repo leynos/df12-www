@@ -324,6 +324,47 @@ def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> No
     assert (kept / "replaced" / "one.json").read_text(encoding="utf-8") == (
         "previous one"
     ), f"the previous run's file is not recoverable from {kept}"
+    inconsistent = caught.value.__cause__
+    assert isinstance(inconsistent, output._InconsistentDestinationError), (
+        f"the SystemExit should chain from the rollback failure; got {inconsistent!r}"
+    )
+    assert isinstance(inconsistent.__cause__, OSError), (
+        "the rollback failure should chain from the publication failure that "
+        f"forced the rollback; got {inconsistent.__cause__!r}"
+    )
+    assert "the filesystem went away" in str(inconsistent.__cause__), (
+        f"the original failure was lost from the chain; got {inconsistent.__cause__!r}"
+    )
+
+
+def test_a_lock_refused_at_publication_still_cleans_up_staging(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`_exclusive` gives up on a held lock with SystemExit, not OSError.
+
+    Rolling up staging only for `OSError` left that path leaking: the capture
+    finished, the lock could not be taken, and a full staging directory sat
+    beside the destination looking like a published run.
+    """
+    destination = _seeded(tmp_path)
+
+    @contextlib.contextmanager
+    def held(path: Path, contended: str) -> cabc.Iterator[None]:
+        message = f"another run has held {contended}"
+        raise SystemExit(message)
+        yield  # pragma: no cover - the lock is never granted
+
+    monkeypatch.setattr(output, "_exclusive", held)
+
+    with pytest.raises(SystemExit, match="another run has held"):
+        _staged_run(destination, lambda source, target: source.replace(target))
+
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "the destination should be untouched when the lock is refused"
+    )
+    assert not list(tmp_path.glob(".out-*")), (
+        "a refused lock should not leave a staging directory behind"
+    )
 
 
 def test_an_ordinary_publication_failure_still_cleans_up(tmp_path: Path) -> None:

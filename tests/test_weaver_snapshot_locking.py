@@ -8,6 +8,7 @@ is opened to hold it is checked rather than assumed.
 
 from __future__ import annotations
 
+import errno
 import os
 import typing as typ
 
@@ -71,6 +72,47 @@ def test_the_startup_lock_is_released_when_the_run_fails(
     # its file was removed by hand.
     with locking._startup_lock(8099):
         pass
+
+
+def test_a_non_contention_flock_failure_is_raised_at_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Only contention is worth waiting out.
+
+    A kernel with no lock table left (ENOLCK) will not grow one because
+    another run finished, so retrying turns a hard failure into a
+    thirty-second stall that ends in the wrong message.
+    """
+    lock = tmp_path / "port.lock"
+    attempts: list[int] = []
+
+    def _no_locks_left(handle: object, flags: int) -> None:
+        attempts.append(flags)
+        raise OSError(errno.ENOLCK, "no locks available")
+
+    monkeypatch.setattr(locking.fcntl, "flock", _no_locks_left)
+
+    class _MustNotWait:
+        """A clock the lock must not consult: no retries, no timeout."""
+
+        def monotonic(self) -> float:
+            return 0.0
+
+        def sleep(self, seconds: float) -> None:
+            message = f"slept {seconds}s over a failure retrying cannot cure"
+            raise AssertionError(message)
+
+    with (
+        pytest.raises(OSError, match="no locks available") as caught,
+        locking._exclusive(lock, "the test lock", _MustNotWait()),
+    ):
+        pass  # pragma: no cover - the lock must not be granted
+
+    assert not isinstance(caught.value, SystemExit), (
+        "a non-contention failure was dressed up as the timeout message"
+    )
+    assert caught.value.errno == errno.ENOLCK
+    assert len(attempts) == 1, f"flock was retried: {len(attempts)} attempts"
 
 
 def test_the_lock_file_is_named_for_the_port_and_the_user() -> None:

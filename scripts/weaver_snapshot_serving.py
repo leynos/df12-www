@@ -10,15 +10,17 @@ from __future__ import annotations
 import collections.abc as cabc
 import contextlib
 import socket
-import typing as typ
 
 from weaver_snapshot_locking import _startup_lock
 from weaver_snapshot_ownership import _confirm_ownership, _ownership_marker
 from weaver_snapshot_paths import HTTP_SERVER
-from weaver_snapshot_process import Launcher, _await_server, _launch, _stop
-
-if typ.TYPE_CHECKING:
-    import subprocess
+from weaver_snapshot_process import (
+    Launcher,
+    ServerProcess,
+    _await_server,
+    _launch,
+    _stop,
+)
 
 
 def _refuse_occupied_port(port: int) -> None:
@@ -155,7 +157,7 @@ def _start_server(
     *,
     named: bool = True,
     launch: Launcher = _launch,
-) -> subprocess.Popen[bytes]:
+) -> ServerProcess:
     """Acquire the port and return a server already answering on it, as itself.
 
     Parameters
@@ -174,8 +176,9 @@ def _start_server(
 
     Returns
     -------
-    subprocess.Popen
-        The running server. The caller owns stopping it.
+    ServerProcess
+        The running server — a `subprocess.Popen` in production. The caller
+        owns stopping it.
 
     Raises
     ------
@@ -187,19 +190,33 @@ def _start_server(
     # kernel just handed out is not contended — nothing else can have been
     # given it — so locking it buys nothing and leaves a file behind in the
     # shared temp directory for every run ever made.
+    #
+    # It covers the check-then-act — probe, spawn, wait for an answer — and
+    # nothing after: once this server is answering, a contending run reaching
+    # the probe is refused with the ordinary port-in-use message whether the
+    # lock is held or not. The ownership fetch is a blocking request, and
+    # making the loser of the race wait through it buys no ordering the probe
+    # does not already provide.
+    base = f"http://127.0.0.1:{port}"
     with _startup_lock(port) if named else contextlib.nullcontext():
         _refuse_occupied_port(port)
         server = launch(_server_argv(port))
         try:
-            base = f"http://127.0.0.1:{port}"
             _await_server(server, base, port)
-            _confirm_ownership(base, marker, port, "on starting")
         except BaseException:
             # Otherwise a failed start leaves a child holding the port, and
             # the next run's probe refuses to start because of it.
             _stop(server)
             raise
-        return server
+    try:
+        _confirm_ownership(base, marker, port, "on starting")
+    except BaseException:
+        # The server answered but as somebody else's tree — or the check
+        # itself was interrupted. Either way the child must not be left
+        # holding the port.
+        _stop(server)
+        raise
+    return server
 
 
 @contextlib.contextmanager

@@ -9,7 +9,6 @@ between them, and what happens when a process will not stand down.
 from __future__ import annotations
 
 import collections.abc as cabc
-import contextlib
 import subprocess
 import typing as typ
 
@@ -27,7 +26,7 @@ _MID_START_FAILURE = "the port was occupied"
 # A port number for the messages these tests read back. Nothing binds it.
 PORT = 8099
 
-# The bound  puts on each of its waits.
+# The bound `_stop` puts on each of its waits.
 STOP_TIMEOUT = 10
 
 locking = load("weaver_snapshot_locking")
@@ -241,9 +240,7 @@ def test_a_server_that_died_before_answering_is_not_taken_for_the_responder() ->
     )
 
 
-def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder() -> None:
     """A reply proves something is listening, not that it is this run's server.
 
     The bind probe and the startup lock make this unreachable between two runs
@@ -261,14 +258,17 @@ def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder(
             """Report alive, then exited, so the reply lands in between."""
             return next(replies)
 
-    monkeypatch.setattr(
-        process.urllib.request,
-        "urlopen",
-        lambda *_args, **_kwargs: contextlib.nullcontext(),
-    )
+    def answers(_url: str) -> None:
+        """Succeed at once, the way a foreign server on the port would."""
 
     with pytest.raises(SystemExit) as caught:
-        process._await_server(_DiesAfterReplying(), "http://127.0.0.1:8099", 8099)
+        process._await_server(
+            _DiesAfterReplying(),
+            "http://127.0.0.1:8099",
+            8099,
+            _FakeClock(),
+            probe=answers,
+        )
 
     message = str(caught.value.code)
     assert "another server" in message, (

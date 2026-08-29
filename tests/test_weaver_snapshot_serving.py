@@ -28,9 +28,6 @@ _MID_START_FAILURE = "the port was occupied"
 # A port number for the messages these tests read back. Nothing binds it.
 PORT = 8099
 
-# The bound  puts on each of its waits.
-STOP_TIMEOUT = 10
-
 locking = load("weaver_snapshot_locking")
 paths = load("weaver_snapshot_paths")
 process = load("weaver_snapshot_process")
@@ -119,6 +116,101 @@ def test_the_port_is_probed_with_the_startup_lock_held(
     assert held == [True], (
         "the port must be probed while the startup lock is held, or two runs "
         f"can still interleave; observed {held!r}"
+    )
+
+
+class _Stoppably:
+    """A launched child that records whether it was told to stand down."""
+
+    def __init__(self) -> None:
+        self.stopped = False
+
+    def poll(self) -> int | None:
+        """Report still running."""
+        return None
+
+    def terminate(self) -> None:
+        """Record the request to stop."""
+        self.stopped = True
+
+    def kill(self) -> None:
+        """Record the insistence, the same way."""
+        self.stopped = True
+
+    def wait(self, timeout: int | None = None) -> int:
+        """Stand down immediately."""
+        return 0
+
+
+def test_ownership_is_confirmed_after_the_startup_lock_is_released(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The lock covers the check-then-act, not the blocking ownership fetch.
+
+    Once this run's server is answering, a contender reaching the probe is
+    refused whether the lock is held or not — so holding it through a
+    blocking HTTP request only makes the loser of the race wait longer for
+    the same refusal.
+    """
+    lock = tmp_path / "port.lock"
+    monkeypatch.setattr(locking, "_lock_path", lambda _port: lock)
+
+    held: list[bool] = []
+
+    def confirm(_base: str, _marker: str, _port: int, _when: str) -> None:
+        # An exclusive lock cannot be taken twice, so taking it here is how
+        # its release is observed.
+        with lock.open("r+", encoding="utf-8") as rival:
+            try:
+                fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                held.append(True)
+            else:
+                fcntl.flock(rival, fcntl.LOCK_UN)
+                held.append(False)
+
+    monkeypatch.setattr(serving, "_refuse_occupied_port", lambda _port: None)
+    monkeypatch.setattr(serving, "_await_server", lambda *_a, **_k: None)
+    monkeypatch.setattr(serving, "_confirm_ownership", confirm)
+
+    child = _Stoppably()
+    server = serving._start_server(
+        8099, "weaver-snapshot-deadbeef.txt", launch=lambda _argv: child
+    )
+
+    assert server is child, "the started server should be handed back as-is"
+    assert held == [False], (
+        "ownership should be confirmed after the startup lock is released; "
+        f"observed {held!r}"
+    )
+    assert not child.stopped, "a server that confirmed as ours was stopped"
+
+
+def test_a_server_that_fails_the_ownership_check_is_stopped(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A child that answered as somebody else must not be left on the port."""
+
+    def refuse(_base: str, _marker: str, _port: int, _when: str) -> None:
+        message = "another server has it"
+        raise SystemExit(message)
+
+    monkeypatch.setattr(serving, "_refuse_occupied_port", lambda _port: None)
+    monkeypatch.setattr(serving, "_await_server", lambda *_a, **_k: None)
+    monkeypatch.setattr(serving, "_confirm_ownership", refuse)
+
+    child = _Stoppably()
+    with pytest.raises(SystemExit, match="another server"):
+        serving._start_server(
+            8099,
+            "weaver-snapshot-deadbeef.txt",
+            named=False,
+            launch=lambda _argv: child,
+        )
+
+    assert child.stopped, (
+        "a failed ownership check should stop the child, or the next run's "
+        "probe refuses to start because of it"
     )
 
 

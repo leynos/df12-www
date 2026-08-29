@@ -12,9 +12,9 @@ from __future__ import annotations
 import contextlib
 import secrets
 import typing as typ
-import urllib.request
 
 from weaver_snapshot_paths import REPO_ROOT
+from weaver_snapshot_process import _NO_REDIRECTS
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -69,9 +69,11 @@ def _fetch(url: str, limit: int) -> str:
     Raises
     ------
     OSError
-        If the request fails.
+        If the request fails — including by answering with a redirect. A
+        marker is proof of ownership only if this exact URL served it, so a
+        server that points somewhere else has already failed the check.
     """
-    with urllib.request.urlopen(url, timeout=5) as response:  # noqa: S310 - literal loopback URL
+    with _NO_REDIRECTS.open(url, timeout=5) as response:
         return response.read(limit).decode("utf-8", "replace")
 
 

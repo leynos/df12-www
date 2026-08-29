@@ -9,6 +9,7 @@ already there.
 from __future__ import annotations
 
 import contextlib
+import errno
 import fcntl
 import hashlib
 import os
@@ -205,6 +206,13 @@ def _exclusive(
                 fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 break
             except OSError as exc:
+                # Only contention is worth waiting out. Anything else — no
+                # lock table left (ENOLCK), a bad descriptor — will not be
+                # cured by another run finishing, so retrying it would turn a
+                # hard failure into a thirty-second stall with the wrong
+                # message at the end of it.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
                 if clock.monotonic() >= deadline:
                     message = (
                         f"another run has held {contended} ({path}) for over "

@@ -80,7 +80,7 @@ def _publish(
             landed = destination / captured.name
             move(captured, landed)
             published.append(landed)
-    except BaseException:
+    except BaseException as cause:
         # `BaseException`, not `OSError`: a Ctrl-C between two renames leaves
         # the destination holding half of each run just as a full disk does,
         # and the operator who pressed it has no more reason to expect that
@@ -109,7 +109,10 @@ def _publish(
                 f"publication, and the previous run's files are in {aside}. "
                 + "; ".join(failures)
             )
-            raise _InconsistentDestinationError(message) from None
+            # Chained from the failure that interrupted publication, because
+            # the message describes the rollback and the operator also needs
+            # to see what went wrong in the first place.
+            raise _InconsistentDestinationError(message) from cause
         raise
 
 
@@ -184,5 +187,13 @@ def _staged(
         shutil.rmtree(staging, ignore_errors=True)
         message = f"{destination} could not be published to ({exc})"
         raise SystemExit(message) from exc
+    except BaseException:
+        # Publication can fail without an OSError: `_exclusive` gives up on a
+        # held lock with SystemExit, and a Ctrl-C can land between renames.
+        # The rollback has already run by the time either arrives here, so
+        # the staging directory holds nothing worth keeping — sweep it up
+        # rather than leave a half-capture that looks like a published one.
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
     else:
         shutil.rmtree(staging, ignore_errors=True)

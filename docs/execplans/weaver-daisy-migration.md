@@ -1813,23 +1813,67 @@ configured to block every host except `127.0.0.1`:
 - `http://127.0.0.1:8080/weaver/` renders the cream page, the indigo sidebar
   with its offset-shadow active item, the Playfair masthead, and the paper
   texture — indistinguishable from a screenshot taken before the migration.
-- The page's HTML contains exactly one stylesheet link,
-  `/weaver/assets/styles/weaver.css`, and exactly one script,
-  `/weaver/assets/js/mobile-nav.js`.
+
+  **Addendum (2026-08-29):** the "indistinguishable" clause is historical. It
+  described the Milestone 2 cutover, which was required to change nothing. Work
+  after Milestone 8 deliberately changed pixels for accessibility: the nav index
+  moved from `opacity-60` to `opacity-75` to clear AA, and code, table and
+  heading content may break mid-token below 768px so the document itself no
+  longer scrolls sideways at 360px. The cream page, the indigo sidebar, the
+  offset-shadow active item, the Playfair masthead and the paper texture are all
+  still as described.
+- The page's HTML links exactly one stylesheet,
+  `/weaver/assets/styles/weaver.css`, and loads exactly two external scripts,
+  `/weaver/assets/js/telemetry.js` and `/weaver/assets/js/mobile-nav.js`, in
+  that order. Both are same-origin. A page also carries one inline `<script>`
+  block — the anchor smooth-scroll handler — which fetches nothing.
+
+  **Addendum (2026-08-29):** the script half of this criterion is corrected in
+  place rather than appended, because it stated an outcome that had stopped
+  being true. It read "exactly one script, `/weaver/assets/js/mobile-nav.js`"
+  and was written when the drawer script was the only one.
+  `src/static/weaver/assets/js/telemetry.js` was added later, as its own file
+  rather than as part of `mobile-nav.js`, because `mobile-nav.js` returns early
+  on a page without the drawer's markup while the install and home pages' copy
+  controls still need the seam (see the Decision Log). Telemetry loads first so
+  the seam exists before the drawer reports on being built. The stylesheet half
+  is unchanged and still holds: one link, and no page reaches a third-party
+  host.
 - At 360px wide, `/weaver/privacy-policy/` shows a hamburger button that opens
   a modal drawer — behaviour that does not exist today.
 - Every icon that was a Font Awesome glyph is now an inline `<svg>`;
   `view-source` contains no `<i class="fa-` anywhere.
 
-**Test acceptance.** `uv run pytest tests/test_weaver_build.py` reports three
-passed. Each test failed before its milestone and passes after; the red failure
-is observed via `@pytest.mark.xfail(strict=True)`, and the marker is removed as
-part of the green step.
+**Test acceptance.** The three invariants that define "done" —
+`test_weaver_stylesheet_is_compiled`, `test_weaver_pages_reach_no_third_party_hosts`,
+and `test_weaver_sources_declare_no_colour_literals` — each failed before its
+milestone and passes after; the red failure is observed via
+`@pytest.mark.xfail(strict=True)`, and the marker is removed as part of the
+green step.
+
+**Addendum (2026-08-29):** this criterion previously read
+"`uv run pytest tests/test_weaver_build.py` reports three passed", which is no
+longer the layout. The three invariants still live in `tests/test_weaver_build.py`,
+but that file now also carries the control cases that stop the subresource and
+Font Awesome patterns passing vacuously, and the build-time Weaver suite has
+been split to stay inside the 400-line ceiling. The current command and counts:
+
+```bash
+uv run pytest tests/test_weaver_build.py \
+  tests/test_weaver_icons.py \
+  tests/test_weaver_icons_publication.py \
+  tests/test_weaver_conventions.py
+```
+
+reports 83 passed — 39, 24, 4 and 16 respectively. The browser, snapshot,
+chrome and users' guide suites are separate and are listed under
+`Artefacts and notes`.
 
 **Quality criteria.**
 
-- Tests: `make test` and `make test-js` pass; no test is skipped other than the
-  Playwright-marked ones when Chromium is absent.
+- Tests: `make test` and `make test-js` pass; the only skip is the Playwright
+  check in `tests/test_stilyagi_focus.py`, which skips when the Playwright node
+  package is absent and names `bun add -d playwright` in its skip reason.
 - Lint and format: `make lint` and `make check-fmt` pass. Biome accepts the new
   CSS partials.
 - Types: `make typecheck` passes.

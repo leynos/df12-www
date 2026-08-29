@@ -23,7 +23,7 @@
 .ir-explain code {
   font-family: var(--font-mono);
   font-size: 0.86em;
-  background: var(--paper-shade);
+  background: var(--color-paper-shade);
   padding: 1px 4px;
   white-space: nowrap;
 }
@@ -35,19 +35,19 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   line-height: 1.7;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
   margin-bottom: calc(var(--unit) * 1.5);
   max-width: 90ch;
 }
 .ir-hint .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-size: 1.1rem;
   line-height: 1;
 }
 
 .ir-frame {
-  border: var(--rule-weight-2) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight-2) solid var(--color-ink);
+  background: var(--color-paper);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   overflow: hidden;
@@ -58,12 +58,12 @@
   flex-direction: column;
 }
 .ir-frame .pane + .pane {
-  border-left: var(--rule-weight) solid var(--ink);
+  border-left: var(--rule-weight) solid var(--color-ink);
 }
 .ir-header {
   padding: 12px 20px;
-  border-bottom: var(--rule-weight) solid var(--ink);
-  background: var(--paper-shade);
+  border-bottom: var(--rule-weight) solid var(--color-ink);
+  background: var(--color-paper-shade);
   font-family: var(--font-sans);
   font-size: 0.72rem;
   letter-spacing: 0.18em;
@@ -73,7 +73,7 @@
   align-items: center;
 }
 .ir-header .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
 }
 
@@ -82,7 +82,7 @@
   font-size: 0.88rem;
   line-height: 1.6;
   padding: 20px 22px 28px;
-  background: var(--paper);
+  background: var(--color-paper);
   overflow-x: auto;
   flex: 1;
 }
@@ -91,7 +91,7 @@
   gap: 18px;
 }
 .src-line .gut {
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
   user-select: none;
   flex: 0 0 28px;
   text-align: right;
@@ -117,32 +117,32 @@
 /* :not(.active) lifts the specificity above the per-type tints below, so
    hover feedback shows on tinted regions without disturbing an active one. */
 .region:not(.active):hover {
-  background: color-mix(in srgb, var(--press-red) 12%, transparent);
+  background: color-mix(in srgb, var(--color-press-red) 12%, transparent);
 }
 .region.active {
-  background: var(--press-red);
-  color: var(--paper);
-  outline: 1px solid var(--ink);
+  background: var(--color-press-red);
+  color: var(--color-paper);
+  outline: 1px solid var(--color-ink);
 }
 /* One tint per region kind, each a wash of the palette hue the legend below
    pairs it with.  They are decoration over ink-on-paper type — the kind is
    also spelled out in the tree opposite — so they carry no contrast floor of
    their own; the swatches that key them do, and clear it. */
 .region.type-heading {
-  background: color-mix(in srgb, var(--jazz-ochre) 18%, transparent);
+  background: color-mix(in srgb, var(--color-jazz-ochre) 18%, transparent);
 }
 .region.type-paragraph {
   background: transparent;
 }
 .region.type-code {
-  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
 .region.type-link {
-  background: color-mix(in srgb, var(--jazz-blue) 18%, transparent);
-  color: var(--ink);
+  background: color-mix(in srgb, var(--color-jazz-blue) 18%, transparent);
+  color: var(--color-ink);
 }
 .region.type-list-item {
-  background: color-mix(in srgb, var(--signal-sage) 15%, transparent);
+  background: color-mix(in srgb, var(--color-signal-sage) 15%, transparent);
 }
 /* The per-type tints above share specificity with .region.active but follow
    it in source order, so without these rules an active region keeps its pale
@@ -152,8 +152,8 @@
 .region.type-code.active,
 .region.type-link.active,
 .region.type-list-item.active {
-  background: var(--press-red);
-  color: var(--paper);
+  background: var(--color-press-red);
+  color: var(--color-paper);
 }
 
 .ir-tree {
@@ -163,17 +163,17 @@
   line-height: 1.55;
   flex: 1;
   overflow-x: auto;
-  background: var(--paper);
+  background: var(--color-paper);
 }
 .tree-node {
   padding: 3px 6px;
   border-left: 2px solid transparent;
   margin-left: 0;
   cursor: pointer;
-  color: var(--ink);
+  color: var(--color-ink);
 }
 .tree-node:hover {
-  background: color-mix(in srgb, var(--press-red) 8%, transparent);
+  background: color-mix(in srgb, var(--color-press-red) 8%, transparent);
 }
 /* The nodes are stacked with no gap between them, so the shared ring is
    drawn inside the row rather than around it — outside, consecutive rows
@@ -185,25 +185,25 @@
   outline-offset: -3px;
 }
 .tree-node.active {
-  background: var(--press-red);
-  color: var(--paper);
-  border-left-color: var(--ink);
+  background: var(--color-press-red);
+  color: var(--color-paper);
+  border-left-color: var(--color-ink);
 }
 .tree-node.active .k {
-  color: var(--paper);
+  color: var(--color-paper);
 }
 .tree-node.active .v {
-  color: var(--paper);
+  color: var(--color-paper);
 }
 .tree-node .k {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
 }
 .tree-node .v {
-  color: var(--ink);
+  color: var(--color-ink);
 }
 .tree-node .d {
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 /* Scoped to the tree, not the node: the plain lines (content_hash,
    line_index, regions, the closing brackets) carry indents too. */
@@ -219,26 +219,26 @@
 
 .ir-foot {
   padding: 14px 20px;
-  border-top: var(--rule-weight) solid var(--ink);
-  background: var(--paper-shade);
+  border-top: var(--rule-weight) solid var(--color-ink);
+  background: var(--color-paper-shade);
   font-family: var(--font-sans);
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
   display: flex;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
 }
 .ir-foot .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
 }
 .ir-foot code {
   background: none;
   padding: 0;
-  color: var(--ink);
+  color: var(--color-ink);
   font-family: var(--font-mono);
   letter-spacing: 0;
 }
@@ -252,7 +252,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 .legend .sw {
   display: inline-block;
@@ -260,22 +260,22 @@
   height: 14px;
   margin-right: 6px;
   vertical-align: middle;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--color-ink);
 }
 .sw-heading {
-  background: var(--jazz-ochre);
+  background: var(--color-jazz-ochre);
 }
 .sw-para {
-  background: var(--paper);
+  background: var(--color-paper);
 }
 .sw-code {
-  background: color-mix(in srgb, var(--ink) 15%, transparent);
+  background: color-mix(in srgb, var(--color-ink) 15%, transparent);
 }
 .sw-link {
-  background: color-mix(in srgb, var(--jazz-blue) 28%, transparent);
+  background: color-mix(in srgb, var(--color-jazz-blue) 28%, transparent);
 }
 .sw-list {
-  background: color-mix(in srgb, var(--signal-sage) 22%, transparent);
+  background: color-mix(in srgb, var(--color-signal-sage) 22%, transparent);
 }
 
 .planner {
@@ -284,18 +284,18 @@
   padding: calc(var(--unit) * 6) calc(var(--unit) * 4);
 }
 .plan-frame {
-  border: var(--rule-weight-2) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight-2) solid var(--color-ink);
+  background: var(--color-paper);
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
 }
 .plan-left {
   padding: calc(var(--unit) * 4);
-  border-right: var(--rule-weight) solid var(--ink);
+  border-right: var(--rule-weight) solid var(--color-ink);
 }
 .plan-right {
   padding: calc(var(--unit) * 4);
-  background: var(--paper-shade);
+  background: var(--color-paper-shade);
 }
 .plan-frame h3 {
   font-family: var(--font-display);
@@ -309,7 +309,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+  border-bottom: 1px dashed color-mix(in srgb, var(--color-ink) 20%, transparent);
   font-family: var(--font-sans);
   font-size: 0.85rem;
   cursor: pointer;
@@ -330,15 +330,15 @@
 .rule-toggle .check {
   width: 18px;
   height: 18px;
-  border: 1.5px solid var(--ink);
+  border: 1.5px solid var(--color-ink);
   display: inline-block;
   position: relative;
   flex: 0 0 18px;
-  background: var(--paper);
+  background: var(--color-paper);
 }
 .rule-toggle.on .check {
-  background: var(--press-red);
-  border-color: var(--press-red);
+  background: var(--color-press-red);
+  border-color: var(--color-press-red);
 }
 .rule-toggle.on .check::after {
   content: "✓";
@@ -346,26 +346,26 @@
   inset: 0;
   display: grid;
   place-items: center;
-  color: var(--paper);
+  color: var(--color-paper);
   font-weight: 900;
   font-size: 0.9rem;
 }
 .rule-toggle .code {
   font-family: var(--font-mono);
   font-weight: 700;
-  color: var(--ink);
+  color: var(--color-ink);
   flex: 0 0 80px;
 }
 .rule-toggle .desc {
   font-family: var(--font-editorial);
-  color: var(--ink);
+  color: var(--color-ink);
   font-size: 0.98rem;
   flex: 1;
 }
 .rule-toggle .caps {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 
 .providers {
@@ -375,8 +375,8 @@
 }
 .provider {
   padding: 14px 16px;
-  border: 1.5px solid var(--ink);
-  background: var(--paper);
+  border: 1.5px solid var(--color-ink);
+  background: var(--color-paper);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -401,10 +401,10 @@
   margin-top: 4px;
 }
 .provider.loaded .pnote {
-  color: var(--paper);
+  color: var(--color-paper);
 }
 .provider.skipped .pnote {
-  color: var(--fg2);
+  color: var(--color-fg2);
 }
 .provider .ptag {
   font-family: var(--font-sans);
@@ -417,37 +417,37 @@
 /* Paper on press-red is 4.60:1, so the loaded card carries body-weight type
    at the AA floor without a variant of its own. */
 .provider.loaded {
-  background: var(--press-red);
-  color: var(--paper);
-  border-color: var(--press-red);
+  background: var(--color-press-red);
+  color: var(--color-paper);
+  border-color: var(--color-press-red);
 }
 .provider.loaded .ptag {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--color-ink);
+  color: var(--color-paper);
 }
 .provider.skipped {
-  background: var(--paper-shade);
-  border-color: var(--border-soft);
-  color: var(--fg2);
+  background: var(--color-paper-shade);
+  border-color: var(--color-border-soft);
+  color: var(--color-fg2);
 }
 .provider.skipped .ptag {
-  background: var(--paper-shade);
-  color: var(--ink);
-  border: 1px solid var(--ink);
+  background: var(--color-paper-shade);
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink);
 }
 
 .plan-sum {
   margin-top: 18px;
   padding-top: 14px;
-  border-top: var(--rule-weight) solid var(--ink);
+  border-top: var(--rule-weight) solid var(--color-ink);
   font-family: var(--font-sans);
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 .plan-sum b {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 
 .adrs {
@@ -461,15 +461,15 @@
   gap: calc(var(--unit) * 3);
 }
 .adr-card {
-  border: var(--rule-weight) solid var(--ink);
+  border: var(--rule-weight) solid var(--color-ink);
   padding: calc(var(--unit) * 3);
-  background: var(--paper);
+  background: var(--color-paper);
 }
 .adr-card .adr-num {
   font-family: var(--font-sans);
   font-size: 0.72rem;
   letter-spacing: 0.18em;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -487,14 +487,14 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   padding: 2px 6px 1px;
-  background: var(--signal-sage-solid);
-  color: var(--paper);
+  background: var(--color-signal-sage-solid);
+  color: var(--color-paper);
   display: inline-block;
   margin-bottom: 10px;
 }
 .adr-card .adr-status.prov {
-  background: var(--jazz-ochre);
-  color: var(--ink);
+  background: var(--color-jazz-ochre);
+  color: var(--color-ink);
 }
 .adr-card p {
   font-family: var(--font-editorial);
@@ -509,8 +509,8 @@
   padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 6);
 }
 .grammar-illo .inner {
-  border: var(--rule-weight-2) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight-2) solid var(--color-ink);
+  background: var(--color-paper);
   display: grid;
   grid-template-columns: 4fr 6fr;
   overflow: hidden;
@@ -528,10 +528,10 @@
   font-size: 2rem;
   margin: 0 0 calc(var(--unit) * 2);
   line-height: 0.95;
-  color: var(--ink);
+  color: var(--color-ink);
 }
 .grammar-illo .inner .text-side h3 .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .grammar-illo .inner .text-side p {
   font-family: var(--font-editorial);
@@ -542,7 +542,7 @@
 .grammar-illo .inner .text-side code {
   font-family: var(--font-mono);
   font-size: 0.86em;
-  background: var(--paper-shade);
+  background: var(--color-paper-shade);
   padding: 1px 4px;
   white-space: nowrap;
 }
@@ -563,9 +563,9 @@
   letter-spacing: 0.04em;
   line-height: 1;
   padding: 4px 6px 3px;
-  border: 1px solid var(--ink);
-  color: var(--ink);
-  background: var(--paper-shade);
+  border: 1px solid var(--color-ink);
+  color: var(--color-ink);
+  background: var(--color-paper-shade);
 }
 .grammar-illo .inner img {
   height: 95%;
@@ -587,11 +587,11 @@
   }
   .ir-frame .pane + .pane {
     border-left: 0;
-    border-top: var(--rule-weight) solid var(--ink);
+    border-top: var(--rule-weight) solid var(--color-ink);
   }
   .plan-left {
     border-right: 0;
-    border-bottom: var(--rule-weight) solid var(--ink);
+    border-bottom: var(--rule-weight) solid var(--color-ink);
   }
 }
 

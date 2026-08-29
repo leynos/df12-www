@@ -52,6 +52,7 @@
 @import "./stilyagi/pages/legal.css" layer(components);
 @import "./stilyagi/pages/why.css" layer(components);
 @import "./stilyagi/pages/how.css" layer(components);
+@import "./stilyagi/pages/design.css" layer(components);
 
 @source "../../templates/stilyagi/**/*.jinja";
 

@@ -18,7 +18,6 @@
  * by the site's static-assets build step. That makes it a committed generated
  * file, and `--check` fails when it drifts from the content it describes.
  *
- * @file
  * @module scripts/build-episodic-search-index
  */
 

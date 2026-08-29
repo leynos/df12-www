@@ -28,7 +28,7 @@ if typ.TYPE_CHECKING:
     from bs4.element import Tag
 
 STILYAGI_TEMPLATES = "templates/stilyagi"
-ROADMAP_CSS = Path("src/static/stilyagi/assets/styles/pages/roadmap.css")
+ROADMAP_CSS = Path("src/styles/stilyagi/pages/roadmap.css")
 
 #: Phase-row class -> (label status class, mark, spoken status). ``later``
 #: takes no status class because planned is the label's default appearance.
@@ -188,8 +188,8 @@ class TestRoadmapCallOutStyles:
     @pytest.mark.parametrize(
         ("selector", "fill"),
         [
-            (".illo-label.is-done", "--signal-sage-solid"),
-            (".illo-label.is-current", "--press-red"),
+            (".illo-label.is-done", "--color-signal-sage-solid"),
+            (".illo-label.is-current", "--color-press-red"),
         ],
     )
     def test_status_fill_is_declared(

@@ -6,15 +6,15 @@
   padding: calc(var(--unit) * 4) calc(var(--unit) * 4) calc(var(--unit) * 6);
 }
 .slice-timeline {
-  border-top: var(--rule-weight-2) solid var(--ink);
+  border-top: var(--rule-weight-2) solid var(--color-ink);
   margin-top: calc(var(--unit) * 3);
 }
 .phase {
-  border-bottom: var(--rule-weight) solid var(--ink);
-  background: var(--paper);
+  border-bottom: var(--rule-weight) solid var(--color-ink);
+  background: var(--color-paper);
 }
 .phase:hover:not(.open) {
-  background: var(--paper-shade);
+  background: var(--color-paper-shade);
 }
 /* A phase head is a button that fills its row, and until now the keyboard
    got only whatever ring the browser drew by default.  It takes the same
@@ -26,7 +26,7 @@
    between this phase and the next.  Ink on either ground the row can have
    is 15.21:1 on paper and 13.44:1 on the recessed shade. */
 .phase:not(.open):has(.ph-head:focus-visible) {
-  background: var(--paper-shade);
+  background: var(--color-paper-shade);
 }
 .phase .ph-head:focus-visible {
   outline-offset: -4px;
@@ -47,13 +47,13 @@
   line-height: 1;
 }
 .phase.done .ph-num {
-  color: var(--signal-sage);
+  color: var(--color-signal-sage);
 }
 .phase.current .ph-num {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .phase.later .ph-num {
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 .ph-title {
   font-family: var(--font-display);
@@ -65,13 +65,13 @@
   font-size: 1.75rem;
   line-height: 1.05;
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink);
 }
 .ph-tag {
   font-family: var(--font-sans);
   font-size: 0.72rem;
   letter-spacing: 0.18em;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   display: block;
   margin-bottom: 4px;
   font-weight: 700;
@@ -83,7 +83,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
   line-height: 1.6;
 }
 .ph-status {
@@ -94,39 +94,39 @@
   margin-bottom: 6px;
 }
 .phase.done .ph-status {
-  background: var(--signal-sage-solid);
-  color: var(--paper);
+  background: var(--color-signal-sage-solid);
+  color: var(--color-paper);
 }
 .phase.current .ph-status {
-  background: var(--press-red);
-  color: var(--paper);
+  background: var(--color-press-red);
+  color: var(--color-paper);
 }
 .phase.later .ph-status {
-  background: var(--paper-shade);
-  color: var(--ink);
-  border: 1px solid var(--ink);
+  background: var(--color-paper-shade);
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink);
 }
 .ph-toggle {
   font-family: var(--font-display);
   font-size: 2.4rem;
   line-height: 1;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   text-align: center;
   transition: transform 180ms;
 }
 .phase.open .ph-toggle {
   transform: rotate(45deg);
-  color: var(--ink);
+  color: var(--color-ink);
 }
 .ph-body {
   overflow: hidden;
   max-height: 0;
   transition: max-height 280ms ease-out;
-  background: var(--paper-shade);
+  background: var(--color-paper-shade);
 }
 .phase.open .ph-body {
   max-height: 2200px;
-  border-top: var(--rule-weight) solid var(--ink);
+  border-top: var(--rule-weight) solid var(--color-ink);
 }
 .ph-body-inner {
   display: grid;
@@ -143,7 +143,7 @@
   margin: 0 0 10px;
 }
 .goal h3 .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .goal p {
   font-family: var(--font-editorial);
@@ -154,16 +154,16 @@
 .ship-strip {
   margin-top: 18px;
   padding: 14px 16px;
-  border-left: 4px solid var(--press-red);
-  background: var(--paper);
+  border-left: 4px solid var(--color-press-red);
+  background: var(--color-paper);
   font-family: var(--font-sans);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--ink);
+  color: var(--color-ink);
 }
 .ship-strip b {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .deliverables ul {
   list-style: none;
@@ -173,7 +173,7 @@
 .deliverables li {
   padding: 8px 0 8px 1.8em;
   position: relative;
-  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+  border-bottom: 1px dashed color-mix(in srgb, var(--color-ink) 20%, transparent);
   font-family: var(--font-editorial);
   font-size: 1rem;
   line-height: 1.45;
@@ -188,7 +188,7 @@
   top: 8px;
   font-family: var(--font-display);
   font-weight: 900;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .legend-bar {
   display: flex;
@@ -199,7 +199,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 .legend-bar .dot {
   display: inline-block;
@@ -209,14 +209,14 @@
   margin-right: 6px;
 }
 .dot-done {
-  background: var(--signal-sage);
+  background: var(--color-signal-sage);
 }
 .dot-cur {
-  background: var(--press-red);
+  background: var(--color-press-red);
 }
 .dot-later {
-  background: var(--paper-shade);
-  border: 1px solid var(--ink);
+  background: var(--color-paper-shade);
+  border: 1px solid var(--color-ink);
 }
 /* Three keys no longer share a line at phone widths — wrapping leaves one
    stranded — so they stack into a short list instead. */
@@ -234,26 +234,29 @@
   grid-template-columns: 260px 1fr;
   gap: calc(var(--unit) * 6);
 }
-.margin-note {
+/* Scoped to the page's <main> class: the manifesto and mechanics pages
+   have margin notes of their own, styled by their own partials, and these
+   rules must not reach them now every partial ships in one sheet. */
+.roadmap-page .margin-note {
   font-family: var(--font-sans);
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
   line-height: 1.8;
   position: sticky;
   top: 100px;
   align-self: start;
 }
-.margin-note .red {
-  color: var(--accent-text);
+.roadmap-page .margin-note .red {
+  color: var(--color-accent-text);
   font-weight: 700;
   display: block;
   margin-bottom: 6px;
 }
 /* The note carries two headings; the second opens a fresh remark and needs
    air above it that the first, sitting at the top of the aside, does not. */
-.margin-note .red:not(:first-child) {
+.roadmap-page .margin-note .red:not(:first-child) {
   margin-top: 12px;
 }
 .risks .body h3 {
@@ -280,7 +283,7 @@
 }
 .roadmap-illo .illo-frame {
   position: relative;
-  border: var(--rule-weight-2) solid var(--ink);
+  border: var(--rule-weight-2) solid var(--color-ink);
   margin: calc(var(--unit) * 3) 0 0;
 }
 /* The plate boxes the artwork alone, so the call-out percentages below
@@ -304,7 +307,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   line-height: 1.5;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
 }
 .roadmap-illo img {
   width: 100%;
@@ -325,9 +328,9 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink);
-  background: var(--paper);
-  border: 1px solid var(--ink);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 1px solid var(--color-ink);
   padding: 2px 7px 1px;
   white-space: nowrap;
 }
@@ -338,12 +341,12 @@
    the mark is decorative and the status is spoken by a visually hidden
    suffix. */
 .illo-label.is-done {
-  background: var(--signal-sage-solid);
-  color: var(--paper);
+  background: var(--color-signal-sage-solid);
+  color: var(--color-paper);
 }
 .illo-label.is-current {
-  background: var(--press-red);
-  color: var(--paper);
+  background: var(--color-press-red);
+  color: var(--color-paper);
 }
 .illo-mark {
   font-weight: 900;
@@ -378,7 +381,7 @@
     border-block-end: 0;
   }
   .roadmap-illo img {
-    border-block-end: var(--rule-weight-2) solid var(--ink);
+    border-block-end: var(--rule-weight-2) solid var(--color-ink);
   }
   .illo-caption {
     position: static;
@@ -418,15 +421,15 @@
   gap: 14px;
 }
 .pacing .pacing-card {
-  border: 1px solid var(--ink);
+  border: 1px solid var(--color-ink);
   padding: 14px 16px;
-  background: var(--paper);
+  background: var(--color-paper);
 }
 .pacing .pacing-card .tt {
   font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.16em;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 6px;
@@ -453,7 +456,7 @@
   /* Stacked one-up, the sticky note travels over the prose instead of beside
      it, so it needs a surface of its own.  Same treatment as the masthead: a
      near-opaque paper wash over a blur, lifted above the body column. */
-  .margin-note {
+  .roadmap-page .margin-note {
     z-index: 1;
     /* The masthead runs 74–90px tall depending on how the brand imprint
        wraps.  Anchoring the box at 74px and padding the text down to 98px
@@ -463,9 +466,9 @@
     top: 74px;
     margin-inline: calc(var(--unit) * -2);
     padding: calc(var(--unit) * 3) calc(var(--unit) * 2) calc(var(--unit) * 1.5);
-    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    background: color-mix(in srgb, var(--color-paper) 92%, transparent);
     backdrop-filter: blur(8px);
-    border-bottom: var(--rule-weight) solid var(--ink);
+    border-bottom: var(--rule-weight) solid var(--color-ink);
   }
   .pacing {
     grid-template-columns: repeat(2, minmax(0, 1fr));

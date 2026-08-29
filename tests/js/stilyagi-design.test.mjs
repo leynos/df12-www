@@ -1,4 +1,5 @@
-/* Tests for the Stilyagi design page's IR inspector and capability planner.
+/**
+ * @file Tests for the Stilyagi design page's IR inspector and capability planner.
  *
  * The planner's whole job is to answer two questions from the enabled
  * ruleset: which linguistic providers must load, and what that costs at

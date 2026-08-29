@@ -1,4 +1,5 @@
-/* A DOM-level harness for the Stilyagi widgets.
+/**
+ * @file DOM-level harness for the Stilyagi widgets.
  *
  * The widget modules are classic scripts: an IIFE that reads the document at
  * load time, wires listeners, and exports only its pure decision functions.

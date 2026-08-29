@@ -1,4 +1,5 @@
-/* Shared DOM primitives for the browser-level harnesses.
+/**
+ * @file Shared DOM primitives for the browser-level harnesses.
  *
  * Both `mobile-nav-harness.mjs` and `stilyagi.mjs` drive shipped classic
  * scripts against a happy-dom window; the mechanics of loading a script and

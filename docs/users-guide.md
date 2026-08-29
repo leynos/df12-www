@@ -91,7 +91,9 @@ The drawer closes four ways, and any of them will do:
 While the drawer is open, focus moves into it, so the next `Tab` moves through
 the navigation rather than through the page behind it. Closing the drawer
 restores focus to wherever it was before the drawer opened; if nothing in
-particular held it, focus returns to the button that opened the drawer.
+particular held it, focus returns to the button that opened the drawer. The
+same fallback applies if whatever held focus has since been removed from the
+page or can no longer be focused.
 
 The page behind the drawer does not scroll vertically while it is open, so
 dismissing the drawer leaves the page at the same position rather than

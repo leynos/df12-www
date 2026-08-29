@@ -461,6 +461,27 @@ fails if the committed macro does not match what the generator would produce
 from the current mapping, so `templates/weaver/_icons.jinja` must never be
 hand-edited — change `config/weaver-icons.yaml` and rerun the generator instead.
 
+
+#### The shared atomic writer
+
+`scripts/atomic_write.py` has one public function,
+`atomic_write(output: Path, payload: str | bytes)`, and it is how each
+single-file generator above publishes its result. Text is encoded as UTF-8;
+bytes are written as given. Missing parent directories are created. The
+payload goes to a unique temporary file beside `output` and is moved into
+place with a same-filesystem rename, which is atomic: until the rename,
+`output` holds the old contents untouched, and after it, the new contents in
+full — never a partial write. The temporary file is removed on every path
+that does not end in a successful rename. Failure raises `OSError`; a caller
+wanting a friendlier message wraps it, as the icon generator above does,
+converting it to a `SystemExit` naming the file.
+
+`scripts/generate_weaver_icons.py`, `scripts/build_episodic_roadmap_data.py`,
+and `scripts/typos_rollout_cache.py` all publish through it. The Weaver
+snapshot harness's directory-level publication (`_output`, section 7.1) is a
+different problem — staging and swapping a whole tree rather than replacing
+one file — and is deliberately not built on this helper.
+
 ### 4.8. Weaver's chrome macros
 
 `templates/weaver/_chrome.jinja` holds two macros shared across every Weaver

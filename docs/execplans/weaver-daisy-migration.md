@@ -1118,10 +1118,14 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   needed `python -m` with a path fiddle. A `__main__.py` can use
   package-relative imports perfectly well when the package is invoked that way;
   what it cannot do is use them under the direct-path invocation this harness
-  documents because running a directory supplies no package context. Either
+  documents, because running a directory supplies no package context. Either
   route would have changed the documented invocation, the Makefile, and every
   test that loads the harness. Siblings changed the invocation not at all.
   Date/Author: 2026-08-28, review batch.
+
+  **Addendum (2026-08-29):** the sentence reads better without the comma
+  before "because" — "documents because running a directory supplies no
+  package context" — but the entry above stands as written.
 - **Decision:** take the startup lock only for a port the caller named.
   Rationale: the lock serializes contention, and a port the kernel has just
   handed out cannot be contended — nothing else was given it. Keying a lock

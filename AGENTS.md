@@ -128,11 +128,12 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Four entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Five entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode), `src/styles/mxd.css` for the mxd sub-site (the `mxd`
-theme), `src/styles/episodic.css` for Episodic (the `episodic` theme), and
-`src/styles/weaver.css` for Weaver (the `weaver` theme).
+theme), `src/styles/episodic.css` for Episodic (the `episodic` theme),
+`src/styles/weaver.css` for Weaver (the `weaver` theme), and
+`src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme).
 
 Weaver's entrypoint is the one to read first when adding a sub-site stylesheet,
 and Episodic's follows the same shape. It declares the theme, then imports
@@ -144,14 +145,13 @@ specificity, so a sub-site stylesheet left unlayered silently outranks the
 utilities in the markup. In the components layer a utility still wins, which is
 what anyone writing `class="mt-8"` expects.
 
-Netsuke and Stilyagi still carry hand-crafted stylesheets and neither uses
-daisyUI. Netsuke loads the **Tailwind Play CDN** at runtime and extends the
-default theme through `/netsuke/assets/js/tailwind-config.js`; Stilyagi uses
-neither. The Play CDN is not the compiled build: it injects its utilities into a
-`<style>` tag after the stylesheet link, which is why handwritten rules on
-Netsuke sometimes need the doubled selector described below. Their colour
-tokens live in their own stylesheets, and the accessibility rules below apply
-to them just the same.
+Netsuke still carries hand-crafted stylesheets and does not use daisyUI: it
+loads the **Tailwind Play CDN** at runtime and extends the default theme
+through `/netsuke/assets/js/tailwind-config.js`. The Play CDN is not the
+compiled build: it injects its utilities into a `<style>` tag after the
+stylesheet link, which is why handwritten rules on Netsuke sometimes need the
+doubled selector described below. Its colour tokens live in its own
+stylesheets, and the accessibility rules below apply to it just the same.
 
 Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
 build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which
@@ -170,11 +170,13 @@ test fails if the two disagree. Weaver's code samples are marked up by hand
 rather than run through Pygments, and their `.token-*` colours live in
 `src/styles/weaver/code.css`.
 
-Stilyagi's palette is split by role rather than by hue: `--press-red` paints
-fills, borders, and stamps, while red *type* uses `--accent-text`, which each
-dark panel re-points from the paper-surface red to the ink-ground one. Because
-custom properties inherit, setting `--accent-text` on a container is enough —
-prefer that over adding a colour at the call site.
+Stilyagi's palette is split by role rather than by hue: `--color-press-red`
+paints fills, borders, and stamps, while red *type* uses
+`--color-accent-text`, which each dark panel re-points from the paper-surface
+red to the ink-ground one (the re-pointing block lives in
+`src/styles/stilyagi/site-base.css`). Because custom properties inherit,
+setting `--color-accent-text` on a container is enough — prefer that over
+adding a colour at the call site.
 
 ### Prefer semantic classes over literal colours
 

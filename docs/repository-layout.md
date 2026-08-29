@@ -118,23 +118,27 @@ Build-time scripts outside the Python package:
 ### `src/`
 
 Frontend source files. `styles/` contains one Tailwind CSS entry point per
-compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css` and
-`weaver.css` for those sub-sites — plus any plugins. Each is compiled to its
-own file under `public/`: `public/assets/site.css`,
+compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css`,
+`weaver.css` and `stilyagi.css` for those sub-sites — plus any plugins. Each
+is compiled to its own file under `public/`: `public/assets/site.css`,
 `public/mxd/assets/tailwind.css`, `public/episodic/assets/styles/tailwind.css`,
-and `public/weaver/assets/styles/weaver.css`.
+`public/weaver/assets/styles/weaver.css`, and
+`public/stilyagi/assets/styles/stilyagi.css`.
 
 An entry point that has grown past a single file keeps its partials in a
-directory beside it. `styles/episodic/` and `styles/weaver/` are the examples:
-the entry point declares the theme and imports partials named for what they
-style, each into an explicit cascade layer.
+directory beside it. `styles/episodic/`, `styles/weaver/` and
+`styles/stilyagi/` are the examples: the entry point declares the theme and
+imports partials named for what they style, each into an explicit cascade
+layer.
 
 `static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
 and favicons — that are copied verbatim into the published tree. Its layout
-mirrors the output, so `src/static/stilyagi/assets/styles/` is the
-authoritative source for the Stilyagi sub-site's CSS and is published at
-`/stilyagi/assets/styles/`. Edit the files here. The copies under `public/` are
-build output and are overwritten on the next build.
+mirrors the output, so `src/static/stilyagi/assets/fonts/` is published at
+`/stilyagi/assets/fonts/`. Edit the files here. The copies under `public/` are
+build output and are overwritten on the next build. The one stylesheet still
+under `src/static/stilyagi/assets/styles/` is `syntax.css`, whose marked block
+is generated Pygments output; it compiles into the Stilyagi entry point rather
+than being linked on its own.
 
 ### `templates/`
 

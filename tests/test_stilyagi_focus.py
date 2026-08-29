@@ -57,6 +57,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 STILYAGI_TEMPLATES = REPO_ROOT / "templates" / "stilyagi"
 STILYAGI_STATIC = REPO_ROOT / "src" / "static" / "stilyagi"
 STYLES = STILYAGI_STATIC / "assets" / "styles"
+#: The compiled-stylesheet sources; the shared tokens and most page partials
+#: live here since the daisyUI migration, while anything not yet migrated
+#: stays under STYLES.
+STYLE_SOURCES = REPO_ROOT / "src" / "styles" / "stilyagi"
+COMPILED_STYLESHEET = (
+    REPO_ROOT / "public" / "stilyagi" / "assets" / "styles" / "stilyagi.css"
+)
 FOCUS_PROBE = Path(__file__).parent / "support" / "stilyagi_focus_probe.mjs"
 
 #: The namespace whose active chip is filled with ink, so its ring is the one
@@ -76,7 +83,7 @@ MIN_RING_WIDTH_PX = 2
 CHIP_ROW_MIN_WIDTH = 1280
 
 _RULE_RE = re.compile(r"(?P<selector>[^{}]+)\{(?P<body>[^{}]*)\}")
-_PAPER_RING_RE = re.compile(r"--focus-ring-color\s*:\s*var\(\s*--paper\s*\)")
+_PAPER_RING_RE = re.compile(r"--focus-ring-color\s*:\s*var\(\s*--(?:color-)?paper\s*\)")
 _OUTLINE_OFFSET_RE = re.compile(r"outline-offset\s*:\s*(?P<value>-?[\d.]+)px")
 
 
@@ -86,9 +93,10 @@ def _stylesheets() -> cabc.Iterator[Path]:
     ``syntax.css`` is generated from a Pygments style and carries no focus
     rules, so it is excluded rather than parsed.
     """
-    for path in sorted(STYLES.rglob("*.css")):
-        if path.name != "syntax.css":
-            yield path
+    for root in (STYLES, STYLE_SOURCES):
+        for path in sorted(root.rglob("*.css")):
+            if path.name != "syntax.css":
+                yield path
 
 
 class TestFocusRingTokens:
@@ -121,8 +129,8 @@ class TestFocusRingTokens:
 
     def test_the_shared_ring_is_ink_and_drawn_outside(self) -> None:
         """The default suits the common case: any control on a paper page."""
-        tokens = (STYLES / "colors-and-type.css").read_text(encoding="utf-8")
-        assert "--focus-ring-color: var(--ink);" in tokens, (
+        tokens = (STYLE_SOURCES / "site-base.css").read_text(encoding="utf-8")
+        assert "--focus-ring-color: var(--color-ink);" in tokens, (
             "the shared ring should default to ink, which holds against every "
             "paper surface the site has"
         )
@@ -152,6 +160,15 @@ def served_docs_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """
     root = tmp_path_factory.mktemp("stilyagi-site")
     shutil.copytree(STILYAGI_STATIC / "assets", root / "stilyagi" / "assets")
+
+    # The layout links the compiled Tailwind + daisyUI sheet, which is build
+    # output rather than a static asset; the tree serves the site's real
+    # stylesheet or the page under test is unstyled.
+    if not COMPILED_STYLESHEET.exists():
+        pytest.skip("compiled Stilyagi stylesheet missing; run `bun run build:css`")
+    shutil.copy(
+        COMPILED_STYLESHEET, root / "stilyagi" / "assets" / "styles" / "stilyagi.css"
+    )
 
     config = ContentPageConfig(
         key="docs",

@@ -41,6 +41,7 @@
  * reason the per-page <link> used to come after the shared ones: where a
  * page tunes a shared component, the page's rule wins the source-order tie. */
 @import "./stilyagi/pages/legal.css" layer(components);
+@import "./stilyagi/pages/why.css" layer(components);
 
 @source "../../templates/stilyagi/**/*.jinja";
 

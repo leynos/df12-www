@@ -4,13 +4,13 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
-  border: var(--rule-weight-2) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight-2) solid var(--color-ink);
+  background: var(--color-paper);
   margin: calc(var(--unit) * 2) 0 calc(var(--unit) * 6);
 }
 .camps .camp {
   padding: calc(var(--unit) * 4) calc(var(--unit) * 3);
-  border-right: var(--rule-weight) solid var(--ink);
+  border-right: var(--rule-weight) solid var(--color-ink);
   position: relative;
 }
 .camps .camp:last-child {
@@ -21,7 +21,7 @@
   font-weight: 900;
   font-size: 4.5rem;
   line-height: 0.8;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   margin-bottom: 8px;
 }
 .camps .camp h3 {
@@ -31,7 +31,7 @@
   letter-spacing: 0;
   text-transform: uppercase;
   margin: 0 0 12px;
-  color: var(--ink);
+  color: var(--color-ink);
   line-height: 1;
 }
 .camps .camp p {
@@ -48,12 +48,12 @@
   font-size: 0.7rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--paper);
-  background: var(--ink);
+  color: var(--color-paper);
+  background: var(--color-ink);
   padding: 3px 8px 2px;
 }
 .camps .camp .verdict-tag.red {
-  background: var(--press-red);
+  background: var(--color-press-red);
 }
 
 .argument {
@@ -72,11 +72,11 @@
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--color-ink-soft);
   line-height: 1.8;
 }
 .argument .margin-note .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
   display: block;
   margin-bottom: 8px;
@@ -88,13 +88,13 @@
   text-transform: uppercase;
   line-height: 0.95;
   margin: calc(var(--unit) * 4) 0 calc(var(--unit) * 2);
-  color: var(--ink);
+  color: var(--color-ink);
 }
 .argument .body h3:first-child {
   margin-top: 0;
 }
 .argument .body h3 .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .argument .body p {
   font-family: var(--font-editorial);
@@ -107,11 +107,11 @@
 }
 
 .personas {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--color-ink);
+  color: var(--color-paper);
   padding: calc(var(--unit) * 8) 0;
-  border-top: var(--rule-weight-3) solid var(--press-red);
-  border-bottom: var(--rule-weight-3) solid var(--press-red);
+  border-top: var(--rule-weight-3) solid var(--color-press-red);
+  border-bottom: var(--rule-weight-3) solid var(--color-press-red);
 }
 .personas .wrap {
   max-width: 1240px;
@@ -119,32 +119,32 @@
   padding: 0 calc(var(--unit) * 4);
 }
 .personas h2 {
-  color: var(--paper);
+  color: var(--color-paper);
   font-size: 3rem;
   line-height: 0.95;
   margin: 0 0 calc(var(--unit) * 2);
 }
 .personas h2 .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .personas .intro {
   font-family: var(--font-editorial);
   font-size: 1.15rem;
-  color: var(--paper);
+  color: var(--color-paper);
   max-width: 60ch;
   margin-bottom: calc(var(--unit) * 5);
 }
 .personas table {
   width: 100%;
   border-collapse: collapse;
-  color: var(--paper);
+  color: var(--color-paper);
   font-family: var(--font-editorial);
 }
 .personas table th,
 .personas table td {
   padding: 14px 12px;
   vertical-align: top;
-  border-bottom: 1px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-paper) 25%, transparent);
   font-size: 1.02rem;
   line-height: 1.5;
 }
@@ -154,9 +154,9 @@
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent-text);
-  border-top: 2px solid var(--press-red);
-  border-bottom: 2px solid var(--press-red);
+  color: var(--color-accent-text);
+  border-top: 2px solid var(--color-press-red);
+  border-bottom: 2px solid var(--color-press-red);
 }
 .personas table tbody th {
   font-family: var(--font-display);
@@ -164,17 +164,17 @@
   font-size: 1.15rem;
   text-transform: uppercase;
   letter-spacing: 0.01em;
-  color: var(--paper);
+  color: var(--color-paper);
   width: 22%;
 }
 /* The section folio sits on the ink ground, where --accent-text is already
    the on-ink red, so it needs only its spacing. */
 .personas .personas-folio {
   margin-bottom: 18px;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .personas table td.ignore {
-  color: color-mix(in srgb, var(--paper) 55%, transparent);
+  color: color-mix(in srgb, var(--color-paper) 55%, transparent);
   font-style: italic;
   width: 28%;
 }
@@ -191,9 +191,9 @@
   margin-top: calc(var(--unit) * 3);
 }
 .valueset .tenet-card {
-  border: var(--rule-weight) solid var(--ink);
+  border: var(--rule-weight) solid var(--color-ink);
   padding: calc(var(--unit) * 3);
-  background: var(--paper);
+  background: var(--color-paper);
   position: relative;
   min-height: 180px;
 }
@@ -201,7 +201,7 @@
   font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.18em;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-weight: 700;
 }
 .valueset .tenet-card h3 {
@@ -241,7 +241,7 @@
   line-height: 0.95;
 }
 .rejected-head .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .rejected-lede {
   margin-top: 18px;
@@ -255,15 +255,15 @@
 }
 
 .weakness-panel {
-  border: var(--rule-weight-2) solid var(--press-red);
-  background: var(--paper-shade);
+  border: var(--rule-weight-2) solid var(--color-press-red);
+  background: var(--color-paper-shade);
   padding: calc(var(--unit) * 4);
 }
 .weakness-panel h3 {
   font-family: var(--font-display);
   font-weight: 900;
   text-transform: uppercase;
-  color: var(--accent-text);
+  color: var(--color-accent-text);
   font-size: 1.7rem;
   margin: 0 0 calc(var(--unit) * 2);
 }
@@ -277,14 +277,16 @@
   margin-bottom: 10px;
 }
 
-/* The shared closing section lives in stilyagi-site.css.  This page's quote
-   is the shortest of the three and is set larger on a tighter measure, and
-   the panel above it supplies no gap underneath, so the section takes its
-   own top padding. */
-.closing {
+/* The shared closing section lives in chrome.css.  This page's quote is the
+   shortest of the three and is set larger on a tighter measure, and the
+   panel above it supplies no gap underneath, so the section takes its own
+   top padding.  Scoped to the page's <main> class: every page's partial now
+   ships in the one compiled sheet, and unscoped these would restyle the
+   closings on how and design too. */
+.why-page .closing {
   padding-top: calc(var(--unit) * 4);
 }
-.closing .pullquote {
+.why-page .closing .pullquote {
   max-width: 34ch;
   font-size: 2.2rem;
 }
@@ -296,8 +298,8 @@
   padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 4);
 }
 .style-hunter-panel .inner {
-  border: var(--rule-weight-2) solid var(--ink);
-  background: var(--paper);
+  border: var(--rule-weight-2) solid var(--color-ink);
+  background: var(--color-paper);
   display: grid;
   grid-template-columns: auto 1fr;
   overflow: hidden;
@@ -307,7 +309,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  border-right: var(--rule-weight-2) solid var(--ink);
+  border-right: var(--rule-weight-2) solid var(--color-ink);
   mix-blend-mode: multiply;
 }
 .style-hunter-panel .inner .text {
@@ -325,7 +327,7 @@
   line-height: 0.95;
 }
 .style-hunter-panel .inner .text h3 .red {
-  color: var(--accent-text);
+  color: var(--color-accent-text);
 }
 .style-hunter-panel .inner .text p {
   font-family: var(--font-editorial);
@@ -345,7 +347,7 @@
   /* Stacked two-up, the third and fourth camps need the rule between rows
      that the single-row layout got from the side borders alone. */
   .camps .camp:nth-child(-n + 2) {
-    border-bottom: var(--rule-weight) solid var(--ink);
+    border-bottom: var(--rule-weight) solid var(--color-ink);
   }
   .camps .camp:nth-child(2n) {
     border-right: 0;
@@ -361,7 +363,7 @@
   }
   .camps .camp {
     border-right: 0;
-    border-bottom: var(--rule-weight) solid var(--ink);
+    border-bottom: var(--rule-weight) solid var(--color-ink);
   }
   /* Stacked one-up, the sticky note travels over the prose instead of beside
      it, so it needs a surface of its own.  Same treatment as the masthead: a
@@ -374,9 +376,9 @@
     z-index: 1;
     margin-inline: calc(var(--unit) * -2);
     padding: calc(var(--unit) * 3) calc(var(--unit) * 2) calc(var(--unit) * 1.5);
-    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    background: color-mix(in srgb, var(--color-paper) 92%, transparent);
     backdrop-filter: blur(8px);
-    border-bottom: var(--rule-weight) solid var(--ink);
+    border-bottom: var(--rule-weight) solid var(--color-ink);
   }
   .style-hunter-panel .inner {
     grid-template-columns: 1fr;
@@ -385,6 +387,6 @@
     width: 100%;
     height: 200px;
     border-right: 0;
-    border-bottom: var(--rule-weight-2) solid var(--ink);
+    border-bottom: var(--rule-weight-2) solid var(--color-ink);
   }
 }

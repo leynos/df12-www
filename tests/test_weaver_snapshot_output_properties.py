@@ -63,15 +63,19 @@ def test_publication_always_ends_in_a_recoverable_state(
         (destination / f"{stem}.json").write_text(f"prev:{stem}", encoding="utf-8")
 
     calls = {"n": 0}
+    raised: list[BaseException] = []
 
     def mover(source: Path, target: Path) -> object:
         """Move for real, failing at each generated position."""
         calls["n"] += 1
         if calls["n"] in fail_at:
-            if interrupt:
-                raise KeyboardInterrupt
-            message = "provoked"
-            raise OSError(message)
+            failure: BaseException = (
+                KeyboardInterrupt() if interrupt else OSError("provoked")
+            )
+            # Retained so the chain assertions below can demand the exact
+            # objects, not merely their types.
+            raised.append(failure)
+            raise failure
         return source.replace(target)
 
     outcome: BaseException | None = None
@@ -113,21 +117,21 @@ def test_publication_always_ends_in_a_recoverable_state(
                 )
             match stop.__cause__:
                 case output._InconsistentDestinationError() as inconsistent:
-                    # The second link matters as much as the first: dropping
-                    # either `from` in the production code would keep the
-                    # wrapper type while losing the diagnostic cause.
-                    match inconsistent.__cause__:
-                        case KeyboardInterrupt() if interrupt:
-                            pass
-                        case OSError() if not interrupt:
-                            pass
-                        case unexpected:
-                            pytest.fail(
-                                f"the inconsistent-destination report should "
-                                f"chain from the provoked "
-                                f"{'interrupt' if interrupt else 'OSError'}; "
-                                f"got {unexpected!r}"
-                            )
+                    # The second link matters as much as the first, and it is
+                    # asserted by identity: an interrupted rollback chains
+                    # from the interruption that landed *inside* the rollback
+                    # (the second exception raised), while a rollback whose
+                    # restores merely failed chains from the publication
+                    # failure that forced it (the first). Dropping either
+                    # `from` in the production code fails this.
+                    expected = raised[1] if interrupt else raised[0]
+                    origin = (
+                        "rollback interruption" if interrupt else "publication failure"
+                    )
+                    assert inconsistent.__cause__ is expected, (
+                        f"the report should chain from the exact {origin}; got "
+                        f"{inconsistent.__cause__!r} rather than {expected!r}"
+                    )
                 case unexpected:
                     pytest.fail(
                         f"the report should chain from the rollback's own "

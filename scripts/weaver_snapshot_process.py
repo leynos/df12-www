@@ -70,9 +70,11 @@ class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
     ) -> typ.NoReturn:
         """Refuse the redirect, whatever it points at."""
         # The signature is the base class's; the status line's reason phrase
-        # is not needed to refuse, so it is consumed rather than suppressed.
-        del msg
-        reason = f"redirected to {newurl}, which is not the server being checked"
+        # and the Location target are both server-controlled text, so neither
+        # is repeated into the error — the refusal is the diagnostic, and the
+        # status code is the only detail worth keeping.
+        del msg, newurl
+        reason = "answered with a redirect, which is not the server being checked"
         raise urllib.error.HTTPError(req.full_url, code, reason, headers, fp)
 
 
@@ -169,13 +171,17 @@ class ServerProcess(_Stoppable, _Pollable, typ.Protocol):
 
 
 def _probe_failure_category(failure: OSError | None) -> str:
-    """Name the readiness probe's failure stably, for the giving-up message.
+    """Name a loopback request's failure stably, for a giving-up message.
+
+    The category is the only part of a failure that belongs in a message:
+    whatever holds the port is untrusted, so its reason phrases and redirect
+    targets are its to choose and are not repeated.
 
     Parameters
     ----------
     failure
-        The last exception a probe attempt raised, or ``None`` if every
-        attempt was somehow spent without one being recorded.
+        The last exception a request raised, or ``None`` if every attempt
+        was somehow spent without one being recorded.
 
     Returns
     -------
@@ -251,13 +257,15 @@ def _await_server(
         # Giving up is the moment the failure's shape matters: a port that
         # answered every probe with a refused redirect is a different problem
         # from one that never accepted a connection, and the operator gets
-        # one message to tell them apart.
+        # one message to tell them apart. Only bounded fields appear — the
+        # category, the attempt count, the window — because whatever holds
+        # the port is untrusted and its text has no place in the message;
+        # the chained exception keeps the detail for a traceback.
         message = (
             f"http-server did not come up on port {port}: the readiness "
             f"probe failed as {_probe_failure_category(last_failure)} on "
             f"each of {READINESS_ATTEMPTS} attempts over roughly "
-            f"{READINESS_ATTEMPTS * READINESS_POLL_SECONDS:.0f}s "
-            f"(last failure: {last_failure})"
+            f"{READINESS_ATTEMPTS * READINESS_POLL_SECONDS:.0f}s"
         )
         raise SystemExit(message) from last_failure
 

@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import collections.abc as cabc
 import email.message
+import io
 import subprocess
 import typing as typ
 import urllib.error
+import urllib.request
 
 import pytest
 
@@ -144,6 +146,96 @@ def test_a_port_that_only_redirects_is_reported_as_such() -> None:
     )
     assert isinstance(caught.value.__cause__, urllib.error.HTTPError), (
         "the giving-up message should chain from the last probe failure"
+    )
+
+
+def test_an_http_error_is_classified_by_its_status() -> None:
+    """A port that answers 503 on every probe is named as exactly that."""
+
+    def unavailable(url: str) -> None:
+        """Answer every probe with a 503, as a sick server would."""
+        raise urllib.error.HTTPError(
+            url, 503, "service unavailable", email.message.Message(), None
+        )
+
+    with pytest.raises(SystemExit) as caught:
+        process._await_server(
+            _Running(), "http://127.0.0.1:9999", PORT, _FakeClock(), unavailable
+        )
+
+    message = str(caught.value.code)
+    assert "http_503" in message, (
+        f"the message should carry the numeric status; got {message!r}"
+    )
+    assert str(process.READINESS_ATTEMPTS) in message, (
+        f"the message should say how often it asked; got {message!r}"
+    )
+    assert isinstance(caught.value.__cause__, urllib.error.HTTPError), (
+        "the giving-up message should chain from the last probe failure"
+    )
+
+
+@pytest.mark.parametrize(
+    ("failure", "category"),
+    [
+        (None, "timeout"),
+        (OSError("connection refused"), "connection_failed"),
+    ],
+)
+def test_the_remaining_failure_categories_are_stable(
+    failure: OSError | None, category: str
+) -> None:
+    """The category vocabulary is fixed; these pin the non-HTTP entries."""
+    assert process._probe_failure_category(failure) == category
+
+
+def test_the_diagnostics_repeat_nothing_the_server_chose() -> None:
+    """Whatever holds the port writes its own reasons; none reach the message.
+
+    The redirect refusal must not carry the `Location` target, and the
+    giving-up message must not carry the probe failure's text — both are
+    attacker-chosen on a port this harness explicitly does not trust.
+    """
+    hostile = "http://attacker.example/" + "A" * 4096
+
+    refuser = process._RefuseRedirects()
+    with pytest.raises(urllib.error.HTTPError) as refused:
+        refuser.redirect_request(
+            urllib.request.Request("http://127.0.0.1:9999/weaver/"),
+            io.BytesIO(),
+            302,
+            "B" * 4096,
+            email.message.Message(),
+            hostile,
+        )
+    assert hostile not in str(refused.value), (
+        "the refusal repeated the attacker-chosen redirect target"
+    )
+    assert "B" * 64 not in str(refused.value), (
+        "the refusal repeated the attacker-chosen reason phrase"
+    )
+
+    def taunts(_url: str) -> None:
+        """Fail with a message the server's owner chose."""
+        raise OSError("C" * 4096)
+
+    with pytest.raises(SystemExit) as caught:
+        process._await_server(
+            _Running(), "http://127.0.0.1:9999", PORT, _FakeClock(), taunts
+        )
+    message = str(caught.value.code)
+    assert "C" * 64 not in message, (
+        "the giving-up message repeated the probe failure's text"
+    )
+    assert "connection_failed" in message, (
+        f"the message should still classify the failure; got {message!r}"
+    )
+    # Every field in the message is fixed text or a number, so its length is
+    # bounded whatever the responder does; the margin covers a five-digit
+    # port and a wider retry budget without inviting free text back in.
+    generous_bound = 256
+    assert len(message) <= generous_bound, (
+        f"the giving-up message should be bounded; got {len(message)} chars"
     )
 
 

@@ -101,7 +101,12 @@ def test_the_port_is_probed_with_the_startup_lock_held(
         with lock.open("r+", encoding="utf-8") as rival:
             try:
                 fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except OSError:
+            except OSError as exc:
+                # Only contention proves the lock is held; anything else —
+                # ENOLCK, a bad descriptor — is a broken observation, not
+                # evidence, and must fail the test rather than pass it.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
                 held.append(True)
             else:
                 fcntl.flock(rival, fcntl.LOCK_UN)
@@ -167,7 +172,11 @@ def test_the_whole_startup_sequence_runs_with_the_lock_held(
         with lock.open("r+", encoding="utf-8") as rival:
             try:
                 fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except OSError:
+            except OSError as exc:
+                # Only contention proves the lock is held; anything else is a
+                # broken observation and must fail the test.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
                 held[stage] = True
             else:
                 fcntl.flock(rival, fcntl.LOCK_UN)
@@ -228,7 +237,12 @@ def test_ownership_is_confirmed_after_the_startup_lock_is_released(
         with lock.open("r+", encoding="utf-8") as rival:
             try:
                 fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except OSError:
+            except OSError as exc:
+                # Only contention proves the lock is held; anything else —
+                # ENOLCK, a bad descriptor — is a broken observation, not
+                # evidence, and must fail the test rather than pass it.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
                 held.append(True)
             else:
                 fcntl.flock(rival, fcntl.LOCK_UN)

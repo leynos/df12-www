@@ -285,9 +285,23 @@ def test_atomic_projector_write_preserves_output_and_cleans_up(
     monkeypatch: pytest.MonkeyPatch,
     failure: str,
 ) -> None:
-    """A temporary-write or replace failure keeps the prior generated file intact."""
+    """A temporary-write or replace failure keeps the prior generated file intact.
+
+    Driven through ``main`` rather than the writer directly, so the failure
+    travels the production path: the projector renders a real roadmap, hands
+    it to the shared writer, and the writer's guarantee — old contents or new,
+    never a partial — is what the caller actually gets.
+    """
+    source = tmp_path / "episodic source"
+    roadmap = source / "docs" / "roadmap.md"
+    roadmap.parent.mkdir(parents=True)
+    roadmap.write_text(
+        "## 1. Foundation\n\n### 1.1. Core\n\n- [x] 1.1.1. Complete the first task.\n",
+        encoding="utf-8",
+    )
     output = tmp_path / "roadmap.jinja"
     output.write_text("complete prior projection\n", encoding="utf-8")
+    arguments = ["--episodic-root", str(source), "--output", str(output)]
     original_replace = Path.replace
 
     if failure == "write":
@@ -335,7 +349,7 @@ def test_atomic_projector_write_preserves_output_and_cleans_up(
         monkeypatch.setattr(Path, "replace", fail_replacement)
 
     with pytest.raises(OSError, match=r"^$"):
-        atomic_writer.atomic_write(output, "new incomplete projection\n")
+        main(arguments)
 
     assert output.read_text(encoding="utf-8") == "complete prior projection\n", (
         "an atomic-write failure must leave the prior complete output unchanged"

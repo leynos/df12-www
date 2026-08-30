@@ -11,6 +11,7 @@
  * cleanup.
  */
 import { afterEach, describe, expect, test } from "bun:test";
+import fc from "fast-check";
 
 import { setUp, tearDown } from "./helpers/weaver-drawer.mjs";
 
@@ -94,5 +95,66 @@ describe("the harness returns the globals it borrowed", () => {
     GLOBALS.forEach((name, index) => {
       expect(Object.getOwnPropertyDescriptor(globalThis, name)).toEqual(before[index]);
     });
+  });
+
+  test("whatever trace of setups, modes, and failures a test takes", () => {
+    /* The example tests pin four representative traces; this generates the
+       rest. A trace is a sequence of setUp calls in either telemetry mode,
+       any of which may be followed by an injected scenario failure, ending
+       in `tearDown` — after which the sentinels must be back by identity
+       (asserted inside `withSentinels`) and the pre-sentinel descriptors
+       must be back exactly (asserted here). */
+    const steps = fc.array(fc.record({ telemetry: fc.boolean(), fails: fc.boolean() }), {
+      minLength: 1,
+      maxLength: 4,
+    });
+    const before = GLOBALS.map((name) => Object.getOwnPropertyDescriptor(globalThis, name));
+    fc.assert(
+      fc.property(steps, (trace) => {
+        withSentinels(() => {
+          for (const step of trace) {
+            setUp({ telemetry: step.telemetry });
+            if (step.fails) {
+              try {
+                throw new Error("an injected scenario failure");
+              } catch {
+                /* The failure is the test's own; what matters is that the
+                   trace continues and restoration still holds at the end. */
+              }
+            }
+          }
+          tearDown();
+        });
+        for (const [index, name] of GLOBALS.entries()) {
+          expect(Object.getOwnPropertyDescriptor(globalThis, name)).toEqual(before[index]);
+        }
+      }),
+    );
+  });
+
+  test("a trace that aborts mid-way still restores the descriptors", () => {
+    /* Complementing the caught-failure property above: here the failure
+       propagates out of the scenario, so `withSentinels`' cleanup path is
+       the only thing standing between the sentinels and the next test. */
+    const positions = fc.record({
+      setups: fc.integer({ min: 1, max: 3 }),
+      telemetry: fc.boolean(),
+    });
+    const before = GLOBALS.map((name) => Object.getOwnPropertyDescriptor(globalThis, name));
+    fc.assert(
+      fc.property(positions, ({ setups, telemetry }) => {
+        expect(() =>
+          withSentinels(() => {
+            for (let i = 0; i < setups; i += 1) {
+              setUp({ telemetry });
+            }
+            throw new Error("the trace aborted");
+          }),
+        ).toThrow("the trace aborted");
+        for (const [index, name] of GLOBALS.entries()) {
+          expect(Object.getOwnPropertyDescriptor(globalThis, name)).toEqual(before[index]);
+        }
+      }),
+    );
   });
 });

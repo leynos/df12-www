@@ -815,20 +815,21 @@ having asserted nothing, and a loop over no items is not a failure.
 The Weaver drawer suites share a harness of their own,
 `tests/js/helpers/weaver-drawer.mjs`. Its `setUp` builds a happy-dom page with
 the sidebar markup `templates/weaver/` renders, evaluates the shipped drawer
-script into it (and `telemetry.js` too, when called with `{ telemetry: true }`),
-and returns the parts a test drives — `sidebar`, `toggle`, `backdrop`,
-`isOpen()`, and the recorded `events`. Because `evaluateScript` runs shipped
-scripts against the process's own `globalThis` rather than the happy-dom
-window's, `setUp` installs a telemetry sink there and touches three process
-globals: `df12WeaverNavTelemetry`, `df12WeaverTelemetry`, and `df12WeaverCopy`.
+script into it (and `telemetry.js` too, when called with
+`{ telemetry: true }`), and returns the parts a test drives — `sidebar`,
+`toggle`, `backdrop`, `isOpen()`, and the recorded `events`. Because
+`evaluateScript` runs shipped scripts against the process's own `globalThis`
+rather than the happy-dom window's, `setUp` installs a telemetry sink there and
+touches three process globals: `df12WeaverNavTelemetry`, `df12WeaverTelemetry`,
+and `df12WeaverCopy`.
 
-On a test's first `setUp` call — and only that one — the helper snapshots
-those globals' prior values, so repeated `setUp` calls within one test do not
+On a test's first `setUp` call — and only that one — the helper snapshots those
+globals' prior values, so repeated `setUp` calls within one test do not
 overwrite the snapshot with values the harness itself installed. The exported
 `tearDown` restores them, and every file that imports `setUp` must register it
-with `afterEach(tearDown)`; skip it and the sink leaks into whichever test
-file the runner loads next. `tests/js/weaver-drawer-harness.test.mjs` pins
-this contract with sentinel-identity tests.
+with `afterEach(tearDown)`; skip it and the sink leaks into whichever test file
+the runner loads next. `tests/js/weaver-drawer-harness.test.mjs` pins this
+contract with sentinel-identity tests.
 
 Bun tests under `tests/js/` cover these pure functions, and they `require` the
 **built** copy from `public/`, not the source under `src/static/`:
@@ -1180,6 +1181,11 @@ into `_NO_REDIRECTS`): every request here is to the server this run just
 started, so a redirect is not a route to follow but proof that whatever
 answered is not that server, and the run should fail rather than trust content
 from wherever the redirect points.
+
+The `Launcher` type returns a `ServerProcess`, and `_start_server` (in
+`scripts/weaver_snapshot_serving.py`) hands one back to its caller. The
+protocol names the union of what serving consumes from the child: `poll`
+(from `_Pollable`) and `terminate`, `kill`, and `wait` (from `_Stoppable`).
 
 The startup lock in `scripts/weaver_snapshot_serving.py`'s `_start_server`
 covers exactly the probe, the spawn, and the wait for readiness; it is released

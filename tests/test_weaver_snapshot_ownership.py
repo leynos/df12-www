@@ -9,10 +9,12 @@ branch's work.
 from __future__ import annotations
 
 import contextlib
+import email.message
 import functools
 import http.server
 import threading
 import typing as typ
+import urllib.error
 from pathlib import Path
 
 import pytest
@@ -234,6 +236,56 @@ def test_a_server_that_does_not_answer_at_all_is_refused() -> None:
     assert "after the capture" in message, (
         f"the message should say when the check ran, since the two failures "
         f"mean different things; got {message!r}"
+    )
+
+
+@pytest.mark.parametrize(
+    ("failure", "category"),
+    [
+        (OSError("D" * 4096), "connection_failed"),
+        (
+            urllib.error.HTTPError(
+                "http://127.0.0.1:9999/marker.txt",
+                302,
+                "E" * 4096,
+                email.message.Message(),
+                None,
+            ),
+            "redirect_refused",
+        ),
+    ],
+)
+def test_an_ownership_failure_reports_its_category_and_nothing_it_was_told(
+    failure: OSError, category: str
+) -> None:
+    """The message classifies the fetch failure without repeating its text.
+
+    Whatever answered the marker's URL is untrusted — the check exists
+    because of that — so its reason phrases have no place in the message;
+    the chained exception keeps the detail for a traceback.
+    """
+
+    def hostile(_url: str, _limit: int) -> str:
+        """Fail the way the untrusted responder chose to."""
+        raise failure
+
+    with pytest.raises(SystemExit) as caught:
+        ownership._confirm_ownership(
+            "http://127.0.0.1:9999", "marker.txt", PORT, "on starting", hostile
+        )
+
+    message = str(caught.value.code)
+    assert category in message, (
+        f"the message should classify the failure; got {message!r}"
+    )
+    assert "D" * 64 not in message, (
+        "the message repeated text the untrusted responder chose"
+    )
+    assert "E" * 64 not in message, (
+        "the message repeated the reason phrase the responder chose"
+    )
+    assert caught.value.__cause__ is failure, (
+        "the refusal should chain from the fetch failure it classifies"
     )
 
 

@@ -9,8 +9,10 @@ between them, and what happens when a process will not stand down.
 from __future__ import annotations
 
 import collections.abc as cabc
+import email.message
 import subprocess
 import typing as typ
+import urllib.error
 
 import pytest
 
@@ -107,8 +109,41 @@ def test_a_server_that_never_answers_gives_up_after_a_bounded_wait() -> None:
     assert len(clock.slept) == process.READINESS_ATTEMPTS, (
         f"it should wait after every failed attempt; it slept {len(clock.slept)} times"
     )
-    assert str(PORT) in str(caught.value.code), (
-        f"the message should name the port; got {caught.value.code!r}"
+    message = str(caught.value.code)
+    assert str(PORT) in message, f"the message should name the port; got {message!r}"
+    assert "connection_failed" in message, (
+        f"the message should classify the failure; got {message!r}"
+    )
+    assert str(process.READINESS_ATTEMPTS) in message, (
+        f"the message should say how often it asked; got {message!r}"
+    )
+
+
+def test_a_port_that_only_redirects_is_reported_as_such() -> None:
+    """A refused redirect on every probe is a different problem from silence.
+
+    Whatever holds the port is answering — with a ``Location`` the opener
+    refuses to follow — and the operator reading the giving-up message needs
+    to know that, not merely that the server "did not come up".
+    """
+
+    def redirects(url: str) -> None:
+        """Answer every probe with a refused redirect, as the opener would."""
+        raise urllib.error.HTTPError(
+            url, 302, "redirected to elsewhere", email.message.Message(), None
+        )
+
+    with pytest.raises(SystemExit) as caught:
+        process._await_server(
+            _Running(), "http://127.0.0.1:9999", PORT, _FakeClock(), redirects
+        )
+
+    message = str(caught.value.code)
+    assert "redirect_refused" in message, (
+        f"the message should classify the redirect; got {message!r}"
+    )
+    assert isinstance(caught.value.__cause__, urllib.error.HTTPError), (
+        "the giving-up message should chain from the last probe failure"
     )
 
 

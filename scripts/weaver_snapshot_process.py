@@ -168,6 +168,33 @@ class ServerProcess(_Stoppable, _Pollable, typ.Protocol):
     """
 
 
+def _probe_failure_category(failure: OSError | None) -> str:
+    """Name the readiness probe's failure stably, for the giving-up message.
+
+    Parameters
+    ----------
+    failure
+        The last exception a probe attempt raised, or ``None`` if every
+        attempt was somehow spent without one being recorded.
+
+    Returns
+    -------
+    str
+        One of ``redirect_refused`` (the port answered with a redirect the
+        opener refused to follow), ``http_<status>`` (it answered with an
+        HTTP error), ``connection_failed`` (it did not answer at all), or
+        ``timeout`` (no failure was recorded).
+    """
+    if failure is None:
+        return "timeout"
+    if isinstance(failure, urllib.error.HTTPError):
+        redirects = range(300, 400)
+        if failure.code in redirects:
+            return "redirect_refused"
+        return f"http_{failure.code}"
+    return "connection_failed"
+
+
 def _await_server(
     server: _Pollable,
     base: str,
@@ -203,6 +230,7 @@ def _await_server(
     """
     # Poll rather than sleeping a fixed interval, so a slow start does not
     # silently yield a directory full of failed captures.
+    last_failure: OSError | None = None
     for _ in range(READINESS_ATTEMPTS):
         # A server that has already exited will never answer, and anything
         # that does answer on its port is not it.
@@ -214,13 +242,24 @@ def _await_server(
             raise SystemExit(message)
         try:
             probe(f"{base}/weaver/")
-        except OSError:
+        except OSError as exc:
+            last_failure = exc
             clock.sleep(READINESS_POLL_SECONDS)
         else:
             break
     else:
-        message = f"http-server did not come up on port {port}"
-        raise SystemExit(message)
+        # Giving up is the moment the failure's shape matters: a port that
+        # answered every probe with a refused redirect is a different problem
+        # from one that never accepted a connection, and the operator gets
+        # one message to tell them apart.
+        message = (
+            f"http-server did not come up on port {port}: the readiness "
+            f"probe failed as {_probe_failure_category(last_failure)} on "
+            f"each of {READINESS_ATTEMPTS} attempts over roughly "
+            f"{READINESS_ATTEMPTS * READINESS_POLL_SECONDS:.0f}s "
+            f"(last failure: {last_failure})"
+        )
+        raise SystemExit(message) from last_failure
 
     # The request succeeded, but that alone does not say who answered it. If
     # the child has exited by now, something else on the port did, and the

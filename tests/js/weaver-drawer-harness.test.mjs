@@ -41,19 +41,25 @@ function withSentinels(scenario) {
       expect(globalThis[name]).toBe(sentinels[name]);
     }
   } finally {
-    tearDown();
-    /* Asserted here, before the descriptor restoration below, so a failing
-       scenario still verifies that `tearDown` itself put the borrowed
-       values back — the restoration must not mask a `tearDown` that did
-       not do its job. */
-    for (const name of GLOBALS) {
-      expect(globalThis[name]).toBe(sentinels[name]);
-    }
-    for (const name of GLOBALS) {
-      if (descriptors[name] === undefined) {
-        delete globalThis[name];
-      } else {
-        Object.defineProperty(globalThis, name, descriptors[name]);
+    try {
+      tearDown();
+      /* Asserted here, before the descriptor restoration below, so a failing
+         scenario still verifies that `tearDown` itself put the borrowed
+         values back — the restoration must not mask a `tearDown` that did
+         not do its job. */
+      for (const name of GLOBALS) {
+        expect(globalThis[name]).toBe(sentinels[name]);
+      }
+    } finally {
+      /* Restored even when the verification above throws, so a failed
+         teardown cannot leave the sentinels installed to contaminate
+         whichever test runs next. */
+      for (const name of GLOBALS) {
+        if (descriptors[name] === undefined) {
+          delete globalThis[name];
+        } else {
+          Object.defineProperty(globalThis, name, descriptors[name]);
+        }
       }
     }
   }

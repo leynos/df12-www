@@ -461,7 +461,6 @@ fails if the committed macro does not match what the generator would produce
 from the current mapping, so `templates/weaver/_icons.jinja` must never be
 hand-edited — change `config/weaver-icons.yaml` and rerun the generator instead.
 
-
 #### The shared atomic writer
 
 `scripts/atomic_write.py` has one public function,

@@ -92,8 +92,7 @@ def test_publication_always_ends_in_a_recoverable_state(
         case None:
             # Success: wholly this run's results, staging swept.
             assert published == {stem: f"new:{stem}" for stem in fresh}, (
-                f"a clean publication should land exactly the capture; got "
-                f"{published}"
+                f"a clean publication should land exactly the capture; got {published}"
             )
             assert kept == [], f"staging survived a clean publication: {kept}"
         case SystemExit() as stop if "inconsistent state" in str(stop.code):

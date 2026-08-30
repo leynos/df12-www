@@ -294,6 +294,44 @@ def _staged_run(destination: Path, move: cabc.Callable[[Path, Path], object]) ->
     return seen[0]
 
 
+def test_an_interrupted_rollback_keeps_the_only_copy(tmp_path: Path) -> None:
+    """A second Ctrl-C, landing mid-rollback, must not cost the staging copy.
+
+    The rollback's own handlers catch `OSError`; an interruption is neither
+    caught by them nor a rollback *failure*, and letting it propagate bare
+    would have `_staged` sweep the staging directory — with the previous
+    run's only surviving copy inside it.
+    """
+    destination = _seeded(tmp_path)
+    moves = {"n": 0}
+
+    def interrupted_twice(source: Path, target: Path) -> object:
+        """Rescue, then fail the publication, then interrupt the rollback."""
+        moves["n"] += 1
+        if moves["n"] == 1:
+            return source.replace(target)
+        if moves["n"] == 2:  # noqa: PLR2004 - the publication move
+            message = "no space left on device"
+            raise OSError(message)
+        raise KeyboardInterrupt
+
+    with pytest.raises(SystemExit) as caught:
+        _staged_run(destination, interrupted_twice)
+
+    message = str(caught.value.code)
+    assert "inconsistent state" in message, f"got {message!r}"
+    assert "interrupted rollback" in message, f"got {message!r}"
+    kept = next(tmp_path.glob(".out-*"))
+    assert (kept / "replaced" / "one.json").read_text(encoding="utf-8") == (
+        "previous one"
+    ), f"the previous run's file is not recoverable from {kept}"
+    inconsistent = caught.value.__cause__
+    assert isinstance(inconsistent, output._InconsistentDestinationError)
+    assert isinstance(inconsistent.__cause__, KeyboardInterrupt), (
+        f"the report should chain from the interruption; got {inconsistent.__cause__!r}"
+    )
+
+
 def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> None:
     """When the rollback fails too, staging holds the only previous results.
 

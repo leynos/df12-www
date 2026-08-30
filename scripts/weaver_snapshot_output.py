@@ -89,16 +89,29 @@ def _publish(
         # Undo this run's half-publication first, so putting the previous
         # files back cannot be blocked by a file this run had just landed.
         failures: list[str] = []
-        for landed in published:
-            try:
-                landed.unlink()
-            except OSError as exc:
-                failures.append(f"{landed} could not be removed ({exc})")
-        for moved, original in rescued:
-            try:
-                move(moved, original)
-            except OSError as exc:
-                failures.append(f"{original} could not be restored ({exc})")
+        try:
+            for landed in published:
+                try:
+                    landed.unlink()
+                except OSError as exc:
+                    failures.append(f"{landed} could not be removed ({exc})")
+            for moved, original in rescued:
+                try:
+                    move(moved, original)
+                except OSError as exc:
+                    failures.append(f"{original} could not be restored ({exc})")
+        except BaseException as interruption:
+            # The rollback itself was interrupted — a second Ctrl-C landing
+            # between two restores. The destination may now hold neither
+            # run's results in full, and the staging directory holds the only
+            # copy of what was moved aside; the distinct type is what stops
+            # `_staged` sweeping it up.
+            message = (
+                f"{destination} is in an inconsistent state after an "
+                f"interrupted rollback, and the previous run's files are in "
+                f"{aside}."
+            )
+            raise _InconsistentDestinationError(message) from interruption
         if failures:
             # The rollback itself failed, so the destination holds neither
             # run's results in full and the previous run's files are still in

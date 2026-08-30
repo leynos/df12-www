@@ -35,18 +35,18 @@ SETTINGS = settings(
 
 # Small alphabets keep the example space dense: what varies usefully is the
 # overlap between the two sets and where the failures land, not the names.
-stems = st.sets(st.sampled_from(["a", "b", "c", "d"]), max_size=3)
+STEMS = st.sets(st.sampled_from(["a", "b", "c", "d"]), max_size=3)
 
 # Which move calls fail. Publication of up to seven files makes at most ten
 # calls including the rollback, so positions beyond that mean "no failure".
-positions = st.frozensets(st.integers(min_value=1, max_value=10), max_size=3)
+POSITIONS = st.frozensets(st.integers(min_value=1, max_value=10), max_size=3)
 
 
 @SETTINGS
 @given(
-    previous=stems,
-    fresh=stems,
-    fail_at=positions,
+    previous=STEMS,
+    fresh=STEMS,
+    fail_at=POSITIONS,
     interrupt=st.booleans(),
 )
 def test_publication_always_ends_in_a_recoverable_state(
@@ -112,8 +112,22 @@ def test_publication_always_ends_in_a_recoverable_state(
                     f"{sorted(p.name for p in (kept[0] / 'replaced').glob('*'))}"
                 )
             match stop.__cause__:
-                case output._InconsistentDestinationError():
-                    pass
+                case output._InconsistentDestinationError() as inconsistent:
+                    # The second link matters as much as the first: dropping
+                    # either `from` in the production code would keep the
+                    # wrapper type while losing the diagnostic cause.
+                    match inconsistent.__cause__:
+                        case KeyboardInterrupt() if interrupt:
+                            pass
+                        case OSError() if not interrupt:
+                            pass
+                        case unexpected:
+                            pytest.fail(
+                                f"the inconsistent-destination report should "
+                                f"chain from the provoked "
+                                f"{'interrupt' if interrupt else 'OSError'}; "
+                                f"got {unexpected!r}"
+                            )
                 case unexpected:
                     pytest.fail(
                         f"the report should chain from the rollback's own "

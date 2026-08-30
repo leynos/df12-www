@@ -144,9 +144,14 @@ def test_a_port_that_only_redirects_is_reported_as_such() -> None:
     assert "redirect_refused" in message, (
         f"the message should classify the redirect; got {message!r}"
     )
-    assert isinstance(caught.value.__cause__, urllib.error.HTTPError), (
-        "the giving-up message should chain from the last probe failure"
-    )
+    match caught.value.__cause__:
+        case urllib.error.HTTPError():
+            pass
+        case unexpected:
+            pytest.fail(
+                f"the giving-up message should chain from the last probe "
+                f"failure; got {unexpected!r}"
+            )
 
 
 def test_an_http_error_is_classified_by_its_status() -> None:
@@ -170,9 +175,14 @@ def test_an_http_error_is_classified_by_its_status() -> None:
     assert str(process.READINESS_ATTEMPTS) in message, (
         f"the message should say how often it asked; got {message!r}"
     )
-    assert isinstance(caught.value.__cause__, urllib.error.HTTPError), (
-        "the giving-up message should chain from the last probe failure"
-    )
+    match caught.value.__cause__:
+        case urllib.error.HTTPError():
+            pass
+        case unexpected:
+            pytest.fail(
+                f"the giving-up message should chain from the last probe "
+                f"failure; got {unexpected!r}"
+            )
 
 
 @pytest.mark.parametrize(

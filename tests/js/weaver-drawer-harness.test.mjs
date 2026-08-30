@@ -110,6 +110,56 @@ describe("the harness returns the globals it borrowed", () => {
     });
   });
 
+  test("globals absent before setUp are absent again after tearDown", () => {
+    /* Assigning `undefined` back is not the same as absence: an own
+       property holding `undefined` still shadows the prototype chain and
+       answers `in` checks. Restoration means deletion here. */
+    const before = GLOBALS.map((name) => Object.getOwnPropertyDescriptor(globalThis, name));
+    for (const name of GLOBALS) {
+      delete globalThis[name];
+    }
+    try {
+      setUp({ telemetry: true });
+      tearDown();
+      for (const name of GLOBALS) {
+        expect(Object.getOwnPropertyDescriptor(globalThis, name)).toBeUndefined();
+      }
+    } finally {
+      GLOBALS.forEach((name, index) => {
+        if (before[index] !== undefined) {
+          Object.defineProperty(globalThis, name, before[index]);
+        }
+      });
+    }
+  });
+
+  test("a non-default descriptor is restored exactly", () => {
+    /* A pre-existing global may carry non-default flags; tearDown restores
+       the descriptor, not merely the value. */
+    const name = "df12WeaverNavTelemetry";
+    const before = Object.getOwnPropertyDescriptor(globalThis, name);
+    const marker = () => "pre-existing";
+    try {
+      Object.defineProperty(globalThis, name, {
+        value: marker,
+        writable: true,
+        enumerable: false,
+        configurable: true,
+      });
+      const expected = Object.getOwnPropertyDescriptor(globalThis, name);
+      setUp({ telemetry: false });
+      tearDown();
+      expect(Object.getOwnPropertyDescriptor(globalThis, name)).toEqual(expected);
+      expect(globalThis[name]).toBe(marker);
+    } finally {
+      if (before === undefined) {
+        delete globalThis[name];
+      } else {
+        Object.defineProperty(globalThis, name, before);
+      }
+    }
+  });
+
   test("whatever trace of setups, modes, and failures a test takes", () => {
     /* The example tests pin four representative traces; this generates the
        rest. A trace is a sequence of setUp calls in either telemetry mode,

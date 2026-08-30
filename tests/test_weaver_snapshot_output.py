@@ -325,11 +325,21 @@ def test_an_interrupted_rollback_keeps_the_only_copy(tmp_path: Path) -> None:
     assert (kept / "replaced" / "one.json").read_text(encoding="utf-8") == (
         "previous one"
     ), f"the previous run's file is not recoverable from {kept}"
-    inconsistent = caught.value.__cause__
-    assert isinstance(inconsistent, output._InconsistentDestinationError)
-    assert isinstance(inconsistent.__cause__, KeyboardInterrupt), (
-        f"the report should chain from the interruption; got {inconsistent.__cause__!r}"
-    )
+    match caught.value.__cause__:
+        case output._InconsistentDestinationError() as inconsistent:
+            match inconsistent.__cause__:
+                case KeyboardInterrupt():
+                    pass
+                case unexpected:
+                    pytest.fail(
+                        f"the report should chain from the interruption; got "
+                        f"{unexpected!r}"
+                    )
+        case unexpected:
+            pytest.fail(
+                f"the SystemExit should chain from the inconsistent-destination "
+                f"report; got {unexpected!r}"
+            )
 
 
 def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> None:
@@ -366,17 +376,24 @@ def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> No
     assert (kept / "replaced" / "one.json").read_text(encoding="utf-8") == (
         "previous one"
     ), f"the previous run's file is not recoverable from {kept}"
-    inconsistent = caught.value.__cause__
-    assert isinstance(inconsistent, output._InconsistentDestinationError), (
-        f"the SystemExit should chain from the rollback failure; got {inconsistent!r}"
-    )
-    assert isinstance(inconsistent.__cause__, OSError), (
-        "the rollback failure should chain from the publication failure that "
-        f"forced the rollback; got {inconsistent.__cause__!r}"
-    )
-    assert "the filesystem went away" in str(inconsistent.__cause__), (
-        f"the original failure was lost from the chain; got {inconsistent.__cause__!r}"
-    )
+    match caught.value.__cause__:
+        case output._InconsistentDestinationError() as inconsistent:
+            match inconsistent.__cause__:
+                case OSError() as publication_failure:
+                    assert "the filesystem went away" in str(publication_failure), (
+                        f"the original failure was lost from the chain; got "
+                        f"{publication_failure!r}"
+                    )
+                case unexpected:
+                    pytest.fail(
+                        f"the rollback failure should chain from the publication "
+                        f"failure that forced the rollback; got {unexpected!r}"
+                    )
+        case unexpected:
+            pytest.fail(
+                f"the SystemExit should chain from the rollback failure; got "
+                f"{unexpected!r}"
+            )
 
 
 def test_a_lock_refused_at_publication_still_cleans_up_staging(

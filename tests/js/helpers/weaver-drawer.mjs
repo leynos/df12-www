@@ -11,22 +11,34 @@ import { evaluateScript, installMatchMedia, stubLayout } from "./mobile-nav-harn
 const SCRIPT = "public/weaver/assets/js/mobile-nav.js";
 const TELEMETRY = "public/weaver/assets/js/telemetry.js";
 
+/* The globals `setUp` touches on this process, in one place. */
+const TOUCHED = ["df12WeaverNavTelemetry", "df12WeaverTelemetry", "df12WeaverCopy"];
+
 /* What the touched globals held before the first `setUp` of the current
-   test. `evaluateScript` runs the shipped scripts against this process's
-   `globalThis`, so whatever `setUp` installs there outlives the test — and
-   the test file — unless something puts the old values back. */
+   test — as property descriptors, so a global that was absent is told apart
+   from one holding `undefined`. `evaluateScript` runs the shipped scripts
+   against this process's `globalThis`, so whatever `setUp` installs there
+   outlives the test — and the test file — unless something puts the old
+   state back. */
 let saved = null;
 
-/* Restore every global `setUp` touches to its pre-setup value. Register this
-   with `afterEach` in every file that imports `setUp`, or the file's sinks
-   and telemetry API leak into whichever test file the runner loads next. */
+/* Restore every global `setUp` touches to its exact pre-setup state: a
+   global that was absent is deleted rather than left holding `undefined`,
+   and one that existed gets its descriptor back, flags and all. Register
+   this with `afterEach` in every file that imports `setUp`, or the file's
+   sinks and telemetry API leak into whichever test file the runner loads
+   next. */
 export function tearDown() {
   if (saved === null) {
     return;
   }
-  globalThis.df12WeaverNavTelemetry = saved.nav;
-  globalThis.df12WeaverTelemetry = saved.telemetry;
-  globalThis.df12WeaverCopy = saved.copy;
+  for (const name of TOUCHED) {
+    if (saved[name] === undefined) {
+      delete globalThis[name];
+    } else {
+      Object.defineProperty(globalThis, name, saved[name]);
+    }
+  }
   saved = null;
 }
 
@@ -34,11 +46,10 @@ export function tearDown() {
    drawer into it, and hand back the parts a test needs to drive. */
 export function setUp({ links = ["/install", "/docs"], telemetry = false } = {}) {
   if (saved === null) {
-    saved = {
-      nav: globalThis.df12WeaverNavTelemetry,
-      telemetry: globalThis.df12WeaverTelemetry,
-      copy: globalThis.df12WeaverCopy,
-    };
+    saved = {};
+    for (const name of TOUCHED) {
+      saved[name] = Object.getOwnPropertyDescriptor(globalThis, name);
+    }
   }
   const window = new Window({ url: "https://weaver.example/docs/" });
   const { document } = window;

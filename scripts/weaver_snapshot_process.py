@@ -191,14 +191,16 @@ def _probe_failure_category(failure: OSError | None) -> str:
         HTTP error), ``connection_failed`` (it did not answer at all), or
         ``timeout`` (no failure was recorded).
     """
-    if failure is None:
-        return "timeout"
-    if isinstance(failure, urllib.error.HTTPError):
-        redirects = range(300, 400)
-        if failure.code in redirects:
+    redirects = range(300, 400)
+    match failure:
+        case None:
+            return "timeout"
+        case urllib.error.HTTPError(code=code) if code in redirects:
             return "redirect_refused"
-        return f"http_{failure.code}"
-    return "connection_failed"
+        case urllib.error.HTTPError(code=code):
+            return f"http_{code}"
+        case _:
+            return "connection_failed"
 
 
 def _await_server(

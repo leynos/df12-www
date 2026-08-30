@@ -1123,9 +1123,9 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   test that loads the harness. Siblings changed the invocation not at all.
   Date/Author: 2026-08-28, review batch.
 
-  **Addendum (2026-08-29):** the sentence reads better without the comma
-  before "because" — "documents because running a directory supplies no
-  package context" — but the entry above stands as written.
+  **Addendum (2026-08-29):** the sentence reads better without the comma before
+  "because" — "documents because running a directory supplies no package
+  context" — but the entry above stands as written.
 - **Decision:** take the startup lock only for a port the caller named.
   Rationale: the lock serializes contention, and a port the kernel has just
   handed out cannot be contended — nothing else was given it. Keying a lock
@@ -1820,12 +1820,12 @@ configured to block every host except `127.0.0.1`:
 
   **Addendum (2026-08-29):** the "indistinguishable" clause is historical. It
   described the Milestone 2 cutover, which was required to change nothing. Work
-  after Milestone 8 deliberately changed pixels for accessibility: the nav index
-  moved from `opacity-60` to `opacity-75` to clear AA, and code, table and
-  heading content may break mid-token below 768px so the document itself no
+  after Milestone 8 deliberately changed pixels for accessibility: the nav
+  index moved from `opacity-60` to `opacity-75` to clear AA, and code, table
+  and heading content may break mid-token below 768px so the document itself no
   longer scrolls sideways at 360px. The cream page, the indigo sidebar, the
-  offset-shadow active item, the Playfair masthead and the paper texture are all
-  still as described.
+  offset-shadow active item, the Playfair masthead and the paper texture are
+  all still as described.
 - The page's HTML links exactly one stylesheet,
   `/weaver/assets/styles/weaver.css`, and loads exactly two external scripts,
   `/weaver/assets/js/telemetry.js` and `/weaver/assets/js/mobile-nav.js`, in
@@ -1849,18 +1849,20 @@ configured to block every host except `127.0.0.1`:
   `view-source` contains no `<i class="fa-` anywhere.
 
 **Test acceptance.** The three invariants that define "done" —
-`test_weaver_stylesheet_is_compiled`, `test_weaver_pages_reach_no_third_party_hosts`,
-and `test_weaver_sources_declare_no_colour_literals` — each failed before its
+`test_weaver_stylesheet_is_compiled`,
+`test_weaver_pages_reach_no_third_party_hosts`, and
+`test_weaver_sources_declare_no_colour_literals` — each failed before its
 milestone and passes after; the red failure is observed via
 `@pytest.mark.xfail(strict=True)`, and the marker is removed as part of the
 green step.
 
 **Addendum (2026-08-29):** this criterion previously read
 "`uv run pytest tests/test_weaver_build.py` reports three passed", which is no
-longer the layout. The three invariants still live in `tests/test_weaver_build.py`,
-but that file now also carries the control cases that stop the subresource and
-Font Awesome patterns passing vacuously, and the build-time Weaver suite has
-been split to stay inside the 400-line ceiling. The current command and counts:
+longer the layout. The three invariants still live in
+`tests/test_weaver_build.py`, but that file now also carries the control cases
+that stop the subresource and Font Awesome patterns passing vacuously, and the
+build-time Weaver suite has been split to stay inside the 400-line ceiling. The
+current command and counts:
 
 ```bash
 uv run pytest tests/test_weaver_build.py \

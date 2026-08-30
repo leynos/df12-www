@@ -1224,6 +1224,16 @@ observes a directory halfway through being replaced. Publication clears only
 the extension being written, so a `capture` and a `shots` run can share a
 directory.
 
+An ordinary publication failure rolls the destination back to the previous
+run's results, removes the staging directory, and exits naming the
+destination. If the rollback itself fails or is interrupted — a second
+Ctrl-C landing between two restores, say — the destination may be left
+holding neither run's results in full; the run then raises the documented
+inconsistent-destination error, keeps the staging directory, and says so.
+That directory's `replaced/` subdirectory holds the only surviving copy of
+the previous run's files, so it must not be deleted by hand without
+recovering them first.
+
 It is a cyclopts app with three subcommands, invoked bare — there is no
 Makefile target and no console-script entry point:
 

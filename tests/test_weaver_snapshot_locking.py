@@ -211,9 +211,14 @@ def test_every_contention_errno_is_waited_out(tmp_path: Path, code: int) -> None
         ):
             pass  # pragma: no cover - the lock must not be granted
 
-    assert isinstance(caught.value.__cause__, OSError), (
-        "the timeout message should chain from the last contention"
-    )
+    match caught.value.__cause__:
+        case OSError():
+            pass
+        case unexpected:
+            pytest.fail(
+                f"the timeout message should chain from the last contention; "
+                f"got {unexpected!r}"
+            )
     attempts_before_giving_up = 2
     assert len(attempts) == attempts_before_giving_up, (
         f"expected one retry before giving up; got {attempts}"

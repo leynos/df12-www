@@ -22,7 +22,7 @@
     "bump": "uv run pages bump"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.7",
+    "@biomejs/biome": "2.5.10",
     "@happy-dom/global-registrator": "20.11.2",
     "@iconify-json/carbon": "^1.2.25",
     "@tailwindcss/cli": "^4.1.15",

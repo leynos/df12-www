@@ -1,6 +1,6 @@
 """Tests for the Stilyagi focus indicator.
 
-The sub-site draws one focus ring, declared once in ``colors-and-type.css``
+The sub-site draws one focus ring, declared once in ``site-base.css``
 and tuned per control only where an outward ring would be clipped. Two things
 can quietly remove it, and both have happened:
 
@@ -32,23 +32,23 @@ that would have caught the regression this module was written for.
 
 from __future__ import annotations
 
-import functools
-import http.server
 import json
 import os
 import re
 import shutil
-import socketserver
 import subprocess
-import threading
 import typing as typ
-from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
 
 from df12_pages.config import ContentPageConfig
 from df12_pages.content_page import ContentPageGenerator
+from tests.support.stilyagi_browser import (
+    http_serve,
+    installed_chromium,
+    skip_unless_browser_available,
+)
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -57,6 +57,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 STILYAGI_TEMPLATES = REPO_ROOT / "templates" / "stilyagi"
 STILYAGI_STATIC = REPO_ROOT / "src" / "static" / "stilyagi"
 STYLES = STILYAGI_STATIC / "assets" / "styles"
+#: The compiled-stylesheet sources; the shared tokens and most page partials
+#: live here since the daisyUI migration, while anything not yet migrated
+#: stays under STYLES.
+STYLE_SOURCES = REPO_ROOT / "src" / "styles" / "stilyagi"
+COMPILED_STYLESHEET = (
+    REPO_ROOT / "public" / "stilyagi" / "assets" / "styles" / "stilyagi.css"
+)
 FOCUS_PROBE = Path(__file__).parent / "support" / "stilyagi_focus_probe.mjs"
 
 #: The namespace whose active chip is filled with ink, so its ring is the one
@@ -76,7 +83,7 @@ MIN_RING_WIDTH_PX = 2
 CHIP_ROW_MIN_WIDTH = 1280
 
 _RULE_RE = re.compile(r"(?P<selector>[^{}]+)\{(?P<body>[^{}]*)\}")
-_PAPER_RING_RE = re.compile(r"--focus-ring-color\s*:\s*var\(\s*--paper\s*\)")
+_PAPER_RING_RE = re.compile(r"--focus-ring-color\s*:\s*var\(\s*--(?:color-)?paper\s*\)")
 _OUTLINE_OFFSET_RE = re.compile(r"outline-offset\s*:\s*(?P<value>-?[\d.]+)px")
 
 
@@ -86,9 +93,10 @@ def _stylesheets() -> cabc.Iterator[Path]:
     ``syntax.css`` is generated from a Pygments style and carries no focus
     rules, so it is excluded rather than parsed.
     """
-    for path in sorted(STYLES.rglob("*.css")):
-        if path.name != "syntax.css":
-            yield path
+    for root in (STYLES, STYLE_SOURCES):
+        for path in sorted(root.rglob("*.css")):
+            if path.name != "syntax.css":
+                yield path
 
 
 class TestFocusRingTokens:
@@ -121,8 +129,8 @@ class TestFocusRingTokens:
 
     def test_the_shared_ring_is_ink_and_drawn_outside(self) -> None:
         """The default suits the common case: any control on a paper page."""
-        tokens = (STYLES / "colors-and-type.css").read_text(encoding="utf-8")
-        assert "--focus-ring-color: var(--ink);" in tokens, (
+        tokens = (STYLE_SOURCES / "site-base.css").read_text(encoding="utf-8")
+        assert "--focus-ring-color: var(--color-ink);" in tokens, (
             "the shared ring should default to ink, which holds against every "
             "paper surface the site has"
         )
@@ -137,7 +145,7 @@ class TestFocusRingTokens:
         Below it the chips are hidden and a native select drives the filter, so
         a focus check on the chip is only meaningful at a wider viewport.
         """
-        docs_css = (STYLES / "pages" / "docs.css").read_text(encoding="utf-8")
+        docs_css = (STYLE_SOURCES / "pages" / "docs.css").read_text(encoding="utf-8")
         assert f"@media (width <= {CHIP_ROW_MIN_WIDTH}px)" in docs_css
         assert ".filter-chip {\n    display: none;\n  }" in docs_css
 
@@ -153,6 +161,15 @@ def served_docs_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
     root = tmp_path_factory.mktemp("stilyagi-site")
     shutil.copytree(STILYAGI_STATIC / "assets", root / "stilyagi" / "assets")
 
+    # The layout links the compiled Tailwind + daisyUI sheet, which is build
+    # output rather than a static asset; the tree serves the site's real
+    # stylesheet or the page under test is unstyled.
+    if not COMPILED_STYLESHEET.exists():
+        pytest.skip("compiled Stilyagi stylesheet missing; run `bun run build:css`")
+    shutil.copy(
+        COMPILED_STYLESHEET, root / "stilyagi" / "assets" / "styles" / "stilyagi.css"
+    )
+
     config = ContentPageConfig(
         key="docs",
         label="Docs",
@@ -164,73 +181,10 @@ def served_docs_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
         root / "stilyagi",
         templates_dir=STILYAGI_TEMPLATES,
         nav_links=[],
-        stylesheet="assets/styles/stilyagi-site.css",
+        stylesheet="/stilyagi/assets/styles/stilyagi.css",
     )
     generator.run()
     return root
-
-
-@contextmanager
-def _http_serve(directory: Path) -> cabc.Iterator[int]:
-    """Serve *directory* on a free port, yielding it.
-
-    The layout links its assets from ``/stilyagi/assets/``, so the page has to
-    be fetched over HTTP from a root that carries them rather than opened as a
-    file.
-    """
-
-    class _SilentHandler(http.server.SimpleHTTPRequestHandler):
-        def log_message(self, format: str, *args: object) -> None:  # noqa: A002
-            pass
-
-    handler = functools.partial(_SilentHandler, directory=str(directory))
-    with socketserver.TCPServer(("127.0.0.1", 0), handler) as httpd:
-        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
-        thread.start()
-        try:
-            yield httpd.server_address[1]
-        finally:
-            httpd.shutdown()
-            thread.join(timeout=5)
-
-
-def _installed_chromium() -> str | None:
-    """Return an installed Chromium binary, newest revision first.
-
-    Playwright launches the revision it was built against, which is not
-    necessarily one of the revisions on disk: the package and the browsers are
-    installed separately and drift apart. Handing it one that exists keeps the
-    check runnable without a fresh download.
-    """
-    browsers = Path(
-        os.environ.get(
-            "PLAYWRIGHT_BROWSERS_PATH", Path.home() / ".cache" / "ms-playwright"
-        )
-    )
-    candidates = sorted(
-        (
-            binary
-            for pattern in ("chromium-*", "chromium_headless_shell-*")
-            for build in browsers.glob(pattern)
-            for name in ("chrome", "chrome-headless-shell", "headless_shell")
-            for binary in build.glob(f"*/{name}")
-            if binary.is_file()
-        ),
-        key=lambda path: path.parent.parent.name,
-        reverse=True,
-    )
-    return str(candidates[0]) if candidates else None
-
-
-def _skip_unless_browser_available() -> None:
-    """Skip when the browser tooling this test drives is not installed."""
-    if _installed_chromium() is None:  # pragma: no cover - environment guard
-        pytest.skip(
-            "no Playwright Chromium build found; run `bun x playwright install "
-            "chromium`"
-        )
-    if shutil.which("bun") is None:  # pragma: no cover - environment guard
-        pytest.skip("bun is required to drive the focus probe")
 
 
 @pytest.mark.playwright
@@ -244,13 +198,13 @@ def test_active_namespace_chip_shows_a_keyboard_focus_ring(
     the paper filter bar around it. A ring coloured for the fill is invisible
     there, which is the regression this guards.
     """
-    _skip_unless_browser_available()
+    skip_unless_browser_available()
     bun_exe = typ.cast("str", shutil.which("bun"))
     environment = os.environ | {
-        "PLAYWRIGHT_CHROMIUM_EXECUTABLE": typ.cast("str", _installed_chromium())
+        "PLAYWRIGHT_CHROMIUM_EXECUTABLE": typ.cast("str", installed_chromium())
     }
 
-    with _http_serve(served_docs_root) as port:
+    with http_serve(served_docs_root) as port:
         url = f"http://127.0.0.1:{port}/stilyagi/docs/"
         try:
             probe = subprocess.run(  # noqa: S603 - fixed argv, paths from fixtures

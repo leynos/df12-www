@@ -1,8 +1,10 @@
 {#
   Shared chrome for the Stilyagi sub-site.
 
-  A page overrides `title`, `description`, and `page_stylesheet` (a link to its
-  own stylesheet under assets/styles/pages/), then fills `content`.  Set
+  A page overrides `title` and `description`, then fills `content`.  Page
+  styles live in the compiled stylesheet's per-page partials
+  (src/styles/stilyagi/pages/); `page_stylesheet` remains only as an
+  extension point for a page that must link an extra asset.  Set
   `main_class` when the page body needs a class on the <main> wrapper.  The
   masthead and colophon live here so every page shares one source.
 #}
@@ -13,9 +15,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{% block title %}Stilyagi{% endblock %}</title>
     <meta name="description" content="{% block description %}{% endblock %}" />
-    <link rel="stylesheet" href="/stilyagi/assets/styles/colors-and-type.css" />
-    <link rel="stylesheet" href="/stilyagi/assets/styles/motifs-and-components.css" />
-    <link rel="stylesheet" href="/stilyagi/assets/styles/stilyagi-site.css" />
+    {#- The compiled Tailwind + daisyUI sheet: every Stilyagi page's styles,
+        shared and per-page, plus the generated Pygments sheet, compile
+        into this one stylesheet. -#}
+    <link rel="stylesheet" href="/stilyagi/assets/styles/stilyagi.css" />
     {% block page_stylesheet %}{% endblock %}
   </head>
   <body>

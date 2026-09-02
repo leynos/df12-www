@@ -247,7 +247,7 @@ class TestStilyagiHighlighting:
             tmp_path / "out",
             templates_dir=templates_dir,
             nav_links=[],
-            stylesheet="assets/styles/stilyagi-site.css",
+            stylesheet="/stilyagi/assets/styles/stilyagi.css",
         )
         output_path = generator.run()
 

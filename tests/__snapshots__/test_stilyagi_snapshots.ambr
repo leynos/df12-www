@@ -1,0 +1,298 @@
+# serializer version: 1
+# name: test_stilyagi_component_structure[design-adr-status]
+  '''
+  span.adr-status
+  
+  '''
+# ---
+# name: test_stilyagi_component_structure[docs-syntax-tabs]
+  '''
+  div.syntax-tabs aria-label='Suppression syntax' role='tablist'
+    button.active.syntax-tab aria-controls='suppress-panel-md' aria-selected='true' id='suppress-tab-md' role='tab' type='button'
+    button.syntax-tab aria-controls='suppress-panel-py' aria-selected='false' id='suppress-tab-py' role='tab' type='button'
+  
+  '''
+# ---
+# name: test_stilyagi_component_structure[how-term-ink-panel]
+  '''
+  div.term
+    div
+      span.prompt
+      span.cmd
+    div.dim
+    div.dim
+    br
+    div
+      span.path
+      span.dim
+    div
+      span.err
+      span.msg
+    br
+    div.dim
+    div.dim
+    div
+      span.code
+    div
+      span aria-hidden='true'
+      span.caret
+      span.rule
+    div.dim
+    br
+    div.dim
+    div.dim
+    br
+    div
+      span.final
+  
+  '''
+# ---
+# name: test_stilyagi_component_structure[roadmap-pacing-card]
+  '''
+  div.pacing-card
+    div.tt
+    div.body-t
+  
+  '''
+# ---
+# name: test_stilyagi_component_structure[roadmap-slice-timeline]
+  '''
+  div.slice-timeline
+    div.closed.done.phase
+      div.ph-head aria-controls='phase-body-0' aria-expanded='false' id='phase-head-0' role='button' tabindex='0'
+        div.ph-num
+        div
+          span.ph-tag
+          h2.ph-title
+        div.ph-meta
+          span.ph-status
+          br
+          span
+            br
+          span
+            br
+        div.ph-toggle
+      div.ph-body aria-labelledby='phase-head-0' id='phase-body-0' role='region'
+        div.ph-body-inner
+          div.goal
+            h3
+              span.red
+            p
+            div.ship-strip
+              b
+          div.deliverables
+            h3
+            ul
+              li
+              li
+              li
+              li
+              li
+              li
+    div.closed.done.phase
+      div.ph-head aria-controls='phase-body-1' aria-expanded='false' id='phase-head-1' role='button' tabindex='0'
+        div.ph-num
+        div
+          span.ph-tag
+          h2.ph-title
+        div.ph-meta
+          span.ph-status
+          br
+          span
+            br
+          span
+            br
+        div.ph-toggle
+      div.ph-body aria-labelledby='phase-head-1' id='phase-body-1' role='region'
+        div.ph-body-inner
+          div.goal
+            h3
+              span.red
+            p
+            div.ship-strip
+              b
+          div.deliverables
+            h3
+            ul
+              li
+              li
+              li
+              li
+              li
+              li
+    div.current.open.phase
+      div.ph-head aria-controls='phase-body-2' aria-expanded='true' id='phase-head-2' role='button' tabindex='0'
+        div.ph-num
+        div
+          span.ph-tag
+          h2.ph-title
+        div.ph-meta
+          span.ph-status
+          br
+          span
+            br
+          span
+            br
+        div.ph-toggle
+      div.ph-body aria-labelledby='phase-head-2' id='phase-body-2' role='region'
+        div.ph-body-inner
+          div.goal
+            h3
+              span.red
+            p
+            div.ship-strip
+              b
+          div.deliverables
+            h3
+            ul
+              li
+              li
+              li
+              li
+              li
+              li
+              li
+    div.closed.later.phase
+      div.ph-head aria-controls='phase-body-3' aria-expanded='false' id='phase-head-3' role='button' tabindex='0'
+        div.ph-num
+        div
+          span.ph-tag
+          h2.ph-title
+        div.ph-meta
+          span.ph-status
+          br
+          span
+            br
+          span
+            br
+        div.ph-toggle
+      div.ph-body aria-labelledby='phase-head-3' id='phase-body-3' role='region'
+        div.ph-body-inner
+          div.goal
+            h3
+              span.red
+            p
+            div.ship-strip
+              b
+          div.deliverables
+            h3
+            ul
+              li
+              li
+              li
+              li
+              li
+              li
+    div.closed.later.phase
+      div.ph-head aria-controls='phase-body-4' aria-expanded='false' id='phase-head-4' role='button' tabindex='0'
+        div.ph-num
+        div
+          span.ph-tag
+          h2.ph-title
+        div.ph-meta
+          span.ph-status
+          br
+          span
+            br
+          span
+            br
+        div.ph-toggle
+      div.ph-body aria-labelledby='phase-head-4' id='phase-body-4' role='region'
+        div.ph-body-inner
+          div.goal
+            h3
+              span.red
+            p
+            div.ship-strip
+              b
+          div.deliverables
+            h3
+            ul
+              li
+              li
+              li
+              li
+              li
+              li
+    div.closed.later.phase
+      div.ph-head aria-controls='phase-body-5' aria-expanded='false' id='phase-head-5' role='button' tabindex='0'
+        div.ph-num
+        div
+          span.ph-tag
+          h2.ph-title
+        div.ph-meta
+          span.ph-status
+          br
+          span
+            br
+          span
+            br
+        div.ph-toggle
+      div.ph-body aria-labelledby='phase-head-5' id='phase-body-5' role='region'
+        div.ph-body-inner
+          div.goal
+            h3
+              span.red
+            p
+            div.ship-strip
+              b
+          div.deliverables
+            h3
+            ul
+              li
+              li
+              li
+              li
+              li
+              li
+              li
+  
+  '''
+# ---
+# name: test_stilyagi_component_structure[why-personas-ink-panel]
+  '''
+  section.personas
+    div.wrap
+      div.folio-sm.personas-folio
+      h2
+        span.red
+      p.intro
+      table
+        thead
+          tr
+            th
+            th
+            th
+        tbody
+          tr
+            th
+            td
+            td.ignore
+          tr
+            th
+            td
+            td.ignore
+          tr
+            th
+            td
+            td.ignore
+          tr
+            th
+            td
+            td.ignore
+          tr
+            th
+            td
+            td.ignore
+  
+  '''
+# ---
+# name: test_stilyagi_component_structure[why-tenet-card]
+  '''
+  div.tenet-card
+    div.vs-num
+    h3
+    p
+  
+  '''
+# ---

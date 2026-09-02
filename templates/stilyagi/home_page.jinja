@@ -1,9 +1,6 @@
 {% extends "_layout.jinja" %}
 {% block title %}{{ homepage.title }}{% endblock %}
 {% block description %}Stilyagi is a deterministic prose linter for Markdown and source-code doc comments: Rust extraction, Python rules, and diagnostics anchored to the bytes they describe.{% endblock %}
-{% block page_stylesheet %}
-    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/home.css" />
-{% endblock %}
 {% block main_class %} class="home-shell"{% endblock %}
 {% block content %}
         <section class="poster-board" aria-labelledby="home-title">

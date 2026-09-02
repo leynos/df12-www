@@ -28,7 +28,7 @@ if typ.TYPE_CHECKING:
     from bs4.element import Tag
 
 STILYAGI_TEMPLATES = "templates/stilyagi"
-ROADMAP_CSS = Path("src/static/stilyagi/assets/styles/pages/roadmap.css")
+ROADMAP_CSS = Path("src/styles/stilyagi/pages/roadmap.css")
 
 #: Phase-row class -> (label status class, mark, spoken status). ``later``
 #: takes no status class because planned is the label's default appearance.
@@ -55,7 +55,7 @@ def roadmap(tmp_path_factory: pytest.TempPathFactory) -> BeautifulSoup:
         tmp_path_factory.mktemp("out"),
         templates_dir=Path(STILYAGI_TEMPLATES).resolve(),
         nav_links=[],
-        stylesheet="assets/styles/stilyagi-site.css",
+        stylesheet="/stilyagi/assets/styles/stilyagi.css",
     )
     output_path = generator.run()
     return BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
@@ -188,8 +188,8 @@ class TestRoadmapCallOutStyles:
     @pytest.mark.parametrize(
         ("selector", "fill"),
         [
-            (".illo-label.is-done", "--signal-sage-solid"),
-            (".illo-label.is-current", "--press-red"),
+            (".illo-label.is-done", "--color-signal-sage-solid"),
+            (".illo-label.is-current", "--color-press-red"),
         ],
     )
     def test_status_fill_is_declared(

@@ -1,4 +1,5 @@
-/* Registers happy-dom's window on the global scope before any test runs.
+/**
+ * @file Registers happy-dom's window on the global scope before any test runs.
  *
  * Loaded through the `[test].preload` entry in `bunfig.toml`, so every suite
  * under `tests/js` sees a real `document`, `window`, and event machinery

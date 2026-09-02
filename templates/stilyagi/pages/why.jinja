@@ -1,9 +1,7 @@
 {% extends "_layout.jinja" %}
 {% block title %}Stilyagi · Why — the case against the weak camps{% endblock %}
 {% block description %}Existing prose tools trade away structure, programmability, determinism, or source fidelity. The case for a fifth camp that gives up none of them.{% endblock %}
-{% block page_stylesheet %}
-    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/why.css" />
-{% endblock %}
+{% block main_class %} class="why-page"{% endblock %}
 {% block content %}
       <section class="page-intro">
         <div class="wrap">
@@ -182,7 +180,7 @@
           </div>
         </div>
         <div class="valueset">
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 01</div>
             <h3>Source-faithful</h3>
             <p>
@@ -190,7 +188,7 @@
               be written to.
             </p>
           </div>
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 02</div>
             <h3>Deterministic</h3>
             <p>
@@ -198,7 +196,7 @@
               diagnostics, always.
             </p>
           </div>
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 03</div>
             <h3>Offline</h3>
             <p>
@@ -206,7 +204,7 @@
               works on isolated runners.
             </p>
           </div>
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 04</div>
             <h3>Programmable</h3>
             <p>
@@ -214,7 +212,7 @@
               DSL, no recompile.
             </p>
           </div>
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 05</div>
             <h3>Structural</h3>
             <p>
@@ -222,7 +220,7 @@
               first-class extraction target.
             </p>
           </div>
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 06</div>
             <h3>Conservative fixes</h3>
             <p>
@@ -230,7 +228,7 @@
               non-identical edits fail loudly.
             </p>
           </div>
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 07</div>
             <h3>Honest about trust</h3>
             <p>
@@ -238,7 +236,7 @@
               cannot keep.
             </p>
           </div>
-          <div class="card">
+          <div class="tenet-card">
             <div class="vs-num">§ 08</div>
             <h3>Debuggable</h3>
             <p>

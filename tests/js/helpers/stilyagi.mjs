@@ -1,4 +1,5 @@
-/* A DOM-level harness for the Stilyagi widgets.
+/**
+ * @file DOM-level harness for the Stilyagi widgets.
  *
  * The widget modules are classic scripts: an IIFE that reads the document at
  * load time, wires listeners, and exports only its pure decision functions.
@@ -9,6 +10,15 @@
  *
  * Scripts are read from `src/static/`, the hand-crafted source of truth, so
  * the DOM suites need no build step to run.
+ *
+ * The bulk of this file is the fixtures that make that mounting possible:
+ * ROADMAP_FIXTURE, CATALOGUE_FIXTURE, TABS_FIXTURE, RAIL_FIXTURE,
+ * INSPECTOR_FIXTURE, and PLANNER_FIXTURE are exported constants of
+ * template-faithful markup, each built to match the corresponding Jinja
+ * template closely enough that the widget scripts' selectors and class
+ * toggles behave as they would on a real page. They're consumed by
+ * stilyagi-design.test.mjs, stilyagi-docs.test.mjs, and
+ * stilyagi-roadmap.test.mjs.
  */
 import { join } from "node:path";
 import { click as domClick, pressKey as domPressKey, evaluateScript } from "./dom.mjs";
@@ -137,10 +147,10 @@ function phase(index, { open = false, flavour = "later" } = {}) {
 }
 
 /* Mirrors the phase accordion in `templates/stilyagi/pages/roadmap.jinja`:
-   a timeline of `.phase` blocks whose `.ph-head` carries `aria-controls`
+   a slice timeline of `.phase` blocks whose `.ph-head` carries `aria-controls`
    and `aria-expanded`, with one phase shipped open. */
 export const ROADMAP_FIXTURE = `
-  <div class="timeline">
+  <div class="slice-timeline">
     ${phase(0, { flavour: "done" })}
     ${phase(1, { open: true, flavour: "current" })}
     ${phase(2)}
@@ -199,11 +209,11 @@ export const CATALOGUE_FIXTURE = `
    a two-tab tablist whose panels are keyed by `data-panel`. */
 export const TABS_FIXTURE = `
   <section class="suppress">
-    <div class="tabs" role="tablist" aria-label="Suppression syntax">
+    <div class="syntax-tabs" role="tablist" aria-label="Suppression syntax">
       <button type="button" role="tab" id="suppress-tab-md" data-tab="md"
-        aria-controls="suppress-panel-md" aria-selected="true" class="tab active">Markdown</button>
+        aria-controls="suppress-panel-md" aria-selected="true" class="syntax-tab active">Markdown</button>
       <button type="button" role="tab" id="suppress-tab-py" data-tab="py"
-        aria-controls="suppress-panel-py" aria-selected="false" class="tab">Python docstring</button>
+        aria-controls="suppress-panel-py" aria-selected="false" class="syntax-tab">Python docstring</button>
     </div>
     <pre id="suppress-panel-md" role="tabpanel" aria-labelledby="suppress-tab-md"
       data-panel="md" tabindex="0">markdown example</pre>

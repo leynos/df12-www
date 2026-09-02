@@ -1,9 +1,6 @@
 {% extends "_layout.jinja" %}
 {% block title %}Stilyagi · Design — under the bonnet{% endblock %}
 {% block description %}The Stilyagi architecture in full: the boundary between extraction and rule execution, the IR schema, and the packaging split between the Rust core and the Python rule API.{% endblock %}
-{% block page_stylesheet %}
-    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/design.css" />
-{% endblock %}
 {% block content %}
       <section class="page-intro">
         <div class="wrap">
@@ -550,7 +547,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-001</div>
             <h3>Python package, Rust extractor</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               Ship one wheel per platform. PyO3 bindings. Pre-built wheels for Linux, macOS, Windows;
               sdist only if requested.
@@ -559,7 +556,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-002</div>
             <h3>No bundled spellchecker in base</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               Spelling is an optional extra. Base install stays small and offline. Network-free by default
               is a hard contract.
@@ -568,7 +565,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-003</div>
             <h3>Rules are trusted code</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               Plugins run as ordinary Python. No sandbox. Documented loudly in the README, CLI help, and
               the plugin guide.
@@ -577,7 +574,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-004</div>
             <h3>Region IR, not raw AST</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               Rules subscribe to typed region classes. Raw AST is an implementation detail of the
               extractor, not a public surface.
@@ -586,7 +583,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-005</div>
             <h3>Capability planner</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               Providers load only when at least one enabled rule declares them. Runtime cost is
               proportional to the enabled rule set.
@@ -595,7 +592,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-006</div>
             <h3>Markdown first; MDX provisional</h3>
-            <span class="status prov">Provisional</span>
+            <span class="adr-status prov">Provisional</span>
             <p class="editorial">
               MDX support ships behind a feature flag. Tree-sitter grammar stability is the pacing risk.
             </p>
@@ -603,7 +600,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-007</div>
             <h3>SARIF as primary machine format</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               JSON is the CLI-friendly fallback; SARIF is the CI integration format. One schema for both
               versions, stable.
@@ -612,7 +609,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-008</div>
             <h3>Fix safety is explicit</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               safe / unsafe / manual are first-class. The --fix flag accepts a safety class; unsafe fixes
               never run without an opt-in.
@@ -621,7 +618,7 @@
           <div class="adr-card">
             <div class="adr-num">ADR-009</div>
             <h3>Deterministic ordering</h3>
-            <span class="status">Accepted</span>
+            <span class="adr-status">Accepted</span>
             <p class="editorial">
               Normalised path, byte offset, rule code, message hash. The same input yields the same output
               bytes, always.

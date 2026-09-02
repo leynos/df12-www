@@ -1,13 +1,13 @@
-"""Fixtures shared between the Weaver suites.
+"""Fixtures shared between the site-build suites.
 
 ``built_site`` lives here rather than in one test module because several
-suites need it — the build tests read the published markup, and the browser
-tests serve it to a real Chromium — and a full ``bun run build`` costs too
-much to run once per module.
+suites need it — the Weaver and Stilyagi build tests read the published
+markup, and the Weaver browser tests serve it to a real Chromium — and a full
+``bun run build`` costs too much to run once per module.
 
-``served`` and ``drive`` are here for the same reason: the two browser suites
-share one server and one browser session between them, rather than starting a
-pair each.
+``served`` and ``drive`` are here for the same reason: the two Weaver browser
+suites share one server and one browser session between them, rather than
+starting a pair each.
 """
 
 from __future__ import annotations

@@ -1516,7 +1516,7 @@ sites:
   stilyagi:
     output_dir: public/stilyagi
     templates_dir: templates/stilyagi
-    stylesheet: assets/styles/stilyagi-site.css
+    stylesheet: /stilyagi/assets/styles/stilyagi.css
     base_path: /stilyagi/
     theme:
       site_name: Stilyagi

@@ -19,8 +19,8 @@
    visible width. */
 .stilyagi-syntax {
   flex: 1;
-  background: var(--ink);
-  border-left: var(--rule-weight-3) solid var(--press-red);
+  background: var(--color-ink);
+  border-left: var(--rule-weight-3) solid var(--color-press-red);
   width: max-content;
   min-width: 100%;
   box-sizing: border-box;

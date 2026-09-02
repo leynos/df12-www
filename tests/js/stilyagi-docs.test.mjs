@@ -1,11 +1,14 @@
-/* Tests for the Stilyagi docs page's widgets.
+/**
+ * @file Tests for the Stilyagi docs page's widgets.
  *
  * `matchesFilter` is the catalogue's whole decision: given a row's namespace
  * and its precomputed searchable text, plus the selected chip and the search
  * box contents, it decides whether the row stays visible. The DOM suites
  * then check the wiring: rows actually hide, the chip row and the select
  * stay in step, the suppression tabs move selection and focus, and the
- * section rail follows the observer.
+ * section rail follows the observer. The suite mounts CATALOGUE_FIXTURE,
+ * TABS_FIXTURE, and RAIL_FIXTURE from `helpers/stilyagi.mjs` into happy-dom
+ * before evaluating the widget script against them.
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";

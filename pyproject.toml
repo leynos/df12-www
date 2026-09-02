@@ -44,6 +44,7 @@ dev = [
     "msgspec",
     "jqpy",
     "hypothesis==6.165.10",
+    "syrupy>=6.0.0",
 ]
 
 [tool.ruff]

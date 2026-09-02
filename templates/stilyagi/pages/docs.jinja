@@ -1,9 +1,6 @@
 {% extends "_layout.jinja" %}
 {% block title %}Stilyagi · Docs — rules catalogue, configuration, colophon{% endblock %}
 {% block description %}Stilyagi reference: the rules catalogue, configuration schema, suppression semantics, the testing sandbox for rule authors, and the growing manual for the tool itself.{% endblock %}
-{% block page_stylesheet %}
-    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/docs.css" />
-{% endblock %}
 {% block content %}
       <section class="page-intro">
         <div class="wrap">
@@ -616,7 +613,7 @@
               <h2><span class="red">Suppressions</span> · three scopes, no magic</h2>
               <div class="counts">line · next-line · block</div>
             </div>
-            <div class="tabs" role="tablist" aria-label="Suppression syntax">
+            <div class="syntax-tabs" role="tablist" aria-label="Suppression syntax">
               <button
                 type="button"
                 role="tab"
@@ -624,7 +621,7 @@
                 data-tab="md"
                 aria-controls="suppress-panel-md"
                 aria-selected="true"
-                class="tab active"
+                class="syntax-tab active"
               >
                 Markdown</button
               ><button
@@ -634,7 +631,7 @@
                 data-tab="py"
                 aria-controls="suppress-panel-py"
                 aria-selected="false"
-                class="tab"
+                class="syntax-tab"
               >
                 Python docstring
               </button>

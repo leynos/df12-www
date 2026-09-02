@@ -1,9 +1,7 @@
 {% extends "_layout.jinja" %}
 {% block title %}Stilyagi · Roadmap — six vertical slices{% endblock %}
 {% block description %}The Stilyagi delivery plan: six vertical slices from a Markdown core through rule packs, richer diagnostics, and editor integration.{% endblock %}
-{% block page_stylesheet %}
-    <link rel="stylesheet" href="/stilyagi/assets/styles/pages/roadmap.css" />
-{% endblock %}
+{% block main_class %} class="roadmap-page"{% endblock %}
 {% block content %}
       <section class="page-intro">
         <div class="wrap">
@@ -57,7 +55,7 @@
           ><span><span class="dot dot-cur"></span>In flight (0.4)</span
           ><span><span class="dot dot-later"></span>Planned (0.6 – 1.0)</span>
         </div>
-        <div class="timeline">
+        <div class="slice-timeline">
           <div class="phase done closed">
             <div
               class="ph-head"
@@ -355,26 +353,26 @@
         </div>
       </section>
       <section class="pacing">
-        <div class="card">
+        <div class="pacing-card">
           <div class="tt">§ Cadence</div>
           <div class="body-t">
             Minor releases every six to ten weeks. Patches as needed. No sprint theatre.
           </div>
         </div>
-        <div class="card">
+        <div class="pacing-card">
           <div class="tt">§ Deprecations</div>
           <div class="body-t">
             One minor-version warning before removal. Renames ship with aliases that outlive two minors.
           </div>
         </div>
-        <div class="card">
+        <div class="pacing-card">
           <div class="tt">§ Stability</div>
           <div class="body-t">
             Rule IDs never change meaning. If a rule evolves, it gets a new ID; the old one is retired,
             never reassigned.
           </div>
         </div>
-        <div class="card">
+        <div class="pacing-card">
           <div class="tt">§ Governance</div>
           <div class="body-t">
             New rules require a one-page RFC. New providers require a two-page RFC and a performance

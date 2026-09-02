@@ -1,4 +1,4 @@
-/* mobile-nav.js — the Weaver sidebar's narrow-viewport drawer (<1024px).
+/* mobile-nav.ts — the Weaver sidebar's narrow-viewport drawer (<1024px).
  *
  * A plain script module in the shape described in section 6 of the
  * developers' guide: an IIFE loaded with `<script defer>` that finds its
@@ -16,24 +16,29 @@
 (() => {
   "use strict";
 
-  var sidebar = document.getElementById("sidebar");
+  /* The three roots are cast rather than narrowed because the functions
+     below are hoisted declarations, which the checker does not narrow through;
+     the early returns that follow are what make each cast true at runtime. */
+  const sidebar = document.getElementById("sidebar") as HTMLElement;
   if (!sidebar) return;
 
-  var nav = sidebar.querySelector("nav");
+  const nav = sidebar.querySelector("nav") as HTMLElement;
   if (!nav) return;
 
-  var header = sidebar.querySelector("[data-mobile-nav-header]");
+  const header = sidebar.querySelector("[data-mobile-nav-header]") as HTMLElement;
   if (!header) return;
 
   /* Signal that JS is available so CSS can safely hide the nav */
   document.documentElement.classList.add("has-mobile-nav");
 
-  /* Optional telemetry, from `telemetry.js`. Absent on a page that did not
+  /* Optional telemetry, from `telemetry.ts`. Absent on a page that did not
      load it, and a no-op there unless a host installed a sink; either way the
      drawer behaves the same. See that file for the whole event schema. */
   var telemetry = globalThis.df12WeaverTelemetry;
-  function report(outcome, reason) {
-    telemetry?.emit(telemetry.OPERATIONS.drawer, outcome, reason);
+  /* `outcome` is only ever undefined when `telemetry` is too, since callers
+     read it off the same object, so the cast holds wherever `emit` runs. */
+  function report(outcome: string | undefined, reason?: string): void {
+    telemetry?.emit(telemetry.OPERATIONS.drawer, outcome as string, reason);
   }
 
   /* ---- hamburger button ---- */
@@ -54,23 +59,23 @@
   /* ---- backdrop ---- */
   var backdrop = document.createElement("div");
   backdrop.id = "mobile-nav-backdrop";
-  sidebar.parentNode.insertBefore(backdrop, sidebar.nextSibling);
+  (sidebar.parentNode as Node).insertBefore(backdrop, sidebar.nextSibling);
 
   /* Publish the header's height as a custom property, so the drawer can sit
      below a header whose height depends on the rendered text. */
-  function setHeaderHeight() {
+  function setHeaderHeight(): void {
     var h = header.getBoundingClientRect().height;
     sidebar.style.setProperty("--mobile-header-height", `${h}px`);
   }
 
   var previousBodyOverflowY = "";
-  var savedFocus = null;
-  var focusTrapHandler = null;
+  var savedFocus: Element | null = null;
+  var focusTrapHandler: ((e: KeyboardEvent) => void) | null = null;
 
   /* The drawer's tab stops, in document order. Requeried on each keypress
      rather than cached, since the nav's contents are not fixed. */
-  function getFocusableElements() {
-    return nav.querySelectorAll(
+  function getFocusableElements(): NodeListOf<HTMLElement> {
+    return nav.querySelectorAll<HTMLElement>(
       "a[href], button:not([disabled]), input:not([disabled]), " +
         'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
     );
@@ -78,7 +83,7 @@
 
   /* Open the drawer: lock the page behind it, move focus inside, and install
      the trap that keeps focus there. */
-  function open() {
+  function open(): void {
     sidebar.classList.add("mobile-nav-open");
     btn.setAttribute("aria-expanded", "true");
     btn.setAttribute("aria-label", "Close navigation menu");
@@ -105,7 +110,7 @@
     }
 
     /* Install focus trap */
-    focusTrapHandler = (e) => {
+    focusTrapHandler = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
       var els = getFocusableElements();
       if (!els.length) {
@@ -142,7 +147,7 @@
 
   /* Close the drawer, unlock the page, remove the trap, and return focus to
      whatever held it before the drawer opened. */
-  function close(reason) {
+  function close(reason?: string): void {
     sidebar.classList.remove("mobile-nav-open");
     btn.setAttribute("aria-expanded", "false");
     btn.setAttribute("aria-label", "Open navigation menu");
@@ -162,12 +167,10 @@
      * element is the body, `body.focus()` does nothing, and focus is left on
      * a nav link inside a drawer that has just been hidden. Falling back to
      * the toggle puts it somewhere the reader can see and use. */
+    var saved = savedFocus as HTMLElement | null;
     var restoreTo =
-      savedFocus &&
-      savedFocus !== document.body &&
-      savedFocus.isConnected &&
-      typeof savedFocus.focus === "function"
-        ? savedFocus
+      saved && saved !== document.body && saved.isConnected && typeof saved.focus === "function"
+        ? saved
         : btn;
     restoreTo.focus();
     report(telemetry?.OUTCOMES.closed, reason);
@@ -179,7 +182,7 @@
   }
 
   /* Whether the drawer is currently open. */
-  function isOpen() {
+  function isOpen(): boolean {
     return sidebar.classList.contains("mobile-nav-open");
   }
 
@@ -207,10 +210,10 @@
 
   /* Close the drawer once the viewport is wide enough for the full sidebar,
      so the page is never left scroll-locked behind an invisible drawer. */
-  function onBreakpoint() {
+  function onBreakpoint(): void {
     if (mql.matches && isOpen()) close(telemetry?.REASONS.breakpoint);
   }
-  if (mql.addEventListener) mql.addEventListener("change", onBreakpoint);
+  if (typeof mql.addEventListener === "function") mql.addEventListener("change", onBreakpoint);
   else mql.addListener(onBreakpoint); /* Safari <14 */
 
   report(telemetry?.OUTCOMES.initialized);

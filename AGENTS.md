@@ -328,7 +328,8 @@ make test-js       # JavaScript suite
 
 Rebuild and inspect the rendered result as well. A template change that passes
 every gate can still produce a broken page, because the gates do not render the
-site.
+site. See [Validating rendered pages](#validating-rendered-pages) for the
+required browser checks.
 
 `make lint` runs Ruff over the Python and Biome over everything else —
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked
@@ -395,6 +396,74 @@ that the configuration can be validated offline.
 For site changes, run `bun run dev` to watch sources and serve `public/` on
 port 8080, then edit templates, `config/pages.yaml`, or the stylesheets and
 check the rendered page in a browser.
+
+### The dev server
+
+`bun run dev` watches `src/`, `df12_pages/`, `config/`, and `scripts/`,
+rebuilds on change, and serves `public/` with `http-server`. `bun run serve`
+does one build and then serves. Both read `DF12_PORT`, so pick a port per
+worktree when several are served at once (`DF12_PORT=8097 bun run serve`).
+For an agent session, start the server in the background, confirm it answers
+with `curl -s -o /dev/null -w "%{http_code}" http://localhost:$DF12_PORT/`,
+and stop it when the checks are done. The build emits a Mermaid warning for
+one upstream document; it is pre-existing and not a failure.
+
+### Validating rendered pages
+
+The commit gates do not render the site, so every change to a template,
+stylesheet, or page config is validated in a real browser before it is
+committed. Two tools are installed for this and both work without a display:
+`agent-browser` (navigation, accessibility-tree snapshots, screenshots, and
+`eval`) and `css-view` (computed-style snapshots as JSON for `jq`). Load the
+`agent-browser` and `css-view` skills before using them.
+
+1. **Look at the page.** Open each changed page with `agent-browser open`,
+   wait for `networkidle`, and take a full-page screenshot
+   (`agent-browser screenshot --full page.png`). Read the screenshot. Check
+   the links you added with `agent-browser snapshot -i -u`.
+2. **Audit every supported viewport.** The site supports widths from 320px
+   to desktop, and Tailwind breakpoints change the layout at 640, 768, 1024,
+   and 1280px, so a page that is right at one width can be broken at another.
+   For every changed page, set each of the widths 1440, 1280, 1024, 768, 390,
+   and 320 with `agent-browser set viewport <w> 900`, reload, and assert that
+   the document does not scroll horizontally:
+
+   ```bash
+   agent-browser eval "JSON.stringify({sw: document.documentElement.scrollWidth, iw: window.innerWidth})"
+   ```
+
+   `scrollWidth` greater than `innerWidth` is a failure. Find the offender
+   with an `eval` that lists elements whose `getBoundingClientRect().right`
+   exceeds the viewport, then fix the cause rather than clipping it: wide
+   content scrolls inside its own `overflow-x-auto` container, and a grid or
+   flex child that holds it needs `min-w-0` so the column cannot grow to the
+   content's minimum width. Screenshot the narrowest and widest viewports as
+   well as the one you designed at. This audit is mandatory for every changed
+   page, not a spot check.
+3. **Inspect computed styles when the screenshot is not enough.** `css-view
+   <url>` captures every element's computed styles; the default mode on this
+   host is CDP, so query `.payload.nodes[]` with `.attributes.class`,
+   `.computedStyles`, and `.boundingBox`. Use it to confirm that a utility
+   resolved to the value you meant, that a theme token propagated, or that
+   an element you expect to be hidden has a zero-height box. The `css-view`
+   skill has the `jq` idioms.
+4. **Prove output-neutral changes are neutral.** A refactor that is meant to
+   change nothing visible — moving utilities into a component class,
+   extracting a macro, reorganizing a stylesheet, upgrading a dependency —
+   is verified by snapshot diffing, not by eye. Capture `css-view <url> -o
+   before.json` for each affected page before the change and `after.json`
+   after it, at the same viewport, and diff the computed styles:
+
+   ```bash
+   diff <(jq -S '[.payload.nodes[] | {t: .tagName, c: .attributes.class, s: .computedStyles, b: .boundingBox}]' before.json) \
+        <(jq -S '[.payload.nodes[] | {t: .tagName, c: .attributes.class, s: .computedStyles, b: .boundingBox}]' after.json)
+   ```
+
+   An empty diff is the evidence the change was neutral. A non-empty diff is
+   either a bug or a change that must be described in the commit message.
+   Narrow the captured properties with `--props` when the page is large.
+5. **Run the accessibility audit** over the changed pages, as the
+   [Accessibility](#accessibility) section requires.
 
 Test any changes to `deploy.tofu` or its modules using the OpenTofu native
 framework as described in `docs/opentofu-module-unit-testing-guide.md`. Follow

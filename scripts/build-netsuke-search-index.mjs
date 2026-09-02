@@ -17,6 +17,7 @@ import MiniSearch from "minisearch";
 
 const SITE_DIR = "public/netsuke";
 const DOCS_DIR = path.join(SITE_DIR, "docs");
+const FORTHCOMING_DIR = path.join(SITE_DIR, "forthcoming");
 const EXAMPLES_DIR = path.join(SITE_DIR, "examples");
 const SEARCH_OUTPUT_DIR = path.join(SITE_DIR, "assets", "search");
 const SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "docs-search.json");
@@ -51,6 +52,9 @@ async function main() {
     path.join(DOCS_DIR, "cli", "index.html"),
     path.join(DOCS_DIR, "configuration", "index.html"),
     path.join(DOCS_DIR, "security", "index.html"),
+    path.join(FORTHCOMING_DIR, "index.html"),
+    path.join(FORTHCOMING_DIR, "linter", "index.html"),
+    path.join(FORTHCOMING_DIR, "testing-framework", "index.html"),
   ];
   const exampleFiles = [
     path.join(EXAMPLES_DIR, "index.html"),

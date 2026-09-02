@@ -67,6 +67,8 @@
                         <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
                         <li><a href="/netsuke/docs/security/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Security Model</a></li>
                         <li><a href="#network-policy" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Network policy</a></li>
+                        <li><a href="#recipe-shells" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Recipe shells</a></li>
+                        <li><a href="#shell-dollars" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Markers and shell dollars</a></li>
                         <li><a href="#security" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security model</a></li>
                     </ul>
                 </div>
@@ -91,7 +93,7 @@
                 </div>
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Security Model</h1>
                 <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Validated structure, quoted path substitutions, and an auditable network policy for the <code>fetch()</code> helper. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>.
+                    Validated structure, quoted path substitutions, a documented recipe-shell contract, and an auditable network policy for the <code>fetch()</code> helper. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>: Netsuke reduces common quoting mistakes, but it is not a sandbox.
                 </p>
             </div>
 
@@ -140,6 +142,82 @@ $ netsuke \
                 </div>
             </section>
 
+            <section id="recipe-shells" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Recipe shells
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Recipes are shell strings in v0.1.x. Which interpreter runs them is a fixed contract per platform, not a property of the shell that launched <code>netsuke</code>.
+                    Structured executable arguments (<a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0001-structured-command-blocks.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">RFC 0001</a>) are planned for v0.2.0 and do not change the contract below.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="flex items-center mb-3">
+                            <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:linux" aria-hidden="true"></span>
+                            <h3 class="font-bold text-charcoal text-sm">Unix: <code>/bin/sh -e</code></h3>
+                        </div>
+                        <p class="text-xs text-charcoal-mid">Each <code>command</code> list entry runs in its own brace group, joined with <code>&amp;&amp;</code>, and is passed to <code>eval</code> as a shell-quoted payload so a trailing <code>#</code> or <code>&amp;</code> cannot break the chain. Groups run in the current shell, so a <code>cd</code> or variable assignment carries to later entries. An entry may start at most one background job; structured or nested <code>exec</code> forms are rejected during Ninja generation.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="flex items-center mb-3">
+                            <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:logo-windows" aria-hidden="true"></span>
+                            <h3 class="font-bold text-charcoal text-sm">Windows: PowerShell by default</h3>
+                        </div>
+                        <p class="text-xs text-charcoal-mid">Every legacy recipe is handed to Windows PowerShell (<code>powershell.exe</code>, not <code>pwsh</code>) as an encoded, non-interactive, no-profile command. A command list shares one process and is checked with <code>$LASTEXITCODE</code> after every entry. Use PowerShell syntax: <code>$name</code> is a variable and <code>$env:NAME</code> reads the environment. <code>{{ ins }}</code> and <code>{{ outs }}</code> render as single-quoted PowerShell arguments. Recipes over Windows' command-line limit and up to 1 MiB are routed through a self-deleting <code>.ps1</code> response file.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <div class="flex items-center mb-3">
+                            <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:logo-git" aria-hidden="true"></span>
+                            <h3 class="font-bold text-charcoal text-sm">Windows: explicit Bash route</h3>
+                        </div>
+                        <p class="text-xs text-charcoal-mid">Set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX interpretation through Git Bash or MSYS2 (<code>bash.exe</code> on <code>PATH</code>). Netsuke verifies <code>bash.exe --version</code> before <code>build</code> or Ninja-tool execution and stops with install instructions otherwise. In CI, install Git explicitly, prepend its <code>bin</code> directory to <code>PATH</code>, and launch Netsuke from a <code>pwsh</code> step rather than relying on a workflow-wide <code>shell: bash</code>.</p>
+                    </div>
+                </div>
+                <div class="bg-charcoal rounded-xl overflow-hidden">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Keeping POSIX recipes on Windows</div>
+                    {% endraw %}{% highlight 'powershell' %}{% raw %}
+choco install git --yes --no-progress
+$env:PATH = "C:\Program Files\Git\bin;$env:PATH"
+$env:NETSUKE_WINDOWS_SHELL = "bash"
+netsuke build
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+            </section>
+
+            <section id="shell-dollars" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:currency-dollar" aria-hidden="true"></span> Markers and shell dollars
+                </h2>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    <code>{{ ins }}</code> and <code>{{ outs }}</code> are the only Netsuke markers for input and output paths, and the only values that are automatically shell-quoted. Everything else a template renders is ordinary command text. Since v0.1.0-beta3, shell dollar expressions are written normally: Netsuke lowers the markers first and only then escapes literal dollars as <code>$$</code> in the generated Ninja file, so the shell receives them unchanged.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Write this</h3>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  - name: build/app
+    sources: src/main.c
+    command: >-
+      ${CC:-cc} $CFLAGS {{ ins }} -o {{ outs }}
+      && echo "built on $HOSTNAME"
+{% endraw %}{% endhighlight %}{% raw %}
+                        </div>
+                        <p class="text-xs text-charcoal-mid mt-3"><code>$CC</code>, <code>$CFLAGS</code>, and <code>$HOSTNAME</code> reach <code>/bin/sh</code> as literal shell variables. On the PowerShell route, write <code>$env:CC</code> instead; PowerShell does not perform POSIX <code>${VAR:-default}</code> expansion.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Migrating a beta2 manifest</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li class="flex items-start"><span class="iconify text-amber mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace the historical spelling <code>$$PATH</code> with <code>$PATH</code>. On POSIX and Bash routes <code>$$</code> is the shell's process identifier; in PowerShell it is the last token of the previous command, so the extra dollar now changes the result.</span></li>
+                            <li class="flex items-start"><span class="iconify text-amber mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace any <code>$in</code> or <code>$out</code> placeholder with <code>{{ ins }}</code> or <code>{{ outs }}</code>. Literal <code>$ins</code> and <code>$outs</code> remain ordinary shell variables.</span></li>
+                            <li class="flex items-start"><span class="iconify text-amber mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>On POSIX and Bash routes a marker may appear unquoted, single-quoted, or double-quoted, but not inside a command substitution or backticks. In PowerShell, use markers unquoted; quoted and command-substitution sites are rejected.</span></li>
+                            <li class="flex items-start"><span class="iconify text-amber mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Build and default-target paths reject <code>$</code>, spaces, colons, <code>|</code>, and control characters; emitted metadata such as descriptions rejects newlines and NUL.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
             <section id="security" class="mb-16 pt-10 border-t border-stone-light">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center">
@@ -151,7 +229,7 @@ $ netsuke \
                 </div>
 
                 <p class="text-charcoal-mid mb-10 max-w-3xl">
-                    Netsuke validates every manifest against a schema before template expansion runs, and escapes shell interpolation to prevent injection. Diagnostics are typed, so validation failures point to the exact manifest location rather than surfacing as opaque errors.
+                    Netsuke validates every manifest against a schema before template expansion runs, quotes the path markers it owns, and rejects the characters Ninja cannot represent unambiguously. Diagnostics are typed, so validation failures point to the exact manifest location rather than surfacing as opaque errors.
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
@@ -167,8 +245,8 @@ $ netsuke \
                         <div class="w-10 h-10 rounded-full bg-boxwood flex items-center justify-center text-charcoal mb-4">
                             <span class="iconify" data-icon="carbon:fingerprint-recognition" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-2">Shell escaping</h3>
-                        <p class="text-sm text-charcoal-mid">Interpolated values in commands and scripts are escaped by default, with explicit opt-outs for raw usage where the author really means it.</p>
+                        <h3 class="font-bold text-charcoal mb-2">Quoted path markers</h3>
+                        <p class="text-sm text-charcoal-mid"><code>{{ ins }}</code> and <code>{{ outs }}</code> are quoted as path arguments for the selected recipe shell. Other rendered Jinja values are <em>not</em> automatically shell-quoted, and the <code>shell_escape</code> filter described in older drafts is not implemented in v{% endraw %}{{ netsuke_version }}{% raw %}: handwritten shell fragments remain the author's responsibility.</p>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
@@ -188,7 +266,7 @@ $ netsuke \
                         <div class="ml-4">
                             <h3 class="text-sm font-bold text-charcoal">Scoped glob authority</h3>
                             <div class="mt-2 text-sm text-charcoal-mid space-y-2">
-                                <p>Since v{% endraw %}{{ netsuke_version }}{% raw %}, the filesystem capability used for <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">glob()</code> metadata checks is opened at the pattern's longest literal directory prefix &mdash; not at the filesystem root or the working directory &mdash; so glob expansion holds only the authority its pattern can reach.</p>
+                                <p>Since v0.1.0-beta2, the filesystem capability used for <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">glob()</code> metadata checks is opened at the pattern's longest literal directory prefix &mdash; not at the filesystem root or the working directory &mdash; so glob expansion holds only the authority its pattern can reach. Since v0.1.0-beta3, the Jinja helper also rejects any matched path that is not a portable unquoted shell word, so an untrusted checkout filename cannot become shell syntax when <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">item</code> is interpolated into a recipe.</p>
                                 <p>A pattern whose literal prefix is missing, or names something other than a directory, expands to no matches. A match reached through a symbolic link that resolves outside the prefix, or dangles, is skipped rather than failing the expansion; a cyclic symbolic link still fails it, and a literal prefix that is itself a symbolic link cannot establish the capability, so the expansion fails. Glob tracing redacts caller-controlled path fields as <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">&lt;redacted&gt;</code>.</p>
                             </div>
                         </div>
@@ -199,7 +277,7 @@ $ netsuke \
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Vulnerability Mitigation</h3>
                     <p class="text-xs text-charcoal-mid mb-4">Qualitative comparison based on documented safety features; no numeric mitigation claim is implied.</p>
-                    <p id="securityChartSummary" class="text-xs text-charcoal-mid mb-4">Manifest schema validation, default shell escaping, and typed diagnostics give Netsuke stronger qualitative mitigation than ad hoc scripts on each documented boundary. Interactive charting requires JavaScript.</p>
+                    <p id="securityChartSummary" class="text-xs text-charcoal-mid mb-4">Manifest schema validation, quoted path markers with shell-safe glob results, and typed diagnostics give Netsuke stronger qualitative mitigation than ad hoc scripts on each documented boundary. Interactive charting requires JavaScript.</p>
                     <div id="securityChart" class="h-[400px] w-full" role="img" aria-label="Bar chart comparing vulnerability mitigation between Netsuke and ad hoc scripts" aria-describedby="securityChartSummary"></div>
                 </div>
             </section>
@@ -215,7 +293,7 @@ $ netsuke \
             try {
                 const categories = [
                     'Malformed manifests',
-                    'Shell injection',
+                    'Path injection',
                     'Opaque diagnostics',
                 ];
                 const levels = { Low: 1, Moderate: 2, High: 3 };

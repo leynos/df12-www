@@ -1,0 +1,450 @@
+{% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "docs_nav.jinja" as docsnav %}
+{% set active_nav = 'roadmap' %}
+{% block page_title %}Netsukefile Testing Framework (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+{% raw %}
+    <div class="site-container pt-16 flex-grow flex">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            <nav class="space-y-8" aria-label="Preview pages">
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Forthcoming</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/forthcoming/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">All previews</a></li>
+                        <li><a href="/netsuke/forthcoming/linter/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Netsukefile Linter</a></li>
+                        <li><a href="/netsuke/forthcoming/testing-framework/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Testing Framework</a></li>
+                        <li><a href="#status" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Status</a></li>
+                        <li><a href="#why" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Why manifest tests</a></li>
+                        <li><a href="#layout" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Test tree and files</a></li>
+                        <li><a href="#steps" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Given, when, then</a></li>
+                        <li><a href="#mocks" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Doubles and fixtures</a></li>
+                        <li><a href="#command" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">The command</a></li>
+                        <li><a href="#example" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Worked example</a></li>
+                        <li><a href="#design" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Under the hood</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Sources</h3>
+                    <ul class="space-y-1">
+                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">RFC 0007</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">UX and semantic design</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Technical design</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
+                <a href="/netsuke/forthcoming/" class="hover:text-vermillion transition-colors">Forthcoming</a>
+                <span class="mx-2 text-stone">/</span>
+                <span class="text-charcoal font-medium">Testing Framework</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center flex-wrap gap-3 mb-4">
+                    {% endraw %}{{ ui.kicker('Forthcoming capability', dot='bg-indigo') }}{% raw %}
+                    <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview targeted at v0.4.0</span>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Netsukefile Testing Framework</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    Netsukefiles contain real logic &mdash; <code>foreach</code>, <code>when</code>, macros, environment probes, globbing,
+                    <code>command_available</code> &mdash; and today the only way to verify it is to run a build and eyeball the output.
+                    <code>netsuke test</code> runs declarative tests through the same compiler pipeline as <code>netsuke build</code> and asserts on
+                    the rendered manifest, the build graph, and the generated Ninja text, deterministically and without executing a single recipe.
+                </p>
+            </div>
+
+            <section id="status" class="mb-16">
+                <div class="bg-amber/5 border border-amber/30 rounded-xl p-6">
+                    <h2 class="font-bold text-charcoal text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-amber mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {% endraw %}{{ generated_at.strftime('%-d %B %Y') }}{% raw %}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{% endraw %}{{ netsuke_version }}{% raw %}.</strong> Nothing described here is implemented: there is no <code>test</code> command, no <code>tests</code> manifest key, and no test dialect in the released binary.</span></li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">RFC 0007</a> (proposed, 17 August 2026) sets the scope; the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">UX and semantic design</a> and the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">technical design</a> are drafts. Roadmap phase 7 tracks the work, with every task still open.</span></li>
+                        <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span><strong>Gated on evidence.</strong> Before the dialect and mock engine are built, the seams are dogfooded through a differential fidelity suite over the repository's example manifests; if the dialect's demand assumptions fail, the design's explicit exit is overrides only, with no dialect.</span></li>
+                        <li class="flex items-start"><span class="iconify text-indigo mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.4.0.</strong> The success criterion is concrete: an author can write the worked example below and run it to a green result on a machine with no compiler, no network, and a fixed clock. Key names, matchers, and output shapes may change before then.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why manifest tests
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Four things cannot be checked today: negative properties (that <code>skip.c</code> is <em>not</em> a target), environment-dependent
+                    behaviour (what the manifest does when <code>CC</code> is unset), refactoring safety, and a machine-checkable contract that an
+                    agent or CI job can run before and after editing a manifest. The design rests on three commitments.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">Same compiler, declared substitutions</h3>
+                        <p class="text-xs text-charcoal-mid">Tests use the real loader, expansion, IR lowering, and Ninja generator. Mocks are substitutions at named seams &mdash; template functions, environment, clock, macros &mdash; never a re-implementation that can drift from the product.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">Plan mode is the unit-testing story</h3>
+                        <p class="text-xs text-charcoal-mid">Like OpenTofu's plan-mode tests, every pipeline action stops at generated Ninja text and never executes build commands. An unmocked impure call is an error, not a silent passthrough.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">Failure output is a feature</h3>
+                        <p class="text-xs text-charcoal-mid">A failing assertion is rendered as the expression with its actual values substituted, in the style of Open Policy Agent. An unexpected mock call suggests the configuration stanza that would have accepted it.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="layout" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:folder" aria-hidden="true"></span> Test tree and files
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Tests live in a <code>netsuke-tests</code> directory beside the Netsukefile. An optional top-level <code>tests</code> block in the
+                    manifest reconfigures discovery; it is tool configuration, not build data, so its values are invisible to templates and
+                    <code>tests.root</code> accepts no Jinja. Files whose name starts with <code>_</code> are support files, loaded only when imported.
+                    A run that discovers no files, or whose filters select zero cases, fails rather than reporting a silent green.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile: discovery block and its defaults</div>
+                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.2.0"
+
+tests:
+  root: netsuke-tests
+  include:
+    - "**/*.yml"
+    - "**/*.yaml"
+  exclude:
+    - "**/_*.yml"
+    - "**/_*.yaml"
+{% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                    <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A test file's fixed keys plus test_* cases</div>
+                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_test_version: "1.0"   # required in every file
+
+imports:                       # optional support files,
+  - _fixtures.yml              # confined to the test tree
+
+vars: {}                       # suite-local test variables
+
+macros: []                     # same shape as Netsukefile macros
+
+fixtures: {}                   # fixture definitions
+
+test_compile_target:           # one or more cases
+  steps: []
+{% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid mt-4"><code>netsuke_test_version</code> is a <code>MAJOR.MINOR</code> string. The dialect denies unknown keys everywhere, so every addition is a minor-version event and an older runner rejects a newer file rather than misreading it; an unknown key is reported with the nearest known key. Case names match <code>test_[A-Za-z0-9_]+</code> and are reported as <code>&lt;file&gt;::&lt;name&gt;</code>.</p>
+            </section>
+
+            <section id="steps" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> Given, when, then
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A case is an ordered list of <code>steps</code>. Each step carries at least one of <code>given</code> (fixtures, environment,
+                    doubles, clock), <code>when</code> (a pipeline action), and <code>then</code> (assertions). Context from <code>given</code> persists
+                    across the later steps of the same case; nothing persists between cases. The smallest useful test needs none of the machinery:
+                </p>
+                <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/hello.yml</div>
+                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_test_version: "1.0"
+
+test_hello_target_is_generated:
+  steps:
+    - when: generate_ninja
+      then:
+        - result.ok
+        - result.graph.has_target("build/hello.txt")
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm"><code>when</code>: pipeline actions</h3>
+                        <div class="overflow-x-auto [contain:inline-size]" tabindex="0"><table class="min-w-full text-xs">
+                            <thead><tr class="text-left text-charcoal-mid"><th class="pb-2 pr-4 font-bold">Action</th><th class="pb-2 pr-4 font-bold">Runs</th><th class="pb-2 font-bold">Result carries</th></tr></thead>
+                            <tbody class="divide-y divide-stone-light text-charcoal-mid">
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">load_manifest</td><td class="py-2 pr-4">ingest, parse, expand, deserialize, render</td><td class="py-2 font-mono">result.manifest</td></tr>
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">build_graph</td><td class="py-2 pr-4"><code>load_manifest</code> + IR lowering</td><td class="py-2 font-mono">result.graph</td></tr>
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">generate_ninja</td><td class="py-2 pr-4"><code>build_graph</code> + Ninja generation</td><td class="py-2 font-mono">result.ninja</td></tr>
+                            </tbody>
+                        </table></div>
+                        <p class="text-xs text-charcoal-mid mt-3">Scalar, list, and object forms are accepted; the object form can name an explicit <code>manifest</code> path, typically a fixture export.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm"><code>then</code>: assertion forms</h3>
+                        <p class="text-xs text-charcoal-mid mb-3">Scalar entries are MiniJinja boolean expressions over the result and the mock journal; object entries are structured assertions with richer diffs. Helpers available in expressions: <code>contains</code>, <code>starts_with</code>, <code>ends_with</code>, <code>matches</code>, <code>file_exists</code>, <code>file_contains</code>.</p>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+then:
+  - result.ok
+  - result.graph.targets | length == 3
+  - equals:
+      actual: result.graph.edge_count
+      expected: 4
+  - contains:
+      value: result.ninja
+      needle: "default app"
+  - matches:
+      value: result.error.message
+      regex: "missing.*rule"
+{% endraw %}{% endhighlight %}{% raw %}
+                        </div>
+                        <p class="text-xs text-charcoal-mid mt-3">A false assertion is a <em>FAIL</em>; a case that could not run to a verdict is an <em>ERROR</em>. The two are distinct end to end, and expected failures can be asserted on by name.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="mocks" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:cube" aria-hidden="true"></span> Doubles and fixtures
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    <code>given.let</code> binds a double to a template function name. The three kinds follow the stub, mock, and spy taxonomy: a
+                    <strong>stub</strong> returns a canned value and is journalled but never verified; a <strong>mock</strong> is verified, so every
+                    declared expectation must be met and an unmatched call fails the action immediately; a <strong>spy</strong> journals every call and
+                    passes through to the effective implementation under test configuration. The terse form is deliberately the loose one, so
+                    don't-care collaborators cost one line and full expectation machinery is opt-in.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Shorthand doubles in given.let</div>
+                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+given:
+  env:
+    set:
+      CC: clang
+  let:
+    glob: mock(args=["src/*.c"], returns=["src/main.c"])
+    cc:   stub(returns="clang")
+    now:  spy()
+    compile_cmd: substitute("stand_in_compile")
+{% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">What can be mocked</h3>
+                        <div class="overflow-x-auto [contain:inline-size]" tabindex="0"><table class="min-w-full text-xs">
+                            <thead><tr class="text-left text-charcoal-mid"><th class="pb-2 pr-4 font-bold">Seam</th><th class="pb-2 pr-4 font-bold">Mechanism</th><th class="pb-2 font-bold">Example</th></tr></thead>
+                            <tbody class="divide-y divide-stone-light text-charcoal-mid">
+                                <tr><td class="py-2 pr-4">Template functions</td><td class="py-2 pr-4"><code>mock</code>/<code>stub</code>/<code>spy</code></td><td class="py-2 font-mono">glob, which, fetch, command_available</td></tr>
+                                <tr><td class="py-2 pr-4">Environment variables</td><td class="py-2 pr-4"><code>given.env</code></td><td class="py-2 font-mono">env("CC")</td></tr>
+                                <tr><td class="py-2 pr-4">Clock</td><td class="py-2 pr-4"><code>given.clock</code></td><td class="py-2 font-mono">now()</td></tr>
+                                <tr><td class="py-2 pr-4">Manifest macros</td><td class="py-2 pr-4"><code>substitute(...)</code></td><td class="py-2 font-mono">compile_cmd(...)</td></tr>
+                                <tr><td class="py-2 pr-4">Filesystem observations</td><td class="py-2 pr-4">fixtures and <code>given.fs</code></td><td class="py-2 font-mono">file tests, sandboxed glob</td></tr>
+                            </tbody>
+                        </table></div>
+                        <p class="text-xs text-charcoal-mid mt-3">Filters and Jinja tests are not mockable in the first version; filesystem fixtures cover most file-test cases with real sandboxed files, which is simpler and higher fidelity. Spying <code>fetch</code> is a suite error because the deny-all network policy makes its real implementation unreachable.</p>
+                    </div>
+                </div>
+                <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">Fixtures</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">
+                    Fixtures are lifecycle objects: ordered <code>setup</code> actions, <code>exports</code>, and ordered <code>teardown</code>, with an action
+                    vocabulary of <code>tmpdir</code>, <code>mkdir</code>, <code>write</code>, <code>copy</code>, <code>remove</code>, and <code>env</code>. Every path resolves inside a
+                    per-case sandbox; a fixture cannot touch the project root or the host filesystem. Teardown runs in reverse order for every fixture
+                    whose setup completed, regardless of later failures, and a failing teardown never masks the case result. All fixtures are case-scoped
+                    in the first version; an arbitrary-command <code>run</code> action is deferred with execution generally.
+                </p>
+                <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A fixture from the UX design</div>
+                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+fixtures:
+  tiny_c_project:
+    description: Minimal C project with one source and a Netsukefile.
+    setup:
+      - tmpdir: project
+      - mkdir: "{{ project }}/src"
+      - write:
+          path: "{{ project }}/src/main.c"
+          text: |
+            int main(void) { return 0; }
+      - write:
+          path: "{{ project }}/Netsukefile"
+          text: |
+            netsuke_version: "1.2.0"
+            targets:
+              - name: build/main.o
+                command: "cc -c src/main.c -o build/main.o"
+                sources: src/main.c
+    exports:
+      root: "{{ project }}"
+      manifest: "{{ project }}/Netsukefile"
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+            </section>
+
+            <section id="command" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> The command
+                </h2>
+                <div class="bg-charcoal rounded-xl overflow-hidden mb-6">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke test, as designed</div>
+                    {% endraw %}{% highlight 'text' %}{% raw %}
+netsuke test [FILTER...]
+
+Arguments:
+  FILTER                   Case selectors: file paths, file::case names, or
+                           substring patterns
+
+Options:
+  --tests-dir <DIR>        Override tests.root
+  --list                   List discovered cases without running them
+  --tag <TAG>              Run only cases with this tag (repeatable)
+  --skip-tag <TAG>         Exclude cases with this tag (repeatable)
+  --fail-fast              Stop after the first failing case
+  --timeout <SECS>         Per-case wall-clock budget (default 60)
+  --keep                   Preserve sandboxes of failing cases
+  --allow-empty            Succeed when zero cases are selected
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Exit codes</h3>
+                        <div class="overflow-x-auto [contain:inline-size]" tabindex="0"><table class="min-w-full text-xs">
+                            <tbody class="divide-y divide-stone-light text-charcoal-mid">
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">0</td><td class="py-2">all selected cases passed</td></tr>
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">1</td><td class="py-2">at least one case failed or errored</td></tr>
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">2</td><td class="py-2">invalid suite, invalid selector, or zero cases without <code>--allow-empty</code></td></tr>
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">3</td><td class="py-2">internal runner error</td></tr>
+                                <tr><td class="py-2 pr-4 font-mono text-indigo">130</td><td class="py-2">interrupted</td></tr>
+                            </tbody>
+                        </table></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-3 text-sm">Conventions it inherits</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li class="flex items-start"><span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>--json</code> and <code>--jobs</code> are the existing global flags. A completed run writes exactly one JSON document to stdout; a run that produces no report writes one diagnostic document to stderr.</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>The colour, emoji, progress, and accessibility policies and the localized message catalogue apply as they do everywhere else.</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Every selected case is reported exactly once as <code>passed</code>, <code>failed</code>, <code>errored</code>, or <code>skipped</code>, so counts always add up to the selection, even under <code>--fail-fast</code> or an interrupt.</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A case that exceeds its timeout is terminated, reported as errored with the journal it had produced, and keeps its sandbox for inspection.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="example" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Worked example
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The case below verifies <code>foreach</code> expansion, <code>when</code> filtering, environment-driven command construction, and
+                    macro wiring &mdash; without a compiler installed, without touching the real filesystem, and identically on every machine.
+                    It is the design's own success criterion.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile (subject)</div>
+                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.2.0"
+
+tests:
+  root: netsuke-tests
+
+macros:
+  - signature: "compile_cmd(src, obj)"
+    body: |
+      {{ env('CC') }} -c {{ src }} -o {{ obj }}
+
+targets:
+  - foreach: glob('src/*.c')
+    when: item | basename != 'skip.c'
+    name: "build/{{ item | basename | with_suffix('.o') }}"
+    command: "{{ compile_cmd(item, 'build/' ~ (item | basename | with_suffix('.o'))) }}"
+    sources: "{{ item }}"
+
+defaults:
+  - build/main.o
+{% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                    <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/compile.yml</div>
+                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+netsuke_test_version: "1.0"
+
+macros:
+  - signature: "stand_in_compile(src, obj)"
+    body: |
+      STUB {{ src }} -> {{ obj }}
+
+test_skips_filtered_sources:
+  description: foreach expands sources; when filters skip.c;
+    the compile macro can be substituted.
+  tags: [manifest, foreach]
+  steps:
+    - given:
+        env:
+          set:
+            CC: clang
+        let:
+          glob: mock(args=["src/*.c"],
+                     returns=["src/main.c", "src/skip.c"])
+          compile_cmd: substitute("stand_in_compile")
+      when: generate_ninja
+      then:
+        - result.ok
+        - result.graph.has_target("build/main.o")
+        - not result.graph.has_target("build/skip.o")
+        - contains(result.ninja, "STUB src/main.c -> build/main.o")
+        - mocks.glob.call_count == 1
+        - substitutes.compile_cmd.call_count == 1
+{% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                </div>
+                <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Human report, with one failing assertion rendered with its actual value</div>
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke test
+
+PASS compile.yml::test_generates_object_targets
+FAIL compile.yml::test_substituted_macro_receives_source
+
+  then[1]: substitutes.compile_cmd.calls[0].args[0] == "src/main.c"
+    substitutes.compile_cmd.calls[0].args[0] = "src/lib.c"
+
+2 cases: 1 passed, 1 failed
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+            </section>
+
+            <section id="design" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:layers" aria-hidden="true"></span> Under the hood
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">One compiler, two new seams</h3>
+                        <p class="text-xs text-charcoal-mid">Implementation reuses the existing pipeline behind an options-carrying loader entry point that registers test overlays after the standard library and manifest macros and before <code>foreach</code> expansion. Only two seams are added: a clock provider and a macro-substitution overlay. Network mocking needs no transport seam, because the deny-all policy plus function-level doubles make the real network code unreachable under test.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">A killable child per case</h3>
+                        <p class="text-xs text-charcoal-mid">Each case runs in its own child process so <code>--timeout</code> is a hard bound rather than a cooperative courtesy: MiniJinja evaluation cannot be pre-empted in-process. Discovery, scheduling, and report rendering stay in the parent. Results travel over length-prefixed JSON frames versioned like the existing envelope, with incremental journal checkpoints, so a case killed on the deadline still reports the calls it had made.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">Hermetic and deterministic</h3>
+                        <p class="text-xs text-charcoal-mid">Per-case sandboxes built on capability-scoped filesystem handles; no ambient mutation; no execution; a fixed clock; and localized, stream-pure output. The build path ignores the <code>tests</code> block entirely, so a manifest with a test suite behaves identically to one without.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">Out of scope</h3>
+                        <p class="text-xs text-charcoal-mid">Executing builds or fixture shell commands (designed, but deferred behind explicit allow flags); replacing Netsuke's own Rust test suites; a general-purpose scripting language for tests; file- and session-scoped fixtures; JUnit XML output. The <code>tests</code> key is admitted from the manifest version of the release that ships it, and older binaries reject it with their ordinary unknown-field diagnostic.</p>
+                    </div>
+                </div>
+            </section>
+
+{% endraw %}{{ docsnav.footer_nav({'kicker': 'Previous preview', 'label': 'Netsukefile Linter', 'href': '/netsuke/forthcoming/linter/'}, {'kicker': 'Follow', 'label': 'Roadmap', 'href': '/netsuke/roadmap/'}) }}{% raw %}
+
+        </main>
+    </div>
+{% endraw %}
+{% endblock %}

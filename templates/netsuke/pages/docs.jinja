@@ -263,6 +263,36 @@ targets:
                 </div>
             </section>
 
+            <!-- Forthcoming capabilities -->
+            <section id="forthcoming" class="mt-16">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal">Forthcoming capabilities</h2>
+                    <a href="/netsuke/forthcoming/" class="text-sm font-medium text-charcoal-mid hover:text-vermillion transition-colors hidden sm:block">All previews</a>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <a href="/netsuke/forthcoming/linter/" class="group block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-indigo/10 text-indigo flex items-center justify-center text-lg">
+                                <span class="iconify" data-icon="carbon:rule-test" aria-hidden="true"></span>
+                            </div>
+                            <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview: v0.2.0</span>
+                        </div>
+                        <h3 class="font-bold text-charcoal text-lg mb-2 group-hover:text-indigo transition-colors">Netsukefile linter</h3>
+                        <p class="text-charcoal-mid text-sm leading-relaxed">Deterministic manifest linting under <code>netsuke check</code>, inspired by mbake, with a stable rule catalogue and per-rule severity policy.</p>
+                    </a>
+                    <a href="/netsuke/forthcoming/testing-framework/" class="group block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-indigo/10 text-indigo flex items-center justify-center text-lg">
+                                <span class="iconify" data-icon="carbon:test-tool" aria-hidden="true"></span>
+                            </div>
+                            <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview: v0.4.0</span>
+                        </div>
+                        <h3 class="font-bold text-charcoal text-lg mb-2 group-hover:text-indigo transition-colors">Netsukefile testing framework</h3>
+                        <p class="text-charcoal-mid text-sm leading-relaxed">Manifest-time tests under <code>netsuke test</code> that run through the same compiler as the build, with mocks and fixtures instead of the real host.</p>
+                    </a>
+                </div>
+            </section>
+
             <!-- Help Footer -->
             <div class="mt-20 pt-10 border-t border-stone-light">
                 <div class="bg-indigo/5 rounded-xl p-8 text-center border border-indigo/10">

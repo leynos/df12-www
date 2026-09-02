@@ -189,6 +189,12 @@ New-Item Netsukefile -ItemType File
                         <p class="text-sm text-charcoal-mid">
                             This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared. Windows PowerShell 5.1 has no <code class="font-mono text-xs">&amp;&amp;</code> operator, so the two commands are separated by a semicolon.
                         </p>
+                        <div class="mt-4 flex items-start p-4 bg-amber/5 rounded-lg border border-amber/30">
+                            <span class="iconify text-amber mt-0.5 mr-3 shrink-0" data-icon="carbon:logo-windows" aria-hidden="true"></span>
+                            <p class="text-xs text-charcoal-mid">
+                                On Windows, recipes run in Windows PowerShell by default, so the <code>printf</code> and <code>tr</code> commands in the manifest opposite need either WSL2 or the explicit Bash route: install Git for Windows, prepend its <code>bin</code> directory to <code>PATH</code>, and set <code>NETSUKE_WINDOWS_SHELL=bash</code> before running <code>netsuke build</code>. See the <a href="/netsuke/docs/security/#recipe-shells" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">recipe shell contract</a>.
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Step 2: Content -->

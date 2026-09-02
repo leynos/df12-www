@@ -208,7 +208,7 @@ targets:
                     <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
                         <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">2</div>
                         <h4 class="font-bold text-charcoal mb-2">Recipe field</h4>
-                        <p class="text-sm text-charcoal-mid">A rule carries exactly one recipe: <code class="font-mono text-xs">command</code> or <code class="font-mono text-xs">script</code>. A <code class="font-mono text-xs">command</code> may be one shell string or an ordered list of commands chained fail-fast with <code class="font-mono text-xs">&amp;&amp;</code>.</p>
+                        <p class="text-sm text-charcoal-mid">A rule carries exactly one recipe: <code class="font-mono text-xs">command</code> or <code class="font-mono text-xs">script</code>. A <code class="font-mono text-xs">command</code> may be one shell string or an ordered list of commands chained fail-fast with <code class="font-mono text-xs">&amp;&amp;</code>. Rules never declare <code class="font-mono text-xs">deps</code>; dependencies belong on the target or action.</p>
                     </div>
                     <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
                         <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">3</div>
@@ -243,7 +243,12 @@ targets:
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">deps</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">["build"]</td>
-                                <td class="px-6 py-4 text-sm text-charcoal-mid">Named dependencies that must be built first and do trigger rebuilds.</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Implicit dependencies that must be built first and do trigger rebuilds, but never appear as recipe arguments. A target or action with a non-empty <code>deps</code> list may omit its recipe and become a dependency-only aggregate.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">vars</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">{ opt: "-O2" }</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Values that override global <code>vars</code> for this target only. <code>env</code> and <code>glob</code> are rejected as keys here too.</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">order_only_deps</td>
@@ -278,8 +283,9 @@ targets:
                         <div class="ml-4">
                             <h3 class="text-sm font-bold text-charcoal">CLI Tip: Querying Targets</h3>
                             <div class="mt-2 text-sm text-charcoal-mid">
-                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke generate</code> to inspect the plan without running a full build.</p>
+                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke help targets</code> to list the catalogue of targets and actions with their descriptions, and <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke generate</code> to inspect the plan without running a full build.</p>
                                 <div class="bg-charcoal text-stone-light p-3 rounded font-mono text-xs">
+                                    $ netsuke help targets<br>
                                     $ netsuke graph --output build.dot
                                 </div>
                             </div>
@@ -292,7 +298,7 @@ targets:
             <section id="serial-ordering" class="mb-16">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="font-serif text-2xl font-bold text-charcoal">Serial dependency ordering</h2>
-                    <span class="text-xs font-mono text-matcha bg-matcha/10 px-2 py-1 rounded">New in v{% endraw %}{{ netsuke_version }}{% raw %}</span>
+                    <span class="text-xs font-mono text-matcha bg-matcha/10 px-2 py-1 rounded">Since v0.1.0-beta2</span>
                 </div>
 
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
@@ -323,13 +329,19 @@ actions:
   - name: test
     command: "make test"
   - name: all
-    command: ":"
     dependency_order: serial
     deps:
       - check-fmt
       - lint
       - test
 {% endraw %}{% endhighlight %}{% raw %}
+                    </div>
+                </div>
+
+                <div class="mb-8 bg-boxwood-pale border-l-4 border-matcha p-5 rounded-r-lg">
+                    <div class="flex items-start">
+                        <span class="text-xs font-mono text-matcha bg-matcha/10 px-2 py-1 rounded mr-4 shrink-0">New in v0.1.0-beta3</span>
+                        <p class="text-sm text-charcoal-mid">The <code>all</code> action above has no recipe: its dependencies are the whole workflow, so Netsuke lowers it to a native Ninja <code>phony</code> node with no shell no-op of its own. Any action or target with a non-empty <code>deps</code> list may omit <code>rule</code>, <code>command</code>, and <code>script</code> this way. Prefer it to the old <code>command: ":"</code> idiom.</p>
                     </div>
                 </div>
 
@@ -378,7 +390,7 @@ actions:
                         </div>
                         <h3 class="font-bold text-charcoal mb-3">Validation boundaries</h3>
                         <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
-                            The reviewed docs emphasize validation, deterministic plan generation, and explicit shell escaping. Treat those as the documented safety story.
+                            Schema validation, deterministic plan generation, quoted <code>{{ ins }}</code> and <code>{{ outs }}</code> markers, and a documented recipe-shell contract are the safety story. Build and default-target paths reject <code>$</code>, spaces, colons, <code>|</code>, and control characters because Ninja cannot represent them unambiguously.
                         </p>
                         <a href="/netsuke/docs/security/" class="text-indigo text-sm font-medium hover:underline">Read Security Model &rarr;</a>
                     </div>

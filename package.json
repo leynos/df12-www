@@ -18,6 +18,7 @@
     "serve": "bun run build && bunx http-server public -p ${DF12_PORT:-8080}",
     "lint:js": "biome check .",
     "docs:check": "typedoc --options typedoc.json",
+    "typecheck:js": "tsc -p tsconfig.browser.json --noEmit && tsc -p tsconfig.scripts.json --noEmit",
     "lint:js:fix": "biome check --write .",
     "test:js": "bun test tests/js",
     "bump": "uv run pages bump"

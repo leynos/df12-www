@@ -16,7 +16,8 @@ PYTEST_FILTER += -m 'not playwright'
 endif
 
 .PHONY: help all clean build build-release lint fmt check-fmt check-site-data \
-        docs-check markdownlint nixie site-data spelling test typecheck $(TOOLS) \
+        docs-check markdownlint nixie site-data spelling test typecheck typecheck-js \
+        $(TOOLS) \
         $(VENV_TOOLS) dev
 
 .DEFAULT_GOAL := all
@@ -106,9 +107,12 @@ lint: ruff $(NODE_MODULES_STAMP) ## Run linters
 	ruff check
 	bun run lint:js
 
-typecheck: build ty ## Run typechecking
+typecheck: build ty typecheck-js ## Run typechecking
 	ty --version
 	ty check
+
+typecheck-js: $(NODE_MODULES_STAMP) ## Typecheck the browser scripts and build scripts
+	bun run typecheck:js
 
 markdownlint: $(MDLINT) ## Lint Markdown files
 	$(MDLINT) '**/*.md'

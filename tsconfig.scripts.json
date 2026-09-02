@@ -1,0 +1,14 @@
+{
+  // The build-time module tree: the scripts Bun runs during `bun run build`
+  // and the Tailwind plugin it loads. These are real ES modules with Bun and
+  // Node at hand. TypeDoc validates the same tree through this file.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["bun"],
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["scripts/**/*", "src/styles/plugins/**/*"],
+  "exclude": ["node_modules", "public", "**/vendor/**"]
+}

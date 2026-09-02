@@ -1,0 +1,20 @@
+{
+  // The browser scripts under src/static/**/assets/js/. They are classic
+  // scripts — an IIFE per file, loaded with a plain <script defer> — so they
+  // see the DOM and nothing else: no Bun, no Node, and no npm package
+  // types, which is what the empty `types` array enforces. The globals a
+  // classic script can rely on — the guarded `module.exports` test hook and
+  // the vendored libraries loaded ahead of it — are declared in
+  // src/static/browser-globals.d.ts.
+  //
+  // The scripts still compile as classic scripts under `isolatedModules`
+  // because the compiler only requires that a file *with* imports or exports
+  // be a module; a script with neither is left alone.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": []
+  },
+  "include": ["src/static/**/*.ts", "src/static/**/*.d.ts"],
+  "exclude": ["node_modules", "public", "**/vendor/**"]
+}

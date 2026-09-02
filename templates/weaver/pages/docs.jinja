@@ -229,7 +229,7 @@
                             <h2 class="font-serif text-3xl text-base-content">Configuration</h2>
                         </div>
                         <p class="mb-6 text-base-content/80">
-                            Configuration is layered with <code class="font-mono text-xs bg-primary/10 px-1">ortho-config</code>. Each successive layer overrides earlier sources, so a CLI flag always wins.
+                            In the planned 0.1.0 target, configuration is layered with <code class="font-mono text-xs bg-primary/10 px-1">ortho-config</code>: <code class="font-mono text-xs bg-primary/10 px-1">built-in defaults &lt; config files &lt; profile &lt; environment &lt; flags</code>. Each successive layer overrides earlier sources, so a CLI flag always wins.
                         </p>
                         <div class="reference-callout mb-8">
                             <div class="reference-callout-title">
@@ -258,14 +258,19 @@
                                 </thead>
                                 <tbody class="divide-y divide-base-content/10">
                                     <tr class="hover:bg-base-100/30">
-                                        <td class="p-4 font-mono text-base-content font-bold">4</td>
+                                        <td class="p-4 font-mono text-base-content font-bold">5</td>
                                         <td class="p-4 font-mono text-base-content">CLI flags</td>
                                         <td class="p-4 text-base-content/80">Always honoured. See table below.</td>
                                     </tr>
                                     <tr class="hover:bg-base-100/30">
-                                        <td class="p-4 font-mono text-base-content font-bold">3</td>
+                                        <td class="p-4 font-mono text-base-content font-bold">4</td>
                                         <td class="p-4 font-mono text-base-content">Environment variables</td>
-                                        <td class="p-4 text-base-content/80"><code>WEAVER_*</code> convention. Override files, yield to flags.</td>
+                                        <td class="p-4 text-base-content/80"><code>WEAVER_*</code> convention. Override profiles and files; yield to flags.</td>
+                                    </tr>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">3</td>
+                                        <td class="p-4 font-mono text-base-content">Profile</td>
+                                        <td class="p-4 text-base-content/80">A saved profile selected with <code>--profile</code> overrides configuration files and is overridden by environment variables and CLI flags.</td>
                                     </tr>
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold">2</td>
@@ -442,6 +447,10 @@ string "yes", expected a boolean
                                         <tr class="hover:bg-base-100/30">
                                             <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--config-path &lt;PATH&gt;</td>
                                             <td class="p-3 text-xs text-base-content/80">Read an explicit configuration file instead of using XDG discovery.</td>
+                                        </tr>
+                                        <tr class="hover:bg-base-100/30">
+                                            <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--profile &lt;NAME&gt;</td>
+                                            <td class="p-3 text-xs text-base-content/80">Planned for 0.1.0. Select a saved profile; it overrides configuration files and is overridden by environment variables and CLI flags.</td>
                                         </tr>
                                         <tr class="hover:bg-base-100/30">
                                             <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--daemon-socket &lt;ENDPOINT&gt;</td>

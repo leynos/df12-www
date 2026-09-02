@@ -36,8 +36,10 @@ PAGE_CONTENT_CONTRACTS = (
     pytest.param(
         "",
         (
-            'select(.schema == "weaver.selector.v1" and '
-            '(.captures.NAME.text | startswith("old_")))',
+            (
+                'select(.schema == "weaver.selector.v1" and '
+                '(.captures.NAME.text | startswith("old_")))'
+            ),
             "weaver symbols rename --selectors - --new-name run --dry-run",
         ),
         id="homepage-selector-stream-contract",

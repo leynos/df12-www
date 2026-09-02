@@ -34,7 +34,7 @@
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-3xl font-light">
-                        The change commands &ndash; <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">patches apply</span>, <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols rename</span>, and <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols move</span> &ndash; share one mutation engine. For supported edits, the Double-Lock harness applies the parser-backed syntactic check and the language-server semantic check before the change is committed to disk. No proposal cycle, no human approval gate &ndash; the locks <em>are</em> the safety gate.
+                        The planned change commands &ndash; <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">patches apply</span>, <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols rename</span>, and <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols move</span> &ndash; share one mutation engine. For supported edits, the Double-Lock harness applies the parser-backed syntactic check and the language-server semantic check before the change is committed to disk. No proposal cycle, no human approval gate &ndash; the locks <em>are</em> the safety gate.
                     </p>
                 </div>
 
@@ -57,7 +57,7 @@
                         <div class="lg:col-span-1">
                             <h2 class="font-serif text-2xl text-base-content mb-4">Synopsis</h2>
                             <p class="text-sm text-base-content/88 mb-6 leading-relaxed">
-                                <span class="font-mono text-xs bg-primary/10 px-1">patches apply</span> accepts a patch file with <code class="font-mono text-xs bg-primary/10 px-1">--file</code> or standard input. <span class="font-mono text-xs bg-primary/10 px-1">symbols rename</span> and <span class="font-mono text-xs bg-primary/10 px-1">symbols move</span> use selector entry points: direct (<code class="font-mono text-xs bg-primary/10 px-1">--uri</code> + <code class="font-mono text-xs bg-primary/10 px-1">--position</code>, or an inline <code class="font-mono text-xs bg-primary/10 px-1">--query</code>) and a typed stream via <code class="font-mono text-xs bg-primary/10 px-1">--selectors &lt;path|-&gt;</code>. For edits supported by the parser and language-server integration, the daemon plans in memory, runs both locks, and writes to disk only on success. Failures leave the filesystem untouched.
+                                Planned targets: <span class="font-mono text-xs bg-primary/10 px-1">patches apply</span> accepts a patch file with <code class="font-mono text-xs bg-primary/10 px-1">--file</code> or standard input. <span class="font-mono text-xs bg-primary/10 px-1">symbols rename</span> and <span class="font-mono text-xs bg-primary/10 px-1">symbols move</span> use selector entry points: direct (<code class="font-mono text-xs bg-primary/10 px-1">--uri</code> + <code class="font-mono text-xs bg-primary/10 px-1">--position</code>, or an inline <code class="font-mono text-xs bg-primary/10 px-1">--query</code>) and a typed stream via <code class="font-mono text-xs bg-primary/10 px-1">--selectors &lt;path|-&gt;</code>. For edits supported by the parser and language-server integration, the daemon plans in memory, runs both locks, and writes to disk only on success. Failures leave the filesystem untouched.
                             </p>
 
                             <div class="bg-base-100 border border-base-content p-4 relative mb-6">
@@ -87,12 +87,12 @@
                                     </thead>
                                     <tbody class="divide-y divide-base-content/10">
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">patches apply</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">patches apply <span class="status-pill status-pill-planned ml-1">Planned</span></td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">File / STDIN</td>
                                             <td class="p-3 text-sm text-base-content/80">Apply a Git-style patch via <span class="font-mono text-xs bg-primary/10 px-1">--file</span> or stdin. Supports modify, create, and delete hunks, plus <span class="font-mono text-xs bg-primary/10 px-1">--dry-run</span>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">symbols rename</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">symbols rename <span class="status-pill status-pill-planned ml-1">Planned</span></td>
                                             <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Selectors</td>
                                             <td class="p-3 text-sm text-base-content/80">Rename by position, inline <span class="font-mono text-xs bg-primary/10 px-1">--query</span>, or piped <span class="font-mono text-xs bg-primary/10 px-1">--selectors -</span>. Capability: <code>symbol.rename</code>.</td>
                                         </tr>
@@ -166,7 +166,7 @@
                             <div class="absolute -left-4 top-0 bottom-0 w-1 bg-primary opacity-30 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-baseline gap-3 mb-4 pl-4">
                                 <span class="font-mono text-xs font-bold text-base-100 bg-primary px-2 py-1 rounded-xs">EXAMPLE</span>
-                                <h3 class="font-serif text-xl text-base-content">patches apply</h3>
+                                <h3 class="font-serif text-xl text-base-content">patches apply <span class="status-pill status-pill-planned ml-1">Planned</span></h3>
                             </div>
                             <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
                                 Point at a Git-style patch. The engine stages it against expected content versions, formats the staged files, runs both locks, and commits atomically &ndash; recording the transaction, digests, and rollback reference.
@@ -201,7 +201,7 @@
                             <div class="absolute -left-4 top-0 bottom-0 w-1 bg-accent opacity-30 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-baseline gap-3 mb-4 pl-4">
                                 <span class="font-mono text-xs font-bold text-white bg-accent-deep px-2 py-1 rounded-xs">EXAMPLE</span>
-                                <h3 class="font-serif text-xl text-base-content">symbols rename (by query)</h3>
+                                <h3 class="font-serif text-xl text-base-content">symbols rename (by query) <span class="status-pill status-pill-planned ml-1">Planned</span></h3>
                             </div>
                             <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
                                 An inline query selects the target; the routed actuator plans, the shared engine verifies through the Double-Lock, and disk changes happen only on success. A multi-match query is refused, with candidates listed &ndash; no command guesses whether a multi-match mutation is intended.
@@ -484,12 +484,6 @@
                                             <td class="p-3 font-mono text-xs">bool</td>
                                             <td class="p-3 text-xs">No</td>
                                             <td class="p-3 text-xs">Create missing destination modules. Default <code class="font-mono bg-primary/5 px-1 rounded-sm">true</code>; to disable, pass <code class="font-mono bg-primary/5 px-1 rounded-sm">--no-create-missing-modules</code>.</td>
-                                        </tr>
-                                        <tr class="border-b border-base-content/10">
-                                            <td class="p-3 font-mono text-xs">--format</td>
-                                            <td class="p-3 font-mono text-xs">string</td>
-                                            <td class="p-3 text-xs">No</td>
-                                            <td class="p-3 text-xs"><code class="font-mono bg-primary/5 px-1 rounded-sm">auto</code>, <code class="font-mono bg-primary/5 px-1 rounded-sm">on</code>, or <code class="font-mono bg-primary/5 px-1 rounded-sm">off</code>. Default <code class="font-mono bg-primary/5 px-1 rounded-sm">auto</code>.</td>
                                         </tr>
                                         <tr>
                                             <td class="p-3 font-mono text-xs">--explain</td>

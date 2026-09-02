@@ -111,6 +111,30 @@ announced. Pasting the command is the way to verify that the copy worked. A
 browser may also refuse the clipboard on an insecure connection or without
 permission, and that refusal is likewise silent.
 
+
+### 4.3. Current and planned command surface
+
+Weaver still has a prototype surface in the current checkout. These examples
+work today:
+
+- `weaver --capabilities`
+- `weaver definitions get`
+- `weaver act apply-patch`
+
+`act apply-patch` consumes patch content from standard input.
+
+The planned 0.1.0 surface is `weaver <resource> <verb> [FLAGS]`, with `--json`
+as the machine switch. Selector-driven commands pass `weaver.selector.v1`
+records through `--selectors -`; the daemon is per-user and local, using Unix
+sockets by default and loopback-only TCP only for compatibility on non-Unix
+systems. Shared mutation guarantees stay the same: parser and
+language-server checks where they apply, stale-source refusal, Double-Lock
+verification, and idempotent mutations.
+
+Use the current examples until the planned commands ship. `patches apply` and
+`symbols rename` remain target wording in the docs, not a promise about the
+current binary.
+
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the
 [df12 Pages App Design](df12-pages-app-design.md).

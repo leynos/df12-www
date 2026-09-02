@@ -598,8 +598,8 @@ sections that remain accurate.
 
 **Roadmap (`/weaver/roadmap/`, `pages/roadmap.jinja`).** Rebuild from
 `docs/roadmap.md` phases 12–20: near term — command-surface reset (ADR 007),
-introspection and discoverability (phase 13), code-reading loop (14); mid-
-term — Sempai query slice (15), safe change loop (16), graph slices (17);
+introspection and discoverability (phase 13), code-reading loop (14);
+mid-term — Sempai query slice (15), safe change loop (16), graph slices (17);
 long term — agent workflow and assurance (19: profiles, jobs, delivery
 sinks, feedback). Mark what is already built (CLI/daemon architecture, LSP
 hosting, Tree-sitter, plugin sandbox, Double-Lock, patch application, Sempai
@@ -741,9 +741,20 @@ the `df12-copy` and `en-gb-oxendict` skills at copywriting time.
 
 ## Revision note (2026-08-29)
 
-Reconciled the COMPLETE plan with every later pull-request change because the
-previous outcome and scope stopped at the original content execution. Added
-the final delivery addendum, stylesheet and test tolerances, conformance basis,
-and rendered verification evidence. Completion status remains unchanged; only
-the illustration regeneration, navigation decision, and upstream RFC/ADR
-drift check remain open.
+This revision reconciled the COMPLETE plan with every later pull-request
+change because the previous outcome and scope stopped at the original content
+execution. Added the final delivery addendum, stylesheet and test tolerances,
+conformance basis, and rendered verification evidence. Completion status
+remains unchanged; only the illustration regeneration, navigation decision,
+and upstream RFC/ADR drift check remain open.
+
+## Review follow-up (2026-09-02)
+
+Recorded the verified Weaver follow-ups: the user guide now separates the
+current prototype commands from the planned 0.1.0 target surface, the install
+and command docs stay aligned with the current command examples, the
+rendered page contracts and bounded responsive Hypothesis coverage are in
+place, the shared page shell now uses `min-w-0` to remove the 1024px overflow
+found by the bounded responsive browser test, and the home page keeps the
+selector-stream terminator by retaining the deliberate `or` predicate.
+Completion status remains unchanged.

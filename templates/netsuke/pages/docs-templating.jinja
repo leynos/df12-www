@@ -1,6 +1,7 @@
 {% extends "doc_page.jinja" %}
 {% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Templating - Netsuke Build System{% endblock %}
 {% block extra_head %}
@@ -156,18 +157,7 @@
                     Use <code>|</code> for a multi-line string that preserves line breaks, or <code>&gt;-</code> to fold lines
                     into one string.
                 </p>
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 
 vars:
@@ -185,9 +175,7 @@ targets:
 
 defaults:
   - greeting.txt
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
             </section>
 
             <!-- Rendering -->
@@ -311,18 +299,7 @@ targets:
                     declared as data rather than written as <code>{% macro %}</code> statements, the YAML document stays a
                     document.
                 </p>
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
 macros:
   - signature: "obj_name(src)"
     body: |
@@ -333,9 +310,7 @@ targets:
     name: "build/{{ obj_name(item) }}"
     rule: "compile"
     sources: "{{ item }}"
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
             </section>
 
             <!-- Advanced Patterns -->

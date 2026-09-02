@@ -1,6 +1,7 @@
 {% extends "doc_page.jinja" %}
 {% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Rules &amp; Targets Reference - Netsuke Build System{% endblock %}
 {% block extra_head %}
@@ -171,18 +172,7 @@
                     A Netsuke rule is a reusable command or script template. Targets can reference the rule by name, add their own inputs, and keep duplicated shell out of the manifest.
                 </p>
 
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-8">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Netsukefile', outer_class='mb-8', body_class='p-6 font-mono text-sm overflow-x-auto text-stone-light') }}{% highlight 'netsuke' %}{% raw %}
 rules:
   - name: "compile"
     command: "gcc -c {{ ins }} -o {{ outs }}"
@@ -195,9 +185,7 @@ targets:
   - name: "app"
     rule: "link"
     sources: ["main.o", "utils.o"]
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <div class="grid md:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
@@ -309,18 +297,7 @@ targets:
                     later ones in the list do not start through the serial path.
                 </p>
 
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-8">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto text-stone-light">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Netsukefile', outer_class='mb-8', body_class='p-6 font-mono text-sm overflow-x-auto text-stone-light') }}{% highlight 'netsuke' %}{% raw %}
 actions:
   - name: check-fmt
     command: "make check-fmt"
@@ -334,9 +311,7 @@ actions:
       - check-fmt
       - lint
       - test
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <div class="mb-8 bg-boxwood-pale border-l-4 border-matcha p-5 rounded-r-lg">
                     <div class="flex items-start">

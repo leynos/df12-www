@@ -1,6 +1,7 @@
 {% extends "doc_page.jinja" %}
 {% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Manifest Reference - Netsuke Build System{% endblock %}
 {% block extra_head %}
@@ -108,35 +109,7 @@
                     Every <code class="font-mono text-sm">Netsukefile</code> is a YAML mapping. Unknown fields and duplicate mapping keys are errors. <code>netsuke_version</code> and <code>targets</code> are required (an empty <code>targets</code> list is valid for an action-only manifest); <code>vars</code>, <code>macros</code>, <code>rules</code>, <code>actions</code>, and <code>defaults</code> are optional.
                 </p>
 
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden relative">
-                    <!-- Annotation Overlay -->
-                    <div class="absolute right-6 top-16 hidden lg:block">
-                        <div class="flex items-center mb-10">
-                            <div class="w-24 h-px bg-stone-light/30 mr-2"></div>
-                            <span class="text-stone-light text-xs font-mono">Manifest metadata</span>
-                        </div>
-                        <div class="flex items-center mb-16">
-                            <div class="w-24 h-px bg-stone-light/30 mr-2"></div>
-                            <span class="text-stone-light text-xs font-mono">Reusable rules</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-24 h-px bg-stone-light/30 mr-2"></div>
-                            <span class="text-stone-light text-xs font-mono">Targets and defaults</span>
-                        </div>
-                    </div>
-
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                        <div class="w-12"></div>
-                    </div>
-
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Netsukefile', outer_class='relative') }}{% highlight 'netsuke' %}{% raw %}
 # 1. Schema version
 netsuke_version: "1.0.0"
 
@@ -157,8 +130,22 @@ targets:
 defaults:
   - "main.o"
 {% endraw %}{% endhighlight %}{% raw %}
+                    <!-- Annotation Overlay -->
+                    <div class="absolute right-6 top-16 hidden lg:block">
+                        <div class="flex items-center mb-10">
+                            <div class="w-24 h-px bg-stone-light/30 mr-2"></div>
+                            <span class="text-stone-light text-xs font-mono">Manifest metadata</span>
+                        </div>
+                        <div class="flex items-center mb-16">
+                            <div class="w-24 h-px bg-stone-light/30 mr-2"></div>
+                            <span class="text-stone-light text-xs font-mono">Reusable rules</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-24 h-px bg-stone-light/30 mr-2"></div>
+                            <span class="text-stone-light text-xs font-mono">Targets and defaults</span>
+                        </div>
                     </div>
-                </div>
+                    {% endraw %}{{ chrome.faux_window_close() }}{% raw %}
             </section>
 
             <!-- Core Fields Table -->

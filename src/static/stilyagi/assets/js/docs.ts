@@ -6,7 +6,7 @@
 (() => {
   "use strict";
 
-  const onReady = (fn) => {
+  const onReady = (fn: () => void): void => {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", fn, { once: true });
     } else {
@@ -21,7 +21,12 @@
    * the raw contents of the search box.  `haystack` is the row's precomputed
    * lowercase "id title description" string.
    */
-  function matchesFilter(rowNamespace, haystack, namespace, query) {
+  function matchesFilter(
+    rowNamespace: string | undefined,
+    haystack: string | undefined,
+    namespace: string,
+    query: string,
+  ): boolean {
     if (namespace !== "all" && rowNamespace !== namespace) return false;
     const needle = (query || "").trim().toLowerCase();
     if (!needle) return true;
@@ -29,21 +34,21 @@
   }
 
   /** Filter the rules table by namespace chip and free-text search. */
-  function initCatalogue() {
-    const bar = document.querySelector(".filter-bar");
-    const table = document.querySelector(".rules-table");
+  function initCatalogue(): void {
+    const bar = document.querySelector<HTMLElement>(".filter-bar");
+    const table = document.querySelector<HTMLTableElement>(".rules-table");
     if (!bar || !table) return;
 
-    const chips = [...bar.querySelectorAll(".filter-chip[data-ns]")];
-    const select = bar.querySelector(".filter-select");
-    const search = bar.querySelector("#rule-search");
-    const rows = [...table.querySelectorAll("tbody tr[data-ns]")];
-    const emptyRow = table.querySelector("tbody .empty-row");
+    const chips = [...bar.querySelectorAll<HTMLElement>(".filter-chip[data-ns]")];
+    const select = bar.querySelector<HTMLSelectElement>(".filter-select");
+    const search = bar.querySelector<HTMLInputElement>("#rule-search");
+    const rows = [...table.querySelectorAll<HTMLTableRowElement>("tbody tr[data-ns]")];
+    const emptyRow = table.querySelector<HTMLTableRowElement>("tbody .empty-row");
     if (!chips.length || !rows.length) return;
 
     let namespace = "all";
 
-    const apply = () => {
+    const apply = (): void => {
       const query = search ? search.value : "";
       let visible = 0;
       for (const row of rows) {
@@ -56,7 +61,7 @@
 
     // The chip row and the select are the same control at different widths,
     // so a change to either has to leave the other showing the same answer.
-    const choose = (next) => {
+    const choose = (next: string): void => {
       namespace = next;
       for (const chip of chips) {
         const active = chip.dataset.ns === next;
@@ -71,7 +76,7 @@
     };
 
     for (const chip of chips) {
-      chip.addEventListener("click", () => choose(chip.dataset.ns));
+      chip.addEventListener("click", () => choose(chip.dataset.ns ?? ""));
     }
 
     if (select) {
@@ -93,20 +98,20 @@
   }
 
   /** Swap the Markdown and Python suppression examples. */
-  function initSuppressionTabs() {
-    const tablist = document.querySelector('.suppress .syntax-tabs[role="tablist"]');
+  function initSuppressionTabs(): void {
+    const tablist = document.querySelector<HTMLElement>('.suppress .syntax-tabs[role="tablist"]');
     if (!tablist) return;
 
-    const tabs = [...tablist.querySelectorAll('[role="tab"][data-tab]')];
+    const tabs = [...tablist.querySelectorAll<HTMLElement>('[role="tab"][data-tab]')];
     const panels = new Map(
-      [...document.querySelectorAll(".suppress [data-panel]")].map((panel) => [
+      [...document.querySelectorAll<HTMLElement>(".suppress [data-panel]")].map((panel) => [
         panel.dataset.panel,
         panel,
       ]),
     );
     if (tabs.length < 2 || panels.size < 2) return;
 
-    const select = (tab) => {
+    const select = (tab: HTMLElement): void => {
       for (const other of tabs) {
         const active = other === tab;
         other.classList.toggle("active", active);
@@ -120,14 +125,20 @@
     };
 
     tablist.addEventListener("click", (event) => {
-      const tab = event.target.closest('[role="tab"][data-tab]');
+      const tab = (event.target as Element).closest<HTMLElement>('[role="tab"][data-tab]');
       if (tab) select(tab);
     });
 
+    const STEPS: Record<string, number> = {
+      ArrowRight: 1,
+      ArrowLeft: -1,
+      ArrowDown: 1,
+      ArrowUp: -1,
+    };
     tablist.addEventListener("keydown", (event) => {
-      const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 }[event.key];
+      const step = STEPS[event.key];
       if (!step) return;
-      const index = tabs.indexOf(document.activeElement);
+      const index = tabs.indexOf(document.activeElement as HTMLElement);
       if (index === -1) return;
       event.preventDefault();
       const next = tabs[(index + step + tabs.length) % tabs.length];
@@ -139,17 +150,19 @@
   }
 
   /** Mark the rail entry for whichever section is in view. */
-  function initSectionRail() {
-    const rail = document.querySelector(".side-toc");
+  function initSectionRail(): void {
+    const rail = document.querySelector<HTMLElement>(".side-toc");
     if (!rail || !("IntersectionObserver" in window)) return;
 
     const links = new Map(
-      [...rail.querySelectorAll('a[href^="#"]')].map((link) => [
-        link.getAttribute("href").slice(1),
+      [...rail.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')].map((link) => [
+        (link.getAttribute("href") ?? "").slice(1),
         link,
       ]),
     );
-    const sections = [...links.keys()].map((id) => document.getElementById(id)).filter(Boolean);
+    const sections = [...links.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => section !== null);
     if (!sections.length) return;
 
     const observer = new IntersectionObserver(

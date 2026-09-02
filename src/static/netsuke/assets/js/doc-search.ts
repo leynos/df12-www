@@ -13,9 +13,50 @@
   const SEARCH_MIN_LENGTH = 2;
   const RESULT_LIMIT = 6;
 
+  type Index = import("minisearch").default;
+  type IndexOptions = import("minisearch").Options;
+  type SearchOptions = import("minisearch").SearchOptions;
+
+  /* The JSON `scripts/build-netsuke-search-index.mjs` writes: a serialized
+     index and the options it was built with, including the query-time
+     options every search should use. */
+  interface IndexPayload {
+    index: string;
+    indexOptions: IndexOptions & { searchOptions: SearchOptions };
+  }
+
+  /* A deserialized index and the query options that go with it. */
+  interface LoadedIndex {
+    miniSearch: Index;
+    searchOptions: SearchOptions;
+  }
+
+  /* One result, as the index stores it: MiniSearch's own fields plus the
+     stored page fields the results list renders. */
+  interface DocSearchHit {
+    id: unknown;
+    sitePath: string;
+    title: string;
+    kind: string;
+    pageTitle: string;
+    sectionTitle?: string;
+    excerpt?: string;
+  }
+
+  /* Everything `renderResults` needs to redraw one root. */
+  interface RenderState {
+    activeIndex: number;
+    activeResults: DocSearchHit[];
+    input: HTMLInputElement;
+    meta: HTMLElement;
+    panel: HTMLElement;
+    resultsList: HTMLElement;
+    siteRoot: string;
+  }
+
   if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
-      const searchRoots = document.querySelectorAll("[data-doc-search-root]");
+      const searchRoots = document.querySelectorAll<HTMLElement>("[data-doc-search-root]");
 
       for (const root of searchRoots) {
         initializeDocSearch(root).catch((error) => {
@@ -28,11 +69,11 @@
   /* Wire one search root: its input, results panel, and list. Loads the index
      lazily through the shared cache, so a page carrying several roots for the
      same index fetches it once. */
-  async function initializeDocSearch(root) {
-    const input = root.querySelector("[data-doc-search-input]");
-    const panel = root.querySelector("[data-doc-search-panel]");
-    const resultsList = root.querySelector("[data-doc-search-results]");
-    const meta = root.querySelector("[data-doc-search-meta]");
+  async function initializeDocSearch(root: HTMLElement): Promise<void> {
+    const input = root.querySelector<HTMLInputElement>("[data-doc-search-input]");
+    const panel = root.querySelector<HTMLElement>("[data-doc-search-panel]");
+    const resultsList = root.querySelector<HTMLElement>("[data-doc-search-results]");
+    const meta = root.querySelector<HTMLElement>("[data-doc-search-meta]");
     const searchIndexPath = root.getAttribute("data-doc-search-index");
 
     if (!input || !panel || !resultsList || !meta || !searchIndexPath) {
@@ -45,7 +86,7 @@
       return;
     }
 
-    let loaded;
+    let loaded: LoadedIndex | null;
     try {
       loaded = await loadSearchIndex(searchIndexPath);
     } catch {
@@ -61,7 +102,7 @@
     const siteRoot = siteRootFromIndexPath(searchIndexPath);
 
     let activeIndex = -1;
-    let activeResults = [];
+    let activeResults: DocSearchHit[] = [];
 
     input.setAttribute("autocomplete", "off");
     input.setAttribute("spellcheck", "false");
@@ -134,7 +175,7 @@
     });
 
     document.addEventListener("click", (event) => {
-      if (!root.contains(event.target)) {
+      if (!root.contains(event.target as Node)) {
         hidePanel(panel, input);
       }
     });
@@ -149,7 +190,11 @@
   /* Run `rawQuery` against the index and return at most RESULT_LIMIT results,
      or nothing at all for a query below the minimum length. Results are merged
      so a page and its sections do not both appear for the same match. */
-  function search(miniSearch, searchOptions, rawQuery) {
+  function search(
+    miniSearch: Index,
+    searchOptions: SearchOptions,
+    rawQuery: string,
+  ): DocSearchHit[] {
     const query = rawQuery.trim();
     if (query.length < SEARCH_MIN_LENGTH) {
       return [];
@@ -161,14 +206,16 @@
     });
     const fuzzyResults = miniSearch.search(query, searchOptions);
 
-    const merged = new Map();
+    const merged = new Map<unknown, import("minisearch").SearchResult>();
     for (const result of [...exactResults, ...fuzzyResults]) {
       if (!merged.has(result.id)) {
         merged.set(result.id, result);
       }
     }
 
-    return [...merged.values()].slice(0, RESULT_LIMIT);
+    // The stored fields ride along on each result under an index signature,
+    // so the narrower shape is asserted rather than checked.
+    return [...merged.values()].slice(0, RESULT_LIMIT) as unknown as DocSearchHit[];
   }
 
   /* Draw the results list and its count, then show the panel and mark the
@@ -182,7 +229,7 @@
     panel,
     resultsList,
     siteRoot,
-  }) {
+  }: RenderState): void {
     const query = input.value.trim();
 
     if (query.length < SEARCH_MIN_LENGTH) {
@@ -232,7 +279,7 @@
 
   /* Move the highlight to the option at `activeIndex`, clearing it from the
      rest. Pass an index no option holds to clear it entirely. */
-  function updateActiveResult(resultsList, activeIndex) {
+  function updateActiveResult(resultsList: HTMLElement, activeIndex: number): void {
     const options = resultsList.querySelectorAll("[data-doc-search-option]");
 
     for (const option of options) {
@@ -245,13 +292,13 @@
   }
 
   /* Reveal the results panel and record it as expanded on the combobox. */
-  function showPanel(panel, input) {
+  function showPanel(panel: HTMLElement, input: HTMLInputElement): void {
     panel.classList.remove("hidden");
     input.setAttribute("aria-expanded", "true");
   }
 
   /* Hide the results panel and record it as collapsed on the combobox. */
-  function hidePanel(panel, input) {
+  function hidePanel(panel: HTMLElement, input: HTMLInputElement): void {
     panel.classList.add("hidden");
     input.setAttribute("aria-expanded", "false");
   }
@@ -262,9 +309,11 @@
   // listeners stay per-root. The cache stores promises so concurrent roots
   // reuse the in-flight load, and a failed or empty load is evicted so a
   // later root can retry. `load` is injectable for tests.
-  function createIndexCache(load) {
-    const cache = new Map();
-    return function loadCached(path) {
+  function createIndexCache<T>(
+    load: (path: string) => Promise<T | null>,
+  ): (path: string) => Promise<T | null> {
+    const cache = new Map<string, Promise<T | null>>();
+    return function loadCached(path: string): Promise<T | null> {
       if (!cache.has(path)) {
         const pending = Promise.resolve()
           .then(() => load(path))
@@ -282,19 +331,21 @@
           );
         cache.set(path, pending);
       }
-      return cache.get(path);
+      // Set on the branch above when absent, which `has` does not tell the
+      // checker.
+      return cache.get(path) as Promise<T | null>;
     };
   }
 
   /* Fetch and deserialize one MiniSearch index, returning the index and the
      search options it was built with, or null when the request fails — a
      search box that cannot load its index simply stays inert. */
-  async function fetchSearchIndex(searchIndexPath) {
+  async function fetchSearchIndex(searchIndexPath: string): Promise<LoadedIndex | null> {
     const response = await fetch(searchIndexPath);
     if (!response.ok) {
       return null;
     }
-    const payload = await response.json();
+    const payload: IndexPayload = await response.json();
     return {
       miniSearch: window.MiniSearch.loadJSON(payload.index, payload.indexOptions),
       searchOptions: payload.indexOptions.searchOptions,
@@ -305,7 +356,7 @@
 
   /* The sub-site root a set of results belongs to, recovered from the index
      path. Falls back to "/" when the expected marker is absent. */
-  function siteRootFromIndexPath(indexPath) {
+  function siteRootFromIndexPath(indexPath: string): string {
     // Index files live at "<siteRoot>assets/search/<name>.json", so the
     // prefix before that marker is the sub-site root the results belong to.
     const marker = "assets/search/";
@@ -315,14 +366,14 @@
 
   /* Join a site root and an indexed path into an absolute same-origin href,
      preserving the fragment that takes the reader to the right section. */
-  function toAbsoluteSiteHref(siteRoot, sitePath) {
+  function toAbsoluteSiteHref(siteRoot: string, sitePath: string): string {
     const url = new URL(siteRoot + sitePath, window.location.origin);
     return `${url.pathname}${url.hash}`;
   }
 
   /* Escape `text` for interpolation into result markup. Indexed content is
      built from the site's own pages, but it still reaches innerHTML. */
-  function escapeHtml(text) {
+  function escapeHtml(text: string): string {
     return text
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")

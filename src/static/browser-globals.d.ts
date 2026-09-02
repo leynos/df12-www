@@ -27,8 +27,13 @@
 /** The CommonJS module record, present only when a script is `require`d. */
 declare const module: { exports: Record<string, unknown> };
 
-/** The vendored MiniSearch constructor; see `src/static/<site>/assets/vendor/`. */
-declare const MiniSearch: typeof import("minisearch").default;
+/**
+ * The vendored MiniSearch constructor; see `src/static/<site>/assets/vendor/`.
+ * A `var`, because the UMD build assigns it as a property of the global
+ * object, which is how the scripts reach it through `window` and
+ * `globalThis`.
+ */
+declare var MiniSearch: typeof import("minisearch").default;
 
 /** A Weaver telemetry event, as handed to the host's sink by `telemetry.ts`. */
 interface WeaverTelemetryEvent {
@@ -51,13 +56,17 @@ interface WeaverTelemetryApi {
   REASONS: Readonly<Record<string, string>>;
 }
 
-/** An Episodic search telemetry event; the schema is fixed and carries no query. */
+/**
+ * An Episodic search-index lifecycle event, as `site-search.ts` hands it to
+ * the host's sink. The schema is fixed and has nowhere to put a query, a
+ * path, or anything that identifies a person.
+ */
 interface EpisodicSearchTelemetryEvent {
-  event: string;
-  phase: string;
+  attempt: string;
+  cache_state: string;
+  operation: string;
   outcome: string;
   duration_bucket?: string;
-  reason?: string;
 }
 
 /** The Tailwind Play CDN's configuration hook, read once when the CDN script runs. */
@@ -73,6 +82,5 @@ declare var df12EpisodicSearchTelemetry:
   | undefined;
 
 interface Window {
-  MiniSearch?: typeof MiniSearch;
   tailwind?: TailwindPlayCdn;
 }

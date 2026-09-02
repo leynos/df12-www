@@ -294,6 +294,82 @@ def _staged_run(destination: Path, move: cabc.Callable[[Path, Path], object]) ->
     return seen[0]
 
 
+def test_an_interrupt_landing_after_a_rescue_move_is_still_rolled_back(
+    tmp_path: Path,
+) -> None:
+    """A Ctrl-C arriving just after a rename must not orphan the rescued file.
+
+    The rename has completed but the interrupt lands before the next
+    statement runs. A rollback working from bookkeeping alone misses the
+    move, and `_staged` then sweeps the staging directory — with the previous
+    run's only copy inside its `replaced/`. Intent is recorded before the
+    move so the rollback can reconcile against what actually happened.
+    """
+    destination = _seeded(tmp_path)
+    moves = {"n": 0}
+
+    def interrupted_after(source: Path, target: Path) -> object:
+        """Complete the rescue move, then interrupt before anything else."""
+        moves["n"] += 1
+        result = source.replace(target)
+        if moves["n"] == 1:
+            raise KeyboardInterrupt
+        return result
+
+    with pytest.raises(KeyboardInterrupt):
+        _staged_run(destination, interrupted_after)
+
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "the file rescued just before the interrupt was not put back, so the "
+        "staging sweep took its only copy"
+    )
+    assert not list(tmp_path.glob(".out-*")), (
+        "a fully rolled-back interrupt should not leave a staging directory"
+    )
+
+
+def test_an_interrupt_landing_after_a_publication_move_removes_the_file(
+    tmp_path: Path,
+) -> None:
+    """A file landed just before a Ctrl-C must not survive the rollback.
+
+    The rename has completed but the interrupt lands before the next
+    statement runs. A rollback working from bookkeeping alone leaves the
+    file in the destination, which then holds a page from each run — the
+    half-state publication exists to prevent.
+    """
+    destination = _seeded(tmp_path)
+    moves = {"n": 0}
+    # One rescue, then the publication move that completes before the
+    # interrupt lands.
+    publication = 2
+
+    def interrupted_after(source: Path, target: Path) -> object:
+        """Complete each move; interrupt just after the publication one."""
+        moves["n"] += 1
+        result = source.replace(target)
+        if moves["n"] == publication:
+            raise KeyboardInterrupt
+        return result
+
+    with (
+        pytest.raises(KeyboardInterrupt),
+        output._staged(destination, ".json", interrupted_after) as staging,
+    ):
+        (staging / "two.json").write_text("this run", encoding="utf-8")
+
+    assert not (destination / "two.json").exists(), (
+        "the file landed just before the interrupt survived the rollback, so "
+        "the destination holds a page from each run"
+    )
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "the rollback should have restored the previous run's snapshot"
+    )
+    assert not list(tmp_path.glob(".out-*")), (
+        "a fully rolled-back interrupt should not leave a staging directory"
+    )
+
+
 def test_an_interrupted_rollback_keeps_the_only_copy(tmp_path: Path) -> None:
     """A second Ctrl-C, landing mid-rollback, must not cost the staging copy.
 

@@ -48,15 +48,22 @@ POSITIONS = st.frozensets(st.integers(min_value=1, max_value=10), max_size=3)
     fresh=STEMS,
     fail_at=POSITIONS,
     interrupt=st.booleans(),
+    late=st.booleans(),
 )
-def test_publication_always_ends_in_a_recoverable_state(
+def test_publication_always_ends_in_a_recoverable_state(  # noqa: PLR0913 - each parameter is a generated dimension, not an API
     tmp_path: Path,
     previous: set[str],
     fresh: set[str],
     fail_at: frozenset[int],
     interrupt: bool,  # noqa: FBT001 - a generated boolean, not an API flag
+    late: bool,  # noqa: FBT001 - a generated boolean, not an API flag
 ) -> None:
-    """Wherever a failure lands, no file is lost and no half-state survives."""
+    """Wherever a failure lands, no file is lost and no half-state survives.
+
+    `late` decides whether an injected failure fires before the rename or
+    just after it has completed — the window a real interrupt has between a
+    returned syscall and the caller's next statement.
+    """
     destination = Path(tempfile.mkdtemp(dir=tmp_path)) / "out"
     destination.mkdir()
     for stem in previous:
@@ -69,12 +76,18 @@ def test_publication_always_ends_in_a_recoverable_state(
         """Move for real, failing at each generated position."""
         calls["n"] += 1
         if calls["n"] in fail_at:
+            # The text names the call so the message assertions below can
+            # tell one injected failure from another.
             failure: BaseException = (
-                KeyboardInterrupt() if interrupt else OSError("provoked")
+                KeyboardInterrupt()
+                if interrupt
+                else OSError(f"provoked at move {calls['n']}")
             )
             # Retained so the chain assertions below can demand the exact
             # objects, not merely their types.
             raised.append(failure)
+            if late:
+                source.replace(target)
             raise failure
         return source.replace(target)
 
@@ -132,10 +145,19 @@ def test_publication_always_ends_in_a_recoverable_state(
                         f"the report should chain from the exact {origin}; got "
                         f"{inconsistent.__cause__!r} rather than {expected!r}"
                     )
+                    if not interrupt:
+                        # The chain carries the publication failure, so the
+                        # failures that stopped the rollback must each be
+                        # reported in the message instead.
+                        for rollback_failure in raised[1:]:
+                            assert str(rollback_failure) in str(stop.code), (
+                                f"the report should name the rollback failure "
+                                f"{rollback_failure!r}; got {stop.code!r}"
+                            )
                 case unexpected:
                     pytest.fail(
-                        f"the report should chain from the rollback's own "
-                        f"failure; got {unexpected!r}"
+                        f"the SystemExit should chain through the "
+                        f"inconsistent-destination report; got {unexpected!r}"
                     )
         case _:
             # Any other failure: the rollback ran, so the destination holds

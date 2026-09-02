@@ -69,17 +69,24 @@ def _publish(
     aside = staging / "replaced"
     aside.mkdir(exist_ok=True)
 
+    # Intent is recorded before each move rather than after it: an interrupt
+    # can land between a completed rename and the following statement, and a
+    # rollback working from records alone would miss that move — leaving a
+    # rescued file to be swept away with the staging directory, or a freshly
+    # landed one sitting in the destination. A rename is atomic, so the
+    # rollback tells an intended move from a completed one by whether the
+    # target exists.
     rescued: list[tuple[Path, Path]] = []
     published: list[Path] = []
     try:
         for stale in sorted(destination.glob(f"*{suffix}")):
             moved = aside / stale.name
-            move(stale, moved)
             rescued.append((moved, stale))
+            move(stale, moved)
         for captured in sorted(staging.glob(f"*{suffix}")):
             landed = destination / captured.name
-            move(captured, landed)
             published.append(landed)
+            move(captured, landed)
     except BaseException as cause:
         # `BaseException`, not `OSError`: a Ctrl-C between two renames leaves
         # the destination holding half of each run just as a full disk does,
@@ -92,10 +99,17 @@ def _publish(
         try:
             for landed in published:
                 try:
-                    landed.unlink()
+                    # `missing_ok` because the last recorded intent may never
+                    # have become a move: the failure that landed here can
+                    # precede the rename as easily as follow it.
+                    landed.unlink(missing_ok=True)
                 except OSError as exc:
                     failures.append(f"{landed} could not be removed ({exc})")
             for moved, original in rescued:
+                if not moved.exists():
+                    # Recorded but never moved: the file never left the
+                    # destination, so there is nothing to put back.
+                    continue
                 try:
                     move(moved, original)
                 except OSError as exc:

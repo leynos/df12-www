@@ -10,6 +10,15 @@
  *
  * Scripts are read from `src/static/`, the hand-crafted source of truth, so
  * the DOM suites need no build step to run.
+ *
+ * The bulk of this file is the fixtures that make that mounting possible:
+ * ROADMAP_FIXTURE, CATALOGUE_FIXTURE, TABS_FIXTURE, RAIL_FIXTURE,
+ * INSPECTOR_FIXTURE, and PLANNER_FIXTURE are exported constants of
+ * template-faithful markup, each built to match the corresponding Jinja
+ * template closely enough that the widget scripts' selectors and class
+ * toggles behave as they would on a real page. They're consumed by
+ * stilyagi-design.test.mjs, stilyagi-docs.test.mjs, and
+ * stilyagi-roadmap.test.mjs.
  */
 import { join } from "node:path";
 import { click as domClick, pressKey as domPressKey, evaluateScript } from "./dom.mjs";

@@ -4,7 +4,9 @@
  * `nextOpenIndex` decides which phase is open after a header is activated.
  * Only one phase is open at a time, and activating the open one closes it.
  * The DOM suite then checks that the decision actually lands in the markup:
- * `aria-expanded` on the heads, `.open`/`.closed` on the phases.
+ * `aria-expanded` on the heads, `.open`/`.closed` on the phases. The suite
+ * mounts ROADMAP_FIXTURE from `helpers/stilyagi.mjs` into happy-dom before
+ * evaluating the widget script against it.
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";

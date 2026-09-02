@@ -6,7 +6,9 @@
  * start-up. The DOM suites then check the wiring: the inspector previews on
  * hover without announcing an activation, activation moves `aria-pressed`
  * and the footer, and the planner's toggles drive the provider cards and
- * the summary counters.
+ * the summary counters. The suite mounts INSPECTOR_FIXTURE and
+ * PLANNER_FIXTURE from `helpers/stilyagi.mjs` into happy-dom before
+ * evaluating the widget script against them.
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";

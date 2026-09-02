@@ -741,7 +741,6 @@ never taken effect and the hero pill's border is stone. Moving the rule would
 change how the hero looks, so it has been left as it stands; do not assume the
 modifier order in that file is meaningful.
 
-
 ### 5.2. Netsuke's page furniture: `chrome.jinja`
 
 `templates/netsuke/chrome.jinja` holds the Netsuke page furniture that the
@@ -816,7 +815,6 @@ active=false, sub=false)` renders one entry and is what both paths call.
 Adding a docs page means adding one entry to `docs_pages`; the sidebar, the
 mobile dropdown, and the footer links follow. `tests/test_netsuke_navigation.py`
 pins all three to the list.
-
 
 ### 5.4. The example pages: `exdata.example_header`
 

@@ -427,7 +427,7 @@ committed. Two tools are installed for this and both work without a display:
 1. **Look at the page.** Open each changed page with `agent-browser open`,
    wait for `networkidle`, and take a full-page screenshot
    (`agent-browser screenshot --full page.png`). Read the screenshot. Check
-   the links you added with `agent-browser snapshot -i -u`.
+   any added links with `agent-browser snapshot -i -u`.
 2. **Audit every supported viewport.** The site supports widths from 320px
    to desktop, and Tailwind breakpoints change the layout at 640, 768, 1024,
    and 1280px, so a page that is right at one width can be broken at another.
@@ -452,8 +452,8 @@ committed. Two tools are installed for this and both work without a display:
    <url>` captures every element's computed styles; the default mode on this
    host is CDP, so query `.payload.nodes[]` with `.attributes.class`,
    `.computedStyles`, and `.boundingBox`. Use it to confirm that a utility
-   resolved to the value you meant, that a theme token propagated, or that
-   an element you expect to be hidden has a zero-height box. The `css-view`
+   resolved to the intended value, that a theme token propagated, or that
+   an element expected to be hidden has a zero-height box. The `css-view`
    skill has the `jq` idioms.
 4. **Prove output-neutral changes are neutral.** A refactor that is meant to
    change nothing visible — moving utilities into a component class,

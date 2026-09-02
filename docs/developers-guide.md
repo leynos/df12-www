@@ -747,10 +747,10 @@ modifier order in that file is meaningful.
 `templates/netsuke/chrome.jinja` holds the Netsuke page furniture that the
 `doc_page.jinja` layout does not draw: the windows a code sample sits in, the
 page header, and the breadcrumb. Import it as `chrome`. The homepage extends
-`doc_page.jinja` like every other Netsuke page, so the navbar, mobile menu, and
-footer have one owner; the layout's `page_scripts` block wraps the docs-only
-scripts and `body_class` carries the flex column, and the homepage overrides
-both.
+`doc_page.jinja` like every other Netsuke content page except the standalone
+`pages/icon-replacements.jinja`, so the navbar, mobile menu, and footer have
+one owner; the layout's `page_scripts` block wraps the docs-only scripts and
+`body_class` carries the flex column, and the homepage overrides both.
 
 The windows are opener/closer pairs rather than `{% call %}` blocks, so a long
 highlighted sample can stay inside the page's `{% raw %}` region and the calls
@@ -793,7 +793,6 @@ category.
 ```jinja
 {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}{% raw %}
 ```
-
 
 ### 5.3. The docs sidebar: `docsnav.sidebar`
 

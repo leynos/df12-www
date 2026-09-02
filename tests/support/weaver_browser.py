@@ -184,9 +184,32 @@ def _violations(drive: cabc.Callable[..., str]) -> list[dict[str, typ.Any]]:
     checks it could not decide. Most of this sub-site's contrast checks land
     there, because the panels sit on a paper texture and a gradient and axe
     will not guess at a background it cannot resolve to one colour. Those are
-    not failures and are not treated as any.
+    not failures and are not treated as any. The decorative texture overlay
+    is hidden during the audit so it does not cover the content and prevent
+    axe from measuring otherwise determinate contrast.
     """
-    payload = json.loads(drive("a11y", "--tags", AXE_TAGS, "--json"))
+    overlay_was_hidden = _evaluate(
+        drive,
+        """(() => {
+            const overlay = document.querySelector('.texture-overlay');
+            if (!overlay) return null;
+            const wasHidden = overlay.hidden;
+            overlay.hidden = true;
+            return wasHidden;
+        })()""",
+    )
+    try:
+        payload = json.loads(drive("a11y", "--tags", AXE_TAGS, "--json"))
+    finally:
+        if overlay_was_hidden is not None:
+            _evaluate(
+                drive,
+                f"""(() => {{
+                    const overlay = document.querySelector('.texture-overlay');
+                    if (overlay) overlay.hidden = {json.dumps(overlay_was_hidden)};
+                    return overlay !== null;
+                }})()""",
+            )
     return payload["data"]["violations"]
 
 

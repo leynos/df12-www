@@ -20,6 +20,10 @@ COMMAND_PAGES = (
     "commands/act/",
     "commands/verify/",
 )
+WHITE_PAPER_CONTENTS = (
+    pytest.param("sempai/", 8, id="sempai"),
+    pytest.param("jacquard/", 7, id="jacquard"),
+)
 MOBILE_TABLE_WIDTH = 767
 DESKTOP_TABLE_WIDTH = 768
 COMMAND_TABLE_CELL_COUNT = 3
@@ -304,6 +308,58 @@ def test_command_index_publishes_the_machine_selector_contract(
         "selector": True,
         "complete": True,
     }
+
+
+@pytest.mark.timeout(900)
+@pytest.mark.parametrize(("page", "expected_margin_links"), WHITE_PAPER_CONTENTS)
+def test_white_paper_contents_stay_out_of_the_primary_sidebar(
+    drive: cabc.Callable[..., str],
+    served: str,
+    page: str,
+    expected_margin_links: int,
+) -> None:
+    """The far-left menu does not repeat the white-paper margin contents."""
+    _open(drive, served, page, MAXIMUM_SUPPORTED_WIDTH, DESKTOP_HEIGHT)
+    links = _evaluate(
+        drive,
+        "JSON.stringify({primary: document.querySelectorAll("
+        "'#sidebar nav a[href^=\"#\"]').length, margin: "
+        "document.querySelectorAll('main > aside a[href^=\"#\"]').length})",
+    )
+
+    assert links == {"primary": 0, "margin": expected_margin_links}
+
+
+@pytest.mark.timeout(900)
+def test_jacquard_card_summary_is_not_sticky(
+    drive: cabc.Callable[..., str], served: str
+) -> None:
+    """The card summary scrolls with its section instead of sticking."""
+    _open(drive, served, "jacquard/", MAXIMUM_SUPPORTED_WIDTH, DESKTOP_HEIGHT)
+    position = _evaluate(
+        drive,
+        "JSON.stringify((() => { const heading = [...document.querySelectorAll('p')]"
+        ".find((node) => node.textContent.trim() === 'What the card contains'); "
+        "return heading ? getComputedStyle(heading.parentElement).position : null; "
+        "})())",
+    )
+
+    assert position == "static"
+
+
+@pytest.mark.timeout(900)
+def test_texture_overlay_is_positioned_against_the_document(
+    drive: cabc.Callable[..., str], served: str
+) -> None:
+    """The paper texture scrolls with the document rather than the viewport."""
+    _open(drive, served, "jacquard/", MAXIMUM_SUPPORTED_WIDTH, DESKTOP_HEIGHT)
+    position = _evaluate(
+        drive,
+        "JSON.stringify(getComputedStyle("
+        "document.querySelector('.texture-overlay')).position)",
+    )
+
+    assert position == "absolute"
 
 
 @pytest.mark.timeout(900)

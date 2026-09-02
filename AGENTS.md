@@ -54,10 +54,15 @@ is authored directly as HTML.
   `doc_path` and `source_url` recorded in the page's config entry.
 - **`templates/<site>/`** holds each sub-site's Jinja2 templates;
   `df12_pages/templates/` holds the main site's.
-- **`src/static/`** holds hand-crafted assets that are copied verbatim into
-  the published tree — stylesheets, scripts, images, fonts, and favicons. Its
-  layout mirrors the output, so `src/static/mxd/assets/site.css` is published as
-  `/mxd/assets/site.css`.
+- **`src/static/`** holds hand-crafted assets that are published at the same
+  path — stylesheets, scripts, images, fonts, and favicons. Its layout mirrors
+  the output, so `src/static/mxd/assets/site.css` is published as
+  `/mxd/assets/site.css`. Most of it is copied verbatim; the browser scripts
+  are the exception. They are TypeScript under `src/static/<site>/assets/js/`,
+  typechecked by `make typecheck` and compiled to plain `.js` at the mirrored
+  path by `scripts/compile-browser-scripts.ts`, so
+  `src/static/netsuke/assets/js/doc-search.ts` is published as
+  `/netsuke/assets/js/doc-search.js`.
 - **`src/styles/`** holds the Tailwind entrypoints, which are compiled rather
   than copied.
 
@@ -87,6 +92,7 @@ Every published file therefore has a source elsewhere in the repository:
 | `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                      |
 | `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
 | `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
+| `*/assets/js/*.js`                    | swc compiling `src/static/**/assets/js/*.ts`          |
 | `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |
 | everything else                       | `src/static/`, copied by `scripts/copy-static.ts`     |
 
@@ -105,10 +111,11 @@ DF12_PORT=8090 make dev  # same, on another port
 which matters when several worktrees are served at once.
 
 The steps run in order, because each depends on the last: `build:static` first,
-since the image step reads the source images it places; then `build:css`,
-`build:images`, `build:pages`, and `build:search`; and finally `build:static`
-again, so the checked `src/static/episodic/assets/search/episodic-search.json`
-is copied into `public/episodic/assets/search/episodic-search.json`.
+since the image step reads the source images it places; then `build:js`, which
+compiles the browser scripts; then `build:css`, `build:images`, `build:pages`,
+and `build:search`; and finally `build:static` again, so the checked
+`src/static/episodic/assets/search/episodic-search.json` is copied into
+`public/episodic/assets/search/episodic-search.json`.
 
 `bun run build:pages` wraps the generator, which can also be driven directly:
 
@@ -146,12 +153,12 @@ utilities in the markup. In the components layer a utility still wins, which is
 what anyone writing `class="mt-8"` expects.
 
 Netsuke still carries hand-crafted stylesheets and does not use daisyUI: it
-loads the **Tailwind Play CDN** at runtime and extends the default theme
-through `/netsuke/assets/js/tailwind-config.js`. The Play CDN is not the
-compiled build: it injects its utilities into a `<style>` tag after the
-stylesheet link, which is why handwritten rules on Netsuke sometimes need the
-doubled selector described below. Its colour tokens live in its own
-stylesheets, and the accessibility rules below apply to it just the same.
+loads the **Tailwind Play CDN** at runtime and extends the default theme through
+`/netsuke/assets/js/tailwind-config.js`. The Play CDN is not the compiled
+build: it injects its utilities into a `<style>` tag after the stylesheet link,
+which is why handwritten rules on Netsuke sometimes need the doubled selector
+described below. Its colour tokens live in its own stylesheets, and the
+accessibility rules below apply to it just the same.
 
 Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
 build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which
@@ -171,12 +178,11 @@ rather than run through Pygments, and their `.token-*` colours live in
 `src/styles/weaver/code.css`.
 
 Stilyagi's palette is split by role rather than by hue: `--color-press-red`
-paints fills, borders, and stamps, while red *type* uses
-`--color-accent-text`, which each dark panel re-points from the paper-surface
-red to the ink-ground one (the re-pointing block lives in
-`src/styles/stilyagi/site-base.css`). Because custom properties inherit,
-setting `--color-accent-text` on a container is enough — prefer that over
-adding a colour at the call site.
+paints fills, borders, and stamps, while red *type* uses `--color-accent-text`,
+which each dark panel re-points from the paper-surface red to the ink-ground
+one (the re-pointing block lives in `src/styles/stilyagi/site-base.css`).
+Because custom properties inherit, setting `--color-accent-text` on a container
+is enough — prefer that over adding a colour at the call site.
 
 ### Prefer semantic classes over literal colours
 
@@ -241,11 +247,11 @@ understand and more to maintain than the one above it.
    list and its matching sections, a card grid and a filter, a table of
    contents and the headings it points at. Two hand-maintained copies of the
    same list will drift; a loop over one list cannot.
-5. **A plain script module** — an IIFE under the sub-site's `assets/js/`,
-   loaded with `defer`, addressing its markup through `data-*` attributes and
-   returning early when its root is absent. This is how every existing
-   behaviour on the site is written; see section 6 of the
-   [Developer's Guide](docs/developers-guide.md).
+5. **A plain script module** — an IIFE in a `.ts` file under the sub-site's
+   `assets/js/`, compiled to a classic script, loaded with `defer`, addressing
+   its markup through `data-*` attributes and returning early when its root is
+   absent. This is how every existing behaviour on the site is written; see
+   section 6 of the [Developer's Guide](docs/developers-guide.md).
 6. **A custom element**, as a last resort, where behaviour is complex enough
    that a script module's conventions stop carrying it — where a page needs
    several independent instances, or a real lifecycle, or state that must not
@@ -329,6 +335,12 @@ make test-js       # JavaScript suite
 Rebuild and inspect the rendered result as well. A template change that passes
 every gate can still produce a broken page, because the gates do not render the
 site.
+
+`make typecheck` runs `ty` over the Python and `tsc` over the TypeScript: the
+browser scripts under `src/static/` against `tsconfig.browser.json`, and the
+build scripts under `scripts/` against `tsconfig.scripts.json`, both in strict
+mode. The compile step strips types without checking them, so this gate is the
+only thing that catches a wrongly typed module before review.
 
 `make lint` runs Ruff over the Python and Biome over everything else —
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked

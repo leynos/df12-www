@@ -34,8 +34,9 @@ rationale for a specific change lives in its execution plan under
 depends on the last:
 
 ```bash
-bun run build              # build:static, build:css, build:images, build:pages, build:search, build:static
-bun run build:static       # copy src/static/ verbatim (scripts/copy-static.ts)
+bun run build              # build:static, build:js, build:css, build:images, build:pages, build:search, build:static
+bun run build:static       # copy src/static/ verbatim, except .ts (scripts/copy-static.ts)
+bun run build:js           # compile the browser scripts to public/ (scripts/compile-browser-scripts.ts)
 bun run build:css          # compile the main, mxd, Episodic, Weaver and Stilyagi Tailwind entrypoints
 bun run build:css:mxd      # just the mxd entrypoint, for iterating on one sub-site
 bun run build:css:episodic # just the Episodic entrypoint
@@ -48,8 +49,10 @@ bun run check:search       # fail when the committed Episodic index has drifted
 ```
 
 `build:static` runs first because `build:images` reads the source images it
-places. `build:pages` wraps the Python generator, which can also be driven
-directly:
+places. `build:js` compiles the TypeScript under `src/static/<site>/assets/js/`
+into plain `.js` at the mirrored path under `public/`; see section 6 for what
+the compiler preserves and section 2.4 for the typecheck that goes with it.
+`build:pages` wraps the Python generator, which can also be driven directly:
 
 ```bash
 uv run pages generate --all-sites     # main site plus every sub-site
@@ -185,14 +188,53 @@ tag, or TypeDoc attaches it to whatever declaration follows it and reports the
 module as undocumented.
 
 The entry points are the build-time module tree: `scripts/` and
-`src/styles/plugins/`. The browser scripts under `src/static/` are outside it
-deliberately. They are classic scripts — an IIFE assigning to a guarded
-`module.exports` — so TypeDoc resolves the export object as an anonymous type
-and asks for documentation on each synthetic member, down to names like
+`src/styles/plugins/`, typechecked through `tsconfig.scripts.json`, which
+`typedoc.json` names explicitly. The browser scripts under `src/static/` are
+outside it deliberately. They are classic scripts — an IIFE assigning to a
+guarded `module.exports` — so TypeDoc resolves the export object as an
+anonymous type and asks for documentation on each synthetic member, down to
+names like
 `export=.__type.createCopyController.__type.__type.toast.__type.announcer`.
 Satisfying that would mean writing comments addressed to the type checker
 rather than to a reader. Those modules are commented in the house style and
-reviewed; see section 6.
+reviewed; see section 6. They are typechecked, though, by the separate gate
+described in section 2.4.
+
+### 2.4. TypeScript and the typecheck gate
+
+Two kinds of TypeScript live in the repository, and they run in different
+worlds. The build scripts under `scripts/` and the Tailwind plugin under
+`src/styles/plugins/` are ES modules that Bun executes with Node and Bun at
+hand. The browser scripts under `src/static/<site>/assets/js/` are classic
+scripts that see the DOM and nothing else. So they are typechecked as two
+projects that share one strict base:
+
+| File                    | Covers                                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------------- |
+| `tsconfig.base.json`    | The options both projects share: `strict`, `noEmit`, ES2022, `isolatedModules`                 |
+| `tsconfig.browser.json` | `src/static/**/*.ts` with the DOM libraries and `types: []`, so no Node or Bun global leaks in |
+| `tsconfig.scripts.json` | `scripts/**` and `src/styles/plugins/**` with the Bun types; also what TypeDoc reads           |
+| `tsconfig.json`         | A solution file with no sources of its own, pointing editors at both                           |
+
+_Table 1: The TypeScript projects and what each one covers._
+
+`src/static/browser-globals.d.ts` declares what a classic script can reach
+beyond the DOM: the guarded `module` the Bun tests `require` through, the
+vendored `MiniSearch` global (typed against the identical `minisearch` release
+in `devDependencies`, so the stub cannot drift from the file that ships), and
+the cross-script telemetry contracts the Weaver and Episodic scripts install on
+`globalThis`. Vendored files under `**/vendor/**` are excluded from both
+projects, as they are from Biome.
+
+```bash
+bun run typecheck:js   # tsc -p tsconfig.browser.json && tsc -p tsconfig.scripts.json
+make typecheck-js      # the same, in the gate
+make typecheck         # ty over the Python, then typecheck-js
+```
+
+The gate is separate from the build on purpose. `build:js` uses swc, which
+strips types without checking them, so a wrongly typed module compiles and
+ships; `make typecheck` is what fails it. Both run under `make all`.
 
 #### Configuration boundaries
 
@@ -212,7 +254,7 @@ carries its reasoning in the file:
 | `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
 | `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
 
-_Table 1: The trees `biome.jsonc` holds out of scope, and why each is written
+_Table 2: The trees `biome.jsonc` holds out of scope, and why each is written
 by something other than a person._
 
 Two parser settings matter as much as the exclusions.
@@ -232,28 +274,30 @@ anyone rebuilds from a clean tree.
 
 Every published file has a source elsewhere in the repository:
 
-| Published under `public/`             | Comes from                                            |
-| ------------------------------------- | ----------------------------------------------------- |
-| `**/*.html`                           | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`                     | Tailwind compiling `src/styles/`                      |
-| `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                      |
-| `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                      |
-| `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
-| `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |
-| `episodic/assets/search/*.json`       | `scripts/build-episodic-search-index.mjs`             |
-| everything else                       | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`             | Comes from                                                                    |
+| ------------------------------------- | ----------------------------------------------------------------------------- |
+| `**/*.html`                           | `df12_pages` rendering `templates/` against `config/`                         |
+| `assets/site.css`                     | Tailwind compiling `src/styles/`                                              |
+| `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                                              |
+| `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                                              |
+| `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                                              |
+| `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                                          |
+| `*/assets/js/*.js`                    | `scripts/compile-browser-scripts.ts` compiling `src/static/**/assets/js/*.ts` |
+| `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`                                      |
+| `episodic/assets/search/*.json`       | `scripts/build-episodic-search-index.mjs`                                     |
+| everything else                       | `src/static/`, copied by `scripts/copy-static.ts`                             |
 
-_Table 2: Published paths under `public/` and the source that generates them._
+_Table 3: Published paths under `public/` and the source that generates them._
 
 In summary: hand-crafted assets — stylesheets, scripts, images, fonts, and
 favicons — live under `src/static/`, whose layout mirrors the published tree
-(`src/static/netsuke/assets/js/config-keys.js` is published at
-`/netsuke/assets/js/config-keys.js`). Templates live under `templates/<site>/`
-for each sub-site, and under `df12_pages/templates/` for the main site.
-Tailwind entrypoints live under `src/styles/` and are compiled, not copied. See
-[The site is generated](../AGENTS.md#the-site-is-generated)
-in `AGENTS.md` for the full picture, including where page copy comes from.
+(`src/static/netsuke/assets/js/config-keys.ts` is compiled to
+`/netsuke/assets/js/config-keys.js`; everything that is not TypeScript is
+copied as it is). Templates live under `templates/<site>/` for each sub-site,
+and under `df12_pages/templates/` for the main site. Tailwind entrypoints live
+under `src/styles/` and are compiled, not copied. See
+[The site is generated](../AGENTS.md#the-site-is-generated) in `AGENTS.md` for
+the full picture, including where page copy comes from.
 
 Editing a file under `public/` directly is always a mistake: the next build —
 local or in CI — discards it silently.
@@ -429,7 +473,7 @@ block outright, so a run restores it without needing the previous content.
 | Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/static/netsuke/assets/css/himotoshi.css`  |
 | Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
 
-_Table 3: Pygments styles, the lexers each sub-site's templates actually name
+_Table 4: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
@@ -517,7 +561,7 @@ install:  font-medium text-neutral hover:bg-accent/5 transition-colors border bo
 | `current_href` | The href of the page being rendered, typically `chrome.current_href(nav_links)`.      |
 | `variant`      | `'install'` selects the monospaced install-link style instead of the default.         |
 
-_Table 4: the `nav_link` macro's parameters._
+_Table 5: the `nav_link` macro's parameters._
 
 `index` also switches how the label is prefixed: a truthy `index` renders it in
 a small monospaced span before the label (dimmed to 75% opacity unless the link
@@ -564,7 +608,7 @@ block's default content unless it overrides that block.
 | `content`               | empty                          |
 | `page_footer`           | full site footer               |
 
-_Table 4a: every block `doc_page.jinja` defines, and what it renders by
+_Table 5a: every block `doc_page.jinja` defines, and what it renders by
 default._
 
 `home_page.jinja` overrides only `page_title` and `content`, and inherits every
@@ -621,7 +665,7 @@ to it. A page that wants the default classes plus one more should use
 wants a genuinely different class list, as `shared_content_page.jinja` does,
 should override `main_class` itself.
 
-Table 4b lists the four blocks a page is most likely to override, with their
+Table 5b lists the four blocks a page is most likely to override, with their
 defaults and what overriding each is for:
 
 | Block             | Default                                                                 | Overriding it is for                                                                    |
@@ -631,7 +675,7 @@ defaults and what overriding each is for:
 | `main_class`      | `flex-1 lg:ml-64 grid-bg min-h-screen relative` plus `main_extra_class` | swapping the `<main>` element's class list wholesale, such as dropping `grid-bg`        |
 | `page_footer`     | the full site footer                                                    | swapping in a shorter or differently structured footer, such as the legal pages' footer |
 
-_Table 4b: the blocks a page is most likely to override._
+_Table 5b: the blocks a page is most likely to override._
 
 ### 4.10. Which Weaver templates use the shared layout
 
@@ -702,7 +746,7 @@ The pill-shaped eyebrow above a page or section heading.
 | `icon_class` | Utility classes for that icon, typically a colour.                      |
 | `dot`        | A background utility for a leading status dot, such as `bg-amber`.      |
 
-_Table 5: the `kicker` macro's parameters._
+_Table 6: the `kicker` macro's parameters._
 
 Three call sites show the range:
 
@@ -727,7 +771,7 @@ default.
 | `.hm-kicker--accent`  | Pairs with `--section` for the docs hub's indigo.      |
 | `.hm-kicker__dot`     | The roadmap's leading status dot.                      |
 
-_Table 6: the kicker component class and its modifiers._
+_Table 7: the kicker component class and its modifiers._
 
 **Normative:** a new variant is a new modifier on `.hm-kicker`, not a fresh
 class list at the call site and not a utility string passed through `extra`.
@@ -743,18 +787,41 @@ modifier order in that file is meaningful.
 
 ## 6. Browser-side components
 
-Browser-side scripts under `src/static/netsuke/assets/js/` follow one
-convention: a plain immediately invoked function expression (IIFE) module,
-loaded with `<script defer>`, that guards its own initialization on
-`document.readyState` (running immediately if the document has already finished
-loading, or waiting for `DOMContentLoaded` otherwise). Where a component's
-behaviour has a pure decision worth testing in isolation — no DOM, no timers —
-that function is exported via `module.exports` at the end of the IIFE, guarded
-by `typeof module !== "undefined"` so the same file still runs unmodified as a
-plain browser script. `docs-scrollspy.js` exports `pickActiveIndex` (which
-heading is currently being read); `config-keys.js` exports `nextTabIndex`
-(which tab an arrow/Home/End keypress should move to). `mobile-nav.js` has no
-such function — its logic is DOM interaction throughout — and exports nothing.
+Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files
+that follow one convention: a plain immediately invoked function expression
+(IIFE) module, loaded with `<script defer>`, that guards its own initialization
+on `document.readyState` (running immediately if the document has already
+finished loading, or waiting for `DOMContentLoaded` otherwise). Where a
+component's behaviour has a pure decision worth testing in isolation — no DOM,
+no timers — that function is exported via `module.exports` at the end of the
+IIFE, guarded by `typeof module !== "undefined"` so the same file still runs
+unmodified as a plain browser script. `docs-scrollspy.ts` exports
+`pickActiveIndex` (which heading is currently being read); `config-keys.ts`
+exports `nextTabIndex` (which tab an arrow/Home/End keypress should move to).
+`mobile-nav.ts` has no such function — its logic is DOM interaction throughout
+— and exports nothing.
+
+The `.ts` file is the source of truth. `bun run build:js`
+(`scripts/compile-browser-scripts.ts`) strips the types with swc and writes the
+result as `.js` at the mirrored path under `public/`, which is what the
+templates load and the tests `require`. The compiler is run with
+`isModule: false` and no module transform, so the output keeps the IIFE, the
+`"use strict"` directive, the comments, and the `module.exports` guard; the
+only thing that changes is that the types are gone. `copy-static.ts` skips
+`.ts` files, so nothing under `src/static` reaches `public/` in two forms.
+`make typecheck` checks the scripts against `tsconfig.browser.json` in strict
+mode (section 2.4); swc does not, so a type error fails the gate rather than
+the build.
+
+Types are the only thing a migrated module gains. Each `querySelector` result
+is typed as the element its handler reads and narrowed with an early return;
+the injected `deps` objects (`copy-buttons.ts`, `config-keys.ts`,
+`site-search.ts`) are named interfaces so the browser wiring and the test fakes
+are held to the same shape; the `data-*` vocabularies are typed where a module
+reads more than one. Where the checker cannot narrow — a `var` or a hoisted
+`function` declaration reading a root that an early return has already guarded
+— the lookup is cast at the point of the guard, with a comment saying so,
+rather than the module being restructured around the checker.
 
 Where a module has no pure decision to extract, it is tested against a real DOM
 instead. `tests/js/helpers/mobile-nav-harness.mjs` builds a happy-dom window,
@@ -770,30 +837,29 @@ Underneath both approaches sits a global preload: `bunfig.toml`'s
 `[test].preload` loads `tests/js/happydom.ts`, which calls
 `GlobalRegistrator.register()` from the `@happy-dom/global-registrator`
 development dependency. That gives every suite under `tests/js` a real global
-`document`, `window`, and event machinery before a single test runs, so a
-suite can assert against `document` directly without constructing one.
-Suites that need an isolated window — the mobile-nav harnesses above — still
-build their own `Window` rather than touching the global one; the two
-coexist without interference.
+`document`, `window`, and event machinery before a single test runs, so a suite
+can assert against `document` directly without constructing one. Suites that
+need an isolated window — the mobile-nav harnesses above — still build their own
+`Window` rather than touching the global one; the two coexist without
+interference.
 
 The Stilyagi widgets are tested against that global document.
 `tests/js/helpers/stilyagi.mjs` mounts template-faithful fixtures — one per
 widget, mirroring the markup in `templates/stilyagi/pages/design.jinja`,
 `docs.jinja`, and `roadmap.jinja` — into `document.body`, then evaluates the
-matching widget script read straight from `src/static/stilyagi/assets/js/`,
-so these suites need no build step to run. Its fixtures must stay in step
+matching compiled widget script from `public/stilyagi/assets/js/`, as the other
+harnesses do, so `build:js` has to have run. Its fixtures must stay in step
 with the templates they mirror. The widgets attach listeners only inside
 `body`, which the harness relies on for isolation: its `reset` clears
-`document.body` and restores any patched globals — including the
-controllable `IntersectionObserver` stub it installs for the docs page's
-section rail — between tests. The primitives both harnesses share — evaluating
-a script against a window, dispatching a click, pressing a key — live in
+`document.body` and restores any patched globals — including the controllable
+`IntersectionObserver` stub it installs for the docs page's section rail —
+between tests. The primitives both harnesses share — evaluating a script
+against a window, dispatching a click, pressing a key — live in
 `tests/js/helpers/dom.mjs`.
 
-`mobile-nav-harness.mjs` also supplies the traces both drawer suites run
-over. It exports
-`TRANSITIONS`, the six things that can happen to an open drawer — `toggle`,
-`tab`, `shift-tab`, `escape`, `wide`, `narrow` — and
+`mobile-nav-harness.mjs` also supplies the traces both drawer suites run over.
+It exports `TRANSITIONS`, the six things that can happen to an open drawer —
+`toggle`, `tab`, `shift-tab`, `escape`, `wide`, `narrow` — and
 `exhaustiveTransitionSequences({ depth = 4 })`, which returns every trace over
 that set up to `depth`, each one prefixed by the opening `toggle` because a
 closed drawer ignores almost everything and such a trace proves nothing about
@@ -838,21 +904,24 @@ Bun tests under `tests/js/` cover these pure functions, and they `require` the
 const { nextTabIndex } = require("../../public/netsuke/assets/js/config-keys.js");
 ```
 
-This means the copy step must have run before the suite sees a source change, so
-`make test-js` runs `bun run build:static` before `bun run test:js`. Driving
-`bun test tests/js` directly skips that, and will quietly test the previous
-form of anything edited since the last build. (`make build` does not cover it:
-that target builds the Python virtual environment, not the site.)
+This means the compile step must have run before the suite sees a source
+change, so `make test-js` runs `bun run build:static` and `bun run build:js`
+before `bun run test:js`. Driving `bun test tests/js` directly skips that, and
+will quietly test the previous form of anything edited since the last build.
+(`make build` does not cover it: that target builds the Python virtual
+environment, not the site.) The harnesses that evaluate a whole script through
+`new Function` rely on the same thing: the compiled output is still a classic
+script, so it runs there exactly as it does in a `<script>` tag.
 
-Nothing here is bundled, transpiled, or module-loaded: `scripts/copy-static.ts`
-copies these files verbatim. There are no ES modules, no classes, and no custom
-elements anywhere on the site at the time of writing. Encapsulation is the IIFE
-and nothing else, with the DOM contract expressed through `data-*` attributes
-so that restyling cannot break a selector, and an early return when the root
+Nothing here is bundled or module-loaded: the compiler removes types and
+nothing else. There are no ES modules, no classes, and no custom elements
+anywhere on the site at the time of writing. Encapsulation is the IIFE and
+nothing else, with the DOM contract expressed through `data-*` attributes so
+that restyling cannot break a selector, and an early return when the root
 element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
-`src/static/episodic/assets/js/site-search.js` follows the same plain-script
+`src/static/episodic/assets/js/site-search.ts` follows the same plain-script
 shape. It exposes seven helpers when `module.exports` is available:
 `createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
 for fetching and deserializing the MiniSearch payload, `searchEpisodicIndex`
@@ -904,7 +973,7 @@ the site does not use a front-end framework at all.
 
 ### 6.2. The Weaver mobile drawer
 
-`src/static/weaver/assets/js/mobile-nav.js` turns the sidebar into a drawer
+`src/static/weaver/assets/js/mobile-nav.ts` turns the sidebar into a drawer
 below the tablet breakpoint. It builds its own controls rather than expecting
 them in the markup, so a page supplies three hooks and gets the rest.
 
@@ -968,7 +1037,7 @@ crossing is a fifth, and is the one a reader does not initiate.
 The Weaver drawer and its copy controls report through the same optional hook
 model as Episodic search. A production host may set
 `window.df12WeaverNavTelemetry` to a function before the deferred scripts run;
-without it, `src/static/weaver/assets/js/telemetry.js` is a no-op and nothing
+without it, `src/static/weaver/assets/js/telemetry.ts` is a no-op and nothing
 is collected. A sink that throws is caught and ignored because observability
 must not be able to break the drawer or the button it was watching.
 
@@ -982,7 +1051,7 @@ declared as three frozen vocabularies at the top of that file:
 | `outcome`   | `initialized`, `opened`, `closed`, `focus-restored`, `copied`, `failed`                                                 |
 | `reason`    | `toggle`, `backdrop`, `nav-link`, `escape`, `breakpoint`, `saved-element`, `toggle-fallback`, `unavailable`, `rejected` |
 
-_Table 7: every field a Weaver chrome telemetry event may carry._
+_Table 8: every field a Weaver chrome telemetry event may carry._
 
 `reason` is present only where an outcome has more than one cause worth
 separating: which of the five things closed the drawer, whether focus went back
@@ -999,7 +1068,7 @@ person or persisting between visits. A sink must treat the event as operational
 metadata and must not enrich it with page or user data.
 
 **The inspection point for a maintainer is
-`src/static/weaver/assets/js/telemetry.js`.** It is about a hundred lines, the
+`src/static/weaver/assets/js/telemetry.ts`.** It is about a hundred lines, the
 vocabularies are the first thing in it, and `emit` is the only function that
 calls the sink. Reading those two things is the whole of the privacy argument;
 `tests/js/weaver-telemetry.test.mjs` is the enforcement, and it tries to get
@@ -1093,8 +1162,8 @@ The Netsuke sub-site still loads the
 (`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
 stylesheet, and uses its utilities in its markup alongside its own hand-crafted
 stylesheet; it extends the default theme through
-`/netsuke/assets/js/tailwind-config.js`. This differs from the main site,
-mxd, Weaver, and Stilyagi, which compile Tailwind v4 ahead of time; see the
+`/netsuke/assets/js/tailwind-config.js`. This differs from the main site, mxd,
+Weaver, and Stilyagi, which compile Tailwind v4 ahead of time; see the
 [Tailwind v4 guide](tailwind-v4-guide.md) for that path. Stilyagi's only
 remaining hand-crafted stylesheet is the generated Pygments block at
 `src/static/stilyagi/assets/styles/syntax.css`, and even that is `@import`ed
@@ -1186,8 +1255,8 @@ from wherever the redirect points.
 
 The `Launcher` type returns a `ServerProcess`, and `_start_server` (in
 `scripts/weaver_snapshot_serving.py`) hands one back to its caller. The
-protocol names the union of what serving consumes from the child: `poll`
-(from `_Pollable`) and `terminate`, `kill`, and `wait` (from `_Stoppable`).
+protocol names the union of what serving consumes from the child: `poll` (from
+`_Pollable`) and `terminate`, `kill`, and `wait` (from `_Stoppable`).
 
 The startup lock in `scripts/weaver_snapshot_serving.py`'s `_start_server`
 covers exactly the probe, the spawn, and the wait for readiness; it is released
@@ -1227,14 +1296,13 @@ the extension being written, so a `capture` and a `shots` run can share a
 directory.
 
 An ordinary publication failure rolls the destination back to the previous
-run's results, removes the staging directory, and exits naming the
-destination. If the rollback itself fails or is interrupted — a second
-Ctrl-C landing between two restores, say — the destination may be left
-holding neither run's results in full; the run then raises the documented
-inconsistent-destination error, keeps the staging directory, and says so.
-That directory's `replaced/` subdirectory holds the only surviving copy of
-the previous run's files, so it must not be deleted by hand without
-recovering them first.
+run's results, removes the staging directory, and exits naming the destination.
+If the rollback itself fails or is interrupted — a second Ctrl-C landing
+between two restores, say — the destination may be left holding neither run's
+results in full; the run then raises the documented inconsistent-destination
+error, keeps the staging directory, and says so. That directory's `replaced/`
+subdirectory holds the only surviving copy of the previous run's files, so it
+must not be deleted by hand without recovering them first.
 
 It is a cyclopts app with three subcommands, invoked bare — there is no
 Makefile target and no console-script entry point:

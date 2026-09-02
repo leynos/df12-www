@@ -111,6 +111,11 @@ written rather than being churned into the house style.
 
 Build-time scripts outside the Python package:
 
+- `copy-static.ts` — Copies `src/static/` into `public/`, skipping the
+  TypeScript sources the compile step owns.
+- `compile-browser-scripts.ts` — Compiles the browser scripts under
+  `src/static/**/assets/js/*.ts` to plain classic `.js` at the mirrored path
+  under `public/`, with swc. It strips types only; `make typecheck` checks them.
 - `generate-image-variants.ts` — Produces responsive image variants with Sharp.
 - `build-netsuke-search-index.mjs` — Builds the MiniSearch full-text index for
   the Netsuke documentation sub-site.
@@ -119,8 +124,8 @@ Build-time scripts outside the Python package:
 
 Frontend source files. `styles/` contains one Tailwind CSS entry point per
 compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css`,
-`weaver.css` and `stilyagi.css` for those sub-sites — plus any plugins. Each
-is compiled to its own file under `public/`: `public/assets/site.css`,
+`weaver.css` and `stilyagi.css` for those sub-sites — plus any plugins. Each is
+compiled to its own file under `public/`: `public/assets/site.css`,
 `public/mxd/assets/tailwind.css`, `public/episodic/assets/styles/tailwind.css`,
 `public/weaver/assets/styles/weaver.css`, and
 `public/stilyagi/assets/styles/stilyagi.css`.
@@ -128,16 +133,19 @@ is compiled to its own file under `public/`: `public/assets/site.css`,
 An entry point that has grown past a single file keeps its partials in a
 directory beside it. `styles/episodic/`, `styles/weaver/` and
 `styles/stilyagi/` are the examples: the entry point declares the theme and
-imports partials named for what they style, each into an explicit cascade
-layer.
+imports partials named for what they style, each into an explicit cascade layer.
 
 `static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
-and favicons — that are copied verbatim into the published tree. Its layout
-mirrors the output, so `src/static/stilyagi/assets/fonts/` is published at
-`/stilyagi/assets/fonts/`. Edit the files here. The copies under `public/` are
-build output and are overwritten on the next build. The one stylesheet still
-under `src/static/stilyagi/assets/styles/` is `syntax.css`, whose marked block
-is generated Pygments output; it compiles into the Stilyagi entry point rather
+and favicons — that are published at the same path. Its layout mirrors the
+output, so `src/static/stilyagi/assets/fonts/` is published at
+`/stilyagi/assets/fonts/`. Most files are copied verbatim; the browser scripts
+under `static/<site>/assets/js/` are TypeScript, typechecked against
+`tsconfig.browser.json` and compiled to `.js` at the mirrored path, and
+`static/browser-globals.d.ts` declares the globals those classic scripts can
+see beyond the DOM. Edit the files here. The copies under `public/` are build
+output and are overwritten on the next build. The one stylesheet still under
+`src/static/stilyagi/assets/styles/` is `syntax.css`, whose marked block is
+generated Pygments output; it compiles into the Stilyagi entry point rather
 than being linked on its own.
 
 ### `templates/`
@@ -160,16 +168,21 @@ Test suite for the Python package:
 
 ## Top-level configuration files
 
-| File                       | Purpose                                        |
-| -------------------------- | ---------------------------------------------- |
-| `Makefile`                 | Build, lint, format, and test orchestration    |
-| `package.json`             | Node/Bun scripts and frontend dependencies     |
-| `pyproject.toml`           | Python project metadata and tool configuration |
-| `uv.lock`                  | Locked Python dependency graph                 |
-| `bun.lockb`                | Locked Node dependency graph                   |
-| `biome.jsonc`              | Biome linter and formatter configuration       |
-| `.markdownlint-cli2.jsonc` | Markdownlint rule overrides and ignores        |
-| `*.tofu`                   | OpenTofu infrastructure definitions            |
-| `AGENTS.md`                | Agent and contributor workflow instructions    |
+| File                       | Purpose                                                        |
+| -------------------------- | -------------------------------------------------------------- |
+| `Makefile`                 | Build, lint, format, and test orchestration                    |
+| `package.json`             | Node/Bun scripts and frontend dependencies                     |
+| `pyproject.toml`           | Python project metadata and tool configuration                 |
+| `uv.lock`                  | Locked Python dependency graph                                 |
+| `bun.lockb`                | Locked Node dependency graph                                   |
+| `biome.jsonc`              | Biome linter and formatter configuration                       |
+| `tsconfig.json`            | TypeScript solution file referencing the two projects below    |
+| `tsconfig.base.json`       | Strict compiler options shared by both projects                |
+| `tsconfig.browser.json`    | Typechecks the browser scripts under `src/static/`             |
+| `tsconfig.scripts.json`    | Typechecks `scripts/` and the Tailwind plugin; read by TypeDoc |
+| `typedoc.json`             | TypeDoc documentation gate configuration                       |
+| `.markdownlint-cli2.jsonc` | Markdownlint rule overrides and ignores                        |
+| `*.tofu`                   | OpenTofu infrastructure definitions                            |
+| `AGENTS.md`                | Agent and contributor workflow instructions                    |
 
 _Table 1: Top-level configuration files and their responsibilities._

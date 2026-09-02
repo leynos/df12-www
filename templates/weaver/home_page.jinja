@@ -179,7 +179,7 @@
                                     <span class="mr-2">~</span>
                                     <span class="text-white">weaver symbols list --lang rust --query 'fn $NAME($...ARGS)' --json \</span>
                                 </div>
-                                <div class="text-white pl-10">| jq -c 'select(.schema != "weaver.selector.v1" or (.captures.NAME.text | startswith("old_")))' \</div>
+                                <div class="text-white pl-10">| jq -c 'select(.schema == "weaver.selector.v1" and (.captures.NAME.text | startswith("old_")))' \</div>
                                 <div class="text-white pl-10">| weaver symbols rename --selectors - --new-name run --dry-run</div>
                                 <div class="text-note-info mt-2 pl-4 border-l-2 border-note-info-line/30">
                                     {"schema":"weaver.selector.v1","uri":"file:///src/lib.rs","captures":{"NAME":{"text":"old_run"}}}

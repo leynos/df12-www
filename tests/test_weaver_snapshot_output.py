@@ -467,8 +467,9 @@ def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> No
                     )
         case unexpected:
             pytest.fail(
-                f"the SystemExit should chain from the rollback failure; got "
-                f"{unexpected!r}"
+                f"the SystemExit should chain through the "
+                f"inconsistent-destination report to the publication failure; "
+                f"got {unexpected!r}"
             )
 
 

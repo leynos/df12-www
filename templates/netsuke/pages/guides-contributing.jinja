@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Contributing - Netsuke Build System{% endblock %}
@@ -37,25 +37,11 @@
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono" aria-label="Breadcrumb">
-                <ol class="flex items-center">
-                    <li><a href="/netsuke/guides/" class="hover:text-vermillion transition-colors">Guides</a></li>
-                    <li aria-hidden="true"><span class="mx-2 text-stone">/</span></li>
-                    <li><span class="text-charcoal font-medium" aria-current="page">Contributing</span></li>
-                </ol>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Contributing'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center justify-between mb-4">
-                    {% endraw %}{{ ui.kicker('Community') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Contributing to Netsuke</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Netsuke is open-source and welcoming to contributors of all backgrounds. Whether you fix a bug, write a test, improve documentation, or translate a message string, every contribution matters.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Community', 'Contributing to Netsuke') %}
+                Netsuke is open-source and welcoming to contributors of all backgrounds. Whether you fix a bug, write a test, improve documentation, or translate a message string, every contribution matters.
+            {% endcall %}{% raw %}
 
             <!-- Ways to Contribute -->
             <section id="ways-to-contribute" class="mb-20">

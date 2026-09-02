@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Guides Hub - Netsuke Build System{% endblock %}
 {% block content %}
@@ -7,13 +7,9 @@
 <main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
 
         <!-- Hero Section -->
-        <header id="guides-hero" class="mb-16 text-center max-w-3xl mx-auto">
-            {% endraw %}{{ ui.kicker('Concepts & Contribution', 'mb-6') }}{% raw %}
-            <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Guides & Deep Dives</h1>
-            <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                Understand the compiler model behind Netsuke, learn where the sharp edges are, and use the same language the manifests use.
-            </p>
-        </header>
+        {% endraw %}{% call chrome.page_header('Concepts & Contribution', 'Guides & Deep Dives', hero=true, id='guides-hero') %}
+            Understand the compiler model behind Netsuke, learn where the sharp edges are, and use the same language the manifests use.
+        {% endcall %}{% raw %}
 
         <!-- Featured Guide (How it works) -->
         <section id="featured-guide" class="mb-20">

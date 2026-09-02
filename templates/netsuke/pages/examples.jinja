@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Examples Hub - Netsuke Build System{% endblock %}
@@ -9,13 +9,9 @@
     <main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
 
         <!-- Header Section -->
-        <header class="text-center max-w-3xl mx-auto mb-16">
-            {% endraw %}{{ ui.kicker('Community & Official', 'mb-6') }}{% raw %}
-            <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Examples Hub</h1>
-            <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                Explore small, concrete Netsuke manifests. Each example shows one part of the language clearly enough to steal without regret.
-            </p>
-        </header>
+        {% endraw %}{% call chrome.page_header('Community & Official', 'Examples Hub', hero=true) %}
+            Explore small, concrete Netsuke manifests. Each example shows one part of the language clearly enough to steal without regret.
+        {% endcall %}{% raw %}
 
         <!-- Featured Example (Hero Card) -->
         <section id="featured-example" class="mb-20">

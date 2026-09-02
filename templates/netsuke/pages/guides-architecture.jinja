@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}How Netsuke Works - Netsuke Build System{% endblock %}
@@ -39,23 +39,11 @@
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/guides/" class="hover:text-vermillion transition-colors">Guides</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">How Netsuke Works</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'How Netsuke Works'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center mb-4">
-                    {% endraw %}{{ ui.kicker('Architecture') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">How Netsuke Works</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Netsuke is a build-system compiler. It takes a YAML manifest with controlled Jinja expansion, resolves every dynamic decision up front, and emits a static Ninja plan for execution. This guide walks the pipeline from manifest to running build.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Architecture', 'How Netsuke Works') %}
+                Netsuke is a build-system compiler. It takes a YAML manifest with controlled Jinja expansion, resolves every dynamic decision up front, and emits a static Ninja plan for execution. This guide walks the pipeline from manifest to running build.
+            {% endcall %}{% raw %}
 
             <!-- A build-system compiler -->
             <section id="compiler" class="mb-16">

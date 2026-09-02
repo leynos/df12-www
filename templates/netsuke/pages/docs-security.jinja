@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Security Model - Netsuke Build System{% endblock %}
@@ -79,23 +79,11 @@
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 {% endraw %}{{ docsnav.mobile_docs_bar('security') }}{% raw %}
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">Security Model</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Security Model'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center mb-4">
-                    {% endraw %}{{ ui.kicker('Reference') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Security Model</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Validated structure, quoted path substitutions, a documented recipe-shell contract, and an auditable network policy for the <code>fetch()</code> helper. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>: Netsuke reduces common quoting mistakes, but it is not a sandbox.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Reference', 'Security Model') %}
+                Validated structure, quoted path substitutions, a documented recipe-shell contract, and an auditable network policy for the <code>fetch()</code> helper. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>: Netsuke reduces common quoting mistakes, but it is not a sandbox.
+            {% endcall %}{% raw %}
 
             <section id="network-policy" class="mb-20">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">

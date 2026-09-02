@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Documentation Hub - Netsuke Build System{% endblock %}
@@ -72,21 +72,11 @@
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 {% endraw %}{{ docsnav.mobile_docs_bar('') }}{% raw %}
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/" class="hover:text-vermillion transition-colors">Home</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">Documentation</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/', 'label': 'Home'}, {'label': 'Documentation'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                {% endraw %}{{ ui.kicker('Documentation', 'mb-4', accent=true) }}{% raw %}
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Documentation Hub</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Welcome to the Netsuke documentation. Start with the YAML manifest, learn how Jinja expands it, then follow the path through validation and Ninja execution.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Documentation', 'Documentation Hub', accent=true) %}
+                Welcome to the Netsuke documentation. Start with the YAML manifest, learn how Jinja expands it, then follow the path through validation and Ninja execution.
+            {% endcall %}{% raw %}
 
             <!-- Start Here Section -->
             <section id="start-here" class="mb-16">

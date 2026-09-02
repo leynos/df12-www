@@ -18,28 +18,7 @@
 {% raw %}
 <main id="main-content" class="flex-grow pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
 
-        <!-- Breadcrumbs -->
-        <nav class="flex mb-8 text-sm text-charcoal-mid" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="/netsuke/examples/" class="inline-flex items-center hover:text-indigo">
-                        Examples
-                    </a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <span  class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span>
-                        <span class="ml-1 font-medium text-charcoal-mid">System Programming</span>
-                    </div>
-                </li>
-                <li aria-current="page">
-                    <div class="flex items-center">
-                        <span  class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span>
-                        <span class="ml-1 font-medium text-charcoal">Basic C Application</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
+        {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'System Programming'}, {'label': 'Basic C Application'}]) }}{% raw %}
 
         <!-- Example Header -->
         <header id="example-header" class="mb-12 border-b border-stone pb-12">

@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Translating Netsuke - Netsuke Build System{% endblock %}
@@ -40,26 +40,12 @@
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono" aria-label="Breadcrumb">
-                <ol class="flex items-center">
-                    <li><a href="/netsuke/guides/" class="hover:text-vermillion transition-colors">Guides</a></li>
-                    <li aria-hidden="true"><span class="mx-2 text-stone">/</span></li>
-                    <li><span class="text-charcoal font-medium" aria-current="page">Translating Netsuke</span></li>
-                </ol>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Translating Netsuke'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center justify-between mb-4">
-                    {% endraw %}{{ ui.kicker('Localization') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Translating Netsuke</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Every user-facing message in Netsuke lives in a <a href="https://projectfluent.org/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Project Fluent</a> resource file, not in Rust source.
-                    Translating the whole CLI means editing one file per locale — this guide covers the format, the conventions, and the checks that keep translations honest.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Localization', 'Translating Netsuke') %}
+                Every user-facing message in Netsuke lives in a <a href="https://projectfluent.org/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Project Fluent</a> resource file, not in Rust source.
+                Translating the whole CLI means editing one file per locale — this guide covers the format, the conventions, and the checks that keep translations honest.
+            {% endcall %}{% raw %}
 
             <!-- How localization works -->
             <section id="how-it-works" class="mb-20">

@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Writing Examples &amp; Showcases - Netsuke Build System{% endblock %}
@@ -38,27 +38,13 @@
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono" aria-label="Breadcrumb">
-                <ol class="flex items-center">
-                    <li><a href="/netsuke/guides/" class="hover:text-vermillion transition-colors">Guides</a></li>
-                    <li aria-hidden="true"><span class="mx-2 text-stone">/</span></li>
-                    <li><span class="text-charcoal font-medium" aria-current="page">Writing Examples &amp; Showcases</span></li>
-                </ol>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Writing Examples & Showcases'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center justify-between mb-4">
-                    {% endraw %}{{ ui.kicker('Community') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Writing Examples &amp; Showcases</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    An example is the fastest route from &ldquo;what is this?&rdquo; to a working build.
-                    This guide covers what makes an example worth stealing, the manifest conventions the repository follows,
-                    and how a good example becomes a showcase page on this site.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Community', 'Writing Examples & Showcases') %}
+                An example is the fastest route from &ldquo;what is this?&rdquo; to a working build.
+                This guide covers what makes an example worth stealing, the manifest conventions the repository follows,
+                and how a good example becomes a showcase page on this site.
+            {% endcall %}{% raw %}
 
             <!-- What makes a good example -->
             <section id="good-example" class="mb-20">

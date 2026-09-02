@@ -1,5 +1,4 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
 {% import "chrome.jinja" as chrome %}
 {% set active_nav = 'docs' %}
@@ -77,23 +76,11 @@
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 {% endraw %}{{ docsnav.mobile_docs_bar('cli') }}{% raw %}
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">CLI Commands</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center mb-4">
-                    {% endraw %}{{ ui.kicker('Reference') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">CLI Commands</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Build targets, inspect the plan, and control output. Every command's status goes to stderr and its artefacts to stdout, so pipelines capture exactly what they need.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Reference', 'CLI Commands') %}
+                Build targets, inspect the plan, and control output. Every command's status goes to stderr and its artefacts to stdout, so pipelines capture exactly what they need.
+            {% endcall %}{% raw %}
 
             <section id="cli" class="mb-20">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">

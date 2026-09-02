@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'roadmap' %}
 {% block page_title %}Roadmap - Netsuke Build System{% endblock %}
 {% block content %}
@@ -8,14 +8,10 @@
     <main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
 
         <!-- Header Section -->
-        <header class="text-center max-w-3xl mx-auto mb-16">
-            {% endraw %}{{ ui.kicker('Current version v' ~ netsuke_version, 'mb-6', dot='bg-amber') }}{% raw %}
-            <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Roadmap</h1>
-            <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                v{% endraw %}{{ netsuke_version }}{% raw %} is a useful preview for early adopters, not a declaration that Netsuke is finished.
-                This page tracks what shipped, what is honestly still rough, and the order of the work ahead.
-            </p>
-        </header>
+        {% endraw %}{% call chrome.page_header('Current version v' ~ netsuke_version, 'Roadmap', hero=true, dot='bg-amber') %}
+            v{{ netsuke_version }} is a useful preview for early adopters, not a declaration that Netsuke is finished.
+            This page tracks what shipped, what is honestly still rough, and the order of the work ahead.
+        {% endcall %}{% raw %}
 
         <div class="grid lg:grid-cols-12 gap-12">
 

@@ -133,9 +133,11 @@ docs-check: $(NODE_MODULES_STAMP) ## Validate TypeScript documentation with Type
 	bun run docs:check
 
 test-js: $(NODE_MODULES_STAMP) ## Run JavaScript unit tests
-	# The suite loads the built copies under public/, so the copy step has to
-	# run first or a source change is tested in its previous form.
+	# The suite loads the built copies under public/, so the copy and compile
+	# steps have to run first or a source change is tested in its previous
+	# form.
 	bun run build:static
+	bun run build:js
 	bun run test:js
 
 help: ## Show available targets

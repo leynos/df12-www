@@ -8,8 +8,10 @@
  * into the happy-dom `document` registered globally by `happydom.ts` and
  * evaluate the widget script against it.
  *
- * Scripts are read from `src/static/`, the hand-crafted source of truth, so
- * the DOM suites need no build step to run.
+ * Scripts are read from `public/`, the compiled copy the browser is served,
+ * in keeping with the convention the other harnesses follow. The sources
+ * under `src/static/` are TypeScript, so `bun run build:js` has to have run
+ * first — as it does under `make test-js`.
  *
  * The bulk of this file is the fixtures that make that mounting possible:
  * ROADMAP_FIXTURE, CATALOGUE_FIXTURE, TABS_FIXTURE, RAIL_FIXTURE,
@@ -23,7 +25,7 @@
 import { join } from "node:path";
 import { click as domClick, pressKey as domPressKey, evaluateScript } from "./dom.mjs";
 
-const SCRIPT_DIR = join("src", "static", "stilyagi", "assets", "js");
+const SCRIPT_DIR = join("public", "stilyagi", "assets", "js");
 
 /* Evaluate a Stilyagi widget script (`design`, `docs`, or `roadmap`) against
    the global window, as a classic `<script>` tag would. The document is

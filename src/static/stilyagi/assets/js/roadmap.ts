@@ -5,7 +5,7 @@
 (() => {
   "use strict";
 
-  const onReady = (fn) => {
+  const onReady = (fn: () => void): void => {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", fn, { once: true });
     } else {
@@ -19,15 +19,15 @@
    * Activating the open phase closes it, which is why this returns -1 rather
    * than always echoing `clicked` back.
    */
-  function nextOpenIndex(current, clicked) {
+  function nextOpenIndex(current: number, clicked: number): number {
     return current === clicked ? -1 : clicked;
   }
 
-  function init() {
-    const heads = [...document.querySelectorAll(".ph-head[aria-controls]")];
+  function init(): void {
+    const heads = [...document.querySelectorAll<HTMLElement>(".ph-head[aria-controls]")];
     if (!heads.length) return;
 
-    const setOpen = (head, open) => {
+    const setOpen = (head: HTMLElement, open: boolean): void => {
       head.setAttribute("aria-expanded", String(open));
       const phase = head.closest(".phase");
       if (!phase) return;
@@ -35,10 +35,10 @@
       phase.classList.toggle("closed", !open);
     };
 
-    const currentIndex = () =>
+    const currentIndex = (): number =>
       heads.findIndex((head) => head.getAttribute("aria-expanded") === "true");
 
-    const activate = (index) => {
+    const activate = (index: number): void => {
       const next = nextOpenIndex(currentIndex(), index);
       heads.forEach((head, i) => {
         setOpen(head, i === next);

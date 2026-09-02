@@ -28,9 +28,6 @@ _MID_START_FAILURE = "the port was occupied"
 # A port number for the messages these tests read back. Nothing binds it.
 PORT = 8099
 
-# The bound  puts on each of its waits.
-STOP_TIMEOUT = 10
-
 locking = load("weaver_snapshot_locking")
 paths = load("weaver_snapshot_paths")
 process = load("weaver_snapshot_process")
@@ -98,12 +95,18 @@ def test_the_port_is_probed_with_the_startup_lock_held(
     held: list[bool] = []
 
     def probe(_port: int) -> None:
+        """Observe whether the lock is held, then stop the start."""
         # An exclusive lock cannot be taken twice, so failing to take it here
         # is how holding it is observed.
         with lock.open("r+", encoding="utf-8") as rival:
             try:
                 fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except OSError:
+            except OSError as exc:
+                # Only contention proves the lock is held; anything else —
+                # ENOLCK, a bad descriptor — is a broken observation, not
+                # evidence, and must fail the test rather than pass it.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
                 held.append(True)
             else:
                 fcntl.flock(rival, fcntl.LOCK_UN)
@@ -119,6 +122,175 @@ def test_the_port_is_probed_with_the_startup_lock_held(
     assert held == [True], (
         "the port must be probed while the startup lock is held, or two runs "
         f"can still interleave; observed {held!r}"
+    )
+
+
+class _Stoppably:
+    """A launched child that records whether it was told to stand down."""
+
+    def __init__(self) -> None:
+        """Start not yet stopped."""
+        self.stopped = False
+
+    def poll(self) -> int | None:
+        """Report still running."""
+        return None
+
+    def terminate(self) -> None:
+        """Record the request to stop."""
+        self.stopped = True
+
+    def kill(self) -> None:
+        """Record the insistence, the same way."""
+        self.stopped = True
+
+    def wait(self, timeout: int | None = None) -> int:
+        """Stand down immediately."""
+        del timeout
+        return 0
+
+
+def test_the_whole_startup_sequence_runs_with_the_lock_held(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Probe, spawn, and readiness wait are the check-then-act; all under lock.
+
+    Asserting only the probe would let the spawn or the readiness wait drift
+    outside the lock unnoticed, and either would reopen the interleaving the
+    lock exists to remove: two runs both finding the port free, or one run's
+    readiness poll answered by the other's server.
+    """
+    lock = tmp_path / "port.lock"
+    monkeypatch.setattr(locking, "_lock_path", lambda _port: lock)
+
+    held: dict[str, bool] = {}
+
+    def observed(stage: str) -> None:
+        """Record whether the startup lock is held at this stage."""
+        # An exclusive lock cannot be taken twice, so failing to take it here
+        # is how holding it is observed.
+        with lock.open("r+", encoding="utf-8") as rival:
+            try:
+                fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError as exc:
+                # Only contention proves the lock is held; anything else is a
+                # broken observation and must fail the test.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
+                held[stage] = True
+            else:
+                fcntl.flock(rival, fcntl.LOCK_UN)
+                held[stage] = False
+
+    child = _Stoppably()
+
+    def launch(_argv: object) -> _Stoppably:
+        """Observe the lock at the spawn, then hand back the stand-in."""
+        observed("launch")
+        return child
+
+    monkeypatch.setattr(
+        serving, "_refuse_occupied_port", lambda _port: observed("probe")
+    )
+    monkeypatch.setattr(
+        serving, "_await_server", lambda *_a, **_k: observed("readiness")
+    )
+    monkeypatch.setattr(
+        serving, "_confirm_ownership", lambda *_a, **_k: observed("confirm")
+    )
+
+    server = serving._start_server(8099, "weaver-snapshot-deadbeef.txt", launch=launch)
+
+    assert server is child, "the started server should be handed back as-is"
+    assert held == {
+        "probe": True,
+        "launch": True,
+        "readiness": True,
+        "confirm": False,
+    }, (
+        "the probe, the spawn, and the readiness wait must all run under the "
+        "startup lock, and only the ownership fetch after its release; "
+        f"observed {held!r}"
+    )
+    assert not child.stopped, "a clean start should not stop its own server"
+
+
+def test_ownership_is_confirmed_after_the_startup_lock_is_released(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The lock covers the check-then-act, not the blocking ownership fetch.
+
+    Once this run's server is answering, a contender reaching the probe is
+    refused whether the lock is held or not — so holding it through a
+    blocking HTTP request only makes the loser of the race wait longer for
+    the same refusal.
+    """
+    lock = tmp_path / "port.lock"
+    monkeypatch.setattr(locking, "_lock_path", lambda _port: lock)
+
+    held: list[bool] = []
+
+    def confirm(_base: str, _marker: str, _port: int, _when: str) -> None:
+        """Observe whether the lock is still held at confirmation."""
+        # An exclusive lock cannot be taken twice, so taking it here is how
+        # its release is observed.
+        with lock.open("r+", encoding="utf-8") as rival:
+            try:
+                fcntl.flock(rival, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError as exc:
+                # Only contention proves the lock is held; anything else —
+                # ENOLCK, a bad descriptor — is a broken observation, not
+                # evidence, and must fail the test rather than pass it.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
+                held.append(True)
+            else:
+                fcntl.flock(rival, fcntl.LOCK_UN)
+                held.append(False)
+
+    monkeypatch.setattr(serving, "_refuse_occupied_port", lambda _port: None)
+    monkeypatch.setattr(serving, "_await_server", lambda *_a, **_k: None)
+    monkeypatch.setattr(serving, "_confirm_ownership", confirm)
+
+    child = _Stoppably()
+    server = serving._start_server(
+        8099, "weaver-snapshot-deadbeef.txt", launch=lambda _argv: child
+    )
+
+    assert server is child, "the started server should be handed back as-is"
+    assert held == [False], (
+        "ownership should be confirmed after the startup lock is released; "
+        f"observed {held!r}"
+    )
+    assert not child.stopped, "a server that confirmed as ours was stopped"
+
+
+def test_a_server_that_fails_the_ownership_check_is_stopped(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A child that answered as somebody else must not be left on the port."""
+
+    def refuse(_base: str, _marker: str, _port: int, _when: str) -> None:
+        """Refuse the way a foreign server on the port is refused."""
+        message = "another server has it"
+        raise SystemExit(message)
+
+    monkeypatch.setattr(serving, "_refuse_occupied_port", lambda _port: None)
+    monkeypatch.setattr(serving, "_await_server", lambda *_a, **_k: None)
+    monkeypatch.setattr(serving, "_confirm_ownership", refuse)
+
+    child = _Stoppably()
+    with pytest.raises(SystemExit, match="another server"):
+        serving._start_server(
+            8099,
+            "weaver-snapshot-deadbeef.txt",
+            named=False,
+            launch=lambda _argv: child,
+        )
+
+    assert child.stopped, (
+        "a failed ownership check should stop the child, or the next run's "
+        "probe refuses to start because of it"
     )
 
 
@@ -146,6 +318,7 @@ def test_choosing_a_port_is_separable_from_obtaining_one() -> None:
     asked: list[int] = []
 
     def allocator() -> int:
+        """Hand out the fixed port, recording the ask."""
         asked.append(allocated)
         return allocated
 
@@ -172,12 +345,15 @@ def test_a_machine_with_no_free_port_says_so(monkeypatch: pytest.MonkeyPatch) ->
         """A socket that cannot be bound, as an exhausted machine's would be."""
 
         def __enter__(self) -> _Refusing:
+            """Hand the socket stand-in back."""
             return self
 
         def __exit__(self, *_exc: object) -> None:
-            return None
+            """Have nothing to close."""
+            return
 
         def bind(self, _address: tuple[str, int]) -> None:
+            """Refuse the bind, as a machine out of ports would."""
             message = "Address family not supported"
             raise OSError(message)
 
@@ -309,12 +485,14 @@ def test_a_kernel_assigned_port_leaves_no_lock_file_behind(
     locks: list[int] = []
 
     def record(port: int) -> contextlib.AbstractContextManager[None]:
+        """Record the port the lock was asked for."""
         locks.append(port)
         return contextlib.nullcontext()
 
     monkeypatch.setattr(serving, "_startup_lock", record)
 
     def stop_before_spawning(_port: int) -> None:
+        """Stop the start before anything is spawned."""
         raise SystemExit(_MID_START_FAILURE)
 
     monkeypatch.setattr(serving, "_refuse_occupied_port", stop_before_spawning)
@@ -335,6 +513,7 @@ def test_the_default_port_is_treated_as_unnamed(
     seen: dict[str, object] = {}
 
     def start(_port: int, _marker: str, *, named: bool) -> object:
+        """Record how the port was classified and stop there."""
         seen["named"] = named
         message = "far enough"
         raise SystemExit(message)

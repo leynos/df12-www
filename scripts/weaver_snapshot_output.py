@@ -69,18 +69,25 @@ def _publish(
     aside = staging / "replaced"
     aside.mkdir(exist_ok=True)
 
+    # Intent is recorded before each move rather than after it: an interrupt
+    # can land between a completed rename and the following statement, and a
+    # rollback working from records alone would miss that move — leaving a
+    # rescued file to be swept away with the staging directory, or a freshly
+    # landed one sitting in the destination. A rename is atomic, so the
+    # rollback tells an intended move from a completed one by whether the
+    # target exists.
     rescued: list[tuple[Path, Path]] = []
     published: list[Path] = []
     try:
         for stale in sorted(destination.glob(f"*{suffix}")):
             moved = aside / stale.name
-            move(stale, moved)
             rescued.append((moved, stale))
+            move(stale, moved)
         for captured in sorted(staging.glob(f"*{suffix}")):
             landed = destination / captured.name
-            move(captured, landed)
             published.append(landed)
-    except BaseException:
+            move(captured, landed)
+    except BaseException as cause:
         # `BaseException`, not `OSError`: a Ctrl-C between two renames leaves
         # the destination holding half of each run just as a full disk does,
         # and the operator who pressed it has no more reason to expect that
@@ -89,16 +96,36 @@ def _publish(
         # Undo this run's half-publication first, so putting the previous
         # files back cannot be blocked by a file this run had just landed.
         failures: list[str] = []
-        for landed in published:
-            try:
-                landed.unlink()
-            except OSError as exc:
-                failures.append(f"{landed} could not be removed ({exc})")
-        for moved, original in rescued:
-            try:
-                move(moved, original)
-            except OSError as exc:
-                failures.append(f"{original} could not be restored ({exc})")
+        try:
+            for landed in published:
+                try:
+                    # `missing_ok` because the last recorded intent may never
+                    # have become a move: the failure that landed here can
+                    # precede the rename as easily as follow it.
+                    landed.unlink(missing_ok=True)
+                except OSError as exc:
+                    failures.append(f"{landed} could not be removed ({exc})")
+            for moved, original in rescued:
+                if not moved.exists():
+                    # Recorded but never moved: the file never left the
+                    # destination, so there is nothing to put back.
+                    continue
+                try:
+                    move(moved, original)
+                except OSError as exc:
+                    failures.append(f"{original} could not be restored ({exc})")
+        except BaseException as interruption:
+            # The rollback itself was interrupted — a second Ctrl-C landing
+            # between two restores. The destination may now hold neither
+            # run's results in full, and the staging directory holds the only
+            # copy of what was moved aside; the distinct type is what stops
+            # `_staged` sweeping it up.
+            message = (
+                f"{destination} is in an inconsistent state after an "
+                f"interrupted rollback, and the previous run's files are in "
+                f"{aside}."
+            )
+            raise _InconsistentDestinationError(message) from interruption
         if failures:
             # The rollback itself failed, so the destination holds neither
             # run's results in full and the previous run's files are still in
@@ -109,7 +136,10 @@ def _publish(
                 f"publication, and the previous run's files are in {aside}. "
                 + "; ".join(failures)
             )
-            raise _InconsistentDestinationError(message) from None
+            # Chained from the failure that interrupted publication, because
+            # the message describes the rollback and the operator also needs
+            # to see what went wrong in the first place.
+            raise _InconsistentDestinationError(message) from cause
         raise
 
 
@@ -184,5 +214,13 @@ def _staged(
         shutil.rmtree(staging, ignore_errors=True)
         message = f"{destination} could not be published to ({exc})"
         raise SystemExit(message) from exc
+    except BaseException:
+        # Publication can fail without an OSError: `_exclusive` gives up on a
+        # held lock with SystemExit, and a Ctrl-C can land between renames.
+        # The rollback has already run by the time either arrives here, so
+        # the staging directory holds nothing worth keeping — sweep it up
+        # rather than leave a half-capture that looks like a published one.
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
     else:
         shutil.rmtree(staging, ignore_errors=True)

@@ -14,6 +14,7 @@ from __future__ import annotations
 import contextlib
 import subprocess
 import typing as typ
+import urllib.error
 import urllib.request
 
 from weaver_snapshot_clock import SYSTEM_CLOCK, Clock
@@ -21,6 +22,7 @@ from weaver_snapshot_paths import REPO_ROOT
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
+    import email.message
 
 
 # How the readiness poll asks whether the server is answering yet. Raises when
@@ -30,7 +32,7 @@ type Probe = cabc.Callable[[str], None]
 
 # How a server process is started. Returns something that can be polled,
 # terminated and waited on — a `subprocess.Popen` in production.
-type Launcher = cabc.Callable[[cabc.Sequence[str]], "subprocess.Popen[bytes]"]
+type Launcher = cabc.Callable[[cabc.Sequence[str]], "ServerProcess"]
 
 
 # How many times the readiness poll asks before giving up, and how long it
@@ -45,6 +47,43 @@ READINESS_POLL_SECONDS = 0.2
 STOP_TIMEOUT_SECONDS = 10
 
 
+class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
+    """Treat a redirect as a failure rather than following it.
+
+    Every request this harness makes is to the loopback server it just
+    started, and the answer only means anything if it came from that exact
+    URL. The default opener follows a ``Location`` header wherever it points,
+    so whatever holds the port could send the request to a server of its
+    choosing — and the readiness poll or the ownership check would then be
+    trusting that server's content instead. A redirect is therefore proof
+    enough that the thing answering is not ``http-server`` serving this tree.
+    """
+
+    def redirect_request(  # noqa: PLR0913 - the base class fixed this signature
+        self,
+        req: urllib.request.Request,
+        fp: typ.IO[bytes],
+        code: int,
+        msg: str,
+        headers: email.message.Message,
+        newurl: str,
+    ) -> typ.NoReturn:
+        """Refuse the redirect, whatever it points at."""
+        # The signature is the base class's; the status line's reason phrase
+        # and the Location target are both server-controlled text, so neither
+        # is repeated into the error — the refusal is the diagnostic, and the
+        # status code is the only detail worth keeping.
+        del msg, newurl
+        reason = "answered with a redirect, which is not the server being checked"
+        raise urllib.error.HTTPError(req.full_url, code, reason, headers, fp)
+
+
+# One opener for every loopback request the harness makes. `build_opener`
+# swaps its default redirect handler for the refusing one above; everything
+# else about it is the default opener.
+_NO_REDIRECTS = urllib.request.build_opener(_RefuseRedirects())
+
+
 def _probe_url(url: str) -> None:
     """Ask a URL for a response, raising if it does not give one.
 
@@ -56,9 +95,11 @@ def _probe_url(url: str) -> None:
     Raises
     ------
     OSError
-        If the request fails, which the readiness poll reads as "not yet".
+        If the request fails — including by answering with a redirect, which
+        only something other than this run's server would do. The readiness
+        poll reads either as "not yet".
     """
-    with urllib.request.urlopen(url, timeout=1):  # noqa: S310 - literal loopback URL
+    with _NO_REDIRECTS.open(url, timeout=1):
         return
 
 
@@ -119,6 +160,49 @@ class _Pollable(typ.Protocol):
         ...  # pragma: no cover - a protocol has no body
 
 
+class ServerProcess(_Stoppable, _Pollable, typ.Protocol):
+    """Everything serving a snapshot consumes from the process running one.
+
+    `_await_server` polls it and `_stop` terminates, kills and waits on it;
+    nothing asks for more. Naming that union is what lets a launcher return a
+    stand-in in tests, while a real `subprocess.Popen[bytes]` satisfies it in
+    production without being named in the signature.
+    """
+
+
+def _probe_failure_category(failure: OSError | None) -> str:
+    """Name a loopback request's failure stably, for a giving-up message.
+
+    The category is the only part of a failure that belongs in a message:
+    whatever holds the port is untrusted, so its reason phrases and redirect
+    targets are its to choose and are not repeated.
+
+    Parameters
+    ----------
+    failure
+        The last exception a request raised, or ``None`` if every attempt
+        was somehow spent without one being recorded.
+
+    Returns
+    -------
+    str
+        One of ``redirect_refused`` (the port answered with a redirect the
+        opener refused to follow), ``http_<status>`` (it answered with an
+        HTTP error), ``connection_failed`` (it did not answer at all), or
+        ``timeout`` (no failure was recorded).
+    """
+    redirects = range(300, 400)
+    match failure:
+        case None:
+            return "timeout"
+        case urllib.error.HTTPError(code=code) if code in redirects:
+            return "redirect_refused"
+        case urllib.error.HTTPError(code=code):
+            return f"http_{code}"
+        case _:
+            return "connection_failed"
+
+
 def _await_server(
     server: _Pollable,
     base: str,
@@ -154,6 +238,7 @@ def _await_server(
     """
     # Poll rather than sleeping a fixed interval, so a slow start does not
     # silently yield a directory full of failed captures.
+    last_failure: OSError | None = None
     for _ in range(READINESS_ATTEMPTS):
         # A server that has already exited will never answer, and anything
         # that does answer on its port is not it.
@@ -165,13 +250,26 @@ def _await_server(
             raise SystemExit(message)
         try:
             probe(f"{base}/weaver/")
-        except OSError:
+        except OSError as exc:
+            last_failure = exc
             clock.sleep(READINESS_POLL_SECONDS)
         else:
             break
     else:
-        message = f"http-server did not come up on port {port}"
-        raise SystemExit(message)
+        # Giving up is the moment the failure's shape matters: a port that
+        # answered every probe with a refused redirect is a different problem
+        # from one that never accepted a connection, and the operator gets
+        # one message to tell them apart. Only bounded fields appear — the
+        # category, the attempt count, the window — because whatever holds
+        # the port is untrusted and its text has no place in the message;
+        # the chained exception keeps the detail for a traceback.
+        message = (
+            f"http-server did not come up on port {port}: the readiness "
+            f"probe failed as {_probe_failure_category(last_failure)} on "
+            f"each of {READINESS_ATTEMPTS} attempts over roughly "
+            f"{READINESS_ATTEMPTS * READINESS_POLL_SECONDS:.0f}s"
+        )
+        raise SystemExit(message) from last_failure
 
     # The request succeeded, but that alone does not say who answered it. If
     # the child has exited by now, something else on the port did, and the

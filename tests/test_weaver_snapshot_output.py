@@ -138,6 +138,7 @@ def test_a_diff_takes_the_same_lock_publication_does(
 
     @contextlib.contextmanager
     def watched(path: Path, contended: str) -> cabc.Iterator[None]:
+        """Record the lock taken, then take it for real."""
         taken.append(path)
         with real(path, contended):
             yield
@@ -181,6 +182,7 @@ def test_a_failed_publication_leaves_the_destination_as_it_was(
     breaks_on = 4
 
     def failing(source: Path, target: Path) -> object:
+        """Move for real until the scripted failure, then refuse."""
         moves["n"] += 1
         # Exactly one operation fails. A rename back into the directory the
         # file just left needs no new space, so a real ENOSPC would not block
@@ -254,6 +256,7 @@ def test_a_cancelled_publication_still_restores_the_destination(
     interrupt_on = 4
 
     def interrupted(source: Path, target: Path) -> object:
+        """Move for real until the scripted interrupt."""
         moves["n"] += 1
         if moves["n"] == interrupt_on:
             raise KeyboardInterrupt
@@ -291,6 +294,130 @@ def _staged_run(destination: Path, move: cabc.Callable[[Path, Path], object]) ->
     return seen[0]
 
 
+def test_an_interrupt_landing_after_a_rescue_move_is_still_rolled_back(
+    tmp_path: Path,
+) -> None:
+    """A Ctrl-C arriving just after a rename must not orphan the rescued file.
+
+    The rename has completed but the interrupt lands before the next
+    statement runs. A rollback working from bookkeeping alone misses the
+    move, and `_staged` then sweeps the staging directory — with the previous
+    run's only copy inside its `replaced/`. Intent is recorded before the
+    move so the rollback can reconcile against what actually happened.
+    """
+    destination = _seeded(tmp_path)
+    moves = {"n": 0}
+
+    def interrupted_after(source: Path, target: Path) -> object:
+        """Complete the rescue move, then interrupt before anything else."""
+        moves["n"] += 1
+        result = source.replace(target)
+        if moves["n"] == 1:
+            raise KeyboardInterrupt
+        return result
+
+    with pytest.raises(KeyboardInterrupt):
+        _staged_run(destination, interrupted_after)
+
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "the file rescued just before the interrupt was not put back, so the "
+        "staging sweep took its only copy"
+    )
+    assert not list(tmp_path.glob(".out-*")), (
+        "a fully rolled-back interrupt should not leave a staging directory"
+    )
+
+
+def test_an_interrupt_landing_after_a_publication_move_removes_the_file(
+    tmp_path: Path,
+) -> None:
+    """A file landed just before a Ctrl-C must not survive the rollback.
+
+    The rename has completed but the interrupt lands before the next
+    statement runs. A rollback working from bookkeeping alone leaves the
+    file in the destination, which then holds a page from each run — the
+    half-state publication exists to prevent.
+    """
+    destination = _seeded(tmp_path)
+    moves = {"n": 0}
+    # One rescue, then the publication move that completes before the
+    # interrupt lands.
+    publication = 2
+
+    def interrupted_after(source: Path, target: Path) -> object:
+        """Complete each move; interrupt just after the publication one."""
+        moves["n"] += 1
+        result = source.replace(target)
+        if moves["n"] == publication:
+            raise KeyboardInterrupt
+        return result
+
+    with (
+        pytest.raises(KeyboardInterrupt),
+        output._staged(destination, ".json", interrupted_after) as staging,
+    ):
+        (staging / "two.json").write_text("this run", encoding="utf-8")
+
+    assert not (destination / "two.json").exists(), (
+        "the file landed just before the interrupt survived the rollback, so "
+        "the destination holds a page from each run"
+    )
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "the rollback should have restored the previous run's snapshot"
+    )
+    assert not list(tmp_path.glob(".out-*")), (
+        "a fully rolled-back interrupt should not leave a staging directory"
+    )
+
+
+def test_an_interrupted_rollback_keeps_the_only_copy(tmp_path: Path) -> None:
+    """A second Ctrl-C, landing mid-rollback, must not cost the staging copy.
+
+    The rollback's own handlers catch `OSError`; an interruption is neither
+    caught by them nor a rollback *failure*, and letting it propagate bare
+    would have `_staged` sweep the staging directory — with the previous
+    run's only surviving copy inside it.
+    """
+    destination = _seeded(tmp_path)
+    moves = {"n": 0}
+
+    def interrupted_twice(source: Path, target: Path) -> object:
+        """Rescue, then fail the publication, then interrupt the rollback."""
+        moves["n"] += 1
+        if moves["n"] == 1:
+            return source.replace(target)
+        if moves["n"] == 2:  # noqa: PLR2004 - the publication move
+            message = "no space left on device"
+            raise OSError(message)
+        raise KeyboardInterrupt
+
+    with pytest.raises(SystemExit) as caught:
+        _staged_run(destination, interrupted_twice)
+
+    message = str(caught.value.code)
+    assert "inconsistent state" in message, f"got {message!r}"
+    assert "interrupted rollback" in message, f"got {message!r}"
+    kept = next(tmp_path.glob(".out-*"))
+    assert (kept / "replaced" / "one.json").read_text(encoding="utf-8") == (
+        "previous one"
+    ), f"the previous run's file is not recoverable from {kept}"
+    match caught.value.__cause__:
+        case output._InconsistentDestinationError() as inconsistent:
+            match inconsistent.__cause__:
+                case KeyboardInterrupt():
+                    pass
+                case unexpected:
+                    pytest.fail(
+                        f"the report should chain from the interruption; got "
+                        f"{unexpected!r}"
+                    )
+        case unexpected:
+            pytest.fail(
+                f"the SystemExit should chain from the inconsistent-destination "
+                f"report; got {unexpected!r}"
+            )
+
+
 def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> None:
     """When the rollback fails too, staging holds the only previous results.
 
@@ -303,6 +430,7 @@ def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> No
     moves = {"n": 0}
 
     def hopeless(source: Path, target: Path) -> object:
+        """Let the rescue through, then fail everything after it."""
         moves["n"] += 1
         # The rescue succeeds; the publication and then the rollback do not.
         if moves["n"] == 1:
@@ -324,6 +452,56 @@ def test_a_rollback_that_cannot_finish_keeps_the_only_copy(tmp_path: Path) -> No
     assert (kept / "replaced" / "one.json").read_text(encoding="utf-8") == (
         "previous one"
     ), f"the previous run's file is not recoverable from {kept}"
+    match caught.value.__cause__:
+        case output._InconsistentDestinationError() as inconsistent:
+            match inconsistent.__cause__:
+                case OSError() as publication_failure:
+                    assert "the filesystem went away" in str(publication_failure), (
+                        f"the original failure was lost from the chain; got "
+                        f"{publication_failure!r}"
+                    )
+                case unexpected:
+                    pytest.fail(
+                        f"the rollback failure should chain from the publication "
+                        f"failure that forced the rollback; got {unexpected!r}"
+                    )
+        case unexpected:
+            pytest.fail(
+                f"the SystemExit should chain through the "
+                f"inconsistent-destination report to the publication failure; "
+                f"got {unexpected!r}"
+            )
+
+
+def test_a_lock_refused_at_publication_still_cleans_up_staging(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`_exclusive` gives up on a held lock with SystemExit, not OSError.
+
+    Rolling up staging only for `OSError` left that path leaking: the capture
+    finished, the lock could not be taken, and a full staging directory sat
+    beside the destination looking like a published run.
+    """
+    destination = _seeded(tmp_path)
+
+    @contextlib.contextmanager
+    def held(_path: Path, contended: str) -> cabc.Iterator[None]:
+        """Refuse the lock the way a held one is refused."""
+        message = f"another run has held {contended}"
+        raise SystemExit(message)
+        yield  # pragma: no cover - the lock is never granted
+
+    monkeypatch.setattr(output, "_exclusive", held)
+
+    with pytest.raises(SystemExit, match="another run has held"):
+        _staged_run(destination, lambda source, target: source.replace(target))
+
+    assert (destination / "one.json").read_text(encoding="utf-8") == "previous one", (
+        "the destination should be untouched when the lock is refused"
+    )
+    assert not list(tmp_path.glob(".out-*")), (
+        "a refused lock should not leave a staging directory behind"
+    )
 
 
 def test_an_ordinary_publication_failure_still_cleans_up(tmp_path: Path) -> None:
@@ -334,6 +512,7 @@ def test_an_ordinary_publication_failure_still_cleans_up(tmp_path: Path) -> None
     publication = 2
 
     def fails_once(source: Path, target: Path) -> object:
+        """Fail only the publication move; rescue and rollback work."""
         moves["n"] += 1
         if moves["n"] == publication:
             message = "no space left on device"

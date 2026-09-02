@@ -9,9 +9,12 @@ between them, and what happens when a process will not stand down.
 from __future__ import annotations
 
 import collections.abc as cabc
-import contextlib
+import email.message
+import io
 import subprocess
 import typing as typ
+import urllib.error
+import urllib.request
 
 import pytest
 
@@ -27,7 +30,7 @@ _MID_START_FAILURE = "the port was occupied"
 # A port number for the messages these tests read back. Nothing binds it.
 PORT = 8099
 
-# The bound  puts on each of its waits.
+# The bound `_stop` puts on each of its waits.
 STOP_TIMEOUT = 10
 
 locking = load("weaver_snapshot_locking")
@@ -40,6 +43,7 @@ class _FakeClock:
     """A clock that records what it was asked to wait for and never waits."""
 
     def __init__(self, times: cabc.Iterator[float] | None = None) -> None:
+        """Store the scripted times and start with no sleeps recorded."""
         self.slept: list[float] = []
         self._times = times
 
@@ -66,6 +70,7 @@ def test_the_readiness_poll_retries_until_the_server_answers() -> None:
     answers_on = 3
 
     def probe(url: str) -> None:
+        """Refuse until the scripted attempt, recording each ask."""
         attempts.append(url)
         if len(attempts) < answers_on:
             message = "connection refused"
@@ -91,6 +96,7 @@ def test_a_server_that_never_answers_gives_up_after_a_bounded_wait() -> None:
     attempts: list[str] = []
 
     def never(url: str) -> None:
+        """Refuse every time, recording each ask."""
         attempts.append(url)
         message = "connection refused"
         raise OSError(message)
@@ -105,8 +111,141 @@ def test_a_server_that_never_answers_gives_up_after_a_bounded_wait() -> None:
     assert len(clock.slept) == process.READINESS_ATTEMPTS, (
         f"it should wait after every failed attempt; it slept {len(clock.slept)} times"
     )
-    assert str(PORT) in str(caught.value.code), (
-        f"the message should name the port; got {caught.value.code!r}"
+    message = str(caught.value.code)
+    assert str(PORT) in message, f"the message should name the port; got {message!r}"
+    assert "connection_failed" in message, (
+        f"the message should classify the failure; got {message!r}"
+    )
+    assert str(process.READINESS_ATTEMPTS) in message, (
+        f"the message should say how often it asked; got {message!r}"
+    )
+
+
+def test_a_port_that_only_redirects_is_reported_as_such() -> None:
+    """A refused redirect on every probe is a different problem from silence.
+
+    Whatever holds the port is answering — with a ``Location`` the opener
+    refuses to follow — and the operator reading the giving-up message needs
+    to know that, not merely that the server "did not come up".
+    """
+
+    def redirects(url: str) -> None:
+        """Answer every probe with a refused redirect, as the opener would."""
+        raise urllib.error.HTTPError(
+            url, 302, "redirected to elsewhere", email.message.Message(), None
+        )
+
+    with pytest.raises(SystemExit) as caught:
+        process._await_server(
+            _Running(), "http://127.0.0.1:9999", PORT, _FakeClock(), redirects
+        )
+
+    message = str(caught.value.code)
+    assert "redirect_refused" in message, (
+        f"the message should classify the redirect; got {message!r}"
+    )
+    match caught.value.__cause__:
+        case urllib.error.HTTPError():
+            pass
+        case unexpected:
+            pytest.fail(
+                f"the giving-up message should chain from the last probe "
+                f"failure; got {unexpected!r}"
+            )
+
+
+def test_an_http_error_is_classified_by_its_status() -> None:
+    """A port that answers 503 on every probe is named as exactly that."""
+
+    def unavailable(url: str) -> None:
+        """Answer every probe with a 503, as a sick server would."""
+        raise urllib.error.HTTPError(
+            url, 503, "service unavailable", email.message.Message(), None
+        )
+
+    with pytest.raises(SystemExit) as caught:
+        process._await_server(
+            _Running(), "http://127.0.0.1:9999", PORT, _FakeClock(), unavailable
+        )
+
+    message = str(caught.value.code)
+    assert "http_503" in message, (
+        f"the message should carry the numeric status; got {message!r}"
+    )
+    assert str(process.READINESS_ATTEMPTS) in message, (
+        f"the message should say how often it asked; got {message!r}"
+    )
+    match caught.value.__cause__:
+        case urllib.error.HTTPError():
+            pass
+        case unexpected:
+            pytest.fail(
+                f"the giving-up message should chain from the last probe "
+                f"failure; got {unexpected!r}"
+            )
+
+
+@pytest.mark.parametrize(
+    ("failure", "category"),
+    [
+        (None, "timeout"),
+        (OSError("connection refused"), "connection_failed"),
+    ],
+)
+def test_the_remaining_failure_categories_are_stable(
+    failure: OSError | None, category: str
+) -> None:
+    """The category vocabulary is fixed; these pin the non-HTTP entries."""
+    assert process._probe_failure_category(failure) == category
+
+
+def test_the_diagnostics_repeat_nothing_the_server_chose() -> None:
+    """Whatever holds the port writes its own reasons; none reach the message.
+
+    The redirect refusal must not carry the `Location` target, and the
+    giving-up message must not carry the probe failure's text — both are
+    attacker-chosen on a port this harness explicitly does not trust.
+    """
+    hostile = "http://attacker.example/" + "A" * 4096
+
+    refuser = process._RefuseRedirects()
+    with pytest.raises(urllib.error.HTTPError) as refused:
+        refuser.redirect_request(
+            urllib.request.Request("http://127.0.0.1:9999/weaver/"),
+            io.BytesIO(),
+            302,
+            "B" * 4096,
+            email.message.Message(),
+            hostile,
+        )
+    assert hostile not in str(refused.value), (
+        "the refusal repeated the attacker-chosen redirect target"
+    )
+    assert "B" * 64 not in str(refused.value), (
+        "the refusal repeated the attacker-chosen reason phrase"
+    )
+
+    def taunts(_url: str) -> None:
+        """Fail with a message the server's owner chose."""
+        raise OSError("C" * 4096)
+
+    with pytest.raises(SystemExit) as caught:
+        process._await_server(
+            _Running(), "http://127.0.0.1:9999", PORT, _FakeClock(), taunts
+        )
+    message = str(caught.value.code)
+    assert "C" * 64 not in message, (
+        "the giving-up message repeated the probe failure's text"
+    )
+    assert "connection_failed" in message, (
+        f"the message should still classify the failure; got {message!r}"
+    )
+    # Every field in the message is fixed text or a number, so its length is
+    # bounded whatever the responder does; the margin covers a five-digit
+    # port and a wider retry budget without inviting free text back in.
+    generous_bound = 256
+    assert len(message) <= generous_bound, (
+        f"the giving-up message should be bounded; got {len(message)} chars"
     )
 
 
@@ -114,7 +253,11 @@ def test_the_launcher_is_given_the_argv_the_run_would_use() -> None:
     """What a start would run, checked without starting anything."""
     launched: list[cabc.Sequence[str]] = []
 
-    def launch(argv: cabc.Sequence[str]) -> object:
+    def launch(argv: cabc.Sequence[str]) -> typ.NoReturn:
+        """Record the argv and stop the start right there."""
+        # `NoReturn` rather than `object`: a `Launcher` promises a process,
+        # and a stand-in returning less would not satisfy the alias. This one
+        # never returns at all, which any return type accepts.
         launched.append(list(argv))
         message = "far enough"
         raise SystemExit(message)
@@ -136,16 +279,20 @@ def test_stopping_a_server_that_stands_down_does_not_kill_it() -> None:
 
     class _Obedient:
         def __init__(self) -> None:
+            """Start with nothing recorded."""
             self.calls: list[str] = []
             self.waits: list[int | None] = []
 
         def terminate(self) -> None:
+            """Record the request to stop."""
             self.calls.append("terminate")
 
         def kill(self) -> None:
+            """Record the escalation."""
             self.calls.append("kill")
 
         def wait(self, timeout: int | None = None) -> int:
+            """Record the bounded wait and stand down."""
             self.calls.append("wait")
             self.waits.append(timeout)
             return 0
@@ -166,16 +313,20 @@ def test_a_server_that_will_not_stand_down_is_killed() -> None:
 
     class _Stubborn:
         def __init__(self) -> None:
+            """Start with nothing recorded."""
             self.calls: list[str] = []
             self.waits: list[int | None] = []
 
         def terminate(self) -> None:
+            """Record the request to stop."""
             self.calls.append("terminate")
 
         def kill(self) -> None:
+            """Record the escalation."""
             self.calls.append("kill")
 
         def wait(self, timeout: int | None = None) -> int:
+            """Time out on the first wait, then stand down."""
             self.calls.append("wait")
             self.waits.append(timeout)
             if len(self.waits) == 1:
@@ -203,15 +354,19 @@ def test_only_the_final_wait_may_time_out_silently() -> None:
 
     class _Unkillable:
         def __init__(self) -> None:
+            """Start with nothing recorded."""
             self.calls: list[str] = []
 
         def terminate(self) -> None:
+            """Record the request to stop."""
             self.calls.append("terminate")
 
         def kill(self) -> None:
+            """Record the escalation."""
             self.calls.append("kill")
 
         def wait(self, timeout: int | None = None) -> int:
+            """Time out on every wait."""
             self.calls.append("wait")
             raise subprocess.TimeoutExpired("http-server", timeout or 0)
 
@@ -241,9 +396,7 @@ def test_a_server_that_died_before_answering_is_not_taken_for_the_responder() ->
     )
 
 
-def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder() -> None:
     """A reply proves something is listening, not that it is this run's server.
 
     The bind probe and the startup lock make this unreachable between two runs
@@ -261,14 +414,17 @@ def test_a_server_that_dies_after_answering_is_not_taken_for_the_responder(
             """Report alive, then exited, so the reply lands in between."""
             return next(replies)
 
-    monkeypatch.setattr(
-        process.urllib.request,
-        "urlopen",
-        lambda *_args, **_kwargs: contextlib.nullcontext(),
-    )
+    def answers(_url: str) -> None:
+        """Succeed at once, the way a foreign server on the port would."""
 
     with pytest.raises(SystemExit) as caught:
-        process._await_server(_DiesAfterReplying(), "http://127.0.0.1:8099", 8099)
+        process._await_server(
+            _DiesAfterReplying(),
+            "http://127.0.0.1:8099",
+            8099,
+            _FakeClock(),
+            probe=answers,
+        )
 
     message = str(caught.value.code)
     assert "another server" in message, (

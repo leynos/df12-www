@@ -12,9 +12,9 @@ from __future__ import annotations
 import contextlib
 import secrets
 import typing as typ
-import urllib.request
 
 from weaver_snapshot_paths import REPO_ROOT
+from weaver_snapshot_process import _NO_REDIRECTS, _probe_failure_category
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -69,9 +69,11 @@ def _fetch(url: str, limit: int) -> str:
     Raises
     ------
     OSError
-        If the request fails.
+        If the request fails — including by answering with a redirect. A
+        marker is proof of ownership only if this exact URL served it, so a
+        server that points somewhere else has already failed the check.
     """
-    with urllib.request.urlopen(url, timeout=5) as response:  # noqa: S310 - literal loopback URL
+    with _NO_REDIRECTS.open(url, timeout=5) as response:
         return response.read(limit).decode("utf-8", "replace")
 
 
@@ -106,11 +108,14 @@ def _confirm_ownership(
         # longer, and whatever is on that port may serve a great deal more.
         served = fetch(f"{base}/{marker}", len(marker) + 1).strip()
     except OSError as exc:
+        # The category rather than the exception's text: whatever is on the
+        # port is untrusted, and a redirect's reason or target is its to
+        # choose. The chained exception keeps the detail for a traceback.
         message = (
             f"the server on port {port} did not serve this run's marker "
-            f"{when} ({exc}), so it is serving some other tree; the snapshot "
-            f"would be of that. Pass --port, or leave it unset to be given a "
-            f"free one."
+            f"{when} (the fetch failed as {_probe_failure_category(exc)}), "
+            f"so it is serving some other tree; the snapshot would be of "
+            f"that. Pass --port, or leave it unset to be given a free one."
         )
         raise SystemExit(message) from exc
     if served != marker:

@@ -6,7 +6,7 @@
  * puts it back where it was. See `helpers/mobile-nav-harness.mjs` for why
  * these run against a real DOM rather than the fake used elsewhere.
  */
-import { beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import {
   click,
@@ -17,7 +17,12 @@ import {
   pressTab,
   stubLayout,
 } from "./helpers/mobile-nav-harness.mjs";
-import { setUp } from "./helpers/weaver-drawer.mjs";
+import { setUp, tearDown } from "./helpers/weaver-drawer.mjs";
+
+/* `setUp` installs a telemetry sink on the process global, and the runner
+   loads every test file into one process; without the restore, this file's
+   sink would collect the telemetry suite's events. */
+afterEach(tearDown);
 
 /* The two tests below build their own window, to check the guards that
    run before the harness would have anything to hand back. */

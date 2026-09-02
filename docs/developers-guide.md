@@ -461,6 +461,26 @@ fails if the committed macro does not match what the generator would produce
 from the current mapping, so `templates/weaver/_icons.jinja` must never be
 hand-edited — change `config/weaver-icons.yaml` and rerun the generator instead.
 
+#### The shared atomic writer
+
+`scripts/atomic_write.py` has one public function,
+`atomic_write(output: Path, payload: str | bytes)`, and it is how each
+single-file generator above publishes its result. Text is encoded as UTF-8;
+bytes are written as given. Missing parent directories are created. The payload
+goes to a unique temporary file beside `output` and is moved into place with a
+same-filesystem rename, which is atomic: until the rename, `output` holds the
+old contents untouched, and after it, the new contents in full — never a
+partial write. The temporary file is removed on every path that does not end in
+a successful rename. Failure raises `OSError`; a caller wanting a friendlier
+message wraps it, as the icon generator above does, converting it to a
+`SystemExit` naming the file.
+
+`scripts/generate_weaver_icons.py`, `scripts/build_episodic_roadmap_data.py`,
+and `scripts/typos_rollout_cache.py` all publish through it. The Weaver
+snapshot harness's directory-level publication (`_output`, section 7.1) is a
+different problem — staging and swapping a whole tree rather than replacing one
+file — and is deliberately not built on this helper.
+
 ### 4.8. Weaver's chrome macros
 
 `templates/weaver/_chrome.jinja` holds two macros shared across every Weaver
@@ -791,6 +811,25 @@ removes the seed, and with it the question of what the run happened not to draw.
 suites iterate whatever it returns. An empty return would leave them passing
 having asserted nothing, and a loop over no items is not a failure.
 
+The Weaver drawer suites share a harness of their own,
+`tests/js/helpers/weaver-drawer.mjs`. Its `setUp` builds a happy-dom page with
+the sidebar markup `templates/weaver/` renders, evaluates the shipped drawer
+script into it (and `telemetry.js` too, when called with
+`{ telemetry: true }`), and returns the parts a test drives — `sidebar`,
+`toggle`, `backdrop`, `isOpen()`, and the recorded `events`. Because
+`evaluateScript` runs shipped scripts against the process's own `globalThis`
+rather than the happy-dom window's, `setUp` installs a telemetry sink there and
+touches three process globals: `df12WeaverNavTelemetry`, `df12WeaverTelemetry`,
+and `df12WeaverCopy`.
+
+On a test's first `setUp` call — and only that one — the helper snapshots those
+globals' prior values, so repeated `setUp` calls within one test do not
+overwrite the snapshot with values the harness itself installed. The exported
+`tearDown` restores them, and every file that imports `setUp` must register it
+with `afterEach(tearDown)`; skip it and the sink leaks into whichever test file
+the runner loads next. `tests/js/weaver-drawer-harness.test.mjs` pins this
+contract with sentinel-identity tests.
+
 Bun tests under `tests/js/` cover these pure functions, and they `require` the
 **built** copy from `public/`, not the source under `src/static/`:
 
@@ -937,7 +976,7 @@ declared as three frozen vocabularies at the top of that file:
 
 | Field       | Values                                                                                                                  |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `component` | `weaver-mobile-nav`                                                                                                     |
+| `component` | `weaver-mobile-nav`, `weaver-copy-button`                                                                               |
 | `operation` | `drawer`, `clipboard`                                                                                                   |
 | `outcome`   | `initialized`, `opened`, `closed`, `focus-restored`, `copied`, `failed`                                                 |
 | `reason`    | `toggle`, `backdrop`, `nav-link`, `escape`, `breakpoint`, `saved-element`, `toggle-fallback`, `unavailable`, `rejected` |
@@ -1103,16 +1142,55 @@ over `!important`, which would also outrank a later, deliberate override.
 
 ### 7.1. Verifying a styling change against Weaver
 
-`scripts/weaver_snapshot.py` is the command surface; the work sits in eight
+`scripts/weaver_snapshot.py` is the command surface; the work sits in ten
 siblings beside it, none over 400 lines, named for what they do: `_paths` (the
 published tree, the page list, and each page's filename stem), `_locking`
 (advisory locks and lock-file hygiene), `_output` (staging and failure-atomic
 publication), `_ownership` (proving whose server answered), `_serving` (ports,
 the server, and its lifecycle), `_tools` (the argv handed to css-view and
-agent-browser), `_colour` (one colour written one way), and `_normalize`
-(reducing a captured tree to what a reader could see). They are plain modules
-rather than a package, so a script run by path finds them on `sys.path` and the
-invocation below is unchanged.
+agent-browser), `_colour` (one colour written one way), `_normalize` (reducing
+a captured tree to what a reader could see), `_clock` (the passage of time, as
+something a caller can supply), and `_process` (starting, polling, and stopping
+the server child). They are plain modules rather than a package, so a script
+run by path finds them on `sys.path` and the invocation below is unchanged.
+
+Every outward dependency the harness has — the clock, the readiness probe, the
+process launcher, the marker fetch, the file mover, the port allocator — is a
+parameter with a production default, bound at the function that needs it. A
+caller that does not care never sees the parameter; a test supplies a stand-in
+and so exercises retry pacing, timeout escalation, and failure paths without a
+real sleep, socket, or child process.
+
+`_clock` names that pattern for time specifically: a `Clock` protocol with
+`monotonic` and `sleep`, and `SYSTEM_CLOCK`, the real one, which is what
+production always uses. The lock's timeout and the server's readiness poll are
+both loops over a clock rather than over `time` directly, so a test can check
+how many attempts are made and how long is waited between them without sitting
+through it.
+
+`_process` is the half of serving that is about the child rather than the port:
+the `Probe` and `Launcher` types, with `_probe_url` and `_launch` as their
+production defaults, a readiness poll (`_await_server`) that tries fifty times
+at 0.2 seconds apart — roughly ten seconds — before giving up, and a shutdown
+(`_stop`) that asks the process to terminate and, if it has not gone within a
+ten-second wait, kills it and waits up to ten seconds more. Both loopback
+requests it makes — the readiness probe and, via `_ownership`, the marker fetch
+— go through an opener that refuses HTTP redirects (`_RefuseRedirects`, built
+into `_NO_REDIRECTS`): every request here is to the server this run just
+started, so a redirect is not a route to follow but proof that whatever
+answered is not that server, and the run should fail rather than trust content
+from wherever the redirect points.
+
+The `Launcher` type returns a `ServerProcess`, and `_start_server` (in
+`scripts/weaver_snapshot_serving.py`) hands one back to its caller. The
+protocol names the union of what serving consumes from the child: `poll`
+(from `_Pollable`) and `terminate`, `kill`, and `wait` (from `_Stoppable`).
+
+The startup lock in `scripts/weaver_snapshot_serving.py`'s `_start_server`
+covers exactly the probe, the spawn, and the wait for readiness; it is released
+before the ownership check that confirms the server answering is this run's,
+which stops the server and fails the run if that confirmation does not come
+back.
 
 `scripts/weaver_snapshot.py` exists because a cascade change on a compiled
 Tailwind sheet is easy to get subtly wrong: nothing errors, a selector simply
@@ -1144,6 +1222,16 @@ untouched, two runs writing one directory do not interleave, and a diff never
 observes a directory halfway through being replaced. Publication clears only
 the extension being written, so a `capture` and a `shots` run can share a
 directory.
+
+An ordinary publication failure rolls the destination back to the previous
+run's results, removes the staging directory, and exits naming the
+destination. If the rollback itself fails or is interrupted — a second
+Ctrl-C landing between two restores, say — the destination may be left
+holding neither run's results in full; the run then raises the documented
+inconsistent-destination error, keeps the staging directory, and says so.
+That directory's `replaced/` subdirectory holds the only surviving copy of
+the previous run's files, so it must not be deleted by hand without
+recovering them first.
 
 It is a cyclopts app with three subcommands, invoked bare — there is no
 Makefile target and no console-script entry point:

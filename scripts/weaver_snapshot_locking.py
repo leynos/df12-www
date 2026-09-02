@@ -9,6 +9,7 @@ already there.
 from __future__ import annotations
 
 import contextlib
+import errno
 import fcntl
 import hashlib
 import os
@@ -199,12 +200,23 @@ def _exclusive(
         If the lock is still held after :data:`LOCK_TIMEOUT_SECONDS`.
     """
     with _lock_file(path) as handle:
-        deadline = clock.monotonic() + LOCK_TIMEOUT_SECONDS
+        # Set on the first contention rather than up front, so a failure that
+        # is not contention never consults the clock at all.
+        deadline: float | None = None
         while True:
             try:
                 fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 break
             except OSError as exc:
+                # Only contention is worth waiting out. Anything else — no
+                # lock table left (ENOLCK), a bad descriptor — will not be
+                # cured by another run finishing, so retrying it would turn a
+                # hard failure into a thirty-second stall with the wrong
+                # message at the end of it.
+                if exc.errno not in (errno.EACCES, errno.EAGAIN):
+                    raise
+                if deadline is None:
+                    deadline = clock.monotonic() + LOCK_TIMEOUT_SECONDS
                 if clock.monotonic() >= deadline:
                     message = (
                         f"another run has held {contended} ({path}) for over "

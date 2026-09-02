@@ -13,6 +13,8 @@ from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup, Tag
+from hypothesis import given, settings
+from hypothesis import strategies as st
 from jinja2 import Environment, FileSystemLoader
 
 from df12_pages.config import ContentPageConfig, SubSiteHomepageConfig
@@ -73,7 +75,7 @@ def _render_homepage(tmp_path: Path) -> BeautifulSoup:
     return BeautifulSoup(builder.run().read_text(encoding="utf-8"), "html.parser")
 
 
-def _render_macro(source: str, **context: str) -> BeautifulSoup:
+def _render_macro(source: str, **context: object) -> BeautifulSoup:
     """Render a template string that imports the Netsuke macro modules."""
     env = Environment(
         loader=FileSystemLoader(str(NETSUKE_TEMPLATES)),
@@ -134,12 +136,14 @@ class TestSharedLayout:
             "the shared mobile-nav script still loads"
         )
         body = soup.body
-        assert body is not None
+        assert body is not None, "the homepage has a body"
         assert "flex" not in _classes(body), (
             "the homepage body flows rather than stretching into a flex column"
         )
-        assert soup.title is not None
-        assert soup.title.get_text(strip=True) == "Netsuke test homepage"
+        assert soup.title is not None, "the homepage has a title"
+        assert soup.title.get_text(strip=True) == "Netsuke test homepage", (
+            "the configured title reaches the page_title block"
+        )
 
     def test_content_page_keeps_the_layout_defaults(self, tmp_path: Path) -> None:
         """A docs page keeps the docs scripts and the flex body column."""
@@ -153,7 +157,7 @@ class TestSharedLayout:
             "docs pages load the copy buttons"
         )
         body = soup.body
-        assert body is not None
+        assert body is not None, "the docs page has a body"
         assert "flex" in _classes(body), "docs pages keep the flex column"
         assert not any("plot.ly" in s for s in sources), "docs pages do not load Plotly"
 
@@ -174,19 +178,21 @@ class TestWindows:
             window["class"]
         ), "the default frame is the docs dark card"
         titlebar = window.select_one(".hm-faux-window__titlebar")
-        assert titlebar is not None
+        assert titlebar is not None, "the window has a titlebar"
         assert len(titlebar.select(".rounded-full")) == TRAFFIC_LIGHTS, (
             "three traffic lights"
         )
         label = titlebar.select_one("span")
-        assert label is not None
-        assert label.get_text(strip=True) == "Netsukefile"
+        assert label is not None, "the titlebar carries a label"
+        assert label.get_text(strip=True) == "Netsukefile", (
+            "the label is the caller's text"
+        )
         body = window.select_one(".hm-faux-window__body")
-        assert body is not None
+        assert body is not None, "the window has a body"
         assert "p-6" in body["class"], "the default body inset applies"
         assert "font-mono" in body["class"], "the default body face applies"
         content = body.select_one("p")
-        assert content is not None
+        assert content is not None, "the body holds the caller's content"
         assert content.get_text() == "body", (
             "the caller's content lands inside the body"
         )
@@ -200,14 +206,14 @@ class TestWindows:
         )
         window = soup.select_one("div.hm-faux-window")
 
-        assert window is not None
+        assert window is not None, "the opener renders the window element"
         classes = set(window["class"])
         assert "hm-faux-window--card-bleed" in classes, "variant is a modifier"
         assert "mb-8" in classes, "outer_class is appended"
         assert "code-window" in classes, "frame is rendered"
         assert "bg-charcoal" not in classes, "frame replaces the default outright"
         body = window.select_one(".hm-faux-window__body")
-        assert body is not None
+        assert body is not None, "the window has a body"
         assert body["class"] == ["hm-faux-window__body", "p-2"], (
             "body_class replaces the default body utilities"
         )
@@ -220,12 +226,44 @@ class TestWindows:
         )
         terminal = soup.select_one("div.hm-example-terminal")
 
-        assert terminal is not None
+        assert terminal is not None, "the opener renders the terminal element"
         label = terminal.select_one(".hm-example-terminal__titlebar > div.text-xs")
-        assert label is not None
+        assert label is not None, "the titlebar carries a label"
         assert label.get_text(strip=True) == "Terminal", "the default label"
         assert terminal.select_one(".hm-example-terminal__body > p") is not None, (
             "the caller's content lands inside the body"
+        )
+
+    @pytest.mark.parametrize(
+        ("opener", "closer", "selector"),
+        [
+            ("faux_window_open('x')", "faux_window_close()", "div.hm-faux-window"),
+            (
+                "example_terminal_open()",
+                "example_terminal_close()",
+                "div.hm-example-terminal",
+            ),
+        ],
+    )
+    def test_closer_closes_the_window(
+        self, opener: str, closer: str, selector: str
+    ) -> None:
+        """Content after the closer sits outside the window, not inside it."""
+        soup = _render_macro(
+            "{{ chrome." + opener + " }}<p id='inside'>in</p>"
+            "{{ chrome." + closer + " }}<p id='after'>after</p>"
+        )
+        window = soup.select_one(selector)
+
+        assert window is not None, "the opener renders the window"
+        assert window.select_one("#inside") is not None, (
+            "content before the closer is inside the window"
+        )
+        assert window.select_one("#after") is None, (
+            "content after the closer is outside the window"
+        )
+        assert soup.select_one("#after") is not None, (
+            "the trailing content still renders"
         )
 
 
@@ -240,20 +278,20 @@ class TestPageHeader:
         )
         header = soup.select_one("header")
 
-        assert header is not None
+        assert header is not None, "the macro renders a header element"
         assert "border-b" in header["class"], "the docs treatment is ruled off"
         kicker = header.select_one(".hm-kicker")
-        assert kicker is not None
-        assert kicker.get_text(strip=True) == "Reference"
+        assert kicker is not None, "the header carries a kicker pill"
+        assert kicker.get_text(strip=True) == "Reference", "the kicker label"
         assert "mb-4" in kicker["class"], "the docs kicker margin"
-        assert header.h1 is not None
+        assert header.h1 is not None, "the header carries an h1"
         assert header.h1.get_text(strip=True) == "CLI & Co", (
             "the title is escaped once, not twice"
         )
         lede = header.select_one("p")
-        assert lede is not None
+        assert lede is not None, "the header carries a lede paragraph"
         assert lede.select_one("code") is not None, "the lede body keeps its markup"
-        assert "lg:text-5xl" in header.h1["class"]
+        assert "lg:text-5xl" in header.h1["class"], "the docs heading size"
 
     def test_hero_header(self) -> None:
         """The hero treatment is centred, larger, and can carry an id."""
@@ -265,7 +303,7 @@ class TestPageHeader:
 
         assert header is not None, "the id reaches the header element"
         assert "text-center" in header["class"], "the hero treatment is centred"
-        assert header.h1 is not None
+        assert header.h1 is not None, "the header carries an h1"
         assert "lg:text-6xl" in header.h1["class"], "the hero heading is larger"
         assert header.select_one(".hm-kicker__dot.bg-amber") is not None, (
             "kicker options pass through"
@@ -288,8 +326,8 @@ class TestBreadcrumb:
         )
 
         assert len(items) == len(["Docs", "Rules & Targets"])
-        assert items[0].a is not None
-        assert items[0].a["href"] == "/netsuke/docs/"
+        assert items[0].a is not None, "the first crumb is a link"
+        assert items[0].a["href"] == "/netsuke/docs/", "the first crumb's href"
         assert items[1].get("aria-current") == "page", (
             "the final crumb is the current page"
         )
@@ -305,11 +343,11 @@ class TestBreadcrumb:
             " {'href': '/b/', 'label': 'B'}, {'label': 'C'}, {'label': 'D'}]) }}"
         )
 
-        assert len(items) == len("ABCD")
-        assert items[1].a is not None
+        assert len(items) == len("ABCD"), "one item per crumb"
+        assert items[1].a is not None, "a middle crumb with an href is a link"
         assert items[1].a["href"] == "/b/", "a middle crumb with an href links"
         assert items[2].a is None, "a middle crumb without an href is text"
-        assert items[2].get_text(strip=True) == "C"
+        assert items[2].get_text(strip=True) == "C", "the plain crumb keeps its label"
         assert [i.get("aria-current") for i in items] == [None, None, None, "page"]
         assert len(items[1].select(".iconify")) == 1, "chevrons separate crumbs"
 
@@ -331,7 +369,9 @@ class TestSidebarContract:
         assert hrefs == expected, "the sidebar follows the shared reading order"
         active_links = [link for link in links if "active" in link["class"]]
         assert len(active_links) == 1, "exactly one entry is active"
-        assert active_links[0]["href"] == expected[DOCS_SLUGS.index(active)]
+        assert active_links[0]["href"] == expected[DOCS_SLUGS.index(active)], (
+            "the active entry is the requested page"
+        )
         assert soup.select_one("[data-doc-search-root]") is not None, (
             "docs sidebars carry the search widget"
         )
@@ -347,30 +387,130 @@ class TestSidebarContract:
         index = next(i for i, link in enumerate(links) if "active" in link["class"])
         subs = links[index + 1 : index + 3]
         assert [s["href"] for s in subs] == ["#a", "#b"], "anchors follow the page"
-        assert all("sidebar-link--sub" in s["class"] for s in subs)
+        assert all("sidebar-link--sub" in s["class"] for s in subs), (
+            "anchors carry the sub modifier"
+        )
         assert not any(
             "sidebar-link--sub" in link["class"] for link in links[:index]
         ), "no anchor precedes the active page"
 
 
+EXAMPLE_HEADERS: dict[str, tuple[str, str, str, str, list[tuple[str, str, str]]]] = {
+    "hello-world": (
+        "Basics",
+        "warning",
+        "Beginner",
+        "Hello World",
+        [
+            ("/netsuke/examples/", "carbon:arrow-left", "Back to Examples"),
+            ("/netsuke/docs/getting-started/", "carbon:book", "Getting Started"),
+        ],
+    ),
+    "static-site-pipeline": (
+        "Web",
+        "brand",
+        "Intermediate",
+        "Static Site Pipeline",
+        [
+            ("/netsuke/examples/", "carbon:arrow-left", "Back to Examples"),
+            ("/netsuke/docs/rules-and-targets/", "carbon:book", "Rules & Targets"),
+        ],
+    ),
+    "batch-photo-processing": (
+        "Media",
+        "success",
+        "Intermediate",
+        "Batch Photo Processing",
+        [
+            ("/netsuke/examples/", "carbon:arrow-left", "Back to Examples"),
+            ("/netsuke/docs/templating/", "carbon:template", "Templating Guide"),
+        ],
+    ),
+    "visual-design-assets": (
+        "Design",
+        "accent",
+        "Intermediate",
+        "Visual Design Assets",
+        [
+            ("/netsuke/examples/", "carbon:arrow-left", "Back to Examples"),
+            ("/netsuke/docs/templating/", "carbon:template", "Templating Guide"),
+        ],
+    ),
+    "basic-c-application": (
+        "C / C++",
+        "brand",
+        "Beginner",
+        "Basic C Application",
+        [
+            (
+                "https://github.com/leynos/netsuke/archive/refs/heads/main.zip",
+                "carbon:download",
+                "Download Repository Source",
+            ),
+            (
+                "https://github.com/leynos/netsuke/blob/main/examples/basic_c.yml",
+                "carbon:logo-github",
+                "View on GitHub",
+            ),
+        ],
+    ),
+    "multi-format-documentation": (
+        "Docs",
+        "muted",
+        "Intermediate",
+        "Multi-Format Documentation",
+        [
+            ("/netsuke/examples/", "carbon:arrow-left", "Back to Examples"),
+            ("/netsuke/docs/rules-and-targets/", "carbon:book", "Rules & Targets"),
+        ],
+    ),
+}
+
+
 class TestExampleHeader:
     """The example detail header renders from the catalogue."""
 
-    def test_header_from_catalogue(self) -> None:
+    @pytest.mark.parametrize("key", sorted(EXAMPLE_HEADERS))
+    def test_header_from_catalogue(self, key: str) -> None:
         """Chips, title, lede, and both actions come from the entry."""
-        soup = _render_macro("{{ exdata.example_header('visual-design-assets') }}")
+        category, variant, level, title, actions = EXAMPLE_HEADERS[key]
+        soup = _render_macro("{{ exdata.example_header(key) }}", key=key)
         header = soup.select_one("header#example-header")
 
-        assert header is not None
-        chips = [c.get_text(strip=True) for c in header.select(".hm-chip")]
-        assert chips == ["Design", "Intermediate", "Reviewed syntax"]
-        assert header.select_one(".hm-chip--accent") is not None, (
+        assert header is not None, "the macro renders the example header"
+        chips = header.select(".hm-chip")
+        assert [c.get_text(strip=True) for c in chips] == [
+            category,
+            level,
+            "Reviewed syntax",
+        ], "category, level, and review chips in that order"
+        assert f"hm-chip--{variant}" in chips[0]["class"], (
             "the category chip uses the entry's variant"
         )
-        assert header.h1 is not None
-        assert header.h1.get_text(strip=True) == "Visual Design Assets"
+        assert "hm-chip--muted" in chips[1]["class"], "the level chip is muted"
+        assert "hm-chip--success" in chips[2]["class"], "the review chip is success"
+        assert header.h1 is not None, "the header carries an h1"
+        assert header.h1.get_text(strip=True) == title, (
+            "the title comes from the catalogue entry"
+        )
+        lede = header.select_one("p")
+        assert lede is not None, "the header carries a lede"
+        assert lede.get_text(strip=True), "the lede is not empty"
         buttons = header.select("a.hm-button")
-        assert len(buttons) == ACTION_COUNT, "two actions"
+        rendered = []
+        for button in buttons:
+            icon = button.select_one(".iconify")
+            assert icon is not None, "every action carries an icon"
+            rendered.append(
+                (
+                    str(button["href"]),
+                    str(icon["data-icon"]),
+                    button.get_text(strip=True),
+                )
+            )
+        assert rendered == actions, (
+            "both actions carry the entry's href, icon, and label"
+        )
         assert "hm-button--primary" in buttons[0]["class"], "first action is primary"
         assert "hm-button--ghost" in buttons[1]["class"], "second action is ghost"
 
@@ -378,4 +518,105 @@ class TestExampleHeader:
         """An unknown key renders no header rather than a broken one."""
         soup = _render_macro("{{ exdata.example_header('no-such-example') }}")
 
-        assert soup.select_one("header") is None
+        assert soup.select_one("header") is None, "an unknown key renders no header"
+
+
+_LABELS = (
+    st.text(
+        alphabet=st.characters(whitelist_categories=("L", "N", "P", "Z")),
+        min_size=1,
+        max_size=24,
+    )
+    .map(str.strip)
+    .filter(bool)
+)
+_CRUMB = st.fixed_dictionaries(
+    {"label": _LABELS},
+    optional={"href": st.from_regex(r"\A/[a-z0-9/-]{0,20}\Z")},
+)
+
+
+class TestListContracts:
+    """Property checks for the macros that take caller-supplied lists."""
+
+    @given(trail=st.lists(_CRUMB, min_size=1, max_size=6))
+    @settings(max_examples=60, deadline=None)
+    def test_breadcrumb_renders_every_crumb_in_order(
+        self, trail: list[dict[str, str]]
+    ) -> None:
+        """One item per crumb, order kept, exactly the last marked current."""
+        soup = _render_macro("{{ chrome.breadcrumb(trail) }}", trail=trail)
+        items = soup.select("nav[aria-label='Breadcrumb'] ol > li")
+
+        assert [i.get_text(strip=True) for i in items] == [c["label"] for c in trail], (
+            "labels render in trail order, escaped once"
+        )
+        assert [i.get("aria-current") for i in items] == [None] * (len(trail) - 1) + [
+            "page"
+        ], "exactly the final crumb is the current page"
+        assert len(soup.select("nav[aria-label='Breadcrumb'] .iconify")) == (
+            len(trail) - 1
+        ), "one chevron precedes every crumb after the first"
+        for index, (item, crumb) in enumerate(zip(items, trail, strict=True)):
+            link = item.a
+            if index == len(trail) - 1:
+                assert link is None, "the current page is never a link"
+            elif index == 0 or "href" in crumb:
+                assert link is not None, "a leading or href-bearing crumb links"
+                assert link["href"] == crumb.get("href", ""), "the link target"
+            else:
+                assert link is None, "a middle crumb without an href is text"
+
+    @given(
+        sections=st.lists(
+            st.fixed_dictionaries(
+                {
+                    "title": _LABELS,
+                    "links": st.lists(
+                        st.fixed_dictionaries(
+                            {
+                                "href": st.from_regex(r"\A#[a-z][a-z0-9-]{0,12}\Z"),
+                                "label": _LABELS,
+                            }
+                        ),
+                        min_size=1,
+                        max_size=5,
+                    ),
+                },
+                optional={"sub": st.just(value=True)},
+            ),
+            min_size=1,
+            max_size=4,
+        )
+    )
+    @settings(max_examples=40, deadline=None)
+    def test_sidebar_sections_render_in_order(
+        self, sections: list[dict[str, object]]
+    ) -> None:
+        """Bespoke sections keep their order, links, and sub modifier."""
+        soup = _render_macro(
+            "{{ docsnav.sidebar(sections=sections, search=false) }}",
+            sections=sections,
+        )
+        groups = soup.select("#sidebar nav > div")
+
+        assert [g.h3.get_text(strip=True) for g in groups if g.h3] == [
+            s["title"] for s in sections
+        ], "one heading per section, in order"
+        for group, section in zip(groups, sections, strict=True):
+            links = group.select("a.sidebar-link")
+            expected = section["links"]
+            assert isinstance(expected, list)
+            assert [(str(a["href"]), a.get_text(strip=True)) for a in links] == [
+                (link["href"], link["label"]) for link in expected
+            ], "links render in order with their targets"
+            assert all(
+                ("sidebar-link--sub" in a["class"]) == bool(section.get("sub"))
+                for a in links
+            ), "sub applies to every link in the section or none"
+            assert not any("active" in a["class"] for a in links), (
+                "bespoke sections mark nothing active by default"
+            )
+        assert soup.select_one("[data-doc-search-root]") is None, (
+            "search=false drops the widget"
+        )

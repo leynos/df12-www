@@ -79,19 +79,20 @@
   The breadcrumb trail above a page header.
 
   `trail` is an ordered list of mappings with a `label` and, for every
-  entry but the last, usually an `href`. The first entry is always a link;
-  a middle entry without an `href` renders as plain text (the examples
-  pages use one for the example's category); the last entry is the current
-  page and carries `aria-current`.
+  entry but the last, usually an `href`. The last entry is the current
+  page and carries `aria-current`, even when it is the only entry; before
+  it, the first entry is always a link, and a middle entry without an
+  `href` renders as plain text (the examples pages use one for the
+  example's category).
 #}
 {% macro breadcrumb(trail) -%}
 <nav class="flex mb-8 text-sm text-charcoal-mid" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
         {%- for crumb in trail %}
-        {%- if loop.first %}
+        {%- if loop.last %}
+        <li aria-current="page"><div class="flex items-center">{% if not loop.first %}<span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span>{% endif %}<span class="ml-1 font-medium text-charcoal">{{ crumb.label }}</span></div></li>
+        {%- elif loop.first %}
         <li class="inline-flex items-center"><a href="{{ crumb.href }}" class="inline-flex items-center hover:text-indigo">{{ crumb.label }}</a></li>
-        {%- elif loop.last %}
-        <li aria-current="page"><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium text-charcoal">{{ crumb.label }}</span></div></li>
         {%- elif crumb.href %}
         <li><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><a href="{{ crumb.href }}" class="ml-1 font-medium hover:text-indigo">{{ crumb.label }}</a></div></li>
         {%- else %}

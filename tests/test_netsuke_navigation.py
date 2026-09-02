@@ -135,3 +135,42 @@ class TestGuidesFooter:
             "Manifest Reference",
             "/netsuke/docs/manifest-reference/",
         ) in links
+
+
+class TestDocsSidebar:
+    """The desktop sidebar renders from the shared page list."""
+
+    def test_sidebar_lists_every_docs_page_in_order(self, tmp_path: Path) -> None:
+        """Page links appear in reading order, with the current one marked."""
+        soup = _render(tmp_path, "pages/docs-cli.jinja", "docs/cli")
+        page_links = soup.select("#sidebar a.sidebar-link:not(.sidebar-link--sub)")
+
+        labels = [link.get_text(strip=True) for link in page_links]
+        assert labels == [label for _, label in DOCS_ORDER]
+
+        active = [link for link in page_links if "active" in link["class"]]
+        assert [link.get_text(strip=True) for link in active] == ["CLI Commands"]
+
+    def test_sidebar_nests_anchors_under_the_active_page(self, tmp_path: Path) -> None:
+        """In-page anchors follow the active page and nothing else."""
+        soup = _render(tmp_path, "pages/docs-cli.jinja", "docs/cli")
+        items = soup.select("#sidebar li a.sidebar-link")
+
+        active_index = next(
+            i for i, link in enumerate(items) if "active" in link["class"]
+        )
+        following = items[active_index + 1 :]
+        subs = [link for link in following if "sidebar-link--sub" in link["class"]]
+        assert subs, "the CLI page should list its section anchors"
+        assert following[: len(subs)] == subs, "anchors sit directly under the page"
+        assert all(link["href"].startswith("#") for link in subs)
+
+    def test_guides_sidebar_uses_bespoke_sections(self, tmp_path: Path) -> None:
+        """Guides pages drop the search widget and list their own sections."""
+        soup = _render(
+            tmp_path, "pages/guides-architecture.jinja", "guides/architecture"
+        )
+
+        assert soup.select_one("#sidebar [data-doc-search-root]") is None
+        headings = [h.get_text(strip=True) for h in soup.select("#sidebar h3")]
+        assert headings == ["On this page", "Helpful links"]

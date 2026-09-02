@@ -8,34 +8,10 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
 
-        <!-- Sidebar Navigation (Desktop) -->
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
-            <nav class="space-y-8">
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
-                    <ul class="space-y-1">
-                        <li><a href="#how-it-works" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">How localization works</a></li>
-                        <li><a href="#file-structure" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">File structure</a></li>
-                        <li><a href="#message-keys" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Message keys</a></li>
-                        <li><a href="#variables-plurals" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Variables &amp; plurals</a></li>
-                        <li><a href="#new-locale" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Adding a new locale</a></li>
-                        <li><a href="#quality" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Quality &amp; validation</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Helpful links</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/guides/contributing/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Contributing Guide</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/translators-guide.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Translator Guide (source)</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Localization Style Guide (source)</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Localization Glossary (source)</a></li>
-                        <li><a href="https://projectfluent.org/fluent/guide/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Fluent Syntax Guide</a></li>
-                        <li><a href="https://cldr.unicode.org/index/cldr-spec/plural-rules" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLDR Plural Rules</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        {% endraw %}{{ docsnav.sidebar(sections=[
+            {'title': 'On this page', 'sub': true, 'links': [{'href': '#how-it-works', 'label': 'How localization works'}, {'href': '#file-structure', 'label': 'File structure'}, {'href': '#message-keys', 'label': 'Message keys'}, {'href': '#variables-plurals', 'label': 'Variables & plurals'}, {'href': '#new-locale', 'label': 'Adding a new locale'}, {'href': '#quality', 'label': 'Quality & validation'}]},
+            {'title': 'Helpful links', 'links': [{'href': '/netsuke/guides/contributing/', 'label': 'Contributing Guide'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/translators-guide.md', 'label': 'Translator Guide (source)'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md', 'label': 'Localization Style Guide (source)'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md', 'label': 'Localization Glossary (source)'}, {'href': 'https://projectfluent.org/fluent/guide/', 'label': 'Fluent Syntax Guide'}, {'href': 'https://cldr.unicode.org/index/cldr-spec/plural-rules', 'label': 'CLDR Plural Rules'}]},
+        ], search=false) }}{% raw %}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">

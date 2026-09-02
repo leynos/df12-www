@@ -8,33 +8,10 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
 
-        <!-- Sidebar Navigation (Desktop) -->
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
-            <nav class="space-y-8">
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
-                    <ul class="space-y-1">
-                        <li><a href="#compiler" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">A build-system compiler</a></li>
-                        <li><a href="#pipeline" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">The six-stage pipeline</a></li>
-                        <li><a href="#static-graph" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">The static graph mandate</a></li>
-                        <li><a href="#ir" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">The intermediate representation</a></li>
-                        <li><a href="#execution" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Handing off to Ninja</a></li>
-                        <li><a href="#errors" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">When it breaks</a></li>
-                        <li><a href="#crate" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Inside the crate</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Helpful links</h3>
-                    <ul class="space-y-1">
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-design.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Full design document</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/repository-layout.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Repository layout</a></li>
-                        <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
-                        <li><a href="/netsuke/docs/security/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        {% endraw %}{{ docsnav.sidebar(sections=[
+            {'title': 'On this page', 'sub': true, 'links': [{'href': '#compiler', 'label': 'A build-system compiler'}, {'href': '#pipeline', 'label': 'The six-stage pipeline'}, {'href': '#static-graph', 'label': 'The static graph mandate'}, {'href': '#ir', 'label': 'The intermediate representation'}, {'href': '#execution', 'label': 'Handing off to Ninja'}, {'href': '#errors', 'label': 'When it breaks'}, {'href': '#crate', 'label': 'Inside the crate'}]},
+            {'title': 'Helpful links', 'links': [{'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-design.md', 'label': 'Full design document'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/repository-layout.md', 'label': 'Repository layout'}, {'href': '/netsuke/docs/manifest-reference/', 'label': 'Manifest Reference'}, {'href': '/netsuke/docs/security/', 'label': 'Security Model'}]},
+        ], search=false) }}{% raw %}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">

@@ -14,9 +14,9 @@
   /* Wire the example-card filter chips, returning early when the page has no
      chips or no cards. Each chip presses itself, unpresses its siblings, and
      shows the cards matching its filter. */
-  function initFilters() {
-    const buttons = [...document.querySelectorAll("[data-example-filter]")];
-    const cards = [...document.querySelectorAll("[data-example-card]")];
+  function initFilters(): void {
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>("[data-example-filter]")];
+    const cards = [...document.querySelectorAll<HTMLElement>("[data-example-card]")];
 
     if (buttons.length === 0 || cards.length === 0) {
       return;

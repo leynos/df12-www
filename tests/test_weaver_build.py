@@ -265,6 +265,9 @@ def test_no_font_awesome_markup_remains() -> None:
         # its documentation shows the markup it replaces.
         if path.name != "_icons.jinja"
     ]
+    # The browser scripts are TypeScript sources compiled at build time; the
+    # `.js` glob is kept so a script that has not been migrated is still read.
+    sources += sorted(WEAVER_STATIC.rglob("*.ts"))
     sources += sorted(WEAVER_STATIC.rglob("*.js"))
     sources += sorted(WEAVER_STATIC.rglob("*.css"))
 

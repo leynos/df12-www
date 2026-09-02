@@ -146,7 +146,7 @@ def test_the_breakpoint_the_guide_quotes_is_the_one_in_force(
         "the stylesheet's drawer breakpoint has moved away from 1023px, so the "
         "guide's 1024 is no longer the boundary"
     )
-    script = (WEAVER_SCRIPTS / "mobile-nav.js").read_text(encoding="utf-8")
+    script = (WEAVER_SCRIPTS / "mobile-nav.ts").read_text(encoding="utf-8")
     assert 'matchMedia("(min-width: 1024px)")' in script, (
         "the script's breakpoint has moved away from 1024px, so the guide's "
         "number is no longer the boundary"
@@ -155,7 +155,7 @@ def test_the_breakpoint_the_guide_quotes_is_the_one_in_force(
 
 def test_the_controls_the_guide_describes_exist(weaver_section: str) -> None:
     """Each named control, traced to the thing that provides it."""
-    script = (WEAVER_SCRIPTS / "mobile-nav.js").read_text(encoding="utf-8")
+    script = (WEAVER_SCRIPTS / "mobile-nav.ts").read_text(encoding="utf-8")
 
     assert "drawer" in weaver_section.lower(), "the guide should name the drawer"
     assert 'btn.id = "mobile-nav-toggle"' in script, (

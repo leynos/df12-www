@@ -144,8 +144,11 @@ than being linked on its own.
 
 Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `episodic/`,
 `netsuke/`, `weaver/`, `stilyagi/`) holds the templates for that sub-site's
-design system. Episodic and Netsuke keep shared macros in `components.jinja`,
-and Stilyagi centralizes its chrome in `_layout.jinja` that every page extends.
+design system. Episodic and Netsuke keep shared macros in `components.jinja`;
+Netsuke adds `chrome.jinja` for page furniture, `docs_nav.jinja` for the docs
+navigation, and `examples_data.jinja` for the examples catalogue, and every
+Netsuke page, the homepage included, extends `doc_page.jinja`. Stilyagi
+centralizes its chrome in `_layout.jinja` that every page extends.
 These are distinct from the main-site templates in `df12_pages/templates/`.
 
 ### `tests/`

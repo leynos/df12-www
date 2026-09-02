@@ -146,10 +146,14 @@ class TestDocsSidebar:
         page_links = soup.select("#sidebar a.sidebar-link:not(.sidebar-link--sub)")
 
         labels = [link.get_text(strip=True) for link in page_links]
-        assert labels == [label for _, label in DOCS_ORDER]
+        assert labels == [label for _, label in DOCS_ORDER], (
+            "sidebar must list the docs pages in reading order"
+        )
 
         active = [link for link in page_links if "active" in link["class"]]
-        assert [link.get_text(strip=True) for link in active] == ["CLI Commands"]
+        assert [link.get_text(strip=True) for link in active] == ["CLI Commands"], (
+            "exactly the current page should be marked active"
+        )
 
     def test_sidebar_nests_anchors_under_the_active_page(self, tmp_path: Path) -> None:
         """In-page anchors follow the active page and nothing else."""
@@ -163,7 +167,9 @@ class TestDocsSidebar:
         subs = [link for link in following if "sidebar-link--sub" in link["class"]]
         assert subs, "the CLI page should list its section anchors"
         assert following[: len(subs)] == subs, "anchors sit directly under the page"
-        assert all(link["href"].startswith("#") for link in subs)
+        assert all(str(link["href"]).startswith("#") for link in subs), (
+            "sub-links are in-page anchors"
+        )
 
     def test_guides_sidebar_uses_bespoke_sections(self, tmp_path: Path) -> None:
         """Guides pages drop the search widget and list their own sections."""
@@ -171,6 +177,10 @@ class TestDocsSidebar:
             tmp_path, "pages/guides-architecture.jinja", "guides/architecture"
         )
 
-        assert soup.select_one("#sidebar [data-doc-search-root]") is None
+        assert soup.select_one("#sidebar [data-doc-search-root]") is None, (
+            "guides pages do not carry the docs search widget"
+        )
         headings = [h.get_text(strip=True) for h in soup.select("#sidebar h3")]
-        assert headings == ["On this page", "Helpful links"]
+        assert headings == ["On this page", "Helpful links"], (
+            "guides pass their own section headings"
+        )

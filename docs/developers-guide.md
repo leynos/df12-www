@@ -113,6 +113,17 @@ For Markdown changes, run `make markdownlint` and `make nixie`. Rebuild and
 inspect the rendered result as well — the gates do not render the site, so a
 template change that passes every gate can still produce a broken page.
 
+Because the gates do not render the site, every change to a template,
+stylesheet, or page config is validated in a browser before it is committed.
+Serve the rebuilt `public/` with `bun run dev` or
+`DF12_PORT=<port> bun run serve`, then follow the mandatory procedure under
+[AGENTS.md](../AGENTS.md#validating-rendered-pages): a screenshot of each
+changed page, the viewport matrix (1440, 1280, 1024, 768, 390, and 320 pixels)
+with a horizontal-overflow check at each, computed-style inspection with
+`css-view`, snapshot diffing for output-neutral refactors, and the
+accessibility audit. `agent-browser` and `css-view` are the tools used for
+this, and both work headless.
+
 ### 2.1. Bun is required
 
 Bun is not optional tooling for this repository. It runs the build, the

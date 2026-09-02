@@ -342,6 +342,7 @@
    it is paper: 15.21:1 there. */
 .config-grid pre:focus-visible {
   --focus-ring-color: var(--color-paper);
+
   outline-offset: -3px;
 }
 .config-grid pre .k {

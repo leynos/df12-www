@@ -409,6 +409,7 @@ pre.code .tok-nm {
    paper: 15.21:1 there. */
 .code-scroll:focus-visible {
   --focus-ring-color: var(--color-paper);
+
   outline-offset: -3px;
 }
 

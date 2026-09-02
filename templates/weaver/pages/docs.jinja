@@ -25,7 +25,7 @@
                         <h3 class="font-serif text-base-content font-bold mb-3 text-sm">Design &amp; Concept</h3>
                         <ul class="space-y-2 border-l border-base-content/10 ml-1">
                             <li><a href="#design-docs" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Design Documents</a></li>
-                            <li><a href="#architecture" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Architecture Deep Dive</a></li>
+                            <li><a href="#architecture" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink hover:border-l-2 hover:border-accent -ml-[1px] py-1 transition-all">Architecture Decisions</a></li>
                         </ul>
                     </div>
 
@@ -88,6 +88,9 @@
                             <span class="h-px w-8 bg-accent mr-4"></span>
                             <h2 class="font-serif text-3xl text-base-content">Design Documents</h2>
                         </div>
+                        <p class="mb-8 text-base-content/80 max-w-2xl">
+                            The vision and the systems it demands: what Weaver is, how Sempai and Jacquard work, and where the roadmap goes next.
+                        </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <a href="https://github.com/leynos/weaver/blob/main/docs/weaver-design.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -100,24 +103,12 @@
                                     {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
                                 </div>
                             </a>
-                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
-                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    {{ icon('shield-halved', 'text-4xl text-base-content') }}
-                                </div>
-                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-001: Plugin Capability Model</h3>
-                                <p class="text-sm text-base-content/88 mb-4">Capability-first model for act operations, including <code>extricate-symbol</code> and provider resolution.</p>
-                                <div class="flex items-center text-xs font-mono text-base-content/78">
-                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
-                                    <span class="font-mono">adr-001</span>
-                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
-                                </div>
-                            </a>
                             <a href="https://github.com/leynos/weaver/blob/main/docs/sempai-query-language-design.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
                                 <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                                     {{ icon('magnifying-glass', 'text-4xl text-base-content') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Sempai Query Language Design</h3>
-                                <p class="text-sm text-base-content/88 mb-4">Semgrep-compatible query engine backed by Tree-sitter for semantics-aware code pattern matching.</p>
+                                <p class="text-sm text-base-content/88 mb-4">Operators, tokens, and evaluation semantics for the Semgrep-compatible engine. Its command-surface sections are superseded by RFC 0003.</p>
                                 <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">sempai-query-language-design.md</span>
                                     {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
@@ -139,7 +130,7 @@
                                     {{ icon('book', 'text-4xl text-base-content') }}
                                 </div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">User's Guide</h3>
-                                <p class="text-sm text-base-content/88 mb-4">CLI commands, domain operations, configuration, daemon lifecycle, and plugin system.</p>
+                                <p class="text-sm text-base-content/88 mb-4">The 0.1.0 command-surface target and the current prototype reference, split honestly. Plus configuration, daemon lifecycle, and plugins.</p>
                                 <div class="flex items-center text-xs font-mono text-base-content/78">
                                     <span class="font-mono">users-guide.md</span>
                                     {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
@@ -159,6 +150,78 @@
                         </div>
                     </section>
 
+                    <!-- Architecture Decisions Section -->
+                    <section id="architecture" class="mb-20 scroll-mt-20">
+                        <div class="flex items-center mb-8">
+                            <span class="h-px w-8 bg-accent mr-4"></span>
+                            <h2 class="font-serif text-3xl text-base-content">Architecture Decisions</h2>
+                        </div>
+                        <p class="mb-8 text-base-content/80 max-w-2xl">
+                            The RFCs and Architecture Decision Records (ADRs) that reset the public surface for 0.1.0, plus the gap analysis that keeps the target honest. The RFC and ADR entries are Status: Proposed.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-007-agent-native-command-surface.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('terminal', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-007: Agent-Native Command Surface</h3>
+                                <p class="text-sm text-base-content/88 mb-4">The 0.1.0 reset: noun-verb grammar, dual renderers, universal <code>--json</code>, and the capability model that hides providers.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">adr-007</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/rfcs/0002-multi-workspace-daemon.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('server', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">RFC 0002: Multi-Workspace Daemon</h3>
+                                <p class="text-sm text-base-content/88 mb-4">One per-user daemon, workspace-scoped state, language servers keyed by execution identity, and workspace-local concurrency. With ADRs 008&ndash;010.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">rfc-0002</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/rfcs/0003-sempai-query-to-selector.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('diagram-project', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">RFC 0003: Query to Selector</h3>
+                                <p class="text-sm text-base-content/88 mb-4">The Sempai pipeline: query input, versioned selector streams, and the typed handoff into safe actuation. With ADRs 011&ndash;012.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">rfc-0003</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('shield-halved', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">ADR-001: Plugin Capability Model</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Capability-first model for change operations, including <code>extricate-symbol</code> and provider resolution.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="bg-status-info-soft text-status-info-ink px-2 py-0.5 rounded-sm mr-2">PROPOSED</span>
+                                    <span class="font-mono">adr-001</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                            <a href="https://github.com/leynos/weaver/blob/main/docs/ui-gap-analysis.md" target="_blank" class="group block p-6 bg-white border border-base-content/10 rounded-xs relative overflow-hidden hover:border-accent/40 transition-colors">
+                                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    {{ icon('scale-balanced', 'text-4xl text-base-content') }}
+                                </div>
+                                <h3 class="font-serif text-xl text-base-content mb-2">UI Gap Analysis</h3>
+                                <p class="text-sm text-base-content/88 mb-4">Principle-by-principle audit of the current surface against the target: errors that teach, bounded output, non-interactive defaults.</p>
+                                <div class="flex items-center text-xs font-mono text-base-content/78">
+                                    <span class="font-mono">ui-gap-analysis.md</span>
+                                    {{ icon('arrow-right', 'ml-auto text-accent-ink opacity-0 group-hover:opacity-100 transition-opacity') }}
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+
                     <!-- Configuration Section -->
                     <section id="configuration" class="mb-20 scroll-mt-20">
                         <div class="flex items-center mb-8">
@@ -166,7 +229,7 @@
                             <h2 class="font-serif text-3xl text-base-content">Configuration</h2>
                         </div>
                         <p class="mb-6 text-base-content/80">
-                            Configuration is layered with <code class="font-mono text-xs bg-primary/10 px-1">ortho-config</code>. Each successive layer overrides earlier sources, so a CLI flag always wins.
+                            In the planned 0.1.0 target, configuration is layered with <code class="font-mono text-xs bg-primary/10 px-1">ortho-config</code>: <code class="font-mono text-xs bg-primary/10 px-1">built-in defaults &lt; config files &lt; profile &lt; environment &lt; flags</code>. Each successive layer overrides earlier sources, so a CLI flag always wins.
                         </p>
                         <div class="reference-callout mb-8">
                             <div class="reference-callout-title">
@@ -195,14 +258,19 @@
                                 </thead>
                                 <tbody class="divide-y divide-base-content/10">
                                     <tr class="hover:bg-base-100/30">
-                                        <td class="p-4 font-mono text-base-content font-bold">4</td>
+                                        <td class="p-4 font-mono text-base-content font-bold">5</td>
                                         <td class="p-4 font-mono text-base-content">CLI flags</td>
                                         <td class="p-4 text-base-content/80">Always honoured. See table below.</td>
                                     </tr>
                                     <tr class="hover:bg-base-100/30">
-                                        <td class="p-4 font-mono text-base-content font-bold">3</td>
+                                        <td class="p-4 font-mono text-base-content font-bold">4</td>
                                         <td class="p-4 font-mono text-base-content">Environment variables</td>
-                                        <td class="p-4 text-base-content/80"><code>WEAVER_*</code> convention. Override files, yield to flags.</td>
+                                        <td class="p-4 text-base-content/80"><code>WEAVER_*</code> convention. Override profiles and files; yield to flags.</td>
+                                    </tr>
+                                    <tr class="hover:bg-base-100/30">
+                                        <td class="p-4 font-mono text-base-content font-bold">3</td>
+                                        <td class="p-4 font-mono text-base-content">Profile</td>
+                                        <td class="p-4 text-base-content/80">A saved profile selected with <code>--profile</code> overrides configuration files and is overridden by environment variables and CLI flags.</td>
                                     </tr>
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold">2</td>
@@ -212,11 +280,15 @@
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold">1</td>
                                         <td class="p-4 font-mono text-base-content">Built-in defaults</td>
-                                        <td class="p-4 text-base-content/80">Unix socket, <code>info</code> filter, <code>json</code> format, no overrides.</td>
+                                        <td class="p-4 text-base-content/80">Unix socket on Unix; loopback TCP on non-Unix prototype builds; <code>info</code> filter, <code>json</code> format, no overrides.</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+
+                        <p class="mb-8 text-sm text-base-content/80">
+                            The 0.1.0 target remains one local, per-user daemon with no remotely reachable endpoint. Unix targets default to a Unix domain socket. The current prototype retains <code class="font-mono text-xs bg-primary/10 px-1">tcp://127.0.0.1:9779</code> for non-Unix compatibility; TCP must stay on an IPv4 or IPv6 loopback address and is not a remote-service transport.
+                        </p>
 
                         <!-- TOML example -->
                         <div tabindex="0" class="bg-neutral p-6 rounded-xs shadow-lg overflow-x-auto border border-base-content/20 mb-8 paper-panel">
@@ -227,7 +299,7 @@
 <pre class="font-mono text-sm text-code-text leading-relaxed">
 <span class="text-code-muted"># Top-level keys (no [section] headers)</span>
 
-<span class="text-code-muted"># Daemon transport (Unix socket or TCP)</span>
+<span class="text-code-muted"># Prototype TCP compatibility (loopback-only; not remote)</span>
 daemon_socket = { transport = <span class="text-code-string">"tcp"</span>, host = <span class="text-code-string">"127.0.0.1"</span>, port = <span class="text-code-warn">9779</span> }
 
 <span class="text-code-muted"># Logging</span>
@@ -237,7 +309,7 @@ log_format = <span class="text-code-string">"compact"</span>  <span class="text-
 <span class="text-code-muted"># Capability overrides (repeatable)</span>
 <span class="text-ink-muted">[[capability_overrides]]</span>
 language = <span class="text-code-string">"python"</span>
-capability = <span class="text-code-string">"observe.call-hierarchy"</span>
+capability = <span class="text-code-string">"definition.get"</span>
 directive = <span class="text-code-string">"force"</span>
 </pre>
                         </div>
@@ -283,7 +355,7 @@ string "yes", expected a boolean
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_DAEMON_SOCKET</td>
                                         <td class="p-4 font-mono text-ink-muted text-xs">--daemon-socket</td>
-                                        <td class="p-4 text-base-content/80">Daemon transport endpoint (<code>unix://</code> or <code>tcp://</code>).</td>
+                                        <td class="p-4 text-base-content/80">Local daemon endpoint. <code>unix://</code> is the Unix default; prototype <code>tcp://</code> compatibility must use loopback.</td>
                                     </tr>
                                     <tr class="hover:bg-base-100/30">
                                         <td class="p-4 font-mono text-base-content font-bold text-xs">WEAVER_LOG_FILTER</td>
@@ -353,9 +425,9 @@ string "yes", expected a boolean
                         </p>
                         <div tabindex="0" class="bg-neutral p-4 rounded-xs border border-base-content/20 overflow-x-auto mb-4 paper-panel">
 <pre class="font-mono text-xs text-code-text leading-relaxed">
-<span class="text-base-100/70">$</span> weaver observe get-definition \
-    --capability-overrides <span class="text-code-string">"python:observe.call-hierarchy=force"</span> \
-    --capability-overrides <span class="text-code-string">"rust:observe.call-hierarchy=deny"</span> \
+<span class="text-base-100/70">$</span> weaver definitions get \
+    --capability-overrides <span class="text-code-string">"python:definition.get=force"</span> \
+    --capability-overrides <span class="text-code-string">"rust:definition.get=deny"</span> \
     --uri file:///src/main.rs --position 10:5
 </pre>
                         </div>
@@ -377,8 +449,12 @@ string "yes", expected a boolean
                                             <td class="p-3 text-xs text-base-content/80">Read an explicit configuration file instead of using XDG discovery.</td>
                                         </tr>
                                         <tr class="hover:bg-base-100/30">
+                                            <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--profile &lt;NAME&gt;</td>
+                                            <td class="p-3 text-xs text-base-content/80">Planned for 0.1.0. Select a saved profile; it overrides configuration files and is overridden by environment variables and CLI flags.</td>
+                                        </tr>
+                                        <tr class="hover:bg-base-100/30">
                                             <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--daemon-socket &lt;ENDPOINT&gt;</td>
-                                            <td class="p-3 text-xs text-base-content/80">Override the daemon transport. Accepts <code>unix://</code> or <code>tcp://</code> URIs.</td>
+                                            <td class="p-3 text-xs text-base-content/80">Override the local daemon endpoint. <code>unix://</code> is the Unix default; prototype <code>tcp://</code> compatibility must use loopback.</td>
                                         </tr>
                                         <tr class="hover:bg-base-100/30">
                                             <td class="p-3 font-mono text-xs text-base-content font-bold whitespace-nowrap">--log-filter &lt;FILTER&gt;</td>
@@ -468,14 +544,14 @@ string "yes", expected a boolean
                             <div class="relative">
                                 <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">1</div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Start</h3>
-                                <p class="text-sm text-base-content/88 mb-3"><code class="font-mono text-xs bg-primary/10 px-1">weaver daemon start</code> verifies the configured socket is free, spawns <code class="font-mono text-xs bg-primary/10 px-1">weaverd</code> (overridable via <code class="font-mono text-xs bg-primary/10 px-1">WEAVERD_BIN</code>), and waits for the health snapshot to report <code>ready</code>. The daemon daemonises itself, creates runtime artefacts, and binds the socket.</p>
-                                <code class="bg-primary/5 px-2 py-1 rounded-sm text-xs font-mono text-base-content">Auto-start: domain commands start the daemon automatically if it is not running (30&nbsp;s timeout).</code>
+                                <p class="text-sm text-base-content/88 mb-3"><code class="font-mono text-xs bg-primary/10 px-1">weaver daemon start</code> verifies the configured local endpoint is free, spawns <code class="font-mono text-xs bg-primary/10 px-1">weaverd</code> (overridable via <code class="font-mono text-xs bg-primary/10 px-1">WEAVERD_BIN</code>), and waits for the health snapshot to report <code>ready</code>. The daemon daemonises itself, creates runtime artefacts, and binds the Unix socket or loopback-only prototype TCP endpoint.</p>
+                                <code class="bg-primary/5 px-2 py-1 rounded-sm text-xs font-mono text-base-content">Auto-start: routed commands start the daemon automatically if it is not running (30&nbsp;s timeout).</code>
                             </div>
 
                             <div class="relative">
                                 <div class="absolute -left-[41px] top-0 w-6 h-6 rounded-full bg-ink-muted text-white flex items-center justify-center text-xs font-bold">2</div>
                                 <h3 class="font-serif text-xl text-base-content mb-2">Serve</h3>
-                                <p class="text-sm text-base-content/88 mb-3">The daemon accepts concurrent client connections and runs a JSONL request dispatch loop, routing <code>observe</code>, <code>act</code>, and <code>verify</code> commands to the appropriate domain handlers. Language servers are initialised lazily on first use.</p>
+                                <p class="text-sm text-base-content/88 mb-3">The daemon accepts concurrent same-host client connections and runs a JSONL request dispatch loop, routing read, query, and change commands to the appropriate capability handlers. Language servers are initialised lazily on first use.</p>
                             </div>
 
                             <div class="relative">
@@ -567,7 +643,7 @@ string "yes", expected a boolean
                             </div>
                             <div class="bg-white border border-base-content/10 p-4 rounded-xs">
                                 <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-2">Auto-Start</h4>
-                                <p class="text-sm text-base-content/80">Domain commands (<code>observe</code>, <code>act</code>, <code>verify</code>) spawn the daemon automatically if it is not running. The CLI prints <code class="font-mono text-xs bg-primary/10 px-1">Waiting for daemon start&hellip;</code> to stderr and waits up to 30&nbsp;seconds. Configuration flags passed to the command are forwarded to the daemon. Errors unrelated to the daemon being offline (e.g.&nbsp;permission denied) bypass auto-start and are reported immediately.</p>
+                                <p class="text-sm text-base-content/80">Routed commands spawn the daemon automatically if it is not running. The CLI prints <code class="font-mono text-xs bg-primary/10 px-1">Waiting for daemon start&hellip;</code> to stderr and waits up to 30&nbsp;seconds. Configuration flags passed to the command are forwarded to the daemon. Errors unrelated to the daemon being offline (e.g.&nbsp;permission denied) bypass auto-start and are reported immediately.</p>
                             </div>
                             <div class="bg-white border border-base-content/10 p-4 rounded-xs">
                                 <h4 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-2">WEAVERD_BIN</h4>

@@ -1,7 +1,7 @@
 {% extends "doc_page.jinja" %}
 {% from '_icons.jinja' import icon %}
 
-{% block page_title %}Command: Act - Weaver AI Codebase Tooling{% endblock %}
+{% block page_title %}Commands: Change - Weaver AI Codebase Tooling{% endblock %}
 
 {% block extra_head %}
 {% endblock %}
@@ -9,9 +9,9 @@
 {% block nav_subitems_commands %}
                     <!-- Sub-navigation for Commands -->
                     <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
-                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/observe</a>
-                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono font-bold text-accent-ink bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/act</a>
-                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/verify</a>
+                        <a href="/weaver/commands/observe/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/read</a>
+                        <a href="/weaver/commands/act/" class="block py-1 text-xs font-mono font-bold text-accent-ink bg-accent/5 -ml-4 pl-4 border-l-2 border-accent">/change</a>
+                        <a href="/weaver/commands/verify/" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">/verification</a>
                     </div>
 {% endblock %}
 
@@ -24,7 +24,7 @@
                         <div class="masthead-eyebrow self-start">
                             <a href="/weaver/commands/" class="font-mono text-xs tracking-widest uppercase text-base-content/82 hover:text-accent-ink transition-colors">COMMANDS</a>
                             <span class="text-base-content/75">/</span>
-                            <span class="font-mono text-xs tracking-widest uppercase text-base-content font-bold">ACT</span>
+                            <span class="font-mono text-xs tracking-widest uppercase text-base-content font-bold">CHANGE</span>
                         </div>
                     </div>
 
@@ -34,7 +34,7 @@
                     </h1>
 
                     <p class="font-sans text-lg text-base-content/80 leading-relaxed max-w-3xl font-light">
-                        The <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">act</span> domain groups all code-modification operations. Every edit is lock-guarded and transactional: changes are applied to in-memory copies, validated by the Double-Lock harness (syntactic + semantic checks), and only then atomically committed to disk. No proposal cycle, no human approval gate — the locks <em>are</em> the safety gate.
+                        The planned change commands &ndash; <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">patches apply</span>, <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols rename</span>, and <span class="font-mono text-sm bg-primary/10 px-1 rounded-sm">symbols move</span> &ndash; share one mutation engine. For supported edits, the Double-Lock harness applies the parser-backed syntactic check and the language-server semantic check before the change is committed to disk. No proposal cycle, no human approval gate &ndash; the locks <em>are</em> the safety gate.
                     </p>
                 </div>
 
@@ -57,13 +57,13 @@
                         <div class="lg:col-span-1">
                             <h2 class="font-serif text-2xl text-base-content mb-4">Synopsis</h2>
                             <p class="text-sm text-base-content/88 mb-6 leading-relaxed">
-                                Each <code class="font-mono text-xs bg-primary/10 px-1">act</code> operation sends a structured request to the daemon. The daemon applies the edit in memory, runs both locks, and writes to disk only on success. Failures leave the filesystem untouched.
+                                Planned targets: <span class="font-mono text-xs bg-primary/10 px-1">patches apply</span> accepts a patch file with <code class="font-mono text-xs bg-primary/10 px-1">--file</code> or standard input. <span class="font-mono text-xs bg-primary/10 px-1">symbols rename</span> and <span class="font-mono text-xs bg-primary/10 px-1">symbols move</span> use selector entry points: direct (<code class="font-mono text-xs bg-primary/10 px-1">--uri</code> + <code class="font-mono text-xs bg-primary/10 px-1">--position</code>, or an inline <code class="font-mono text-xs bg-primary/10 px-1">--query</code>) and a typed stream via <code class="font-mono text-xs bg-primary/10 px-1">--selectors &lt;path|-&gt;</code>. For edits supported by the parser and language-server integration, the daemon plans in memory, runs both locks, and writes to disk only on success. Failures leave the filesystem untouched.
                             </p>
 
                             <div class="bg-base-100 border border-base-content p-4 relative mb-6">
                                 <div class="absolute -top-3 left-4 bg-base-100 px-2 text-xs font-mono text-accent-ink font-bold">SYNTAX</div>
                                 <code class="font-mono text-sm text-base-content block break-all">
-                                    weaver act &lt;OPERATION&gt; [ARG ...]
+                                    weaver &lt;resource&gt; &lt;verb&gt; [--dry-run] [FLAGS]
                                 </code>
                             </div>
 
@@ -75,36 +75,36 @@
 
                         <!-- Right: Operations Table -->
                         <div class="lg:col-span-2">
-                            <h2 class="font-serif text-2xl text-base-content mb-4">Operations</h2>
+                            <h2 class="font-serif text-2xl text-base-content mb-4">Commands</h2>
                             <div class="overflow-hidden border border-base-content/20 rounded-xs shadow-xs bg-base-100">
-                                <table class="w-full text-left border-collapse">
+                                <table class="command-table w-full text-left border-collapse">
                                     <thead>
                                         <tr class="bg-primary text-base-100 font-mono text-xs uppercase tracking-wider">
-                                            <th class="p-3 border-r border-base-100/20 w-40">Operation</th>
+                                            <th class="p-3 border-r border-base-100/20 w-44">Command</th>
                                             <th class="p-3 border-r border-base-100/20 w-24">Input</th>
                                             <th class="p-3">Description</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-base-content/10">
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">apply-patch</td>
-                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">STDIN</td>
-                                            <td class="p-3 text-sm text-base-content/80">Read a Git-style patch from STDIN. Supports modify, create, and delete hunks.</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">patches apply <span class="status-pill status-pill-planned ml-1">Planned</span></td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">File / STDIN</td>
+                                            <td class="p-3 text-sm text-base-content/80">Apply a Git-style patch via <span class="font-mono text-xs bg-primary/10 px-1">--file</span> or stdin. Supports modify, create, and delete hunks, plus <span class="font-mono text-xs bg-primary/10 px-1">--dry-run</span>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">apply-rewrite</td>
-                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Flags</td>
-                                            <td class="p-3 text-sm text-base-content/80">AST-aware search-and-replace via <span class="font-mono text-xs bg-primary/10 px-1">--pattern</span> and <span class="font-mono text-xs bg-primary/10 px-1">--replacement</span>.</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">symbols rename <span class="status-pill status-pill-planned ml-1">Planned</span></td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Selectors</td>
+                                            <td class="p-3 text-sm text-base-content/80">Rename by position, inline <span class="font-mono text-xs bg-primary/10 px-1">--query</span>, or piped <span class="font-mono text-xs bg-primary/10 px-1">--selectors -</span>. Capability: <code>symbol.rename</code>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">refactor</td>
-                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Flags</td>
-                                            <td class="p-3 text-sm text-base-content/80">Delegate to a registered plugin via <span class="font-mono text-xs bg-primary/10 px-1">--provider</span> and <span class="font-mono text-xs bg-primary/10 px-1">--refactoring</span>. Add <span class="font-mono text-xs bg-primary/10 px-1">--file</span> when the provider needs explicit workspace-relative file context, then pass provider-specific trailing <span class="font-mono text-xs bg-primary/10 px-1">KEY=VALUE</span> operands. Built-in <code>rename</code> examples use <code>new_name=&lt;IDENT&gt;</code> and <code>offset=&lt;BYTE_OFFSET&gt;</code>.</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">symbols move <span class="status-pill status-pill-planned ml-1">Planned</span></td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Selectors</td>
+                                            <td class="p-3 text-sm text-base-content/80">Move a symbol to another module (formerly <code>extricate</code>). Public verb <code>move</code>; internal capability <code>extricate-symbol</code>. Not an alias for <code>extract-method</code>. See the <a href="#extricate" class="text-accent-ink hover:underline">deep dive</a>.</td>
                                         </tr>
                                         <tr class="hover:bg-primary/5 transition-colors">
-                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">extricate <span class="status-pill status-pill-planned ml-1">Planned</span></td>
-                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">Flags</td>
-                                            <td class="p-3 text-sm text-base-content/80">Move a symbol to a different module. Capability: <code>extricate-symbol</code>.</td>
+                                            <td class="p-3 font-mono text-xs font-bold text-accent-ink border-r border-base-content/10">declared, unbuilt</td>
+                                            <td class="p-3 font-mono text-xs text-base-content/82 border-r border-base-content/10">&mdash;</td>
+                                            <td class="p-3 text-sm text-base-content/80">Sibling capability identifiers <code>extract-method</code>, <code>replace-body</code>, and <code>extract-predicate</code> are declared in the contract but not implemented. They will not pretend otherwise.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -161,15 +161,15 @@
 
                     <div class="space-y-12">
 
-                        <!-- Example 1: apply-patch -->
+                        <!-- Example 1: patches apply -->
                         <div class="relative group">
                             <div class="absolute -left-4 top-0 bottom-0 w-1 bg-primary opacity-30 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-baseline gap-3 mb-4 pl-4">
                                 <span class="font-mono text-xs font-bold text-base-100 bg-primary px-2 py-1 rounded-xs">EXAMPLE</span>
-                                <h3 class="font-serif text-xl text-base-content">apply-patch</h3>
+                                <h3 class="font-serif text-xl text-base-content">patches apply <span class="status-pill status-pill-planned ml-1">Planned</span></h3>
                             </div>
                             <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
-                                Pipe a Git-style diff to STDIN. The daemon parses it, applies to in-memory copies, runs both locks, and commits atomically.
+                                Point at a Git-style patch. The engine stages it against expected content versions, formats the staged files, runs both locks, and commits atomically &ndash; recording the transaction, digests, and rollback reference.
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
@@ -178,15 +178,14 @@
                                         <span class="text-xs font-mono text-base-100/70">TERMINAL</span>
                                     </div>
                                     <div class="font-mono text-sm leading-relaxed">
-                                        <span class="text-code-string">$</span> <span class="text-white">cat fix.diff |</span> <span class="text-code-string">weaver</span> <span class="text-white">act apply-patch</span>
+                                        <span class="text-code-string">$</span> <span class="text-code-string">weaver</span> <span class="text-white">patches apply --file fix.patch --json</span>
                                     </div>
                                 </div>
 
                                 <div tabindex="0" class="bg-code-surface rounded-xs p-4 border border-base-content/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">JSONL</div>
+                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">JSON RESULT</div>
 <pre class="text-code-text">
-{<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,<span class="token-key">"data"</span>:<span class="token-string">"{\"status\":\"ok\",\"files_written\":1,\"files_deleted\":0}"</span>}
-{<span class="token-key">"kind"</span>:<span class="token-string">"exit"</span>,<span class="token-key">"status"</span>:<span class="token-number">0</span>}
+{<span class="token-key">"transaction"</span>:<span class="token-string">"txn_01j9..."</span>,<span class="token-key">"changed"</span>:[<span class="token-string">"src/lib.rs"</span>],<span class="token-key">"verification"</span>:{<span class="token-key">"syntactic"</span>:<span class="token-string">"ok"</span>,<span class="token-key">"semantic"</span>:<span class="token-string">"ok"</span>},<span class="token-key">"diagnostics"</span>:{<span class="token-key">"introduced"</span>:<span class="token-number">0</span>,<span class="token-key">"resolved"</span>:<span class="token-number">1</span>}}
 </pre>
                                 </div>
                             </div>
@@ -202,10 +201,10 @@
                             <div class="absolute -left-4 top-0 bottom-0 w-1 bg-accent opacity-30 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-baseline gap-3 mb-4 pl-4">
                                 <span class="font-mono text-xs font-bold text-white bg-accent-deep px-2 py-1 rounded-xs">EXAMPLE</span>
-                                <h3 class="font-serif text-xl text-base-content">refactor (rename via plugin)</h3>
+                                <h3 class="font-serif text-xl text-base-content">symbols rename (by query) <span class="status-pill status-pill-planned ml-1">Planned</span></h3>
                             </div>
                             <p class="text-sm text-base-content/88 mb-4 pl-4 max-w-2xl">
-                                The provider returns a unified diff to the daemon. The daemon validates that diff through the Double-Lock, commits files to disk only on success, and discards the overlay on any failure.
+                                An inline query selects the target; the routed actuator plans, the shared engine verifies through the Double-Lock, and disk changes happen only on success. A multi-match query is refused, with candidates listed &ndash; no command guesses whether a multi-match mutation is intended.
                             </p>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pl-4">
@@ -214,19 +213,16 @@
                                         <span class="text-xs font-mono text-base-100/70">TERMINAL</span>
                                     </div>
                                     <div class="font-mono text-sm leading-relaxed">
-                                        <span class="text-code-string">$</span> <span class="text-code-string">weaver</span> <span class="text-white">act refactor \</span><br>
-                                        <span class="text-white pl-4">--provider rope \</span><br>
-                                        <span class="text-white pl-4">--refactoring rename \</span><br>
-                                        <span class="text-white pl-4">--file src/main.py \</span><br>
-                                        <span class="text-white pl-4">new_name=renamed_symbol offset=4</span>
+                                        <span class="text-code-string">$</span> <span class="text-code-string">weaver</span> <span class="text-white">symbols rename \</span><br>
+                                        <span class="text-white pl-4">--query 'fn process_request($...ARGS)' \</span><br>
+                                        <span class="text-white pl-4">--new-name run_request --json</span>
                                     </div>
                                 </div>
 
                                 <div tabindex="0" class="bg-code-surface rounded-xs p-4 border border-base-content/20 font-mono text-xs overflow-x-auto shadow-inner relative">
-                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">JSONL</div>
+                                    <div class="absolute top-2 right-2 text-3xs text-white/55 uppercase tracking-widest">JSON RESULT</div>
 <pre class="text-code-text">
-{<span class="token-key">"kind"</span>:<span class="token-string">"stream"</span>,<span class="token-key">"stream"</span>:<span class="token-string">"stdout"</span>,<span class="token-key">"data"</span>:<span class="token-string">"{\"status\":\"ok\",\"files_written\":1,\"files_deleted\":0}"</span>}
-{<span class="token-key">"kind"</span>:<span class="token-string">"exit"</span>,<span class="token-key">"status"</span>:<span class="token-number">0</span>}
+{<span class="token-key">"transaction"</span>:<span class="token-string">"txn_01ja..."</span>,<span class="token-key">"changed"</span>:[<span class="token-string">"src/main.rs"</span>,<span class="token-string">"src/handler.rs"</span>],<span class="token-key">"verification"</span>:{<span class="token-key">"syntactic"</span>:<span class="token-string">"ok"</span>,<span class="token-key">"semantic"</span>:<span class="token-string">"ok"</span>},<span class="token-key">"diagnostics"</span>:{<span class="token-key">"introduced"</span>:<span class="token-number">0</span>,<span class="token-key">"resolved"</span>:<span class="token-number">0</span>}}
 </pre>
                                 </div>
                             </div>
@@ -272,7 +268,22 @@
                             </code>
                         </div>
 
-                        <!-- Error 3: Sandbox Violation -->
+                        <!-- Error 3: Stale Source -->
+                        <div class="bg-base-100 border border-accent/30 p-5 rounded-xs relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-accent"></div>
+                            <div class="flex items-start justify-between mb-3">
+                                <span class="font-mono text-xs font-bold text-accent-ink">ERR_STALE_SOURCE</span>
+                                {{ icon('rotate-left', 'text-accent-ink/40') }}
+                            </div>
+                            <p class="text-xs text-base-content/80 leading-relaxed mb-3">
+                                The file changed since the selectors were produced. Checked before planning and again immediately before commit; <code class="text-3xs font-mono">--force</code> cannot erase this precondition.
+                            </p>
+                            <code class="block bg-primary/5 p-2 rounded-sm text-3xs font-mono text-base-content">
+                                stale source: src/lib.rs digest mismatch; re-run the query
+                            </code>
+                        </div>
+
+                        <!-- Error 4: Sandbox Violation -->
                         <div class="bg-base-100 border border-base-content/20 p-5 rounded-xs relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                             <div class="flex items-start justify-between mb-3">
@@ -291,12 +302,48 @@
                 </div>
             </section>
 
-            <!-- Act Extricate (PLANNED) -->
+            <!-- Mutation Contract Guarantees -->
+            <section class="py-16 px-8 lg:px-16 border-b border-base-content/20">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="font-serif text-3xl text-base-content mb-4">The Mutation Contract</h2>
+                    <p class="text-sm text-base-content/80 max-w-3xl mb-10">
+                        One engine plans and commits every change, so every actuator inherits the same guarantees. Human and <code class="text-xs bg-primary/10 px-1">--json</code> renderers read the same result.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white border border-base-content/15 p-6 rounded-xs">
+                            <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Completion before actuation</h3>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                An actuator reads or spools the complete selector stream and validates its completion record before planning anything. It never mutates while input is still arriving, and a producer failure never fakes a successful completion.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-base-content/15 p-6 rounded-xs">
+                            <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Explicit cardinality</h3>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                Every actuator documents its policy for zero, one, several, and overlapping selectors. The defaults refuse ambiguity: a multi-match mutation requires the caller to say so.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-base-content/15 p-6 rounded-xs">
+                            <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Idempotent by construction</h3>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                Idempotency keys, transaction identifiers, and retry matching survive a daemon restart. Resubmitting an equivalent request returns the existing transaction &ndash; or the existing refusal.
+                            </p>
+                        </div>
+                        <div class="bg-white border border-base-content/15 p-6 rounded-xs">
+                            <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Honest no-ops</h3>
+                            <p class="text-sm text-base-content/75 leading-relaxed">
+                                A mutation whose post-format result is byte-identical returns an explicit no-op, and repeated no-ops trip a circuit breaker. Formatting runs on staged files before verification; a formatter failure cannot touch the live workspace.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Symbols Move (PLANNED) -->
             <section id="extricate" class="py-16 px-8 lg:px-16 border-t border-base-content/10">
                 <div class="max-w-6xl mx-auto">
                     <div class="border-2 border-dashed border-base-content/40 rounded-xs p-8 lg:p-12 opacity-80">
                         <div class="flex items-center gap-3 mb-8">
-                            <h2 class="font-serif text-3xl font-bold text-base-content">act extricate</h2>
+                            <h2 class="font-serif text-3xl font-bold text-base-content">symbols move</h2>
                             <span class="status-pill status-pill-planned">Planned</span>
                         </div>
 
@@ -308,7 +355,7 @@
                         <div class="mb-8">
                             <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Synopsis</h3>
                             <div class="paper-panel bg-neutral text-base-100 p-4 rounded-xs">
-                                <code class="text-xs font-mono">weaver act extricate --uri &lt;file:///...&gt; --position &lt;line:col&gt; --to &lt;module&gt;</code>
+                                <code class="text-xs font-mono">weaver symbols move --uri &lt;file:///...&gt; --position &lt;line:col&gt; --to &lt;module&gt; [--dry-run]</code>
                             </div>
                         </div>
 
@@ -316,7 +363,7 @@
                         <div class="mb-8">
                             <h3 class="font-mono text-xs font-bold text-base-content uppercase tracking-wider mb-3">Capability</h3>
                             <p class="text-sm text-base-content/80">
-                                Maps to capability ID <code class="text-xs font-mono bg-primary/5 px-1 py-0.5 rounded-sm">extricate-symbol</code>. Providers declare this capability in their plugin manifest; the daemon resolves the correct provider for the source file's language.
+                                Public verb <code class="text-xs font-mono bg-primary/5 px-1 py-0.5 rounded-sm">move</code>; internal capability <code class="text-xs font-mono bg-primary/5 px-1 py-0.5 rounded-sm">extricate-symbol</code> &ndash; deliberately not an alias for <code class="text-xs font-mono bg-primary/5 px-1 py-0.5 rounded-sm">extract-method</code>. Providers declare the capability in their plugin manifest; the daemon resolves the correct provider for the source file's language and keeps the provider's name out of the primary UX.
                             </p>
                         </div>
 
@@ -438,12 +485,6 @@
                                             <td class="p-3 text-xs">No</td>
                                             <td class="p-3 text-xs">Create missing destination modules. Default <code class="font-mono bg-primary/5 px-1 rounded-sm">true</code>; to disable, pass <code class="font-mono bg-primary/5 px-1 rounded-sm">--no-create-missing-modules</code>.</td>
                                         </tr>
-                                        <tr class="border-b border-base-content/10">
-                                            <td class="p-3 font-mono text-xs">--format</td>
-                                            <td class="p-3 font-mono text-xs">string</td>
-                                            <td class="p-3 text-xs">No</td>
-                                            <td class="p-3 text-xs"><code class="font-mono bg-primary/5 px-1 rounded-sm">auto</code>, <code class="font-mono bg-primary/5 px-1 rounded-sm">on</code>, or <code class="font-mono bg-primary/5 px-1 rounded-sm">off</code>. Default <code class="font-mono bg-primary/5 px-1 rounded-sm">auto</code>.</td>
-                                        </tr>
                                         <tr>
                                             <td class="p-3 font-mono text-xs">--explain</td>
                                             <td class="p-3 font-mono text-xs">bool</td>
@@ -506,7 +547,7 @@
                             <p class="text-sm text-base-content/88">Ensure the actions taken produced the desired outcome.</p>
                         </div>
                         <a href="/weaver/commands/verify/" class="group flex items-center gap-3 px-6 py-3 bg-primary text-base-100 font-mono text-xs font-bold uppercase tracking-wider hover:bg-accent transition-colors shadow-md">
-                            Next: Verify Command
+                            Next: Verification
                             {{ icon('arrow-right', 'group-hover:translate-x-1 transition-transform') }}
                         </a>
                     </div>

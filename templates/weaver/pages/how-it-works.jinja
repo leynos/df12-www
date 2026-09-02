@@ -10,6 +10,7 @@
                     <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
                         <a href="#fusion" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors"># Semantic Fusion</a>
                         <a href="#daemon" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors"># Client-Daemon</a>
+                        <a href="#workspaces" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors"># Workspaces</a>
                     </div>
 {% endblock %}
 
@@ -83,7 +84,7 @@
                             </div>
                             <h2 class="font-serif text-4xl text-base-content mb-6">Semantic Fusion Engine</h2>
                             <p class="text-lg text-base-content/80 mb-6 font-light">
-                                The heart of Weaver is the Fusion Engine. It ingests raw code, AST data, and LSP diagnostics to build internal semantic data structures that power every observe, act, and verify operation.
+                                The heart of Weaver is the Fusion Engine. It ingests raw code, syntax-tree data, and LSP diagnostics to build the internal semantic structures behind every read, query, and change command.
                             </p>
 
                             <div class="space-y-8 mt-8">
@@ -110,8 +111,8 @@
 
                         <!-- Right Content: JSONL Example -->
                         <div class="lg:w-1/2">
-                            <div class="bg-white border-2 border-base-content shadow-panel p-1">
-                                <div class="bg-base-100 border border-base-content/20 p-6">
+                            <div class="bg-white border-2 border-base-content shadow-panel p-1 max-md:-mx-8 max-md:border-x-0 max-md:p-0 max-md:shadow-none">
+                                <div class="bg-base-100 border border-base-content/20 p-6 max-md:border-x-0">
                                     <div class="flex justify-between items-center mb-4 border-b border-base-content/10 pb-2">
                                         <span class="font-mono text-xs font-bold text-base-content">INTERNAL TELEMETRY: FUSION_OUTPUT</span>
                                         <span class="font-mono text-3xs text-accent-ink animate-pulse">● LIVE</span>
@@ -184,7 +185,7 @@
                                 </li>
                                 <li class="flex items-start gap-3">
                                     {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
-                                    <span>Listens on Unix Domain Socket (or TCP via <code class="text-xs text-base-100/70">--daemon-socket</code>).</span>
+                                    <span>Uses a Unix domain socket by default on Unix; the prototype retains loopback-only TCP for non-Unix compatibility.</span>
                                 </li>
                                 <li class="flex items-start gap-3">
                                     {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
@@ -205,7 +206,7 @@
                             </div>
 
                             <h3 class="font-serif text-2xl text-white mb-2">The Client</h3>
-                            <div class="font-mono text-xs text-accent-ink mb-4">weaver &lt;domain&gt; &lt;operation&gt;</div>
+                            <div class="font-mono text-xs text-accent-ink mb-4">weaver &lt;resource&gt; &lt;verb&gt;</div>
 
                             <ul class="space-y-3 text-sm text-base-100/80 font-light">
                                 <li class="flex items-start gap-3">
@@ -218,14 +219,50 @@
                                 </li>
                                 <li class="flex items-start gap-3">
                                     {{ icon('check', 'mt-1 text-accent-ink text-xs') }}
-                                    <span>Renders human-readable output when stdout is a TTY (<code class="text-xs text-base-100/70">--output auto</code>).</span>
+                                    <span>Renders readable output on a TTY; <code class="text-xs text-base-100/70">--json</code> is the one switch to the stable machine contract.</span>
                                 </li>
                             </ul>
 
                             <div class="mt-8 pt-6 border-t border-white/10">
                                 <div class="font-mono text-xs text-code-dim mb-2">Usage example:</div>
-                                <code class="block bg-black/30 p-2 rounded-sm text-xs font-mono text-code-string">$ weaver observe get-definition --uri file:///src/main.rs --position 10:5</code>
+                                <code class="block bg-black/30 p-2 rounded-sm text-xs font-mono text-code-string">$ weaver definitions get --uri file:///src/main.rs --position 10:5</code>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Multi-Workspace Section -->
+            <section id="workspaces" class="py-20 px-8 lg:px-16 border-b border-base-content/20 bg-white/40">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+                        <div>
+                            <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-2 block">Planned &mdash; RFC 0002</span>
+                            <h2 class="font-serif text-4xl text-base-content mb-2">One Daemon, Many Workspaces</h2>
+                            <p class="text-base-content/80 max-w-2xl">
+                                One local, per-user <code class="text-sm bg-primary/10 px-1">weaverd</code> serves every repository. Each request carries a workspace locator; the daemon &ndash; never the client &ndash; canonicalizes it into the key that owns caches, language servers, and the mutation coordinator. A client path is untrusted input, not filesystem authority.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-base-100 border border-base-content/20 p-6">
+                            <h3 class="font-serif text-xl text-base-content mb-3">Isolated by identity</h3>
+                            <p class="text-sm text-base-content/88 leading-relaxed">
+                                Language servers are keyed by their full execution identity: language, command, resolved toolchain, and workspace roots. Unrelated repositories never share a process, and a missing rustup component returns structured installation guidance rather than a silent fallback.
+                            </p>
+                        </div>
+                        <div class="bg-base-100 border border-base-content/20 p-6">
+                            <h3 class="font-serif text-xl text-base-content mb-3">Concurrent by default</h3>
+                            <p class="text-sm text-base-content/88 leading-relaxed">
+                                No daemon-wide mutex. Unrelated workspaces and languages progress in parallel under bounded admission at daemon, workspace, and server scope. Saturation returns a structured, retryable overload result naming the scope and the wait &ndash; not a dropped connection.
+                            </p>
+                        </div>
+                        <div class="bg-base-100 border border-base-content/20 p-6">
+                            <h3 class="font-serif text-xl text-base-content mb-3">Local and quiet</h3>
+                            <p class="text-sm text-base-content/88 leading-relaxed">
+                                Single-user and local-only: no remotely reachable endpoint or remote authentication. The prototype's loopback-only TCP compatibility path does not turn the planned per-user model into a network service. Logs and metrics carry bounded, opaque workspace identifiers &ndash; never raw paths, environment values, source contents, or patch bodies.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -291,7 +328,7 @@
                                 <div class="flex-1 bg-white border-2 border-accent p-6 rounded-xs shadow-md">
                                     <h3 class="font-serif font-bold text-base-content text-lg mb-2">Graph Fusion</h3>
                                     <p class="text-sm text-base-content/88 mb-3">
-                                        All data points are merged into the Semantic Graph. Nodes are tagged with confidence scores based on their source (e.g., LSP > Regex).
+                                        All data points merge into the semantic graph. Every node carries its evidence: an LSP-confirmed edge outranks a purely syntactic one, and the provenance says which is which.
                                     </p>
                                     <div class="w-full h-2 bg-status-idle-soft rounded-full overflow-hidden mt-2">
                                         <div class="h-full bg-accent w-3/4"></div>

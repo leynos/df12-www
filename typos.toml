@@ -33,6 +33,7 @@ extend-ignore-re = [
     "(?:carousel|dropdown|footer|indicator|navbar|toast)-center",
     "(?s)```.*?```",
     "--(?:tw-)?color-[a-z0-9*-]+",
+    "--color",
     "--my-brand-color",
     "--netsuke-vermillion",
     "\\b-?(?:accent|background|border(?:-(?:block|inline)(?:-(?:start|end))?|-(?:top|right|bottom|left)|-\\*)?|caret|column-rule|flood|lighting|outline|scrollbar|stop|text-decoration|text-emphasis|webkit-text-fill|webkit-text-stroke)-color\\b",

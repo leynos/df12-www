@@ -176,6 +176,41 @@ def test_the_controls_the_guide_describes_exist(weaver_section: str) -> None:
     )
 
 
+def test_the_guide_separates_current_commands_from_the_target(
+    weaver_section: str,
+) -> None:
+    """Readers can distinguish usable prototype commands from 0.1.0 plans."""
+    for command in (
+        "weaver --capabilities",
+        "weaver definitions get",
+        "weaver act apply-patch",
+    ):
+        assert command in weaver_section, f"the guide omits current command {command}"
+
+    assert "work today" in weaver_section
+    assert "planned 0.1.0 surface" in weaver_section
+    assert "weaver <resource> <verb> [FLAGS]" in weaver_section
+    assert "`--json`" in weaver_section
+    assert "weaver.selector.v1" in weaver_section
+    assert "`--selectors -`" in weaver_section
+
+
+def test_the_guide_preserves_the_local_mutation_contract(
+    weaver_section: str,
+) -> None:
+    """Transport and mutation guarantees stay visible beside the target CLI."""
+    normalized = " ".join(weaver_section.split())
+    for guarantee in (
+        "per-user and local",
+        "Unix sockets by default",
+        "loopback-only TCP",
+        "stale-source refusal",
+        "Double-Lock verification",
+        "idempotent mutations",
+    ):
+        assert guarantee in normalized, f"the guide omits {guarantee!r}"
+
+
 def test_the_guide_describes_the_copy_controls_that_exist(
     weaver_section: str,
 ) -> None:

@@ -42,6 +42,8 @@ ignore = [
   # The `border-*-color` form appears where prose quotes the whole family at
   # once, so the wildcard is spelled out alongside the real sides.
   '\b-?(?:accent|background|border(?:-(?:block|inline)(?:-(?:start|end))?|-(?:top|right|bottom|left)|-\*)?|caret|column-rule|flood|lighting|outline|scrollbar|stop|text-decoration|text-emphasis|webkit-text-fill|webkit-text-stroke)-color\b',
+  # Weaver CLI flag name (upstream contract, ADR 007).
+  '--color',
   # daisyUI placement modifiers.
   '(?:carousel|dropdown|footer|indicator|navbar|toast)-center',
   # Netsuke design token, spelled with the double-l variant in the stylesheet.

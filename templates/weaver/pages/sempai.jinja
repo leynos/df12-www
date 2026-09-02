@@ -3,18 +3,6 @@
 
 {% block page_title %}Sempai Query Engine White Paper - Weaver AI Codebase Tooling{% endblock %}
 
-{% block nav_subitems_sempai %}
-                    <!-- Sub-navigation for Sempai -->
-                    <div class="ml-4 pl-4 border-l border-base-content/20 space-y-1 my-2">
-                        <a href="#thesis" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">Thesis</a>
-                        <a href="#surface" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">Query Surface</a>
-                        <a href="#engine" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">Execution Model</a>
-                        <a href="#contract" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">Integration Contract</a>
-                        <a href="#limits" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">Limits &amp; Guardrails</a>
-                        <a href="#roadmap" class="block py-1 text-xs font-mono text-base-content/80 hover:text-accent-ink transition-colors">Roadmap</a>
-                    </div>
-{% endblock %}
-
 {% block main_extra_class %} flex flex-col xl:flex-row{% endblock %}
 
 {% block content %}
@@ -33,7 +21,7 @@
                             <li><a href="#surface" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Query Surface</a></li>
                             <li><a href="#engine" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Execution Model</a></li>
                             <li><a href="#contract" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Integration Contract</a></li>
-                            <li><a href="#observe-integration" class="block pl-4 text-xs text-base-content/82 hover:text-accent-ink -ml-[1px] py-1 transition-all">Observe Integration</a></li>
+                            <li><a href="#observe-integration" class="block pl-4 text-xs text-base-content/82 hover:text-accent-ink -ml-[1px] py-1 transition-all">Weaver Integration</a></li>
                             <li><a href="#limits" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Limits &amp; Guardrails</a></li>
                             <li><a href="#roadmap" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">Roadmap</a></li>
                             <li><a href="#references" class="block pl-4 text-xs text-base-content/88 hover:text-accent-ink -ml-[1px] py-1 transition-all">References</a></li>
@@ -44,8 +32,9 @@
                         <ul class="space-y-3 text-xs text-base-content/80 leading-relaxed">
                             <li>Supports Rust, Python, TypeScript, Go, plus optional HCL.</li>
                             <li>Parses legacy <code>pattern*</code> and v2 <code>match</code> formulas.</li>
+                            <li>Emits versioned <code>weaver.selector.v1</code> streams under <code>--json</code>.</li>
                             <li>Executes <code>search</code> mode. Parses <code>extract</code>, <code>taint</code>, and <code>join</code> without pretending to run them.</li>
-                            <li>Returns machine-usable <code>span</code>, <code>captures</code>, and <code>focus</code> for downstream actuation.</li>
+                            <li>Returns machine-usable <code>span</code>, <code>captures</code>, <code>focus</code>, and source digests for downstream actuation.</li>
                         </ul>
                     </div>
                 </div>
@@ -59,7 +48,7 @@
                             <div class="writing-vertical-rl font-mono text-3xs tracking-stamp uppercase text-base-content">White Paper 01</div>
                         </div>
                         <div class="masthead-eyebrow mb-6">
-                            <span class="font-mono text-xs tracking-widest uppercase text-accent-ink">Observe Engine</span>
+                            <span class="font-mono text-xs tracking-widest uppercase text-accent-ink">Query Engine</span>
                             <span class="text-base-content/75">/</span>
                             <span class="font-mono text-xs tracking-widest uppercase text-base-content">Sempai</span>
                         </div>
@@ -72,8 +61,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                             <div class="bg-white/70 border border-base-content/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">Input</p>
-                                <p class="font-serif text-2xl text-base-content mb-2">Two front doors.</p>
-                                <p class="text-sm text-base-content/75">Full YAML rule files for compatibility. One-line DSL for interactive use.</p>
+                                <p class="font-serif text-2xl text-base-content mb-2">Three front doors.</p>
+                                <p class="text-sm text-base-content/75">Bare structural patterns via <code>--query</code>. A rich expression DSL via <code>--expr</code>. Semgrep-style YAML via <code>--rule</code>. No auto-detection, no guessing.</p>
                             </div>
                             <div class="bg-white/70 border border-base-content/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">Scope</p>
@@ -83,7 +72,7 @@
                             <div class="bg-white/70 border border-base-content/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">Output</p>
                                 <p class="font-serif text-2xl text-base-content mb-2">Matches that travel.</p>
-                                <p class="text-sm text-base-content/75">Every match carries a span, captures, and optional focus. That is enough to act on.</p>
+                                <p class="text-sm text-base-content/75">Every match leaves as a versioned selector record: span, captures, optional focus, and a source digest. Enough to act on, and to refuse when stale.</p>
                             </div>
                             <div class="bg-white/70 border border-base-content/10 p-5 rounded-xs paper-panel">
                                 <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-2">Discipline</p>
@@ -127,7 +116,7 @@
                                 </ul>
                             </div>
                             <div class="bg-primary text-base-100 rounded-xs p-6 paper-panel">
-                                <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Explicitly Out</p>
+                                <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Explicitly Out</p>
                                 <ul class="space-y-3 text-sm text-base-100/85 leading-relaxed">
                                     <li>No full Semgrep parity in MVP.</li>
                                     <li>No autofix application inside Sempai.</li>
@@ -148,13 +137,13 @@
                                     That matters more in Weaver than it does in a standalone matcher. Sempai is not just finding text. It is selecting code objects for downstream action. The front door has to be expressive enough for structure, readable enough for humans, and stable enough for agents to generate without turning every query into a grammar seminar.
                                 </p>
                             </div>
-                            <div tabindex="0" class="xl:col-span-7 overflow-x-auto bg-white/75 border border-base-content/10 rounded-xs paper-panel">
+                            <div class="xl:col-span-7 min-w-0 overflow-x-auto bg-white/75 border border-base-content/10 rounded-xs paper-panel">
                                 <table class="min-w-full text-sm spec-table">
                                     <thead>
                                         <tr class="text-left bg-primary text-base-100">
                                             <th class="px-4 py-3 font-mono text-2xs uppercase tracking-label">Surface</th>
                                             <th class="px-4 py-3 font-mono text-2xs uppercase tracking-label">What it does well</th>
-                                            <th class="px-4 py-3 font-mono text-2xs uppercase tracking-label">Why it is not the main interface</th>
+                                            <th class="px-4 py-3 font-mono text-2xs uppercase tracking-label">Positioning</th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-base-content/85">
@@ -184,7 +173,7 @@
                         </div>
 
                         <div class="mt-8 bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Why the hierarchy matters</p>
+                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Why the hierarchy matters</p>
                             <p class="text-sm text-base-100/90 leading-relaxed mb-3">
                                 The design gets this exactly right: keep <code>regex</code> as a supported atom, keep raw Tree-sitter queries as an explicit escape hatch, and make Semgrep syntax the primary surface. That is not compromise. That is layering.
                             </p>
@@ -195,9 +184,9 @@
 
                         <!-- One-liner DSL syntax -->
                         <div class="mt-10">
-                            <h3 class="font-serif text-2xl text-base-content mb-4">One-liner DSL</h3>
+                            <h3 class="font-serif text-2xl text-base-content mb-4">Expression DSL</h3>
                             <p class="text-sm text-base-content/80 leading-relaxed mb-5">
-                                The DSL provides a compact expression form for interactive use and CLI flags. It maps directly to the normalised formula model.
+                                The DSL provides a compact expression form for <code>--expr</code> and <code>--expr-file</code>. It maps directly to the normalized formula model. A bare positive pattern needs none of it: <code>--query 'fn $NAME($...ARGS)'</code> takes the host-language pattern directly, with no <code>pattern("...")</code> wrapper.
                             </p>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                                 <div class="bg-white/70 border border-base-content/10 rounded-xs p-5">
@@ -227,10 +216,9 @@
                             </div>
                             <div class="bg-neutral text-base-100 rounded-xs p-5 paper-panel">
                                 <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Example</p>
-<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver observe query \
+<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">weaver symbols list \
   --lang python \
-  --uri file:///repo/app.py \
-  --q 'pattern("@decorator\nclass $C: ...") and not(inside("class Test$_: ..."))'</pre>
+  --expr 'pattern("@decorator\nclass $C: ...") and not(inside("class Test$_: ..."))'</pre>
                             </div>
                         </div>
 
@@ -243,7 +231,7 @@
                             <p class="text-sm text-base-content/80 leading-relaxed mb-4">
                                 Planned. These YAML extension keys are design-surface only for now. When they land, they will cover the exact grammar-node cases where Semgrep patterns are too coarse:
                             </p>
-                            <div tabindex="0" class="overflow-x-auto">
+                            <div class="overflow-x-auto">
                                 <table class="w-full text-sm border border-base-content/20">
                                     <thead>
                                         <tr class="bg-primary/5">
@@ -276,7 +264,7 @@
 
                     <section id="engine" class="mb-20 border-t border-base-content/15 pt-16">
                         <div class="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
-                            <div class="xl:col-span-7 order-2 xl:order-1">
+                            <div class="xl:col-span-7 order-2 xl:order-1 xl:sticky xl:top-8">
                                 <figure class="bg-white/75 border border-base-content/10 p-4 rounded-xs figure-frame figure-fullbleed">
                                     <img src="/weaver/assets/sempai/sempai-whitepaper-pattern-compilation.png" alt="Illustrated three-stage diagram of query snippet compilation into wrapper scaffolds and pattern IR." class="w-full rounded-xs border border-base-content/10">
                                     <figcaption class="mt-4 text-sm text-base-content/75 leading-relaxed">
@@ -320,7 +308,7 @@
                                     The execution plan splits anchor-producing terms from constraint terms, then evaluates them in order: first anchor matches, then predicates such as <code>Inside</code>, <code>Not</code>, <code>Anywhere</code>, and <code>Where</code>, then compatible existential matches from additional anchors, then projection of <code>span</code>, <code>captures</code>, and <code>focus</code>. That is not just neat. It is debuggable.
                                 </p>
                             </div>
-                            <div class="xl:col-span-7">
+                            <div class="xl:col-span-7 xl:sticky xl:top-8">
                                 <figure class="bg-white/75 border border-base-content/10 p-4 rounded-xs figure-frame figure-fullbleed">
                                     <img src="/weaver/assets/sempai/sempai-whitepaper-evaluation.png" alt="Illustrated diagram of anchor matching, constraint evaluation, and focus span selection for actuation." class="w-full rounded-xs border border-base-content/10">
                                     <figcaption class="mt-4 text-sm text-base-content/75 leading-relaxed">
@@ -336,36 +324,33 @@
                         <span class="font-mono text-xs text-accent-ink font-bold tracking-widest uppercase mb-4 block">04. Integration Contract</span>
                         <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
                             <div>
-                                <h2 class="font-serif text-4xl text-base-content mb-5">The interface is narrow. That is a feature.</h2>
+                                <h2 class="font-serif text-4xl text-base-content mb-5">The interface is narrow.<br> That is a feature.</h2>
                                 <p class="text-base text-base-content/80 leading-relaxed mb-5">
-                                    The stable facade crate exposes exactly what it should: compile YAML, compile DSL, execute plans. Not a sprawling bag of internal types. The daemon side gets a new <code>weaver observe query</code> surface with <code>--lang</code>, <code>--uri</code>, and one of <code>--rule-file</code>, <code>--rule</code>, or <code>--q</code>. Enough to be useful. Not enough to rot instantly.
+                                    The stable facade crate exposes exactly what it should: compile YAML, compile DSL, execute plans. Not a sprawling bag of internal types. The public surface is <code>weaver symbols list</code> with exactly one of <code>--query</code>, <code>--query-file</code>, <code>--expr</code>, <code>--expr-file</code>, <code>--rule</code>, or <code>--rule-file</code>; <code>-</code> means stdin, and only one flag may own it. A wrong choice returns an error enumerating the alternatives. Enough to be useful. Not enough to rot instantly.
                                 </p>
                                 <div class="bg-white border border-base-content/10 rounded-xs p-5 paper-panel">
                                     <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">CLI Contract</p>
-<pre class="font-mono text-xs text-base-content/90 whitespace-pre-wrap leading-relaxed">weaver observe query \
-  --output json \
+<pre class="font-mono text-xs text-base-content/90 whitespace-pre-wrap leading-relaxed">weaver symbols list \
   --lang rust \
-  --uri file:///repo/src/lib.rs \
-  --q 'pattern("fn $F(...) { ... }")'</pre>
+  --query 'fn $F($...ARGS) { ... }' \
+  --json</pre>
+                                </div>
+                                <div class="bg-white/70 border border-base-content/10 rounded-xs p-6 mt-6">
+                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Actuation Handoff</p>
+                                    <p class="text-sm text-base-content/80 leading-relaxed">
+                                        Sempai does not edit code. It hands Weaver an address. Consumers take the stream through the typed <code>--selectors &lt;path|-&gt;</code> flag; <code>focus</code> is the primary target when present, <code>span</code> the fallback, and the actuator re-checks the source digest before touching anything. That keeps query execution and actuation separate, which is exactly where the blast radius should stop.
+                                    </p>
                                 </div>
                             </div>
                             <div class="space-y-6">
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Request Envelope (daemon internal)</p>
-<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">{
-  "op": "observe.query",
-  "engine": "sempai",
-  "language": "python",
-  "uri": "file:///repo/app.py",
-  "query": {
-    "kind": "dsl",
-    "text": "pattern(\"@decorator\\nclass $C: ...\")"
-  }
-}</pre>
-                                </div>
-                                <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">CLI JSON Output (--output json)</p>
-<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap leading-relaxed">{"type":"observe.query.match","engine":"sempai","rule_id":"interactive","uri":"file:///repo/app.py","span":{"start_byte":12,"end_byte":42,"start":{"line":2,"column":0},"end":{"line":4,"column":0}},"focus":null,"captures":{"$C":{"kind":"node","span":{"start_byte":18,"end_byte":26,"start":{"line":3,"column":6},"end":{"line":3,"column":14}},"kind_name":"identifier","text":"MyClass"}},"message":null,"fix":null}</pre>
+                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Stream Rules</p>
+                                    <ul class="space-y-3 text-sm text-base-100/85 leading-relaxed">
+                                        <li>Zero or more selector records, then exactly one completion record. Zero matches is a successful, completion-only stream.</li>
+                                        <li>Canonical ordering: URI, then start byte, then end byte, then selector id. Deterministic every run.</li>
+                                        <li>A producer failure never emits a successful completion record &ndash; consumers can trust the terminator.</li>
+                                        <li>No invented confidence scores. Deterministic structural matches report evidence and compatibility provenance instead.</li>
+                                    </ul>
                                 </div>
                                 <div class="bg-white/70 border border-base-content/10 rounded-xs p-6">
                                     <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Payload Fields</p>
@@ -378,37 +363,60 @@
                                                 </tr>
                                             </thead>
                                             <tbody class="text-base-content/80 text-xs">
-                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">type</td><td class="p-2">Always <code class="bg-primary/5 px-1 rounded-sm">observe.query.match</code>.</td></tr>
-                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">engine</td><td class="p-2">Engine that produced the match (<code class="bg-primary/5 px-1 rounded-sm">sempai</code>).</td></tr>
-                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">rule_id</td><td class="p-2">Rule identifier from the rule file, or <code class="bg-primary/5 px-1 rounded-sm">interactive</code> for one-liners.</td></tr>
-                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">uri</td><td class="p-2">Source file URI.</td></tr>
-                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">span</td><td class="p-2">Byte offsets + line/column positions for the full match.</td></tr>
+                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">schema</td><td class="p-2"><code class="bg-primary/5 px-1 rounded-sm">weaver.selector.v1</code> for matches; <code class="bg-primary/5 px-1 rounded-sm">weaver.selector-stream-end.v1</code> for the terminator.</td></tr>
+                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">stream / selector_id</td><td class="p-2">Stream identity plus sequence, and a stable identifier for each selector.</td></tr>
+                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">uri / language</td><td class="p-2">Source file URI and language of the match.</td></tr>
+                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">span</td><td class="p-2">Byte offsets for the full match.</td></tr>
                                                 <tr class="border-b border-base-content/10"><td class="p-2 font-mono">focus</td><td class="p-2">Narrowed span when a <code class="bg-primary/5 px-1 rounded-sm">where { focus("$X") }</code> decorator is present. <code class="bg-primary/5 px-1 rounded-sm">null</code> otherwise.</td></tr>
-                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">captures</td><td class="p-2">Map of metavariable names to <code class="bg-primary/5 px-1 rounded-sm">{ kind, span, kind_name, text }</code>.</td></tr>
-                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">message</td><td class="p-2">Rule-defined message string, or <code class="bg-primary/5 px-1 rounded-sm">null</code>.</td></tr>
-                                                <tr><td class="p-2 font-mono">fix</td><td class="p-2">Suggested fix text from the rule's <code class="bg-primary/5 px-1 rounded-sm">fix</code> key, or <code class="bg-primary/5 px-1 rounded-sm">null</code>. Surfaced as metadata — not applied by Sempai.</td></tr>
+                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">captures</td><td class="p-2">Bounded map of metavariable names to <code class="bg-primary/5 px-1 rounded-sm">{ text, kind, span }</code>.</td></tr>
+                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">source</td><td class="p-2">Digest and workspace revision of the matched file &ndash; the stale-refusal precondition travels with the match.</td></tr>
+                                                <tr class="border-b border-base-content/10"><td class="p-2 font-mono">query</td><td class="p-2">Query kind and digest, plus capability and provider provenance.</td></tr>
+                                                <tr><td class="p-2 font-mono">fix</td><td class="p-2">Suggested fix text from the rule's <code class="bg-primary/5 px-1 rounded-sm">fix</code> key, or <code class="bg-primary/5 px-1 rounded-sm">null</code>. Surfaced as metadata &mdash; not applied by Sempai.</td></tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-                                <div class="bg-white/70 border border-base-content/10 rounded-xs p-6">
-                                    <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink mb-3">Actuation Handoff</p>
-                                    <p class="text-sm text-base-content/80 leading-relaxed">
-                                        Sempai does not edit code. It hands Weaver an address. <code>focus</code> is the primary target when present; <code>span</code> is the fallback. That keeps query execution and actuation separate, which is exactly where the blast radius should stop.
-                                    </p>
-                                </div>
                             </div>
                         </div>
+
+                        <!-- Selector stream example (full-bleed on desktop) -->
+                        <div class="mt-10 xl:mx-[5%] bg-neutral text-base-100 rounded-xs p-6 paper-panel">
+                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Selector Stream (--json)</p>
+<pre class="font-mono text-xs text-base-100/90 whitespace-pre-wrap break-all leading-relaxed">{
+  "schema": "weaver.selector.v1",
+  "stream": { "id": "st_9d2f", "seq": 0 },
+  "selector_id": "sel_01",
+  "uri": "file:///repo/app.py",
+  "language": "python",
+  "span": { "start": 12, "end": 42 },
+  "focus": null,
+  "captures": {
+    "C": { "text": "MyClass", "kind": "identifier", "span": { "start": 18, "end": 26 } }
+  },
+  "source": { "digest": "sha256:41ab..." },
+  "query": { "kind": "expr", "digest": "sha256:77c0..." }
+}
+{
+  "schema": "weaver.selector-stream-end.v1",
+  "stream": { "id": "st_9d2f" },
+  "matches": 1,
+  "complete": true
+}</pre>
+                            <p class="text-xs text-base-100/70 mt-3 leading-relaxed">
+                                Formatted for reading. On the wire each record is a single JSONL line: zero or more selectors, then exactly one completion record.
+                            </p>
+                        </div>
+
                     </section>
 
                     <!-- Observe Integration callout -->
                     <div id="observe-integration" class="mb-20 bg-primary/5 border border-base-content/15 rounded-xs p-6">
                         <div class="flex items-center gap-3 mb-3">
                             {{ icon('diagram-project', 'text-accent-ink') }}
-                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink font-bold">Observe Integration</p>
+                            <p class="font-mono text-3xs uppercase tracking-stamp text-accent-ink font-bold">Weaver Integration</p>
                         </div>
                         <p class="text-sm text-base-content/80 leading-relaxed">
-                            Sempai sits alongside <code>get-definition</code>, <code>find-references</code>, <code>call-hierarchy</code>, and <code>grep</code> in the <code>observe</code> command family. Where the other operations ask the language server "what is this symbol?", Sempai asks the syntax tree "where does this pattern appear?". The transport envelope is shared across observe operations, but the <code>uri</code> and <code>span</code> handoff described on this page is specific to Sempai match payloads and other payloads that expose those fields explicitly.
+                            Sempai powers <code>weaver symbols list</code> and sits alongside <code>definitions get</code>, <code>references list</code>, and <code>diagnostics list</code> in the read loop. Where those commands ask the language server "what is this symbol?", Sempai asks the syntax tree "where does this pattern appear?". The first executable slice covers Rust, Python, and TypeScript through an explicitly labelled <code>weaver-syntax-compat-v1</code> compatibility adapter &ndash; the label travels in the output, so nobody mistakes the subset for full parity.
                         </p>
                     </div>
 
@@ -421,7 +429,7 @@
                                     <li>Parsed modes are not silently "best-effort" executed.</li>
                                     <li><code>fix</code> is surfaced as metadata, not applied by wishful thinking.</li>
                                     <li>Unsupported constraints return structured errors instead of undefined behaviour with nicer branding.</li>
-                                    <li>Diagnostics are first-class: code, message, primary span, notes.</li>
+                                    <li>Diagnostics are first-class: stable <code>E_SEMPAI_*</code> codes, byte spans, and multiple independent errors from a recovering parser. No query with error-severity diagnostics is executed.</li>
                                 </ul>
                             </div>
                             <div class="bg-primary text-base-100 rounded-xs p-6 paper-panel">
@@ -523,23 +531,23 @@
                                                 <td class="px-4 py-3">Stable facade and convenience entrypoints.</td>
                                             </tr>
                                             <tr>
-                                                <td class="px-4 py-3 font-mono">sempai_core</td>
+                                                <td class="px-4 py-3 font-mono">sempai-core</td>
                                                 <td class="px-4 py-3">Data model, diagnostics, plan IR, semantic validation.</td>
                                             </tr>
                                             <tr>
-                                                <td class="px-4 py-3 font-mono">sempai_yaml</td>
+                                                <td class="px-4 py-3 font-mono">sempai-yaml</td>
                                                 <td class="px-4 py-3">Rule-file parsing via <code>saphyr</code> and <code>serde-saphyr</code>.</td>
                                             </tr>
                                             <tr>
-                                                <td class="px-4 py-3 font-mono">sempai_dsl</td>
+                                                <td class="px-4 py-3 font-mono">sempai-dsl</td>
                                                 <td class="px-4 py-3">One-liner DSL parsing via <code>logos</code> and Chumsky.</td>
                                             </tr>
                                             <tr>
-                                                <td class="px-4 py-3 font-mono">sempai_ts</td>
+                                                <td class="px-4 py-3 font-mono">sempai-ts</td>
                                                 <td class="px-4 py-3">Tree-sitter backend, language profiles, matcher.</td>
                                             </tr>
                                             <tr>
-                                                <td class="px-4 py-3 font-mono">sempai_fixtures</td>
+                                                <td class="px-4 py-3 font-mono">sempai-fixtures</td>
                                                 <td class="px-4 py-3">Corpora and helpers for tests.</td>
                                             </tr>
                                         </tbody>
@@ -552,13 +560,13 @@
                                     <ol class="space-y-4 text-sm text-base-content/80 leading-relaxed">
                                         <li><span class="font-semibold text-base-content">1.</span> Ship core infrastructure: scaffolding, stable API, YAML parsing, DSL parsing.</li>
                                         <li><span class="font-semibold text-base-content">2.</span> Ship Tree-sitter backend: language profiles, snippet parsing, matcher, escape hatch.</li>
-                                        <li><span class="font-semibold text-base-content">3.</span> Ship Weaver integration: daemon path, CLI surface, JSONL streaming, actuation handoff.</li>
+                                        <li><span class="font-semibold text-base-content">3.</span> Ship Weaver integration: the <code>symbols list</code> surface, selector streams, and the typed <code>--selectors</code> handoff into the change loop.</li>
                                     </ol>
                                 </div>
                                 <div class="bg-neutral text-base-100 rounded-xs p-6 paper-panel">
                                     <p class="font-mono text-3xs uppercase tracking-stamp text-accent-lift mb-3">Bottom Line</p>
                                     <p class="text-sm text-base-100/90 leading-relaxed">
-                                        Sempai does not need to be magical. It needs to be dependable, structural, and explicit about what it can and cannot do. The design understands that. That is why it has a chance.
+                                        Sempai does not need to be magical. It needs to be dependable, structural, and explicit about what it can and cannot do. Today that honesty cuts both ways: the horizontal foundations are built, and the executable query loop is the work of the current roadmap phase, not a shipped feature.
                                     </p>
                                 </div>
                             </div>
@@ -571,7 +579,7 @@
                             <div class="bg-white/70 border border-base-content/10 rounded-xs p-6">
                                 <h2 class="font-serif text-3xl text-base-content mb-4">Primary source</h2>
                                 <p class="text-sm text-base-content/80 leading-relaxed">
-                                    This white paper is based on <span class="font-mono text-xs bg-primary/10 px-1 py-0.5 rounded-sm">../weaver/docs/sempai-query-language-design.md</span>, especially the sections on Goals, System overview, Semgrep compatibility scope, Public API design, Internal architecture, Pattern snippet compilation, Formula evaluation engine, Weaver integration, Diagnostics, Performance and safety, and the implementation roadmap.
+                                    This white paper is based on <span class="font-mono text-xs bg-primary/10 px-1 py-0.5 rounded-sm">weaver/docs/rfcs/0003-sempai-query-to-selector.md</span> with ADRs 011 (query input syntax) and 012 (versioned selector streams), and on the language-design sections of <span class="font-mono text-xs bg-primary/10 px-1 py-0.5 rounded-sm">weaver/docs/sempai-query-language-design.md</span> &ndash; whose older command-surface sections the RFC and ADRs supersede.
                                 </p>
                             </div>
                             <div class="bg-white/70 border border-base-content/10 rounded-xs p-6">

@@ -21,35 +21,7 @@
         {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'System Programming'}, {'label': 'Basic C Application'}]) }}{% raw %}
 
         <!-- Example Header -->
-        <header id="example-header" class="mb-12 border-b border-stone pb-12">
-            <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
-                <div class="max-w-3xl">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo/10 text-indigo font-mono border border-indigo/20">
-                            C / C++
-                        </span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-boxwood text-charcoal font-mono border border-stone">
-                            Beginner
-                        </span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-matcha/10 text-matcha font-mono border border-matcha/20">
-                            <span  class="iconify mr-1.5" data-icon="carbon:checkmark" aria-hidden="true"></span> Reviewed syntax
-                        </span>
-                    </div>
-                    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Basic C Application</h1>
-                    <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                        A foundational example demonstrating how to compile two C sources and link them into one executable. The point is the manifest language, not a rule loader.
-                    </p>
-                </div>
-                <div class="flex flex-col gap-3 w-full lg:w-auto shrink-0">
-                    <a href="https://github.com/leynos/netsuke/archive/refs/heads/main.zip" class="hm-button hm-button--primary inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto">
-                        <span  class="iconify mr-2" data-icon="carbon:download" aria-hidden="true"></span> Download Repository Source
-                    </a>
-                    <a href="https://github.com/leynos/netsuke/blob/main/examples/basic_c.yml" class="hm-button hm-button--ghost inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto">
-                        <span  class="iconify mr-2" data-icon="carbon:logo-github" aria-hidden="true"></span> View on GitHub
-                    </a>
-                </div>
-            </div>
-        </header>
+        {% endraw %}{{ exdata.example_header('basic-c-application') }}{% raw %}
 
         <div class="grid lg:grid-cols-12 gap-12">
 

@@ -8,25 +8,7 @@
 <main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
         {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Foundations'}, {'label': 'Hello World'}]) }}{% raw %}
 
-        <header id="example-header" class="mb-12 border-b border-stone pb-12">
-            <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
-                <div class="max-w-3xl">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <span class="hm-chip hm-chip--warning">Basics</span>
-                        <span class="hm-chip hm-chip--muted">Beginner</span>
-                        <span class="hm-chip hm-chip--success"><span class="iconify" data-icon="carbon:checkmark" aria-hidden="true"></span> Reviewed syntax</span>
-                    </div>
-                    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Hello World</h1>
-                    <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                        The smallest useful Netsuke manifest in this repository. One target transforms `input.txt`, another writes a greeting from a variable, and `defaults` tell the CLI what to build when you just run `netsuke`.
-                    </p>
-                </div>
-                <div class="flex flex-col gap-3 w-full lg:w-auto shrink-0">
-                    <a href="/netsuke/examples/" class="hm-button hm-button--primary inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:arrow-left" aria-hidden="true"></span> Back to Examples</a>
-                    <a href="/netsuke/docs/getting-started/" class="hm-button hm-button--ghost inline-flex items-center justify-center px-6 py-3 w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:book" aria-hidden="true"></span> Getting Started</a>
-                </div>
-            </div>
-        </header>
+        {% endraw %}{{ exdata.example_header('hello-world') }}{% raw %}
 
         <div class="grid lg:grid-cols-12 gap-12">
             <div class="lg:col-span-8 space-y-12 min-w-0">

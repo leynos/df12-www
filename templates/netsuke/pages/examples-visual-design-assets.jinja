@@ -8,25 +8,7 @@
 <main id="main-content" class="flex-grow pt-24 pb-20 site-container">
         {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Design Workflows'}, {'label': 'Visual Design Assets'}]) }}{% raw %}
 
-        <header id="example-header" class="mb-12 border-b border-stone pb-12">
-            <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
-                <div class="max-w-3xl">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-vermillion/10 text-vermillion font-mono border border-vermillion/20">Design</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-boxwood text-charcoal font-mono border border-stone">Intermediate</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-matcha/10 text-matcha font-mono border border-matcha/20"><span class="iconify mr-1.5" data-icon="carbon:checkmark" aria-hidden="true"></span> Reviewed syntax</span>
-                    </div>
-                    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Visual Design Assets</h1>
-                    <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                        Rasterise a list of SVG designs into PNG output with Inkscape. The manifest keeps the Inkscape command configurable through a plain `inkscape` variable, alongside `foreach` and a dedicated clean action, without turning a small asset pipeline into a custom script.
-                    </p>
-                </div>
-                <div class="flex flex-col gap-3 w-full lg:w-auto shrink-0">
-                    <a href="/netsuke/examples/" class="inline-flex items-center justify-center px-6 py-3 bg-indigo text-white rounded-md font-medium shadow-sm hover:bg-indigo-light transition-all w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:arrow-left" aria-hidden="true"></span> Back to Examples</a>
-                    <a href="/netsuke/docs/templating/" class="inline-flex items-center justify-center px-6 py-3 bg-white border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:template" aria-hidden="true"></span> Templating Guide</a>
-                </div>
-            </div>
-        </header>
+        {% endraw %}{{ exdata.example_header('visual-design-assets') }}{% raw %}
 
         <div class="grid lg:grid-cols-12 gap-12">
             <div class="lg:col-span-8 space-y-12 min-w-0">

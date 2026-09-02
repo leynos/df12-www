@@ -399,14 +399,21 @@ check the rendered page in a browser.
 
 ### The dev server
 
-`bun run dev` watches `src/`, `df12_pages/`, `config/`, and `scripts/`,
-rebuilds on change, and serves `public/` with `http-server`. `bun run serve`
-does one build and then serves. Both read `DF12_PORT`, so pick a port per
-worktree when several are served at once (`DF12_PORT=8097 bun run serve`).
-For an agent session, start the server in the background, confirm it answers
-with `curl -s -o /dev/null -w "%{http_code}" http://localhost:$DF12_PORT/`,
-and stop it when the checks are done. The build emits a Mermaid warning for
-one upstream document; it is pre-existing and not a failure.
+`bun run dev` watches `src/`, `df12_pages/`, `config/`, `scripts/`, and
+`pyproject.toml`, rebuilds on change, and serves `public/` with
+`http-server`. `bun run serve` does one build and then serves. Both read
+`DF12_PORT`, so pick a port per worktree when several are served at once. For
+an agent session, start the server in the background, confirm it answers, and
+stop it when the checks are done:
+
+```bash
+PORT="${DF12_PORT:-8080}"
+DF12_PORT="$PORT" bun run serve &
+curl -s -o /dev/null -w "%{http_code}" "http://localhost:$PORT/"
+```
+
+The build emits a Mermaid warning for one upstream document; it is
+pre-existing and not a failure.
 
 ### Validating rendered pages
 
@@ -429,16 +436,17 @@ committed. Two tools are installed for this and both work without a display:
    the document does not scroll horizontally:
 
    ```bash
-   agent-browser eval "JSON.stringify({sw: document.documentElement.scrollWidth, iw: window.innerWidth})"
+   agent-browser eval "JSON.stringify({sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth})"
    ```
 
-   `scrollWidth` greater than `innerWidth` is a failure. Find the offender
+   `scrollWidth` greater than `clientWidth` is a failure; `clientWidth`
+   excludes a vertical scrollbar, which `window.innerWidth` does not. Find the offender
    with an `eval` that lists elements whose `getBoundingClientRect().right`
    exceeds the viewport, then fix the cause rather than clipping it: wide
    content scrolls inside its own `overflow-x-auto` container, and a grid or
    flex child that holds it needs `min-w-0` so the column cannot grow to the
    content's minimum width. Screenshot the narrowest and widest viewports as
-   well as the one you designed at. This audit is mandatory for every changed
+   well as the designed viewport. This audit is mandatory for every changed
    page, not a spot check.
 3. **Inspect computed styles when the screenshot is not enough.** `css-view
    <url>` captures every element's computed styles; the default mode on this
@@ -455,11 +463,14 @@ committed. Two tools are installed for this and both work without a display:
    after it, at the same viewport, and diff the computed styles:
 
    ```bash
-   diff <(jq -S '[.payload.nodes[] | {t: .tagName, c: .attributes.class, s: .computedStyles, b: .boundingBox}]' before.json) \
-        <(jq -S '[.payload.nodes[] | {t: .tagName, c: .attributes.class, s: .computedStyles, b: .boundingBox}]' after.json)
+   diff <(jq -S '[.payload.nodes[] | {t: .tagName, s: .computedStyles, b: .boundingBox}]' before.json) \
+        <(jq -S '[.payload.nodes[] | {t: .tagName, s: .computedStyles, b: .boundingBox}]' after.json)
    ```
 
-   An empty diff is the evidence the change was neutral. A non-empty diff is
+   The projection deliberately omits class attributes: renaming or
+   consolidating classes is the usual reason for such a refactor, and only
+   the computed result matters. An empty diff is the evidence the change was
+   neutral. A non-empty diff is
    either a bug or a change that must be described in the commit message.
    Narrow the captured properties with `--props` when the page is large.
 5. **Run the accessibility audit** over the changed pages, as the

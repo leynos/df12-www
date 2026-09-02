@@ -285,6 +285,8 @@ class ContentPageConfig:
     label: str
     template: str
     output_slug: str
+    nav_href: str | None = None
+    """Navigation link to mark current when the page sits outside every nav prefix."""
 
 
 @dc.dataclass(slots=True)

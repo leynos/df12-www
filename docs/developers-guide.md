@@ -1451,6 +1451,62 @@ The rule is deliberately scoped below the tablet breakpoint, so the wide layout
 — where nothing overflows and a mid-token break would be gratuitous — is
 untouched.
 
+### 7.5. Validating rendered pages in a browser
+
+The commit gates do not render the site, so a change to a template, a
+stylesheet, or `config/pages.yaml` is checked in a real browser before it is
+committed. The normative procedure is
+[Validating rendered pages](../AGENTS.md#validating-rendered-pages) in
+`AGENTS.md`; this section explains the tools it relies on and why each step is
+there.
+
+Two command-line tools do the work, and neither needs a display. `agent-browser`
+drives a headless Chromium: it opens a page, waits for `networkidle`, takes a
+full-page screenshot, lists the accessibility tree with element refs, resizes
+the viewport with `agent-browser set viewport <w> <h>`, and evaluates
+JavaScript against the page. `css-view` captures every element's computed
+styles and bounding box as JSON, which `jq` can then query or `diff` can
+compare. Both have a skill under the agent's skills directory that carries the
+current command reference; load it rather than working from memory.
+
+The dev server is the target. `bun run dev` watches `src/`, `df12_pages/`,
+`config/`, `scripts/`, and `pyproject.toml` and rebuilds on change; `bun run
+serve` builds once. Both honour `DF12_PORT`, so several worktrees can be served
+at once. Confirm the server answers with `curl` before driving it, and stop it
+afterwards.
+
+Four checks follow, and the second is mandatory for every changed page rather
+than a spot check:
+
+1. **Read the screenshot.** A rendering that passes every gate can still be
+   wrong on the page, and the screenshot is the only check that sees it.
+2. **Audit every supported viewport for horizontal overflow.** The site
+   supports widths from 320px upwards and the Tailwind breakpoints move the
+   layout at 640, 768, 1024, and 1280px, so each changed page is checked at
+   1440, 1280, 1024, 768, 390, and 320px. At each width,
+   `document.documentElement.scrollWidth` must not exceed
+   `document.documentElement.clientWidth`; `clientWidth` is used rather than
+   `window.innerWidth` because it excludes the vertical scrollbar. The usual
+   cause of a failure is a code block or table inside a grid or flex column:
+   the fix is `overflow-x-auto` on the wide content and `min-w-0` on the
+   column, never a clip on the page. Section 7.4 records how the same
+   failure was found and fixed on Weaver.
+3. **Inspect computed styles when a screenshot cannot settle the question.**
+   `css-view` shows the value a utility resolved to, whether a theme token
+   propagated, and whether an element that should be hidden has a zero-height
+   box.
+4. **Diff before and after for output-neutral changes.** A refactor that is
+   meant to change nothing visible — moving utilities into a component class,
+   extracting a macro, reorganizing a stylesheet, upgrading a dependency — is
+   proven by capturing `css-view` snapshots before and after at the same
+   viewport and diffing each node's tag, computed styles, and bounding box.
+   Class attributes are left out of the projection on purpose, since
+   renaming classes is usually the point. An empty diff is the evidence; a
+   non-empty diff is either a bug or a change the commit message must
+   describe.
+
+Finish with the accessibility audit in section 8.
+
 ## 8. Accessibility checks
 
 Colour choices must meet WCAG 2.2 AA — 4.5:1 for body text, 3:1 for large text

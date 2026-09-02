@@ -110,7 +110,15 @@ class ContentPageGenerator:
         return result
 
     def _current_nav_href(self, target_href: str) -> str | None:
-        """Return the exact or nearest parent nav href for ``target_href``."""
+        """Return the nav href to mark current for ``target_href``.
+
+        An explicit ``nav_href`` on the page config wins, so a page that lives
+        outside every navigation prefix (``/netsuke/forthcoming/`` under
+        Roadmap, say) can still light up the item it belongs to. Otherwise the
+        exact match, then the longest parent prefix, is used.
+        """
+        if self.config.nav_href is not None:
+            return self.config.nav_href
         nav_hrefs = [link.href for link in self.nav_links]
         if target_href in nav_hrefs:
             return target_href

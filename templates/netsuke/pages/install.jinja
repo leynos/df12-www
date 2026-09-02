@@ -295,7 +295,7 @@ $ netsuke build
                 <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
                     <h3 class="font-bold text-charcoal text-lg mb-2">Can I install a specific version?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Use Cargo with a semantic version number: <code>cargo install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{% endraw %}{{ netsuke_version }}{% raw %}</code>, not <code>v{% endraw %}{{ netsuke_version }}{% raw %}</code>). Pre-release versions such as <code>{% endraw %}{{ netsuke_version }}{% raw %}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">crates.io</a> for available versions.
+                        Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +nightly-2026-08-23 install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{% endraw %}{{ netsuke_version }}{% raw %}</code>, not <code>v{% endraw %}{{ netsuke_version }}{% raw %}</code>). Pre-release versions such as <code>{% endraw %}{{ netsuke_version }}{% raw %}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">crates.io</a> for available versions.
                     </p>
                 </div>
 

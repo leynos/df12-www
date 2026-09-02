@@ -95,9 +95,9 @@
                     <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:settings-adjust" aria-hidden="true"></span> Configuration
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    Netsuke layers configuration in this order, with later entries overriding earlier ones:
+                    When neither <code>--config</code> nor <code>NETSUKE_CONFIG</code> selects a file, Netsuke layers configuration in this order, with later entries overriding earlier ones:
                     <strong>one discovered base winner (user configuration, otherwise system configuration, otherwise built-in defaults) &lt; project <code>.netsuke.toml</code> &lt; <code>NETSUKE_</code> environment variables &lt; CLI flags</strong>.
-                    Automatic discovery picks exactly one base file rather than merging system and user scopes, then appends the project layer so project values can override it while fields present only in the winner remain available. A flag on the command line always wins, and project config files can be overridden per-invocation without editing them.
+                    Automatic discovery picks exactly one base file rather than merging system and user scopes, then appends the project layer so project values can override it while fields present only in the winner remain available. An explicit selector bypasses discovery entirely: the selected file replaces the discovered base and project layers, and environment variables and flags still apply on top. A flag on the command line always wins, and project config files can be overridden per-invocation without editing them.
                 </p>
 
                 <div class="bg-amber/5 border border-amber/30 rounded-lg p-4 flex items-start mb-6 max-w-3xl">

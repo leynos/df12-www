@@ -1,7 +1,6 @@
 {% extends "doc_page.jinja" %}
 {% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
-{% set active_nav = 'roadmap' %}
 {% block page_title %}Netsukefile Linter (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
 {% raw %}
@@ -28,9 +27,9 @@
                 <div>
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Sources</h3>
                     <ul class="space-y-1">
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-linter-design.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Linter design</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-linter-rules.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rule reference</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/main/docs/adr-018-manifest-linting-under-netsuke-check.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">ADR-018</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Linter design</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rule reference</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">ADR-018</a></li>
                     </ul>
                 </div>
             </nav>
@@ -68,7 +67,7 @@
                     </h2>
                     <ul class="space-y-2 text-sm text-charcoal-mid">
                         <li class="flex items-start"><span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{% endraw %}{{ netsuke_version }}{% raw %}.</strong> The released CLI has no <code>check</code> command; the roadmap lists it under the canonical CLI redesign.</span></li>
-                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/adr-018-manifest-linting-under-netsuke-check.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">ADR-018</a> (accepted 30 August 2026) places linting under <code>netsuke check</code>; the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-linter-design.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">design document</a> and <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-linter-rules.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">rule reference</a> are normative.</span></li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">ADR-018</a> (accepted 30 August 2026) places linting under <code>netsuke check</code>; the <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">design document</a> and <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">rule reference</a> are normative. They live on the <a href="https://github.com/leynos/netsuke/pull/592" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">#592</a> branch until it merges, so the links here point at that branch.</span></li>
                         <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Implemented on a branch.</strong> Issue <a href="https://github.com/leynos/netsuke/issues/592" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">#592</a> carries the command, all twenty-four rules, the suppression scanner, and contract tests that check the rule reference against the registry in both directions.</span></li>
                         <li class="flex items-start"><span class="iconify text-indigo mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.2.0.</strong> Rule names are intended to be permanent from the release that ships them; flags and output shapes may still change before then.</span></li>
                     </ul>
@@ -315,7 +314,7 @@ targets:
         "code": "netsuke::lint::directory_dep_not_order_only",
         "severity": "warning",
         "help": "Move the directory to `order_only_deps`, which guarantees it exists first without tracking its timestamp.",
-        "url": "https://github.com/leynos/netsuke/blob/main/docs/netsuke-linter-rules.md#directory-dep-not-order-only",
+        "url": "https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md#directory-dep-not-order-only",
         "primary_span": { "line": 24, "column": 7, "snippet": "      - \"{{ build_dir }}\"" }
       }
     ]

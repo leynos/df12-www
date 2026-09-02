@@ -1422,14 +1422,17 @@ sites:
         label: Forthcoming Capabilities
         template: pages/forthcoming.jinja
         output_slug: forthcoming
+        nav_href: /netsuke/roadmap/
       - key: forthcoming-linter
         label: Netsukefile Linter
         template: pages/forthcoming-linter.jinja
         output_slug: forthcoming/linter
+        nav_href: /netsuke/roadmap/
       - key: forthcoming-testing-framework
         label: Netsukefile Testing Framework
         template: pages/forthcoming-testing-framework.jinja
         output_slug: forthcoming/testing-framework
+        nav_href: /netsuke/roadmap/
     pages: {}
 
   weaver:

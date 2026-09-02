@@ -1,0 +1,222 @@
+# serializer version: 1
+# name: test_component_paint_snapshot[design-.adr-card .adr-status.prov]
+  dict({
+    'backgroundColor': 'rgb(214, 159, 46)',
+    'borderBottomColor': 'rgb(15, 15, 15)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '0.0px',
+    'borderTopColor': 'rgb(15, 15, 15)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(15, 15, 15)',
+    'display': 'inline-block',
+    'fontFamily': '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'position': 'static',
+    'textTransform': 'uppercase',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[design-.adr-card .adr-status:not(.prov)]
+  dict({
+    'backgroundColor': 'rgb(100, 105, 64)',
+    'borderBottomColor': 'rgb(239, 228, 206)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '0.0px',
+    'borderTopColor': 'rgb(239, 228, 206)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(239, 228, 206)',
+    'display': 'inline-block',
+    'fontFamily': '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'position': 'static',
+    'textTransform': 'uppercase',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[docs-.suppress .syntax-tab.active]
+  dict({
+    'backgroundColor': 'rgb(228, 215, 185)',
+    'borderBottomColor': 'rgb(194, 39, 46)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '3.0px',
+    'borderTopColor': 'rgb(164, 33, 39)',
+    'borderTopStyle': 'none',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(164, 33, 39)',
+    'display': 'block',
+    'fontFamily': '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'position': 'static',
+    'textTransform': 'uppercase',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[docs-.suppress .syntax-tab:not(.active)]
+  dict({
+    'backgroundColor': 'rgba(0, 0, 0, 0)',
+    'borderBottomColor': 'rgba(0, 0, 0, 0)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '3.0px',
+    'borderTopColor': 'rgb(42, 42, 42)',
+    'borderTopStyle': 'none',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(42, 42, 42)',
+    'display': 'block',
+    'fontFamily': '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'position': 'static',
+    'textTransform': 'uppercase',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[docs-.suppress .syntax-tabs]
+  dict({
+    'backgroundColor': 'rgba(0, 0, 0, 0)',
+    'borderBottomColor': 'rgb(15, 15, 15)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '4.0px',
+    'borderTopColor': 'rgb(15, 15, 15)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(15, 15, 15)',
+    'display': 'flex',
+    'fontFamily': '"EB Garamond", Georgia, "Times New Roman", serif',
+    'position': 'static',
+    'textTransform': 'none',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[home-body]
+  dict({
+    'backgroundColor': 'rgb(239, 228, 206)',
+    'borderBottomColor': 'rgb(15, 15, 15)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '0.0px',
+    'borderTopColor': 'rgb(15, 15, 15)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(15, 15, 15)',
+    'display': 'block',
+    'fontFamily': '"EB Garamond", Georgia, "Times New Roman", serif',
+    'position': 'static',
+    'textTransform': 'none',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[roadmap-.pacing .pacing-card .tt]
+  dict({
+    'backgroundColor': 'rgba(0, 0, 0, 0)',
+    'borderBottomColor': 'rgb(164, 33, 39)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '0.0px',
+    'borderTopColor': 'rgb(164, 33, 39)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(164, 33, 39)',
+    'display': 'block',
+    'fontFamily': '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'position': 'static',
+    'textTransform': 'uppercase',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[roadmap-.pacing .pacing-card]
+  dict({
+    'backgroundColor': 'rgb(239, 228, 206)',
+    'borderBottomColor': 'rgb(15, 15, 15)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '1.0px',
+    'borderTopColor': 'rgb(15, 15, 15)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '1.0px',
+    'color': 'rgb(15, 15, 15)',
+    'display': 'block',
+    'fontFamily': '"EB Garamond", Georgia, "Times New Roman", serif',
+    'position': 'static',
+    'textTransform': 'none',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[roadmap-.slice-timeline]
+  dict({
+    'backgroundColor': 'rgba(0, 0, 0, 0)',
+    'borderBottomColor': 'rgb(15, 15, 15)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '0.0px',
+    'borderTopColor': 'rgb(15, 15, 15)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '4.0px',
+    'color': 'rgb(15, 15, 15)',
+    'display': 'block',
+    'fontFamily': '"EB Garamond", Georgia, "Times New Roman", serif',
+    'position': 'static',
+    'textTransform': 'none',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[why-.personas h2 .red]
+  dict({
+    'backgroundColor': 'rgba(0, 0, 0, 0)',
+    'borderBottomColor': 'rgb(218, 71, 78)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '0.0px',
+    'borderTopColor': 'rgb(218, 71, 78)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(218, 71, 78)',
+    'display': 'inline',
+    'fontFamily': '"Big Shoulders Display", Impact, "Arial Narrow", sans-serif',
+    'position': 'static',
+    'textTransform': 'uppercase',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[why-.personas]
+  dict({
+    'backgroundColor': 'rgb(15, 15, 15)',
+    'borderBottomColor': 'rgb(194, 39, 46)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '8.0px',
+    'borderTopColor': 'rgb(194, 39, 46)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '8.0px',
+    'color': 'rgb(239, 228, 206)',
+    'display': 'block',
+    'fontFamily': '"EB Garamond", Georgia, "Times New Roman", serif',
+    'position': 'static',
+    'textTransform': 'none',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[why-.valueset .tenet-card .vs-num]
+  dict({
+    'backgroundColor': 'rgba(0, 0, 0, 0)',
+    'borderBottomColor': 'rgb(164, 33, 39)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '0.0px',
+    'borderTopColor': 'rgb(164, 33, 39)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '0.0px',
+    'color': 'rgb(164, 33, 39)',
+    'display': 'block',
+    'fontFamily': '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    'position': 'static',
+    'textTransform': 'none',
+    'visibility': 'visible',
+  })
+# ---
+# name: test_component_paint_snapshot[why-.valueset .tenet-card]
+  dict({
+    'backgroundColor': 'rgb(239, 228, 206)',
+    'borderBottomColor': 'rgb(15, 15, 15)',
+    'borderBottomStyle': 'solid',
+    'borderBottomWidth': '2.0px',
+    'borderTopColor': 'rgb(15, 15, 15)',
+    'borderTopStyle': 'solid',
+    'borderTopWidth': '2.0px',
+    'color': 'rgb(15, 15, 15)',
+    'display': 'block',
+    'fontFamily': '"EB Garamond", Georgia, "Times New Roman", serif',
+    'position': 'relative',
+    'textTransform': 'none',
+    'visibility': 'visible',
+  })
+# ---

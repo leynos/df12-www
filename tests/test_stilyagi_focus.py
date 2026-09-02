@@ -32,23 +32,23 @@ that would have caught the regression this module was written for.
 
 from __future__ import annotations
 
-import functools
-import http.server
 import json
 import os
 import re
 import shutil
-import socketserver
 import subprocess
-import threading
 import typing as typ
-from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
 
 from df12_pages.config import ContentPageConfig
 from df12_pages.content_page import ContentPageGenerator
+from tests.support.stilyagi_browser import (
+    http_serve,
+    installed_chromium,
+    skip_unless_browser_available,
+)
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -187,69 +187,6 @@ def served_docs_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return root
 
 
-@contextmanager
-def _http_serve(directory: Path) -> cabc.Iterator[int]:
-    """Serve *directory* on a free port, yielding it.
-
-    The layout links its assets from ``/stilyagi/assets/``, so the page has to
-    be fetched over HTTP from a root that carries them rather than opened as a
-    file.
-    """
-
-    class _SilentHandler(http.server.SimpleHTTPRequestHandler):
-        def log_message(self, format: str, *args: object) -> None:  # noqa: A002
-            pass
-
-    handler = functools.partial(_SilentHandler, directory=str(directory))
-    with socketserver.TCPServer(("127.0.0.1", 0), handler) as httpd:
-        thread = threading.Thread(target=httpd.serve_forever, daemon=True)
-        thread.start()
-        try:
-            yield httpd.server_address[1]
-        finally:
-            httpd.shutdown()
-            thread.join(timeout=5)
-
-
-def _installed_chromium() -> str | None:
-    """Return an installed Chromium binary, newest revision first.
-
-    Playwright launches the revision it was built against, which is not
-    necessarily one of the revisions on disk: the package and the browsers are
-    installed separately and drift apart. Handing it one that exists keeps the
-    check runnable without a fresh download.
-    """
-    browsers = Path(
-        os.environ.get(
-            "PLAYWRIGHT_BROWSERS_PATH", Path.home() / ".cache" / "ms-playwright"
-        )
-    )
-    candidates = sorted(
-        (
-            binary
-            for pattern in ("chromium-*", "chromium_headless_shell-*")
-            for build in browsers.glob(pattern)
-            for name in ("chrome", "chrome-headless-shell", "headless_shell")
-            for binary in build.glob(f"*/{name}")
-            if binary.is_file()
-        ),
-        key=lambda path: path.parent.parent.name,
-        reverse=True,
-    )
-    return str(candidates[0]) if candidates else None
-
-
-def _skip_unless_browser_available() -> None:
-    """Skip when the browser tooling this test drives is not installed."""
-    if _installed_chromium() is None:  # pragma: no cover - environment guard
-        pytest.skip(
-            "no Playwright Chromium build found; run `bun x playwright install "
-            "chromium`"
-        )
-    if shutil.which("bun") is None:  # pragma: no cover - environment guard
-        pytest.skip("bun is required to drive the focus probe")
-
-
 @pytest.mark.playwright
 @pytest.mark.timeout(120)
 def test_active_namespace_chip_shows_a_keyboard_focus_ring(
@@ -261,13 +198,13 @@ def test_active_namespace_chip_shows_a_keyboard_focus_ring(
     the paper filter bar around it. A ring coloured for the fill is invisible
     there, which is the regression this guards.
     """
-    _skip_unless_browser_available()
+    skip_unless_browser_available()
     bun_exe = typ.cast("str", shutil.which("bun"))
     environment = os.environ | {
-        "PLAYWRIGHT_CHROMIUM_EXECUTABLE": typ.cast("str", _installed_chromium())
+        "PLAYWRIGHT_CHROMIUM_EXECUTABLE": typ.cast("str", installed_chromium())
     }
 
-    with _http_serve(served_docs_root) as port:
+    with http_serve(served_docs_root) as port:
         url = f"http://127.0.0.1:{port}/stilyagi/docs/"
         try:
             probe = subprocess.run(  # noqa: S603 - fixed argv, paths from fixtures

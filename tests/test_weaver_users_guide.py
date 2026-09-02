@@ -175,6 +175,7 @@ def test_the_controls_the_guide_describes_exist(weaver_section: str) -> None:
         "the script no longer locks it"
     )
 
+
 def test_the_guide_separates_current_commands_from_the_target(
     weaver_section: str,
 ) -> None:
@@ -193,6 +194,7 @@ def test_the_guide_separates_current_commands_from_the_target(
     assert "weaver.selector.v1" in weaver_section
     assert "`--selectors -`" in weaver_section
 
+
 def test_the_guide_preserves_the_local_mutation_contract(
     weaver_section: str,
 ) -> None:
@@ -207,6 +209,8 @@ def test_the_guide_preserves_the_local_mutation_contract(
         "idempotent mutations",
     ):
         assert guarantee in normalized, f"the guide omits {guarantee!r}"
+
+
 def test_the_guide_describes_the_copy_controls_that_exist(
     weaver_section: str,
 ) -> None:

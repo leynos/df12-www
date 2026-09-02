@@ -111,7 +111,6 @@ announced. Pasting the command is the way to verify that the copy worked. A
 browser may also refuse the clipboard on an insecure connection or without
 permission, and that refusal is likewise silent.
 
-
 ### 4.3. Current and planned command surface
 
 Weaver still has a prototype surface in the current checkout. These examples

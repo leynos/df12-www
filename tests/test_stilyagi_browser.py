@@ -111,16 +111,6 @@ MOBILE_JOBS = {
     "docs": ("docs/", [SYNTAX_TABS, SYNTAX_TAB_ACTIVE]),
 }
 
-#: Pages that scroll horizontally at the mobile width for reasons that
-#: predate the migration, recorded rather than fixed because a layout
-#: change is a design decision this suite must not make. The ``why``
-#: page's personas table has a min-content width of ~412px under the same
-#: rules the hand-written ``pages/why.css`` shipped (verified against
-#: the pre-migration stylesheet in git history); wrapping it in a scroll
-#: container is the fix, and it belongs to a design change, not to the
-#: migration. The overflow test asserts each entry still fires.
-PREEXISTING_OVERFLOW = frozenset({"why"})
-
 #: The computed properties worth snapshotting: paint and typography, not
 #: geometry — box sizes shift with font loading and viewport, and the
 #: layout facts the contracts care about are asserted directly instead.
@@ -486,21 +476,8 @@ class TestMobileViewport:
     def test_page_has_no_horizontal_overflow(
         self, probed: dict[str, typ.Any], name: str
     ) -> None:
-        """The page itself lays out inside the mobile viewport.
-
-        A page in ``PREEXISTING_OVERFLOW`` is asserted to still overflow
-        instead, the way the Weaver suites keep their axe waivers honest:
-        the waiver cannot outlive the defect, and whoever fixes the layout
-        is pointed at the entry to delete.
-        """
+        """The page itself lays out inside the mobile viewport."""
         page = probed[f"mobile-{name}"]["page"]
-        if name in PREEXISTING_OVERFLOW:
-            assert page["scrollWidth"] > page["innerWidth"], (
-                f"/stilyagi/{MOBILE_JOBS[name][0]} no longer overflows at "
-                f"{MOBILE_VIEWPORT[0]}px — the pre-existing defect is fixed, so "
-                f"delete its PREEXISTING_OVERFLOW entry"
-            )
-            return
         assert page["scrollWidth"] <= page["innerWidth"], (
             f"/stilyagi/{MOBILE_JOBS[name][0]} at {MOBILE_VIEWPORT[0]}px scrolls "
             f"horizontally: content is {page['scrollWidth']}px wide in a "

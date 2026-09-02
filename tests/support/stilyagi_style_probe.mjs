@@ -21,6 +21,14 @@
 
 import { existsSync } from "node:fs";
 
+import { compositeOver, parseCssColor } from "./stilyagi_probe_helpers.mjs";
+
+/* The colour helpers run inside the page, where imports cannot reach:
+ * their source is injected as a script tag, which defines the named
+ * function declarations as globals for `inspect` below to call. Keeping
+ * them in a module of their own is what lets the JS suite unit-test them. */
+const HELPER_SOURCE = [parseCssColor, compositeOver].map((fn) => fn.toString()).join("\n");
+
 const spec = JSON.parse(await new Response(process.stdin).text());
 if (!spec || !Array.isArray(spec.jobs) || spec.jobs.length === 0) {
   console.error("usage: stilyagi_style_probe.mjs < jobs.json");
@@ -40,23 +48,13 @@ const launchOptions = executablePath && existsSync(executablePath) ? { executabl
  * surfaces are translucent washes over the paper base; only the browser
  * knows what they composite to. */
 function inspect(selectors) {
-  const parse = (value) => {
-    const parts = value.match(/-?[\d.]+/g);
-    if (!parts) return null;
-    const n = parts.map(Number);
-    // color(srgb r g b / a) carries 0-1 channels; rgb()/rgba() carry 0-255.
-    return value.startsWith("color(")
-      ? [n[0] * 255, n[1] * 255, n[2] * 255, n.length > 3 ? n[3] : 1]
-      : [n[0], n[1], n[2], n.length > 3 ? n[3] : 1];
-  };
-  const composite = (fg, bg) => fg.slice(0, 3).map((c, i) => c * fg[3] + bg[i] * (1 - fg[3]));
   const groundOf = (el) => {
     const chain = [];
     for (let node = el; node; node = node.parentElement) chain.unshift(node);
     let ground = [255, 255, 255];
     for (const node of chain) {
-      const bg = parse(getComputedStyle(node).backgroundColor);
-      if (bg && bg[3] > 0) ground = composite(bg, ground);
+      const bg = parseCssColor(getComputedStyle(node).backgroundColor);
+      if (bg && bg[3] > 0) ground = compositeOver(bg, ground);
     }
     return ground.map(Math.round);
   };
@@ -118,6 +116,12 @@ try {
       viewport: { width: job.width, height: job.height },
     });
     await page.goto(job.url, { waitUntil: "load" });
+    /* The load event does not wait for web fonts, and the sub-site's tables
+     * and labels take their min-content widths from the loaded faces — a
+     * probe that reads layout before `document.fonts.ready` measures the
+     * fallback fonts and reports nondeterministic geometry. */
+    await page.evaluate(() => document.fonts.ready);
+    await page.addScriptTag({ content: HELPER_SOURCE });
     results[job.name] = await page.evaluate(inspect, job.selectors);
     await page.close();
   }

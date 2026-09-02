@@ -30,7 +30,7 @@ declare const module: { exports: Record<string, unknown> };
 /** The vendored MiniSearch constructor; see `src/static/<site>/assets/vendor/`. */
 declare const MiniSearch: typeof import("minisearch").default;
 
-/** A Weaver telemetry event, as emitted by `weaver/assets/js/telemetry.js`. */
+/** A Weaver telemetry event, as handed to the host's sink by `telemetry.ts`. */
 interface WeaverTelemetryEvent {
   component: string;
   operation: string;
@@ -38,9 +38,13 @@ interface WeaverTelemetryEvent {
   reason?: string;
 }
 
-/** The API `weaver/assets/js/telemetry.js` installs for the drawer script. */
+/**
+ * The API `weaver/assets/js/telemetry.ts` installs for the drawer script.
+ * Each vocabulary is a closed map from a camelCase name to the string that
+ * leaves the page; `emit` drops anything outside them.
+ */
 interface WeaverTelemetryApi {
-  emit(event: WeaverTelemetryEvent): boolean;
+  emit(operation: string, outcome: string, reason?: string): void;
   COMPONENTS: Readonly<Record<string, string>>;
   OPERATIONS: Readonly<Record<string, string>>;
   OUTCOMES: Readonly<Record<string, string>>;

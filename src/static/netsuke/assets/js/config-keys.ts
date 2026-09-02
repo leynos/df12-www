@@ -27,12 +27,47 @@
   var ACTIVE = "is-active";
   var PREVIEW = "is-preview";
 
+  /* The `data-config-keys-*` hooks the template emits, named once so the
+     selectors below and the makeButton carry-over agree. */
+  var HOOKS = {
+    labels: "data-config-keys-labels",
+    panels: "data-config-keys-panels",
+    key: "data-config-keys-key",
+    panel: "data-config-keys-panel",
+    label: "data-config-keys-label",
+    note: "data-config-keys-note",
+  };
+
+  /* What `createConfigKeys` needs from its host. `matchMedia` is a function
+     rather than a list so tests can hand back a fake whose `matches` they
+     flip. */
+  interface ConfigKeysDeps {
+    document: Document;
+    matchMedia(query: string): MediaQueryList;
+  }
+
+  /* One key group: the wrapper, the two label elements that alternate in it,
+     the optional paragraph, and the extract the label describes. */
+  interface Pair {
+    key: HTMLElement;
+    span: HTMLElement;
+    button: HTMLButtonElement;
+    note: HTMLElement | null;
+    panel: HTMLElement;
+  }
+
+  /* The handle a mounted component returns, for tests to drive. */
+  interface ConfigKeysController {
+    applyMode(): void;
+    select(index: number, focus: boolean): void;
+  }
+
   /* Index of the tab an arrow/Home/End keypress should move to.
    *
    * Returns -1 when the key is not one this widget handles, so the
    * caller can leave the event alone. Arrow movement wraps.
    */
-  function nextTabIndex(current, key, count) {
+  function nextTabIndex(current: number, key: string, count: number): number {
     if (count <= 0) {
       return -1;
     }
@@ -54,13 +89,13 @@
   }
 
   /* `querySelectorAll` as a real array, so the result can be mapped. */
-  function list(root, selector) {
-    return Array.prototype.slice.call(root.querySelectorAll(selector));
+  function list(root: ParentNode, selector: string): HTMLElement[] {
+    return Array.from(root.querySelectorAll<HTMLElement>(selector));
   }
 
   /* The narrow-viewport tab that stands in for a label `span`, carrying over
      its id, classes, text, and data hook so the same selectors still find it. */
-  function makeButton(doc, span) {
+  function makeButton(doc: Document, span: HTMLElement): HTMLButtonElement {
     var button = doc.createElement("button");
     button.type = "button";
     button.id = span.id;
@@ -69,7 +104,7 @@
     button.setAttribute("role", "tab");
     // Keep the hook the span carried so the button is still findable
     // by the same selector once it has taken the span's place.
-    button.setAttribute("data-config-keys-label", span.getAttribute("data-config-keys-label"));
+    button.setAttribute(HOOKS.label, span.getAttribute(HOOKS.label) ?? "");
     return button;
   }
 
@@ -80,40 +115,45 @@
        real ones. Every precondition is checked before anything is
        mutated: a half-upgraded group is worse than an unupgraded one,
        and a key without its label span used to throw part-way through. */
-  function createConfigKeys(root, deps) {
+  function createConfigKeys(root: HTMLElement, deps: ConfigKeysDeps): ConfigKeysController | null {
     var doc = deps.document;
-    var labelList = root.querySelector("[data-config-keys-labels]");
-    var panelList = root.querySelector("[data-config-keys-panels]");
-    var keys = list(root, "[data-config-keys-key]");
-    var panels = list(root, "[data-config-keys-panel]");
+    /* Cast rather than narrowed: the functions below are hoisted
+       declarations, which the checker does not narrow through, and the early
+       return that follows is what makes the casts true at runtime. */
+    var labelList = root.querySelector(`[${HOOKS.labels}]`) as HTMLElement;
+    var panelList = root.querySelector(`[${HOOKS.panels}]`) as HTMLElement;
+    var keys = list(root, `[${HOOKS.key}]`);
+    var panels = list(root, `[${HOOKS.panel}]`);
     if (!labelList || !panelList || !keys.length || keys.length !== panels.length) {
       return null;
     }
 
-    var spans = keys.map((key) => key.querySelector("[data-config-keys-label]"));
-    if (spans.indexOf(null) !== -1) {
+    var found = keys.map((key) => key.querySelector<HTMLElement>(`[${HOOKS.label}]`));
+    if (found.indexOf(null) !== -1) {
       return null;
     }
+    // Every entry was just checked, which `indexOf` does not tell the checker.
+    var spans = found as HTMLElement[];
 
     var wide = deps.matchMedia(WIDE);
     var selected = 0;
-    var pairs = keys.map((key, index) => ({
+    var pairs: Pair[] = keys.map((key, index) => ({
       key: key,
       span: spans[index],
       button: makeButton(doc, spans[index]),
-      note: key.querySelector("[data-config-keys-note]"),
+      note: key.querySelector<HTMLElement>(`[${HOOKS.note}]`),
       panel: panels[index],
     }));
 
     /* Whichever of the pair's two label elements is currently mounted: the
        span when wide, the tab button when narrow. */
-    function label(pair) {
+    function label(pair: Pair): HTMLElement {
       return wide.matches ? pair.span : pair.button;
     }
 
     /* Put `className` on the key, panel, and label at `index`, and take it off
        every other one. Pass -1 to clear it everywhere. */
-    function mark(className, index) {
+    function mark(className: string, index: number): void {
       pairs.forEach((pair, i) => {
         var on = i === index;
         label(pair).classList.toggle(className, on);
@@ -124,7 +164,7 @@
 
     /* Draw the tablist state: exactly one tab selected, only its panel and
        note on screen, and the roving tabindex on the selected tab. */
-    function renderNarrow() {
+    function renderNarrow(): void {
       // A tablist always has exactly one selected tab.
       if (selected < 0 || selected >= pairs.length) {
         selected = 0;
@@ -143,7 +183,7 @@
 
     /* Draw the wide state: every panel and note visible, and nothing marked,
        since there is no selection to indicate when all of it is on screen. */
-    function renderWide() {
+    function renderWide(): void {
       pairs.forEach((pair) => {
         pair.panel.hidden = false;
         if (pair.note) {
@@ -156,7 +196,7 @@
     }
 
     /* Draw whichever state the current breakpoint calls for. */
-    function render() {
+    function render(): void {
       if (wide.matches) {
         renderWide();
       } else {
@@ -166,7 +206,7 @@
 
     /* Select the tab at `index` and redraw, moving focus to it when `focus`
        is set — which distinguishes a keyboard move from a programmatic one. */
-    function select(index, focus) {
+    function select(index: number, focus: boolean): void {
       selected = index;
       render();
       if (focus) {
@@ -177,7 +217,7 @@
     /* Convert one pair to its tablist form: swap the span for the button,
        make the wrapper presentational so the tablist owns the tab directly,
        wire the ARIA relationships, and move the note above its panel. */
-    function applyNarrow(pair) {
+    function applyNarrow(pair: Pair): void {
       if (pair.button.parentNode !== pair.key) {
         pair.key.replaceChild(pair.button, pair.span);
       }
@@ -197,7 +237,7 @@
 
     /* Convert one pair back to its wide form: restore the span, drop the tab
        ARIA, and return the note to the key it belongs with. */
-    function applyWide(pair) {
+    function applyWide(pair: Pair): void {
       if (pair.span.parentNode !== pair.key) {
         pair.key.replaceChild(pair.span, pair.button);
       }
@@ -211,7 +251,7 @@
 
     /* Move the whole component to the current breakpoint's form and redraw.
        Idempotent, so a repeated breakpoint event costs nothing. */
-    function applyMode() {
+    function applyMode(): void {
       var isWide = wide.matches;
       labelList.setAttribute("role", isWide ? "group" : "tablist");
       pairs.forEach(isWide ? applyWide : applyNarrow);
@@ -250,7 +290,7 @@
       select(next, true);
     });
 
-    if (wide.addEventListener) {
+    if (typeof wide.addEventListener === "function") {
       wide.addEventListener("change", applyMode);
     } else {
       wide.addListener(applyMode);
@@ -269,12 +309,12 @@
 
   /* Mount every config-keys root on the page, injecting the real `document`
      and `matchMedia` that the tests replace with fakes. */
-  function init() {
-    var deps = {
+  function init(): void {
+    var deps: ConfigKeysDeps = {
       document: document,
       matchMedia: (query) => window.matchMedia(query),
     };
-    Array.prototype.forEach.call(document.querySelectorAll("[data-config-keys]"), (root) => {
+    document.querySelectorAll<HTMLElement>("[data-config-keys]").forEach((root) => {
       createConfigKeys(root, deps);
     });
   }

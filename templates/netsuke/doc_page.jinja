@@ -12,11 +12,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/netsuke/assets/css/himotoshi.css">
     <script defer src="/netsuke/assets/js/mobile-nav.js"></script>
+{% block page_scripts %}
     <script defer src="/netsuke/assets/js/docs-scrollspy.js"></script>
     <script defer src="/netsuke/assets/js/copy-buttons.js"></script>
+{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white flex flex-col min-h-screen {% block body_class %}{% endblock %}">
+<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white {% block body_class %}flex flex-col min-h-screen{% endblock %}">
     <!-- Navigation -->
     <nav id="navbar" data-mobile-nav class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
         <div class="site-container">

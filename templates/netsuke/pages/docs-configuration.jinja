@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('configuration') }}{% raw %}
 
@@ -40,7 +40,7 @@
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm flex items-center">
                             <span class="iconify mr-2 text-indigo" data-icon="carbon:document" aria-hidden="true"></span> Config file discovery
                         </h3>
@@ -53,7 +53,7 @@
                         <p class="text-xs text-charcoal-mid mt-3">CLI-only controls such as <code>--config</code>, <code>--directory</code>, and subcommands are not read from configuration files. <code>--directory</code> does not rebase a relative <code>--config</code> or <code>NETSUKE_CONFIG</code> path; pass an absolute selector when it must not depend on the invoking directory.</p>
                         <p class="text-xs text-charcoal-mid mt-3">When discovery finds no file, Netsuke uses its built-in defaults. When it finds a file that cannot be loaded &mdash; malformed TOML, for example &mdash; it reports the load error rather than treating the broken file as absent. An explicit <code>--config</code> or <code>NETSUKE_CONFIG</code> selection that is missing or invalid is likewise an error; Netsuke does not fall back to discovery.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm flex items-center">
                             <span class="iconify mr-2 text-indigo" data-icon="carbon:parameter" aria-hidden="true"></span> Environment variables
                         </h3>
@@ -149,11 +149,11 @@ fetch_block_host = ["metadata.internal"]
                     and a bounded <code>reason</code>.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">What a broken file does</h3>
                         <p class="text-xs text-charcoal-mid">A discovered file that cannot be loaded &mdash; malformed TOML, or an <code>extends</code> parent that is missing &mdash; is reported as a load error, not treated as absent. An explicit selector that is missing or invalid is likewise an error; Netsuke never falls back to discovery from an explicit file. The warning records <code>failure_kind</code> as <code>Missing</code> or <code>LoadError</code>.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Metrics snapshot</h3>
                         <p class="text-xs text-charcoal-mid">With <code>--verbose</code>, Netsuke emits one final <code>metrics snapshot</code> debug event before exiting: bounded counters and histograms for configuration loading (<code>config_load_total</code>, <code>config_load_duration_seconds</code>), cached discovery, raw CLI path validation, and legacy recipe execution. It is an in-process diagnostic record, not a metrics endpoint. JSON mode suppresses all of this tracing so stderr stays a single machine-readable document.</p>
                     </div>

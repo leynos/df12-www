@@ -10,9 +10,9 @@ and each is asserted here so a later change cannot quietly undo one:
 2. No published Netsuke page loads the Play CDN.
 
 Each was written failing, with a strict ``xfail`` marker naming the milestone
-that turns it green — a marker left in place after the behaviour arrives would
-itself fail the suite, so none can be forgotten. The first cleared with the
-compiled entrypoint; the second clears when the Play CDN goes.
+that turned it green — a marker left in place after the behaviour arrived
+would itself have failed the suite, so none could be forgotten. Both now pass
+on their own.
 """
 
 from __future__ import annotations
@@ -54,10 +54,6 @@ def test_netsuke_stylesheet_is_compiled(built_site: Path) -> None:
 
 
 @pytest.mark.timeout(300)
-@pytest.mark.xfail(
-    strict=True,
-    reason="Milestone 3 of the Netsuke daisyUI migration retires the Play CDN",
-)
 def test_netsuke_pages_do_not_load_the_play_cdn(built_site: Path) -> None:
     """No published Netsuke page should fetch Tailwind from the Play CDN.
 

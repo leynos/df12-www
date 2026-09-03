@@ -14,7 +14,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('standard-library', sub_links=[{'href': '#stdlib-reference', 'label': 'Core reference'}, {'href': '#stdlib-extended', 'label': 'Extended library'}, {'href': '#purity', 'label': 'Pure vs host-observing'}]) }}{% raw %}
 
@@ -309,7 +309,7 @@
                 <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
                     <span class="iconify text-indigo mr-2" data-icon="carbon:search-locate" aria-hidden="true"></span> Executable discovery
                 </h3>
-                <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden mb-10">
+                <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden mb-10">
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-3">
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">which</code>
@@ -347,7 +347,7 @@
                                 <h4 class="font-bold text-charcoal text-xs uppercase tracking-wide mb-3">Diagnostic codes</h4>
                                 <div class="space-y-2 text-xs font-mono text-charcoal-mid">
                                     <div><code class="text-vermillion">netsuke::jinja::which::not_found</code> &mdash; executable not on PATH; includes a preview of the scanned PATH</div>
-                                    <div class="mt-2"><code class="text-vermillion">netsuke::jinja::which::args</code> &mdash; unknown or invalid keyword argument</div>
+                                    <div><code class="text-vermillion">netsuke::jinja::which::args</code> &mdash; unknown or invalid keyword argument</div>
                                 </div>
                                 <div class="mt-4 text-xs font-mono text-stone-light bg-charcoal p-3 rounded">
                                     {{ 'clang++' | which(all=true, canonical=true) }}
@@ -413,7 +413,7 @@ targets:
                         helper output, but it does not sandbox template evaluation.
                     </p>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <h3 class="font-bold text-charcoal mb-3 text-sm">The <code>help targets</code> query allowlist</h3>
                     <p class="text-xs text-charcoal-mid mb-3">
                         <code>netsuke help targets</code> renders the manifest through a restricted, side-effect-free surface. Only the lexical

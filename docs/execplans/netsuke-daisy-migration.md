@@ -127,8 +127,12 @@ Hard invariants. Violation requires escalation, not a workaround.
       `build:css:netsuke` wired; the compiled-stylesheet test green. The
       Play CDN is still loaded at this commit, so the pages carry both
       stylesheets until Milestone 3.
-- [ ] Milestone 3: retire the Play CDN, v3→v4 renames, chase the diff to
-      empty.
+- [x] (2026-09-03 21:30Z) Milestone 3: the Play CDN and its config script
+      are gone from every template, `tailwind-config.js` is deleted, the
+      v3→v4 renames are applied, and the diff against the settled
+      pre-cutover baseline is empty: 32 pages compared, 0 differing. Every
+      pin and every accepted difference is in the decision log. The capture
+      now drives agent-browser with a settle wait (see Surprises).
 - [ ] Milestone 4: semantic-class sweep, convention tests, documentation.
 
 ## Surprises & discoveries
@@ -172,6 +176,67 @@ Hard invariants. Violation requires escalation, not a workaround.
   one placeholder on each is the steady state. The Plotly script is kept on
   the homepage through Milestone 1 so its diff shows the chrome change and
   nothing else; it is unused there and goes in Milestone 3.
+- **Observation:** retrying a capture could not settle Iconify once the
+  Play CDN was gone. Evidence: with the compiled stylesheet the page's own
+  requests finish sooner, and the network goes idle before Iconify has even
+  asked for its glyphs — its API response arrives about 1.5s after
+  navigation, the security page's 28 icons came back unrendered on every
+  one of three attempts, and `css-view` offers no hook to wait on. Impact:
+  `capture` no longer runs `css-view`. It drives `agent-browser` the way
+  `shots` already did — set the viewport, open, wait for network idle, then
+  wait for a page-side expression that asks Iconify itself when every icon
+  has arrived or been reported missing — and then evaluates a vendored copy
+  of css-view's walker (`scripts/weaver_snapshot_walker.js`, ISC, the same
+  author) in the settled page. The tree it writes is the shape every reader
+  expects; the walker also reports margins on every node whatever they
+  equal, which the gap folding below needs. The retry logic went with it.
+- **Observation:** the cutover diff was dominated by six v4 notations, each
+  of which the normalizer now reads through. `space-*` puts its margin on
+  the preceding sibling where v3 put it on the following one, so each
+  child's margins are folded into the gaps before and after it, the parent's
+  `gap` included; the colour and transform transition utilities name
+  properties v3 did not; `rounded-full` computes to `calc(infinity * 1px)`;
+  `rotate-*` and `translate-*` write to the individual transform properties
+  rather than the matrix; a `background:` shorthand in a layered rule reports
+  a zero position in pixels rather than percentages; and the theme's several
+  hundred custom properties sit on `:root`. The `<head>` and each node's
+  class list are no longer compared either: the two removed `<script>`
+  elements and the renamed utilities are the cutover, and what they computed
+  to is what the comparison is for.
+- **Observation:** the layer inversion bit in four places, each a component
+  rule that used to beat a utility on specificity and now loses to it. The
+  docs sidebar's sub-links (`a.sidebar-link--sub`, 0,1,1) lost their 14px
+  indent to `px-2`; the mobile menu's parent link (`#navbar-mobile-menu
+  .hm-mobile-menu__link`, 1,1,0) gained the `text-vermillion` its markup had
+  always carried and never shown; the example pages' contents links lost
+  their scroll-spy active state to `border-transparent text-charcoal-mid`;
+  and `.hm-hero.hm-hero` and `.hm-faux-window--card-bleed.hm-faux-window--card-bleed`
+  turned out to have nothing left to beat. Each is pinned in the decision
+  log to what the page rendered.
+- **Observation:** v4 honoured six declarations v3 had suppressed, and the
+  diff named every one. `leading-[1.1]` under `lg:text-7xl` on two hero
+  headings (72px became 79.2px); `bg-white/12` on the hero's italic span,
+  which v3's opacity scale did not include; a child's own `mt-2` and `ml-2`
+  under `space-y-2` and `space-x-2`, which v3's higher-specificity rule had
+  replaced and v4's `:where()` now adds to; `space-x-4` on the navbar's
+  actions, whose last child is the hidden hamburger and which v4 now gives
+  a trailing margin, shifting the link list 8px; and the proportional
+  line-height v4's `text-*` utilities inherit, which shrank every roadmap
+  chip by three pixels. v4's preflight also zeroes padding on every element
+  where v3 left table cells and native `option` items their user-agent
+  pixel, and drops the pointer cursor v3 gave buttons.
+- **Observation:** two utilities had only ever worked because the Play CDN
+  compiled the rendered page rather than the templates. The examples hub
+  builds each card's photo as `bg-[url('{{ ex.image }}')]` from data, which
+  no build-time scanner can resolve, and the same quoted form with a static
+  path compiled fine. The six cards lost their photos and the diff said so;
+  the image is now an inline `style` beside the cover and centre utilities.
+- **Observation:** the one bare `prose` in the templates began styling its
+  code spans the moment daisyUI was linked. daisyUI ships `.prose`
+  compatibility rules for the typography plugin, whether or not the plugin
+  is registered; the Play CDN had been loaded without the plugin, so the
+  class had never styled anything. The class is removed and daisyUI's
+  `typography` part excluded.
 - **Observation:** one capture caught a colour transition mid-flight.
   Evidence: `examples/hello-world/` reported a table-of-contents link's
   `border-left-color` at alpha 0.694 against 1.0, with the link's active
@@ -224,6 +289,62 @@ Hard invariants. Violation requires escalation, not a workaround.
   Rationale: a homepage with its own copy of the chrome is what Milestone 1
   exists to remove; carrying the differences forward as blocks would keep
   two chromes under one file.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** the capture is taken through agent-browser and a vendored
+  walker rather than through css-view. Rationale: css-view captures at
+  network idle and cannot be told to wait; a capture that beats Iconify to
+  the page records a different layout, not a different style, and the
+  retries could not beat a systematic race. The walker is css-view's own,
+  copied with attribution, and agent-browser was already a dependency of
+  `shots`. Weaver's captures were css-view's; nothing stored depends on that.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** `divide-y divide-stone-light` becomes the component class
+  `hm-rows`, and the templating page's responsive grid rules become
+  `hm-cells`. Rationale: v4 draws the rule under each item but the last where
+  v3 drew it above each but the first. The pixels are the same and every
+  row's box moves by one; a diff cannot tell that from a real shift, and a
+  rule between rows is a component in its own right. `:not([hidden])` is
+  kept from v3's selector so a filtered-out card leaves no doubled rule.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** four suppressed declarations are pinned to what rendered:
+  `lg:leading-none` joins `leading-[1.1]` on the two hero headings;
+  `bg-white/12` is dropped from the hero's italic span; the `mt-2` and `ml-2`
+  that v3 replaced are dropped; and the navbar's actions use `gap-x-4`, which
+  ignores the hidden hamburger as `space-x-4` no longer does. Rationale:
+  Constraint 1. Each is recorded so a designer can choose the v4 rendering
+  deliberately later.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** the four layer-inversion losses are resolved in the
+  component, not by specificity. The docs sub-links drop `px-2` for `pr-2`
+  and take their indent from `a.sidebar-link--sub`; the mobile parent link
+  drops the `text-vermillion` it never showed; the example contents links
+  drop `border-transparent text-charcoal-mid`, which `[data-page-toc] a` now
+  states beside `.is-active`. Rationale: Constraint 4 — a utility in the
+  markup must beat a component class, so a state a component sets cannot
+  share an element with a utility for the same property. The mobile parent
+  link's vermilion is a design follow-up, recorded here.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** v3's rem line-heights for `text-xs` through `text-4xl` are
+  pinned under `@theme`. Rationale: v4's ratio inherits differently — a
+  component-sized child in a `text-sm` list took 20px from v3 and 1.43 times
+  its own size from v4 — and the spacing was drawn against the rem values.
+  Weaver accepted the change; on Netsuke it moved every roadmap chip, and a
+  pin is cheaper than a per-component exception.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** `src/styles/netsuke/site-base.css`, in `layer(base)`, restores
+  the user-agent padding on `td`, `th`, and `option` that v4's preflight
+  zeroes, and the pointer cursor v3's preflight gave buttons. Rationale:
+  Constraint 1; the cells' left padding and the buttons' cursor are visible.
+  They are pins, and say so.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** the hero heading's and lede's text shadows move from
+  `drop-shadow-lg`/`drop-shadow-md` into `.hm-hero-panel > h1` and `> p`.
+  Rationale: v3's values were two layers each and v4's theme tokens hold
+  one, so the pair cannot be pinned under `@theme`.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** daisyUI's `scrollbar`, `rootcolor`, `rootscrollgutter`, and
+  `typography` parts are excluded. Rationale: each restyles something the
+  sub-site styles for itself or never styled, and each showed in the diff.
   Date/Author: 2026-09-03, Claude.
 - **Decision:** the four pre-existing 360px overflows are waived, not fixed.
   Rationale: Constraint 1. A fix changes what the page renders and belongs
@@ -336,6 +457,15 @@ Milestone 0 evidence:
 
 ```plaintext
 $ uv run python scripts/weaver_snapshot.py diff .netsuke-baseline .netsuke-baseline-2
+…
+32 pages compared, 0 differing.
+```
+
+Milestone 3 evidence, the settled pre-cutover baseline (captured from a
+temporary worktree at the Milestone 1 commit) against the cutover:
+
+```plaintext
+$ uv run python scripts/weaver_snapshot.py diff .netsuke-baseline-settled .netsuke-after-cutover
 …
 32 pages compared, 0 differing.
 ```

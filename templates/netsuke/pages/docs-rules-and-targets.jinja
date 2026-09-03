@@ -14,7 +14,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('rules-and-targets') }}{% raw %}
 
@@ -32,7 +32,7 @@
             <section id="concepts" class="mb-16">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">The Build Graph</h2>
                 <div class="grid lg:grid-cols-2 gap-8 mb-8">
-                    <div class="prose text-charcoal-mid">
+                    <div class="text-charcoal-mid">
                         <p class="mb-4">
                             Netsuke constructs a Directed Acyclic Graph (DAG) where nodes are targets and edges are dependencies. When you run <code class="bg-stone-light/30 px-1 rounded text-sm text-indigo">netsuke build app</code>, the system:
                         </p>
@@ -52,7 +52,7 @@
                     </div>
 
                     <!-- Graph Visualization Placeholder -->
-                    <div class="bg-white rounded-xl border border-stone shadow-sm p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="bg-white rounded-xl border border-stone shadow-xs p-6 flex flex-col items-center justify-center relative overflow-hidden">
                          <div class="absolute inset-0 opacity-[0.03] bg-[url('/netsuke/assets/graphy.png')]"></div>
                          <!-- Simple CSS Graph Representation -->
                          <div class="relative z-10 w-full max-w-xs h-64">
@@ -61,14 +61,14 @@
                                 app
                             </div>
 
-                            <div class="absolute top-24 left-8 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-sm border border-stone z-20">
+                            <div class="absolute top-24 left-8 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-xs border border-stone z-20">
                                 main.o
                             </div>
-                            <div class="absolute top-24 right-8 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-sm border border-stone z-20">
+                            <div class="absolute top-24 right-8 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-xs border border-stone z-20">
                                 utils.o
                             </div>
 
-                            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-sm border border-stone z-20">
+                            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-xs border border-stone z-20">
                                 compile
                             </div>
 
@@ -117,17 +117,17 @@ targets:
 {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
+                    <div class="bg-white p-5 rounded-lg border border-stone shadow-xs">
                         <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">1</div>
                         <h4 class="font-bold text-charcoal mb-2">Rule name</h4>
                         <p class="text-sm text-charcoal-mid">Targets refer to a rule by <code class="font-mono text-xs">name</code>. Keep names short and literal.</p>
                     </div>
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
+                    <div class="bg-white p-5 rounded-lg border border-stone shadow-xs">
                         <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">2</div>
                         <h4 class="font-bold text-charcoal mb-2">Recipe field</h4>
                         <p class="text-sm text-charcoal-mid">A rule carries exactly one recipe: <code class="font-mono text-xs">command</code> or <code class="font-mono text-xs">script</code>. A <code class="font-mono text-xs">command</code> may be one shell string or an ordered list of commands chained fail-fast with <code class="font-mono text-xs">&amp;&amp;</code>. Rules never declare <code class="font-mono text-xs">deps</code>; dependencies belong on the target or action.</p>
                     </div>
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
+                    <div class="bg-white p-5 rounded-lg border border-stone shadow-xs">
                         <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">3</div>
                         <h4 class="font-bold text-charcoal mb-2">Target wiring</h4>
                         <p class="text-sm text-charcoal-mid">Targets supply the concrete <code class="font-mono text-xs">sources</code>, outputs, and optional per-target variables.</p>
@@ -142,8 +142,8 @@ targets:
                     Netsuke target references are plain names and paths. The important distinction is between normal dependencies, order-only dependencies, and phony or always-run targets.
                 </p>
 
-                <div class="overflow-x-auto [contain:inline-size] shadow ring-1 ring-black ring-opacity-5 rounded-lg border border-stone-light mb-8">
-                    <table class="min-w-full divide-y divide-stone-light prop-table">
+                <div class="overflow-x-auto [contain:inline-size] shadow ring-1 ring-black/5 rounded-lg border border-stone-light mb-8">
+                    <table class="min-w-full hm-rows prop-table">
                         <thead class="bg-boxwood-pale">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Field</th>
@@ -151,7 +151,7 @@ targets:
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Meaning</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-stone-light">
+                        <tbody class="bg-white hm-rows">
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">sources</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">["main.o", "utils.o"]</td>
@@ -194,7 +194,7 @@ targets:
                 <!-- Callout for CLI Usage -->
                 <div class="bg-boxwood-pale border-l-4 border-indigo p-6 rounded-r-lg">
                     <div class="flex">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <span class="iconify text-indigo mt-1" data-icon="carbon:terminal" aria-hidden="true"></span>
                         </div>
                         <div class="ml-4">
@@ -250,7 +250,7 @@ actions:
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">What serial ordering guarantees</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Direct <code>deps</code> run in declaration order, each starting only after the previous one succeeds.</span></li>
@@ -258,7 +258,7 @@ actions:
                             <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A failed dependency stops later entries from starting through the serial path.</span></li>
                         </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">What to watch for</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Only the direct <code>deps</code> list is serialized &mdash; not <code>sources</code>, <code>order_only_deps</code>, or unrelated work. A dependency reachable through another path can still start there; use a dedicated aggregate action when the whole workflow must share one ordered entry point.</span></li>
@@ -273,7 +273,7 @@ actions:
             <section id="determinism" class="mb-16">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Outputs &amp; Determinism</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-vermillion/10 flex items-center justify-center text-vermillion mb-4">
                             <span class="iconify" data-icon="carbon:fingerprint-recognition" aria-hidden="true"></span>
                         </div>
@@ -288,7 +288,7 @@ actions:
                         </ul>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
                             <span class="iconify" data-icon="carbon:security" aria-hidden="true"></span>
                         </div>
@@ -309,7 +309,7 @@ actions:
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
                             <span class="iconify" data-icon="carbon:play-outline" aria-hidden="true"></span>
                         </div>
@@ -318,12 +318,12 @@ actions:
                             With no outputs on disk, every edge in the plan is out of date, so Ninja runs every command once. This is the upper bound on build work: the whole graph, in dependency order.
                         </p>
                         <ul class="text-sm text-charcoal-mid space-y-2">
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Each target's recipe executes exactly once</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordering follows <code class="font-mono text-xs">sources</code>, <code class="font-mono text-xs">deps</code>, and <code class="font-mono text-xs">order_only_deps</code></span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Each target's recipe executes exactly once</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordering follows <code class="font-mono text-xs">sources</code>, <code class="font-mono text-xs">deps</code>, and <code class="font-mono text-xs">order_only_deps</code></span></li>
                         </ul>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
                             <span class="iconify" data-icon="carbon:renew" aria-hidden="true"></span>
                         </div>
@@ -332,16 +332,16 @@ actions:
                             Ninja walks the same static graph and compares each edge's declared inputs against its outputs. Only the commands whose inputs changed are re-run, along with whatever depends on their results.
                         </p>
                         <ul class="text-sm text-charcoal-mid space-y-2">
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unchanged subgraphs are skipped, not re-checked command by command</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code class="font-mono text-xs">order_only_deps</code> constrain ordering without forcing a rebuild</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Targets marked <code class="font-mono text-xs">always</code> run regardless of input state</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unchanged subgraphs are skipped, not re-checked command by command</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code class="font-mono text-xs">order_only_deps</code> constrain ordering without forcing a rebuild</span></li>
+                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Targets marked <code class="font-mono text-xs">always</code> run regardless of input state</span></li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="bg-boxwood-pale border-l-4 border-indigo p-6 rounded-r-lg">
                     <div class="flex">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <span class="iconify text-indigo mt-1" data-icon="carbon:flow" aria-hidden="true"></span>
                         </div>
                         <div class="ml-4">

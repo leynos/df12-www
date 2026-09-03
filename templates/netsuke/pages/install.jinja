@@ -28,7 +28,7 @@
 {% endblock %}
 {% block content %}
 {% raw %}
-<main id="main-content" class="flex-grow pt-24 pb-20 site-container">
+<main id="main-content" class="grow pt-24 pb-20 site-container">
 
         <!-- Hero Section -->
         <header id="install-hero" class="mb-16 text-center max-w-3xl mx-auto">
@@ -182,7 +182,7 @@ netsuke --version
 
                     <!-- Step 1 -->
                     <div class="relative pl-10 border-l-2 border-stone-light">
-                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-sm">1</div>
+                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-xs">1</div>
                         <h3 class="text-xl font-bold text-charcoal mb-4">Verify Installation</h3>
                         <p class="text-charcoal-mid mb-4">Run the version command to ensure Netsuke is correctly installed and accessible in your path.</p>
                         <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
@@ -195,7 +195,7 @@ netsuke {% endraw %}{{ netsuke_version }}{% raw %}
 
                     <!-- Step 2 -->
                     <div class="relative pl-10 border-l-2 border-stone-light">
-                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-sm">2</div>
+                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-xs">2</div>
                         <h3 class="text-xl font-bold text-charcoal mb-4">Create a Manifest</h3>
                         <p class="text-charcoal-mid mb-4">Create a <code>Netsukefile</code> in the project root. Start with one rule, one target, and one default.</p>
                         <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
@@ -212,7 +212,7 @@ defaults: ["hello.txt"]
 
                     <!-- Step 3 -->
                     <div class="relative pl-10 border-l-2 border-stone-light">
-                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-sm">3</div>
+                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-xs">3</div>
                         <h3 class="text-xl font-bold text-charcoal mb-4">Run Your First Build</h3>
                         <p class="text-charcoal-mid mb-4">Execute the default target defined in your manifest. Netsuke validates the manifest, expands templates, writes a Ninja plan, and hands execution over.</p>
                         <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
@@ -256,7 +256,7 @@ $ netsuke build
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                          <h3 class="font-serif text-lg font-bold text-charcoal mb-4">
                             Manual Download
                         </h3>
@@ -292,21 +292,21 @@ $ netsuke build
             <h2 class="font-serif text-3xl font-bold text-charcoal mb-8 text-center">Common Questions</h2>
 
             <div class="space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <h3 class="font-bold text-charcoal text-lg mb-2">Can I install a specific version?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
                         Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +nightly-2026-08-23 install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{% endraw %}{{ netsuke_version }}{% raw %}</code>, not <code>v{% endraw %}{{ netsuke_version }}{% raw %}</code>). Pre-release versions such as <code>{% endraw %}{{ netsuke_version }}{% raw %}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">crates.io</a> for available versions.
                     </p>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <h3 class="font-bold text-charcoal text-lg mb-2">How do I update Netsuke?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
                         Re-run <code>cargo binstall netsuke-build@&lt;VERSION&gt;</code> with the new version to fetch its prebuilt release, or run <code>cargo +nightly-2026-08-23 install netsuke-build --force</code> to rebuild from crates.io with the pinned nightly shown above. Either way the existing <code>netsuke</code> binary is replaced.
                     </p>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <h3 class="font-bold text-charcoal text-lg mb-2">Does it work with CI/CD?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
                         Yes. Install Netsuke on your continuous integration (CI) agent via <code>cargo binstall netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}</code> (pin the version in automated workflows) and run <code>netsuke build</code> as a build step. When standard error (stderr) is not a teletype/terminal (TTY), progress falls back to plain text automatically, and <code>--json</code> emits a machine-readable result document. Dedicated CI integrations are planned but not yet available.

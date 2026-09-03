@@ -18,11 +18,14 @@ default is Weaver, which the harness was written for and is named after:
 
     uv run python scripts/weaver_snapshot.py capture --site netsuke .netsuke-baseline
 
-``capture`` records computed styles via ``css-view`` and is the objective
-gate; ``diff`` exits non-zero when any page changed. ``shots`` records
-full-page screenshots via ``agent-browser`` for human review, because some
-regressions — a wrong icon glyph, a texture that failed to load — are obvious
-to the eye and invisible in a style diff.
+``capture`` records computed styles and is the objective gate; ``diff`` exits
+non-zero when any page changed. ``shots`` records full-page screenshots for
+human review, because some regressions — a wrong icon glyph, a texture that
+failed to load — are obvious to the eye and invisible in a style diff. Both
+drive ``agent-browser``, and both wait for a page to settle — the network
+idle, and every Iconify glyph either drawn or reported missing — before
+taking anything; a capture taken a moment too early records a different
+layout, not a different style.
 
 All three read the published tree under ``public/``, so run ``bun run build``
 first. Each serves that tree itself on a local port and stops the server
@@ -37,7 +40,8 @@ run by path, so its own directory is on `sys.path`.
 - ``weaver_snapshot_output``    — staging and failure-atomic publication
 - ``weaver_snapshot_ownership`` — proving whose server answered
 - ``weaver_snapshot_serving``   — ports, the server, and its lifecycle
-- ``weaver_snapshot_tools``     — argv for css-view and agent-browser
+- ``weaver_snapshot_tools``     — driving agent-browser, and the walker
+- ``weaver_snapshot_walker.js`` — the computed-style walk, run in the page
 - ``weaver_snapshot_colour``    — one colour written one way
 - ``weaver_snapshot_normalize`` — reducing a tree to what is visible
 """
@@ -63,6 +67,7 @@ from weaver_snapshot_serving import _served
 from weaver_snapshot_tools import (
     SCREENSHOT_WIDTHS,
     _capture_pages,
+    _read_tool,
     _run_tool,
     _shoot_pages,
     _tool,
@@ -92,11 +97,11 @@ def capture(out_dir: Path, /, *, port: int = 0, site: str = DEFAULT_SITE) -> Non
         ``config/pages.yaml``. Its pages are read from ``public/<site>``.
     """
     pages = _page_paths(_public_root(site))
-    bun = _tool("bun")
+    browser = _tool("agent-browser")
     print(f"capturing {len(pages)} {site} pages into {out_dir}")
 
     with _staged(out_dir, ".json") as staging, _served(port, site=site) as base:
-        _capture_pages(pages, staging, base, bun, _run_tool, site)
+        _capture_pages(pages, staging, base, browser, _run_tool, _read_tool, site)
 
     print(f"done: {out_dir.resolve()}")
 

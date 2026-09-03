@@ -5,7 +5,7 @@
 {% block page_title %}Netsukefile Linter (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
 {% raw %}
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar(sections=[
             {'title': 'Forthcoming', 'links': [
@@ -73,15 +73,15 @@
                     in a recipe is another target's output.
                 </p>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">Prior art</h3>
                         <p class="text-xs text-charcoal-mid">mbake confirmed the formatting-versus-semantic split, and its per-rule Boolean configuration and GNU error format shaped the policy table and compact human output. hadolint contributed stable identifiers, per-rule severity, and the failure threshold; buildifier the statement-scoped disable comment; ShellCheck the per-rule URL; Clippy and Ruff the idea that category is metadata and machine output is first-class.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">No new noun</h3>
                         <p class="text-xs text-charcoal-mid"><code>check</code> was already reserved in the canonical command vocabulary and listed as unbuilt work. A separate <code>lint</code> command would be a synonym the CLI design forbids, and <code>generate --lint</code> would bury findings behind a generation flag. The linter <em>is</em> <code>netsuke check</code>.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">Constraints</h3>
                         <p class="text-xs text-charcoal-mid">Non-interactive and deterministic: no prompts, network, clock, or terminal dependence, so two runs over the same manifest and policy produce byte-identical findings in a fixed order. No reparsing. No duplication of a hard error. Bounded output. And findings never mutate anything: there is no <code>--fix</code>; automated rewriting of an executable manifest is a separate project.</p>
                     </div>
@@ -106,8 +106,8 @@ $ netsuke check --rule clarity=off --rule literal-recipe-path=error --fail-on wa
 $ netsuke --json check
 {% endraw %}{% endhighlight %}{% raw %}
                 </div>
-                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
-                    <table class="min-w-full divide-y divide-stone-light prop-table">
+                <div class="bg-white rounded-lg border border-stone shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
                         <thead class="bg-boxwood-pale">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Flag</th>
@@ -115,7 +115,7 @@ $ netsuke --json check
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Default</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-stone-light">
+                        <tbody class="bg-white hm-rows">
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">--rule &lt;NAME=SEVERITY&gt;</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Repeatable policy selector. <code>NAME</code> is a rule or a category; <code>SEVERITY</code> is <code>off</code>, <code>advice</code>, <code>warning</code>, or <code>error</code>. Selectors apply in order, so a category selector followed by a rule selector narrows it. An unknown name is an error, not a warning.</td>
@@ -158,8 +158,8 @@ $ netsuke --json check
                     invalidate a configuration file. Each finding also carries a diagnostic code of the form
                     <code>netsuke::lint::&lt;name_in_snake_case&gt;</code> and a <code>url</code> into the rule reference.
                 </p>
-                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto [contain:inline-size] mb-8" tabindex="0">
-                    <table class="min-w-full divide-y divide-stone-light prop-table text-sm">
+                <div class="bg-white rounded-lg border border-stone shadow-xs overflow-x-auto [contain:inline-size] mb-8" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table text-sm">
                         <thead class="bg-boxwood-pale">
                             <tr>
                                 <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Rule</th>
@@ -169,7 +169,7 @@ $ netsuke --json check
                                 <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Detects</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-stone-light text-charcoal-mid">
+                        <tbody class="bg-white hm-rows text-charcoal-mid">
                             <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">undeclared-target-input</td><td class="px-4 py-2 text-xs">correctness</td><td class="px-4 py-2 text-xs">graph</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe names another target's output without depending on it</td></tr>
                             <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">directory-dep-not-order-only</td><td class="px-4 py-2 text-xs">caching</td><td class="px-4 py-2 text-xs">manifest</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">directory-creating target used as a content dependency</td></tr>
                             <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">phony-dep-of-file-target</td><td class="px-4 py-2 text-xs">caching</td><td class="px-4 py-2 text-xs">manifest</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">file target depends on a phony target through <code>sources</code> or <code>deps</code></td></tr>
@@ -261,7 +261,7 @@ targets:
                         </div>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                     <h3 class="font-bold text-charcoal mb-3 text-sm">Directive grammar</h3>
                     <ul class="space-y-2 text-xs text-charcoal-mid font-mono">
                         <li><code># netsuke-lint: allow &lt;rule&gt;[, &lt;rule&gt;…] -- &lt;reason&gt;</code> <span class="font-sans">suppresses the named rules within one node.</span></li>

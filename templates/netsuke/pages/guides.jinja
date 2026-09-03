@@ -4,7 +4,7 @@
 {% block page_title %}Guides Hub - Netsuke Build System{% endblock %}
 {% block content %}
 {% raw %}
-<main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
+<main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Hero Section -->
         {% endraw %}{% call chrome.page_header('Concepts & Contribution', 'Guides & Deep Dives', hero=true, id='guides-hero') %}
@@ -57,7 +57,7 @@
                         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#8A8279 1px, transparent 1px); background-size: 24px 24px;"></div>
 
                         <!-- Abstract Diagram Visualization -->
-                        <div class="relative z-10 w-full max-w-md aspect-square bg-white rounded-xl shadow-sm border border-stone p-6 flex flex-col justify-between">
+                        <div class="relative z-10 w-full max-w-md aspect-square bg-white rounded-xl shadow-xs border border-stone p-6 flex flex-col justify-between">
                             <div class="flex justify-between items-center border-b border-stone pb-4 mb-4">
                                 <span class="font-mono text-xs text-charcoal-light">pipeline_state.rs</span>
                                 <div class="flex space-x-1">
@@ -75,7 +75,7 @@
                                     <span>Analysis Phase</span>
                                     <span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 </div>
-                                <div class="bg-boxwood p-2 rounded border border-stone text-charcoal shadow-sm flex justify-between items-center">
+                                <div class="bg-boxwood p-2 rounded border border-stone text-charcoal shadow-xs flex justify-between items-center">
                                     <span>Execution Phase</span>
                                     <span  class="iconify text-charcoal-mid animate-spin" data-icon="carbon:rotate-360" aria-hidden="true"></span>
                                 </div>
@@ -170,10 +170,10 @@
                     </div>
 
                     <div class="hm-card overflow-hidden">
-                        <div class="divide-y divide-stone-light">
+                        <div class="hm-rows">
                             <a href="/netsuke/guides/contributing/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
+                                    <div class="shrink-0 mt-1">
                                         <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:notebook" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">
@@ -187,7 +187,7 @@
                             </a>
                             <a href="/netsuke/guides/translating/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
+                                    <div class="shrink-0 mt-1">
                                         <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:language" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">
@@ -201,7 +201,7 @@
                             </a>
                             <a href="/netsuke/guides/writing-examples/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
+                                    <div class="shrink-0 mt-1">
                                         <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:cube" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">

@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Font Awesome to Carbon Icon Replacements</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/netsuke/assets/js/tailwind-config.js"></script>
     <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/netsuke/assets/css/himotoshi.css">
+    <link rel="stylesheet" href="/netsuke/{{ stylesheet or 'assets/css/himotoshi.css' }}">
     <style>
 .type-serif { font-family: "Fraunces", serif; }
         .type-mono { font-family: "JetBrains Mono", monospace; }
@@ -41,7 +39,7 @@
                 <h1 class="type-serif text-4xl lg:text-6xl font-bold tracking-tight mt-5 mb-5">Font Awesome to Carbon icon replacements</h1>
                 <p class="text-lg leading-relaxed text-[#5C554D] max-w-3xl">This page documents every unique Font Awesome icon that was used across the Netsuke prototype and the Carbon Design System replacement now applied to the site through Iconify. Where Carbon does not offer a true 1:1 brand or metaphor, the replacement is intentionally creative and called out as such.</p>
             </div>
-            <div class="rounded-3xl border border-[#D1C7B8] bg-white/80 p-6 shadow-sm space-y-4">
+            <div class="rounded-3xl border border-[#D1C7B8] bg-white/80 p-6 shadow-xs space-y-4">
                 <h2 class="type-serif text-2xl font-bold">Method</h2>
                 <p class="text-sm leading-6 text-[#5C554D]">Firecrawl confirmed the official Carbon icon library and the Iconify Carbon collection pages. The final <code class="type-mono">carbon:*</code> names on this page were also checked against the published <code class="type-mono">@iconify-json/carbon</code> package so the identifiers are valid.</p>
                 <ul class="text-sm leading-6 text-[#5C554D] list-disc pl-5 space-y-1">
@@ -59,7 +57,7 @@
             </div>
         </section>
 
-        <section class="rounded-3xl border border-[#D1C7B8] bg-white/85 shadow-sm overflow-hidden">
+        <section class="rounded-3xl border border-[#D1C7B8] bg-white/85 shadow-xs overflow-hidden">
             <div class="overflow-x-auto">
                 <table>
                     <thead>

@@ -22,9 +22,20 @@ def _node(**style: str) -> dict[str, typ.Any]:
 
 
 def test_tailwind_internal_properties_are_ignored() -> None:
-    """``--tw-*`` variables are plumbing, not something a reader can see."""
+    """Custom properties are plumbing, not something a reader can see.
+
+    ``--tw-*`` are Tailwind's; ``--color-*`` and the rest are the theme's
+    tokens on ``:root``, several hundred of them, each consumed by the
+    visible property that would show a change.
+    """
     normalized = normalize._normalize(
-        _node(**{"--tw-text-opacity": "1", "color": "rgb(1, 2, 3)"})
+        _node(
+            **{
+                "--tw-text-opacity": "1",
+                "--color-primary": "#2b4162",
+                "color": "rgb(1, 2, 3)",
+            }
+        )
     )
     assert normalized["styleDiff"] == {"color": "rgba(1, 2, 3, 1.000)"}, (
         "`--tw-*` variables are Tailwind's plumbing and change between "
@@ -190,10 +201,10 @@ def test_resolve_tracked_reports_a_departure_and_carries_it_down() -> None:
 
 def test_resolve_tracked_leaves_the_inherited_mapping_alone() -> None:
     """The parent's values are shared down the tree, so they must not be edited."""
-    inherited = {"color-scheme": "light"}
+    inherited = {"color-scheme": "dark"}
     normalize._resolve_tracked({"color-scheme": "dark"}, inherited)
 
-    assert inherited == {"color-scheme": "light"}, (
+    assert inherited == {"color-scheme": "dark"}, (
         "_resolve_tracked must return a new mapping rather than mutate the "
         f"one its siblings also hold; it became {inherited!r}"
     )
@@ -319,14 +330,14 @@ def test_root_only_declarations_are_not_repeated_down_the_tree() -> None:
     than against the parent, so a single ``:root`` rule shows up on every node
     beneath it.
     """
-    root = _node(**{"color-scheme": "light"})
-    child = _node(**{"color-scheme": "light"})
-    grandchild = _node(**{"color-scheme": "dark"})
+    root = _node(**{"color-scheme": "dark"})
+    child = _node(**{"color-scheme": "dark"})
+    grandchild = _node(**{"color-scheme": "light dark"})
     child["children"] = [grandchild]
     root["children"] = [child]
 
     normalized = normalize._normalize(root)
-    assert normalized["styleDiff"] == {"color-scheme": "light"}, (
+    assert normalized["styleDiff"] == {"color-scheme": "dark"}, (
         f"the node that declares it should report it; got {normalized['styleDiff']!r}"
     )
     assert normalized["children"][0]["styleDiff"] == {}, (
@@ -336,9 +347,197 @@ def test_root_only_declarations_are_not_repeated_down_the_tree() -> None:
     )
     # A node that genuinely departs from its parent still reports.
     assert normalized["children"][0]["children"][0]["styleDiff"] == {
-        "color-scheme": "dark"
+        "color-scheme": "light dark"
     }, (
         "de-duplicating against the parent must not silence a node that "
         "genuinely departs from it; got "
         f"{normalized['children'][0]['children'][0]['styleDiff']!r}"
+    )
+
+
+def test_the_members_only_one_tailwind_transitions_are_ignored() -> None:
+    """v4's colour transition names outline-color and gradient stops; v3's did not."""
+    v3 = _node(
+        **{
+            "transition-property": "color, background-color, border-color, "
+            "text-decoration-color, fill, stroke, -webkit-text-decoration-color"
+        }
+    )
+    v4 = _node(
+        **{
+            "transition-property": "color, background-color, border-color, "
+            "outline-color, text-decoration-color, fill, stroke, "
+            "--tw-gradient-from, --tw-gradient-via, --tw-gradient-to"
+        }
+    )
+    assert (
+        normalize._normalize(v3)["styleDiff"]["transition-property"]
+        == normalize._normalize(v4)["styleDiff"]["transition-property"]
+    ), "the two lists describe the same behaviour on this site"
+
+    real = _node(**{"transition-property": "opacity"})
+    assert normalize._normalize(real)["styleDiff"]["transition-property"] == "opacity"
+
+
+@pytest.mark.parametrize(
+    ("reported", "canonical"),
+    [
+        ("9999px", "9999px"),
+        ("3.35544e+07px", "9999px"),
+        ("1e+07px 3.35544e+07px", "9999px 9999px"),
+        ("8px", "8px"),
+        ("9998px", "9998px"),
+    ],
+)
+def test_a_radius_past_a_semicircle_reads_as_the_same_radius(
+    reported: str, canonical: str
+) -> None:
+    """`rounded-full` is 9999px in v3 and calc(infinity * 1px) in v4."""
+    normalized = normalize._normalize(_node(**{"border-top-left-radius": reported}))
+    assert normalized["styleDiff"]["border-top-left-radius"] == canonical
+
+
+def _stack(
+    *margins: dict[str, str], parent: dict[str, str] | None = None
+) -> dict[str, typ.Any]:
+    """Build a parent whose children carry the given margins."""
+    root = _node(**(parent or {}))
+    root["children"] = [_node(**margin) for margin in margins]
+    return root
+
+
+def _gaps(tree: dict[str, typ.Any]) -> list[dict[str, str]]:
+    """Read back each child's folded gaps and any margins left behind."""
+    return [
+        {
+            k: v
+            for k, v in child["styleDiff"].items()
+            if k.startswith(("gap-", "margin-"))
+        }
+        for child in normalize._normalize(tree)["children"]
+    ]
+
+
+def test_space_y_reads_the_same_whichever_sibling_carries_the_margin() -> None:
+    """v3 margined every child but the first; v4 every child but the last."""
+    v3 = _stack({}, {"margin-top": "16px"}, {"margin-top": "16px"})
+    v4 = _stack({"margin-bottom": "16px"}, {"margin-bottom": "16px"}, {})
+    assert _gaps(v3) == _gaps(v4), (
+        "the children sit in the same places, so their gaps must read the same"
+    )
+    assert _gaps(v3)[1]["gap-before-top"] == "16px"
+    assert "gap-before-top" not in _gaps(v3)[0], "the first child has nothing before it"
+    assert _gaps(v3)[0]["gap-after-bottom"] == "16px", "but 16px after it"
+    assert "gap-after-bottom" not in _gaps(v3)[2], "and the last nothing after it"
+
+
+def test_a_gap_on_the_parent_reads_the_same_as_margins_on_the_children() -> None:
+    """`gap-x-4` on a flex row is what v4 recommends in place of `space-x-4`."""
+    spaced = _stack({}, {"margin-left": "16px"}, {"margin-left": "16px"})
+    gapped = _stack({}, {}, {}, parent={"column-gap": "16px"})
+    assert _gaps(spaced) == _gaps(gapped)
+    assert "column-gap" not in normalize._normalize(gapped)["styleDiff"], (
+        "the parent's gap is folded into the children's and must not also count"
+    )
+
+
+def test_a_margin_that_really_changes_still_changes_a_gap() -> None:
+    """The folding must not swallow a real move."""
+    before = _stack({}, {"margin-top": "16px"})
+    after = _stack({}, {"margin-top": "24px"})
+    assert _gaps(before) != _gaps(after)
+
+
+def test_a_margin_that_is_not_a_length_is_left_alone() -> None:
+    """`auto` centres a block; it is not a gap and is kept as a margin."""
+    centred = _stack({"margin-left": "auto", "margin-right": "auto"})
+    gaps = _gaps(centred)[0]
+    assert gaps["margin-left"] == "auto"
+    assert "gap-before-left" not in gaps
+
+
+@pytest.mark.parametrize("position", ["0px 0px", "0% 0%"])
+def test_a_background_at_its_origin_is_where_an_unpositioned_one_is(
+    position: str,
+) -> None:
+    """Chromium spells the default in percentages and a reset in pixels."""
+    normalized = normalize._normalize(_node(**{"background-position": position}))
+    assert "background-position" not in normalized["styleDiff"]
+
+    moved = normalize._normalize(_node(**{"background-position": "50% 50%"}))
+    assert moved["styleDiff"]["background-position"] == "50% 50%"
+
+
+def test_a_light_colour_scheme_reads_as_the_default_one() -> None:
+    """A page that only offers light renders the same either way."""
+    light = normalize._normalize(_node(**{"color-scheme": "light"}))
+    assert "color-scheme" not in light["styleDiff"]
+
+    dark = normalize._normalize(_node(**{"color-scheme": "dark"}))
+    assert dark["styleDiff"]["color-scheme"] == "dark", "dark is a real change"
+
+
+def test_the_head_is_not_compared() -> None:
+    """Nothing in the head renders, and a cutover's whole point is what it removes."""
+    root = _node()
+    root["tag"] = "html"
+    head = _node()
+    head["tag"] = "head"
+    script = _node()
+    script["tag"] = "script"
+    head["children"] = [script]
+    body = _node()
+    body["tag"] = "body"
+    root["children"] = [head, body]
+    normalized = normalize._normalize(root)
+    assert normalized["children"][0]["children"] == [], "the head's children go"
+    assert normalized["children"][1]["tag"] == "body", "the body stays"
+
+
+def test_a_v4_rotation_reads_as_the_matrix_v3_wrote() -> None:
+    """`rotate-2` was a transform in v3 and is a `rotate` property in v4."""
+    v3 = _node(transform="matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0)")
+    v4 = _node(rotate="2deg")
+    assert (
+        normalize._normalize(v3)["styleDiff"]["transform"]
+        == normalize._normalize(v4)["styleDiff"]["transform"]
+    )
+    assert "rotate" not in normalize._normalize(v4)["styleDiff"]
+
+
+def test_a_v4_translation_resolves_against_the_box() -> None:
+    """`-translate-x-1/2` is a percentage in v4 and was pixels in v3's matrix."""
+    v3 = _node(transform="matrix(1, 0, 0, 1, -64, 0)")
+    v4 = _node(translate="-50%")
+    for node in (v3, v4):
+        node["bbox"] = {"x": 0, "y": 0, "width": 128, "height": 40}
+    assert (
+        normalize._normalize(v3)["styleDiff"]["transform"]
+        == normalize._normalize(v4)["styleDiff"]["transform"]
+    )
+
+
+def test_an_identity_transform_is_left_unsaid() -> None:
+    """v3's bare `transform` utility wrote an identity matrix; v4 writes none."""
+    v3 = _node(transform="matrix(1, 0, 0, 1, 0, 0)")
+    assert "transform" not in normalize._normalize(v3)["styleDiff"]
+
+
+def test_a_real_transform_survives() -> None:
+    """The folding must not swallow a transform that is not one of the pins."""
+    moved = _node(transform="matrix(1, 0, 0, 1, 10, 0)")
+    assert (
+        normalize._normalize(moved)["styleDiff"]["transform"]
+        == "matrix(1, 0, 0, 1, 10, 0)"
+    )
+
+
+def test_a_class_list_is_not_compared() -> None:
+    """A rename is the usual reason for a change that is meant to look the same."""
+    node = _node(color="rgb(1, 2, 3)")
+    node["classes"] = ["shadow-sm"]
+    normalized = normalize._normalize(node)
+    assert "classes" not in normalized
+    assert normalized["styleDiff"]["color"] == "rgba(1, 2, 3, 1.000)", (
+        "what the classes computed to is still compared"
     )

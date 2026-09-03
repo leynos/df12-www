@@ -5,7 +5,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area -->
-    <main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
+    <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Header Section -->
         {% endraw %}{% call chrome.page_header('Current version v' ~ netsuke_version, 'Roadmap', hero=true, dot='bg-amber') %}
@@ -31,7 +31,7 @@
                         The public beta releases so far cover the following; items marked <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span> are new in this release.
                     </p>
                     <div class="grid md:grid-cols-2 gap-4">
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <h3 class="font-bold text-charcoal text-sm mb-2">Manifest language</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>YAML 1.2 parsing with duplicate-key and schema validation</span></li>
@@ -43,7 +43,7 @@
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordinary shell dollars: write <code>$PATH</code> as-is; Netsuke escapes it for Ninja after lowering the <code>{{ ins }}</code> and <code>{{ outs }}</code> markers <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
                             </ul>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <h3 class="font-bold text-charcoal text-sm mb-2">Compiler &amp; execution</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A deterministic build graph with duplicate-output, missing-rule, and cycle checks</span></li>
@@ -54,7 +54,7 @@
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>UTF-8 build-file and working-directory paths are required, with a clear diagnostic otherwise <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
                             </ul>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <h3 class="font-bold text-charcoal text-sm mb-2">Operator experience</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Layered configuration, localized output, and accessibility preferences</span></li>
@@ -64,7 +64,7 @@
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Thirty-five locale catalogues; beta3 adds a published <a href="/netsuke/guides/translating/#style-and-terminology" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization style guide and glossary</a> <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
                             </ul>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <h3 class="font-bold text-charcoal text-sm mb-2">Confidence &amp; packaging</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
                                 <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unit, behavioural, integration, property, snapshot, and initial Kani verification coverage</span></li>
@@ -90,7 +90,7 @@
                         automation and expect some command names, flags, diagnostic schemas, and manifest details to change before 1.0.
                         The following limitations apply to v{% endraw %}{{ netsuke_version }}{% raw %}.
                     </p>
-                    <div class="bg-white rounded-xl border border-stone shadow-sm divide-y divide-stone-light">
+                    <div class="bg-white rounded-xl border border-stone shadow-xs hm-rows">
                         <div class="p-5 flex items-start">
                             <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:terminal" aria-hidden="true"></span>
                             <p class="text-sm text-charcoal-mid">Recipes remain shell strings: Unix scripts use <code>/bin/sh -e</code>, Windows legacy recipes use Windows PowerShell by default, and the Windows Bash compatibility route is an explicit opt-in. Structured executable arguments and recipe environment mappings are not implemented yet.</p>
@@ -144,7 +144,7 @@
 
                     <div class="space-y-6">
                         <!-- Phase 3 -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Stabilize the command-line contract</h3>
@@ -164,7 +164,7 @@
                         </div>
 
                         <!-- Recipe model -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Make recipes safer and clearer</h3>
@@ -184,7 +184,7 @@
                         </div>
 
                         <!-- Phase 4 -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Strengthen confidence</h3>
@@ -201,7 +201,7 @@
                         </div>
 
                         <!-- Phase 5 -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Compounding features for humans and agents</h3>
@@ -218,7 +218,7 @@
                         </div>
 
                         <!-- Linter -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Netsukefile linter under <code>netsuke check</code></h3>
@@ -235,7 +235,7 @@
                         </div>
 
                         <!-- Testing framework -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Netsukefile testing framework</h3>
@@ -252,7 +252,7 @@
                         </div>
 
                         <!-- Standard library expansion -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-stone shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
                                     <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Template standard-library expansion</h3>
@@ -275,7 +275,7 @@
             <aside class="lg:col-span-4">
                 <div class="sticky top-24 space-y-8">
                     <!-- Release card -->
-                    <div class="bg-white rounded-xl border border-stone shadow-sm p-6">
+                    <div class="bg-white rounded-xl border border-stone shadow-xs p-6">
                         <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
                             <span class="iconify text-matcha mr-2 text-sm" data-icon="carbon:tag" aria-hidden="true"></span> Current release
                         </h3>

@@ -9,7 +9,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('security', sub_links=[{'href': '#network-policy', 'label': 'Network policy'}, {'href': '#recipe-shells', 'label': 'Recipe shells'}, {'href': '#shell-dollars', 'label': 'Markers and shell dollars'}, {'href': '#security', 'label': 'Security model'}]) }}{% raw %}
 
@@ -35,21 +35,21 @@
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="space-y-4">
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <code class="text-indigo font-bold font-mono text-sm">--fetch-allow-scheme &lt;SCHEME&gt;</code>
                             <p class="text-xs text-charcoal-mid mt-2">Allow additional URL schemes beyond the defaults. Repeat the flag to allow multiple schemes.</p>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <code class="text-indigo font-bold font-mono text-sm">--fetch-allow-host &lt;HOST&gt;</code>
                             <p class="text-xs text-charcoal-mid mt-2">Allow the provided hostname when default-deny mode is active. Wildcards such as <code>*.example.com</code> are supported.</p>
                         </div>
                     </div>
                     <div class="space-y-4">
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <code class="text-vermillion font-bold font-mono text-sm">--fetch-block-host &lt;HOST&gt;</code>
                             <p class="text-xs text-charcoal-mid mt-2">Always block the provided hostname, even if it appears on the allowlist. Wildcards are supported.</p>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
+                        <div class="bg-white p-5 rounded-xl border border-stone shadow-xs">
                             <code class="text-vermillion font-bold font-mono text-sm">--fetch-default-deny</code>
                             <p class="text-xs text-charcoal-mid mt-2">Deny all hosts by default. Only hosts explicitly allowed by <code>--fetch-allow-host</code> may be contacted.</p>
                         </div>
@@ -77,21 +77,21 @@ $ netsuke \
                     Structured executable arguments (<a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0001-structured-command-blocks.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">RFC 0001</a>) are planned for v0.2.0 and do not change the contract below.
                 </p>
                 <div class="grid md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="flex items-center mb-3">
                             <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:linux" aria-hidden="true"></span>
                             <h3 class="font-bold text-charcoal text-sm">Unix: <code>/bin/sh -e</code></h3>
                         </div>
                         <p class="text-xs text-charcoal-mid">Each <code>command</code> list entry runs in its own brace group, joined with <code>&amp;&amp;</code>, and is passed to <code>eval</code> as a shell-quoted payload so a trailing <code>#</code> or <code>&amp;</code> cannot break the chain. Groups run in the current shell, so a <code>cd</code> or variable assignment carries to later entries. An entry may start at most one background job; structured or nested <code>exec</code> forms are rejected during Ninja generation.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="flex items-center mb-3">
                             <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:logo-windows" aria-hidden="true"></span>
                             <h3 class="font-bold text-charcoal text-sm">Windows: PowerShell by default</h3>
                         </div>
                         <p class="text-xs text-charcoal-mid">Every legacy recipe is handed to Windows PowerShell (<code>powershell.exe</code>, not <code>pwsh</code>) as an encoded, non-interactive, no-profile command. A command list shares one process and is checked with <code>$LASTEXITCODE</code> after every entry. Use PowerShell syntax: <code>$name</code> is a variable and <code>$env:NAME</code> reads the environment. <code>{{ ins }}</code> and <code>{{ outs }}</code> render as single-quoted PowerShell arguments. Recipes over Windows' command-line limit and up to 1 MiB are routed through a self-deleting <code>.ps1</code> response file.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="flex items-center mb-3">
                             <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:logo-git" aria-hidden="true"></span>
                             <h3 class="font-bold text-charcoal text-sm">Windows: explicit Bash route</h3>
@@ -118,7 +118,7 @@ netsuke build
                     <code>{{ ins }}</code> and <code>{{ outs }}</code> are the only Netsuke markers for input and output paths, and the only values that are automatically shell-quoted. Everything else a template renders is ordinary command text. Since v0.1.0-beta3, shell dollar expressions are written normally: Netsuke lowers the markers first and only then escapes literal dollars as <code>$$</code> in the generated Ninja file, so the shell receives them unchanged.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Write this</h3>
                         <div class="bg-charcoal rounded-lg p-4 overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
@@ -132,7 +132,7 @@ targets:
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3"><code>$CC</code>, <code>$CFLAGS</code>, and <code>$HOSTNAME</code> reach <code>/bin/sh</code> as literal shell variables. On the PowerShell route, write <code>$env:CC</code> instead; PowerShell does not perform POSIX <code>${VAR:-default}</code> expansion.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Migrating a beta2 manifest</h3>
                         <ul class="space-y-2 text-xs text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-amber mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace the historical spelling <code>$$PATH</code> with <code>$PATH</code>. On POSIX and Bash routes <code>$$</code> is the shell's process identifier; in PowerShell it is the last token of the previous command, so the extra dollar now changes the result.</span></li>
@@ -159,7 +159,7 @@ targets:
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-boxwood flex items-center justify-center text-charcoal mb-4">
                             <span class="iconify" data-icon="carbon:box" aria-hidden="true"></span>
                         </div>
@@ -167,7 +167,7 @@ targets:
                         <p class="text-sm text-charcoal-mid">The manifest must be valid YAML before any template expansion happens. Structural mistakes fail early, before commands are generated.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-boxwood flex items-center justify-center text-charcoal mb-4">
                             <span class="iconify" data-icon="carbon:fingerprint-recognition" aria-hidden="true"></span>
                         </div>
@@ -175,7 +175,7 @@ targets:
                         <p class="text-sm text-charcoal-mid"><code>{{ ins }}</code> and <code>{{ outs }}</code> are quoted as path arguments for the selected recipe shell. Other rendered Jinja values are <em>not</em> automatically shell-quoted, and the <code>shell_escape</code> filter described in older drafts is not implemented in v{% endraw %}{{ netsuke_version }}{% raw %}: handwritten shell fragments remain the author's responsibility.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-boxwood flex items-center justify-center text-charcoal mb-4">
                             <span class="iconify" data-icon="carbon:network-4" aria-hidden="true"></span>
                         </div>
@@ -186,7 +186,7 @@ targets:
 
                 <div class="bg-boxwood-pale border-l-4 border-indigo p-6 rounded-r-lg mb-12">
                     <div class="flex">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <span class="iconify text-indigo mt-1" data-icon="carbon:folder-shared" aria-hidden="true"></span>
                         </div>
                         <div class="ml-4">
@@ -200,7 +200,7 @@ targets:
                 </div>
 
                 <!-- Security Chart -->
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Vulnerability Mitigation</h3>
                     <p class="text-xs text-charcoal-mid mb-4">Qualitative comparison based on documented safety features; no numeric mitigation claim is implied.</p>
                     <p id="securityChartSummary" class="text-xs text-charcoal-mid mb-4">Manifest schema validation, quoted path markers with shell-safe glob results, and typed diagnostics give Netsuke stronger qualitative mitigation than ad hoc scripts on each documented boundary. Interactive charting requires JavaScript.</p>

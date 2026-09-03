@@ -17,7 +17,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('templating', sub_links=[{'href': '#why', 'label': 'Why Jinja inside YAML'}, {'href': '#yaml', 'label': 'YAML foundations'}, {'href': '#rendering', 'label': 'How rendering works'}, {'href': '#foreach', 'label': 'Repeating with foreach'}, {'href': '#when', 'label': 'Selecting with when'}, {'href': '#macros', 'label': 'Macros'}, {'href': '#patterns', 'label': 'Common patterns'}]) }}{% raw %}
 
@@ -43,21 +43,21 @@
                     the build graph &mdash; it is to keep repeated YAML short enough to tolerate.
                 </p>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
                             <span class="iconify" data-icon="carbon:document" aria-hidden="true"></span>
                         </div>
                         <h3 class="font-bold text-charcoal mb-2">YAML first</h3>
                         <p class="text-sm text-charcoal-mid">Structure is checked before templating renders commands. Structural mistakes fail early, with YAML line numbers.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
                             <span class="iconify" data-icon="carbon:flow" aria-hidden="true"></span>
                         </div>
                         <h3 class="font-bold text-charcoal mb-2">Entries, not branches</h3>
                         <p class="text-sm text-charcoal-mid"><code>foreach</code> and <code>when</code> select manifest entries at plan time. Build-time branching belongs in recipe commands, not the manifest.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
                             <span class="iconify" data-icon="carbon:function" aria-hidden="true"></span>
                         </div>
@@ -111,7 +111,7 @@ defaults:
                     function with parentheses, and apply a test with <code>is</code>.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Rules that keep manifests honest</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Undefined values are errors, not silent empty strings.</span></li>
@@ -120,7 +120,7 @@ defaults:
                             <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>vars</code> keys named <code>env</code> or <code>glob</code> are rejected at parse time &mdash; they would silently shadow the built-in helpers of the same name. The error names the offending key.</span></li>
                         </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Order of operations</h3>
                         <ol class="space-y-2 text-sm text-charcoal-mid list-decimal list-inside marker:text-indigo marker:font-bold">
                             <li>Parse and validate the YAML document.</li>
@@ -240,7 +240,7 @@ targets:
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Common Patterns</h2>
 
                 <div class="bg-boxwood-pale border border-stone rounded-xl overflow-hidden">
-                    <div class="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-stone">
+                    <div class="grid md:grid-cols-12 hm-cells">
                         <!-- Sidebar for patterns -->
                         <div class="md:col-span-4 p-6 bg-white/50">
                             <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Recipes</h3>

@@ -30,12 +30,12 @@
                     <span class="w-2 h-2 rounded-full bg-matcha mr-2 animate-pulse"></span> <span class="hm-kicker__lede">Open Source Build System &middot; </span>v{{ netsuke_version }}
                 </div>
 
-                <h1 class="font-serif text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight drop-shadow-lg">
+                <h1 class="font-serif text-5xl lg:text-7xl font-bold text-white leading-[1.1] lg:leading-none tracking-tight">
                     Build systems,<br>
-                    not <span class="text-vermillion italic bg-white/12 px-2 rounded-lg">build scripts</span>.
+                    not <span class="text-vermillion italic px-2 rounded-lg">build scripts</span>.
                 </h1>
 
-                <p class="text-xl text-stone-light max-w-lg leading-relaxed font-light drop-shadow-md">
+                <p class="text-xl text-stone-light max-w-lg leading-relaxed font-light">
                     Netsuke turns a YAML-plus-Jinja <code class="bg-white/10 px-1.5 py-0.5 rounded border border-white/10">Netsukefile</code> into a static Ninja plan. Describe the graph once; let Ninja do the running.
                 </p>
 
@@ -192,7 +192,7 @@ targets:
                     <!-- Stage 1 -->
                     <div class="relative group">
                         <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">1</div>
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">1</div>
                             <h4 class="font-bold text-charcoal text-sm mb-2">Read</h4>
                             <p class="text-xs text-charcoal-mid">Load manifest files from disk</p>
                         </div>
@@ -202,7 +202,7 @@ targets:
                     <!-- Stage 2 -->
                     <div class="relative group">
                         <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">2</div>
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">2</div>
                             <h4 class="font-bold text-charcoal text-sm mb-2">Parse</h4>
                             <p class="text-xs text-charcoal-mid">Validate the manifest as YAML</p>
                         </div>
@@ -212,7 +212,7 @@ targets:
                     <!-- Stage 3 -->
                     <div class="relative group">
                         <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">3</div>
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">3</div>
                             <h4 class="font-bold text-charcoal text-sm mb-2">Expand</h4>
                             <p class="text-xs text-charcoal-mid">Process templates & variables</p>
                         </div>
@@ -222,7 +222,7 @@ targets:
                     <!-- Stage 4 -->
                     <div class="relative group">
                         <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">4</div>
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">4</div>
                             <h4 class="font-bold text-charcoal text-sm mb-2">Render</h4>
                             <p class="text-xs text-charcoal-mid">Deserialize and render string fields</p>
                         </div>
@@ -232,7 +232,7 @@ targets:
                     <!-- Stage 5 -->
                     <div class="relative group">
                         <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-sm">5</div>
+                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">5</div>
                             <h4 class="font-bold text-charcoal text-sm mb-2">Validate</h4>
                             <p class="text-xs text-charcoal-mid">Check cycles & missing deps</p>
                         </div>
@@ -242,7 +242,7 @@ targets:
                     <!-- Stage 6 -->
                     <div class="relative group">
                         <div class="h-full bg-indigo text-white p-6 rounded-lg border border-indigo-light shadow-md flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center mb-4 text-white font-bold font-serif shadow-sm">6</div>
+                            <div class="w-10 h-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center mb-4 text-white font-bold font-serif shadow-xs">6</div>
                             <h4 class="font-bold text-white text-sm mb-2">Build</h4>
                             <p class="text-xs text-indigo-100">Execute via Ninja backend</p>
                         </div>
@@ -314,8 +314,8 @@ targets:
                 <p class="text-charcoal-mid">Comparing Netsuke to traditional Makefiles.</p>
             </div>
 
-            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg border border-stone-light">
-                <table class="min-w-full divide-y divide-stone-light">
+            <div class="overflow-hidden shadow ring-1 ring-black/5 rounded-lg border border-stone-light">
+                <table class="min-w-full hm-rows">
                     <thead class="bg-boxwood-pale">
                         <tr>
                             <th scope="col" class="py-4 pl-6 pr-3 text-left text-sm font-bold text-charcoal font-serif">Feature</th>
@@ -323,7 +323,7 @@ targets:
                             <th scope="col" class="px-3 py-4 text-left text-sm font-bold text-charcoal font-serif text-indigo">Netsuke</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-stone-light bg-white">
+                    <tbody class="hm-rows bg-white">
                         <tr>
                             <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Configuration</td>
                             <td class="px-3 py-4 text-sm text-charcoal-mid">Imperative, shell-dependent</td>

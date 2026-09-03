@@ -26,7 +26,7 @@
         <div class="space-y-8">
           {% endraw %}{{ ui.kicker('v1.0.0 Release') }}{% raw %}
           <h1
-            class="font-serif text-5xl lg:text-7xl font-bold text-charcoal leading-[1.1] tracking-tight">
+            class="font-serif text-5xl lg:text-7xl font-bold text-charcoal leading-[1.1] lg:leading-none tracking-tight">
             Warmth,<br>
             Precision,<br><span class="text-vermillion italic">Structure.</span>
           </h1>
@@ -53,7 +53,7 @@
             class="relative rounded-xl overflow-hidden shadow-2xl border border-stone bg-boxwood-pale p-1">
             <div class="absolute top-4 right-4 z-20">
               <div
-                class="bg-white/90 backdrop-blur px-3 py-1 rounded text-xs font-mono text-charcoal shadow-sm border border-stone/50">
+                class="bg-white/90 backdrop-blur px-3 py-1 rounded text-xs font-mono text-charcoal shadow-xs border border-stone/50">
                 Netsuke UI
               </div>
             </div><img
@@ -203,7 +203,7 @@
               a 16px baseline. We pair the humanistic Fraunces serif with the
               clean utility of Source Sans 3 and JetBrains Mono.
             </p>
-            <div class="p-6 bg-white border border-stone rounded-lg shadow-sm">
+            <div class="p-6 bg-white border border-stone rounded-lg shadow-xs">
               <h4 class="font-serif font-bold text-lg mb-4 text-indigo">Font
                 Stack</h4>
               <div class="space-y-4">
@@ -290,7 +290,7 @@
         </div>
         <div class="grid lg:grid-cols-2 gap-12">
           <!-- Buttons Card -->
-          <div class="bg-white p-8 rounded-xl border border-stone shadow-sm">
+          <div class="bg-white p-8 rounded-xl border border-stone shadow-xs">
             <h3
               class="font-serif text-xl font-bold text-charcoal mb-6 flex items-center">
               <span  class="iconify text-indigo mr-3 text-sm" data-icon="carbon:cursor-1" aria-hidden="true"></span>
@@ -301,10 +301,10 @@
                 <p class="text-sm text-charcoal-mid mb-4 font-mono">Default Size
                 </p>
                 <div class="flex flex-wrap gap-4 items-center"><button
-                    class="px-6 py-2.5 bg-indigo text-white rounded-md font-medium shadow-sm hover:bg-indigo-light transition-colors focus:ring-2 focus:ring-indigo focus:ring-offset-2">
+                    class="px-6 py-2.5 bg-indigo text-white rounded-md font-medium shadow-xs hover:bg-indigo-light transition-colors focus:ring-2 focus:ring-indigo focus:ring-offset-2">
                     Primary Action
                   </button><button
-                    class="px-6 py-2.5 bg-vermillion text-white rounded-md font-medium shadow-sm hover:bg-vermillion-dim transition-colors focus:ring-2 focus:ring-vermillion focus:ring-offset-2">
+                    class="px-6 py-2.5 bg-vermillion text-white rounded-md font-medium shadow-xs hover:bg-vermillion-dim transition-colors focus:ring-2 focus:ring-vermillion focus:ring-offset-2">
                     Accent CTA
                   </button><button
                     class="px-6 py-2.5 bg-transparent border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors">
@@ -315,10 +315,10 @@
                 <p class="text-sm text-charcoal-mid mb-4 font-mono">Small Size
                   (--sm)</p>
                 <div class="flex flex-wrap gap-4 items-center"><button
-                    class="px-3 py-1.5 text-sm bg-indigo text-white rounded-md font-medium shadow-sm hover:bg-indigo-light transition-colors">
+                    class="px-3 py-1.5 text-sm bg-indigo text-white rounded-md font-medium shadow-xs hover:bg-indigo-light transition-colors">
                     Primary
                   </button><button
-                    class="px-3 py-1.5 text-sm bg-vermillion text-white rounded-md font-medium shadow-sm hover:bg-vermillion-dim transition-colors">
+                    class="px-3 py-1.5 text-sm bg-vermillion text-white rounded-md font-medium shadow-xs hover:bg-vermillion-dim transition-colors">
                     Accent
                   </button><button
                     class="px-3 py-1.5 text-sm bg-transparent border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors">
@@ -327,7 +327,7 @@
               </div>
             </div>
           </div><!-- Tags & Badges -->
-          <div class="bg-white p-8 rounded-xl border border-stone shadow-sm">
+          <div class="bg-white p-8 rounded-xl border border-stone shadow-xs">
             <h3
               class="font-serif text-xl font-bold text-charcoal mb-6 flex items-center">
               <span  class="iconify text-indigo mr-3 text-sm" data-icon="carbon:tag" aria-hidden="true"></span> Tags
@@ -360,7 +360,7 @@
                 <div
                   class="border-l-4 border-indigo bg-indigo/5 p-4 rounded-r-md">
                   <div class="flex">
-                    <div class="flex-shrink-0"><span
+                    <div class="shrink-0"><span
                          class="iconify text-indigo" data-icon="carbon:information-filled" aria-hidden="true"></span></div>
                     <div class="ml-3">
                       <h3 class="text-sm font-medium text-indigo">Information
@@ -375,7 +375,7 @@
                 <div
                   class="mt-4 border-l-4 border-vermillion bg-vermillion/5 p-4 rounded-r-md">
                   <div class="flex">
-                    <div class="flex-shrink-0"><span
+                    <div class="shrink-0"><span
                          class="iconify text-vermillion" data-icon="carbon:error-filled" aria-hidden="true"></span>
                     </div>
                     <div class="ml-3">
@@ -472,8 +472,8 @@
           </div>
           <div class="lg:col-span-2">
             <div
-              class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
-              <table class="min-w-full divide-y divide-stone-light">
+              class="overflow-hidden shadow ring-1 ring-black/5 rounded-lg">
+              <table class="min-w-full hm-rows">
                 <thead class="bg-boxwood-pale">
                   <tr>
                     <th scope="col"
@@ -490,7 +490,7 @@
                       Use Case</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-stone-light bg-white">
+                <tbody class="hm-rows bg-white">
                   <tr>
                     <td
                       class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-mono text-indigo sm:pl-6">
@@ -578,12 +578,12 @@
           class="font-serif text-3xl font-bold text-charcoal mb-8 text-center">
           Data Visualization Style</h2>
         <div class="grid lg:grid-cols-2 gap-8">
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-stone">
+          <div class="bg-white p-6 rounded-xl shadow-xs border border-stone">
             <h3 class="font-serif text-lg font-bold text-charcoal mb-4">System
               Adoption</h3>
             <div id="barChartContainer" class="h-[300px] w-full"></div>
           </div>
-          <div class="bg-white p-6 rounded-xl shadow-sm border border-stone">
+          <div class="bg-white p-6 rounded-xl shadow-xs border border-stone">
             <h3 class="font-serif text-lg font-bold text-charcoal mb-4">
               Component Usage</h3>
             <div id="pieChartContainer" class="h-[300px] w-full"></div>

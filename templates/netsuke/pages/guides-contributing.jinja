@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#ways-to-contribute', 'label': 'Ways to Contribute'}, {'href': '#dev-workflow', 'label': 'Development Workflow'}, {'href': '#quality-gates', 'label': 'Quality Gates'}, {'href': '#translation', 'label': 'Translating Netsuke'}, {'href': '#commit-style', 'label': 'Commit Style'}]},
@@ -29,7 +29,7 @@
                 </h2>
 
                 <div class="grid md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
                             <span class="iconify" data-icon="carbon:code" aria-hidden="true"></span>
                         </div>
@@ -37,7 +37,7 @@
                         <p class="text-sm text-charcoal-mid">Fix bugs, add features, improve tests. Check the issue tracker for items tagged <code>good first issue</code> or <code>help wanted</code>.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
                             <span class="iconify" data-icon="carbon:document" aria-hidden="true"></span>
                         </div>
@@ -45,7 +45,7 @@
                         <p class="text-sm text-charcoal-mid">Improve explanations, add examples, fix typos, or write guides. Documentation contributions are reviewed just like code.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
                             <span class="iconify" data-icon="carbon:translate" aria-hidden="true"></span>
                         </div>
@@ -94,7 +94,7 @@ $ make check-fmt lint test
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Test suite structure</h3>
                         <ul class="space-y-2 text-xs text-charcoal-mid">
                             <li class="flex items-start">
@@ -111,7 +111,7 @@ $ make check-fmt lint test
                             </li>
                         </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Compile-time validation</h3>
                         <p class="text-xs text-charcoal-mid mb-3">
                             Several checks happen at build time to catch regressions early:

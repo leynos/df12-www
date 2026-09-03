@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#how-it-works', 'label': 'How localization works'}, {'href': '#file-structure', 'label': 'File structure'}, {'href': '#style-and-terminology', 'label': 'Style, tone, and terminology'}, {'href': '#message-keys', 'label': 'Message keys'}, {'href': '#variables-plurals', 'label': 'Variables & plurals'}, {'href': '#new-locale', 'label': 'Adding a new locale'}, {'href': '#quality', 'label': 'Quality & validation'}]},
@@ -36,7 +36,7 @@
                     and the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization glossary</a> is the source of truth for terminology in every locale.
                 </p>
 
-                <div class="bg-white rounded-xl border border-stone shadow-sm p-6 mb-8">
+                <div class="bg-white rounded-xl border border-stone shadow-xs p-6 mb-8">
                     <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">Shipped locales by script family</h3>
                     <div class="overflow-x-auto [contain:inline-size]">
                         <table class="min-w-full text-xs">
@@ -46,7 +46,7 @@
                                     <th scope="col" class="pb-2 font-bold uppercase tracking-wide">Locale catalogues</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-stone-light">
+                            <tbody class="hm-rows">
                                 <tr><th scope="row" class="py-2 pr-4 font-bold text-charcoal whitespace-nowrap align-top text-left">Latin</th><td class="py-2 font-mono text-charcoal-mid">cs, cy, da, de, en-GB, en-US, es-419, es-ES, fi, fr, gd, hu, id, it, nb, nl, pl, pt-BR, pt-PT, ro, sv, tr, vi</td></tr>
                                 <tr><th scope="row" class="py-2 pr-4 font-bold text-charcoal whitespace-nowrap align-top text-left">Cyrillic</th><td class="py-2 font-mono text-charcoal-mid">ru, uk</td></tr>
                                 <tr><th scope="row" class="py-2 pr-4 font-bold text-charcoal whitespace-nowrap align-top text-left">Greek</th><td class="py-2 font-mono text-charcoal-mid">el</td></tr>
@@ -170,7 +170,7 @@ greeting = Hello, { $name }!</code></pre>
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="block bg-white p-6 rounded-xl border border-stone shadow-sm hover:border-indigo hover:shadow-paper transition-all group">
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="block bg-white p-6 rounded-xl border border-stone shadow-xs hover:border-indigo hover:shadow-paper transition-all group">
                         <h3 class="font-bold text-charcoal mb-3 text-sm group-hover:text-indigo transition-colors flex items-center">
                             <span class="iconify mr-2 text-indigo" data-icon="carbon:document" aria-hidden="true"></span> Localization style guide
                         </h3>
@@ -182,7 +182,7 @@ greeting = Hello, { $name }!</code></pre>
                         </ul>
                         <span class="inline-flex items-center mt-4 text-xs font-bold text-indigo">Read the style guide <span class="iconify ml-1" data-icon="carbon:arrow-right" aria-hidden="true"></span></span>
                     </a>
-                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="block bg-white p-6 rounded-xl border border-stone shadow-sm hover:border-indigo hover:shadow-paper transition-all group">
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="block bg-white p-6 rounded-xl border border-stone shadow-xs hover:border-indigo hover:shadow-paper transition-all group">
                         <h3 class="font-bold text-charcoal mb-3 text-sm group-hover:text-indigo transition-colors flex items-center">
                             <span class="iconify mr-2 text-indigo" data-icon="carbon:book" aria-hidden="true"></span> Localization glossary
                         </h3>
@@ -217,8 +217,8 @@ greeting = Hello, { $name }!</code></pre>
                     (<code>CLI_FLAG_FILE_HELP</code> maps to <code>cli.flag.file.help</code>).
                 </p>
 
-                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto">
-                    <table class="min-w-full divide-y divide-stone-light">
+                <div class="bg-white rounded-lg border border-stone shadow-xs overflow-x-auto">
+                    <table class="min-w-full hm-rows">
                         <thead class="bg-boxwood-pale">
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Domain</th>
@@ -226,7 +226,7 @@ greeting = Hello, { $name }!</code></pre>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Example</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-stone-light">
+                        <tbody class="bg-white hm-rows">
                             <tr>
                                 <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-indigo">cli.*</td>
                                 <td class="px-6 py-3 text-sm text-charcoal-mid">CLI help text and validation</td>
@@ -314,7 +314,7 @@ example.files_processed = { $count -&gt;
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">CLDR categories by language</h3>
                         <ul class="space-y-1.5 text-xs text-charcoal-mid font-mono">
                             <li>English, Spanish, French &mdash; <code>one</code>, <code>other</code></li>
@@ -363,7 +363,7 @@ $ cp locales/en-US/messages.ftl locales/is/messages.ftl
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Step 4: register the locale</h3>
                         <p class="text-xs text-charcoal-mid mb-3"><code>src/locale_catalogues.rs</code> is the authoritative registry. Its <code>define_locales!</code> macro both declares the tag and embeds the catalogue, so a tag without a file on disk fails to compile:</p>
                         <div class="bg-charcoal rounded-lg p-4 overflow-x-auto">
@@ -374,7 +374,7 @@ $ cp locales/en-US/messages.ftl locales/is/messages.ftl
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3">Two lists deliberately duplicate the registry and must be updated too: the <code>locales</code> array under <code>[package.metadata.ortho_config]</code> in <code>Cargo.toml</code> (the build audit fails if the two drift) and <code>EXPECTED_SHIPPED_TAGS</code> in <code>tests/locale_registry_tests.rs</code>, an independent oracle. When the language already ships a catalogue, extend its <code>LANGUAGE_FALLBACKS</code> rule so every region and script still resolves to exactly one variant.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Steps 5&ndash;6: build and test</h3>
                         <div class="bg-charcoal rounded-lg p-4 overflow-x-auto mb-3">
                             {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
@@ -410,7 +410,7 @@ $ cargo run -- --locale is --help
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Pre-submission checklist</h3>
                     <ul class="grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
                         <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>All keys from <code>en-US/messages.ftl</code> are present</span></li>

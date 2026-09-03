@@ -354,12 +354,12 @@ defaults:
 {% macro card(ex) %}
             <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full" data-example-card data-category="{{ ex.category }}">
                 <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('{{ ex.image }}')] bg-cover bg-center opacity-95"></div>
+                     <div class="absolute inset-0 bg-cover bg-center opacity-95" style="background-image: url('{{ ex.image }}')"></div>
                     <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
                         <span class="iconify mr-1 {{ ex.cat_colour }} inline" data-icon="{{ ex.cat_icon }}" aria-hidden="true"></span> {{ ex.category }}
                     </div>
                 </div>
-                <div class="p-6 flex flex-col flex-grow">
+                <div class="p-6 flex flex-col grow">
                     <div class="mb-4">
                         <h3 class="font-serif text-xl font-bold text-charcoal mb-2">{{ ex.title }}</h3>
                         <p class="text-sm text-charcoal-mid line-clamp-3">

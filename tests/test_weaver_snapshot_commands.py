@@ -8,6 +8,7 @@ one output per page.
 from __future__ import annotations
 
 import contextlib
+import json
 import subprocess
 import typing as typ
 
@@ -191,6 +192,13 @@ def _driven(
     monkeypatch.setattr(
         commands, "_run_tool", lambda argv: record["argv"].append(list(argv))
     )
+
+    def read(argv: cabc.Sequence[str]) -> str:
+        record["argv"].append(list(argv))
+        tree = {"tag": "html", "classes": [], "styleDiff": {}, "children": []}
+        return json.dumps(json.dumps({"tree": tree, "visited": 1}))
+
+    monkeypatch.setattr(commands, "_read_tool", read)
     yield record
 
 
@@ -234,7 +242,9 @@ def test_the_capture_command_wires_its_helpers_together(
 ) -> None:
     """The same for `capture`, whose only other coverage needs a real browser."""
     pages = ["", "commands/act/"]
-    with _driven(monkeypatch, pages, {"bun": "/usr/bin/bun"}) as run:
+    with _driven(
+        monkeypatch, pages, {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
         commands.capture(tmp_path / "out", port=8124)
 
     assert run["served"] == [8124], f"the named port should be served; got {run}"
@@ -243,15 +253,13 @@ def test_the_capture_command_wires_its_helpers_together(
         f"captures should stage as .json; got {run['staged']}"
     )
 
-    outputs = [argv[argv.index("--output") + 1] for argv in run["argv"]]
-    expected = [
-        f"{tmp_path / 'out' / '.staging'}/{paths._slug(page)}.json" for page in pages
-    ]
-    assert outputs == expected, (
-        f"expected one snapshot per page, into the staging directory; got {outputs}"
+    written = sorted(path.name for path in (tmp_path / "out" / ".staging").iterdir())
+    expected = sorted(f"{paths._slug(page)}.json" for page in pages)
+    assert written == expected, (
+        f"expected one snapshot per page, into the staging directory; got {written}"
     )
-    assert all(argv[0] == "/usr/bin/bun" for argv in run["argv"]), (
-        f"every command should run through the resolved bun; got {run['argv']}"
+    assert all(argv[0] == "/usr/bin/agent-browser" for argv in run["argv"]), (
+        f"every command should run through the resolved browser; got {run['argv']}"
     )
 
 
@@ -266,7 +274,9 @@ def test_the_capture_command_addresses_the_site_it_was_given(
     """
     roots: list[Path] = []
     sites: list[str] = []
-    with _driven(monkeypatch, ["", "docs/"], {"bun": "/usr/bin/bun"}) as run:
+    with _driven(
+        monkeypatch, ["", "docs/"], {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
 
         def pages_under(root: Path) -> list[str]:
             roots.append(root)
@@ -288,7 +298,7 @@ def test_the_capture_command_addresses_the_site_it_was_given(
     assert sites == ["netsuke"], (
         f"the server's readiness probe should ask for the named site; got {sites}"
     )
-    urls = [argv[-1] for argv in run["argv"]]
+    urls = [argv[2] for argv in run["argv"] if argv[1] == "open"]
     assert urls == [
         "http://127.0.0.1:9999/netsuke/",
         "http://127.0.0.1:9999/netsuke/docs/",
@@ -321,10 +331,12 @@ def test_a_command_stops_its_server_even_when_a_page_fails(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """A browser that fails on page two must not strand the server on port one."""
-    with _driven(monkeypatch, ["", "install/"], {"bun": "/usr/bin/bun"}) as run:
+    with _driven(
+        monkeypatch, ["", "install/"], {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
 
         def refuse(_argv: cabc.Sequence[str]) -> None:
-            raise subprocess.CalledProcessError(1, "bun")
+            raise subprocess.CalledProcessError(1, "agent-browser")
 
         monkeypatch.setattr(commands, "_run_tool", refuse)
         with pytest.raises(subprocess.CalledProcessError):

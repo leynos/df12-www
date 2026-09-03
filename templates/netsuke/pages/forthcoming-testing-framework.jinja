@@ -5,7 +5,7 @@
 {% block page_title %}Netsukefile Testing Framework (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
 {% raw %}
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar(sections=[
             {'title': 'Forthcoming', 'links': [
@@ -72,15 +72,15 @@
                     agent or CI job can run before and after editing a manifest. The design rests on three commitments.
                 </p>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">Same compiler, declared substitutions</h3>
                         <p class="text-xs text-charcoal-mid">Tests use the real loader, expansion, IR lowering, and Ninja generator. Mocks are substitutions at named seams &mdash; template functions, environment, clock, macros &mdash; never a re-implementation that can drift from the product.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">Plan mode is the unit-testing story</h3>
                         <p class="text-xs text-charcoal-mid">Like OpenTofu's plan-mode tests, every pipeline action stops at generated Ninja text and never executes build commands. An unmocked impure call is an error, not a silent passthrough.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">Failure output is a feature</h3>
                         <p class="text-xs text-charcoal-mid">A failing assertion is rendered as the expression with its actual values substituted, in the style of Open Policy Agent. An unexpected mock call suggests the configuration stanza that would have accepted it.</p>
                     </div>
@@ -158,11 +158,11 @@ test_hello_target_is_generated:
 {% endraw %}{% endhighlight %}{% raw %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-3 text-sm"><code>when</code>: pipeline actions</h3>
                         <div class="overflow-x-auto [contain:inline-size]" tabindex="0"><table class="min-w-full text-xs">
                             <thead><tr class="text-left text-charcoal-mid"><th class="pb-2 pr-4 font-bold">Action</th><th class="pb-2 pr-4 font-bold">Runs</th><th class="pb-2 font-bold">Result carries</th></tr></thead>
-                            <tbody class="divide-y divide-stone-light text-charcoal-mid">
+                            <tbody class="hm-rows text-charcoal-mid">
                                 <tr><td class="py-2 pr-4 font-mono text-indigo">load_manifest</td><td class="py-2 pr-4">ingest, parse, expand, deserialize, render</td><td class="py-2 font-mono">result.manifest</td></tr>
                                 <tr><td class="py-2 pr-4 font-mono text-indigo">build_graph</td><td class="py-2 pr-4"><code>load_manifest</code> + IR lowering</td><td class="py-2 font-mono">result.graph</td></tr>
                                 <tr><td class="py-2 pr-4 font-mono text-indigo">generate_ninja</td><td class="py-2 pr-4"><code>build_graph</code> + Ninja generation</td><td class="py-2 font-mono">result.ninja</td></tr>
@@ -170,7 +170,7 @@ test_hello_target_is_generated:
                         </table></div>
                         <p class="text-xs text-charcoal-mid mt-3">Scalar, list, and object forms are accepted; the object form can name an explicit <code>manifest</code> path, typically a fixture export.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-3 text-sm"><code>then</code>: assertion forms</h3>
                         <p class="text-xs text-charcoal-mid mb-3">Scalar entries are MiniJinja boolean expressions over the result and the mock journal; object entries are structured assertions with richer diffs. Helpers available in expressions: <code>contains</code>, <code>starts_with</code>, <code>ends_with</code>, <code>matches</code>, <code>file_exists</code>, <code>file_contains</code>.</p>
                         <div class="bg-charcoal rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
@@ -220,11 +220,11 @@ given:
     compile_cmd: substitute("stand_in_compile")
 {% endraw %}{% endhighlight %}{% raw %}
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">What can be mocked</h3>
                         <div class="overflow-x-auto [contain:inline-size]" tabindex="0"><table class="min-w-full text-xs">
                             <thead><tr class="text-left text-charcoal-mid"><th class="pb-2 pr-4 font-bold">Seam</th><th class="pb-2 pr-4 font-bold">Mechanism</th><th class="pb-2 font-bold">Example</th></tr></thead>
-                            <tbody class="divide-y divide-stone-light text-charcoal-mid">
+                            <tbody class="hm-rows text-charcoal-mid">
                                 <tr><td class="py-2 pr-4">Template functions</td><td class="py-2 pr-4"><code>mock</code>/<code>stub</code>/<code>spy</code></td><td class="py-2 font-mono">glob, which, fetch, command_available</td></tr>
                                 <tr><td class="py-2 pr-4">Environment variables</td><td class="py-2 pr-4"><code>given.env</code></td><td class="py-2 font-mono">env("CC")</td></tr>
                                 <tr><td class="py-2 pr-4">Clock</td><td class="py-2 pr-4"><code>given.clock</code></td><td class="py-2 font-mono">now()</td></tr>
@@ -296,10 +296,10 @@ Options:
 {% endraw %}{% endhighlight %}{% raw %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Exit codes</h3>
                         <div class="overflow-x-auto [contain:inline-size]" tabindex="0"><table class="min-w-full text-xs">
-                            <tbody class="divide-y divide-stone-light text-charcoal-mid">
+                            <tbody class="hm-rows text-charcoal-mid">
                                 <tr><td class="py-2 pr-4 font-mono text-indigo">0</td><td class="py-2">all selected cases passed</td></tr>
                                 <tr><td class="py-2 pr-4 font-mono text-indigo">1</td><td class="py-2">at least one case failed or errored</td></tr>
                                 <tr><td class="py-2 pr-4 font-mono text-indigo">2</td><td class="py-2">invalid suite, invalid selector, or zero cases without <code>--allow-empty</code></td></tr>
@@ -308,7 +308,7 @@ Options:
                             </tbody>
                         </table></div>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-3 text-sm">Conventions it inherits</h3>
                         <ul class="space-y-2 text-xs text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-matcha mt-0.5 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>--json</code> and <code>--jobs</code> are the existing global flags. A completed run writes exactly one JSON document to stdout; a run that produces no report writes one diagnostic document to stderr.</span></li>
@@ -409,19 +409,19 @@ FAIL compile.yml::test_substituted_macro_receives_source
                     <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:layers" aria-hidden="true"></span> Under the bonnet
                 </h2>
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">One compiler, two new seams</h3>
                         <p class="text-xs text-charcoal-mid">Implementation reuses the existing pipeline behind an options-carrying loader entry point that registers test overlays after the standard library and manifest macros and before <code>foreach</code> expansion. Only two seams are added: a clock provider and a macro-substitution overlay. Network mocking needs no transport seam, because the deny-all policy plus function-level doubles make the real network code unreachable under test.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">A killable child per case</h3>
                         <p class="text-xs text-charcoal-mid">Each case runs in its own child process so <code>--timeout</code> is a hard bound rather than a cooperative courtesy: MiniJinja evaluation cannot be pre-empted in-process. Discovery, scheduling, and report rendering stay in the parent. Results travel over length-prefixed JSON frames versioned like the existing envelope, with incremental journal checkpoints, so a case killed on the deadline still reports the calls it had made.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">Hermetic and deterministic</h3>
                         <p class="text-xs text-charcoal-mid">Per-case sandboxes built on capability-scoped filesystem handles; no ambient mutation; no execution; a fixed clock; and localized, stream-pure output. The build path ignores the <code>tests</code> block entirely, so a manifest with a test suite behaves identically to one without.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs min-w-0">
                         <h3 class="font-bold text-charcoal mb-2 text-sm">Out of scope</h3>
                         <p class="text-xs text-charcoal-mid">Executing builds or fixture shell commands (designed, but deferred behind explicit allow flags); replacing Netsuke's own Rust test suites; a general-purpose scripting language for tests; file- and session-scoped fixtures; JUnit XML output. The <code>tests</code> key is admitted from the manifest version of the release that ships it, and older binaries reject it with their ordinary unknown-field diagnostic.</p>
                     </div>

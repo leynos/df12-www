@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('') }}{% raw %}
 
@@ -27,7 +27,7 @@
                 </h2>
                 <div class="grid md:grid-cols-2 gap-6">
                     <!-- Quickstart Card -->
-                    <a href="/netsuke/docs/getting-started/" class="group block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all">
+                    <a href="/netsuke/docs/getting-started/" class="group block p-6 bg-white rounded-xl border border-stone shadow-xs hover:shadow-paper hover:border-indigo transition-all">
                         <div class="flex items-start mb-4">
                             <div class="w-10 h-10 rounded-lg bg-indigo/10 text-indigo flex items-center justify-center text-lg">
                                 <span class="iconify" data-icon="carbon:rocket" aria-hidden="true"></span>
@@ -43,7 +43,7 @@
                     </a>
 
                     <!-- Core Concepts Card -->
-                    <a href="/netsuke/docs/getting-started/#first-project" class="group block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-vermillion transition-all">
+                    <a href="/netsuke/docs/getting-started/#first-project" class="group block p-6 bg-white rounded-xl border border-stone shadow-xs hover:shadow-paper hover:border-vermillion transition-all">
                         <div class="flex items-start mb-4">
                             <div class="w-10 h-10 rounded-lg bg-vermillion/10 text-vermillion flex items-center justify-center text-lg">
                                 <span class="iconify" data-icon="carbon:cube-view" aria-hidden="true"></span>
@@ -104,7 +104,7 @@
             </section>
 
             <!-- Example Code Block -->
-            <section id="example-preview" class="mb-16 bg-white border border-stone rounded-xl overflow-hidden shadow-sm">
+            <section id="example-preview" class="mb-16 bg-white border border-stone rounded-xl overflow-hidden shadow-xs">
                 <div class="grid lg:grid-cols-5">
                     <div class="p-8 lg:col-span-2 bg-boxwood-pale border-r border-stone flex flex-col justify-center">
                         <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Self-documenting builds</h3>
@@ -147,8 +147,8 @@ targets:
                 <div class="space-y-4">
                     <!-- Guide Row 1 -->
                     <a href="/netsuke/examples/basic-c-application/" class="block group">
-                        <div class="flex items-start p-4 rounded-lg hover:bg-white border border-transparent hover:border-stone hover:shadow-sm transition-all">
-                            <div class="flex-shrink-0 mt-1 mr-4 text-stone-light group-hover:text-indigo transition-colors">
+                        <div class="flex items-start p-4 rounded-lg hover:bg-white border border-transparent hover:border-stone hover:shadow-xs transition-all">
+                            <div class="shrink-0 mt-1 mr-4 text-stone-light group-hover:text-indigo transition-colors">
                                 <span class="iconify text-2xl" data-icon="carbon:logo-python" aria-hidden="true"></span>
                             </div>
                             <div>
@@ -163,8 +163,8 @@ targets:
 
                     <!-- Guide Row 2 -->
                     <a href="/netsuke/docs/getting-started/#first-project" class="block group">
-                        <div class="flex items-start p-4 rounded-lg hover:bg-white border border-transparent hover:border-stone hover:shadow-sm transition-all">
-                            <div class="flex-shrink-0 mt-1 mr-4 text-stone-light group-hover:text-matcha transition-colors">
+                        <div class="flex items-start p-4 rounded-lg hover:bg-white border border-transparent hover:border-stone hover:shadow-xs transition-all">
+                            <div class="shrink-0 mt-1 mr-4 text-stone-light group-hover:text-matcha transition-colors">
                                 <span class="iconify text-2xl" data-icon="carbon:container-software" aria-hidden="true"></span>
                             </div>
                             <div>
@@ -179,8 +179,8 @@ targets:
 
                     <!-- Guide Row 3 -->
                     <a href="/netsuke/docs/rules-and-targets/#defining-rules" class="block group">
-                        <div class="flex items-start p-4 rounded-lg hover:bg-white border border-transparent hover:border-stone hover:shadow-sm transition-all">
-                            <div class="flex-shrink-0 mt-1 mr-4 text-stone-light group-hover:text-amber transition-colors">
+                        <div class="flex items-start p-4 rounded-lg hover:bg-white border border-transparent hover:border-stone hover:shadow-xs transition-all">
+                            <div class="shrink-0 mt-1 mr-4 text-stone-light group-hover:text-amber transition-colors">
                                 <span class="iconify text-2xl" data-icon="carbon:renew" aria-hidden="true"></span>
                             </div>
                             <div>
@@ -202,7 +202,7 @@ targets:
                     <a href="/netsuke/forthcoming/" class="text-sm font-medium text-charcoal-mid hover:text-vermillion transition-colors hidden sm:block">All previews</a>
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <a href="/netsuke/forthcoming/linter/" class="group block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all">
+                    <a href="/netsuke/forthcoming/linter/" class="group block p-6 bg-white rounded-xl border border-stone shadow-xs hover:shadow-paper hover:border-indigo transition-all">
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-10 h-10 rounded-lg bg-indigo/10 text-indigo flex items-center justify-center text-lg">
                                 <span class="iconify" data-icon="carbon:rule-test" aria-hidden="true"></span>
@@ -212,7 +212,7 @@ targets:
                         <h3 class="font-bold text-charcoal text-lg mb-2 group-hover:text-indigo transition-colors">Netsukefile linter</h3>
                         <p class="text-charcoal-mid text-sm leading-relaxed">Deterministic manifest linting under <code>netsuke check</code>, inspired by mbake, with a stable rule catalogue and per-rule severity policy.</p>
                     </a>
-                    <a href="/netsuke/forthcoming/testing-framework/" class="group block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all">
+                    <a href="/netsuke/forthcoming/testing-framework/" class="group block p-6 bg-white rounded-xl border border-stone shadow-xs hover:shadow-paper hover:border-indigo transition-all">
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-10 h-10 rounded-lg bg-indigo/10 text-indigo flex items-center justify-center text-lg">
                                 <span class="iconify" data-icon="carbon:test-tool" aria-hidden="true"></span>

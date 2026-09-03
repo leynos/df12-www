@@ -24,7 +24,11 @@
  * of specificity. Left unlayered, these rules would start winning arguments
  * they used to lose. In the components layer the old relationship holds: a
  * utility in the markup still wins, and the doubled selectors the partial
- * once needed to win a tie by specificity have nothing left to win. */
+ * once needed to win a tie by specificity have nothing left to win.
+ *
+ * Element defaults go a layer lower, beside the preflight, for the same
+ * reason in reverse: they describe an element before any class touches it. */
+@import "./netsuke/site-base.css" layer(base);
 @import "./netsuke/himotoshi.css" layer(components);
 
 /* The oxide scanner does not discover .jinja files on its own, and the
@@ -38,8 +42,18 @@
  * so the class has never styled anything on this sub-site; registering the
  * plugin here would change that page. Netsuke's prose styling is `.hm-prose`
  * in the partial. */
+/* Four of daisyUI's parts are left out. `scrollbar` paints every element's
+ * scrollbar in the theme's colours, which would replace the
+ * `::-webkit-scrollbar` styling the partial carries; `rootcolor` paints the
+ * root element in base-100 and base-content, which the body already does for
+ * itself; `rootscrollgutter` reserves a scrollbar gutter on the root while a
+ * modal is open, which nothing here opens; and `typography` restyles code
+ * and tables inside `.prose`, a class this sub-site never styled. Each would
+ * show up in a computed-style diff as a change to a page that has not
+ * changed. */
 @plugin "daisyui" {
   themes: netsuke --default;
+  exclude: scrollbar, rootcolor, rootscrollgutter, typography;
   logs: false;
 }
 
@@ -134,14 +148,22 @@
      pipeline stage would otherwise repaint. */
   --color-indigo-100: #e0e7ff;
 
+  /* The line-height each text size carries, pinned to the rem values
+     Tailwind v3 gave them. v4 states them as a ratio of the font size, and
+     a ratio inherits differently: a component-sized child inside a `text-sm`
+     list took 20px from v3 and would take 1.43 times its own size from v4.
+     The templates' spacing was drawn against the rem values. */
+  --text-xs--line-height: 1rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+
   /* One spacing step above Tailwind's scale, for the docs sidebar. */
   --spacing-128: 32rem;
-
-  /* The hero's text shadows, pinned to what Tailwind v3 drew. v4 redrew
-     the drop-shadow scale as single, tighter layers; the hero heading and
-     its lede are the only consumers, and they keep the softer v3 pair. */
-  --drop-shadow-md: 0 4px 3px rgb(0 0 0 / 0.07), 0 2px 2px rgb(0 0 0 / 0.06);
-  --drop-shadow-lg: 0 10px 8px rgb(0 0 0 / 0.04), 0 4px 3px rgb(0 0 0 / 0.1);
 
   /* The paper shadows: the ambient elevation of a card, a panel, and a hero
      window, each a charcoal wash rather than a black one. */

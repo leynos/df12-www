@@ -11,7 +11,7 @@
 {% set install_command = 'cargo binstall netsuke-build@' ~ netsuke_version %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('getting-started', sub_links=[{'href': '/netsuke/docs/getting-started/#installation', 'label': 'Installation'}]) }}{% raw %}
 
@@ -31,7 +31,7 @@
                     <span class="text-stone-light mr-2 font-light">01.</span> Prerequisites
                     <span class="iconify text-sm text-stone opacity-0 group-hover:opacity-100 ml-2 transition-opacity" data-icon="carbon:link" aria-hidden="true"></span>
                 </h2>
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <p class="text-charcoal-mid mb-4">Before we begin, ensure you have the following installed on your system:</p>
                     <ul class="space-y-3">
                         <li class="flex items-start">
@@ -165,7 +165,7 @@ HELLO, NETSUKE!
 {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <div class="flex p-4 bg-boxwood-pale border border-stone rounded-lg">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <span class="iconify text-amber mt-0.5" data-icon="carbon:idea" aria-hidden="true"></span>
                     </div>
                     <div class="ml-3 text-sm text-charcoal-mid">
@@ -181,7 +181,7 @@ HELLO, NETSUKE!
             <section id="next-steps" class="mb-20">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Next Steps</h2>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <a href="/netsuke/docs/manifest-reference/" class="block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all group">
+                    <a href="/netsuke/docs/manifest-reference/" class="block p-6 bg-white rounded-xl border border-stone shadow-xs hover:shadow-paper hover:border-indigo transition-all group">
                         <div class="w-10 h-10 rounded-lg bg-indigo/10 text-indigo flex items-center justify-center text-lg mb-4 group-hover:scale-110 transition-transform">
                             <span class="iconify" data-icon="carbon:book" aria-hidden="true"></span>
                         </div>
@@ -190,7 +190,7 @@ HELLO, NETSUKE!
                         <span class="text-indigo text-sm font-medium">Read docs &rarr;</span>
                     </a>
 
-                    <a href="/netsuke/docs/rules-and-targets/" class="block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-vermillion transition-all group">
+                    <a href="/netsuke/docs/rules-and-targets/" class="block p-6 bg-white rounded-xl border border-stone shadow-xs hover:shadow-paper hover:border-vermillion transition-all group">
                         <div class="w-10 h-10 rounded-lg bg-vermillion/10 text-vermillion flex items-center justify-center text-lg mb-4 group-hover:scale-110 transition-transform">
                             <span class="iconify" data-icon="carbon:center-circle" aria-hidden="true"></span>
                         </div>
@@ -199,7 +199,7 @@ HELLO, NETSUKE!
                         <span class="text-vermillion text-sm font-medium">Explore rules &rarr;</span>
                     </a>
 
-                    <a href="/netsuke/examples/" class="block p-6 bg-white rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-matcha transition-all group">
+                    <a href="/netsuke/examples/" class="block p-6 bg-white rounded-xl border border-stone shadow-xs hover:shadow-paper hover:border-matcha transition-all group">
                         <div class="w-10 h-10 rounded-lg bg-matcha/10 text-matcha flex items-center justify-center text-lg mb-4 group-hover:scale-110 transition-transform">
                             <span class="iconify" data-icon="carbon:code" aria-hidden="true"></span>
                         </div>

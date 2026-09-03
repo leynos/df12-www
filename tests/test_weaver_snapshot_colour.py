@@ -166,3 +166,14 @@ def test_a_percentage_lightness_still_maps_to_one() -> None:
     assert colour._canonical_value("oklch(100% 0 0)") == colour._canonical_value(
         "oklch(1 0 0)"
     ), "100% lightness is 1.0, and scaling it with the axes would darken white"
+
+
+def test_an_opaque_layer_with_no_geometry_paints_nothing() -> None:
+    """v3's ring composed a white zero-size offset layer; v4 composes none."""
+    v3 = (
+        "rgba(255, 255, 255, 1.000) 0px 0px 0px 0px, "
+        "rgba(0, 0, 0, 0.050) 0px 0px 0px 1px"
+    )
+    v4 = "rgba(0, 0, 0, 0.050) 0px 0px 0px 1px"
+    assert colour._canonical_shadow(v3) == colour._canonical_shadow(v4)
+    assert colour._canonical_shadow(v4) == v4, "a drawn ring is kept"

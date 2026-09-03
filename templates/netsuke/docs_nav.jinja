@@ -28,7 +28,7 @@
   sub     an in-page anchor, indented under its page
 #}
 {% macro sidebar_link(href, label, active=false, sub=false) -%}
-<li><a href="{{ href }}" class="sidebar-link{% if active %} active{% endif %}{% if sub %} sidebar-link--sub{% endif %} block px-2 py-1.5{% if active %} text-sm font-medium{% elif sub %} hover:text-vermillion hover:bg-boxwood-light{% else %} text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light{% endif %} rounded-r-md transition-colors">{{ label }}</a></li>
+<li><a href="{{ href }}" class="sidebar-link{% if active %} active{% endif %}{% if sub %} sidebar-link--sub{% endif %} block {% if sub %}pr-2{% else %}px-2{% endif %} py-1.5{% if active %} text-sm font-medium{% elif sub %} hover:text-vermillion hover:bg-boxwood-light{% else %} text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light{% endif %} rounded-r-md transition-colors">{{ label }}</a></li>
 {%- endmacro %}
 
 {#
@@ -51,7 +51,7 @@
              list is not the documentation
 #}
 {% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label='') %}
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+        <aside id="sidebar" class="hidden lg:block w-64 shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
             {%- if search %}
             <!-- Search -->
             <div
@@ -63,7 +63,7 @@
                 <input
                     type="text"
                     placeholder="Search docs..."
-                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
+                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-xs"
                     data-doc-search-input
                     aria-label="Search the documentation"
                     role="combobox"
@@ -73,7 +73,7 @@
                 <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
                 <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
                     <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                        <ul class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>
                         <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
                             Type at least 2 characters to search the docs.
                         </p>
@@ -146,7 +146,7 @@
                 </div>
 
                 <div
-                    class="relative w-full sm:w-64 sm:flex-shrink-0"
+                    class="relative w-full sm:w-64 sm:shrink-0"
                     data-doc-search-root
                     data-doc-search-index="/netsuke/assets/search/docs-search.json"
                 >
@@ -163,7 +163,7 @@
                     >
                     <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
                         <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                            <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                            <ul class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>
                             <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
                                 Type at least 2 characters to search the docs.
                             </p>

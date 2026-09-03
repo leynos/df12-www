@@ -1,7 +1,7 @@
 {% extends "doc_page.jinja" %}
 {% block page_title %}{{ title }} - Netsuke{% endblock %}
 {% block content %}
-    <main id="main-content" class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
+    <main id="main-content" class="grow w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
         <nav class="mb-8 text-sm font-mono text-charcoal-light" aria-label="Breadcrumb">
             <ol class="flex flex-wrap items-center list-none">
                 {% if parent_link %}
@@ -14,7 +14,7 @@
             </ol>
         </nav>
 
-        <div class="rounded-3xl border border-stone bg-white/80 p-6 sm:p-10 shadow-sm">
+        <div class="rounded-3xl border border-stone bg-white/80 p-6 sm:p-10 shadow-xs">
             <div class="inline-flex items-center rounded-full border border-stone bg-boxwood-light px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo">{{ eyebrow or 'Legal' }}</div>
             <h1 class="mt-6 font-serif text-4xl font-bold tracking-tight">{{ title }}</h1>
             {% if summary %}

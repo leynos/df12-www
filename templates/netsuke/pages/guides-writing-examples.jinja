@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#good-example', 'label': 'What makes a good example'}, {'href': '#anatomy', 'label': 'Anatomy of an example'}, {'href': '#conventions', 'label': 'Manifest conventions'}, {'href': '#repository', 'label': 'Where examples live'}, {'href': '#showcases', 'label': 'Showcase pages'}, {'href': '#submitting', 'label': 'Submitting'}]},
@@ -35,7 +35,7 @@
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
                             <span class="iconify" data-icon="carbon:minimize" aria-hidden="true"></span>
                         </div>
@@ -43,7 +43,7 @@
                         <p class="text-sm text-charcoal-mid">Each example teaches one thing: <code>hello-world</code> teaches inline commands, <code>photo_edit.yml</code> teaches <code>foreach</code> and <code>always</code>. Resist the kitchen sink.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
                             <span class="iconify" data-icon="carbon:play" aria-hidden="true"></span>
                         </div>
@@ -51,7 +51,7 @@
                         <p class="text-sm text-charcoal-mid">Real tools, real paths, no placeholders. If the example needs <code>pandoc</code> or <code>darktable-cli</code>, it says so and uses their genuine flags.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
                             <span class="iconify" data-icon="carbon:document-view" aria-hidden="true"></span>
                         </div>
@@ -127,7 +127,7 @@ defaults:
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="flex items-center mb-4">
                             <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
@@ -140,7 +140,7 @@ defaults:
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="flex items-center mb-4">
                             <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:close" aria-hidden="true"></span>
@@ -153,7 +153,7 @@ defaults:
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="flex items-center mb-4">
                             <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
@@ -166,7 +166,7 @@ defaults:
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                         <div class="flex items-center mb-4">
                             <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
@@ -284,7 +284,7 @@ defaults:
                     A showcase page can follow once the example is merged.
                 </p>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
                     <h3 class="font-bold text-charcoal mb-4 text-sm">Pre-submission checklist</h3>
                     <ul class="grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
                         <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>netsuke build</code> succeeds from a clean checkout</span></li>

@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area -->
-    <main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
+    <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Header Section -->
         {% endraw %}{% call chrome.page_header('Community & Official', 'Examples Hub', hero=true) %}
@@ -101,7 +101,7 @@ targets:
                     >
                     <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
                         <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                            <ul id="example-search-results" class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                            <ul id="example-search-results" class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>
                             <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
                                 Type at least 2 characters to search the examples.
                             </p>
@@ -132,7 +132,7 @@ targets:
                         The best way to learn Netsuke is by seeing it in action. If you've built something interesting, contribute it to our examples repository.
                     </p>
                     <div class="flex flex-wrap gap-4">
-                        <a href="mailto:netsuke@df12.studio" class="inline-flex items-center px-6 py-3 bg-white text-indigo rounded-md font-bold shadow-sm hover:bg-stone-light transition-colors">
+                        <a href="mailto:netsuke@df12.studio" class="inline-flex items-center px-6 py-3 bg-white text-indigo rounded-md font-bold shadow-xs hover:bg-stone-light transition-colors">
                             Submit Example
                         </a>
                         <a href="/netsuke/guides/writing-examples/" class="inline-flex items-center px-6 py-3 bg-indigo-light border border-white/20 text-white rounded-md font-bold hover:bg-indigo-light/80 transition-colors">
@@ -146,7 +146,7 @@ targets:
                             <div class="w-3 h-3 rounded-full bg-vermillion"></div>
                             <div class="w-3 h-3 rounded-full bg-amber"></div>
                             <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                            <span class="text-xs text-stone-light/50 ml-2">bash</span>
+                            <span class="text-xs text-stone-light/50">bash</span>
                         </div>
                         <div class="space-y-2">
                             <div><span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~</span> git clone https://github.com/leynos/netsuke.git</div>

@@ -260,7 +260,7 @@ describe("network-free search", () => {
   test("puts strict matches first, removes duplicates, and bounds the result set", () => {
     const strict = Array.from({ length: 9 }, (_, index) => result(`strict-${index}`));
     const loose = [strict[0], result("loose")];
-    const found = searchEpisodicIndex(engine({ needle: { loose, strict } }), "needle");
+    const { hits: found } = searchEpisodicIndex(engine({ needle: { loose, strict } }), "needle");
 
     expect(found).toHaveLength(8);
     expect(found.map(({ id }) => id)).toEqual(strict.slice(0, 8).map(({ id }) => id));
@@ -280,7 +280,10 @@ describe("network-free search", () => {
         fc.array(resultArbitrary, { maxLength: 20 }),
         fc.array(resultArbitrary, { maxLength: 20 }),
         (strict, loose) => {
-          const found = searchEpisodicIndex(engine({ query: { loose, strict } }), "query");
+          const { hits: found } = searchEpisodicIndex(
+            engine({ query: { loose, strict } }),
+            "query",
+          );
           const expected = [];
           const ids = new Set();
           for (const candidate of [...strict, ...loose]) {
@@ -497,13 +500,10 @@ describe("isSearchHit", () => {
     const good = { id: "g", sitePath: "/docs/g/", title: "G", kind: "document" };
     const bad = { id: "b", sitePath: 42, title: "B", kind: "document" };
     const miniSearch = { search: () => [bad, good] };
-    const dropped = [];
     const engine = { miniSearch, searchOptions: {} };
-    expect(searchEpisodicIndex(engine, "g", (count) => dropped.push(count))).toEqual([good]);
-    /* The query stays pure: it reports the count and leaves the warning to
-       the root that owns the UI. */
-    expect(dropped).toEqual([1]);
-    expect(searchEpisodicIndex(engine, "g")).toEqual([good]);
+    /* The query stays pure: it returns the count with the hits and leaves
+       the warning to the root that owns the UI. */
+    expect(searchEpisodicIndex(engine, "g")).toEqual({ hits: [good], dropped: 1 });
   });
 });
 

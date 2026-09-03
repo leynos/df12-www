@@ -117,6 +117,15 @@
     MiniSearch?: typeof globalThis.MiniSearch;
   }
 
+  /**
+   * What a query returns: the hits to show, and how many records the
+   * stored-field guard dropped, for the caller to report as it sees fit.
+   */
+  interface SearchOutcome {
+    hits: SearchHit[];
+    dropped: number;
+  }
+
   /** Called with how many results a query dropped for failing `isSearchHit`. */
   type DropReporter = (count: number) => void;
 
@@ -138,7 +147,7 @@
   interface InitOptions {
     loadIndex?: (path: string) => Promise<Engine | undefined> | Engine;
     miniSearch?: unknown;
-    searchIndex?: (engine: Engine, query: string, onDropped?: DropReporter) => SearchHit[];
+    searchIndex?: (engine: Engine, query: string) => SearchOutcome;
     navigate?: (href: string) => void;
   }
 
@@ -293,13 +302,9 @@
 
   // Search only consults the already-loaded index. The strict pass gives
   // precise multi-word matches first; the loose pass fills useful fallbacks.
-  // A pure query: the count of records dropped for failing `isSearchHit` goes
-  // to `onDropped`, and the caller decides what to do with it.
-  function searchEpisodicIndex(
-    engine: Engine,
-    query: string,
-    onDropped: DropReporter = () => {},
-  ): SearchHit[] {
+  // A pure query: the count of records dropped for failing `isSearchHit`
+  // comes back with the hits, and the caller decides what to do with it.
+  function searchEpisodicIndex(engine: Engine, query: string): SearchOutcome {
     const { miniSearch, searchOptions } = engine;
     const strict = miniSearch.search(query, {
       ...searchOptions,
@@ -318,8 +323,7 @@
     const hits = [...merged.values()].filter((result): result is SearchResult & SearchHit =>
       isSearchHit(result),
     );
-    onDropped(merged.size - hits.length);
-    return hits.slice(0, RESULT_LIMIT);
+    return { hits: hits.slice(0, RESULT_LIMIT), dropped: merged.size - hits.length };
   }
 
   /* Wire one rendered search root. `loadIndex`, `searchIndex`, and `navigate`
@@ -461,7 +465,9 @@
         return;
       }
 
-      results = searchIndex(engine, query, reportDropped);
+      const outcome = searchIndex(engine, query);
+      results = outcome.hits;
+      reportDropped(outcome.dropped);
       render(query);
     };
 

@@ -104,6 +104,13 @@
     console.warn(`doc-search-index: ${category}${detail === undefined ? "" : ` ${detail}`}`);
   }
 
+  /* What a query returns: the hits to show, and how many records the
+     stored-field guard dropped, for the caller to report as it sees fit. */
+  interface SearchOutcome {
+    hits: DocSearchHit[];
+    dropped: number;
+  }
+
   /* Called with how many results a query dropped for failing `isDocSearchHit`. */
   type DropReporter = (count: number) => void;
 
@@ -207,7 +214,9 @@
 
     input.addEventListener("input", () => {
       activeIndex = -1;
-      activeResults = search(miniSearch, searchOptions, input.value, reportDropped);
+      const outcome = search(miniSearch, searchOptions, input.value);
+      activeResults = outcome.hits;
+      reportDropped(outcome.dropped);
       renderResults({
         activeIndex,
         activeResults,
@@ -268,17 +277,16 @@
   /* Run `rawQuery` against the index and return at most RESULT_LIMIT results,
      or nothing at all for a query below the minimum length. Results are merged
      so a page and its sections do not both appear for the same match. A pure
-     query: the count of records dropped for failing `isDocSearchHit` goes to
-     `onDropped`, and the caller decides what to do with it. */
+     query: the count of records dropped for failing `isDocSearchHit` comes
+     back with the hits, and the caller decides what to do with it. */
   function search(
     miniSearch: Index,
     searchOptions: SearchOptions,
     rawQuery: string,
-    onDropped: DropReporter = () => {},
-  ): DocSearchHit[] {
+  ): SearchOutcome {
     const query = rawQuery.trim();
     if (query.length < SEARCH_MIN_LENGTH) {
-      return [];
+      return { hits: [], dropped: 0 };
     }
 
     const exactResults = miniSearch.search(query, {
@@ -299,8 +307,7 @@
     const hits = [...merged.values()].filter((result): result is SearchResult & DocSearchHit =>
       isDocSearchHit(result),
     );
-    onDropped(merged.size - hits.length);
-    return hits.slice(0, RESULT_LIMIT);
+    return { hits: hits.slice(0, RESULT_LIMIT), dropped: merged.size - hits.length };
   }
 
   /* Draw the results list and its count, then show the panel and mark the

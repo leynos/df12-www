@@ -95,6 +95,30 @@
     );
   }
 
+  /* Why an index could not be loaded, as the one word a maintainer needs. */
+  type IndexFailure = "http" | "invalid-payload" | "load-failed";
+
+  /* Report an index failure with a stable operation name and a category, and
+     nothing else: no path, no payload, no error text. */
+  function reportIndexFailure(category: IndexFailure, detail?: number): void {
+    console.warn(`doc-search-index: ${category}${detail === undefined ? "" : ` ${detail}`}`);
+  }
+
+  /* Called with how many results a query dropped for failing `isDocSearchHit`. */
+  type DropReporter = (count: number) => void;
+
+  /* A reporter that says so once, for one root, so a malformed index cannot
+     shrink the results list silently and cannot flood the console either. */
+  function onceDropReporter(): DropReporter {
+    let reported = false;
+    return (count) => {
+      if (count > 0 && !reported) {
+        reported = true;
+        console.warn(`Doc search dropped ${count} malformed result(s) from the index.`);
+      }
+    };
+  }
+
   /* Everything `renderResults` needs to redraw one root. */
   interface RenderState {
     activeIndex: number;
@@ -142,6 +166,7 @@
     try {
       loaded = await loadSearchIndex(searchIndexPath);
     } catch {
+      reportIndexFailure("load-failed");
       loaded = null;
     }
     if (!loaded) {
@@ -155,6 +180,7 @@
 
     let activeIndex = -1;
     let activeResults: DocSearchHit[] = [];
+    const reportDropped = onceDropReporter();
 
     input.setAttribute("autocomplete", "off");
     input.setAttribute("spellcheck", "false");
@@ -181,7 +207,7 @@
 
     input.addEventListener("input", () => {
       activeIndex = -1;
-      activeResults = search(miniSearch, searchOptions, input.value);
+      activeResults = search(miniSearch, searchOptions, input.value, reportDropped);
       renderResults({
         activeIndex,
         activeResults,
@@ -241,11 +267,14 @@
 
   /* Run `rawQuery` against the index and return at most RESULT_LIMIT results,
      or nothing at all for a query below the minimum length. Results are merged
-     so a page and its sections do not both appear for the same match. */
+     so a page and its sections do not both appear for the same match. A pure
+     query: the count of records dropped for failing `isDocSearchHit` goes to
+     `onDropped`, and the caller decides what to do with it. */
   function search(
     miniSearch: Index,
     searchOptions: SearchOptions,
     rawQuery: string,
+    onDropped: DropReporter = () => {},
   ): DocSearchHit[] {
     const query = rawQuery.trim();
     if (query.length < SEARCH_MIN_LENGTH) {
@@ -270,21 +299,8 @@
     const hits = [...merged.values()].filter((result): result is SearchResult & DocSearchHit =>
       isDocSearchHit(result),
     );
-    reportDropped(merged.size - hits.length);
+    onDropped(merged.size - hits.length);
     return hits.slice(0, RESULT_LIMIT);
-  }
-
-  let reportedDropped = false;
-
-  /* Say once, without quoting anything from the index, that results were
-     dropped for failing `isDocSearchHit`; a malformed index would otherwise
-     shrink the list silently. Once, because the same index serves every
-     keystroke. */
-  function reportDropped(count: number): void {
-    if (count > 0 && !reportedDropped) {
-      reportedDropped = true;
-      console.warn(`Doc search dropped ${count} malformed result(s) from the index.`);
-    }
   }
 
   /* Draw the results list and its count, then show the panel and mark the
@@ -412,10 +428,12 @@
   async function fetchSearchIndex(searchIndexPath: string): Promise<LoadedIndex | null> {
     const response = await fetch(searchIndexPath);
     if (!response.ok) {
+      reportIndexFailure("http", response.status);
       return null;
     }
     const payload: unknown = await response.json();
     if (!isIndexPayload(payload)) {
+      reportIndexFailure("invalid-payload");
       return null;
     }
     return {

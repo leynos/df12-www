@@ -117,11 +117,28 @@
     MiniSearch?: typeof globalThis.MiniSearch;
   }
 
+  /** Called with how many results a query dropped for failing `isSearchHit`. */
+  type DropReporter = (count: number) => void;
+
+  /**
+   * A reporter that says so once, for one root, so a malformed index cannot
+   * shrink the results list silently and cannot flood the console either.
+   */
+  function onceDropReporter(): DropReporter {
+    let reported = false;
+    return (count) => {
+      if (count > 0 && !reported) {
+        reported = true;
+        console.warn(`Episodic search dropped ${count} malformed result(s) from the index.`);
+      }
+    };
+  }
+
   /** The seams `initialiseEpisodicSearch` exposes for testing one root. */
   interface InitOptions {
     loadIndex?: (path: string) => Promise<Engine | undefined> | Engine;
     miniSearch?: unknown;
-    searchIndex?: (engine: Engine, query: string) => SearchHit[];
+    searchIndex?: (engine: Engine, query: string, onDropped?: DropReporter) => SearchHit[];
     navigate?: (href: string) => void;
   }
 
@@ -276,7 +293,13 @@
 
   // Search only consults the already-loaded index. The strict pass gives
   // precise multi-word matches first; the loose pass fills useful fallbacks.
-  function searchEpisodicIndex(engine: Engine, query: string): SearchHit[] {
+  // A pure query: the count of records dropped for failing `isSearchHit` goes
+  // to `onDropped`, and the caller decides what to do with it.
+  function searchEpisodicIndex(
+    engine: Engine,
+    query: string,
+    onDropped: DropReporter = () => {},
+  ): SearchHit[] {
     const { miniSearch, searchOptions } = engine;
     const strict = miniSearch.search(query, {
       ...searchOptions,
@@ -295,23 +318,8 @@
     const hits = [...merged.values()].filter((result): result is SearchResult & SearchHit =>
       isSearchHit(result),
     );
-    reportDropped(merged.size - hits.length);
+    onDropped(merged.size - hits.length);
     return hits.slice(0, RESULT_LIMIT);
-  }
-
-  let reportedDropped = false;
-
-  /**
-   * Say once, without quoting anything from the index, that results were
-   * dropped for failing `isSearchHit`; a malformed index would otherwise
-   * shrink the list silently. Once, because the same index serves every
-   * keystroke.
-   */
-  function reportDropped(count: number): void {
-    if (count > 0 && !reportedDropped) {
-      reportedDropped = true;
-      console.warn(`Episodic search dropped ${count} malformed result(s) from the index.`);
-    }
   }
 
   /* Wire one rendered search root. `loadIndex`, `searchIndex`, and `navigate`
@@ -354,6 +362,7 @@
     let results: SearchHit[] = [];
     let active = -1;
     let request = 0;
+    const reportDropped = onceDropReporter();
 
     // This is the one explicit loading boundary for a root. Recording both
     // outcomes makes a failed eager load safe while leaving queries entirely
@@ -452,7 +461,7 @@
         return;
       }
 
-      results = searchIndex(engine, query);
+      results = searchIndex(engine, query, reportDropped);
       render(query);
     };
 

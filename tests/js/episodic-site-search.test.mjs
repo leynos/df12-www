@@ -497,7 +497,13 @@ describe("isSearchHit", () => {
     const good = { id: "g", sitePath: "/docs/g/", title: "G", kind: "document" };
     const bad = { id: "b", sitePath: 42, title: "B", kind: "document" };
     const miniSearch = { search: () => [bad, good] };
-    expect(searchEpisodicIndex({ miniSearch, searchOptions: {} }, "g")).toEqual([good]);
+    const dropped = [];
+    const engine = { miniSearch, searchOptions: {} };
+    expect(searchEpisodicIndex(engine, "g", (count) => dropped.push(count))).toEqual([good]);
+    /* The query stays pure: it reports the count and leaves the warning to
+       the root that owns the UI. */
+    expect(dropped).toEqual([1]);
+    expect(searchEpisodicIndex(engine, "g")).toEqual([good]);
   });
 });
 

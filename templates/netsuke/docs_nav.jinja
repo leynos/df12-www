@@ -42,11 +42,15 @@
              mapping with `href` and `label`
   sections   bespoke groups in place of the docs pages, each a mapping
              with a `title`, its `links`, and optionally `sub: true` to
-             indent every link as an in-page anchor; the guides pass an
-             "On this page" list and a "Helpful links" list
+             indent every link as an in-page anchor; a link may carry its
+             own `sub` or `active`, which the forthcoming pages use to nest
+             anchors under the current preview. The guides pass an "On
+             this page" list and a "Helpful links" list
   search     whether to draw the docs search widget
+  nav_label  an `aria-label` for the sidebar's `nav`, where the section
+             list is not the documentation
 #}
-{% macro sidebar(active=none, sub_links=[], sections=none, search=true) %}
+{% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label='') %}
         <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
             {%- if search %}
             <!-- Search -->
@@ -78,7 +82,7 @@
             </div>
             {%- endif %}
 
-            <nav class="space-y-8">
+            <nav class="space-y-8"{% if nav_label %} aria-label="{{ nav_label }}"{% endif %}>
                 {%- if sections is none %}
                 {%- for group in docs_groups %}
                 <div>
@@ -101,7 +105,7 @@
                     <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">{{ section.title }}</h3>
                     <ul class="space-y-1">
                         {%- for link in section.links %}
-                        {{ sidebar_link(link.href, link.label, active=link.active | default(false), sub=section.sub | default(false)) }}
+                        {{ sidebar_link(link.href, link.label, active=link.active | default(false), sub=link.sub | default(section.sub | default(false))) }}
                         {%- endfor %}
                     </ul>
                 </div>

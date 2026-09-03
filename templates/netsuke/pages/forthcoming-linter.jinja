@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
 {% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
 {% block page_title %}Netsukefile Linter (Forthcoming) - Netsuke Build System{% endblock %}
@@ -6,44 +7,30 @@
 {% raw %}
     <div class="site-container pt-16 flex-grow flex">
 
-        <!-- Sidebar Navigation (Desktop) -->
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
-            <nav class="space-y-8" aria-label="Preview pages">
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Forthcoming</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/forthcoming/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">All previews</a></li>
-                        <li><a href="/netsuke/forthcoming/linter/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Netsukefile Linter</a></li>
-                        <li><a href="#status" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Status</a></li>
-                        <li><a href="#why" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Why a linter</a></li>
-                        <li><a href="#command" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">The command</a></li>
-                        <li><a href="#rules" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rule catalogue</a></li>
-                        <li><a href="#policy" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Policy &amp; suppression</a></li>
-                        <li><a href="#output" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Output</a></li>
-                        <li><a href="#architecture" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">How it works</a></li>
-                        <li><a href="/netsuke/forthcoming/testing-framework/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Testing Framework</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Sources</h3>
-                    <ul class="space-y-1">
-                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Linter design</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rule reference</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">ADR-018</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        {% endraw %}{{ docsnav.sidebar(sections=[
+            {'title': 'Forthcoming', 'links': [
+                {'href': '/netsuke/forthcoming/', 'label': 'All previews'},
+                {'href': '/netsuke/forthcoming/linter/', 'label': 'Netsukefile Linter', 'active': true},
+                {'href': '#status', 'label': 'Status', 'sub': true},
+                {'href': '#why', 'label': 'Why a linter', 'sub': true},
+                {'href': '#command', 'label': 'The command', 'sub': true},
+                {'href': '#rules', 'label': 'Rule catalogue', 'sub': true},
+                {'href': '#policy', 'label': 'Policy & suppression', 'sub': true},
+                {'href': '#output', 'label': 'Output', 'sub': true},
+                {'href': '#architecture', 'label': 'How it works', 'sub': true},
+                {'href': '/netsuke/forthcoming/testing-framework/', 'label': 'Testing Framework'}
+            ]},
+            {'title': 'Sources', 'links': [
+                {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md', 'label': 'Linter design'},
+                {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md', 'label': 'Rule reference'},
+                {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md', 'label': 'ADR-018'}
+            ]},
+        ], search=false, nav_label='Preview pages') }}{% raw %}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/forthcoming/" class="hover:text-vermillion transition-colors">Forthcoming</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">Netsukefile Linter</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': 'Netsukefile Linter'}]) }}{% raw %}
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">

@@ -577,7 +577,11 @@ class TestListContracts:
                             {
                                 "href": st.from_regex(r"\A#[a-z][a-z0-9-]{0,12}\Z"),
                                 "label": _LABELS,
-                            }
+                            },
+                            optional={
+                                "sub": st.booleans(),
+                                "active": st.just(value=True),
+                            },
                         ),
                         min_size=1,
                         max_size=5,
@@ -593,7 +597,7 @@ class TestListContracts:
     def test_sidebar_sections_render_in_order(
         self, sections: list[dict[str, object]]
     ) -> None:
-        """Bespoke sections keep their order, links, and sub modifier."""
+        """Bespoke sections keep their order, links, and per-link states."""
         soup = _render_macro(
             "{{ docsnav.sidebar(sections=sections, search=false) }}",
             sections=sections,
@@ -610,13 +614,15 @@ class TestListContracts:
             assert [(str(a["href"]), a.get_text(strip=True)) for a in links] == [
                 (link["href"], link["label"]) for link in expected
             ], "links render in order with their targets"
-            assert all(
-                ("sidebar-link--sub" in a["class"]) == bool(section.get("sub"))
-                for a in links
-            ), "sub applies to every link in the section or none"
-            assert not any("active" in a["class"] for a in links), (
-                "bespoke sections mark nothing active by default"
-            )
+            for anchor, link in zip(links, expected, strict=True):
+                assert isinstance(link, dict)
+                wants_sub = bool(link.get("sub", section.get("sub", False)))
+                assert ("sidebar-link--sub" in anchor["class"]) == wants_sub, (
+                    "a link's own sub flag wins over the section's"
+                )
+                assert ("active" in anchor["class"]) == bool(link.get("active")), (
+                    "only a link flagged active is marked active"
+                )
         assert soup.select_one("[data-doc-search-root]") is None, (
             "search=false drops the widget"
         )

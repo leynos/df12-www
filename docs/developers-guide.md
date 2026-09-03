@@ -261,7 +261,7 @@ carries its reasoning in the file:
 | `reference/`                                             | Kept snapshots, neither built nor shipped. Their value is that they still read the way they did when they were written.                                                                                                                     |
 | `src/static/**/vendor`, `public/netsuke/assets/vendor`   | Third-party code. Not ours to restyle, and reformatting it would bury the next upstream diff.                                                                                                                                               |
 | `src/static/episodic/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
-| `src/static/netsuke/assets/css/himotoshi.css`            | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/styles/netsuke/himotoshi.css`                       | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/stilyagi/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/episodic/assets/search/episodic-search.json` | Episodic's MiniSearch builder owns the serialized index. Reformatting it would make the committed projection differ from its generator.                                                                                                     |
 | `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
@@ -439,9 +439,9 @@ long as the style declares parents before children.
   rules.
 - Rerun the relevant generator after any change to `EpisodicStyle`,
   `HimotoshiStyle`, or `StilyagiStyle`.
-- The generators write to the tracked source under `src/static/` —
+- The generators write to the tracked source —
   `src/static/episodic/assets/styles/syntax.css`,
-  `src/static/netsuke/assets/css/himotoshi.css`, and
+  `src/styles/netsuke/himotoshi.css`, and
   `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`. Writing
   to `public/` would lose the change on the next clean build.
 - A test asserts the committed marked block matches what the generator would
@@ -449,7 +449,7 @@ long as the style declares parents before children.
   module below). A stale stylesheet fails the commit gates.
 - All three generated stylesheets are excluded from the Biome formatter, in the
   `src/static/stilyagi/assets/styles/syntax.css`,
-  `src/static/netsuke/assets/css/himotoshi.css`, and
+  `src/styles/netsuke/himotoshi.css`, and
   `src/static/episodic/assets/styles/syntax.css` override in `biome.jsonc`.
   `token_rules` emits one rule per line, which the formatter would expand; the
   next generator run would collapse it again, and the tools would undo each
@@ -465,7 +465,7 @@ uv run python scripts/generate_episodic_pygments_css.py
 uv run python scripts/generate_himotoshi_pygments_css.py
 uv run python scripts/generate_stilyagi_pygments_css.py
 uv run pytest tests/test_episodic_highlight.py tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py
-bunx biome check src/static/episodic/assets/styles src/static/netsuke/assets/css src/static/stilyagi/assets/styles
+bunx biome check src/static/episodic/assets/styles src/styles/netsuke src/static/stilyagi/assets/styles
 ```
 
 Each script is idempotent: rerunning it without changing the corresponding
@@ -483,7 +483,7 @@ block outright, so a run restores it without needing the previous content.
 | Site     | Style            | Lexers                                             | Wrapper class     | Variable prefix      | Bold weight | Stylesheet                                     |
 | -------- | ---------------- | -------------------------------------------------- | ----------------- | -------------------- | ----------- | ---------------------------------------------- |
 | Episodic | `EpisodicStyle`  | `bash`, `console`, `json`, `make`, `xml`           | `episodic-syntax` | `--episodic-syntax-` | `600`       | `src/static/episodic/assets/styles/syntax.css` |
-| Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/static/netsuke/assets/css/himotoshi.css`  |
+| Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/styles/netsuke/himotoshi.css`             |
 | Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
@@ -770,7 +770,7 @@ Three call sites show the range:
 ```
 
 The presentation lives in `.hm-kicker` and its modifiers in
-`src/static/netsuke/assets/css/himotoshi.css`. The base carries only what every
+`src/styles/netsuke/himotoshi.css`. The base carries only what every
 pill shares — `inline-flex`, centred items, the stone border, the pill radius,
 size, weight, gap, and uppercasing. The face, tracking, and inset sit on the
 modifiers, because the two variants differ enough that neither is a sensible
@@ -1287,60 +1287,47 @@ restyled by it.
 
 ## 7. Styling and the cascade
 
-The Netsuke sub-site still loads the
-[Tailwind Play CDN](https://tailwindcss.com) script
-(`<script src="https://cdn.tailwindcss.com">`) rather than a compiled
-stylesheet, and uses its utilities in its markup alongside its own hand-crafted
-stylesheet; it extends the default theme through
-`/netsuke/assets/js/tailwind-config.js`. This differs from the main site, mxd,
-Weaver, and Stilyagi, which compile Tailwind v4 ahead of time; see the
-[Tailwind v4 guide](tailwind-v4-guide.md) for that path. Stilyagi's only
+Every sub-site now compiles Tailwind v4 ahead of time; see the
+[Tailwind v4 guide](tailwind-v4-guide.md) for that path. Netsuke was the last
+to move: until the migration recorded in
+`docs/execplans/netsuke-daisy-migration.md` it loaded the
+[Tailwind Play CDN](https://tailwindcss.com) script at runtime and extended the
+default theme through a `tailwind-config.js`. It now has an entrypoint,
+`src/styles/netsuke.css`, that declares the `netsuke` daisyUI theme and imports
+the hand-written partial `src/styles/netsuke/himotoshi.css` into
+`@layer components`, with element defaults in
+`src/styles/netsuke/site-base.css` beside the preflight. Stilyagi's only
 remaining hand-crafted stylesheet is the generated Pygments block at
 `src/static/stilyagi/assets/styles/syntax.css`, and even that is `@import`ed
-into `src/styles/stilyagi.css` rather than linked on its own.
+into `src/styles/stilyagi.css` rather than linked on its own; Netsuke's
+generated block lives inside `himotoshi.css` itself.
 
-Weaver was in Netsuke's position until recently, and moving it off the Play CDN
-is the worked example of what that migration costs. The doubled-selector idiom
-below exists because the CDN's injected `<style>` is unlayered; the compiled
-build has no such tie to break, because its utilities sit in `@layer utilities`
-and a sub-site's own rules sit in `@layer components`, where they lose to a
-utility by construction rather than by source order. The inversion is the trap:
-a handwritten stylesheet that was _left_ unlayered under the compiled build
-stops losing those arguments and starts winning them, silently. See
-`src/styles/weaver.css` for the arrangement and
-`docs/execplans/weaver-daisy-migration.md` for what the change turned up.
+The layering is the point. The compiled build puts utilities in
+`@layer utilities` and a sub-site's own rules in `@layer components`, where
+they lose to a utility by construction rather than by source order. The
+inversion is the trap: a handwritten stylesheet that is _left_ unlayered under
+the compiled build stops losing those arguments and starts winning them,
+silently. See `src/styles/weaver.css` for the arrangement and the two
+migration ExecPlans for what the change turned up.
 
-The Play CDN script scans the rendered document for utility classes in use and
-injects the utilities it finds into a `<style>` element it appends to
-`<head>` — after the handwritten stylesheet `<link>`, regardless of where the
-`<script>` tag itself sits in the markup. Because that injected `<style>` is
-unlayered, and Tailwind's Play build carries no `@layer` boundaries the way the
-compiled entrypoints do, an unlayered handwritten rule of _equal_ specificity
-loses: CSS resolves a tie in specificity by source order, and the CDN's
-injected block comes later.
+What the Play CDN did, for the record: it scanned the rendered document for
+utility classes and injected the utilities it found into a `<style>` element
+appended to `<head>`, after the handwritten stylesheet's `<link>`. That
+injected block was unlayered, so a handwritten rule of _equal_ specificity lost
+the tie on source order, and the idiom used to win instead was to double the
+selector — `.hm-hero.hm-hero` — raising its specificity above a single utility
+class. Under the compiled build the doubling does nothing, since a utility wins
+whatever the specificity, and `tests/test_netsuke_conventions.py` refuses it.
+The right move is the one the migration made wherever a component rule had
+been beating a utility that way: take the utility out of the markup and state
+the value in the component, so the component's own states can override it.
 
-The idiom used to win instead is to double the selector, raising its
-specificity above a single utility class without touching source order:
-
-```css
-/* On narrow viewports the vertically centred hero content rides up under the
-   fixed navbar. Floor the hero's top padding so the kicker never sits closer
-   than 92.2px to the top of the viewport. The selector is doubled to outrank
-   the hero's `py-16` utility, which the Tailwind Play CDN injects into a
-   later <style> block at equal specificity. */
-@media (max-width: 499.98px) {
-  .hm-hero.hm-hero {
-    padding-top: 92.25px;
-  }
-}
-```
-
-(`src/static/netsuke/assets/css/himotoshi.css`). The same idiom recurs wherever
-a handwritten rule must outrank a Tailwind utility of the same class count on
-this sub-site, for example
-`section .hm-faux-window--card-bleed.hm-faux-window--card-bleed` a little
-further down the same file. Prefer raising specificity by doubling the class
-over `!important`, which would also outrank a later, deliberate override.
+The one sanctioned exception is a full-bleed block below the tablet breakpoint,
+where a code panel that carries a border, a padding, and a rounded corner in the
+column has to run edge to edge on a phone. Layer order cannot express that, so
+those declarations carry `!important`, with a comment saying so; Weaver's
+`figures.css` and Netsuke's `himotoshi.css` each have one such block and the
+convention test confines the flag to it.
 
 ### 7.1. Verifying a styling change against Weaver
 
@@ -1349,9 +1336,10 @@ siblings beside it, none over 400 lines, named for what they do: `_paths` (the
 published tree, the page list, and each page's filename stem), `_locking`
 (advisory locks and lock-file hygiene), `_output` (staging and failure-atomic
 publication), `_ownership` (proving whose server answered), `_serving` (ports,
-the server, and its lifecycle), `_tools` (the argv handed to css-view and
-agent-browser), `_colour` (one colour written one way), `_normalize` (reducing
-a captured tree to what a reader could see), `_clock` (the passage of time, as
+the server, and its lifecycle), `_tools` (driving agent-browser, and the
+walker it evaluates in the settled page), `_colour` (one colour written one
+way), `_normalize` (reducing a captured tree to what a reader could see),
+`_clock` (the passage of time, as
 something a caller can supply), and `_process` (starting, polling, and stopping
 the server child). They are plain modules rather than a package, so a script
 run by path finds them on `sys.path` and the invocation below is unchanged.
@@ -1439,17 +1427,26 @@ Makefile target and no console-script entry point:
 
 ```bash
 uv run python scripts/weaver_snapshot.py capture <out-dir>
+uv run python scripts/weaver_snapshot.py capture --site netsuke --width 360 --height 800 <out-dir>
 uv run python scripts/weaver_snapshot.py shots <out-dir>
 uv run python scripts/weaver_snapshot.py diff <before> <after>
 ```
 
-`capture` serves `public/` and records every published Weaver page's computed
-styles as JSON, via `bun x css-view --mode walker`. `shots` screenshots each
-page at 360, 768, and 1440 CSS pixels with `agent-browser`, for the cases a
-style diff cannot catch on its own — a wrong icon glyph, a texture that failed
-to load. `diff` normalizes both snapshot trees and prints a unified diff per
-page, exiting non-zero when any page differs; that exit status is what makes it
-usable as a gate rather than merely informative.
+`capture` serves `public/` and records every published page's computed styles
+as JSON. It drives `agent-browser`: sets the viewport, opens the page, waits
+for the network to go idle and then for Iconify to report every icon arrived
+or missing, and evaluates `scripts/weaver_snapshot_walker.js` — a copy of
+css-view's walker — in the settled page. The wait is what makes a capture
+repeatable on a page that draws its icons after load; a capture taken a moment
+too early records a different layout, not a different style. `--site` names
+the sub-site (the default is Weaver, which the harness was written for) and
+`--width`/`--height` the viewport, since a stylesheet's media queries only show
+at the widths they apply to. `shots` screenshots each page at 360, 768, and
+1440 CSS pixels, for the cases a style diff cannot catch on its own — a wrong
+icon glyph, a texture that failed to load. `diff` normalizes both snapshot
+trees and prints a unified diff per page, exiting non-zero when any page
+differs; that exit status is what makes it usable as a gate rather than merely
+informative.
 
 The typical loop is to capture a baseline before touching anything, make the
 change, capture again, and diff the two directories. An empty diff confirms the

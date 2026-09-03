@@ -301,3 +301,21 @@ def test_a_missing_tool_names_itself_rather_than_failing_obscurely() -> None:
     assert "definitely-not-a-real-tool-name" in str(caught.value.code), (
         f"the message should name the missing tool; got {caught.value.code!r}"
     )
+
+
+def test_capture_lays_pages_out_at_the_viewport_it_was_given(tmp_path: Path) -> None:
+    """A phone width proves the narrow media queries; the default is the desktop."""
+    calls, run, read = _recording_browser(tmp_path)
+    tools._capture_pages(
+        [""],
+        tmp_path,
+        "http://x",
+        "/usr/bin/agent-browser",
+        run,
+        read,
+        "netsuke",
+        (360, 800),
+    )
+    assert calls[0][1:5] == ["set", "viewport", "360", "800"], calls[0]
+    written = json.loads((tmp_path / "__home.json").read_text())
+    assert written["meta"]["viewport"] == {"width": 360, "height": 800}

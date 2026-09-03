@@ -6,7 +6,7 @@
 <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Hero Section -->
-        {% endraw %}{% call chrome.page_header('Previews · not yet in v' ~ netsuke_version, 'Forthcoming Capabilities', hero=true, id='forthcoming-hero', dot='bg-indigo') %}
+        {% endraw %}{% call chrome.page_header('Previews · not yet in v' ~ netsuke_version, 'Forthcoming Capabilities', hero=true, id='forthcoming-hero', dot='bg-primary') %}
             Design-stage write-ups of capabilities that are specified in Netsuke's design documents and RFCs but have not shipped.
             Each page says what is designed, what is implemented on a branch, and which release the preview is targeted at.
             Names, flags, and file formats here may change before they land.
@@ -16,44 +16,44 @@
             <div class="grid md:grid-cols-2 gap-8">
                 <a href="/netsuke/forthcoming/linter/" class="hm-card hm-card--interactive p-8 block h-full group">
                     <div class="flex items-center justify-between mb-6">
-                        <div class="w-12 h-12 rounded-lg bg-indigo text-white flex items-center justify-center text-xl">
+                        <div class="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center text-xl">
                             <span class="iconify" data-icon="carbon:rule-test" aria-hidden="true"></span>
                         </div>
-                        <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview targeted at v0.2.0</span>
+                        <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview targeted at v0.2.0</span>
                     </div>
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-3 group-hover:text-indigo transition-colors">Netsukefile Linter</h2>
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-3 group-hover:text-primary transition-colors">Netsukefile Linter</h2>
                     <p class="text-charcoal-mid text-sm leading-relaxed mb-6">
                         Deterministic manifest linting under <code>netsuke check</code>, inspired by mbake. A stable rule catalogue covering
                         style, correctness, and portability; per-rule severity policy; an explainable rule reference; and
                         findings that share the compiler's own diagnostics envelope. Findings never mutate the manifest.
                     </p>
-                    <span class="inline-flex items-center text-sm font-bold text-indigo">Read the linter preview <span class="iconify ml-2" data-icon="carbon:arrow-right" aria-hidden="true"></span></span>
+                    <span class="inline-flex items-center text-sm font-bold text-primary">Read the linter preview <span class="iconify ml-2" data-icon="carbon:arrow-right" aria-hidden="true"></span></span>
                 </a>
                 <a href="/netsuke/forthcoming/testing-framework/" class="hm-card hm-card--interactive p-8 block h-full group">
                     <div class="flex items-center justify-between mb-6">
-                        <div class="w-12 h-12 rounded-lg bg-matcha text-white flex items-center justify-center text-xl">
+                        <div class="w-12 h-12 rounded-lg bg-success text-white flex items-center justify-center text-xl">
                             <span class="iconify" data-icon="carbon:test-tool" aria-hidden="true"></span>
                         </div>
-                        <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview targeted at v0.4.0</span>
+                        <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview targeted at v0.4.0</span>
                     </div>
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-3 group-hover:text-indigo transition-colors">Netsukefile Testing Framework</h2>
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-3 group-hover:text-primary transition-colors">Netsukefile Testing Framework</h2>
                     <p class="text-charcoal-mid text-sm leading-relaxed mb-6">
                         Manifest-time tests under <code>netsuke test</code> that run through the same compiler as the build. A YAML test dialect
                         beside the manifest, mock and fixture engines so a test never touches the real host, and assertions over the
                         expanded manifest, the build graph, and the generated Ninja.
                     </p>
-                    <span class="inline-flex items-center text-sm font-bold text-indigo">Read the testing framework preview <span class="iconify ml-2" data-icon="carbon:arrow-right" aria-hidden="true"></span></span>
+                    <span class="inline-flex items-center text-sm font-bold text-primary">Read the testing framework preview <span class="iconify ml-2" data-icon="carbon:arrow-right" aria-hidden="true"></span></span>
                 </a>
             </div>
         </section>
 
         <section id="how-to-read" class="max-w-3xl mx-auto">
-            <div class="bg-boxwood-pale border border-stone rounded-xl p-8">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-4">How to read a preview</h2>
+            <div class="bg-base-100 border border-base-300 rounded-xl p-8">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-4">How to read a preview</h2>
                 <ul class="space-y-3 text-sm text-charcoal-mid">
-                    <li class="flex items-start"><span class="iconify text-indigo mt-1 mr-3 shrink-0" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Designed</strong> means the behaviour is specified in an RFC, ADR, or design document in the Netsuke repository, and the page links to it.</span></li>
-                    <li class="flex items-start"><span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Implemented on a branch</strong> means code exists against the design but has not been merged and released. Treat it as evidence the design is buildable, not as a contract.</span></li>
-                    <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-3 shrink-0" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at</strong> names the release in which the capability is planned to appear behind a preview label. The <a href="/netsuke/roadmap/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">roadmap</a> tracks the current sequence, and the <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">task-level roadmap</a> the detail.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-3 shrink-0" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Designed</strong> means the behaviour is specified in an RFC, ADR, or design document in the Netsuke repository, and the page links to it.</span></li>
+                    <li class="flex items-start"><span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Implemented on a branch</strong> means code exists against the design but has not been merged and released. Treat it as evidence the design is buildable, not as a contract.</span></li>
+                    <li class="flex items-start"><span class="iconify text-success mt-1 mr-3 shrink-0" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at</strong> names the release in which the capability is planned to appear behind a preview label. The <a href="/netsuke/roadmap/" class="text-primary underline decoration-primary/40 hover:decoration-primary">roadmap</a> tracks the current sequence, and the <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">task-level roadmap</a> the detail.</span></li>
                 </ul>
             </div>
         </section>

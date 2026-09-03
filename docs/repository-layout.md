@@ -124,16 +124,20 @@ Build-time scripts outside the Python package:
 
 Frontend source files. `styles/` contains one Tailwind CSS entry point per
 compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css`,
-`weaver.css` and `stilyagi.css` for those sub-sites — plus any plugins. Each is
-compiled to its own file under `public/`: `public/assets/site.css`,
-`public/mxd/assets/tailwind.css`, `public/episodic/assets/styles/tailwind.css`,
-`public/weaver/assets/styles/weaver.css`, and
-`public/stilyagi/assets/styles/stilyagi.css`.
+`weaver.css`, `stilyagi.css` and `netsuke.css` for those sub-sites — plus any
+plugins. Each is compiled to its own file under `public/`:
+`public/assets/site.css`, `public/mxd/assets/tailwind.css`,
+`public/episodic/assets/styles/tailwind.css`,
+`public/weaver/assets/styles/weaver.css`,
+`public/stilyagi/assets/styles/stilyagi.css`, and
+`public/netsuke/assets/css/himotoshi.css`.
 
 An entry point that has grown past a single file keeps its partials in a
-directory beside it. `styles/episodic/`, `styles/weaver/` and
-`styles/stilyagi/` are the examples: the entry point declares the theme and
-imports partials named for what they style, each into an explicit cascade layer.
+directory beside it. `styles/episodic/`, `styles/weaver/`, `styles/stilyagi/`
+and `styles/netsuke/` are the examples: the entry point declares the theme and
+imports partials named for what they style, each into an explicit cascade
+layer. Netsuke's `styles/netsuke/himotoshi.css` carries the generated Pygments
+block that `scripts/generate_himotoshi_pygments_css.py` owns.
 
 `static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
 and favicons — that are published at the same path. Its layout mirrors the

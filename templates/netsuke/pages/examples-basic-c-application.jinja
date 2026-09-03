@@ -29,39 +29,39 @@
             <div class="lg:col-span-8 space-y-12 min-w-0">
 
                 <!-- Section: Project Structure -->
-                <section id="structure" class="bg-white rounded-xl border border-stone shadow-xs p-6 lg:p-8">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                        <span  class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:folder-open" aria-hidden="true"></span> Directory Structure
+                <section id="structure" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                        <span  class="iconify text-accent mr-3 text-lg" data-icon="carbon:folder-open" aria-hidden="true"></span> Directory Structure
                     </h2>
                     <div class="grid md:grid-cols-2 gap-8">
-                        <div class="font-mono text-sm text-charcoal-mid bg-boxwood-pale p-6 rounded-lg border border-stone">
+                        <div class="font-mono text-sm text-charcoal-mid bg-base-100 p-6 rounded-lg border border-base-300">
                             <div class="flex items-center mb-2">
-                                <span  class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span>
+                                <span  class="iconify text-primary mr-2" data-icon="carbon:folder" aria-hidden="true"></span>
                                 <span class="font-bold">basic-c/</span>
                             </div>
                             <div class="hm-file-tree-item">
-                                <span  class="iconify text-stone" data-icon="carbon:code-reference" aria-hidden="true"></span>
+                                <span  class="iconify text-base-300" data-icon="carbon:code-reference" aria-hidden="true"></span>
                                 <span>main.c</span>
                             </div>
                             <div class="hm-file-tree-item">
-                                <span  class="iconify text-stone" data-icon="carbon:code-reference" aria-hidden="true"></span>
+                                <span  class="iconify text-base-300" data-icon="carbon:code-reference" aria-hidden="true"></span>
                                 <span>utils.c</span>
                             </div>
                             <div class="hm-file-tree-item">
-                                <span  class="iconify text-stone" data-icon="carbon:code-reference" aria-hidden="true"></span>
+                                <span  class="iconify text-base-300" data-icon="carbon:code-reference" aria-hidden="true"></span>
                                 <span>utils.h</span>
                             </div>
                             <div class="hm-file-tree-item">
-                                <span  class="iconify text-vermillion" data-icon="carbon:cube" aria-hidden="true"></span>
-                                <span class="font-bold text-charcoal">Netsukefile</span>
+                                <span  class="iconify text-accent" data-icon="carbon:cube" aria-hidden="true"></span>
+                                <span class="font-bold text-base-content">Netsukefile</span>
                             </div>
                         </div>
                         <div class="flex flex-col justify-center space-y-4">
                             <p class="text-charcoal-mid">
-                                This project consists of a single executable <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">main.c</code> that depends on a utility library defined by <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">utils.c</code> and <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">utils.h</code>.
+                                This project consists of a single executable <code class="bg-base-100 px-1.5 py-0.5 rounded border border-base-300 text-xs">main.c</code> that depends on a utility library defined by <code class="bg-base-100 px-1.5 py-0.5 rounded border border-base-300 text-xs">utils.c</code> and <code class="bg-base-100 px-1.5 py-0.5 rounded border border-base-300 text-xs">utils.h</code>.
                             </p>
-                            <div class="text-sm border-l-2 border-indigo pl-4 py-1">
-                                <p class="text-indigo font-medium mb-1">Key Concept</p>
+                            <div class="text-sm border-l-2 border-primary pl-4 py-1">
+                                <p class="text-primary font-medium mb-1">Key Concept</p>
                                 <p class="text-charcoal-light">Netsuke files are typically placed at the root of the package they define.</p>
                                 <p class="text-charcoal-light">Keep the graph obvious: sources are file paths, build steps are rules or inline commands, and defaults name the artefacts to build.</p>
                             </div>
@@ -72,10 +72,10 @@
                 <!-- Section: Manifest -->
                 <section id="manifest">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center">
-                            <span  class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest
+                        <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
+                            <span  class="iconify text-accent mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest
                         </h2>
-                        <span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">Netsukefile</span>
+                        <span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">Netsukefile</span>
                     </div>
 
                     <div class="relative group">
@@ -90,24 +90,24 @@
 
                     <!-- Annotations -->
                     <div class="grid gap-4 mt-6">
-                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
-                            <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div>
+                        <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
+                            <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div>
                             <div class="ml-4">
-                                <h4 class="font-bold text-charcoal text-sm mb-1">Schema version</h4>
+                                <h4 class="font-bold text-base-content text-sm mb-1">Schema version</h4>
                                 <p class="text-sm text-charcoal-mid">Every manifest starts with <code class="font-mono text-xs">netsuke_version</code>. The reviewed docs treat it as the contract for the file format.</p>
                             </div>
                         </div>
-                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
-                            <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div>
+                        <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
+                            <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div>
                             <div class="ml-4">
-                                <h4 class="font-bold text-charcoal text-sm mb-1">Reusable rules</h4>
+                                <h4 class="font-bold text-base-content text-sm mb-1">Reusable rules</h4>
                                 <p class="text-sm text-charcoal-mid">A rule holds the shared command template. Targets point at that rule instead of duplicating the command line.</p>
                             </div>
                         </div>
-                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
-                            <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">3</div>
+                        <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
+                            <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">3</div>
                             <div class="ml-4">
-                                <h4 class="font-bold text-charcoal text-sm mb-1">Explicit graph edges</h4>
+                                <h4 class="font-bold text-base-content text-sm mb-1">Explicit graph edges</h4>
                                 <p class="text-sm text-charcoal-mid">The executable target lists the object files it needs in <code class="font-mono text-xs">sources</code>. Netsuke turns that static graph into Ninja build statements.</p>
                             </div>
                         </div>
@@ -116,8 +116,8 @@
 
                 <!-- Section: Running the Build -->
                 <section id="terminal-preview">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                        <span  class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                        <span  class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build
                     </h2>
 
                     {% endraw %}{{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}{% raw %}
@@ -132,17 +132,17 @@ Hello from C!
 
                 <!-- Section: Visual Graph -->
                 <section id="dependency-graph">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                        <span  class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:chart-relationship" aria-hidden="true"></span> Dependency Graph
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                        <span  class="iconify text-accent mr-3 text-lg" data-icon="carbon:chart-relationship" aria-hidden="true"></span> Dependency Graph
                     </h2>
-                    <div class="bg-boxwood-pale rounded-xl border border-stone p-8 flex justify-center items-center h-64 relative overflow-hidden">
+                    <div class="bg-base-100 rounded-xl border border-base-300 p-8 flex justify-center items-center h-64 relative overflow-hidden">
                         <!-- Simple CSS Nodes Graph -->
                         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#8A8279 1px, transparent 1px); background-size: 20px 20px;"></div>
 
                         <div class="relative z-10 flex flex-col items-center gap-8">
                             <!-- Main App Node -->
                             <div class="flex flex-col items-center">
-                                <div class="w-32 h-12 bg-indigo text-white rounded-md shadow-lg flex items-center justify-center font-mono text-sm border-2 border-white">
+                                <div class="w-32 h-12 bg-primary text-white rounded-md shadow-lg flex items-center justify-center font-mono text-sm border-2 border-white">
                                     app
                                 </div>
                                 <div class="h-8 w-0.5 bg-stone-light"></div>
@@ -150,18 +150,18 @@ Hello from C!
                             </div>
 
                             <!-- Utils Node -->
-                            <div class="w-32 h-12 bg-white text-charcoal rounded-md shadow-xs border border-stone flex items-center justify-center font-mono text-sm">
+                            <div class="w-32 h-12 bg-white text-base-content rounded-md shadow-xs border border-base-300 flex items-center justify-center font-mono text-sm">
                                 utils.o
                             </div>
                         </div>
 
                         <!-- Legend -->
-                        <div class="absolute bottom-4 right-4 bg-white/80 backdrop-blur p-3 rounded border border-stone text-xs shadow-xs">
+                        <div class="absolute bottom-4 right-4 bg-white/80 backdrop-blur p-3 rounded border border-base-300 text-xs shadow-xs">
                             <div class="flex items-center mb-1">
-                                <div class="w-3 h-3 bg-indigo rounded mr-2"></div> Binary
+                                <div class="w-3 h-3 bg-primary rounded mr-2"></div> Binary
                             </div>
                             <div class="flex items-center">
-                                <div class="w-3 h-3 bg-white border border-stone rounded mr-2"></div> Library
+                                <div class="w-3 h-3 bg-white border border-base-300 rounded mr-2"></div> Library
                             </div>
                         </div>
                     </div>
@@ -174,41 +174,41 @@ Hello from C!
                 <div class="sticky top-24 space-y-8">
 
                 <!-- Quick Navigation -->
-                <div class="bg-white rounded-lg shadow-xs border border-stone p-6">
-                    <h3 class="font-serif text-lg font-bold text-charcoal mb-4">On this page</h3>
+                <div class="bg-white rounded-lg shadow-xs border border-base-300 p-6">
+                    <h3 class="font-serif text-lg font-bold text-base-content mb-4">On this page</h3>
                     <ul class="space-y-3 text-sm border-l border-stone-light ml-1" data-page-toc>
-                        <li><a href="#structure" class="block pl-4 hover:text-indigo border-l-2 hover:border-indigo -ml-[1px] transition-colors">Directory Structure</a></li>
-                        <li><a href="#manifest" class="block pl-4 hover:text-indigo border-l-2 hover:border-indigo -ml-[1px] transition-colors">Annotated Manifest</a></li>
-                        <li><a href="#terminal-preview" class="block pl-4 hover:text-indigo border-l-2 hover:border-indigo -ml-[1px] transition-colors">Running the Build</a></li>
-                        <li><a href="#dependency-graph" class="block pl-4 hover:text-indigo border-l-2 hover:border-indigo -ml-[1px] transition-colors">Dependency Graph</a></li>
+                        <li><a href="#structure" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Directory Structure</a></li>
+                        <li><a href="#manifest" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Annotated Manifest</a></li>
+                        <li><a href="#terminal-preview" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Running the Build</a></li>
+                        <li><a href="#dependency-graph" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Dependency Graph</a></li>
                     </ul>
 
                     <div class="mt-8 pt-6 border-t border-stone-light">
-                        <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Related Documentation</h3>
+                        <h3 class="font-serif text-lg font-bold text-base-content mb-4">Related Documentation</h3>
                         <ul class="space-y-3">
                             <li>
                                 <a href="/netsuke/docs/rules-and-targets/" class="flex items-start group">
-                                    <span  class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span>
+                                    <span  class="iconify text-base-300 mt-1 mr-2 group-hover:text-primary transition-colors" data-icon="carbon:book" aria-hidden="true"></span>
                                     <div>
-                                        <span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Rules & Targets</span>
+                                        <span class="block text-sm font-medium text-base-content group-hover:text-primary transition-colors">Rules & Targets</span>
                                         <span class="text-xs text-charcoal-light">Reference for rule and target fields</span>
                                     </div>
                                 </a>
                             </li>
                             <li>
                                 <a href="/netsuke/docs/manifest-reference/" class="flex items-start group">
-                                    <span  class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span>
+                                    <span  class="iconify text-base-300 mt-1 mr-2 group-hover:text-primary transition-colors" data-icon="carbon:book" aria-hidden="true"></span>
                                     <div>
-                                        <span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Manifest Reference</span>
+                                        <span class="block text-sm font-medium text-base-content group-hover:text-primary transition-colors">Manifest Reference</span>
                                         <span class="text-xs text-charcoal-light">Top-level keys and field types</span>
                                     </div>
                                 </a>
                             </li>
                             <li>
                                 <a href="/netsuke/docs/cli/" class="flex items-start group">
-                                    <span  class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:terminal" aria-hidden="true"></span>
+                                    <span  class="iconify text-base-300 mt-1 mr-2 group-hover:text-primary transition-colors" data-icon="carbon:terminal" aria-hidden="true"></span>
                                     <div>
-                                        <span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">CLI Reference</span>
+                                        <span class="block text-sm font-medium text-base-content group-hover:text-primary transition-colors">CLI Reference</span>
                                         <span class="text-xs text-charcoal-light">netsuke build options</span>
                                     </div>
                                 </a>

@@ -26,8 +26,8 @@
 
             <!-- What makes a good example -->
             <section id="good-example" class="mb-20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> What makes a good example
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> What makes a good example
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     Each example in the repository demonstrates one part of the language clearly enough to copy without regret.
@@ -35,27 +35,27 @@
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
                             <span class="iconify" data-icon="carbon:minimize" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-2">One concept</h3>
+                        <h3 class="font-bold text-base-content mb-2">One concept</h3>
                         <p class="text-sm text-charcoal-mid">Each example teaches one thing: <code>hello-world</code> teaches inline commands, <code>photo_edit.yml</code> teaches <code>foreach</code> and <code>always</code>. Resist the kitchen sink.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success mb-4">
                             <span class="iconify" data-icon="carbon:play" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-2">Runnable as written</h3>
+                        <h3 class="font-bold text-base-content mb-2">Runnable as written</h3>
                         <p class="text-sm text-charcoal-mid">Real tools, real paths, no placeholders. If the example needs <code>pandoc</code> or <code>darktable-cli</code>, it says so and uses their genuine flags.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning mb-4">
                             <span class="iconify" data-icon="carbon:document-view" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-2">Visible graph</h3>
+                        <h3 class="font-bold text-base-content mb-2">Visible graph</h3>
                         <p class="text-sm text-charcoal-mid">The dependency structure should be legible from the YAML alone. If a reader cannot trace source to deliverable, the example hides too much.</p>
                     </div>
                 </div>
@@ -63,15 +63,15 @@
 
             <!-- Anatomy -->
             <section id="anatomy" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Anatomy of an example
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Anatomy of an example
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     <code>examples/visual_design.yml</code> shows the standard shape: variables first, reusable rules second,
                     targets third, operator actions fourth, and deliverables last.
                 </p>
 
-                <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
+                <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">examples/visual_design.yml</div>
                     {% endraw %}{% highlight 'netsuke' %}{% raw %}
 # Schema version comes first, always quoted.
@@ -119,20 +119,20 @@ defaults:
 
             <!-- Conventions -->
             <section id="conventions" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:rule" aria-hidden="true"></span> Manifest conventions
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:rule" aria-hidden="true"></span> Manifest conventions
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     The shipped examples follow a handful of conventions that keep them correct as well as readable. New examples should follow them too.
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">Declare the file set in <code>vars</code></h3>
+                            <h3 class="font-bold text-base-content">Declare the file set in <code>vars</code></h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             A named list (<code>designs</code>, <code>pages</code>, <code>chapters</code>) makes growth a one-line change and keeps the graph deterministic.
@@ -140,12 +140,12 @@ defaults:
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:close" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">Never glob generated outputs</h3>
+                            <h3 class="font-bold text-base-content">Never glob generated outputs</h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             Templates expand before anything is built, so <code>glob('build/*.o')</code> sees an empty directory on a clean checkout.
@@ -153,12 +153,12 @@ defaults:
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">Model output directories</h3>
+                            <h3 class="font-bold text-base-content">Model output directories</h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             Give the output directory its own <code>mkdir -p</code> target and reference it via <code>order_only_deps</code>:
@@ -166,12 +166,12 @@ defaults:
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">Actions for operator tasks</h3>
+                            <h3 class="font-bold text-base-content">Actions for operator tasks</h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             <code>clean</code>, <code>run</code>, and <code>preview</code> belong in <code>actions</code>, not <code>targets</code> —
@@ -180,10 +180,10 @@ defaults:
                     </div>
                 </div>
 
-                <div class="mt-6 bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
-                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                <div class="mt-6 bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
                     <div>
-                        <h4 class="font-bold text-indigo text-sm mb-1">Small touches that pay off</h4>
+                        <h4 class="font-bold text-primary text-sm mb-1">Small touches that pay off</h4>
                         <p class="text-xs text-charcoal-mid">
                             Give rules a <code>description</code> — it becomes the progress line during the build.
                             Name <code>defaults</code> after concrete deliverables (<code>site/index.html</code>, <code>build/book.pdf</code>) so running bare <code>netsuke</code> produces something a reader can open.
@@ -195,37 +195,37 @@ defaults:
 
             <!-- Where examples live -->
             <section id="repository" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:folder" aria-hidden="true"></span> Where examples live
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:folder" aria-hidden="true"></span> Where examples live
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Examples are part of the <a href="https://github.com/leynos/netsuke/tree/main/examples" class="text-indigo hover:underline">netsuke repository</a> itself, under <code>examples/</code>.
+                    Examples are part of the <a href="https://github.com/leynos/netsuke/tree/main/examples" class="text-primary hover:underline">netsuke repository</a> itself, under <code>examples/</code>.
                     Single-file examples are flat YAML manifests named for their domain; examples that need input files get a directory with a <code>Netsukefile</code>.
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white p-5 rounded-xl border border-stone text-xs font-mono space-y-1 text-charcoal-mid">
+                    <div class="bg-white p-5 rounded-xl border border-base-300 text-xs font-mono space-y-1 text-charcoal-mid">
                         <div>examples/</div>
-                        <div class="pl-4 text-indigo">hello-world/  <span class="text-charcoal-light font-sans">(directory: manifest + input files)</span></div>
+                        <div class="pl-4 text-primary">hello-world/  <span class="text-charcoal-light font-sans">(directory: manifest + input files)</span></div>
                         <div class="pl-8">Netsukefile</div>
                         <div class="pl-8">input.txt</div>
-                        <div class="pl-4 text-matcha">basic_c.yml  <span class="text-charcoal-light font-sans">(rules, targets, actions)</span></div>
-                        <div class="pl-4 text-matcha">website.yml  <span class="text-charcoal-light font-sans">(foreach, order_only_deps)</span></div>
-                        <div class="pl-4 text-matcha">photo_edit.yml  <span class="text-charcoal-light font-sans">(always, actions)</span></div>
-                        <div class="pl-4 text-matcha">visual_design.yml  <span class="text-charcoal-light font-sans">(vars-driven tooling)</span></div>
-                        <div class="pl-4 text-matcha">writing.yml  <span class="text-charcoal-light font-sans">(explicit intermediate files)</span></div>
+                        <div class="pl-4 text-success">basic_c.yml  <span class="text-charcoal-light font-sans">(rules, targets, actions)</span></div>
+                        <div class="pl-4 text-success">website.yml  <span class="text-charcoal-light font-sans">(foreach, order_only_deps)</span></div>
+                        <div class="pl-4 text-success">photo_edit.yml  <span class="text-charcoal-light font-sans">(always, actions)</span></div>
+                        <div class="pl-4 text-success">visual_design.yml  <span class="text-charcoal-light font-sans">(vars-driven tooling)</span></div>
+                        <div class="pl-4 text-success">writing.yml  <span class="text-charcoal-light font-sans">(explicit intermediate files)</span></div>
                     </div>
                     <div>
-                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Naming</h3>
+                        <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Naming</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Name the manifest after the domain it demonstrates (<code>photo_edit.yml</code>), not the feature (<code>foreach_demo.yml</code>).</span></li>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Name the manifest after the domain it demonstrates (<code>photo_edit.yml</code>), not the feature (<code>foreach_demo.yml</code>).</span></li>
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 Use snake_case for flat manifests and kebab-case for example directories, matching the existing set.
                             </li>
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 Keep input fixtures tiny. An example is a teaching aid, not a dataset.
                             </li>
                         </ul>
@@ -235,37 +235,37 @@ defaults:
 
             <!-- Showcase pages -->
             <section id="showcases" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:screen" aria-hidden="true"></span> Showcase pages
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:screen" aria-hidden="true"></span> Showcase pages
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    The strongest examples graduate to full pages in the <a href="/netsuke/examples/" class="text-indigo hover:underline">Examples Hub</a>.
+                    The strongest examples graduate to full pages in the <a href="/netsuke/examples/" class="text-primary hover:underline">Examples Hub</a>.
                     Every showcase follows the same four-part structure, so readers always know where to look.
                 </p>
 
                 <div class="grid md:grid-cols-4 gap-4 mb-8 text-sm">
-                    <div class="rounded-lg border border-stone bg-boxwood-pale p-4">
-                        <p class="font-bold text-charcoal mb-1">1. Directory structure</p>
+                    <div class="rounded-lg border border-base-300 bg-base-100 p-4">
+                        <p class="font-bold text-base-content mb-1">1. Directory structure</p>
                         <p class="text-charcoal-mid text-xs">A file tree showing inputs, outputs, and the <code>Netsukefile</code>, plus one paragraph on why the example matters.</p>
                     </div>
-                    <div class="rounded-lg border border-stone bg-white p-4">
-                        <p class="font-bold text-charcoal mb-1">2. Annotated manifest</p>
+                    <div class="rounded-lg border border-base-300 bg-white p-4">
+                        <p class="font-bold text-base-content mb-1">2. Annotated manifest</p>
                         <p class="text-charcoal-mid text-xs">The manifest verbatim from the repository, with two or three numbered callouts explaining the load-bearing decisions.</p>
                     </div>
-                    <div class="rounded-lg border border-stone bg-white p-4">
-                        <p class="font-bold text-charcoal mb-1">3. Terminal preview</p>
+                    <div class="rounded-lg border border-base-300 bg-white p-4">
+                        <p class="font-bold text-base-content mb-1">3. Terminal preview</p>
                         <p class="text-charcoal-mid text-xs">A realistic <code>netsuke build</code> transcript — Ninja-style <code>[1/4]</code> progress lines showing the actual commands.</p>
                     </div>
-                    <div class="rounded-lg border border-stone bg-boxwood-pale p-4">
-                        <p class="font-bold text-charcoal mb-1">4. Build flow</p>
+                    <div class="rounded-lg border border-base-300 bg-base-100 p-4">
+                        <p class="font-bold text-base-content mb-1">4. Build flow</p>
                         <p class="text-charcoal-mid text-xs">Four steps from declaration to deliverable, naming the manifest features that carry each step.</p>
                     </div>
                 </div>
 
-                <div class="bg-amber/5 border border-amber/20 rounded-lg p-5 flex items-start">
-                    <span class="iconify text-amber mt-1 mr-3" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                <div class="bg-warning/5 border border-warning/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-warning mt-1 mr-3" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                     <div>
-                        <h4 class="font-bold text-amber text-sm mb-1">The manifest on the page is the manifest in the repository</h4>
+                        <h4 class="font-bold text-warning text-sm mb-1">The manifest on the page is the manifest in the repository</h4>
                         <p class="text-xs text-charcoal-mid">
                             Showcase pages quote the shipped example verbatim, label it with its repository path, and link to it on GitHub.
                             If the page needs a different manifest to tell its story, fix the example first — the site never drifts ahead of the code.
@@ -276,23 +276,23 @@ defaults:
 
             <!-- Submitting -->
             <section id="submitting" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:git-pull-request" aria-hidden="true"></span> Submitting
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:git-pull-request" aria-hidden="true"></span> Submitting
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Examples land through the normal <a href="/netsuke/guides/contributing/" class="text-indigo hover:underline">contribution workflow</a>: open an issue to pitch the idea, then a pull request against the repository.
+                    Examples land through the normal <a href="/netsuke/guides/contributing/" class="text-primary hover:underline">contribution workflow</a>: open an issue to pitch the idea, then a pull request against the repository.
                     A showcase page can follow once the example is merged.
                 </p>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                    <h3 class="font-bold text-charcoal mb-4 text-sm">Pre-submission checklist</h3>
+                <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                    <h3 class="font-bold text-base-content mb-4 text-sm">Pre-submission checklist</h3>
                     <ul class="grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid">
-                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>netsuke build</code> succeeds from a clean checkout</span></li>
-                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>netsuke generate</code> emits the Ninja plan you expect</span></li>
-                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> External tools are named in a comment or the pull request</li>
-                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> The manifest demonstrates one concept, stated in one sentence</li>
-                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>defaults</code> name concrete deliverables</span></li>
-                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Repository quality gates pass (<code>make check-fmt lint test</code>)</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>netsuke build</code> succeeds from a clean checkout</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>netsuke generate</code> emits the Ninja plan you expect</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> External tools are named in a comment or the pull request</li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> The manifest demonstrates one concept, stated in one sentence</li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>defaults</code> name concrete deliverables</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Repository quality gates pass (<code>make check-fmt lint test</code>)</span></li>
                     </ul>
                 </div>
             </section>

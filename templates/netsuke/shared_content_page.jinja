@@ -5,23 +5,23 @@
         <nav class="mb-8 text-sm font-mono text-charcoal-light" aria-label="Breadcrumb">
             <ol class="flex flex-wrap items-center list-none">
                 {% if parent_link %}
-                <li><a href="{{ parent_link.href }}" class="hover:text-vermillion">{{ parent_link.label }}</a></li>
+                <li><a href="{{ parent_link.href }}" class="hover:text-accent">{{ parent_link.label }}</a></li>
                 <li class="mx-2" aria-hidden="true">/</li>
                 {% endif %}
-                <li><a href="/netsuke/" class="hover:text-vermillion">Home</a></li>
+                <li><a href="/netsuke/" class="hover:text-accent">Home</a></li>
                 <li class="mx-2" aria-hidden="true">/</li>
                 <li aria-current="page">{{ title }}</li>
             </ol>
         </nav>
 
-        <div class="rounded-3xl border border-stone bg-white/80 p-6 sm:p-10 shadow-xs">
-            <div class="inline-flex items-center rounded-full border border-stone bg-boxwood-light px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo">{{ eyebrow or 'Legal' }}</div>
+        <div class="rounded-3xl border border-base-300 bg-white/80 p-6 sm:p-10 shadow-xs">
+            <div class="inline-flex items-center rounded-full border border-base-300 bg-base-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">{{ eyebrow or 'Legal' }}</div>
             <h1 class="mt-6 font-serif text-4xl font-bold tracking-tight">{{ title }}</h1>
             {% if summary %}
             <p class="mt-4 max-w-3xl text-lg leading-relaxed text-charcoal-mid">{{ summary }}</p>
             {% endif %}
 
-            <article class="hm-prose mt-10 text-charcoal">
+            <article class="hm-prose mt-10 text-base-content">
                 {{ body_html | safe }}
             </article>
         </div>

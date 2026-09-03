@@ -16,25 +16,25 @@
 {% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body class="shell-surface text-charcoal font-sans antialiased selection:bg-vermillion selection:text-white {% block body_class %}flex flex-col min-h-screen{% endblock %}">
+<body class="shell-surface text-base-content font-sans antialiased selection:bg-accent selection:text-white {% block body_class %}flex flex-col min-h-screen{% endblock %}">
     <!-- Navigation -->
     <nav id="navbar" data-mobile-nav class="fixed top-0 w-full z-50 shell-backdrop transition-all duration-300" aria-label="Primary navigation">
         <div class="site-container">
             <div class="flex justify-between h-16 items-center">
                 <a href="/netsuke/" class="flex items-center space-x-3" aria-label="Home">
                     <!-- Logo mark inspired by Netsuke craftsmanship -->
-                    <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light shadow-xs" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="18.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
-                    <span class="font-serif font-bold text-xl tracking-tight text-charcoal">Netsuke</span>
+                    <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-base-200 shadow-xs" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="18.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                    <span class="font-serif font-bold text-xl tracking-tight text-base-content">Netsuke</span>
                 </a>
 
                 <!-- Desktop Nav -->
                 <div class="hidden md:block">
                     <ul class="flex list-none space-x-8">
                         {% if parent_link %}
-                        <li><a href="{{ parent_link.href }}" class="text-vermillion font-medium transition-colors text-sm py-1"><span class="max-[960px]:hidden">{{ parent_link.label }}</span><span class="hidden max-[960px]:inline">&larr; df12</span></a></li>
+                        <li><a href="{{ parent_link.href }}" class="text-accent font-medium transition-colors text-sm py-1"><span class="max-[960px]:hidden">{{ parent_link.label }}</span><span class="hidden max-[960px]:inline">&larr; df12</span></a></li>
                         {% endif %}
                         {% for link in nav_links %}
-                        <li><a href="{{ link.href }}" class="{% if link.current %}text-charcoal font-semibold border-b-2 border-vermillion{% else %}text-charcoal-mid hover:text-vermillion font-medium{% endif %} transition-colors text-sm py-1"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>
+                        <li><a href="{{ link.href }}" class="{% if link.current %}text-base-content font-semibold border-b-2 border-accent{% else %}text-charcoal-mid hover:text-accent font-medium{% endif %} transition-colors text-sm py-1"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -71,13 +71,13 @@
 
     {% block content %}{% endblock %}
 
-    <footer id="footer" class="bg-charcoal pt-20 pb-10 text-stone-light border-t border-charcoal-light">
+    <footer id="footer" class="bg-base-content pt-20 pb-10 text-stone-light border-t border-charcoal-light">
         <div class="site-container">
             <div class="grid grid-cols-1 min-[460px]:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                 <!-- Brand Column -->
                 <div class="col-span-1 min-[460px]:col-span-2 lg:col-span-1">
                     <div class="flex items-center space-x-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-boxwood-light" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="18.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
+                        <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-base-200" aria-hidden="true"><svg class="h-5 w-5" width="32" height="32" viewBox="0 0 32 32" fill="none"><line x1="4.5" y1="16" x2="27.5" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line><circle cx="18.5" cy="16" r="3.75" fill="currentColor"></circle></svg></div>
                         <span class="font-serif font-bold text-xl tracking-tight text-white">Netsuke</span>
                     </div>
                     <p class="text-sm text-charcoal-light leading-relaxed mb-6">
@@ -92,7 +92,7 @@
                 <!-- Links -->
                 <div>
                     <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Documentation</h4>
-                    <ul class="space-y-3 text-sm text-stone">
+                    <ul class="space-y-3 text-sm text-base-300">
                         <li><a href="/netsuke/docs/getting-started/" class="hover:text-white transition-colors">Getting Started</a></li>
                         <li><a href="/netsuke/docs/manifest-reference/" class="hover:text-white transition-colors">Manifest Reference</a></li>
                         <li><a href="/netsuke/docs/rules-and-targets/" class="hover:text-white transition-colors">Rules &amp; Targets</a></li>
@@ -102,7 +102,7 @@
 
                 <div>
                     <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Resources</h4>
-                    <ul class="space-y-3 text-sm text-stone">
+                    <ul class="space-y-3 text-sm text-base-300">
                         <li><a href="/netsuke/examples/" class="hover:text-white transition-colors">Examples Hub</a></li>
                         <li><a href="/netsuke/design/" class="hover:text-white transition-colors">Design System</a></li>
                         <li><a href="/netsuke/roadmap/" class="hover:text-white transition-colors">Roadmap &amp; Releases</a></li>
@@ -115,10 +115,10 @@
                 <div>
                     <h4 class="text-sm font-bold uppercase tracking-wider text-boxwood mb-6">Ready to build?</h4>
                     <div class="space-y-4">
-                        <a href="/netsuke/install/" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">
+                        <a href="/netsuke/install/" class="block w-full py-2 px-4 bg-accent text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">
                             Install Netsuke
                         </a>
-                        <a href="/netsuke/docs/" class="block w-full py-2 px-4 bg-transparent border border-stone/30 text-stone text-center rounded text-sm font-bold hover:bg-white/5 transition-colors">
+                        <a href="/netsuke/docs/" class="block w-full py-2 px-4 bg-transparent border border-base-300/30 text-base-300 text-center rounded text-sm font-bold hover:bg-white/5 transition-colors">
                             Read the docs
                         </a>
                     </div>

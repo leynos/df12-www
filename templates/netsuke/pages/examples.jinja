@@ -25,7 +25,7 @@
                             Beginner
                         </span>
                     </div>
-                    <h2 class="font-serif text-3xl font-bold text-charcoal mb-4">Basic C Application</h2>
+                    <h2 class="font-serif text-3xl font-bold text-base-content mb-4">Basic C Application</h2>
                     <p class="text-charcoal-mid mb-8 leading-relaxed">
                         A small C build expressed in plain YAML. Reuse one compile rule, link two object files, and let Netsuke translate the graph for Ninja.
                     </p>
@@ -38,10 +38,10 @@
                         </a>
                     </div>
                 </div>
-                <div class="bg-charcoal p-6 lg:p-8 flex items-center overflow-hidden relative">
+                <div class="bg-base-content p-6 lg:p-8 flex items-center overflow-hidden relative">
                     <!-- Decorative blurred circles -->
-                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-vermillion/20 rounded-full blur-3xl"></div>
-                    <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 bg-indigo/20 rounded-full blur-3xl"></div>
+                    <div class="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl"></div>
 
                     <div class="w-full relative z-10">
                         <div class="flex justify-between items-center mb-2 text-xs font-mono text-stone-light/60 px-2">
@@ -86,12 +86,12 @@ targets:
                     data-doc-search-index="/netsuke/assets/search/examples-search.json"
                 >
                     <label for="example-search" class="visually-hidden">Search examples</label>
-                    <span  class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                    <span  class="iconify absolute left-3 top-2.5 text-base-300 text-sm" data-icon="carbon:search" aria-hidden="true"></span>
                     <input
                         id="example-search"
                         type="text"
                         placeholder="Search examples..."
-                        class="search-input w-full pl-9 pr-4 py-1.5 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo focus:ring-1 focus:ring-indigo transition-colors"
+                        class="search-input w-full pl-9 pr-4 py-1.5 bg-white border border-base-300 rounded-md text-sm text-base-content placeholder-base-300 focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                         data-doc-search-input
                         aria-label="Search the examples"
                         role="combobox"
@@ -100,9 +100,9 @@ targets:
                         aria-expanded="false"
                     >
                     <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
-                        <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
+                        <div class="overflow-hidden rounded-xl border border-base-300 bg-white shadow-paper-lg">
                             <ul id="example-search-results" class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>
-                            <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                            <p class="border-t border-stone-light bg-base-100 px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
                                 Type at least 2 characters to search the examples.
                             </p>
                         </div>
@@ -121,7 +121,7 @@ targets:
         </section>
 
         <!-- Contributing Callout -->
-        <section class="bg-indigo rounded-2xl p-8 lg:p-12 text-white relative overflow-hidden">
+        <section class="bg-primary rounded-2xl p-8 lg:p-12 text-white relative overflow-hidden">
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-black/20 rounded-full blur-3xl"></div>
 
@@ -132,28 +132,28 @@ targets:
                         The best way to learn Netsuke is by seeing it in action. If you've built something interesting, contribute it to our examples repository.
                     </p>
                     <div class="flex flex-wrap gap-4">
-                        <a href="mailto:netsuke@df12.studio" class="inline-flex items-center px-6 py-3 bg-white text-indigo rounded-md font-bold shadow-xs hover:bg-stone-light transition-colors">
+                        <a href="mailto:netsuke@df12.studio" class="inline-flex items-center px-6 py-3 bg-white text-primary rounded-md font-bold shadow-xs hover:bg-stone-light transition-colors">
                             Submit Example
                         </a>
-                        <a href="/netsuke/guides/writing-examples/" class="inline-flex items-center px-6 py-3 bg-indigo-light border border-white/20 text-white rounded-md font-bold hover:bg-indigo-light/80 transition-colors">
+                        <a href="/netsuke/guides/writing-examples/" class="inline-flex items-center px-6 py-3 bg-secondary border border-white/20 text-white rounded-md font-bold hover:bg-secondary/80 transition-colors">
                             Read Contribution Guide
                         </a>
                     </div>
                 </div>
                 <div class="hidden lg:block">
-                    <div class="bg-charcoal rounded-lg p-6 font-mono text-sm text-stone border border-white/10 shadow-2xl">
+                    <div class="bg-base-content rounded-lg p-6 font-mono text-sm text-base-300 border border-white/10 shadow-2xl">
                         <div class="flex items-center space-x-2 mb-4 border-b border-white/10 pb-4">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
+                            <div class="w-3 h-3 rounded-full bg-accent"></div>
+                            <div class="w-3 h-3 rounded-full bg-warning"></div>
+                            <div class="w-3 h-3 rounded-full bg-success"></div>
                             <span class="text-xs text-stone-light/50">bash</span>
                         </div>
                         <div class="space-y-2">
-                            <div><span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~</span> git clone https://github.com/leynos/netsuke.git</div>
-                            <div><span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~</span> cd netsuke/examples</div>
-                            <div><span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~/netsuke/examples</span> mkdir my-project</div>
+                            <div><span class="text-success">&#10145;</span> <span class="text-secondary">~</span> git clone https://github.com/leynos/netsuke.git</div>
+                            <div><span class="text-success">&#10145;</span> <span class="text-secondary">~</span> cd netsuke/examples</div>
+                            <div><span class="text-success">&#10145;</span> <span class="text-secondary">~/netsuke/examples</span> mkdir my-project</div>
                             <div class="text-stone-light/60 italic">Add a `Netsukefile`, keep the graph small, then submit the example.</div>
-                            <div><span class="text-matcha">&#10145;</span> <span class="text-indigo-light">~/netsuke/examples</span> <span class="animate-pulse">_</span></div>
+                            <div><span class="text-success">&#10145;</span> <span class="text-secondary">~/netsuke/examples</span> <span class="animate-pulse">_</span></div>
                         </div>
                     </div>
                 </div>

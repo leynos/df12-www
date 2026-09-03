@@ -41,6 +41,7 @@ extend-ignore-re = [
     "\\brust-analyzer\\b",
     "\\{color\\}",
     "`color`",
+    "`vermillion(?:-dim)?`",
     "background_color",
     "check_color_contrast",
     "color-mix\\(\\)",

@@ -16,10 +16,10 @@
 {% endblock %}
 {% block content %}
     <!-- Hero Section -->
-    <header id="hero" class="hm-hero relative w-full min-h-[800px] flex items-center overflow-hidden py-16">
+    <header id="hero" class="hm-hero relative w-full min-h-[800px] flex items-center overflow-hidden">
         <!-- Background Image -->
         <div class="absolute inset-0 z-0 hm-hero-overlay">
-             <img class="hm-hero-image w-full h-full object-cover" src="/netsuke/assets/hero-carved-cat.png" alt="wooden carved cat figurine netsuke style, vibrant red floral japanese fabric background, warm lighting, macro photography, extremely detailed wood texture" />
+             <img class="hm-hero-image object-cover" src="/netsuke/assets/hero-carved-cat.png" alt="wooden carved cat figurine netsuke style, vibrant red floral japanese fabric background, warm lighting, macro photography, extremely detailed wood texture" />
              <!-- Gradient Overlay for readability -->
              <div class="absolute inset-0 bg-[linear-gradient(115deg,rgba(46,42,37,0.9)_0%,rgba(46,42,37,0.7)_36%,rgba(46,42,37,0.28)_64%,rgba(245,237,224,0.08)_100%)]"></div>
         </div>
@@ -27,12 +27,12 @@
         <div class="site-container relative z-10 w-full">
             <div class="hm-hero-panel max-w-2xl space-y-8">
                 <div class="hm-kicker hm-kicker--hero">
-                    <span class="w-2 h-2 rounded-full bg-matcha mr-2 animate-pulse"></span> <span class="hm-kicker__lede">Open Source Build System &middot; </span>v{{ netsuke_version }}
+                    <span class="w-2 h-2 rounded-full bg-success mr-2 animate-pulse"></span> <span class="hm-kicker__lede">Open Source Build System &middot; </span>v{{ netsuke_version }}
                 </div>
 
                 <h1 class="font-serif text-5xl lg:text-7xl font-bold text-white leading-[1.1] lg:leading-none tracking-tight">
                     Build systems,<br>
-                    not <span class="text-vermillion italic px-2 rounded-lg">build scripts</span>.
+                    not <span class="text-accent italic px-2 rounded-lg">build scripts</span>.
                 </h1>
 
                 <p class="text-xl text-stone-light max-w-lg leading-relaxed font-light">
@@ -50,9 +50,9 @@
                 </div>
 
                 <div class="hm-proof-list pt-2">
-                    <span class="hm-proof-pill"><span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span> Rust-powered</span>
-                    <span class="hm-proof-pill"><span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span> Ninja backend</span>
-                    <span class="hm-proof-pill"><span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span> Localised, accessible CLI</span>
+                    <span class="hm-proof-pill"><span  class="iconify text-success" data-icon="carbon:checkmark" aria-hidden="true"></span> Rust-powered</span>
+                    <span class="hm-proof-pill"><span  class="iconify text-success" data-icon="carbon:checkmark" aria-hidden="true"></span> Ninja backend</span>
+                    <span class="hm-proof-pill"><span  class="iconify text-success" data-icon="carbon:checkmark" aria-hidden="true"></span> Localised, accessible CLI</span>
                 </div>
             </div>
         </div>
@@ -62,17 +62,17 @@
     <section id="features" class="py-24 bg-white border-y border-stone-light">
         <div class="site-container">
             <div class="text-center mb-16">
-                <span class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">Why Netsuke?</span>
-                <h2 class="font-serif text-4xl font-bold text-charcoal">Crafted for reliability</h2>
+                <span class="text-accent font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">Why Netsuke?</span>
+                <h2 class="font-serif text-4xl font-bold text-base-content">Crafted for reliability</h2>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <!-- Card 1 -->
                 <div class="hm-feature-card p-8">
-                    <div class="w-12 h-12 rounded-lg bg-indigo text-white flex items-center justify-center mb-6 text-xl">
+                    <div class="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center mb-6 text-xl">
                         <span  class="iconify" data-icon="carbon:rule" aria-hidden="true"></span>
                     </div>
-                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Declare</h3>
+                    <h3 class="font-serif text-xl font-bold text-base-content mb-3">Declare</h3>
                     <p class="text-charcoal-mid text-sm leading-relaxed">
                         Describe <em>what</em> you want to build, not <em>how</em>. Netsuke figures out the steps, ensuring reproducibility across machines.
                     </p>
@@ -80,10 +80,10 @@
 
                 <!-- Card 2 -->
                 <div class="hm-feature-card p-8">
-                    <div class="w-12 h-12 rounded-lg bg-vermillion text-white flex items-center justify-center mb-6 text-xl">
+                    <div class="w-12 h-12 rounded-lg bg-accent text-white flex items-center justify-center mb-6 text-xl">
                         <span  class="iconify" data-icon="carbon:flash" aria-hidden="true"></span>
                     </div>
-                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Fast by delegation</h3>
+                    <h3 class="font-serif text-xl font-bold text-base-content mb-3">Fast by delegation</h3>
                     <p class="text-charcoal-mid text-sm leading-relaxed">
                         Netsuke compiles your graph to Ninja, leveraging its blazing fast incremental builds and parallelism.
                     </p>
@@ -91,10 +91,10 @@
 
                 <!-- Card 3 -->
                 <div class="hm-feature-card p-8">
-                    <div class="w-12 h-12 rounded-lg bg-matcha text-white flex items-center justify-center mb-6 text-xl">
+                    <div class="w-12 h-12 rounded-lg bg-success text-white flex items-center justify-center mb-6 text-xl">
                         <span  class="iconify" data-icon="carbon:security" aria-hidden="true"></span>
                     </div>
-                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Safe by default</h3>
+                    <h3 class="font-serif text-xl font-bold text-base-content mb-3">Safe by default</h3>
                     <p class="text-charcoal-mid text-sm leading-relaxed">
                         Structured builds with explicit dependencies are safer by default. Quoted path markers, a fixed recipe-shell contract, and YAML-first validation reduce common error classes.
                     </p>
@@ -102,10 +102,10 @@
 
                 <!-- Card 4 -->
                 <div class="hm-feature-card p-8">
-                    <div class="w-12 h-12 rounded-lg bg-amber text-white flex items-center justify-center mb-6 text-xl">
+                    <div class="w-12 h-12 rounded-lg bg-warning text-white flex items-center justify-center mb-6 text-xl">
                         <span  class="iconify" data-icon="carbon:network-4" aria-hidden="true"></span>
                     </div>
-                    <h3 class="font-serif text-xl font-bold text-charcoal mb-3">Polyglot</h3>
+                    <h3 class="font-serif text-xl font-bold text-base-content mb-3">Polyglot</h3>
                     <p class="text-charcoal-mid text-sm leading-relaxed">
                         One tool, many workflows. Build C++, Rust, Python, documentation, and assets in a single unified graph.
                     </p>
@@ -115,33 +115,33 @@
     </section>
 
     <!-- Code Example Section -->
-    <section id="example" class="py-24 bg-boxwood-pale relative overflow-hidden">
+    <section id="example" class="py-24 bg-base-100 relative overflow-hidden">
         <div class="site-container">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <span class="text-indigo font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">The Netsukefile</span>
-                    <h2 class="font-serif text-4xl font-bold text-charcoal mb-6">Readable configuration</h2>
+                    <span class="text-primary font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">The Netsukefile</span>
+                    <h2 class="font-serif text-4xl font-bold text-base-content mb-6">Readable configuration</h2>
                     <p class="text-lg text-charcoal-mid mb-8 leading-relaxed">
-                        The <code class="bg-white px-2 py-1 rounded border border-stone text-sm font-mono text-vermillion">Netsukefile</code> is plain YAML with controlled Jinja expansion. Structure stays declarative; the dynamic parts stay visible.
+                        The <code class="bg-white px-2 py-1 rounded border border-base-300 text-sm font-mono text-accent">Netsukefile</code> is plain YAML with controlled Jinja expansion. Structure stays declarative; the dynamic parts stay visible.
                     </p>
 
                     <ul class="space-y-4">
                         <li class="flex items-start">
-                            <span  class="iconify text-matcha mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span  class="iconify text-success mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             <span class="text-charcoal-mid"><strong><code>foreach</code> and <code>when</code></strong> for explicit expansion and filtering</span>
                         </li>
                         <li class="flex items-start">
-                            <span  class="iconify text-matcha mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span  class="iconify text-success mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             <span class="text-charcoal-mid"><strong>Rules, actions, and defaults</strong> that map cleanly onto the build graph</span>
                         </li>
                         <li class="flex items-start">
-                            <span  class="iconify text-matcha mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                            <span  class="iconify text-success mt-1.5 mr-3" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             <span class="text-charcoal-mid"><strong>String-only rendering</strong> so structure is validated before commands are produced</span>
                         </li>
                     </ul>
 
                     <div class="mt-10">
-                        <a href="/netsuke/docs/manifest-reference/" class="text-indigo font-medium hover:text-vermillion transition-colors flex items-center group">
+                        <a href="/netsuke/docs/manifest-reference/" class="text-primary font-medium hover:text-accent transition-colors flex items-center group">
                             Read the syntax documentation <span  class="iconify ml-2 transform group-hover:translate-x-1 transition-transform" data-icon="carbon:arrow-right" aria-hidden="true"></span>
                         </a>
                     </div>
@@ -149,7 +149,7 @@
 
                 <!-- Code Window -->
                 <div class="relative">
-                    <div class="hm-faux-window__shadow absolute -top-6 -right-6 w-full h-full bg-stone/30 rounded-lg transform rotate-2"></div>
+                    <div class="hm-faux-window__shadow absolute -top-6 -right-6 w-full h-full bg-base-300/30 rounded-lg transform rotate-2"></div>
                     {{ chrome.faux_window_open('Netsukefile', frame='code-window relative z-10 text-sm', body_class='p-6 overflow-x-auto text-stone-light leading-relaxed') }}
 {% highlight 'netsuke' %}{% raw %}
 # Reusable commands live in rules
@@ -181,8 +181,8 @@ targets:
     <section id="pipeline" class="py-24 bg-white border-y border-stone-light">
         <div class="site-container">
             <div class="text-center mb-16">
-                <span class="text-vermillion font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">How it works</span>
-                <h2 class="font-serif text-4xl font-bold text-charcoal">The Six-Stage Pipeline</h2>
+                <span class="text-accent font-mono text-sm font-semibold tracking-wider uppercase mb-2 block">How it works</span>
+                <h2 class="font-serif text-4xl font-bold text-base-content">The Six-Stage Pipeline</h2>
             </div>
 
             <div class="relative">
@@ -191,9 +191,9 @@ targets:
 
                     <!-- Stage 1 -->
                     <div class="relative group">
-                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">1</div>
-                            <h4 class="font-bold text-charcoal text-sm mb-2">Read</h4>
+                        <div class="h-full bg-base-100 p-6 rounded-lg border border-base-300 hover:border-primary transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-base-300 flex items-center justify-center mb-4 text-base-content font-bold font-serif shadow-xs">1</div>
+                            <h4 class="font-bold text-base-content text-sm mb-2">Read</h4>
                             <p class="text-xs text-charcoal-mid">Load manifest files from disk</p>
                         </div>
                         <div class="pipeline-connector hidden lg:block"></div>
@@ -201,9 +201,9 @@ targets:
 
                     <!-- Stage 2 -->
                     <div class="relative group">
-                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">2</div>
-                            <h4 class="font-bold text-charcoal text-sm mb-2">Parse</h4>
+                        <div class="h-full bg-base-100 p-6 rounded-lg border border-base-300 hover:border-primary transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-base-300 flex items-center justify-center mb-4 text-base-content font-bold font-serif shadow-xs">2</div>
+                            <h4 class="font-bold text-base-content text-sm mb-2">Parse</h4>
                             <p class="text-xs text-charcoal-mid">Validate the manifest as YAML</p>
                         </div>
                         <div class="pipeline-connector hidden lg:block"></div>
@@ -211,9 +211,9 @@ targets:
 
                     <!-- Stage 3 -->
                     <div class="relative group">
-                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">3</div>
-                            <h4 class="font-bold text-charcoal text-sm mb-2">Expand</h4>
+                        <div class="h-full bg-base-100 p-6 rounded-lg border border-base-300 hover:border-primary transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-base-300 flex items-center justify-center mb-4 text-base-content font-bold font-serif shadow-xs">3</div>
+                            <h4 class="font-bold text-base-content text-sm mb-2">Expand</h4>
                             <p class="text-xs text-charcoal-mid">Process templates & variables</p>
                         </div>
                         <div class="pipeline-connector hidden lg:block"></div>
@@ -221,9 +221,9 @@ targets:
 
                     <!-- Stage 4 -->
                     <div class="relative group">
-                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">4</div>
-                            <h4 class="font-bold text-charcoal text-sm mb-2">Render</h4>
+                        <div class="h-full bg-base-100 p-6 rounded-lg border border-base-300 hover:border-primary transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-base-300 flex items-center justify-center mb-4 text-base-content font-bold font-serif shadow-xs">4</div>
+                            <h4 class="font-bold text-base-content text-sm mb-2">Render</h4>
                             <p class="text-xs text-charcoal-mid">Deserialize and render string fields</p>
                         </div>
                         <div class="pipeline-connector hidden lg:block"></div>
@@ -231,9 +231,9 @@ targets:
 
                     <!-- Stage 5 -->
                     <div class="relative group">
-                        <div class="h-full bg-boxwood-pale p-6 rounded-lg border border-stone hover:border-indigo transition-colors flex flex-col items-center text-center z-10 relative">
-                            <div class="w-10 h-10 rounded-full bg-white border border-stone flex items-center justify-center mb-4 text-charcoal font-bold font-serif shadow-xs">5</div>
-                            <h4 class="font-bold text-charcoal text-sm mb-2">Validate</h4>
+                        <div class="h-full bg-base-100 p-6 rounded-lg border border-base-300 hover:border-primary transition-colors flex flex-col items-center text-center z-10 relative">
+                            <div class="w-10 h-10 rounded-full bg-white border border-base-300 flex items-center justify-center mb-4 text-base-content font-bold font-serif shadow-xs">5</div>
+                            <h4 class="font-bold text-base-content text-sm mb-2">Validate</h4>
                             <p class="text-xs text-charcoal-mid">Check cycles & missing deps</p>
                         </div>
                         <div class="pipeline-connector hidden lg:block"></div>
@@ -241,7 +241,7 @@ targets:
 
                     <!-- Stage 6 -->
                     <div class="relative group">
-                        <div class="h-full bg-indigo text-white p-6 rounded-lg border border-indigo-light shadow-md flex flex-col items-center text-center z-10 relative">
+                        <div class="h-full bg-primary text-white p-6 rounded-lg border border-secondary shadow-md flex flex-col items-center text-center z-10 relative">
                             <div class="w-10 h-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center mb-4 text-white font-bold font-serif shadow-xs">6</div>
                             <h4 class="font-bold text-white text-sm mb-2">Build</h4>
                             <p class="text-xs text-indigo-100">Execute via Ninja backend</p>
@@ -254,7 +254,7 @@ targets:
     </section>
 
     <!-- Terminal Preview -->
-    <section id="terminal" class="py-20 bg-charcoal text-stone-light">
+    <section id="terminal" class="py-20 bg-base-content text-stone-light">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="font-serif text-3xl font-bold text-white mb-4">Clear feedback, human errors</h2>
@@ -267,38 +267,38 @@ targets:
                     <!-- Command 1 -->
                     <div>
                         <div class="flex items-center text-stone-light">
-                            <span class="text-matcha mr-2">➜</span>
-                            <span class="text-indigo-light mr-2">~/netsuke-demo</span>
+                            <span class="text-success mr-2">➜</span>
+                            <span class="text-secondary mr-2">~/netsuke-demo</span>
                             <span class="text-white">netsuke build app</span>
                         </div>
                         <div class="pl-4 mt-2 border-l-2 border-charcoal-mid/50 text-charcoal-light">
-                            <div class="hm-terminal-status flex justify-between w-64"><span>Parsing manifests...</span> <span class="text-matcha">Done (12ms)</span></div>
-                            <div class="hm-terminal-status flex justify-between w-64"><span>Constructing graph...</span> <span class="text-matcha">Done (4ms)</span></div>
-                            <div class="mt-1 text-stone-light"><span class="text-matcha font-bold">[1/3]</span> Compiling utils.c</div>
-                            <div class="text-stone-light"><span class="text-matcha font-bold">[2/3]</span> Compiling main.c</div>
-                            <div class="text-stone-light"><span class="text-matcha font-bold">[3/3]</span> Linking app</div>
-                            <div class="mt-2 text-matcha font-bold">Build successful in 0.45s</div>
+                            <div class="hm-terminal-status flex justify-between w-64"><span>Parsing manifests...</span> <span class="text-success">Done (12ms)</span></div>
+                            <div class="hm-terminal-status flex justify-between w-64"><span>Constructing graph...</span> <span class="text-success">Done (4ms)</span></div>
+                            <div class="mt-1 text-stone-light"><span class="text-success font-bold">[1/3]</span> Compiling utils.c</div>
+                            <div class="text-stone-light"><span class="text-success font-bold">[2/3]</span> Compiling main.c</div>
+                            <div class="text-stone-light"><span class="text-success font-bold">[3/3]</span> Linking app</div>
+                            <div class="mt-2 text-success font-bold">Build successful in 0.45s</div>
                         </div>
                     </div>
 
                     <!-- Command 2 (Error) -->
                     <div class="pt-4">
                         <div class="flex items-center text-stone-light">
-                            <span class="text-matcha mr-2">➜</span>
-                            <span class="text-indigo-light mr-2">~/netsuke-demo</span>
+                            <span class="text-success mr-2">➜</span>
+                            <span class="text-secondary mr-2">~/netsuke-demo</span>
                             <span class="text-white">netsuke build broken</span>
                         </div>
-                        <div class="mt-4 p-4 bg-black/20 rounded border-l-2 border-vermillion">
-                            <div class="text-vermillion font-bold mb-2">× Cycle Detected</div>
+                        <div class="mt-4 p-4 bg-black/20 rounded border-l-2 border-accent">
+                            <div class="text-accent font-bold mb-2">× Cycle Detected</div>
                             <div class="text-stone-light mb-1">The dependency graph contains a cycle:</div>
                             <div class="pl-4 text-charcoal-light">
                                 <div>broken</div>
                                 <div>  └─ lib_a</div>
                                 <div>      └─ lib_b</div>
-                                <div>          └─ broken <span class="text-vermillion text-xs ml-2">&lt;-- Cycle here</span></div>
+                                <div>          └─ broken <span class="text-accent text-xs ml-2">&lt;-- Cycle here</span></div>
                             </div>
                             <div class="mt-3 text-xs text-charcoal-light">
-                                Check <span class="text-stone underline">src/Netsukefile:14</span> for dependency definitions.
+                                Check <span class="text-base-300 underline">src/Netsukefile:14</span> for dependency definitions.
                             </div>
                         </div>
                     </div>
@@ -310,44 +310,44 @@ targets:
     <section id="compare" class="py-24 bg-white">
         <div class="site-container">
             <div class="text-center mb-16">
-                <h2 class="font-serif text-3xl font-bold text-charcoal mb-4">What you give up vs. what you gain</h2>
+                <h2 class="font-serif text-3xl font-bold text-base-content mb-4">What you give up vs. what you gain</h2>
                 <p class="text-charcoal-mid">Comparing Netsuke to traditional Makefiles.</p>
             </div>
 
             <div class="overflow-hidden shadow ring-1 ring-black/5 rounded-lg border border-stone-light">
                 <table class="min-w-full hm-rows">
-                    <thead class="bg-boxwood-pale">
+                    <thead class="bg-base-100">
                         <tr>
-                            <th scope="col" class="py-4 pl-6 pr-3 text-left text-sm font-bold text-charcoal font-serif">Feature</th>
-                            <th scope="col" class="px-3 py-4 text-left text-sm font-bold text-charcoal font-serif">Make / Shell Scripts</th>
-                            <th scope="col" class="px-3 py-4 text-left text-sm font-bold text-charcoal font-serif text-indigo">Netsuke</th>
+                            <th scope="col" class="py-4 pl-6 pr-3 text-left text-sm font-bold text-base-content font-serif">Feature</th>
+                            <th scope="col" class="px-3 py-4 text-left text-sm font-bold text-base-content font-serif">Make / Shell Scripts</th>
+                            <th scope="col" class="px-3 py-4 text-left text-sm font-bold text-base-content font-serif text-primary">Netsuke</th>
                         </tr>
                     </thead>
                     <tbody class="hm-rows bg-white">
                         <tr>
-                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Configuration</td>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-base-content">Configuration</td>
                             <td class="px-3 py-4 text-sm text-charcoal-mid">Imperative, shell-dependent</td>
-                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Declarative, structured</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-primary/5 font-medium">Declarative, structured</td>
                         </tr>
                         <tr>
-                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Parallelism</td>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-base-content">Parallelism</td>
                             <td class="px-3 py-4 text-sm text-charcoal-mid">Manual flags (-j), flaky</td>
-                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Automatic, max core usage</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-primary/5 font-medium">Automatic, max core usage</td>
                         </tr>
                         <tr>
-                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Clean Builds</td>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-base-content">Clean Builds</td>
                             <td class="px-3 py-4 text-sm text-charcoal-mid">Often required manually</td>
-                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Correct by default</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-primary/5 font-medium">Correct by default</td>
                         </tr>
                         <tr>
-                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Learning Curve</td>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-base-content">Learning Curve</td>
                             <td class="px-3 py-4 text-sm text-charcoal-mid">Steep (obscure syntax)</td>
-                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">Gentle (Python-like)</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-primary/5 font-medium">Gentle (Python-like)</td>
                         </tr>
                         <tr>
-                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-charcoal">Cross-platform</td>
+                            <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-base-content">Cross-platform</td>
                             <td class="px-3 py-4 text-sm text-charcoal-mid">Difficult (Unix vs Windows)</td>
-                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-indigo/5 font-medium">First-class citizen</td>
+                            <td class="px-3 py-4 text-sm text-charcoal-mid bg-primary/5 font-medium">First-class citizen</td>
                         </tr>
                     </tbody>
                 </table>

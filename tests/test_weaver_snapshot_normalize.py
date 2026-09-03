@@ -541,3 +541,12 @@ def test_a_class_list_is_not_compared() -> None:
     assert normalized["styleDiff"]["color"] == "rgba(1, 2, 3, 1.000)", (
         "what the classes computed to is still compared"
     )
+
+
+def test_an_undisplayed_node_has_no_transform_to_compare() -> None:
+    """Chromium computes `transform` to none on it but keeps `rotate` as declared."""
+    v3 = _node(display="none", transform="none")
+    v4 = _node(display="none", rotate="2deg")
+    assert (
+        normalize._normalize(v3)["styleDiff"] == normalize._normalize(v4)["styleDiff"]
+    )

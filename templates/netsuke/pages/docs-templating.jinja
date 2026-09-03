@@ -34,8 +34,8 @@
 
             <!-- Why -->
             <section id="why" class="mb-20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why Jinja inside YAML
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why Jinja inside YAML
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Netsuke validates YAML before rendering templates. That keeps the manifest legible, keeps the structure
@@ -43,34 +43,34 @@
                     the build graph &mdash; it is to keep repeated YAML short enough to tolerate.
                 </p>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success mb-4">
                             <span class="iconify" data-icon="carbon:document" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-2">YAML first</h3>
+                        <h3 class="font-bold text-base-content mb-2">YAML first</h3>
                         <p class="text-sm text-charcoal-mid">Structure is checked before templating renders commands. Structural mistakes fail early, with YAML line numbers.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
                             <span class="iconify" data-icon="carbon:flow" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-2">Entries, not branches</h3>
+                        <h3 class="font-bold text-base-content mb-2">Entries, not branches</h3>
                         <p class="text-sm text-charcoal-mid"><code>foreach</code> and <code>when</code> select manifest entries at plan time. Build-time branching belongs in recipe commands, not the manifest.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning mb-4">
                             <span class="iconify" data-icon="carbon:function" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-2">Reusable helpers</h3>
-                        <p class="text-sm text-charcoal-mid">Declared macros, filters, and the <a href="/netsuke/docs/standard-library/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">standard library</a> cover common path, file, and environment tasks.</p>
+                        <h3 class="font-bold text-base-content mb-2">Reusable helpers</h3>
+                        <p class="text-sm text-charcoal-mid">Declared macros, filters, and the <a href="/netsuke/docs/standard-library/" class="text-primary underline decoration-primary/40 hover:decoration-primary">standard library</a> cover common path, file, and environment tasks.</p>
                     </div>
                 </div>
             </section>
 
             <!-- YAML foundations -->
             <section id="yaml" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:list-boxes" aria-hidden="true"></span> YAML foundations
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:list-boxes" aria-hidden="true"></span> YAML foundations
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     A <code>Netsukefile</code> is a YAML mapping. Netsuke rejects duplicate keys, unknown fields, and missing
@@ -102,8 +102,8 @@ defaults:
 
             <!-- Rendering -->
             <section id="rendering" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:magic-wand" aria-hidden="true"></span> How rendering works
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:magic-wand" aria-hidden="true"></span> How rendering works
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     MiniJinja renders <em>string fields</em>. Put an expression inside <code>{{ ... }}</code>, read values
@@ -111,18 +111,18 @@ defaults:
                     function with parentheses, and apply a test with <code>is</code>.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm">Rules that keep manifests honest</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">Rules that keep manifests honest</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
-                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Undefined values are errors, not silent empty strings.</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Only <code>{{ ins }}</code> and <code>{{ outs }}</code> are automatically quoted for the host shell; other rendered values are not.</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Structural statements such as <code>{% for %}</code> cannot reshape the YAML document. Use <code>foreach</code>, <code>when</code>, and declared macros instead.</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>vars</code> keys named <code>env</code> or <code>glob</code> are rejected at parse time &mdash; they would silently shadow the built-in helpers of the same name. The error names the offending key.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Undefined values are errors, not silent empty strings.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Only <code>{{ ins }}</code> and <code>{{ outs }}</code> are automatically quoted for the host shell; other rendered values are not.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Structural statements such as <code>{% for %}</code> cannot reshape the YAML document. Use <code>foreach</code>, <code>when</code>, and declared macros instead.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>vars</code> keys named <code>env</code> or <code>glob</code> are rejected at parse time &mdash; they would silently shadow the built-in helpers of the same name. The error names the offending key.</span></li>
                         </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-xs">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm">Order of operations</h3>
-                        <ol class="space-y-2 text-sm text-charcoal-mid list-decimal list-inside marker:text-indigo marker:font-bold">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">Order of operations</h3>
+                        <ol class="space-y-2 text-sm text-charcoal-mid list-decimal list-inside marker:text-primary marker:font-bold">
                             <li>Parse and validate the YAML document.</li>
                             <li>Evaluate <code>foreach</code> and <code>when</code> to select and clone entries.</li>
                             <li>Deserialize the typed manifest and render every string field.</li>
@@ -135,8 +135,8 @@ defaults:
 
             <!-- foreach -->
             <section id="foreach" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:repeat" aria-hidden="true"></span> Repeating with <code class="ml-2">foreach</code>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:repeat" aria-hidden="true"></span> Repeating with <code class="ml-2">foreach</code>
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     <code>foreach</code> takes a direct Jinja expression &mdash; no <code>{{ ... }}</code> braces &mdash; that
@@ -145,7 +145,7 @@ defaults:
                     element) and <code>index</code> (its position) to every string field and to <code>when</code>.
                     It works on <code>targets</code> and on top-level <code>actions</code> alike.
                 </p>
-                <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+                <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
 vars:
   designs:
@@ -165,28 +165,28 @@ targets:
 {% endraw %}{% endhighlight %}{% raw %}
                 </div>
                 <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                    <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                    <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                     <p>Glob over <em>source</em> files only. Templates expand before anything is built, so a glob over generated outputs sees an empty directory on a clean checkout.</p>
                 </div>
                 <div class="mt-4 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                    <span class="iconify text-amber mt-0.5" data-icon="carbon:security" aria-hidden="true"></span>
+                    <span class="iconify text-warning mt-0.5" data-icon="carbon:security" aria-hidden="true"></span>
                     <p>Since v0.1.0-beta3 the Jinja <code>glob()</code> helper rejects a matched path unless it can be inserted as one portable unquoted shell word: ASCII letters, digits, <code>/</code>, <code>:</code>, comma, full stop, underscore, and hyphen are accepted; whitespace, control characters, and shell punctuation fail the expansion. Rename offending checkout files, or keep filesystem-derived paths out of <code>command</code> and <code>script</code> text.</p>
                 </div>
             </section>
 
             <!-- when -->
             <section id="when" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:filter" aria-hidden="true"></span> Selecting with <code class="ml-2">when</code>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:filter" aria-hidden="true"></span> Selecting with <code class="ml-2">when</code>
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     <code>when</code> also takes a direct expression. If it evaluates false, the entry simply does not exist in
                     the plan. On a <code>foreach</code> entry it runs once per clone with <code>item</code> and
                     <code>index</code> in scope, so a single template can both expand and filter.
                     Complementary branches pair naturally with
-                    <a href="/netsuke/docs/standard-library/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo"><code>command_available(...)</code></a>.
+                    <a href="/netsuke/docs/standard-library/" class="text-primary underline decoration-primary/40 hover:decoration-primary"><code>command_available(...)</code></a>.
                 </p>
-                <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+                <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
 targets:
   - when: command_available('magick')
@@ -201,19 +201,19 @@ targets:
 {% endraw %}{% endhighlight %}{% raw %}
                 </div>
                 <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                    <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                    <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                     <p><code>when</code> selects manifest entries at plan time; it is not build-time branching. A condition that must be re-evaluated during the build belongs in the recipe command or script.</p>
                 </div>
                 <div class="mt-4 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                    <span class="iconify text-indigo mt-0.5" data-icon="carbon:debug" aria-hidden="true"></span>
+                    <span class="iconify text-primary mt-0.5" data-icon="carbon:debug" aria-hidden="true"></span>
                     <p>Pass <code>--verbose</code> to see how many targets and actions <code>when</code> filtered out, plus up to 64 per-entry events per expansion. The events carry only a section name, a short hash of the entry name, the iteration index, and the byte length of the expression &mdash; never raw names, <code>item</code> values, or expression text.</p>
                 </div>
             </section>
 
             <!-- Macros -->
             <section id="macros" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:function" aria-hidden="true"></span> Macros
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:function" aria-hidden="true"></span> Macros
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Declared macros are the manifest's unit of reuse: a <code>signature</code> naming the macro and its
@@ -237,13 +237,13 @@ targets:
 
             <!-- Advanced Patterns -->
             <section id="patterns" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Common Patterns</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">Common Patterns</h2>
 
-                <div class="bg-boxwood-pale border border-stone rounded-xl overflow-hidden">
+                <div class="bg-base-100 border border-base-300 rounded-xl overflow-hidden">
                     <div class="grid md:grid-cols-12 hm-cells">
                         <!-- Sidebar for patterns -->
                         <div class="md:col-span-4 p-6 bg-white/50">
-                            <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Recipes</h3>
+                            <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Recipes</h3>
                             <ul class="space-y-2" role="tablist" aria-label="Recipes" aria-orientation="vertical">
                                 <li role="presentation">
                                     <button type="button" id="recipe-tab-cross-compilation" class="recipe-btn recipe-btn--active w-full text-left px-3 py-2 text-sm font-medium rounded-md transition-colors" data-recipe-tab="cross-compilation" role="tab" aria-selected="true" aria-controls="recipe-panel-cross-compilation" tabindex="0">
@@ -265,12 +265,12 @@ targets:
 
                         <!-- Content for patterns -->
                         <div class="md:col-span-8 p-8 bg-white" id="recipe-panel-cross-compilation" data-recipe-panel="cross-compilation" role="tabpanel" aria-labelledby="recipe-tab-cross-compilation">
-                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Platform-specific sources with `when`</h4>
+                            <h4 class="font-serif text-xl font-bold text-base-content mb-2">Platform-specific sources with `when`</h4>
                             <p class="text-sm text-charcoal-mid mb-6">
                                 Use <code class="bg-stone-light/30 px-1 rounded text-xs">when</code> on repeated entries to include targets only when the current variables match the platform you want.
                             </p>
 
-                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+                            <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
 targets:
   - when: target_os == 'linux'
@@ -286,18 +286,18 @@ targets:
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                                <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                                 <p>Keep conditions coarse-grained. Avoid selecting on individual compiler versions unless absolutely necessary.</p>
                             </div>
                         </div>
 
                         <div class="md:col-span-8 p-8 bg-white hidden" id="recipe-panel-test-suites" data-recipe-panel="test-suites" role="tabpanel" aria-labelledby="recipe-tab-test-suites">
-                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Test runs with `actions` and `always`</h4>
+                            <h4 class="font-serif text-xl font-bold text-base-content mb-2">Test runs with `actions` and `always`</h4>
                             <p class="text-sm text-charcoal-mid mb-6">
                                 Put operator-run test suites in <code class="bg-stone-light/30 px-1 rounded text-xs">actions</code> so they stay outside the default graph, and mark report targets <code class="bg-stone-light/30 px-1 rounded text-xs">always</code> when they should rerun on every invocation.
                             </p>
 
-                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+                            <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
 targets:
   - name: test-report.txt
@@ -312,18 +312,18 @@ actions:
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                                <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                                 <p>Keep the build product and the test run distinct: the report target depends on the binary, so tests always run against the current build.</p>
                             </div>
                         </div>
 
                         <div class="md:col-span-8 p-8 bg-white hidden" id="recipe-panel-code-generation" data-recipe-panel="code-generation" role="tabpanel" aria-labelledby="recipe-tab-code-generation">
-                            <h4 class="font-serif text-xl font-bold text-charcoal mb-2">Generated sources as first-class targets</h4>
+                            <h4 class="font-serif text-xl font-bold text-base-content mb-2">Generated sources as first-class targets</h4>
                             <p class="text-sm text-charcoal-mid mb-6">
                                 Model generated code as its own target and let downstream targets name it in <code class="bg-stone-light/30 px-1 rounded text-xs">sources</code>: the implicit dependency keeps generation ordered before compilation.
                             </p>
 
-                            <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
+                            <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
 rules:
   - name: protoc
@@ -341,7 +341,7 @@ targets:
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
-                                <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                                <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                                 <p>List generated inputs explicitly rather than globbing them: templates expand before anything is built, so a glob over generated files sees an empty directory.</p>
                             </div>
                         </div>

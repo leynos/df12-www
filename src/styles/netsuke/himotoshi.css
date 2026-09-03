@@ -1,21 +1,25 @@
+/* The names this partial has always used for the palette, each now read
+   from the daisyUI theme and the tokens in src/styles/netsuke.css so a
+   colour is declared in one place. The two translucent rules are mixed
+   from the slot rather than restated. */
 :root {
   --netsuke-white: #fff;
-  --netsuke-charcoal: #2e2a25;
-  --netsuke-charcoal-mid: #5c554d;
-  --netsuke-charcoal-light: #8a8279;
-  --netsuke-indigo: #2b4162;
-  --netsuke-indigo-border: rgb(43 65 98 / 0.3);
-  --netsuke-indigo-light: #3a5a7c;
-  --netsuke-focus-ring: rgb(43 65 98 / 0.2);
-  --netsuke-vermillion: #c23b22;
-  --netsuke-vermillion-dim: #9e3020;
-  --netsuke-boxwood: #e8d5b5;
-  --netsuke-boxwood-light: #f5ede0;
-  --netsuke-boxwood-pale: #faf6f0;
-  --netsuke-stone: #d1c7b8;
-  --netsuke-stone-light: #e5ddd0;
-  --netsuke-matcha: #4a7c59;
-  --netsuke-amber: #c48b2c;
+  --netsuke-charcoal: var(--color-base-content);
+  --netsuke-charcoal-mid: var(--color-charcoal-mid);
+  --netsuke-charcoal-light: var(--color-charcoal-light);
+  --netsuke-indigo: var(--color-primary);
+  --netsuke-indigo-border: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  --netsuke-indigo-light: var(--color-secondary);
+  --netsuke-focus-ring: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  --netsuke-vermillion: var(--color-accent);
+  --netsuke-vermillion-dim: var(--color-vermillion-dim);
+  --netsuke-boxwood: var(--color-boxwood);
+  --netsuke-boxwood-light: var(--color-base-200);
+  --netsuke-boxwood-pale: var(--color-base-100);
+  --netsuke-stone: var(--color-base-300);
+  --netsuke-stone-light: var(--color-stone-light);
+  --netsuke-matcha: var(--color-success);
+  --netsuke-amber: var(--color-warning);
   --netsuke-surface-rgb: 255 255 255;
   --netsuke-warm-surface-rgb: 245 237 224;
   --netsuke-paper-shadow: 0 4px 6px -1px rgba(46, 42, 37, 0.1),
@@ -184,11 +188,15 @@ a.sidebar-link--sub.active {
 /* On narrow viewports the vertically centred hero content rides up under the
    fixed navbar. Floor the hero's top padding so the kicker never sits closer
    than 92.2px to the top of the viewport. Above 500px the natural centred
-   position already clears that, so the rule stops there. The selector is
-   doubled to outrank the hero's `py-16` utility, which the Tailwind Play CDN
-   injects into a later <style> block at equal specificity. */
+   position already clears that, so the rule stops there. The hero's own
+   padding is declared here rather than as a `py-16` utility in the markup,
+   because a utility beats a component class and this rule has to win. */
+.hm-hero {
+  padding-block: 4rem;
+}
+
 @media (max-width: 499.98px) {
-  .hm-hero.hm-hero {
+  .hm-hero {
     /* 92.25px, not 92.2px: Blink snaps layout to 1/64px, and 92.2px lands on
        92.1875px — a hair under the floor. */
     padding-top: 92.25px;
@@ -242,6 +250,14 @@ a.sidebar-link--sub.active {
   .hm-hero-overlay {
     filter: brightness(0.7);
   }
+}
+
+/* The hero photograph fills the hero. Its size is declared here rather than
+   as `w-full h-full` in the markup so the phone-width crop below, which
+   sizes it by height alone, can win: a utility would beat it. */
+.hm-hero-image {
+  height: 100%;
+  width: 100%;
 }
 
 @media (max-width: 639.98px) {
@@ -1244,74 +1260,81 @@ button.hm-config-keys__label {
   }
 }
 
+/* Full-bleed code and terminal panels on phone-width viewports.
+ *
+ * The `!important` here is load-bearing and deliberate. These rules have to
+ * beat the utilities the markup puts on the same elements — a border, a
+ * padding, a rounded corner, a shadow that make sense in the column and not
+ * when the panel runs to both edges — and layer order alone cannot do that,
+ * because utilities sit in a later layer than this file. Under the Play CDN
+ * the block won on specificity instead; the flag keeps what it won. */
 @media (max-width: 459.98px) {
-
   main.hm-docs-content {
-    overflow-wrap: break-word;
+    overflow-wrap: break-word !important;
   }
 
   .site-container > main.hm-docs-content {
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   main.hm-docs-content .grid > * {
-    min-width: 0;
+    min-width: 0 !important;
   }
 
   section .hm-faux-window {
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    font-size: 0.7rem;
-    margin-inline: -1rem;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 0.7rem !important;
+    margin-inline: -1rem !important;
   }
 
   /* Faux windows nested inside a p-6 card bleed out through the card's own
      1.5rem padding instead of the section's 1rem, so their edges meet the
      inside of the card border. */
-  section .hm-faux-window--card-bleed.hm-faux-window--card-bleed {
-    margin-inline: -1.5rem;
+  section .hm-faux-window--card-bleed {
+    margin-inline: -1.5rem !important;
   }
 
   section .hm-faux-window__titlebar {
-    border-radius: 0;
+    border-radius: 0 !important;
   }
 
   section .hm-faux-window__body {
-    padding: 1rem;
+    padding: 1rem !important;
   }
 
   section .hm-faux-window__shadow {
-    display: none;
+    display: none !important;
   }
 
   section .hm-terminal-status {
-    width: auto;
+    width: auto !important;
   }
 
   section .hm-example-code-block {
-    border-radius: 0;
-    box-shadow: none;
-    font-size: 0.7rem;
-    margin-inline: -1rem;
-    padding: 1rem;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 0.7rem !important;
+    margin-inline: -1rem !important;
+    padding: 1rem !important;
   }
 
   section .hm-example-terminal {
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    font-size: 0.7rem;
-    margin-inline: -1rem;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 0.7rem !important;
+    margin-inline: -1rem !important;
   }
 
   section .hm-example-terminal__titlebar {
-    border-radius: 0;
+    border-radius: 0 !important;
   }
 
   section .hm-example-terminal__body {
-    padding: 1rem;
+    padding: 1rem !important;
   }
 }
 

@@ -267,7 +267,11 @@ def _walker_expression(max_nodes: int = MAX_NODES, text_clip: int = TEXT_CLIP) -
     )
 
 
-def _snapshot_document(url: str, evaluated: str) -> dict[str, typ.Any]:
+def _snapshot_document(
+    url: str,
+    evaluated: str,
+    viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
+) -> dict[str, typ.Any]:
     """Wrap what the walker returned in the envelope css-view writes.
 
     Parameters
@@ -277,6 +281,8 @@ def _snapshot_document(url: str, evaluated: str) -> dict[str, typ.Any]:
     evaluated
         What ``agent-browser eval`` printed: the walker's JSON string, itself
         JSON-encoded once more by the tool.
+    viewport
+        The width and height the page was laid out at, for the record.
 
     Returns
     -------
@@ -293,7 +299,7 @@ def _snapshot_document(url: str, evaluated: str) -> dict[str, typ.Any]:
             "capturedAt": dt.datetime.now(dt.UTC).isoformat(),
             "mode": "walker",
             "tool": "agent-browser",
-            "viewport": {"width": CAPTURE_WIDTH, "height": CAPTURE_HEIGHT},
+            "viewport": {"width": viewport[0], "height": viewport[1]},
         },
         "payload": {
             "tree": result["tree"],
@@ -401,6 +407,7 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     run: Runner,
     read: Reader,
     site: str = DEFAULT_SITE,
+    viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
 ) -> None:
     """Snapshot each page in turn, reporting progress as it goes.
 
@@ -425,6 +432,10 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
         back this way.
     site
         The sub-site the pages belong to.
+    viewport
+        The width and height to lay each page out at. A stylesheet's media
+        queries only show at the widths they apply to, so a migration is
+        proved at more than one.
     """
     session = ["--session", _session_name(site, "capture")]
 
@@ -433,12 +444,12 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
 
     walker = _walker_expression()
     try:
-        drive("set", "viewport", str(CAPTURE_WIDTH), str(CAPTURE_HEIGHT))
+        drive("set", "viewport", str(viewport[0]), str(viewport[1]))
         for page in pages:
             url = f"{base}/{site}/{page}"
             settled = _open_settled(drive, url)
             document = _snapshot_document(
-                url, read([browser, "eval", walker, *session])
+                url, read([browser, "eval", walker, *session]), viewport
             )
             output = out_dir / f"{_slug(page)}.json"
             output.write_text(json.dumps(document), encoding="utf-8")

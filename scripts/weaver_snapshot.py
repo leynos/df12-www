@@ -65,6 +65,8 @@ from weaver_snapshot_output import _staged
 from weaver_snapshot_paths import DEFAULT_SITE, _page_paths, _public_root
 from weaver_snapshot_serving import _served
 from weaver_snapshot_tools import (
+    CAPTURE_HEIGHT,
+    CAPTURE_WIDTH,
     SCREENSHOT_WIDTHS,
     _capture_pages,
     _read_tool,
@@ -80,7 +82,15 @@ app = cyclopts.App(
 
 
 @app.command
-def capture(out_dir: Path, /, *, port: int = 0, site: str = DEFAULT_SITE) -> None:
+def capture(
+    out_dir: Path,
+    /,
+    *,
+    port: int = 0,
+    site: str = DEFAULT_SITE,
+    width: int = CAPTURE_WIDTH,
+    height: int = CAPTURE_HEIGHT,
+) -> None:
     """Record a computed-style snapshot of every page of one sub-site.
 
     Parameters
@@ -95,13 +105,21 @@ def capture(out_dir: Path, /, *, port: int = 0, site: str = DEFAULT_SITE) -> Non
     site
         The sub-site to capture, named as under ``sites:`` in
         ``config/pages.yaml``. Its pages are read from ``public/<site>``.
+    width
+        Viewport width to lay the pages out at. The default is the desktop
+        width the baselines were taken at; a phone width such as 360 proves
+        the rules behind the narrow media queries as well.
+    height
+        Viewport height, for the same reason.
     """
     pages = _page_paths(_public_root(site))
     browser = _tool("agent-browser")
-    print(f"capturing {len(pages)} {site} pages into {out_dir}")
+    print(f"capturing {len(pages)} {site} pages at {width}x{height} into {out_dir}")
 
     with _staged(out_dir, ".json") as staging, _served(port, site=site) as base:
-        _capture_pages(pages, staging, base, browser, _run_tool, _read_tool, site)
+        _capture_pages(
+            pages, staging, base, browser, _run_tool, _read_tool, site, (width, height)
+        )
 
     print(f"done: {out_dir.resolve()}")
 

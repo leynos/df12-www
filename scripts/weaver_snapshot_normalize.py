@@ -446,6 +446,13 @@ def _fold_transform(style: dict[str, typ.Any], bbox: _Bbox) -> None:
         The node's bounding box, against which a percentage translation
         resolves.
     """
+    # An element that is not displayed has no box to transform. Chromium
+    # computes its `transform` to `none` but leaves `rotate` and `translate`
+    # as declared, so v3 and v4 would disagree over a node nobody can see.
+    if style.get("display") == "none":
+        for key in ("transform", "rotate", "translate", "scale"):
+            style.pop(key, None)
+        return
     transform = style.get("transform", "none")
     if not isinstance(transform, str):
         return

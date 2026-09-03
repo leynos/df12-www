@@ -5,7 +5,7 @@ This ExecPlan (execution plan) is a living document. The sections
 `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work
 proceeds.
 
-Status: IN PROGRESS
+Status: COMPLETE
 
 ## Purpose / big picture
 
@@ -133,7 +133,14 @@ Hard invariants. Violation requires escalation, not a workaround.
       pre-cutover baseline is empty: 32 pages compared, 0 differing. Every
       pin and every accepted difference is in the decision log. The capture
       now drives agent-browser with a settle wait (see Surprises).
-- [ ] Milestone 4: semantic-class sweep, convention tests, documentation.
+- [x] (2026-09-04 00:30Z) Milestone 4: the markup swept to daisyUI's slots
+      — 3,147 substitutions across nine colour families, the diff empty
+      after each — the nine transitional tokens with a slot retired and the
+      five without kept under their names, the partial's `--netsuke-*`
+      variables aliased to the theme, the doubled selectors removed, a
+      phone-width capture added and its regressions pinned, the convention
+      tests added, and `AGENTS.md`, the developer guide, and the repository
+      layout updated.
 
 ## Surprises & discoveries
 
@@ -237,6 +244,20 @@ Hard invariants. Violation requires escalation, not a workaround.
   is registered; the Play CDN had been loaded without the plugin, so the
   class had never styled anything. The class is removed and daisyUI's
   `typography` part excluded.
+- **Observation:** a capture at one viewport proves one viewport. Evidence:
+  with the 1280px diff empty, a capture at 360px reported thirty-one pages
+  differing. Every one of the partial's phone-width rules — the full-bleed
+  block that strips a code panel's border, radius, shadow, and padding below
+  460px, the hero's padding floor below 500px, the hero photograph's crop
+  below 640px — had been beating the per-instance utilities on specificity
+  and now lost to them. Impact: `capture` takes `--width` and `--height`,
+  and the migration is proved at 360 as well as 1280. The hero's padding
+  and the photograph's size moved into the component; the full-bleed block
+  carries `!important`, as Weaver's does, with the convention test confining
+  the flag to it. The one difference left at 360 is the navbar actions
+  container's box: `gap-x-4` does not count the hidden siblings that v3's
+  `space-x-4` gave a margin to, so the box is 16px narrower with the
+  hamburger in the same place and nothing visible changed.
 - **Observation:** one capture caught a colour transition mid-flight.
   Evidence: `examples/hello-world/` reported a table-of-contents link's
   `border-left-color` at alpha 0.694 against 1.0, with the link's active
@@ -346,6 +367,26 @@ Hard invariants. Violation requires escalation, not a workaround.
   `typography` parts are excluded. Rationale: each restyles something the
   sub-site styles for itself or never styled, and each showed in the diff.
   Date/Author: 2026-09-03, Claude.
+- **Decision:** the theme's slots are assigned for the sweep as follows,
+  revising the Milestone 2 draft: base-100/200 are the pale and light
+  boxwood papers and base-300 is stone, so `border-base-300` is the site's
+  hairline; primary is indigo and secondary (and info) its lighter cut;
+  accent and error are vermilion; success is matcha; warning is amber with
+  charcoal content; neutral is the charcoal the footer and terminal panels
+  are filled with, and neutral-content the stone-light their text is set
+  in. Rationale: the draft had put stone in neutral and charcoal in
+  secondary, which read backwards against daisyUI's own use of `bg-neutral`
+  for dark blocks and `border-base-300` for rules. Nothing consumed the
+  slots before the sweep, so the revision changed no page.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** five tokens stay under their brand names — `charcoal-mid`,
+  `charcoal-light`, `stone-light`, `boxwood`, `vermillion-dim` — each with a
+  comment naming its role and its contrast. Rationale: daisyUI has no slot
+  for a second and third text weight, a lighter hairline, a warm mid paper,
+  or a pressed accent, and a fixed value is what each was drawn and
+  contrast-checked as. The nine tokens that map onto a slot, and the unused
+  `--spacing-128`, are retired.
+  Date/Author: 2026-09-04, Claude.
 - **Decision:** the four pre-existing 360px overflows are waived, not fixed.
   Rationale: Constraint 1. A fix changes what the page renders and belongs
   to whoever decides how the design page should lay out at phone widths.
@@ -353,7 +394,34 @@ Hard invariants. Violation requires escalation, not a workaround.
 
 ## Outcomes & retrospective
 
-To be written at completion.
+Netsuke builds like every other sub-site. `bun run build` compiles
+`public/netsuke/assets/css/himotoshi.css` from `src/styles/netsuke.css`; no
+Netsuke page loads `https://cdn.tailwindcss.com`, and `tailwind-config.js` is
+gone. The palette is declared once, as the `netsuke` daisyUI theme plus five
+named tokens, and the templates refer to it semantically. The hand-written
+partial sits in the components layer, reads its colours from the theme, and
+carries no doubled selector; `tests/test_netsuke_build.py` and
+`tests/test_netsuke_conventions.py` hold each of those properties.
+
+The proof is the diff. The pre-cutover baseline and the migrated site
+compare with zero differences on all 32 pages at 1280px, and at 360px differ
+only in an invisible container box; every substitution in the sweep diffed
+clean. What the diff found that the plan did not predict is the substance of
+the Surprises: two utilities that only a runtime compiler could have resolved,
+a `.prose` that daisyUI began styling, a proportional line-height that shrank
+every chip, and a phone-width full-bleed that no desktop capture could see.
+
+Lessons. Settle the page before walking it — retries cannot beat a race that
+is systematic. Fold what v4 moved rather than accepting it, so the diff stays
+a gate instead of a report; the sibling-gap folding paid for itself on the
+first sweep. Capture at more than one width. And when a component rule has
+been beating a utility on specificity, the fix is in the markup, not the
+selector: take the utility out and let the component say what it always
+meant.
+
+Two follow-ups are recorded rather than done: the mobile menu's parent link
+was written in vermilion and has never rendered so, and the four pages that
+overflow at 360px did so before this migration and still do.
 
 ## Context and orientation
 

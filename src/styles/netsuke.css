@@ -59,17 +59,19 @@
 
 /* The Netsuke palette as a daisyUI theme.
  *
- * The base ramp is the three boxwood papers — pale, light, and the boxwood
- * itself — and base-content is the charcoal every body run is set in. Indigo
- * is primary: it fills the feature tiles, marks the current docs section, and
- * is the colour a link turns to. Vermillion is the accent, the brand mark and
- * the primary buttons' fill, and it doubles as error because on this site a
- * cycle in the build graph and a call to action are drawn in the same red.
- * Stone is neutral: it is the rule colour, the card border, and the divider,
- * and its content is the charcoal that sits on it.
+ * The base ramp is the two boxwood papers — pale for the page, light for a
+ * raised panel — and the stone the rules and card borders are drawn in, so
+ * `border-base-300` is the site's hairline. Base-content is the charcoal
+ * every body run is set in. Indigo is primary: it fills the feature tiles,
+ * marks the current docs section, and is the colour a link turns to; its
+ * lighter cut is secondary, and info besides. Vermillion is the accent, the
+ * brand mark and the primary buttons' fill, and it doubles as error because
+ * on this site a cycle in the build graph and a call to action are drawn in
+ * the same red. Neutral is the charcoal the footer and the terminal panels
+ * are filled with, and its content is the stone-light their text is set in.
  *
  * Every content pairing meets WCAG 2.2 AA for body text on its fill:
- * primary 10.32:1, secondary 12.26:1, accent 5.33:1, neutral 8.53:1,
+ * primary 10.32:1, secondary 7.16:1, accent 5.33:1, neutral 10.57:1,
  * info 7.16:1, success 4.86:1, warning 4.80:1 (charcoal on amber, since
  * white on amber measures 2.97:1), error 5.33:1, and base-content 13.23:1
  * on base-100. Measured as relative luminance per WCAG 2.x.
@@ -82,17 +84,17 @@
 
   --color-base-100: #faf6f0;
   --color-base-200: #f5ede0;
-  --color-base-300: #e8d5b5;
+  --color-base-300: #d1c7b8;
   --color-base-content: #2e2a25;
 
   --color-primary: #2b4162;
   --color-primary-content: #ffffff;
-  --color-secondary: #2e2a25;
-  --color-secondary-content: #f5ede0;
+  --color-secondary: #3a5a7c;
+  --color-secondary-content: #ffffff;
   --color-accent: #c23b22;
   --color-accent-content: #ffffff;
-  --color-neutral: #d1c7b8;
-  --color-neutral-content: #2e2a25;
+  --color-neutral: #2e2a25;
+  --color-neutral-content: #e5ddd0;
 
   --color-info: #3a5a7c;
   --color-info-content: #ffffff;
@@ -124,24 +126,20 @@
   --font-serif: "Fraunces", serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  /* The brand palette under the names the templates use today, pinned to
-     the values the Play CDN's config gave them. These are transitional:
-     the semantic-class sweep replaces each use with the daisyUI slot above,
-     and a token is retired once nothing references it. */
-  --color-charcoal: #2e2a25;
-  --color-charcoal-mid: #5c554d;
-  --color-charcoal-light: #8a8279;
-  --color-indigo: #2b4162;
-  --color-indigo-light: #3a5a7c;
-  --color-vermillion: #c23b22;
-  --color-vermillion-dim: #9e3020;
-  --color-boxwood: #e8d5b5;
-  --color-boxwood-light: #f5ede0;
-  --color-boxwood-pale: #faf6f0;
-  --color-stone: #d1c7b8;
-  --color-stone-light: #e5ddd0;
-  --color-matcha: #4a7c59;
-  --color-amber: #c48b2c;
+  /* The shades the brand palette needs beyond daisyUI's slots. The rest
+     of the palette lives in the theme above; these are the roles it has no
+     slot for, kept under the names the templates and the partial use.
+     Each is a fixed value rather than a mix of a slot, because it was
+     drawn as its own colour and is checked for contrast as one. */
+  --color-charcoal-mid: #5c554d; /* secondary text: 6.82:1 on base-100 */
+  --color-charcoal-light: #8a8279; /* muted text and labels: 3.51:1 on
+                                      base-100, large or decorative only */
+  --color-stone-light: #e5ddd0; /* the lighter hairline, and text on the
+                                   charcoal panels: 10.57:1 on neutral */
+  --color-boxwood: #e8d5b5; /* the warm mid paper: a fill behind kickers
+                               and a heading colour on the charcoal footer */
+  --color-vermillion-dim: #9e3020; /* the accent pressed: hover and active
+                                      fills */
 
   /* The one stock shade the templates reach for, pinned to what Tailwind v3
      meant by it. v4 redefined its palette in OKLCH, and the homepage's
@@ -161,9 +159,6 @@
   --text-2xl--line-height: 2rem;
   --text-3xl--line-height: 2.25rem;
   --text-4xl--line-height: 2.5rem;
-
-  /* One spacing step above Tailwind's scale, for the docs sidebar. */
-  --spacing-128: 32rem;
 
   /* The paper shadows: the ambient elevation of a card, a panel, and a hero
      window, each a charcoal wash rather than a black one. */

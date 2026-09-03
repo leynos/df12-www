@@ -20,6 +20,7 @@
 
   type Index = import("minisearch").default;
   type SearchOptions = import("minisearch").SearchOptions;
+  type SearchResult = import("minisearch").SearchResult;
 
   /** A host-installed sink for the fixed-schema lifecycle events. */
   type TelemetrySink = (event: EpisodicSearchTelemetryEvent) => void;
@@ -39,6 +40,32 @@
     pageTitle?: string;
     sectionTitle?: string;
     excerpt?: string;
+  }
+
+  /** Whether `value` is absent or a string, as an optional stored field may be. */
+  function isOptionalString(value: unknown): value is string | undefined {
+    return value === undefined || typeof value === "string";
+  }
+
+  /**
+   * Whether a deserialized result carries the stored fields the listbox
+   * renders and navigates to, each as a string. The index builder always
+   * writes them so, but the index arrives as JSON at runtime; a record that
+   * fails this is dropped rather than rendered or navigated to.
+   */
+  function isSearchHit(value: unknown): value is SearchHit {
+    if (typeof value !== "object" || value === null) {
+      return false;
+    }
+    const hit = value as Record<string, unknown>;
+    return (
+      typeof hit.sitePath === "string" &&
+      typeof hit.title === "string" &&
+      typeof hit.kind === "string" &&
+      isOptionalString(hit.pageTitle) &&
+      isOptionalString(hit.sectionTitle) &&
+      isOptionalString(hit.excerpt)
+    );
   }
 
   /** The JSON `scripts/build-episodic-search-index.mjs` writes. */
@@ -223,15 +250,17 @@
     });
     const loose = miniSearch.search(query, searchOptions);
 
-    const merged = new Map<unknown, import("minisearch").SearchResult>();
+    const merged = new Map<unknown, SearchResult>();
     for (const result of [...strict, ...loose]) {
       if (!merged.has(result.id)) {
         merged.set(result.id, result);
       }
     }
     // The stored fields ride along on each result under an index signature,
-    // so the narrower shape is asserted rather than checked.
-    return [...merged.values()].slice(0, RESULT_LIMIT) as unknown as SearchHit[];
+    // so each one is checked before it is trusted.
+    return [...merged.values()]
+      .filter((result): result is SearchResult & SearchHit => isSearchHit(result))
+      .slice(0, RESULT_LIMIT);
   }
 
   /* Wire one rendered search root. `loadIndex`, `searchIndex`, and `navigate`
@@ -515,6 +544,7 @@
       fetchEpisodicSearchIndex,
       initialiseAllEpisodicSearch,
       initialiseEpisodicSearch,
+      isSearchHit,
       searchEpisodicIndex,
     };
   }

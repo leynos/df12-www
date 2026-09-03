@@ -16,6 +16,7 @@ const {
   fetchEpisodicSearchIndex,
   initialiseAllEpisodicSearch,
   initialiseEpisodicSearch,
+  isSearchHit,
   searchEpisodicIndex,
 } = require("../../public/episodic/assets/js/site-search.js");
 
@@ -460,5 +461,28 @@ describe("root event state", () => {
     expect(root.dataset.searchInitialised).toBe("true");
     initialiseAllEpisodicSearch(document, { miniSearch: {} });
     expect(root.dataset.searchInitialised).toBe("true");
+  });
+});
+
+describe("isSearchHit", () => {
+  const hit = { id: "a", sitePath: "/docs/a/", title: "A", kind: "document" };
+
+  test("accepts a record with the stored fields as strings", () => {
+    expect(isSearchHit(hit)).toBe(true);
+    expect(isSearchHit({ ...hit, pageTitle: "A", sectionTitle: "S", excerpt: "…" })).toBe(true);
+  });
+
+  test("rejects a record whose navigation target or labels are not strings", () => {
+    expect(isSearchHit({ ...hit, sitePath: undefined })).toBe(false);
+    expect(isSearchHit({ ...hit, title: 1 })).toBe(false);
+    expect(isSearchHit({ ...hit, excerpt: ["no"] })).toBe(false);
+    expect(isSearchHit(null)).toBe(false);
+  });
+
+  test("keeps a malformed record out of the ranked results", () => {
+    const good = { id: "g", sitePath: "/docs/g/", title: "G", kind: "document" };
+    const bad = { id: "b", sitePath: 42, title: "B", kind: "document" };
+    const miniSearch = { search: () => [bad, good] };
+    expect(searchEpisodicIndex({ miniSearch, searchOptions: {} }, "g")).toEqual([good]);
   });
 });

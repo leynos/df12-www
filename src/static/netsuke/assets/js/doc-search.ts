@@ -16,6 +16,7 @@
   type Index = import("minisearch").default;
   type IndexOptions = import("minisearch").Options;
   type SearchOptions = import("minisearch").SearchOptions;
+  type SearchResult = import("minisearch").SearchResult;
 
   /* The JSON `scripts/build-netsuke-search-index.mjs` writes: a serialized
      index and the options it was built with, including the query-time
@@ -41,6 +42,32 @@
     pageTitle: string;
     sectionTitle?: string;
     excerpt?: string;
+  }
+
+  /* Whether `value` is absent or a string, which is what an optional stored
+     field may be. */
+  function isOptionalString(value: unknown): value is string | undefined {
+    return value === undefined || typeof value === "string";
+  }
+
+  /* Whether a deserialized result carries the stored fields the list renders,
+     each as a string. The index builder always writes them that way, but the
+     index arrives as JSON at runtime, and `escapeHtml` throws on anything
+     else — so a malformed record is dropped here rather than taking every
+     result down with it. */
+  function isDocSearchHit(value: unknown): value is DocSearchHit {
+    if (typeof value !== "object" || value === null) {
+      return false;
+    }
+    const hit = value as Record<string, unknown>;
+    return (
+      typeof hit.sitePath === "string" &&
+      typeof hit.title === "string" &&
+      typeof hit.kind === "string" &&
+      typeof hit.pageTitle === "string" &&
+      isOptionalString(hit.sectionTitle) &&
+      isOptionalString(hit.excerpt)
+    );
   }
 
   /* Everything `renderResults` needs to redraw one root. */
@@ -206,7 +233,7 @@
     });
     const fuzzyResults = miniSearch.search(query, searchOptions);
 
-    const merged = new Map<unknown, import("minisearch").SearchResult>();
+    const merged = new Map<unknown, SearchResult>();
     for (const result of [...exactResults, ...fuzzyResults]) {
       if (!merged.has(result.id)) {
         merged.set(result.id, result);
@@ -214,8 +241,10 @@
     }
 
     // The stored fields ride along on each result under an index signature,
-    // so the narrower shape is asserted rather than checked.
-    return [...merged.values()].slice(0, RESULT_LIMIT) as unknown as DocSearchHit[];
+    // so each one is checked before it is trusted.
+    return [...merged.values()]
+      .filter((result): result is SearchResult & DocSearchHit => isDocSearchHit(result))
+      .slice(0, RESULT_LIMIT);
   }
 
   /* Draw the results list and its count, then show the panel and mark the
@@ -383,6 +412,6 @@
   }
 
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = { createIndexCache, siteRootFromIndexPath };
+    module.exports = { createIndexCache, isDocSearchHit, siteRootFromIndexPath };
   }
 })();

@@ -123,6 +123,21 @@ describe("isBrowserScript over generated trees", () => {
   });
 });
 
+/* A path that is a browser script by construction: plain segments around an
+   `assets/js` pair, no `vendor` anywhere, and a `.ts` name. Built directly
+   rather than by filtering `generatedPath`, which qualifies well under one
+   time in a hundred and would leave fast-check discarding most of its draws. */
+const browserScriptPath = fc
+  .record({
+    before: fc.array(plainSegment, { maxLength: 2 }),
+    after: fc.array(plainSegment, { maxLength: 2 }),
+    stem: plainSegment,
+  })
+  .map(({ before, after, stem }) => ({
+    dirs: [...before, "assets", "js", ...after],
+    name: `${stem}.ts`,
+  }));
+
 describe("targetFor", () => {
   test("mirrors the source path under public/ with a .js extension", () => {
     expect(targetFor(source("netsuke", "assets", "js", "doc-search.ts"))).toBe(
@@ -132,7 +147,9 @@ describe("targetFor", () => {
 
   test("keeps every directory and the file stem for every generated script", () => {
     fc.assert(
-      fc.property(generatedPath.filter(specifiesBrowserScript), (path) => {
+      fc.property(browserScriptPath, (path) => {
+        expect(specifiesBrowserScript(path)).toBe(true);
+        expect(isBrowserScript(source(...path.dirs, path.name))).toBe(true);
         const target = targetFor(source(...path.dirs, path.name));
         const rel = relative(TARGET_ROOT, target).split(sep);
         expect(rel.slice(0, -1)).toEqual(path.dirs);

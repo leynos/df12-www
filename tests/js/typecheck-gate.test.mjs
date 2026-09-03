@@ -49,11 +49,10 @@ const BAD_SCRIPT = `/** A fixture. @module */
 export const count: number = "not a number";
 `;
 
-/* A fixture the checker would reject if it were in scope. The wrong type is
-   marked with a suppression that itself becomes an error when it suppresses
-   nothing, so the file fails on either reading if it is ever checked. */
-const BAD_VENDORED = `// @ts-expect-error vendored code is not checked
-const count: number = "not a number";
+/* A fixture the checker rejects wherever it is in scope: the same error as
+   the scripts fixture, with nothing suppressing it, so a pass with this file
+   under `vendor/` can only be the exclusion at work. */
+const BAD_VENDORED = `const count: number = "not a number";
 export { count };
 `;
 
@@ -114,8 +113,8 @@ describe("the typecheck-js target", () => {
     }
     written.push(VENDOR_FIXTURE);
     writeFileSync(VENDOR_FIXTURE, BAD_VENDORED);
-    /* The same file at BROWSER_FIXTURE fails the gate, so a pass here is the
-       exclusion doing the work rather than the fixture being clean. */
+    /* The same error at SCRIPTS_FIXTURE fails the gate above, so a pass here
+       is the exclusion doing the work rather than the fixture being clean. */
     expect(typecheck().status).toBe(0);
   });
 

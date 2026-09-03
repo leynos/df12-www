@@ -54,8 +54,7 @@ export function isBrowserScript(path: string): boolean {
   if (segments.includes(VENDOR_DIR)) {
     return false;
   }
-  const assets = segments.indexOf("assets");
-  return assets !== -1 && segments[assets + 1] === SCRIPT_DIR;
+  return segments.some((segment, i) => segment === "assets" && segments[i + 1] === SCRIPT_DIR);
 }
 
 /**

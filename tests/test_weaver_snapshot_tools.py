@@ -7,6 +7,7 @@ or a session two runs would share.
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import typing as typ
@@ -127,6 +128,84 @@ def test_capture_drives_one_tool_run_per_page() -> None:
         "install/",
         "commands/act/",
     ], f"each page should be captured once, in order; got {calls!r}"
+
+
+def _icon_snapshot(unrendered: int) -> str:
+    """Render a walker snapshot carrying that many Iconify placeholders."""
+    spans = [
+        {"tag": "span", "classes": ["iconify", "mr-2"], "styleDiff": {}, "children": []}
+        for _ in range(unrendered)
+    ]
+    rendered = {
+        "tag": "svg",
+        "classes": ["[object", "SVGAnimatedString]"],
+        "styleDiff": {},
+        "children": [],
+    }
+    tree = {
+        "tag": "body",
+        "classes": [],
+        "styleDiff": {},
+        "children": [*spans, rendered],
+    }
+    return json.dumps({"payload": {"tree": tree}})
+
+
+def _writing_runner(tmp_path: Path, attempts: list[int]) -> tuple[list[int], typ.Any]:
+    """Build a runner that writes the next scripted snapshot on each call."""
+    written: list[int] = []
+
+    def run(argv: cabc.Sequence[str]) -> None:
+        output = Path(argv[argv.index("--output") + 1])
+        unrendered = attempts[len(written)]
+        written.append(unrendered)
+        output.write_text(_icon_snapshot(unrendered), encoding="utf-8")
+
+    return written, run
+
+
+def test_a_page_whose_icons_rendered_is_captured_once(tmp_path: Path) -> None:
+    """The retry costs nothing on a page that settled first time."""
+    written, run = _writing_runner(tmp_path, [0])
+    tools._capture_pages(["docs/"], tmp_path, "http://x", "/usr/bin/bun", run)
+
+    assert written == [0], f"one clean capture should be the end of it; got {written}"
+    assert tools._unrendered_icons(tmp_path / "docs.json") == 0
+
+
+def test_a_page_with_unrendered_icons_is_captured_again(tmp_path: Path) -> None:
+    """A capture that beat Iconify to the page is retried, and the retry kept."""
+    written, run = _writing_runner(tmp_path, [21, 0])
+    tools._capture_pages(["docs/"], tmp_path, "http://x", "/usr/bin/bun", run)
+
+    assert written == [21, 0], f"the second attempt should have settled; got {written}"
+    assert tools._unrendered_icons(tmp_path / "docs.json") == 0, (
+        "the settled attempt should be the one left on disk"
+    )
+
+
+def test_a_page_that_never_settles_keeps_its_best_attempt(tmp_path: Path) -> None:
+    """An icon the set lacks stays a span forever; the fewest-spans capture wins.
+
+    The last attempt is what css-view leaves on disk, and it need not be the
+    best one, so the harness has to put the best one back.
+    """
+    written, run = _writing_runner(tmp_path, [3, 1, 2])
+    tools._capture_pages(["docs/"], tmp_path, "http://x", "/usr/bin/bun", run)
+
+    assert written == [3, 1, 2], (
+        f"expected exactly {tools.ICON_ATTEMPTS} attempts; got {written}"
+    )
+    assert tools._unrendered_icons(tmp_path / "docs.json") == 1, (
+        "the attempt with the fewest unrendered icons should be the one kept"
+    )
+
+
+def test_a_snapshot_that_cannot_be_read_counts_as_settled(tmp_path: Path) -> None:
+    """Repeating a capture cannot fix a missing file; the diff will name it."""
+    assert tools._unrendered_icons(tmp_path / "absent.json") == 0
+    (tmp_path / "broken.json").write_text("{", encoding="utf-8")
+    assert tools._unrendered_icons(tmp_path / "broken.json") == 0
 
 
 def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None:

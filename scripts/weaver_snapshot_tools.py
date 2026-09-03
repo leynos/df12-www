@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import collections.abc as cabc
 import contextlib
+import json
 import os
 import shutil
 import subprocess
@@ -26,6 +27,19 @@ SCREENSHOT_WIDTHS = (360, 768, 1440)
 # The walker mode's node budget. The largest Weaver page is well under this;
 # the ceiling only guards against a runaway capture.
 MAX_NODES = 8000
+
+# How many times one page is captured while icons on it are still unrendered.
+#
+# Netsuke draws its icons with Iconify, a script that fetches each glyph from
+# a CDN after the page loads and swaps the placeholder `<span class="iconify">`
+# for an `<svg>`. css-view waits for the network to go idle, but Iconify's
+# request can start after that moment, so a capture sometimes lands with a
+# page's icons still unrendered — and a missing icon is not a style change but
+# a layout one, moving every line below it. Three pages carry an icon the set
+# does not have at all, so a span can also remain for good; the capture with
+# the fewest unrendered icons is kept, which is the steady state either way.
+ICON_ATTEMPTS = 3
+
 
 # How long a browser-driving subprocess may take before the run is called off.
 # A headless browser that never returns would otherwise hang the snapshot
@@ -179,6 +193,46 @@ def _screenshot_argv(path: Path) -> list[str]:
     return ["screenshot", str(path), "--full"]
 
 
+def _unrendered_icons(snapshot: Path) -> int:
+    """Count the Iconify placeholders a captured page still carries.
+
+    Parameters
+    ----------
+    snapshot
+        A walker-mode snapshot css-view has just written.
+
+    Returns
+    -------
+    int
+        How many ``<span class="iconify">`` nodes the tree holds. Once Iconify
+        has rendered an icon the span is an ``<svg>``, whose classes the
+        walker reports as an ``SVGAnimatedString`` rather than by name, so
+        only the unrendered ones count. A snapshot that cannot be read counts
+        as settled: the diff will name a page that is missing or malformed,
+        and repeating the capture would not help it.
+    """
+    try:
+        tree = json.loads(snapshot.read_text(encoding="utf-8"))["payload"]["tree"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return 0
+
+    def count(node: typ.Any) -> int:  # noqa: ANN401 - the document is untyped upstream data
+        if not isinstance(node, cabc.Mapping):
+            return 0
+        classes = node.get("classes")
+        own = int(
+            node.get("tag") == "span"
+            and isinstance(classes, list)
+            and "iconify" in classes
+        )
+        children = node.get("children")
+        if not isinstance(children, list):
+            return own
+        return own + sum(count(child) for child in children)
+
+    return count(tree)
+
+
 def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     pages: cabc.Sequence[str],
     out_dir: Path,
@@ -186,8 +240,13 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     bun: str,
     run: Runner,
     site: str = DEFAULT_SITE,
+    unrendered: cabc.Callable[[Path], int] = _unrendered_icons,
 ) -> None:
     """Snapshot each page in turn, reporting progress as it goes.
+
+    A page whose icons had not rendered when the walker ran is captured
+    again, up to :data:`ICON_ATTEMPTS` times, and the attempt with the fewest
+    unrendered icons is the one kept.
 
     Parameters
     ----------
@@ -204,10 +263,61 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
         launching a browser.
     site
         The sub-site the pages belong to.
+    unrendered
+        How many icons a written snapshot still shows unrendered. Injected so
+        the retry can be exercised without a browser.
     """
     for page in pages:
-        run(_css_view_argv(bun, base, page, out_dir, site))
-        print(f"  {_slug(page)}")
+        _capture_settled(page, out_dir, base, bun, run, site, unrendered)
+
+
+def _capture_settled(  # noqa: PLR0913 - one seam per outward dependency
+    page: str,
+    out_dir: Path,
+    base: str,
+    bun: str,
+    run: Runner,
+    site: str,
+    unrendered: cabc.Callable[[Path], int],
+) -> None:
+    """Capture one page until its icons have rendered, or the attempts run out.
+
+    Parameters
+    ----------
+    page
+        The page path relative to the sub-site's base path.
+    out_dir
+        Directory the snapshot is written into.
+    base
+        The origin the local server is listening on.
+    bun
+        Absolute path to the ``bun`` executable.
+    run
+        How to run a tool.
+    site
+        The sub-site the page belongs to.
+    unrendered
+        How many icons a written snapshot still shows unrendered.
+    """
+    argv = _css_view_argv(bun, base, page, out_dir, site)
+    output = out_dir / f"{_slug(page)}.json"
+    best_remaining: int | None = None
+    best_text = ""
+    for _attempt in range(ICON_ATTEMPTS):
+        run(argv)
+        remaining = unrendered(output)
+        if remaining == 0:
+            print(f"  {_slug(page)}")
+            return
+        if best_remaining is None or remaining < best_remaining:
+            best_remaining, best_text = remaining, output.read_text(encoding="utf-8")
+    # Every attempt left something unrendered. The last attempt is what is on
+    # disk; the best one is what the comparison should see.
+    output.write_text(best_text, encoding="utf-8")
+    print(
+        f"  {_slug(page)} ({best_remaining} unrendered icons after "
+        f"{ICON_ATTEMPTS} attempts)"
+    )
 
 
 def _shoot_pages(  # noqa: PLR0913 - one seam per outward dependency

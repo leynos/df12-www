@@ -114,8 +114,13 @@ Hard invariants. Violation requires escalation, not a workaround.
       Surprises).
 - [x] (2026-09-03 14:50Z) Milestone 0: baseline screenshots taken at 360,
       768 and 1440.
-- [ ] Milestone 1: unify the Netsuke chrome (`home_page.jinja` extends
-      `doc_page.jinja`), diff against the baseline, re-baseline.
+- [x] (2026-09-03 15:40Z) Milestone 0: the capture retries a page while
+      Iconify placeholders remain unrendered, keeping the attempt with the
+      fewest (see Surprises).
+- [x] (2026-09-03 16:10Z) Milestone 1: `home_page.jinja` extends
+      `doc_page.jinja`. The diff against the baseline is confined to the
+      homepage and every line of it is traced below; the unified capture is
+      the reference for Milestone 3.
 - [ ] Milestone 2: red build-property tests; `src/styles/netsuke.css` with
       the `netsuke` theme and transitional tokens; `himotoshi.css` relocated
       into `layer(components)`; `build:css:netsuke` wired.
@@ -149,6 +154,28 @@ Hard invariants. Violation requires escalation, not a workaround.
   the width each was measured at; the waiver asserts the overflow is still
   present and no wider, so it cannot outlive the defect. Fixing them is a
   visible change and a separate decision.
+- **Observation:** Iconify's rendering is a race the walker can lose, and on
+  two pages it loses every time. Evidence: the same page captured with 0 and
+  with 28 unrendered `<span class="iconify">` placeholders a few minutes
+  apart; three consecutive captures of the homepage then rendered every
+  icon. Separately, the homepage and the design page came back with 21 and
+  14 unrendered icons on every attempt, and both load Plotly from its CDN
+  with a synchronous `<script>` in the head — the unified homepage, which had
+  dropped that script, rendered all 21. Impact: a missing icon is a layout
+  change, not a style one, and moves every line below it. `css-view` has no
+  hook to wait on, so `_capture_pages` now captures a page up to three times
+  while placeholders remain and keeps the attempt with the fewest; three
+  pages name `carbon:logo-windows`, which the Carbon set does not have, so
+  one placeholder on each is the steady state. The Plotly script is kept on
+  the homepage through Milestone 1 so its diff shows the chrome change and
+  nothing else; it is unused there and goes in Milestone 3.
+- **Observation:** one capture caught a colour transition mid-flight.
+  Evidence: `examples/hello-world/` reported a table-of-contents link's
+  `border-left-color` at alpha 0.694 against 1.0, with the link's active
+  colour set — the scrollspy had just marked it current and the link's 150ms
+  colour transition had not finished. Impact: it did not recur on the next
+  capture. A page whose only difference is one node mid-transition should be
+  recaptured before it is read as a change.
 - **Observation:** `pages/icon-replacements.jinja` renders no chrome at all.
   Evidence: it carries its own `<head>`, no navbar, and inline arbitrary
   colour values. Impact: the browser suite checks it for fitting the viewport
@@ -166,6 +193,20 @@ Hard invariants. Violation requires escalation, not a workaround.
   stand-in now accepts the argument it is passed.
   Rationale: a stand-in that ignored an argument the real function reads
   would pass while the command handed the wrong root.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** the homepage takes `doc_page.jinja`'s chrome as it is, and
+  the three differences that produces are accepted: its desktop navigation
+  becomes a `<ul>` of `<li>` rather than a row of bare `<a>` (the links'
+  boxes shrink from 30px to 24px tall and the underline, text, and spacing
+  render identically at 1440px); its `<body>` gains `flex flex-col
+  min-h-screen`, so each section is a flex item and reports
+  `min-width: auto` and `min-height: auto` with no change to any box; and
+  its footer gains the "Forthcoming Capabilities" link the other pages
+  already carry. The homepage also now loads `docs-scrollspy.js` and
+  `copy-buttons.js`, both of which return early when their markup is absent.
+  Rationale: a homepage with its own copy of the chrome is what Milestone 1
+  exists to remove; carrying the differences forward as blocks would keep
+  two chromes under one file.
   Date/Author: 2026-09-03, Claude.
 - **Decision:** the four pre-existing 360px overflows are waived, not fixed.
   Rationale: Constraint 1. A fix changes what the page renders and belongs

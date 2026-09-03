@@ -110,13 +110,15 @@ make test-js       # JavaScript suite
 ```
 
 For Markdown changes, run `make markdownlint` and `make nixie`. Rebuild and
-inspect the rendered result as well — the gates do not render the site, so a
+inspect the rendered result as well — the Python tests render real Netsuke
+templates through `ContentPageGenerator` and `SubSiteHomePageBuilder`, but they
+do not build and inspect the complete published site in a real browser, so a
 template change that passes every gate can still produce a broken page.
 
-Because the gates do not render the site, every change to a template,
-stylesheet, or page config is validated in a browser before it is committed;
-§7.5, "Validating rendered pages in a browser", covers the tools and the
-procedure.
+Because the gates do not exercise the site in a browser, every change to a
+template, stylesheet, or page config is validated in a browser before it is
+committed; §7.5, "Validating rendered pages in a browser", covers the tools and
+the procedure.
 
 ### 2.1. Bun is required
 
@@ -1550,9 +1552,11 @@ untouched.
 
 ### 7.5. Validating rendered pages in a browser
 
-The commit gates do not render the site, so a change to a template, a
-stylesheet, or `config/pages.yaml` is checked in a real browser before it is
-committed. The normative procedure is
+The commit gates render real Netsuke templates through `ContentPageGenerator`
+and `SubSiteHomePageBuilder`, but they do not build and inspect the complete
+published site in a real browser, so a change to a template, a stylesheet, or
+`config/pages.yaml` is checked in a real browser before it is committed. The
+normative procedure is
 [Validating rendered pages](../AGENTS.md#validating-rendered-pages) in
 `AGENTS.md`; this section explains the tools it relies on and why each step is
 there.

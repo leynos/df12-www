@@ -326,10 +326,12 @@ make test          # Python suite
 make test-js       # JavaScript suite
 ```
 
-Rebuild and inspect the rendered result as well. A template change that passes
-every gate can still produce a broken page, because the gates do not render the
-site. See [Validating rendered pages](#validating-rendered-pages) for the
-required browser checks.
+Rebuild and inspect the rendered result as well. The Python tests render real
+Netsuke templates through `ContentPageGenerator` and `SubSiteHomePageBuilder`,
+but they do not build and inspect the complete published site in a real
+browser, so a template change that passes every gate can still produce a
+broken page. See [Validating rendered pages](#validating-rendered-pages) for
+the required browser checks.
 
 `make lint` runs Ruff over the Python and Biome over everything else —
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked
@@ -417,9 +419,11 @@ pre-existing and not a failure.
 
 ### Validating rendered pages
 
-The commit gates do not render the site, so every change to a template,
-stylesheet, or page config is validated in a real browser before it is
-committed. Two tools are installed for this and both work without a display:
+The commit gates render real Netsuke templates through `ContentPageGenerator`
+and `SubSiteHomePageBuilder`, but they do not build and inspect the complete
+published site in a real browser, so every change to a template, stylesheet, or
+page config is validated in a real browser before it is committed. Two tools
+are installed for this and both work without a display:
 `agent-browser` (navigation, accessibility-tree snapshots, screenshots, and
 `eval`) and `css-view` (computed-style snapshots as JSON for `jq`). Load the
 `agent-browser` and `css-view` skills before using them.

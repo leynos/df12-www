@@ -76,20 +76,31 @@ async function findFiles(dir: string, results: string[] = []): Promise<string[]>
   return results;
 }
 
+/** Whether `error` is the filesystem saying a path does not exist. */
+function isMissing(error: unknown): boolean {
+  return error instanceof Error && "code" in error && error.code === "ENOENT";
+}
+
 /**
  * Whether `targetPath` is missing or older than `sourcePath`.
  *
- * Any error reading either file counts as "needs compiling": a missing
- * output is the common case, and an unreadable source will fail loudly in
- * the compile step rather than be silently skipped here.
+ * Only a missing output counts as "needs compiling". Any other failure —
+ * an unreadable source, an output that exists but cannot be read — is a
+ * real problem with the tree and is thrown rather than turned into a
+ * recompile that would paper over it.
  */
 async function needsCompile(sourcePath: string, targetPath: string): Promise<boolean> {
+  const source = await stat(sourcePath);
+  let target: Awaited<ReturnType<typeof stat>>;
   try {
-    const [source, target] = await Promise.all([stat(sourcePath), stat(targetPath)]);
-    return source.mtimeMs > target.mtimeMs;
-  } catch {
-    return true;
+    target = await stat(targetPath);
+  } catch (error) {
+    if (isMissing(error)) {
+      return true;
+    }
+    throw error;
   }
+  return source.mtimeMs > target.mtimeMs;
 }
 
 /**

@@ -139,7 +139,7 @@
                             <span class="iconify" data-icon="carbon:function" aria-hidden="true"></span>
                         </div>
                         <h3 class="font-bold text-charcoal mb-2">Reusable helpers</h3>
-                        <p class="text-sm text-charcoal-mid">Declared macros, filters, and the <a href="/netsuke/docs/standard-library/" class="text-indigo hover:underline">standard library</a> cover common path, file, and environment tasks.</p>
+                        <p class="text-sm text-charcoal-mid">Declared macros, filters, and the <a href="/netsuke/docs/standard-library/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">standard library</a> cover common path, file, and environment tasks.</p>
                     </div>
                 </div>
             </section>
@@ -258,6 +258,10 @@ targets:
                     <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                     <p>Glob over <em>source</em> files only. Templates expand before anything is built, so a glob over generated outputs sees an empty directory on a clean checkout.</p>
                 </div>
+                <div class="mt-4 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
+                    <span class="iconify text-amber mt-0.5" data-icon="carbon:security" aria-hidden="true"></span>
+                    <p>Since v0.1.0-beta3 the Jinja <code>glob()</code> helper rejects a matched path unless it can be inserted as one portable unquoted shell word: ASCII letters, digits, <code>/</code>, <code>:</code>, comma, full stop, underscore, and hyphen are accepted; whitespace, control characters, and shell punctuation fail the expansion. Rename offending checkout files, or keep filesystem-derived paths out of <code>command</code> and <code>script</code> text.</p>
+                </div>
             </section>
 
             <!-- when -->
@@ -270,7 +274,7 @@ targets:
                     the plan. On a <code>foreach</code> entry it runs once per clone with <code>item</code> and
                     <code>index</code> in scope, so a single template can both expand and filter.
                     Complementary branches pair naturally with
-                    <a href="/netsuke/docs/standard-library/" class="text-indigo hover:underline"><code>command_available(...)</code></a>.
+                    <a href="/netsuke/docs/standard-library/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo"><code>command_available(...)</code></a>.
                 </p>
                 <div class="bg-charcoal p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
@@ -289,6 +293,10 @@ targets:
                 <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
                     <span class="iconify text-amber mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                     <p><code>when</code> selects manifest entries at plan time; it is not build-time branching. A condition that must be re-evaluated during the build belongs in the recipe command or script.</p>
+                </div>
+                <div class="mt-4 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
+                    <span class="iconify text-indigo mt-0.5" data-icon="carbon:debug" aria-hidden="true"></span>
+                    <p>Pass <code>--verbose</code> to see how many targets and actions <code>when</code> filtered out, plus up to 64 per-entry events per expansion. The events carry only a section name, a short hash of the entry name, the iteration index, and the byte length of the expression &mdash; never raw names, <code>item</code> values, or expression text.</p>
                 </div>
             </section>
 

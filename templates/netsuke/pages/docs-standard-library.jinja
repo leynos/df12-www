@@ -174,7 +174,7 @@
                             <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">glob</code>
                             <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Finds workspace paths matching a pattern, including parent-relative patterns such as <code>glob('../shared/*.h')</code>. Expansion holds only the authority of the pattern's literal directory prefix; a match reached through a symbolic link that escapes the prefix is skipped. Host-observing: results depend on workspace contents and platform. Use sparingly to maintain explicit dependencies.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Finds workspace paths matching a pattern, sorted, including parent-relative patterns such as <code>glob('../shared/*.h')</code>. Expansion holds only the authority of the pattern's literal directory prefix; a match reached through a symbolic link that escapes the prefix is skipped. Matched paths must be portable unquoted shell words (letters, digits, <code>/</code>, <code>:</code>, comma, full stop, underscore, hyphen); anything else is rejected so a checkout filename cannot become shell syntax. Host-observing: results depend on workspace contents and platform. Use sparingly to maintain explicit dependencies.</p>
                         <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             glob('src/*.c')
                         </div>
@@ -412,7 +412,7 @@
                                     </div>
                                     <div class="flex items-start">
                                         <span class="text-indigo w-24 shrink-0">cwd_mode</span>
-                                        <span class="text-charcoal-mid"><code>auto</code> | <code>always</code> | <code>never</code> &mdash; control whether empty <code>PATH</code> segments honour the working directory</span>
+                                        <span class="text-charcoal-mid"><code>auto</code> | <code>always</code> | <code>never</code> &mdash; control the bounded project-directory fallback search</span>
                                     </div>
                                 </div>
                             </div>
@@ -478,12 +478,28 @@ targets:
                     host-observing helpers are useful for discovery and conditional planning, but their results can vary
                     between machines or invocations.
                 </p>
-                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
+                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start mb-6">
                     <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:idea" aria-hidden="true"></span>
                     <p class="text-xs text-charcoal-mid">
                         Prefer explicit manifest inputs when a value is part of the build's reproducibility contract, and keep
                         network or command execution out of untrusted <code>Netsukefile</code> content &mdash; Netsuke bounds
                         helper output, but it does not sandbox template evaluation.
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <h3 class="font-bold text-charcoal mb-3 text-sm">The <code>help targets</code> query allowlist</h3>
+                    <p class="text-xs text-charcoal-mid mb-3">
+                        <code>netsuke help targets</code> renders the manifest through a restricted, side-effect-free surface. Only the lexical
+                        path filters <code>basename</code>, <code>dirname</code>, <code>with_suffix</code>, and <code>relative_to</code>, the collection
+                        filters <code>uniq</code>, <code>flatten</code>, and <code>group_by</code>, and the clock-independent <code>timedelta</code>
+                        function are available. Recipe bodies are skipped entirely, so build-only helpers there are never evaluated.
+                    </p>
+                    <p class="text-xs text-charcoal-mid">
+                        <code>env()</code>, <code>glob()</code>, file tests, filesystem metadata filters, <code>hash</code>, <code>digest</code>,
+                        <code>contents</code>, <code>realpath</code>, <code>expanduser</code>, <code>which</code>, <code>command_available</code>,
+                        <code>fetch</code>, <code>shell</code>, <code>grep</code>, and <code>now()</code> are rejected in queries. A <code>when</code>
+                        expression that needs one of them keeps its entry in the catalogue marked <em>conditional</em> rather than failing.
+                        Normal build rendering retains the full library.
                     </p>
                 </div>
             </section>

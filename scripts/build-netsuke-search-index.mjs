@@ -17,10 +17,26 @@ import MiniSearch from "minisearch";
 
 const SITE_DIR = "public/netsuke";
 const DOCS_DIR = path.join(SITE_DIR, "docs");
+const FORTHCOMING_DIR = path.join(SITE_DIR, "forthcoming");
 const EXAMPLES_DIR = path.join(SITE_DIR, "examples");
 const SEARCH_OUTPUT_DIR = path.join(SITE_DIR, "assets", "search");
 const SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "docs-search.json");
 const EXAMPLES_SEARCH_OUTPUT_PATH = path.join(SEARCH_OUTPUT_DIR, "examples-search.json");
+
+/**
+ * One indexed page or section with its destination.
+ *
+ * @interface SearchRecord
+ * @property {string} id Stable identifier: the site path, plus `#section`.
+ * @property {string} kind `page` or `section`.
+ * @property {string} title Result heading.
+ * @property {string} pageTitle Owning page.
+ * @property {string} sectionTitle Subheading, empty for a page record.
+ * @property {string} headings Heading text, for weighting.
+ * @property {string} body Searchable text.
+ * @property {string} excerpt Shown beneath the result.
+ * @property {string} sitePath Destination href relative to the sub-site root.
+ */
 
 const INDEX_OPTIONS = {
   fields: ["title", "pageTitle", "sectionTitle", "headings", "body"],
@@ -37,33 +53,43 @@ const INDEX_OPTIONS = {
   },
 };
 
-/* Build both Netsuke search indices: the documentation set and the examples
-   set. The page lists are explicit rather than globbed, so a page joins the
-   index only when someone means it to. */
-async function main() {
-  const docFiles = [
-    path.join(DOCS_DIR, "index.html"),
-    path.join(DOCS_DIR, "getting-started", "index.html"),
-    path.join(DOCS_DIR, "manifest-reference", "index.html"),
-    path.join(DOCS_DIR, "rules-and-targets", "index.html"),
-    path.join(DOCS_DIR, "templating", "index.html"),
-    path.join(DOCS_DIR, "standard-library", "index.html"),
-    path.join(DOCS_DIR, "cli", "index.html"),
-    path.join(DOCS_DIR, "configuration", "index.html"),
-    path.join(DOCS_DIR, "security", "index.html"),
-  ];
-  const exampleFiles = [
-    path.join(EXAMPLES_DIR, "index.html"),
-    path.join(EXAMPLES_DIR, "hello-world", "index.html"),
-    path.join(EXAMPLES_DIR, "static-site-pipeline", "index.html"),
-    path.join(EXAMPLES_DIR, "batch-photo-processing", "index.html"),
-    path.join(EXAMPLES_DIR, "visual-design-assets", "index.html"),
-    path.join(EXAMPLES_DIR, "basic-c-application", "index.html"),
-    path.join(EXAMPLES_DIR, "multi-format-documentation", "index.html"),
-  ];
+/**
+ * Built pages that feed the documentation index, in reading order.
+ *
+ * The list is explicit rather than globbed, so a page joins the index only
+ * when someone means it to. The forthcoming-capability pages sit here rather
+ * than in the examples index because they are read like documentation.
+ */
+const DOC_FILES = [
+  path.join(DOCS_DIR, "index.html"),
+  path.join(DOCS_DIR, "getting-started", "index.html"),
+  path.join(DOCS_DIR, "manifest-reference", "index.html"),
+  path.join(DOCS_DIR, "rules-and-targets", "index.html"),
+  path.join(DOCS_DIR, "templating", "index.html"),
+  path.join(DOCS_DIR, "standard-library", "index.html"),
+  path.join(DOCS_DIR, "cli", "index.html"),
+  path.join(DOCS_DIR, "configuration", "index.html"),
+  path.join(DOCS_DIR, "security", "index.html"),
+  path.join(FORTHCOMING_DIR, "index.html"),
+  path.join(FORTHCOMING_DIR, "linter", "index.html"),
+  path.join(FORTHCOMING_DIR, "testing-framework", "index.html"),
+];
+/** Built pages that feed the examples index: the hub, then each showcase. */
+const EXAMPLE_FILES = [
+  path.join(EXAMPLES_DIR, "index.html"),
+  path.join(EXAMPLES_DIR, "hello-world", "index.html"),
+  path.join(EXAMPLES_DIR, "static-site-pipeline", "index.html"),
+  path.join(EXAMPLES_DIR, "batch-photo-processing", "index.html"),
+  path.join(EXAMPLES_DIR, "visual-design-assets", "index.html"),
+  path.join(EXAMPLES_DIR, "basic-c-application", "index.html"),
+  path.join(EXAMPLES_DIR, "multi-format-documentation", "index.html"),
+];
 
-  await buildIndex(docFiles, SEARCH_OUTPUT_PATH);
-  await buildIndex(exampleFiles, EXAMPLES_SEARCH_OUTPUT_PATH);
+/* Build both Netsuke search indices: the documentation set and the examples
+   set. */
+async function main() {
+  await buildIndex(DOC_FILES, SEARCH_OUTPUT_PATH);
+  await buildIndex(EXAMPLE_FILES, EXAMPLES_SEARCH_OUTPUT_PATH);
 }
 
 /* Read each HTML file, index every document extracted from it with
@@ -101,11 +127,17 @@ async function buildIndex(files, outputPath) {
   console.log(`wrote ${outputPath} (${documents.length} documents indexed)`);
 }
 
-/* Turn one built page into the documents the index stores: one for the page
-   as a whole, then one per `<section>` that carries an id and some text, so a
-   search result can land on the section rather than the top of the page.
-   Reads only inside `<main>` where present, to keep site chrome out of the
-   index. Returns an array; sections with no body text are dropped. */
+/**
+ * Turn one built page into the documents the index stores: one for the page
+ * as a whole, then one per `<section>` that carries an id and some text, so a
+ * search result can land on the section rather than the top of the page.
+ * Reads only inside `<main>` where present, to keep site chrome out of the
+ * index. Sections with no body text are dropped.
+ *
+ * @param {string} filePath Rendered page on disk, under `public/netsuke`.
+ * @param {string} html Its contents.
+ * @returns {SearchRecord[]} One page record plus one per section.
+ */
 function extractDocuments(filePath, html) {
   const sitePath = toSitePath(filePath);
   const mainHtml = matchFirst(html, /<main\b[^>]*>([\s\S]*?)<\/main>/i) ?? html;
@@ -238,7 +270,11 @@ function matchFirst(text, pattern) {
   return match?.[1] ?? null;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (import.meta.main) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
+
+export { DOC_FILES, EXAMPLE_FILES, extractDocuments };

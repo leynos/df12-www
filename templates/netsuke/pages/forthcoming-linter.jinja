@@ -1,0 +1,367 @@
+{% extends "doc_page.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "docs_nav.jinja" as docsnav %}
+{% block page_title %}Netsukefile Linter (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+{% raw %}
+    <div class="site-container pt-16 flex-grow flex">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            <nav class="space-y-8" aria-label="Preview pages">
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Forthcoming</h3>
+                    <ul class="space-y-1">
+                        <li><a href="/netsuke/forthcoming/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">All previews</a></li>
+                        <li><a href="/netsuke/forthcoming/linter/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Netsukefile Linter</a></li>
+                        <li><a href="#status" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Status</a></li>
+                        <li><a href="#why" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Why a linter</a></li>
+                        <li><a href="#command" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">The command</a></li>
+                        <li><a href="#rules" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rule catalogue</a></li>
+                        <li><a href="#policy" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Policy &amp; suppression</a></li>
+                        <li><a href="#output" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Output</a></li>
+                        <li><a href="#architecture" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">How it works</a></li>
+                        <li><a href="/netsuke/forthcoming/testing-framework/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Testing Framework</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Sources</h3>
+                    <ul class="space-y-1">
+                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Linter design</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rule reference</a></li>
+                        <li><a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">ADR-018</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
+                <a href="/netsuke/forthcoming/" class="hover:text-vermillion transition-colors">Forthcoming</a>
+                <span class="mx-2 text-stone">/</span>
+                <span class="text-charcoal font-medium">Netsukefile Linter</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center flex-wrap gap-3 mb-4">
+                    {% endraw %}{{ ui.kicker('Forthcoming capability', dot='bg-indigo') }}{% raw %}
+                    <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview targeted at v0.2.0</span>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Netsukefile Linter</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    A manifest that parses, lowers, and produces a valid <code>build.ninja</code> can still be a bad manifest: it rebuilds
+                    everything every time, breaks where <code>/bin/sh</code> is not <code>bash</code>, or races on an undeclared edge.
+                    <code>netsuke check</code> polices the band between &ldquo;parses&rdquo; and &ldquo;provably wrong&rdquo; with a semantic
+                    analysis over Netsuke's own compiler stages, inspired by mbake.
+                </p>
+            </div>
+
+            <section id="status" class="mb-16">
+                <div class="bg-amber/5 border border-amber/30 rounded-xl p-6">
+                    <h2 class="font-bold text-charcoal text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-amber mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {% endraw %}{{ generated_at.strftime('%-d %B %Y') }}{% raw %}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{% endraw %}{{ netsuke_version }}{% raw %}.</strong> The released CLI has no <code>check</code> command; the roadmap lists it under the canonical CLI redesign.</span></li>
+                        <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">ADR-018</a> (accepted 30 August 2026) places linting under <code>netsuke check</code>; the <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">design document</a> and <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">rule reference</a> are normative. They live on the <a href="https://github.com/leynos/netsuke/pull/592" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">#592</a> branch until it merges, so the links here point at that branch.</span></li>
+                        <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Implemented on a branch.</strong> Issue <a href="https://github.com/leynos/netsuke/issues/592" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">#592</a> carries the command, all twenty-four rules, the suppression scanner, and contract tests that check the rule reference against the registry in both directions.</span></li>
+                        <li class="flex items-start"><span class="iconify text-indigo mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.2.0.</strong> Rule names are intended to be permanent from the release that ships them; flags and output shapes may still change before then.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why a linter, and why under <code class="ml-2">check</code>
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Netsuke already rejects provable errors: missing rules, duplicate outputs, cycles, and Ninja text it cannot emit.
+                    The linter covers what compiles but misbehaves. It is a set of named rules over the compiler's own artefacts &mdash;
+                    the authored source with its spans, the expanded manifest, and the lowered build graph &mdash; not a text pass over YAML,
+                    so a rule can tell an order-only directory dependency from a content dependency, or recognize that a literal path
+                    in a recipe is another target's output.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">Prior art</h3>
+                        <p class="text-xs text-charcoal-mid">mbake confirmed the formatting-versus-semantic split, and its per-rule Boolean configuration and GNU error format shaped the policy table and compact human output. hadolint contributed stable identifiers, per-rule severity, and the failure threshold; buildifier the statement-scoped disable comment; ShellCheck the per-rule URL; Clippy and Ruff the idea that category is metadata and machine output is first-class.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">No new noun</h3>
+                        <p class="text-xs text-charcoal-mid"><code>check</code> was already reserved in the canonical command vocabulary and listed as unbuilt work. A separate <code>lint</code> command would be a synonym the CLI design forbids, and <code>generate --lint</code> would bury findings behind a generation flag. The linter <em>is</em> <code>netsuke check</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                        <h3 class="font-bold text-charcoal mb-2 text-sm">Constraints</h3>
+                        <p class="text-xs text-charcoal-mid">Non-interactive and deterministic: no prompts, network, clock, or terminal dependence, so two runs over the same manifest and policy produce byte-identical findings in a fixed order. No reparsing. No duplication of a hard error. Bounded output. And findings never mutate anything: there is no <code>--fix</code>; automated rewriting of an executable manifest is a separate project.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="command" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> The command
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    <code>netsuke check</code> analyses the manifest selected by the existing root <code>--file</code> and <code>--directory</code>
+                    flags, and adds four flags of its own. Machine output uses the global <code>--json</code>, not a check-specific flag.
+                </p>
+                <div class="bg-charcoal rounded-xl overflow-hidden mb-8">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Invocations from the design document</div>
+                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+$ netsuke check
+$ netsuke check --explain
+$ netsuke check --explain directory-dep-not-order-only
+$ netsuke check --rule clarity=off --rule literal-recipe-path=error --fail-on warning
+$ netsuke --json check
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full divide-y divide-stone-light prop-table">
+                        <thead class="bg-boxwood-pale">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Flag</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Purpose</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Default</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-stone-light">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">--rule &lt;NAME=SEVERITY&gt;</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Repeatable policy selector. <code>NAME</code> is a rule or a category; <code>SEVERITY</code> is <code>off</code>, <code>advice</code>, <code>warning</code>, or <code>error</code>. Selectors apply in order, so a category selector followed by a rule selector narrows it. An unknown name is an error, not a warning.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">none</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">--fail-on &lt;SEVERITY&gt;</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Threshold at which findings fail the command: <code>error</code>, <code>warning</code>, <code>advice</code>, or <code>never</code>.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">error</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">--limit &lt;N&gt;</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Maximum findings reported, keeping the first in source order; <code>0</code> reports everything. The verdict is decided before bounding, so truncation never changes the exit code.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">200</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">--explain [NAME]</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Print the rule reference for one rule, or the whole catalogue, instead of analysing. With <code>--json</code> the registry is emitted as <code>result.rules</code> so an editor or agent can build a rule picker without scraping prose.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">&mdash;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Exit codes.</strong> <code>0</code> when no finding reaches the threshold, <code>1</code> when one does. A failure to analyse &mdash; missing manifest, parse error, unknown rule name &mdash; is an ordinary command error and also exits <code>1</code> with a diagnostic document. Separating those classes waits on the roadmap's exit-code taxonomy.
+                    </p>
+                </div>
+            </section>
+
+            <section id="rules" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:rule-test" aria-hidden="true"></span> Rule catalogue
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Twenty-four rules across nine categories. A rule is a stable, self-describing kebab-case name that is unique across every
+                    stage and category; the name is what appears in policy selectors, suppression directives, <code>--explain</code>, and the
+                    <code>rule</code> field of JSON output, and it never changes. Category is metadata, so recategorizing a rule cannot
+                    invalidate a configuration file. Each finding also carries a diagnostic code of the form
+                    <code>netsuke::lint::&lt;name_in_snake_case&gt;</code> and a <code>url</code> into the rule reference.
+                </p>
+                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto [contain:inline-size] mb-8" tabindex="0">
+                    <table class="min-w-full divide-y divide-stone-light prop-table text-sm">
+                        <thead class="bg-boxwood-pale">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Rule</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Category</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Stage</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Default</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Detects</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-stone-light text-charcoal-mid">
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">undeclared-target-input</td><td class="px-4 py-2 text-xs">correctness</td><td class="px-4 py-2 text-xs">graph</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe names another target's output without depending on it</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">directory-dep-not-order-only</td><td class="px-4 py-2 text-xs">caching</td><td class="px-4 py-2 text-xs">manifest</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">directory-creating target used as a content dependency</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">phony-dep-of-file-target</td><td class="px-4 py-2 text-xs">caching</td><td class="px-4 py-2 text-xs">manifest</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">file target depends on a phony target through <code>sources</code> or <code>deps</code></td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">bashism</td><td class="px-4 py-2 text-xs">portability</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe uses a construct <code>/bin/sh</code> does not promise</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">background-job</td><td class="px-4 py-2 text-xs">determinism</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe detaches a process with a trailing <code>&amp;</code></td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">recursive-build-invocation</td><td class="px-4 py-2 text-xs">determinism</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe invokes a build tool</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">builtin-clean-action</td><td class="px-4 py-2 text-xs">redundancy</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">advice</td><td class="px-4 py-2 text-xs">action named <code>clean</code> duplicates the built-in <code>netsuke clean</code></td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">duplicate-rule-recipe</td><td class="px-4 py-2 text-xs">redundancy</td><td class="px-4 py-2 text-xs">manifest</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">two rules declare identical recipes</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">redundant-always</td><td class="px-4 py-2 text-xs">redundancy</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">advice</td><td class="px-4 py-2 text-xs"><code>always</code> declared on a target that is already phony</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">redundant-dependency</td><td class="px-4 py-2 text-xs">redundancy</td><td class="px-4 py-2 text-xs">manifest</td><td class="px-4 py-2 text-xs">advice</td><td class="px-4 py-2 text-xs">path declared under more than one dependency key</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">serial-order-without-deps</td><td class="px-4 py-2 text-xs">redundancy</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">advice</td><td class="px-4 py-2 text-xs"><code>dependency_order: serial</code> declared with fewer than two <code>deps</code></td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">unused-macro</td><td class="px-4 py-2 text-xs">hygiene</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">declared macro that nothing calls</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">unused-rule</td><td class="px-4 py-2 text-xs">hygiene</td><td class="px-4 py-2 text-xs">manifest</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">declared rule that no target or action references</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">unused-var</td><td class="px-4 py-2 text-xs">hygiene</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">global <code>vars</code> entry that no template references</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">action-without-description</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">advice</td><td class="px-4 py-2 text-xs">action declares no <code>description</code></td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">command-chain-not-list</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">advice</td><td class="px-4 py-2 text-xs">scalar <code>command</code> chains steps with <code>&amp;&amp;</code></td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">literal-recipe-path</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe repeats a path the target already declares</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">rule-without-description</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">off</td><td class="px-4 py-2 text-xs">rule declares no <code>description</code></td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">unreachable-target</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">graph</td><td class="px-4 py-2 text-xs">off</td><td class="px-4 py-2 text-xs">target reachable from no default and no other target</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">legacy-placeholder</td><td class="px-4 py-2 text-xs">migration</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe uses the undocumented <code>$in</code> or <code>$out</code> placeholder</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">manual-ninja-escape</td><td class="px-4 py-2 text-xs">migration</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe doubles a dollar to escape it for Ninja</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">suppression-without-reason</td><td class="px-4 py-2 text-xs">suppression</td><td class="px-4 py-2 text-xs">directive</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">lint directive states no reason</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">unknown-suppression</td><td class="px-4 py-2 text-xs">suppression</td><td class="px-4 py-2 text-xs">directive</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">lint directive names a rule that does not exist</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-indigo whitespace-nowrap">unused-suppression</td><td class="px-4 py-2 text-xs">suppression</td><td class="px-4 py-2 text-xs">directive</td><td class="px-4 py-2 text-xs">advice</td><td class="px-4 py-2 text-xs">lint directive suppressed no finding</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-charcoal-mid mb-8">Rules default to <code>off</code> only when they encode a project convention rather than a defect: building a target by name without declaring it a default is a legitimate workflow, and rule descriptions are a house style. The two migration rules exist because v0.1.0-beta3 made <code>$$</code> escaping and the <code>$in</code>/<code>$out</code> placeholders obsolete; see <a href="/netsuke/docs/security/#shell-dollars" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">markers and shell dollars</a>.</p>
+
+                <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">One rule, worked</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl"><code>undeclared-target-input</code>: Ninja schedules edges concurrently unless a dependency orders them. A recipe that reads a path another target produces, without declaring it, races &mdash; it succeeds whenever the producer happened to run first. Serial local builds hide this; a parallel or clean build does not.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-xs font-mono uppercase tracking-wide text-vermillion mb-2">Reported</p>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  - name: app
+    command: "cc build/main.o -o {{ outs }}"
+  - name: build/main.o
+    command: "cc -c src/main.c -o {{ outs }}"
+{% endraw %}{% endhighlight %}{% raw %}
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-mono uppercase tracking-wide text-matcha mb-2">Fixed</p>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  - name: app
+    sources: build/main.o
+    command: "cc {{ ins }} -o {{ outs }}"
+  - name: build/main.o
+    command: "cc -c src/main.c -o {{ outs }}"
+{% endraw %}{% endhighlight %}{% raw %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid mt-3">Remediation, as the rule reference states it: declare the path under <code>sources</code> if the recipe reads it, or under <code>deps</code> if it only needs it to exist.</p>
+            </section>
+
+            <section id="policy" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:settings-adjust" aria-hidden="true"></span> Policy and suppression
+                </h2>
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">Project policy</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">Both policy flags layer through the existing configuration precedence, so a project can fix its policy in <code>netsuke.toml</code>. Setting a severity on an off-by-default rule enables it; setting <code>off</code> on any rule disables it. Nothing about policy resolution consults the environment beyond that chain, reads the terminal, or varies with time.</p>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% endraw %}{% highlight 'toml' %}{% raw %}
+[cmds.check]
+rule = ["clarity=off", "unreachable-target=warning"]
+fail_on = "warning"
+{% endraw %}{% endhighlight %}{% raw %}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">Suppression directives</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">Suppression is narrow by construction: a directive names one or more rules and must state a reason. There is no blanket disable comment and no <code>all</code> selector. Scoping follows YAML indentation: a directive alone on its line governs the next declaration and everything indented beneath it.</p>
+                        <div class="bg-charcoal rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% endraw %}{% highlight 'netsuke' %}{% raw %}
+targets:
+  # netsuke-lint: allow background-job -- the previewer is intentionally detached
+  - name: preview
+    script: |
+      feh processed &
+{% endraw %}{% endhighlight %}{% raw %}
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm min-w-0">
+                    <h3 class="font-bold text-charcoal mb-3 text-sm">Directive grammar</h3>
+                    <ul class="space-y-2 text-xs text-charcoal-mid font-mono">
+                        <li><code># netsuke-lint: allow &lt;rule&gt;[, &lt;rule&gt;…] -- &lt;reason&gt;</code> <span class="font-sans">suppresses the named rules within one node.</span></li>
+                        <li><code># netsuke-lint-file: allow &lt;rule&gt;[, &lt;rule&gt;…] -- &lt;reason&gt;</code> <span class="font-sans">suppresses them for the whole file, for findings that cannot be resolved to a span.</span></li>
+                    </ul>
+                    <p class="text-xs text-charcoal-mid mt-3 font-sans">A <code>#</code> inside a quoted or block scalar is content, not a directive: the scanner consults the span index, which is why shell comments inside <code>script: |</code> blocks cannot accidentally disable rules. Three rules police the directives themselves &mdash; <code>unknown-suppression</code>, <code>suppression-without-reason</code>, and <code>unused-suppression</code> &mdash; so a suppression cannot rot silently after the underlying problem is fixed.</p>
+                </div>
+            </section>
+
+            <section id="output" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:json" aria-hidden="true"></span> Output
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Human findings render through the existing diagnostics reporter, so they inherit source snippets and the project's colour,
+                    emoji, and accessibility policies, followed by a summary line stating the count at each severity and any truncation.
+                    With <code>--json</code> the command emits exactly one document in the shared envelope. When no finding reaches the
+                    threshold, a result document goes to stdout; when one does, a diagnostic document goes to stderr with the same finding
+                    objects under <code>diagnostics[0].related</code>, preserving the envelope invariant every other command follows.
+                </p>
+                <div class="bg-charcoal rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke --json check (passing, abridged from the design document)</div>
+                    {% endraw %}{% highlight 'json' %}{% raw %}
+{
+  "schema_version": 1,
+  "generator": { "name": "netsuke", "version": "0.2.0" },
+  "result": {
+    "command": "check",
+    "status": "pass",
+    "fail_on": "error",
+    "summary": { "error": 0, "warning": 2, "advice": 1,
+                 "reported": 3, "suppressed": 1, "omitted": 0 },
+    "truncated": false,
+    "findings": [
+      {
+        "message": "depends on the directory `build` through `deps`",
+        "code": "netsuke::lint::directory_dep_not_order_only",
+        "severity": "warning",
+        "help": "Move the directory to `order_only_deps`, which guarantees it exists first without tracking its timestamp.",
+        "url": "https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md#directory-dep-not-order-only",
+        "primary_span": { "line": 24, "column": 7, "snippet": "      - \"{{ build_dir }}\"" }
+      }
+    ]
+  }
+}
+{% endraw %}{% endhighlight %}{% raw %}
+                </div>
+            </section>
+
+            <section id="architecture" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> How it works
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The linter binds to four points in the pipeline described in <a href="/netsuke/guides/architecture/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">How Netsuke Works</a>.
+                    Manifest source flows into a span index and, in parallel, through the existing compiler stages; each lint stage consumes the
+                    artefact produced immediately above it, and all four feed one ordered finding sink.
+                </p>
+                <div class="grid md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-boxwood-pale p-5 rounded-lg border border-stone">
+                        <div class="font-mono text-xs text-indigo mb-2">document</div>
+                        <p class="text-xs text-charcoal-mid">Rules over the authored source with spans: shell constructs, placeholders, unused declarations, redundant flags.</p>
+                    </div>
+                    <div class="bg-boxwood-pale p-5 rounded-lg border border-stone">
+                        <div class="font-mono text-xs text-indigo mb-2">manifest</div>
+                        <p class="text-xs text-charcoal-mid">Rules over the expanded, typed manifest: dependency shapes, duplicate recipes, unused rules.</p>
+                    </div>
+                    <div class="bg-boxwood-pale p-5 rounded-lg border border-stone">
+                        <div class="font-mono text-xs text-indigo mb-2">graph</div>
+                        <p class="text-xs text-charcoal-mid">Rules over the lowered build graph: undeclared inputs and unreachable targets.</p>
+                    </div>
+                    <div class="bg-boxwood-pale p-5 rounded-lg border border-stone">
+                        <div class="font-mono text-xs text-indigo mb-2">directive</div>
+                        <p class="text-xs text-charcoal-mid">Rules over the suppression directives themselves.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    A rule states what it found and where; the engine stamps the severity resolved from policy, so no rule can decide how loudly to
+                    speak. Every rule carries a summary, a rationale, and a remediation in its registry entry, and a contract test checks the rule
+                    reference against that registry in both directions, so the documentation is provably complete rather than aspirationally so.
+                    A future span-preserving YAML rewriter could add autofixes; that is a separate project and not part of this preview.
+                </p>
+            </section>
+
+{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Forthcoming capabilities', 'href': '/netsuke/forthcoming/'}, {'kicker': 'Next preview', 'label': 'Testing Framework', 'href': '/netsuke/forthcoming/testing-framework/'}) }}{% raw %}
+
+        </main>
+    </div>
+{% endraw %}
+{% endblock %}

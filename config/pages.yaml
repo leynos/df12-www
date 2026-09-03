@@ -1292,7 +1292,7 @@ sites:
     template_vars:
       # Single source of truth for the current Netsuke release shown on the
       # sub-site. Bump this once per release.
-      netsuke_version: "0.1.0-beta2"
+      netsuke_version: "0.1.0-beta3"
     theme:
       site_name: Netsuke
       hero_eyebrow: Netsuke Documentation
@@ -1418,6 +1418,21 @@ sites:
         label: Icon Replacements
         template: pages/icon-replacements.jinja
         output_slug: icon-replacements
+      - key: forthcoming
+        label: Forthcoming Capabilities
+        template: pages/forthcoming.jinja
+        output_slug: forthcoming
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-linter
+        label: Netsukefile Linter
+        template: pages/forthcoming-linter.jinja
+        output_slug: forthcoming/linter
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-testing-framework
+        label: Netsukefile Testing Framework
+        template: pages/forthcoming-testing-framework.jinja
+        output_slug: forthcoming/testing-framework
+        nav_href: /netsuke/roadmap/
     pages: {}
 
   weaver:

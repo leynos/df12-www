@@ -528,12 +528,14 @@ def _build_content_pages(
             raise SiteConfigError(msg)
         label = entry.get("label") or str(key).replace("-", " ").title()
         output_slug = entry.get("output_slug") or str(key)
+        nav_href = entry.get("nav_href")
         result.append(
             ContentPageConfig(
                 key=str(key),
                 label=str(label),
                 template=str(template),
                 output_slug=str(output_slug),
+                nav_href=str(nav_href) if nav_href else None,
             )
         )
     return result

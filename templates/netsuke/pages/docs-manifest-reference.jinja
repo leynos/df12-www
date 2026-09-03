@@ -105,7 +105,7 @@
                 </h2>
 
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    Every <code class="font-mono text-sm">Netsukefile</code> is a YAML mapping. The common top-level sections are <code>netsuke_version</code>, <code>vars</code>, <code>macros</code>, <code>rules</code>, <code>targets</code>, <code>actions</code>, and <code>defaults</code>.
+                    Every <code class="font-mono text-sm">Netsukefile</code> is a YAML mapping. Unknown fields and duplicate mapping keys are errors. <code>netsuke_version</code> and <code>targets</code> are required (an empty <code>targets</code> list is valid for an action-only manifest); <code>vars</code>, <code>macros</code>, <code>rules</code>, <code>actions</code>, and <code>defaults</code> are optional.
                 </p>
 
                 <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden relative">
@@ -189,6 +189,20 @@ defaults:
                                 </td>
                             </tr>
                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">vars</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">Mapping</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">
+                                    Global strings, numbers, booleans, or lists available to Jinja. Keys named <code class="bg-stone-light/30 px-1 rounded">env</code> or <code class="bg-stone-light/30 px-1 rounded">glob</code> are rejected at parse time because they would shadow the built-in helpers.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">macros[]</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">List of Mapping</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">
+                                    Named Jinja macros, each with a <code class="bg-stone-light/30 px-1 rounded">signature</code> and a <code class="bg-stone-light/30 px-1 rounded">body</code>, registered before other fields render.
+                                </td>
+                            </tr>
+                            <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">rules[].name</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">String</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
@@ -213,7 +227,7 @@ defaults:
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">defaults</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">List of String</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
-                                    Lists the target names built when <code class="bg-stone-light/30 px-1 rounded">netsuke</code> runs without explicit targets.
+                                    Lists the target or action names built when <code class="bg-stone-light/30 px-1 rounded">netsuke</code> runs without explicit targets. Entries are literal names; Jinja expressions are not rendered in this field.
                                 </td>
                             </tr>
                         </tbody>
@@ -230,7 +244,7 @@ defaults:
                 </div>
 
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    Targets may define <code class="font-mono text-sm">command</code> or <code class="font-mono text-sm">script</code> inline instead of referencing a named rule. This is useful for one-off steps that are too small to deserve a shared rule.
+                    Targets may define <code class="font-mono text-sm">command</code> or <code class="font-mono text-sm">script</code> inline instead of referencing a named rule. This is useful for one-off steps that are too small to deserve a shared rule. A target or action that performs work carries exactly one of <code class="font-mono text-sm">rule</code>, <code class="font-mono text-sm">command</code>, or <code class="font-mono text-sm">script</code>; one whose entire job is its non-empty <code class="font-mono text-sm">deps</code> list may omit the recipe altogether and becomes a native Ninja phony node. Since v0.1.0-beta3 that dependency-only form is preferred over a no-op such as <code class="font-mono text-sm">command: ":"</code>.
                 </p>
 
                 <div class="grid lg:grid-cols-2 gap-8 mb-8">
@@ -254,7 +268,9 @@ targets:
                                 <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">{{ ins }}</code> <span>Space-separated list of quoted input paths</span></li>
                                 <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">{{ outs }}</code> <span>Space-separated list of quoted output paths</span></li>
                                 <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">vars</code> <span>Global and target-local values exposed to Jinja rendering</span></li>
+                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">$PATH</code> <span>Shell dollars are written normally; Netsuke escapes them for Ninja. <code>$in</code>/<code>$out</code> are not Netsuke placeholders &mdash; use the markers above.</span></li>
                             </ul>
+                            <p class="text-xs text-charcoal-light mt-3">On POSIX and Bash routes a marker may sit unquoted, single-quoted, or double-quoted, but not inside a command substitution or backticks. In PowerShell, use markers unquoted; quoted and command-substitution marker sites are rejected rather than risking a context escape.</p>
                         </div>
                     </div>
 
@@ -288,7 +304,14 @@ targets:
                                     <code class="font-mono font-bold text-indigo">script</code>
                                     <span class="text-xs text-charcoal-light font-mono">String (multiline)</span>
                                 </div>
-                                <p class="text-sm text-charcoal-mid mt-1">A multi-line script executed via <code>/bin/sh -e</code>, so any line failing aborts the step. Mutually exclusive with <code>command</code> and <code>rule</code>.</p>
+                                <p class="text-sm text-charcoal-mid mt-1">A multi-line script interpreted by the selected recipe shell: <code>/bin/sh -e</code> on Unix, so any line failing aborts the step, and Windows PowerShell on Windows unless <code>NETSUKE_WINDOWS_SHELL=bash</code> selects the Bash compatibility route. Mutually exclusive with <code>command</code> and <code>rule</code>.</p>
+                            </div>
+                            <div class="border-l-2 border-indigo pl-4 py-1">
+                                <div class="flex items-baseline justify-between">
+                                    <code class="font-mono font-bold text-indigo">deps</code>
+                                    <span class="text-xs text-charcoal-light font-mono">String or List</span>
+                                </div>
+                                <p class="text-sm text-charcoal-mid mt-1">Implicit dependencies: they affect freshness and ordering but are not appended to the recipe. Declared per target or action; reusable rules reject <code>deps</code>. Pair with <code>dependency_order: serial</code> to run the list in declaration order.</p>
                             </div>
                         </div>
                     </div>

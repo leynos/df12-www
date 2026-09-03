@@ -95,7 +95,7 @@
                         <h4 class="font-bold text-indigo text-sm mb-1">Before you start</h4>
                         <p class="text-xs text-charcoal-mid">
                             For significant changes, open a GitHub issue first to discuss the approach. This prevents duplicate effort and ensures your work fits the project's direction.
-                            All contributors must follow the <a href="/netsuke/code-of-conduct/" class="text-indigo hover:underline">Code of Conduct</a>.
+                            All contributors must follow the <a href="/netsuke/code-of-conduct/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Code of Conduct</a>.
                         </p>
                     </div>
                 </div>
@@ -229,9 +229,11 @@ $ make check-fmt lint test
                     <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:translate" aria-hidden="true"></span> Translating Netsuke
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Netsuke uses <a href="https://projectfluent.org/" class="text-indigo hover:underline">Project Fluent</a> for all user-facing text.
+                    Netsuke uses <a href="https://projectfluent.org/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Project Fluent</a> for all user-facing text.
                     Every message is defined in a <code>.ftl</code> file — one per locale — rather than as hard-coded strings.
-                    Spanish (<code>es-ES</code>) ships as a reference translation; unsupported locales fall back to English (<code>en-US</code>).
+                    Thirty-five locale catalogues ship; English (<code>en-US</code>) is the source locale and the fallback for anything a translation has not yet covered.
+                    Before translating, read the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization style guide</a> for voice, tone, and register, and keep the
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization glossary</a> open for the preferred, allowed, and forbidden form of every term in your locale.
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
@@ -239,9 +241,10 @@ $ make check-fmt lint test
                         <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">File locations</h3>
                         <div class="bg-white p-5 rounded-xl border border-stone text-xs font-mono space-y-1 text-charcoal-mid">
                             <div>locales/</div>
-                            <div class="pl-4 text-indigo">en-US/messages.ftl  <span class="text-charcoal-light font-sans">(primary)</span></div>
-                            <div class="pl-4 text-matcha">es-ES/messages.ftl  <span class="text-charcoal-light font-sans">(reference translation)</span></div>
-                            <div class="pl-4 text-amber">fr-FR/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
+                            <div class="pl-4 text-indigo">en-US/messages.ftl  <span class="text-charcoal-light font-sans">(source locale)</span></div>
+                            <div class="pl-4 text-matcha">es-ES/messages.ftl</div>
+                            <div class="pl-4 text-matcha">…  <span class="text-charcoal-light font-sans">(35 shipped tags)</span></div>
+                            <div class="pl-4 text-amber">is/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
                         </div>
                     </div>
                     <div>
@@ -249,15 +252,15 @@ $ make check-fmt lint test
                         <ol class="space-y-3">
                             <li class="flex items-start text-sm">
                                 <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">1</span>
-                                <span class="text-charcoal-mid">Copy <code class="font-mono">locales/en-US/messages.ftl</code> to a new directory named after your locale identifier (e.g. <code class="font-mono">locales/fr-FR/messages.ftl</code>).</span>
+                                <span class="text-charcoal-mid">Copy <code class="font-mono">locales/en-US/messages.ftl</code> to a new directory named after your locale tag (e.g. <code class="font-mono">locales/is/messages.ftl</code>), then register the tag in <code class="font-mono">src/locale_catalogues.rs</code>, <code class="font-mono">Cargo.toml</code>, and the registry test.</span>
                             </li>
                             <li class="flex items-start text-sm">
                                 <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">2</span>
-                                <span class="text-charcoal-mid">Translate the message values. Do not rename keys — key names are used by the Rust code and must stay identical.</span>
+                                <span class="text-charcoal-mid">Translate the message values in the style guide's voice and with the glossary's terminology. Do not rename keys — key names are used by the Rust code and must stay identical.</span>
                             </li>
                             <li class="flex items-start text-sm">
                                 <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">3</span>
-                                <span class="text-charcoal-mid">Test with <code class="font-mono">NETSUKE_LOCALE=fr-FR netsuke --help</code> to verify your strings appear correctly.</span>
+                                <span class="text-charcoal-mid">Test with <code class="font-mono">NETSUKE_LOCALE=is netsuke --help</code> to verify your strings appear correctly, and run <code class="font-mono">make test</code>.</span>
                             </li>
                             <li class="flex items-start text-sm">
                                 <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 mt-0.5 shrink-0 font-bold">4</span>
@@ -296,6 +299,8 @@ progress-target-count = Building { $count -&gt;
                             <li>Keep all <code>{ $variable }</code> placeholders</li>
                             <li>Adapt plural forms to your language's rules</li>
                             <li>Translate <code>.hint</code> and <code>.label</code> attributes</li>
+                            <li>Use one address form consistently, per the style guide</li>
+                            <li>Follow the glossary's per-locale terminology table</li>
                         </ul>
                     </div>
                     <div class="bg-vermillion/5 border border-vermillion/20 rounded-lg p-4 text-xs">
@@ -304,6 +309,8 @@ progress-target-count = Building { $count -&gt;
                             <li>Rename message keys</li>
                             <li>Add keys that do not exist in <code>en-US/messages.ftl</code></li>
                             <li>Remove or rename <code>{ $variable }</code> placeholders</li>
+                            <li>Translate product names, identifiers, or literal values such as <code>auto</code> and <code>never</code></li>
+                            <li>Add humour, idiom, or remediation absent from the source</li>
                             <li>Use machine translation without human review</li>
                         </ul>
                     </div>
@@ -315,7 +322,7 @@ progress-target-count = Building { $count -&gt;
                         <h4 class="font-bold text-indigo text-sm mb-1">Want the full picture?</h4>
                         <p class="text-xs text-charcoal-mid mb-3">
                             This section is the short version. The full localization guide covers message-key domains, variable catalogues,
-                            CLDR plural categories, locale registration in Rust, and the compile-time audit.
+                            CLDR plural categories, locale registration in Rust, the compile-time audit, and where the style guide and glossary fit.
                         </p>
                         <a href="/netsuke/guides/translating/" class="hm-button hm-button--primary inline-flex items-center px-4 py-2 text-sm">
                             Read the Translating Netsuke guide <span class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>

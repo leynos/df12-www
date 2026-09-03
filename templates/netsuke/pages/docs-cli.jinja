@@ -143,6 +143,18 @@
                                         <span class="text-indigo w-32 shrink-0">--json</span>
                                         <span class="text-charcoal-light">Emit one machine-readable JSON result document</span>
                                     </div>
+                                    <div class="flex items-start text-xs font-mono">
+                                        <span class="text-indigo w-32 shrink-0">--no-input</span>
+                                        <span class="text-charcoal-light">State that the run must never prompt (Netsuke has no interactive mode)</span>
+                                    </div>
+                                    <div class="flex items-start text-xs font-mono">
+                                        <span class="text-indigo w-32 shrink-0">--config</span>
+                                        <span class="text-charcoal-light">Use an explicit configuration file instead of automatic discovery</span>
+                                    </div>
+                                    <div class="flex items-start text-xs font-mono">
+                                        <span class="text-indigo w-32 shrink-0">--color, --emoji</span>
+                                        <span class="text-charcoal-light">Policy: <code>auto</code> | <code>always</code> | <code>never</code> (colour rendering is not yet implemented)</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
@@ -193,7 +205,7 @@
                                     <h3 class="font-mono text-lg font-bold text-charcoal">help targets</h3>
                                     <span class="px-2 py-0.5 rounded text-xs font-mono bg-indigo/10 text-indigo">Discovery</span>
                                 </div>
-                                <p class="text-charcoal-mid text-sm mb-4">Prints the target and action catalogue for the selected manifest &mdash; actions first, then targets &mdash; with a <code>[★ default]</code> marker on manifest defaults and each entry's <code>description</code> metadata. The manifest is loaded and validated through the same stages as a build, but no recipes run and no outputs are created; rendering uses a restricted, side-effect-free Jinja surface that rejects <code>env()</code>, <code>glob()</code>, and other host-observing helpers. Honours <code>--file</code>, <code>-C</code>, and the usual colour, accessibility, locale, and <code>--json</code> conventions, and works without Ninja installed.</p>
+                                <p class="text-charcoal-mid text-sm mb-4">Prints the target and action catalogue for the selected manifest &mdash; actions first, then targets &mdash; with a <code>[★ default]</code> marker on manifest defaults and each entry's <code>description</code> metadata. The manifest is loaded and validated through the same stages as a build, but no recipes run and no outputs are created; rendering uses a restricted, side-effect-free Jinja surface that rejects <code>env()</code>, <code>glob()</code>, and other host-observing helpers, and skips <code>command</code> and <code>script</code> bodies entirely, so build-only helpers in recipes never make discovery fail. An entry whose <code>when</code> expression needs a disabled helper is kept and marked <code>[◇ conditional]</code> (<code>[? conditional]</code> in ASCII output; a boolean <code>conditional</code> field in JSON) rather than resolved. Honours <code>--file</code>, <code>-C</code>, and the usual colour, accessibility, locale, and <code>--json</code> conventions, and works without Ninja installed.</p>
                             </div>
                             <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
                                 netsuke help targets
@@ -206,10 +218,20 @@
                                     <h3 class="font-mono text-lg font-bold text-charcoal">clean</h3>
                                     <span class="px-2 py-0.5 rounded text-xs font-mono bg-vermillion/10 text-vermillion">Maintenance</span>
                                 </div>
-                                <p class="text-charcoal-mid text-sm mb-4">Removes build artefacts by running <code>ninja -t clean</code>. Requires rules and targets to be properly configured for cleaning.</p>
+                                <p class="text-charcoal-mid text-sm mb-4">Removes the file outputs Ninja tracks by running <code>ninja -t clean</code> against a temporary Ninja file. Phony targets and actions do not represent files and are not removed.</p>
                             </div>
                             <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
                                 netsuke clean
+                            </div>
+                        </div>
+
+                        <div id="windows-recipes" class="bg-amber/5 border border-amber/30 rounded-xl p-5 flex items-start">
+                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:logo-windows" aria-hidden="true"></span>
+                            <div>
+                                <h4 class="font-bold text-charcoal text-sm mb-1">Windows recipes run in PowerShell</h4>
+                                <p class="text-xs text-charcoal-mid">
+                                    On Windows, <code>build</code> and <code>clean</code> hand every <code>command</code>, command list, and <code>script</code> to Windows PowerShell (<code>powershell.exe</code>), whichever shell launched <code>netsuke</code>. Set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2; Netsuke checks that <code>bash.exe --version</code> works before executing and stops with install instructions otherwise. <code>generate</code> and <code>help targets</code> never execute recipes, so they need neither route. See the <a href="/netsuke/docs/security/#recipe-shells" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">recipe shell contract</a>.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -438,7 +460,7 @@ Success: Build complete.
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     All user-facing text in Netsuke &mdash; help messages, status lines, error explanations, hints &mdash; is externalised into
-                    <a href="https://projectfluent.org/" class="text-indigo hover:underline">Fluent</a> <code>.ftl</code> resource files.
+                    <a href="https://projectfluent.org/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Fluent</a> <code>.ftl</code> resource files.
                     This means the entire CLI can be translated to a new language without changing a line of Rust.
                     Thirty-five locale catalogues ship, from Arabic (<code>ar</code>) to Traditional Chinese (<code>zh-Hant</code>).
                     Catalogues are selected by exact locale tag with deliberate per-language fallback rules, so
@@ -449,7 +471,7 @@ Success: Build complete.
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
                     <div>
                         <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Locale selection</h3>
-                        <p class="text-sm text-charcoal-mid mb-4">Locale is resolved in this order of precedence:</p>
+                        <p class="text-sm text-charcoal-mid mb-4">The first source that yields a valid BCP 47 tag wins:</p>
                         <ol class="space-y-2 text-sm">
                             <li class="flex items-center">
                                 <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">1</span>
@@ -465,9 +487,10 @@ Success: Build complete.
                             </li>
                             <li class="flex items-center">
                                 <span class="w-6 h-6 rounded-full bg-stone text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">4</span>
-                                <span class="text-charcoal-mid">System default locale</span>
+                                <span class="text-charcoal-mid">System default locale (<code class="font-mono">en_GB.UTF-8</code> is read as <code class="font-mono">en-GB</code>), then <code class="font-mono text-indigo">en-US</code></span>
                             </li>
                         </ol>
+                        <p class="text-xs text-charcoal-mid mt-3">Help text, usage, and command-line validation errors are rendered before any configuration file is read, so they skip step 3. Diagnostics, progress, and status output are rendered after the configuration merge and consult it.</p>
                     </div>
                     <div>
                         <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">What is localised</h3>
@@ -525,8 +548,10 @@ error-file-not-found = Error: File "{ $path }" was not found.
     .hint = Check that the path exists and is readable.</code></pre>
                         </div>
                     </div>
-                    <p class="text-xs text-charcoal-light mt-3">
-                        See the <a href="/netsuke/guides/contributing/" class="text-indigo hover:underline">Contributing guide</a> for translation workflow details.
+                    <p class="text-xs text-charcoal-mid mt-3">
+                        See the <a href="/netsuke/guides/translating/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Translating Netsuke guide</a> for the workflow, and the upstream
+                        <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization style guide</a> and
+                        <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">glossary</a> for voice, tone, and terminology.
                     </p>
                 </div>
             </section>
@@ -550,6 +575,10 @@ error-file-not-found = Error: File "{ $path }" was not found.
                                     <li class="flex items-start">
                                         <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
                                         <span><strong>Template failure:</strong> A variable or macro expanded unexpectedly. Check the rendered string fields and the <code>vars</code> precedence.</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
+                                        <span><strong>Non-UTF-8 path:</strong> Manifest, <code>--directory</code>, and Ninja working-directory paths must be valid UTF-8. Netsuke rejects an invalid path while parsing the command line and names the affected option.</span>
                                     </li>
                                     <li class="flex items-start">
                                         <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>

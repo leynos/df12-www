@@ -111,12 +111,33 @@ announced. Pasting the command is the way to verify that the copy worked. A
 browser may also refuse the clipboard on an insecure connection or without
 permission, and that refusal is likewise silent.
 
+### 4.3. Current and planned command surface
+
+Weaver still has a prototype surface in the current checkout. These examples
+work today:
+
+- `weaver --capabilities`
+- `weaver definitions get`
+- `weaver act apply-patch`
+
+`act apply-patch` consumes patch content from standard input.
+
+The planned 0.1.0 surface is `weaver <resource> <verb> [FLAGS]`, with `--json`
+as the machine switch. Selector-driven commands pass `weaver.selector.v1`
+records through `--selectors -`; the daemon is per-user and local, using Unix
+sockets by default and loopback-only TCP only for compatibility on non-Unix
+systems. Shared mutation guarantees stay the same: parser and
+language-server checks where they apply, stale-source refusal, Double-Lock
+verification, and idempotent mutations.
+
+Use the current examples until the planned commands ship. `patches apply` and
+`symbols rename` remain target wording in the docs, not a promise about the
+current binary.
 
 ## 5. Netsuke
 
 Netsuke's documentation begins at [/netsuke/docs/](/netsuke/docs/); the home
 page is [/netsuke/](/netsuke/).
-
 
 ### 5.1. Navigating the documentation
 
@@ -141,7 +162,6 @@ Pressing it opens the menu; pressing it again, pressing `Escape`, or clicking
 outside the menu closes it. This is the same mobile menu shared across the
 site.
 
-
 ### 5.2. Breadcrumbs
 
 Every documentation, guide, and example page carries a breadcrumb trail above
@@ -149,7 +169,6 @@ its heading, showing the route from the section hub down to that page. The
 final entry in the trail is the current page and is marked as such for
 assistive technology; earlier entries are links back up the route, except
 that an example page's category is shown as plain text.
-
 
 ### 5.3. Example pages
 
@@ -160,32 +179,6 @@ shipped example. Two buttons follow the labels: the first usually returns to
 the examples hub, and the second points at the most relevant documentation
 page. Below the manifest, the transcript of the build runs in a
 terminal-styled panel.
-
-For implementation detail rather than usage guidance, switch to the
-[developers' guide](developers-guide.md) or the
-[df12 Pages App Design](df12-pages-app-design.md).
-### 4.3. Current and planned command surface
-
-Weaver still has a prototype surface in the current checkout. These examples
-work today:
-
-- `weaver --capabilities`
-- `weaver definitions get`
-- `weaver act apply-patch`
-
-`act apply-patch` consumes patch content from standard input.
-
-The planned 0.1.0 surface is `weaver <resource> <verb> [FLAGS]`, with `--json`
-as the machine switch. Selector-driven commands pass `weaver.selector.v1`
-records through `--selectors -`; the daemon is per-user and local, using Unix
-sockets by default and loopback-only TCP only for compatibility on non-Unix
-systems. Shared mutation guarantees stay the same: parser and
-language-server checks where they apply, stale-source refusal, Double-Lock
-verification, and idempotent mutations.
-
-Use the current examples until the planned commands ship. `patches apply` and
-`symbols rename` remain target wording in the docs, not a promise about the
-current binary.
 
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the

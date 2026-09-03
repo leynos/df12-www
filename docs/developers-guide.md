@@ -114,15 +114,9 @@ inspect the rendered result as well — the gates do not render the site, so a
 template change that passes every gate can still produce a broken page.
 
 Because the gates do not render the site, every change to a template,
-stylesheet, or page config is validated in a browser before it is committed.
-Serve the rebuilt `public/` with `bun run dev` or
-`DF12_PORT=<port> bun run serve`, then follow the mandatory procedure under
-[AGENTS.md](../AGENTS.md#validating-rendered-pages): a screenshot of each
-changed page, the viewport matrix (1440, 1280, 1024, 768, 390, and 320 pixels)
-with a horizontal-overflow check at each, computed-style inspection with
-`css-view`, snapshot diffing for output-neutral refactors, and the
-accessibility audit. `agent-browser` and `css-view` are the tools used for
-this, and both work headless.
+stylesheet, or page config is validated in a browser before it is committed;
+§7.5, "Validating rendered pages in a browser", covers the tools and the
+procedure.
 
 ### 2.1. Bun is required
 
@@ -820,8 +814,12 @@ page passes its slug and, where it has section anchors, a `sub_links` list of
 
 The guides pass bespoke `sections` instead, each a mapping with a `title`, its
 `links`, and `sub: true` where every link is an in-page anchor, and turn the
-search widget off with `search=false`. `sidebar_link(href, label,
-active=false, sub=false)` renders one entry and is what both paths call.
+search widget off with `search=false`. A link may carry its own `sub` or
+`active`, which the forthcoming preview pages use to nest a preview's anchors
+under the current entry in a list that also links its siblings; `nav_label`
+sets an `aria-label` on the `nav` where that list is not the documentation.
+`sidebar_link(href, label, active=false, sub=false)` renders one entry and is
+what both paths call.
 
 Adding a docs page means adding one entry to `docs_pages`; the sidebar, the
 mobile dropdown, and the footer links follow. `tests/test_netsuke_navigation.py`

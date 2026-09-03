@@ -70,6 +70,31 @@
     );
   }
 
+  /* Whether `value` is the index payload the build script writes: a
+     serialized index and the options MiniSearch needs to read it back, with
+     `fields` present. The file is fetched at runtime, so its shape is checked
+     rather than assumed; a payload that fails is treated as no index. */
+  function isIndexPayload(value: unknown): value is IndexPayload {
+    if (typeof value !== "object" || value === null) {
+      return false;
+    }
+    const payload = value as Record<string, unknown>;
+    if (typeof payload.index !== "string") {
+      return false;
+    }
+    const options = payload.indexOptions;
+    if (typeof options !== "object" || options === null) {
+      return false;
+    }
+    const { fields, searchOptions } = options as Record<string, unknown>;
+    return (
+      Array.isArray(fields) &&
+      fields.every((field) => typeof field === "string") &&
+      typeof searchOptions === "object" &&
+      searchOptions !== null
+    );
+  }
+
   /* Everything `renderResults` needs to redraw one root. */
   interface RenderState {
     activeIndex: number;
@@ -242,9 +267,24 @@
 
     // The stored fields ride along on each result under an index signature,
     // so each one is checked before it is trusted.
-    return [...merged.values()]
-      .filter((result): result is SearchResult & DocSearchHit => isDocSearchHit(result))
-      .slice(0, RESULT_LIMIT);
+    const hits = [...merged.values()].filter((result): result is SearchResult & DocSearchHit =>
+      isDocSearchHit(result),
+    );
+    reportDropped(merged.size - hits.length);
+    return hits.slice(0, RESULT_LIMIT);
+  }
+
+  let reportedDropped = false;
+
+  /* Say once, without quoting anything from the index, that results were
+     dropped for failing `isDocSearchHit`; a malformed index would otherwise
+     shrink the list silently. Once, because the same index serves every
+     keystroke. */
+  function reportDropped(count: number): void {
+    if (count > 0 && !reportedDropped) {
+      reportedDropped = true;
+      console.warn(`Doc search dropped ${count} malformed result(s) from the index.`);
+    }
   }
 
   /* Draw the results list and its count, then show the panel and mark the
@@ -374,7 +414,10 @@
     if (!response.ok) {
       return null;
     }
-    const payload: IndexPayload = await response.json();
+    const payload: unknown = await response.json();
+    if (!isIndexPayload(payload)) {
+      return null;
+    }
     return {
       miniSearch: window.MiniSearch.loadJSON(payload.index, payload.indexOptions),
       searchOptions: payload.indexOptions.searchOptions,
@@ -412,6 +455,6 @@
   }
 
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = { createIndexCache, isDocSearchHit, siteRootFromIndexPath };
+    module.exports = { createIndexCache, isDocSearchHit, isIndexPayload, siteRootFromIndexPath };
   }
 })();

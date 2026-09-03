@@ -14,6 +14,7 @@ const {
   createIndexCache,
   siteRootFromIndexPath,
   isDocSearchHit,
+  isIndexPayload,
 } = require("../../public/netsuke/assets/js/doc-search.js");
 
 /* A promise with its resolve and reject exposed, so a test can settle a
@@ -127,5 +128,28 @@ describe("isDocSearchHit", () => {
     expect(isDocSearchHit({ ...hit, excerpt: { text: "no" } })).toBe(false);
     expect(isDocSearchHit(null)).toBe(false);
     expect(isDocSearchHit("Install")).toBe(false);
+  });
+});
+
+describe("isIndexPayload", () => {
+  const payload = {
+    index: "{}",
+    indexOptions: { fields: ["title"], storeFields: ["sitePath"], searchOptions: { prefix: true } },
+  };
+
+  test("accepts the shape the index builder writes", () => {
+    expect(isIndexPayload(payload)).toBe(true);
+  });
+
+  test("rejects a payload the loader could not read back", () => {
+    expect(isIndexPayload({})).toBe(false);
+    expect(isIndexPayload({ index: 5, indexOptions: payload.indexOptions })).toBe(false);
+    expect(isIndexPayload({ index: "{}" })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: { searchOptions: {} } })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: [1], searchOptions: {} } })).toBe(
+      false,
+    );
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: ["title"] } })).toBe(false);
+    expect(isIndexPayload(null)).toBe(false);
   });
 });

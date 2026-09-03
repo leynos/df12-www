@@ -78,6 +78,39 @@
     };
   }
 
+  /** Whether `value` is a list of strings. */
+  function isStringArray(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every((item) => typeof item === "string");
+  }
+
+  /**
+   * Whether `value` is the index payload the build script writes: a
+   * serialized index, and options carrying the `fields` MiniSearch needs to
+   * read it back. The file is fetched at runtime, so its shape is checked
+   * rather than assumed.
+   */
+  function isIndexPayload(value: unknown): value is IndexPayload & {
+    indexOptions: { fields: string[] };
+  } {
+    if (typeof value !== "object" || value === null) {
+      return false;
+    }
+    const payload = value as Record<string, unknown>;
+    if (typeof payload.index !== "string") {
+      return false;
+    }
+    const options = payload.indexOptions;
+    if (typeof options !== "object" || options === null) {
+      return false;
+    }
+    const { fields, storeFields, searchOptions } = options as Record<string, unknown>;
+    return (
+      isStringArray(fields) &&
+      (storeFields === undefined || isStringArray(storeFields)) &&
+      (searchOptions === undefined || (typeof searchOptions === "object" && searchOptions !== null))
+    );
+  }
+
   /** What `fetchEpisodicSearchIndex` takes from its host; tests pass fakes. */
   interface FetchDeps {
     fetchImpl?: typeof fetch;
@@ -220,13 +253,14 @@
       throw new Error(`Index request failed: ${response.status}`);
     }
 
-    const payload: IndexPayload = await response.json();
-    const options = payload.indexOptions || {};
+    const payload: unknown = await response.json();
+    if (!isIndexPayload(payload)) {
+      throw new Error("Episodic search index payload is malformed.");
+    }
+    const options = payload.indexOptions;
     return {
       miniSearch: MiniSearch.loadJSON(payload.index, {
-        // MiniSearch requires `fields` and throws when a payload lacks it;
-        // the cast leaves that check where it was rather than defaulting.
-        fields: options.fields as string[],
+        fields: options.fields,
         ...(options.storeFields === undefined ? {} : { storeFields: options.storeFields }),
       }),
       searchOptions: options.searchOptions || {},
@@ -258,9 +292,26 @@
     }
     // The stored fields ride along on each result under an index signature,
     // so each one is checked before it is trusted.
-    return [...merged.values()]
-      .filter((result): result is SearchResult & SearchHit => isSearchHit(result))
-      .slice(0, RESULT_LIMIT);
+    const hits = [...merged.values()].filter((result): result is SearchResult & SearchHit =>
+      isSearchHit(result),
+    );
+    reportDropped(merged.size - hits.length);
+    return hits.slice(0, RESULT_LIMIT);
+  }
+
+  let reportedDropped = false;
+
+  /**
+   * Say once, without quoting anything from the index, that results were
+   * dropped for failing `isSearchHit`; a malformed index would otherwise
+   * shrink the list silently. Once, because the same index serves every
+   * keystroke.
+   */
+  function reportDropped(count: number): void {
+    if (count > 0 && !reportedDropped) {
+      reportedDropped = true;
+      console.warn(`Episodic search dropped ${count} malformed result(s) from the index.`);
+    }
   }
 
   /* Wire one rendered search root. `loadIndex`, `searchIndex`, and `navigate`
@@ -544,6 +595,7 @@
       fetchEpisodicSearchIndex,
       initialiseAllEpisodicSearch,
       initialiseEpisodicSearch,
+      isIndexPayload,
       isSearchHit,
       searchEpisodicIndex,
     };

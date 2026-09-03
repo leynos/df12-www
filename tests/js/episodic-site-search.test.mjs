@@ -5,7 +5,7 @@
  * loader and navigation dependencies, and exercise index loading, result
  * ranking, and keyboard interaction without live network requests.
  */
-import { describe, expect, test } from "bun:test";
+import { describe, expect, mock, test } from "bun:test";
 import { createRequire } from "node:module";
 import fc from "fast-check";
 import { Window } from "happy-dom";
@@ -16,6 +16,7 @@ const {
   fetchEpisodicSearchIndex,
   initialiseAllEpisodicSearch,
   initialiseEpisodicSearch,
+  isIndexPayload,
   isSearchHit,
   searchEpisodicIndex,
 } = require("../../public/episodic/assets/js/site-search.js");
@@ -134,6 +135,19 @@ describe("index loading", () => {
         options: { fields: ["title"], storeFields: ["sitePath"] },
       },
     ]);
+  });
+
+  test("rejects a malformed payload before handing it to MiniSearch", async () => {
+    const loadJSON = mock(() => ({}));
+    for (const body of [{}, { index: 5, indexOptions: { fields: ["title"] } }, { index: "{}" }]) {
+      await expect(
+        fetchEpisodicSearchIndex("/index.json", {
+          MiniSearch: { loadJSON },
+          fetchImpl: async () => ({ ok: true, json: async () => body }),
+        }),
+      ).rejects.toThrow("Episodic search index payload is malformed.");
+    }
+    expect(loadJSON).not.toHaveBeenCalled();
   });
 
   test("rejects unsuccessful index requests", async () => {
@@ -484,5 +498,27 @@ describe("isSearchHit", () => {
     const bad = { id: "b", sitePath: 42, title: "B", kind: "document" };
     const miniSearch = { search: () => [bad, good] };
     expect(searchEpisodicIndex({ miniSearch, searchOptions: {} }, "g")).toEqual([good]);
+  });
+});
+
+describe("isIndexPayload", () => {
+  test("accepts the shape the index builder writes, with optional stored fields", () => {
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: ["title"] } })).toBe(true);
+    expect(
+      isIndexPayload({
+        index: "{}",
+        indexOptions: { fields: ["title"], storeFields: ["sitePath"], searchOptions: {} },
+      }),
+    ).toBe(true);
+  });
+
+  test("rejects a payload without a serialized index or its fields", () => {
+    expect(isIndexPayload({})).toBe(false);
+    expect(isIndexPayload({ index: "{}" })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: {} })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: "title" } })).toBe(false);
+    expect(
+      isIndexPayload({ index: "{}", indexOptions: { fields: ["title"], storeFields: 1 } }),
+    ).toBe(false);
   });
 });

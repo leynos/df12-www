@@ -928,13 +928,20 @@ element is absent so one `defer` script can be loaded on pages that do not use
 it — `doc-search.js` is included on thirteen pages this way.
 
 `src/static/episodic/assets/js/site-search.ts` follows the same plain-script
-shape. It exposes seven helpers when `module.exports` is available:
+shape. It exposes nine helpers when `module.exports` is available:
 `createIndexCache` for shared in-flight index loads, `fetchEpisodicSearchIndex`
 for fetching and deserializing the MiniSearch payload, `searchEpisodicIndex`
 for query-time ranking, `initialiseEpisodicSearch` for one root,
 `initialiseAllEpisodicSearch` for the document, `durationBucket` for the fixed
-telemetry duration classes, and `emitSearchTelemetry` for its bounded event
-schema. The initializers accept injected loader, search, and navigation
+telemetry duration classes, `emitSearchTelemetry` for its bounded event
+schema, `isIndexPayload` for checking that a fetched index file carries a
+serialized index and the `fields` MiniSearch needs to read it back (a payload
+that fails is rejected through the existing load-error path), and
+`isSearchHit` for checking that a deserialized result carries the stored
+fields the listbox renders and navigates to, each as a string, so a malformed
+record is dropped rather than rendered. A dropped record is reported once per
+page load through `console.warn`, with a count only and nothing quoted from
+the index. The initializers accept injected loader, search, and navigation
 dependencies so their DOM behaviour can be tested without a network request or
 navigation. Their roots must provide the `data-search-root`,
 `data-search-index`, `data-search-input`, `data-search-panel`,
@@ -943,6 +950,17 @@ written so the loading boundary stays outside the query path: queries only
 consult an already-loaded index, while initialization owns the fetch and
 failure handling. Failed cache entries are evicted, allowing a later root
 initialization to retry.
+
+`src/static/netsuke/assets/js/doc-search.ts` exposes four helpers when
+`module.exports` is available: `createIndexCache` for shared in-flight index
+loads, evicting a failed or empty load so a later root can retry;
+`isDocSearchHit` for the stored-field check before a result is rendered, with
+`pageTitle` required because the index builder always stores it;
+`isIndexPayload` for the fetched index file's shape check, where a payload
+that fails is treated as no index and the search box reports the index as
+unavailable; and `siteRootFromIndexPath` for the sub-site root recovered from
+the index path. As with the Episodic module, a dropped record is reported
+once per page load through `console.warn`.
 
 ### 6.1. Episodic search telemetry
 

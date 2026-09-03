@@ -26,6 +26,7 @@ import re
 from pathlib import Path
 
 import pytest
+from bs4 import BeautifulSoup
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_STILYAGI = REPO_ROOT / "public" / "stilyagi"
@@ -150,3 +151,59 @@ def test_stilyagi_pages_keep_the_renamed_classes(built_site: Path) -> None:
             f"class token(s) {sorted(collisions)}; use the renamed "
             "equivalents instead"
         )
+
+
+ADR_TITLES = (
+    "Python package, Rust extractor",
+    "No bundled spellchecker in base",
+    "Rules are trusted code",
+    "Region IR, not raw AST",
+    "Capability planner",
+    "Markdown first; MDX provisional",
+    "SARIF as primary machine format",
+    "Fix safety is explicit",
+    "Deterministic ordering",
+)
+PROVISIONAL_ADR = "ADR-006"
+
+
+@pytest.mark.timeout(300)
+def test_stilyagi_design_page_lists_the_nine_adrs(built_site: Path) -> None:
+    """The ADR grid renders every record from the data list, in order.
+
+    The cards come from the ``adr_cards`` list in ``design.jinja`` and one
+    loop, so this pins the loop's output: nine cards numbered in sequence,
+    each with its title, an editorial paragraph, and a status that reads
+    Accepted unless the record names another.
+    """
+    page = PUBLIC_STILYAGI / "design" / "index.html"
+    assert page.is_file(), f"expected a published page at {page}"
+    soup = BeautifulSoup(page.read_text(encoding="utf-8"), "html.parser")
+    cards = soup.select(".adr-grid .adr-card")
+
+    numbers = [c.select_one(".adr-num") for c in cards]
+    assert [n.get_text(strip=True) for n in numbers if n] == [
+        f"ADR-{i:03d}" for i in range(1, len(ADR_TITLES) + 1)
+    ], "the cards are numbered ADR-001 to ADR-009 in order"
+    titles = [c.select_one("h3") for c in cards]
+    assert [t.get_text(strip=True) for t in titles if t] == list(ADR_TITLES), (
+        "each card carries its record's title"
+    )
+    for card in cards:
+        editorial = card.select_one("p.editorial")
+        assert editorial is not None, "each card carries an editorial paragraph"
+        assert editorial.get_text(strip=True), "the editorial text is not empty"
+        status = card.select_one(".adr-status")
+        number = card.select_one(".adr-num")
+        assert status is not None, "each card carries a status"
+        assert number is not None, "each card carries a number"
+        if number.get_text(strip=True) == PROVISIONAL_ADR:
+            assert status.get_text(strip=True) == "Provisional", (
+                "ADR-006 is the provisional record"
+            )
+            assert "prov" in status["class"], "the provisional status is marked"
+        else:
+            assert status.get_text(strip=True) == "Accepted", (
+                "every other record defaults to Accepted"
+            )
+            assert "prov" not in status["class"], "accepted records are unmarked"

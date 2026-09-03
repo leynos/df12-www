@@ -145,17 +145,19 @@ On screens 1024 pixels wide and up, the documentation and guides pages carry a
 sidebar on the left. On a documentation page its entries are grouped under
 "Introduction", "Core Concepts", and "Reference"; the current page is
 highlighted and announced to screen readers as the current page, and its own
-section anchors are listed indented beneath it. On a guide page the sidebar
-instead lists that guide's sections under "On this page" and a short set of
-"Helpful links".
-
-Below 1024 pixels wide there is no room for the sidebar, so it is replaced by
-a bar at the top of the content. That bar holds a drop-down listing the
-documentation pages — choosing one navigates there — and a search box.
-
-The search box appears in the sidebar on wide screens and in the top bar on
-narrow ones. Enter at least two characters to search the documentation; the
+section anchors are listed indented beneath it. A search box sits above the
+groups: enter at least two characters to search the documentation, and the
 search lists matches to follow.
+
+Below 1024 pixels wide there is no room for the sidebar. On a documentation
+page it is replaced by a bar at the top of the content holding a drop-down of
+the documentation pages — choosing one navigates there — and the same search
+box.
+
+A guide page's sidebar instead lists that guide's sections under "On this
+page" and a short set of "Helpful links", with no search box. Below 1024
+pixels wide a guide has no sidebar or bar; its sections follow in reading
+order, and the site-wide navigation bar is the way to other pages.
 
 The site-wide navigation bar has its own menu button below 768 pixels wide.
 Pressing it opens the menu; pressing it again, pressing `Escape`, or clicking

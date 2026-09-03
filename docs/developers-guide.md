@@ -16,8 +16,11 @@ For the generator's architecture and extension points, see
 [df12 Pages App Design](df12-pages-app-design.md). For Tailwind and daisyUI
 conventions used by the main site, the mxd sub-site, and the Episodic sub-site,
 see the [Tailwind v4 guide](tailwind-v4-guide.md) and the
-[daisyUI v5 guide](daisyui-v5-guide.md). Documentation formatting itself
-follows the [documentation style guide](documentation-style-guide.md).
+[daisyUI v5 guide](daisyui-v5-guide.md). For the design of the browser-side
+scripts' compile and typecheck pipeline, see the
+[Browser Script Build Pipeline](browser-script-build-pipeline.md).
+Documentation formatting itself follows the
+[documentation style guide](documentation-style-guide.md).
 
 ## 1. Scope and audience
 
@@ -201,6 +204,9 @@ reviewed; see section 6. They are typechecked, though, by the separate gate
 described in section 2.4.
 
 ### 2.4. TypeScript and the typecheck gate
+
+See the [Browser Script Build Pipeline](browser-script-build-pipeline.md) for
+the rationale behind this split and the compiler choices it makes.
 
 Two kinds of TypeScript live in the repository, and they run in different
 worlds. The build scripts under `scripts/` and the Tailwind plugin under

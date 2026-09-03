@@ -22,6 +22,8 @@ directory. Additional documentation is provided in `docs/`, including:
   accessibility checks.
 - [df12 Pages App Design](docs/df12-pages-app-design.md) – the generator's
   architecture and extension points.
+- [Browser Script Build Pipeline](docs/browser-script-build-pipeline.md) –
+  design of the compile and typecheck path for the browser-side scripts.
 - [daisyUI v5 Guide](docs/daisyui-v5-guide.md) – theme structure and component
   conventions.
 - [Tailwind v4 Guide](docs/tailwind-v4-guide.md) – CSS-first configuration and

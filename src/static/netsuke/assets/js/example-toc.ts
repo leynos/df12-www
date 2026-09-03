@@ -11,7 +11,7 @@
  *
  * Usage: `templates/netsuke/pages/examples-*.jinja` loads the compiled script with a plain
  * `<script defer src="/netsuke/assets/js/example-toc.js">` tag; `build:js` compiles that file
- * from this `.ts` source. There is no initialisation call — the IIFE runs on load and simply
+ * from this `.ts` source. There is no initialization call — the IIFE runs on load and simply
  * waits for `DOMContentLoaded` before it looks for the contents-list markup.
  */
 (() => {

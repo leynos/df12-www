@@ -13,7 +13,7 @@
  * document. The script waits for `DOMContentLoaded` rather than checking
  * `document.readyState`, so the test dispatches that event by hand after
  * mounting — and on the shared document that would also wake the listener
- * the unit suite's `require` of the same script installed, initialising each
+ * the unit suite's `require` of the same script installed, initializing each
  * root twice. An isolated window has exactly one listener: this one.
  */
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
@@ -60,7 +60,7 @@ afterEach(async () => {
 });
 
 /* Mount the search root, evaluate the script against this test's window,
-   let it initialise, and give the async load a few turns to settle. */
+   let it initialize, and give the async load a few turns to settle. */
 async function mount({ response, miniSearch }) {
   const { document } = page;
   document.body.innerHTML = ROOT;

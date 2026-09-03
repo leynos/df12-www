@@ -184,7 +184,9 @@ def _driven(
 
     monkeypatch.setattr(commands, "_served", served)
     monkeypatch.setattr(commands, "_staged", staged)
-    monkeypatch.setattr(commands, "_page_paths", lambda: list(pages))
+    # The command passes the sub-site's root; the stand-in ignores it, since
+    # the page list here is the test's to choose.
+    monkeypatch.setattr(commands, "_page_paths", lambda _root: list(pages))
     monkeypatch.setattr(commands, "_tool", lambda name: tool_paths[name])
     monkeypatch.setattr(
         commands, "_run_tool", lambda argv: record["argv"].append(list(argv))
@@ -250,6 +252,68 @@ def test_the_capture_command_wires_its_helpers_together(
     )
     assert all(argv[0] == "/usr/bin/bun" for argv in run["argv"]), (
         f"every command should run through the resolved bun; got {run['argv']}"
+    )
+
+
+def test_the_capture_command_addresses_the_site_it_was_given(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`--site` has to reach the URL, the page list, and the server's probe.
+
+    A site that reached one and not the others would capture Weaver's pages
+    under Netsuke's name — a baseline of the wrong sub-site that compares
+    clean against itself forever.
+    """
+    roots: list[Path] = []
+    sites: list[str] = []
+    with _driven(monkeypatch, ["", "docs/"], {"bun": "/usr/bin/bun"}) as run:
+
+        def pages_under(root: Path) -> list[str]:
+            roots.append(root)
+            return ["", "docs/"]
+
+        @contextlib.contextmanager
+        def served(port: int, *_args: object, **kwargs: object) -> cabc.Iterator[str]:
+            sites.append(str(kwargs.get("site")))
+            run["served"].append(port)
+            yield "http://127.0.0.1:9999"
+
+        monkeypatch.setattr(commands, "_page_paths", pages_under)
+        monkeypatch.setattr(commands, "_served", served)
+        commands.capture(tmp_path / "out", port=8126, site="netsuke")
+
+    assert roots == [paths._public_root("netsuke")], (
+        f"the page list should be read from public/netsuke; got {roots}"
+    )
+    assert sites == ["netsuke"], (
+        f"the server's readiness probe should ask for the named site; got {sites}"
+    )
+    urls = [argv[-1] for argv in run["argv"]]
+    assert urls == [
+        "http://127.0.0.1:9999/netsuke/",
+        "http://127.0.0.1:9999/netsuke/docs/",
+    ], f"every page should be requested under /netsuke/; got {urls}"
+
+
+def test_the_shots_command_addresses_the_site_it_was_given(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The same for `shots`, whose session name and URLs both carry the site."""
+    with _driven(
+        monkeypatch, ["", "docs/"], {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
+        monkeypatch.setattr(commands, "_page_paths", lambda _root: ["", "docs/"])
+        commands.shots(tmp_path / "out", port=8127, site="netsuke")
+
+    opened = [argv[2] for argv in run["argv"] if argv[1] == "open"]
+    assert opened, "no page was opened at all"
+    assert all(url.startswith("http://127.0.0.1:9999/netsuke/") for url in opened), (
+        f"every page should be opened under /netsuke/; got {opened}"
+    )
+    sessions = {argv[argv.index("--session") + 1] for argv in run["argv"]}
+    assert len(sessions) == 1, f"one run should drive one session; got {sessions}"
+    assert next(iter(sessions)).startswith("netsuke-shots"), (
+        f"the browser session should be named for the site; got {sessions}"
     )
 
 

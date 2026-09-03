@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import collections.abc as cabc
 import json
+import re
 import typing as typ
 
 from weaver_snapshot_colour import _canonical_shadow, _canonical_value
@@ -28,6 +29,28 @@ _BORDER_EDGES = (
 
 
 _ZERO_WIDTHS = frozenset({"0px", "0", "medium"})
+
+
+# The origin the harness serves on, port and all, as it appears inside a
+# computed `url()`. Chromium resolves `background-image` against the document,
+# so an inline `style="background-image: url(/netsuke/assets/x.jpg)"` is
+# reported with the loopback port the capture happened to be given — a new
+# one per run, since the default asks the kernel for a free port.
+_LOOPBACK_ORIGIN = re.compile(r"http://127\.0\.0\.1:\d+")
+
+
+# The uid Plotly mints for a chart on every render — six hex digits from a
+# random seed — as it appears in the ids of the chart's clip paths, defs and
+# legend, and in the `clip-path: url("#clip…")` that references them. The
+# docs' security page draws one such chart, and each capture would otherwise
+# report the whole chart as renamed.
+_PLOTLY_UID = re.compile(r"\b(clip|topdefs-|defs-|legend)[0-9a-f]{6}")
+
+
+# Properties a running animation samples mid-cycle. `opacity` is what a pulse
+# changes; `transform` is what a spin changes, and it drags the node's
+# bounding box round with it.
+_ANIMATED = ("opacity", "transform")
 
 
 def _drop_invisible_border_colours(style: dict[str, typ.Any]) -> None:
@@ -86,8 +109,13 @@ def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any
       as changed and bury the handful that really did. Each colour is
       therefore converted to 8-bit sRGB before comparison, which is the
       precision a screen has anyway.
-    - ``opacity`` on a node running a CSS animation. The Weaver pages carry an
-      ``animate-pulse`` status dot whose opacity is sampled mid-cycle.
+    - ``opacity`` and ``transform`` on a node running a CSS animation. The
+      Weaver pages carry an ``animate-pulse`` status dot whose opacity is
+      sampled mid-cycle; the Netsuke guides hub carries an ``animate-spin``
+      icon whose rotation is.
+    - The loopback port inside a ``url()``. The server is given a free port
+      per run, and Chromium reports a resolved ``background-image`` with the
+      origin it was loaded from.
     - Placeholder shadow layers. v4 composes ``box-shadow`` from more slots
       than v3 did, so an unchanged shadow arrives behind a different number of
       fully transparent, zero-size layers. See :func:`_canonical_shadow`.
@@ -107,17 +135,41 @@ def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any
         alone.
     """
     style = {
-        key: _canonical_value(value) if isinstance(value, str) else value
+        key: _incidental_text(_canonical_value(value))
+        if isinstance(value, str)
+        else value
         for key, value in (style_diff or {}).items()
         if not key.startswith("--tw-")
     }
-    if style.get("animation-name", "none") != "none":
-        style.pop("opacity", None)
+    if _is_animated(style):
+        for key in _ANIMATED:
+            style.pop(key, None)
     for key in ("box-shadow", "text-shadow"):
         if isinstance(style.get(key), str):
             style[key] = _canonical_shadow(style[key])
     _drop_invisible_border_colours(style)
     return style
+
+
+def _incidental_text(value: str) -> str:
+    """Strip the run-to-run noise a string value can carry.
+
+    Parameters
+    ----------
+    value
+        A computed style value, or an id.
+
+    Returns
+    -------
+    str
+        The value with the loopback port and any Plotly uid removed.
+    """
+    return _PLOTLY_UID.sub(r"\1", _LOOPBACK_ORIGIN.sub("http://127.0.0.1", value))
+
+
+def _is_animated(style: dict[str, typ.Any]) -> bool:
+    """Say whether a node's styles show a CSS animation running on it."""
+    return style.get("animation-name", "none") != "none"
 
 
 def _resolve_tracked(
@@ -194,6 +246,8 @@ def _rounded_bbox(bbox: _Bbox) -> _Bbox:
 def _normalize(
     node: dict[str, typ.Any],
     inherited: dict[str, typ.Any] | None = None,
+    *,
+    spinning: bool = False,
 ) -> dict[str, typ.Any]:
     """Strip incidental variation from one walker node and its descendants.
 
@@ -208,6 +262,10 @@ def _normalize(
     inherited
         The values the parent node carried for the properties in
         :data:`_TRACKS_PARENT`. Empty at the root.
+    spinning
+        Whether an ancestor is running an animation. Its box turns with it,
+        and so does every box beneath it: the ``<path>`` inside a spinning
+        icon has no animation of its own and moves all the same.
 
     Returns
     -------
@@ -218,12 +276,22 @@ def _normalize(
     style = _canonical_style(node.get("styleDiff"))
     carried = _resolve_tracked(style, inherited or {})
 
+    spinning = spinning or _is_animated(style)
     normalized = dict(node)
     normalized["styleDiff"] = style
     if "bbox" in node:
-        normalized["bbox"] = _rounded_bbox(node["bbox"])
+        # A spinning node's box is whatever its rotation was when sampled;
+        # rounding cannot settle that, so the box goes rather than the diff
+        # reporting a spinner on every capture.
+        if spinning:
+            del normalized["bbox"]
+        else:
+            normalized["bbox"] = _rounded_bbox(node["bbox"])
+    if isinstance(node.get("id"), str):
+        normalized["id"] = _incidental_text(node["id"])
     normalized["children"] = [
-        _normalize(child, carried) for child in node.get("children") or []
+        _normalize(child, carried, spinning=spinning)
+        for child in node.get("children") or []
     ]
     return normalized
 

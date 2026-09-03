@@ -47,6 +47,30 @@ def test_the_css_view_argv_pins_the_browser_and_names_the_output() -> None:
     )
 
 
+def test_the_css_view_argv_addresses_the_named_site() -> None:
+    """The site is the first URL segment, and Weaver stays the default."""
+    argv = tools._css_view_argv(
+        "/usr/bin/bun", "http://127.0.0.1:8099", "docs/", Path("/out"), "netsuke"
+    )
+
+    assert argv[-1] == "http://127.0.0.1:8099/netsuke/docs/", (
+        f"the page should be requested under the named site; got {argv[-1]!r}"
+    )
+    assert argv[argv.index("--output") + 1] == str(Path("/out/docs.json")), (
+        f"the snapshot's name comes from the page alone, not the site; got {argv!r}"
+    )
+
+
+def test_the_browser_session_is_named_for_the_site() -> None:
+    """Two sites captured by one process would otherwise share a session."""
+    assert tools._session_name("netsuke").startswith("netsuke-shots"), (
+        f"got {tools._session_name('netsuke')!r}"
+    )
+    assert tools._session_name("netsuke") != tools._session_name("weaver"), (
+        "a session is one viewport and one page; two sites need two"
+    )
+
+
 def test_the_screenshot_path_precedes_its_flags() -> None:
     """Order is load-bearing here, and getting it wrong still reports success.
 

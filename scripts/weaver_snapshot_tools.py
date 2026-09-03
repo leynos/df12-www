@@ -14,7 +14,7 @@ import shutil
 import subprocess
 import typing as typ
 
-from weaver_snapshot_paths import REPO_ROOT, _slug
+from weaver_snapshot_paths import DEFAULT_SITE, REPO_ROOT, _slug
 
 if typ.TYPE_CHECKING:
     from pathlib import Path
@@ -90,7 +90,7 @@ def _run_tool(argv: cabc.Sequence[str]) -> None:
     )
 
 
-def _session_name() -> str:
+def _session_name(site: str = DEFAULT_SITE) -> str:
     """Name the browser session this process should drive.
 
     A dedicated session keeps the run clear of any interactive browsing. It
@@ -100,15 +100,23 @@ def _session_name() -> str:
     viewport while the other screenshots, producing images at a width neither
     asked for and reporting success for both.
 
+    Parameters
+    ----------
+    site
+        The sub-site being screenshotted, so the name says what the session
+        is for.
+
     Returns
     -------
     str
         A session name unique to this process.
     """
-    return f"weaver-shots-{os.getpid()}"
+    return f"{site}-shots-{os.getpid()}"
 
 
-def _css_view_argv(bun: str, base: str, page: str, out_dir: Path) -> list[str]:
+def _css_view_argv(
+    bun: str, base: str, page: str, out_dir: Path, site: str = DEFAULT_SITE
+) -> list[str]:
     """Build the ``css-view`` command that snapshots one page.
 
     Parameters
@@ -118,9 +126,12 @@ def _css_view_argv(bun: str, base: str, page: str, out_dir: Path) -> list[str]:
     base
         The origin the local server is listening on, without a trailing slash.
     page
-        A page path relative to ``/weaver/``, as :func:`_page_paths` returns.
+        A page path relative to the sub-site's base path, as
+        :func:`_page_paths` returns.
     out_dir
         Directory the JSON snapshot is written into.
+    site
+        The sub-site the page belongs to; the first segment of its URL.
 
     Returns
     -------
@@ -143,7 +154,7 @@ def _css_view_argv(bun: str, base: str, page: str, out_dir: Path) -> list[str]:
         "networkidle",
         "--output",
         str(out_dir / f"{_slug(page)}.json"),
-        f"{base}/weaver/{page}",
+        f"{base}/{site}/{page}",
     ]
 
 
@@ -168,19 +179,20 @@ def _screenshot_argv(path: Path) -> list[str]:
     return ["screenshot", str(path), "--full"]
 
 
-def _capture_pages(
+def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     pages: cabc.Sequence[str],
     out_dir: Path,
     base: str,
     bun: str,
     run: Runner,
+    site: str = DEFAULT_SITE,
 ) -> None:
     """Snapshot each page in turn, reporting progress as it goes.
 
     Parameters
     ----------
     pages
-        Page paths relative to ``/weaver/``.
+        Page paths relative to the sub-site's base path.
     out_dir
         Directory to write one JSON snapshot per page into.
     base
@@ -190,18 +202,21 @@ def _capture_pages(
     run
         How to run a tool. Injected so a test can assert the argv without
         launching a browser.
+    site
+        The sub-site the pages belong to.
     """
     for page in pages:
-        run(_css_view_argv(bun, base, page, out_dir))
+        run(_css_view_argv(bun, base, page, out_dir, site))
         print(f"  {_slug(page)}")
 
 
-def _shoot_pages(
+def _shoot_pages(  # noqa: PLR0913 - one seam per outward dependency
     pages: cabc.Sequence[str],
     out_dir: Path,
     base: str,
     browser: str,
     run: Runner,
+    site: str = DEFAULT_SITE,
 ) -> None:
     """Screenshot each page at each width, closing the session afterwards.
 
@@ -211,7 +226,7 @@ def _shoot_pages(
     Parameters
     ----------
     pages
-        Page paths relative to ``/weaver/``.
+        Page paths relative to the sub-site's base path.
     out_dir
         Directory to write the PNG files into.
     base
@@ -221,8 +236,10 @@ def _shoot_pages(
     run
         How to run a tool. Injected so a test can assert the argv without
         launching a browser.
+    site
+        The sub-site the pages belong to.
     """
-    session = ["--session", _session_name()]
+    session = ["--session", _session_name(site)]
 
     def drive(*args: str) -> None:
         run([browser, *args, *session])
@@ -231,7 +248,7 @@ def _shoot_pages(
         for width in SCREENSHOT_WIDTHS:
             drive("set", "viewport", str(width), "900")
             for page in pages:
-                drive("open", f"{base}/weaver/{page}")
+                drive("open", f"{base}/{site}/{page}")
                 drive(*_screenshot_argv(out_dir / f"{_slug(page)}@{width}.png"))
             print(f"  {width}px done")
     finally:

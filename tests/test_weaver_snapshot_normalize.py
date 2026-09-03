@@ -49,6 +49,90 @@ def test_animated_opacity_is_ignored_but_static_opacity_is_not() -> None:
     )
 
 
+def test_an_animated_transform_and_box_are_ignored_but_static_ones_are_not() -> None:
+    """A spinner reports whatever angle the sample caught; a rotated logo does not."""
+    spinning = _node(
+        **{
+            "animation-name": "spin",
+            "transform": "matrix(-0.99, 0.1, -0.1, -0.99, 0, 0)",
+        }
+    )
+    spinning["bbox"] = {"x": 1122.64, "y": 674.64, "width": 10.72, "height": 10.72}
+    normalized = normalize._normalize(spinning)
+    assert "transform" not in normalized["styleDiff"], (
+        f"a mid-spin transform differs run to run; got {normalized['styleDiff']!r}"
+    )
+    assert "bbox" not in normalized, (
+        f"a spinning node's box turns with it; got {normalized.get('bbox')!r}"
+    )
+
+    # The path inside the spinning icon has no animation of its own and turns
+    # with its parent all the same.
+    spinning["children"] = [_node()]
+    spinning["children"][0]["bbox"] = {"x": 1.0, "y": 2.0, "width": 3.0, "height": 4.0}
+    assert "bbox" not in normalize._normalize(spinning)["children"][0], (
+        "a box inside a spinning node turns with it and must go too"
+    )
+
+    still = _node(transform="matrix(0.99, 0.1, -0.1, 0.99, 0, 0)")
+    still["bbox"] = {"x": 1.0, "y": 2.0, "width": 3.0, "height": 4.0}
+    normalized = normalize._normalize(still)
+    assert normalized["styleDiff"]["transform"] == still["styleDiff"]["transform"], (
+        "a static transform is a real declaration and must survive"
+    )
+    assert normalized["bbox"] == still["bbox"], "a static node keeps its box"
+
+
+def test_the_loopback_port_inside_a_url_is_ignored() -> None:
+    """The server gets a new port per run, and a resolved url() carries it."""
+    normalized = normalize._normalize(
+        _node(**{"background-image": 'url("http://127.0.0.1:57909/netsuke/a.jpg")'})
+    )
+    assert normalized["styleDiff"]["background-image"] == (
+        'url("http://127.0.0.1/netsuke/a.jpg")'
+    ), f"the port should go and the path stay; got {normalized['styleDiff']!r}"
+
+    elsewhere = _node(**{"background-image": 'url("http://example.com:8080/a.jpg")'})
+    assert normalize._normalize(elsewhere)["styleDiff"] == elsewhere["styleDiff"], (
+        "only the harness's own loopback origin is incidental"
+    )
+
+
+@pytest.mark.parametrize(
+    ("minted", "stable"),
+    [
+        ("clip15905cxyplot", "clipxyplot"),
+        ("clip15905cx", "clipx"),
+        ("defs-15905c", "defs-"),
+        ("topdefs-15905c", "topdefs-"),
+        ("legend15905c", "legend"),
+    ],
+)
+def test_a_plotly_uid_is_ignored_in_an_id_and_in_a_reference(
+    minted: str, stable: str
+) -> None:
+    """Plotly mints a chart's uid from a random seed on every render."""
+    node = _node(**{"clip-path": f'url("#{minted}")'})
+    node["id"] = minted
+    normalized = normalize._normalize(node)
+    assert normalized["id"] == stable, (
+        f"the uid should go from the id; got {normalized['id']!r}"
+    )
+    assert normalized["styleDiff"]["clip-path"] == f'url("#{stable}")', (
+        f"and from the reference to it; got {normalized['styleDiff']!r}"
+    )
+
+
+def test_an_ordinary_id_survives_untouched() -> None:
+    """Only Plotly's shape is incidental; anything else is the page's own."""
+    for other in ("navbar", "clip-path-15", "eclipse2", "clipboard", "legend"):
+        node = _node()
+        node["id"] = other
+        assert normalize._normalize(node)["id"] == other, (
+            f"an ordinary id must survive untouched; {other!r} did not"
+        )
+
+
 def test_normalization_recurses_into_children() -> None:
     """Nested nodes get the same treatment as the root."""
     tree = _node(color="rgb(1, 2, 3)")

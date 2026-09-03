@@ -9,9 +9,10 @@ and each is asserted here so a later change cannot quietly undo one:
    browser, and carries the daisyUI theme.
 2. No published Netsuke page loads the Play CDN.
 
-Each was written failing and carries a strict ``xfail`` marker naming the
-milestone that turns it green — a marker left in place after the behaviour
-arrives would itself fail the suite, so none can be forgotten.
+Each was written failing, with a strict ``xfail`` marker naming the milestone
+that turns it green — a marker left in place after the behaviour arrives would
+itself fail the suite, so none can be forgotten. The first cleared with the
+compiled entrypoint; the second clears when the Play CDN goes.
 """
 
 from __future__ import annotations
@@ -34,10 +35,6 @@ PLAY_CDN = re.compile(r"cdn\.tailwindcss\.com")
 
 
 @pytest.mark.timeout(300)
-@pytest.mark.xfail(
-    strict=True,
-    reason="Milestone 2 of the Netsuke daisyUI migration compiles the stylesheet",
-)
 def test_netsuke_stylesheet_is_compiled(built_site: Path) -> None:
     """The build should emit a Netsuke stylesheet carrying the daisyUI theme.
 

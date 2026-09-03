@@ -257,18 +257,14 @@ class TestHimotoshiPygmentsCss:
     def test_generator_writes_to_the_tracked_stylesheet(self) -> None:
         """The target is the tracked source, not the git-ignored build output.
 
-        ``public/`` is rebuilt from ``src/static/``, so regenerating into
-        ``public/`` would lose the new rules on the next clean build.
-
-        The comparison has to reach back as far as ``src``: the published
-        tree mirrors the source layout, so every component below it matches
-        either way and only that segment tells the two apart.
+        ``public/netsuke/assets/css/himotoshi.css`` is compiled from the
+        Netsuke Tailwind entrypoint, which imports this partial, so
+        regenerating into ``public/`` would lose the new rules on the next
+        build.
         """
-        assert STYLESHEET.parts[-6:] == (
+        assert STYLESHEET.parts[-4:] == (
             "src",
-            "static",
+            "styles",
             "netsuke",
-            "assets",
-            "css",
             "himotoshi.css",
         ), f"unexpected stylesheet target: {STYLESHEET}"

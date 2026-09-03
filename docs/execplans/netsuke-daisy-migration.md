@@ -121,9 +121,12 @@ Hard invariants. Violation requires escalation, not a workaround.
       `doc_page.jinja`. The diff against the baseline is confined to the
       homepage and every line of it is traced below; the unified capture is
       the reference for Milestone 3.
-- [ ] Milestone 2: red build-property tests; `src/styles/netsuke.css` with
-      the `netsuke` theme and transitional tokens; `himotoshi.css` relocated
-      into `layer(components)`; `build:css:netsuke` wired.
+- [x] (2026-09-03 16:50Z) Milestone 2: `src/styles/netsuke.css` with the
+      `netsuke` theme and the transitional tokens; `himotoshi.css` moved to
+      `src/styles/netsuke/` and imported in `layer(components)`;
+      `build:css:netsuke` wired; the compiled-stylesheet test green. The
+      Play CDN is still loaded at this commit, so the pages carry both
+      stylesheets until Milestone 3.
 - [ ] Milestone 3: retire the Play CDN, v3→v4 renames, chase the diff to
       empty.
 - [ ] Milestone 4: semantic-class sweep, convention tests, documentation.
@@ -193,6 +196,20 @@ Hard invariants. Violation requires escalation, not a workaround.
   stand-in now accepts the argument it is passed.
   Rationale: a stand-in that ignored an argument the real function reads
   would pass while the command handed the wrong root.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** `@tailwindcss/typography` is not registered for Netsuke.
+  Rationale: one template carries a bare `prose`, but the Play CDN was loaded
+  without the typography plugin, so the class has never styled anything on
+  this sub-site; registering the plugin would change that page. Netsuke's
+  prose styling is `.hm-prose` in the partial. This departs from the Weaver
+  entrypoint the plan named as the model, where the plugin was registered
+  because the CDN had been loaded with it.
+  Date/Author: 2026-09-03, Claude.
+- **Decision:** the Tailwind v3 `drop-shadow-md` and `drop-shadow-lg` values
+  are pinned under `@theme`. Rationale: v4 redrew the drop-shadow scale as
+  single tighter layers; the hero heading and lede are the only consumers
+  and would otherwise change. `--color-indigo-100` is pinned for the same
+  reason.
   Date/Author: 2026-09-03, Claude.
 - **Decision:** the homepage takes `doc_page.jinja`'s chrome as it is, and
   the three differences that produces are accepted: its desktop navigation

@@ -83,7 +83,7 @@
       // loop, each undoing the other on the next run.
       "includes": [
         "src/static/stilyagi/assets/styles/syntax.css",
-        "src/static/netsuke/assets/css/himotoshi.css",
+        "src/styles/netsuke/himotoshi.css",
         "src/static/episodic/assets/styles/syntax.css"
       ],
       "formatter": { "enabled": false }

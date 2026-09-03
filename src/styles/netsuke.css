@@ -1,0 +1,152 @@
+/* Netsuke sub-site stylesheet — the Tailwind 4 + daisyUI 5 entry.
+ *
+ * Compiled by the shared df12 build into
+ * public/netsuke/assets/css/himotoshi.css, alongside the main, mxd, Episodic,
+ * Weaver, and Stilyagi entrypoints. It replaces the Tailwind Play CDN the
+ * sub-site used to load at runtime, together with the theme extension in
+ * src/static/netsuke/assets/js/tailwind-config.js that the CDN read.
+ *
+ * The palette is declared once — as the daisyUI "netsuke" theme plus the
+ * brand tokens under @theme — and the templates and the hand-written partial
+ * consume those rather than restating a colour literal. See
+ * docs/execplans/netsuke-daisy-migration.md.
+ */
+
+@import "tailwindcss";
+
+/* The sub-site's own rules, in the components layer.
+ *
+ * The layering is load-bearing. When himotoshi.css stood alone beside the
+ * Play CDN, both it and the utilities were unlayered, so ties went to the
+ * utilities on source order — the CDN injected its <style> after this file's
+ * <link>. Compiled Tailwind puts utilities in @layer utilities, and per CSS
+ * Cascade Level 5 an unlayered declaration beats every layered one regardless
+ * of specificity. Left unlayered, these rules would start winning arguments
+ * they used to lose. In the components layer the old relationship holds: a
+ * utility in the markup still wins, and the doubled selectors the partial
+ * once needed to win a tie by specificity have nothing left to win. */
+@import "./netsuke/himotoshi.css" layer(components);
+
+/* The oxide scanner does not discover .jinja files on its own, and the
+ * scripts add classes at runtime — `hidden` and `is-open` from mobile-nav.js
+ * among them — so both are named here. */
+@source "../../templates/netsuke/**/*.jinja";
+@source "../static/netsuke/assets/js";
+
+/* The typography plugin is deliberately not registered. One template carries
+ * a bare `prose`, but the Play CDN was loaded without the typography plugin,
+ * so the class has never styled anything on this sub-site; registering the
+ * plugin here would change that page. Netsuke's prose styling is `.hm-prose`
+ * in the partial. */
+@plugin "daisyui" {
+  themes: netsuke --default;
+  logs: false;
+}
+
+/* The Netsuke palette as a daisyUI theme.
+ *
+ * The base ramp is the three boxwood papers — pale, light, and the boxwood
+ * itself — and base-content is the charcoal every body run is set in. Indigo
+ * is primary: it fills the feature tiles, marks the current docs section, and
+ * is the colour a link turns to. Vermillion is the accent, the brand mark and
+ * the primary buttons' fill, and it doubles as error because on this site a
+ * cycle in the build graph and a call to action are drawn in the same red.
+ * Stone is neutral: it is the rule colour, the card border, and the divider,
+ * and its content is the charcoal that sits on it.
+ *
+ * Every content pairing meets WCAG 2.2 AA for body text on its fill:
+ * primary 10.32:1, secondary 12.26:1, accent 5.33:1, neutral 8.53:1,
+ * info 7.16:1, success 4.86:1, warning 4.80:1 (charcoal on amber, since
+ * white on amber measures 2.97:1), error 5.33:1, and base-content 13.23:1
+ * on base-100. Measured as relative luminance per WCAG 2.x.
+ */
+@plugin "daisyui/theme" {
+  name: "netsuke";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #faf6f0;
+  --color-base-200: #f5ede0;
+  --color-base-300: #e8d5b5;
+  --color-base-content: #2e2a25;
+
+  --color-primary: #2b4162;
+  --color-primary-content: #ffffff;
+  --color-secondary: #2e2a25;
+  --color-secondary-content: #f5ede0;
+  --color-accent: #c23b22;
+  --color-accent-content: #ffffff;
+  --color-neutral: #d1c7b8;
+  --color-neutral-content: #2e2a25;
+
+  --color-info: #3a5a7c;
+  --color-info-content: #ffffff;
+  --color-success: #4a7c59;
+  --color-success-content: #ffffff;
+  --color-warning: #c48b2c;
+  --color-warning-content: #2e2a25;
+  --color-error: #c23b22;
+  --color-error-content: #ffffff;
+
+  /* Netsuke's surfaces are softly rounded: cards and code windows sit at
+     rounded-lg and rounded-xl, pills at rounded-full, buttons and inputs at
+     rounded. Elevation is the paper shadows below rather than daisyUI's
+     depth shading, so depth is off. */
+  --radius-selector: 1rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  /* Typography. Fraunces carries the headings, Source Sans 3 the prose,
+     JetBrains Mono the code and the labels. */
+  --font-sans: "Source Sans 3", sans-serif;
+  --font-serif: "Fraunces", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* The brand palette under the names the templates use today, pinned to
+     the values the Play CDN's config gave them. These are transitional:
+     the semantic-class sweep replaces each use with the daisyUI slot above,
+     and a token is retired once nothing references it. */
+  --color-charcoal: #2e2a25;
+  --color-charcoal-mid: #5c554d;
+  --color-charcoal-light: #8a8279;
+  --color-indigo: #2b4162;
+  --color-indigo-light: #3a5a7c;
+  --color-vermillion: #c23b22;
+  --color-vermillion-dim: #9e3020;
+  --color-boxwood: #e8d5b5;
+  --color-boxwood-light: #f5ede0;
+  --color-boxwood-pale: #faf6f0;
+  --color-stone: #d1c7b8;
+  --color-stone-light: #e5ddd0;
+  --color-matcha: #4a7c59;
+  --color-amber: #c48b2c;
+
+  /* The one stock shade the templates reach for, pinned to what Tailwind v3
+     meant by it. v4 redefined its palette in OKLCH, and the homepage's
+     pipeline stage would otherwise repaint. */
+  --color-indigo-100: #e0e7ff;
+
+  /* One spacing step above Tailwind's scale, for the docs sidebar. */
+  --spacing-128: 32rem;
+
+  /* The hero's text shadows, pinned to what Tailwind v3 drew. v4 redrew
+     the drop-shadow scale as single, tighter layers; the hero heading and
+     its lede are the only consumers, and they keep the softer v3 pair. */
+  --drop-shadow-md: 0 4px 3px rgb(0 0 0 / 0.07), 0 2px 2px rgb(0 0 0 / 0.06);
+  --drop-shadow-lg: 0 10px 8px rgb(0 0 0 / 0.04), 0 4px 3px rgb(0 0 0 / 0.1);
+
+  /* The paper shadows: the ambient elevation of a card, a panel, and a hero
+     window, each a charcoal wash rather than a black one. */
+  --shadow-paper: 0 4px 6px -1px rgba(46, 42, 37, 0.1), 0 2px 4px -1px rgba(46, 42, 37, 0.06);
+  --shadow-paper-lg: 0 10px 15px -3px rgba(46, 42, 37, 0.1), 0 4px 6px -2px rgba(46, 42, 37, 0.05);
+  --shadow-paper-xl:
+    0 20px 25px -5px rgba(46, 42, 37, 0.1), 0 10px 10px -5px rgba(46, 42, 37, 0.04);
+}

@@ -135,7 +135,7 @@
     {
       now = () => globalThis.performance?.now?.() ?? Date.now(),
       telemetry,
-    }: { now?: () => number; telemetry?: TelemetrySink } = {},
+    }: { now?: () => number; telemetry?: TelemetrySink | undefined } = {},
   ): (path: string) => Promise<T | undefined> {
     const cache = new Map<string, Promise<T | undefined>>();
     const retries = new Set<string>();
@@ -200,7 +200,7 @@
         // MiniSearch requires `fields` and throws when a payload lacks it;
         // the cast leaves that check where it was rather than defaulting.
         fields: options.fields as string[],
-        storeFields: options.storeFields,
+        ...(options.storeFields === undefined ? {} : { storeFields: options.storeFields }),
       }),
       searchOptions: options.searchOptions || {},
     };

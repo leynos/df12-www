@@ -13,6 +13,13 @@
     "module": "Preserve",
     "moduleResolution": "bundler",
     "strict": true,
+    // Beyond `strict`: optional properties may be absent but not explicitly
+    // `undefined`, and a class member that overrides must say so. Both are
+    // free for the code as written; `noUncheckedIndexedAccess` and
+    // `noPropertyAccessFromIndexSignature` are not, since the scripts read
+    // `dataset` and index arrays throughout, so they are left off.
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
     "noEmit": true,
     "isolatedModules": true,
     "esModuleInterop": true,

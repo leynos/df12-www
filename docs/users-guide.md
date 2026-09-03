@@ -149,14 +149,14 @@ section anchors are listed indented beneath it. A search box sits above the
 groups: enter at least two characters to search the documentation, and the
 search lists matches to follow.
 
-Below 1024 pixels wide there is no room for the sidebar. On a documentation
+Below 1024 pixels wide, there is no room for the sidebar. On a documentation
 page it is replaced by a bar at the top of the content holding a drop-down of
 the documentation pages — choosing one navigates there — and the same search
 box.
 
 A guide page's sidebar instead lists that guide's sections under "On this
 page" and a short set of "Helpful links", with no search box. Below 1024
-pixels wide a guide has no sidebar or bar; its sections follow in reading
+pixels wide, a guide has no sidebar or bar; its sections follow in reading
 order, and the site-wide navigation bar is the way to other pages.
 
 The site-wide navigation bar has its own menu button below 768 pixels wide.

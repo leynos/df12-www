@@ -8,6 +8,7 @@ the chrome contract every Netsuke page relies on is pinned in one place.
 
 from __future__ import annotations
 
+import re
 import typing as typ
 from pathlib import Path
 
@@ -467,6 +468,43 @@ EXAMPLE_HEADERS: dict[str, tuple[str, str, str, str, list[tuple[str, str, str]]]
 }
 
 
+EXAMPLE_LEDES: dict[str, str] = {
+    "hello-world": (
+        "The smallest useful Netsuke manifest in this repository. One target "
+        "transforms `input.txt`, another writes a greeting from a variable, and "
+        "`defaults` tell the CLI what to build when you just run `netsuke`."
+    ),
+    "static-site-pipeline": (
+        "Compile each Markdown page into HTML, then rebuild a shared index from "
+        "the generated output. This example is small on purpose: it shows "
+        "`foreach`, `order_only_deps`, and reusable rules without hiding the "
+        "graph."
+    ),
+    "batch-photo-processing": (
+        "Convert a directory of RAW files into JPEG output and then regenerate a "
+        "gallery page from the resulting images. This example shows how Netsuke "
+        "fans one rule over many files and still finishes with a single top-level "
+        "artefact."
+    ),
+    "visual-design-assets": (
+        "Rasterise a list of SVG designs into PNG output with Inkscape. The "
+        "manifest keeps the Inkscape command configurable through a plain "
+        "`inkscape` variable, alongside `foreach` and a dedicated clean action, "
+        "without turning a small asset pipeline into a custom script."
+    ),
+    "basic-c-application": (
+        "A foundational example demonstrating how to compile two C sources and "
+        "link them into one executable. The point is the manifest language, not a "
+        "rule loader."
+    ),
+    "multi-format-documentation": (
+        "Convert chapter Markdown into TeX, assemble a PDF with `latexmk`, and "
+        "keep the build directory itself under explicit control. This example is "
+        "about document pipelines, not marketing-site fluff."
+    ),
+}
+
+
 class TestExampleHeader:
     """The example detail header renders from the catalogue."""
 
@@ -495,7 +533,9 @@ class TestExampleHeader:
         )
         lede = header.select_one("p")
         assert lede is not None, "the header carries a lede"
-        assert lede.get_text(strip=True), "the lede is not empty"
+        assert lede.get_text(strip=True) == EXAMPLE_LEDES[key], (
+            "the lede is the catalogue entry's text, rendered exactly"
+        )
         buttons = header.select("a.hm-button")
         rendered = []
         for button in buttons:
@@ -626,3 +666,63 @@ class TestListContracts:
         assert soup.select_one("[data-doc-search-root]") is None, (
             "search=false drops the widget"
         )
+
+
+class TestPreviewPagesAndTokens:
+    """The forthcoming preview pages and the chip modifier they rely on."""
+
+    @pytest.mark.parametrize(
+        ("template", "slug"),
+        [
+            ("pages/forthcoming-linter.jinja", "forthcoming/linter"),
+            (
+                "pages/forthcoming-testing-framework.jinja",
+                "forthcoming/testing-framework",
+            ),
+        ],
+    )
+    def test_preview_sidebar_is_labelled_and_marks_itself(
+        self, tmp_path: Path, template: str, slug: str
+    ) -> None:
+        """The preview sidebar names itself and nests anchors under the page."""
+        soup = _render_page(tmp_path, template, slug)
+        nav = soup.select_one("#sidebar nav[aria-label='Preview pages']")
+
+        assert nav is not None, "the preview sidebar carries its nav_label"
+        headings = [h.get_text(strip=True) for h in nav.select("h3")]
+        assert headings == ["Forthcoming", "Sources"], "the preview groups"
+        links = nav.select("a.sidebar-link")
+        active = [a for a in links if "active" in a["class"]]
+        assert len(active) == 1, "exactly one preview is active"
+        assert active[0]["href"] == f"/netsuke/{slug}/", "the page marks itself"
+        index = links.index(active[0])
+        anchors = [a for a in links[index + 1 :] if "sidebar-link--sub" in a["class"]]
+        assert anchors, "the preview lists its section anchors"
+        assert all(str(a["href"]).startswith("#") for a in anchors), (
+            "anchors are in-page"
+        )
+        assert soup.select_one("nav[aria-label='Breadcrumb'] [aria-current]"), (
+            "the preview page carries the shared breadcrumb"
+        )
+
+    def test_docs_sidebar_default_headings(self, tmp_path: Path) -> None:
+        """A docs page renders the three shared groups from docs_groups."""
+        soup = _render_page(tmp_path, "pages/docs-cli.jinja", "docs/cli")
+        headings = [h.get_text(strip=True) for h in soup.select("#sidebar h3")]
+
+        assert headings == ["Introduction", "Core Concepts", "Reference"], (
+            "the default groups come from docs_groups in order"
+        )
+
+    def test_accent_chip_is_a_named_modifier(self) -> None:
+        """The vermillion chip the Design example uses exists in the stylesheet."""
+        stylesheet = Path("src/static/netsuke/assets/css/himotoshi.css").read_text(
+            encoding="utf-8"
+        )
+        rule = re.search(r"\.hm-chip--accent\s*\{([^}]*)\}", stylesheet)
+
+        assert rule is not None, "the accent modifier is defined"
+        assert "var(--netsuke-vermillion)" in rule.group(1), (
+            "the accent chip draws from the vermillion token, not a literal"
+        )
+        assert "#" not in rule.group(1), "no arbitrary colour in the modifier"

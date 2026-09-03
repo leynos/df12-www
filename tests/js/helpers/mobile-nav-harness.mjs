@@ -70,23 +70,34 @@ export function pressTab(window, orderedStops, { shiftKey = false } = {}) {
 
 /* A matchMedia stand-in whose `matches` the test controls, so a breakpoint
    crossing can be driven without resizing anything. happy-dom's own
-   implementation has no way to fire a change. */
-export function installMatchMedia(window, { matches = false } = {}) {
+   implementation has no way to fire a change.
+
+   `legacy` models Safari before 14, whose `MediaQueryList` had only
+   `addListener`/`removeListener` and no `addEventListener`; the modules keep
+   a fallback for it, and this is the only way to reach that branch. */
+export function installMatchMedia(window, { matches = false, legacy = false } = {}) {
   const listeners = [];
+  const subscribe = (fn) => listeners.push(fn);
+  const unsubscribe = (fn) => {
+    const i = listeners.indexOf(fn);
+    if (i !== -1) listeners.splice(i, 1);
+  };
   const list = {
     matches,
     media: "",
-    addEventListener: (_type, fn) => listeners.push(fn),
-    removeEventListener: (_type, fn) => {
-      const i = listeners.indexOf(fn);
-      if (i !== -1) listeners.splice(i, 1);
-    },
     /* Cross the breakpoint and notify, as the browser would. */
     cross(nowMatches) {
       list.matches = nowMatches;
       for (const fn of listeners.slice()) fn({ matches: nowMatches });
     },
   };
+  if (legacy) {
+    list.addListener = subscribe;
+    list.removeListener = unsubscribe;
+  } else {
+    list.addEventListener = (_type, fn) => subscribe(fn);
+    list.removeEventListener = (_type, fn) => unsubscribe(fn);
+  }
   window.matchMedia = () => list;
   return list;
 }

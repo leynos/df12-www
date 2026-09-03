@@ -45,6 +45,7 @@ beforeAll(() => {
    menu into it, and hand back the parts a test needs to drive. */
 function setUp({
   items = ['<a href="/docs/">Docs</a>', '<a href="/examples/">Examples</a>'],
+  legacy = false,
 } = {}) {
   const window = new Window({ url: PAGE });
   const { document } = window;
@@ -65,7 +66,7 @@ function setUp({
       <div id="navbar-mobile-menu" data-mobile-nav-menu>${items.join("")}</div>
     </nav>`;
   stubLayout(window);
-  const media = installMatchMedia(window);
+  const media = installMatchMedia(window, { legacy });
   evaluateScript(window, SCRIPT);
 
   const menu = document.querySelector("[data-mobile-nav-menu]");
@@ -169,6 +170,15 @@ describe("opening and closing", () => {
     dom.media.cross(true);
     expect(dom.isOpen()).toBe(false);
     expect(dom.menu.classList.contains("hidden")).toBe(true);
+  });
+
+  test("the same crossing is heard through a legacy addListener-only MediaQueryList", () => {
+    const legacy = setUp({ legacy: true });
+    click(legacy.window, legacy.toggle);
+    expect(legacy.isOpen()).toBe(true);
+    legacy.media.cross(true);
+    expect(legacy.isOpen()).toBe(false);
+    expect(legacy.menu.classList.contains("hidden")).toBe(true);
   });
 });
 

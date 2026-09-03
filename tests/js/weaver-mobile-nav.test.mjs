@@ -191,6 +191,14 @@ describe("opening and closing", () => {
     expect(dom.document.body.style.overflow).toBe("");
   });
 
+  test("the same crossing is heard through a legacy addListener-only MediaQueryList", () => {
+    const legacy = setUp({ legacy: true });
+    click(legacy.window, legacy.toggle);
+    expect(legacy.isOpen()).toBe(true);
+    legacy.media.cross(true);
+    expect(legacy.isOpen()).toBe(false);
+  });
+
   test("a breakpoint crossing leaves a closed drawer alone", () => {
     dom.media.cross(true);
     expect(dom.isOpen()).toBe(false);

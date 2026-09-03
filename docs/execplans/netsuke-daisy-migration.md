@@ -419,9 +419,15 @@ been beating a utility on specificity, the fix is in the markup, not the
 selector: take the utility out and let the component say what it always
 meant.
 
-Two follow-ups are recorded rather than done: the mobile menu's parent link
-was written in vermilion and has never rendered so, and the four pages that
-overflow at 360px did so before this migration and still do.
+Three follow-ups are recorded rather than done: the mobile menu's parent link
+was written in vermilion and has never rendered so; the four pages that
+overflow at 360px did so before this migration and still do; and an axe-core
+WCAG 2.2 AA audit reports colour-contrast findings on the homepage (10 nodes)
+and the docs hub (8 nodes), the same counts on the same elements before the
+migration as after — `charcoal-light` measures 3.51:1 on the page ground and
+is set at body size in several places. The Weaver migration fixed the
+equivalent debt as a separate, visible decision; this one is inert by
+constraint and leaves it recorded.
 
 ## Context and orientation
 

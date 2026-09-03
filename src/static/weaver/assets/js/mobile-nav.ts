@@ -13,6 +13,13 @@
  * Unlike the Netsuke menu, this drawer is modal: it dims the page behind a
  * backdrop and locks body scrolling, so focus is trapped inside it until it
  * closes and is then restored to wherever it came from.
+ *
+ * Usage: `templates/weaver/doc_page.jinja` and `design-language.jinja` load the compiled
+ * script with a plain `<script src="/weaver/assets/js/mobile-nav.js">` tag placed at the
+ * end of the body, immediately after the `telemetry.js` script; `build:js` compiles that
+ * file from this `.ts` source. There is no initialisation call: the IIFE runs immediately,
+ * returning early if `#sidebar`, its `nav`, or the `[data-mobile-nav-header]` element is
+ * absent.
  */
 (() => {
   "use strict";

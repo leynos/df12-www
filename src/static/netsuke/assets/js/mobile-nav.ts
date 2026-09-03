@@ -20,6 +20,12 @@
  *
  * The toggle starts hidden and is revealed here, so a viewport wide enough
  * for the full navbar never shows a control that does nothing.
+ *
+ * Usage: `templates/netsuke/home_page.jinja` and `doc_page.jinja` load the compiled script
+ * with a plain `<script defer src="/netsuke/assets/js/mobile-nav.js">` tag; `build:js`
+ * compiles that file from this `.ts` source. There is no initialisation call — the IIFE
+ * guards on `document.readyState`, calling `init` immediately if the document has already
+ * finished loading and otherwise waiting for `DOMContentLoaded`.
  */
 (() => {
   "use strict";

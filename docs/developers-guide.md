@@ -953,7 +953,7 @@ initialization to retry.
 
 `src/static/netsuke/assets/js/doc-search.ts` exposes four helpers when
 `module.exports` is available: `createIndexCache` for shared in-flight index
-loads, evicting a failed or empty load so a later root can retry;
+loads, evicting a failed or empty load, so a later root can retry;
 `isDocSearchHit` for the stored-field check before a result is rendered, with
 `pageTitle` required because the index builder always stores it;
 `isIndexPayload` for the fetched index file's shape check, where a payload

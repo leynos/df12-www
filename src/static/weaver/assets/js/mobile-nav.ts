@@ -1,4 +1,5 @@
-/* mobile-nav.ts — the Weaver sidebar's narrow-viewport drawer (<1024px).
+/**
+ * @file mobile-nav.ts — the Weaver sidebar's narrow-viewport drawer (<1024px).
  *
  * A plain script module in the shape described in section 6 of the
  * developers' guide: an IIFE loaded with `<script defer>` that finds its

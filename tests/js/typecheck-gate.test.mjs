@@ -119,9 +119,33 @@ describe("the typecheck-js target", () => {
     expect(typecheck().status).toBe(0);
   });
 
+  test("tsc -b builds the solution file and reports an error from a referenced project", () => {
+    /* The root tsconfig.json references the two projects without `composite`.
+       Under the pinned TypeScript that is a valid solution build for
+       `noEmit` projects: `tsc -b` checks both and writes only the
+       `.tsbuildinfo` files, which are git-ignored and removed here. */
+    const build = () =>
+      spawnSync(join(REPO_ROOT, "node_modules", ".bin", "tsc"), ["-b", "tsconfig.json"], {
+        cwd: REPO_ROOT,
+        encoding: "utf8",
+      });
+    for (const info of ["tsconfig.browser.tsbuildinfo", "tsconfig.scripts.tsbuildinfo"]) {
+      written.push(join(REPO_ROOT, info));
+    }
+
+    expect(build().status).toBe(0);
+
+    written.push(BROWSER_FIXTURE);
+    writeFileSync(BROWSER_FIXTURE, BAD_BROWSER);
+    const dirty = build();
+    expect(dirty.status).not.toBe(0);
+    expect(`${dirty.stdout ?? ""}${dirty.stderr ?? ""}`).toContain("error TS2322");
+  });
+
   test("leaves no fixture behind", () => {
     expect(existsSync(BROWSER_FIXTURE)).toBe(false);
     expect(existsSync(SCRIPTS_FIXTURE)).toBe(false);
     expect(existsSync(VENDOR_FIXTURE)).toBe(false);
+    expect(existsSync(join(REPO_ROOT, "tsconfig.browser.tsbuildinfo"))).toBe(false);
   });
 });

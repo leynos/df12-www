@@ -1,4 +1,5 @@
-/* example-toc.ts — scroll behaviour for the Netsuke example pages' contents list.
+/**
+ * @file example-toc.ts — scroll behaviour for the Netsuke example pages' contents list.
  *
  * A plain script module in the shape described in section 6 of the
  * developers' guide: an IIFE loaded with `<script defer>` that addresses its

@@ -1,4 +1,5 @@
-/* mobile-nav.ts — the Netsuke navbar's narrow-viewport menu.
+/**
+ * @file mobile-nav.ts — the Netsuke navbar's narrow-viewport menu.
  *
  * A plain script module in the shape described in section 6 of the
  * developers' guide: an IIFE loaded with `<script defer>` that addresses its

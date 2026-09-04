@@ -262,7 +262,10 @@
     });
 
     document.addEventListener("click", (event) => {
-      if (!root.contains(event.target as Node)) {
+      /* A click can be reported against a target that is not a node at all,
+         so check before asking the root whether it contains it. */
+      const target = event.target;
+      if (!(target instanceof Node) || !root.contains(target)) {
         hidePanel(panel, input);
       }
     });

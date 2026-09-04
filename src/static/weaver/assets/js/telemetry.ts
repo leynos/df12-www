@@ -2,9 +2,11 @@
  * @file Optional, privacy-preserving telemetry for the Weaver sub-site's chrome.
  *
  * Modelled on the Episodic search hook in
- * `src/static/episodic/assets/js/site-search.js`: a host may install a
- * function at `globalThis.df12WeaverNavTelemetry` before the deferred scripts
- * run. Without it every call here is a no-op, and nothing is collected.
+ * `src/static/episodic/assets/js/site-search.ts`: a host may install a
+ * function at `globalThis.df12WeaverNavTelemetry` before this script runs,
+ * which happens immediately, at the end of `<body>`, with no `defer` and no
+ * `DOMContentLoaded` gate. Without it every call here is a no-op, and nothing
+ * is collected.
  *
  * What an event may contain is fixed, and deliberately dull. Every field is
  * drawn from a closed vocabulary declared below, so a reader of this file can
@@ -13,7 +15,7 @@
  * persists between visits — not because they are stripped, but because there
  * is nowhere in the schema to put them.
  *
- * This file is separate from `mobile-nav.js` because that script returns
+ * This file is separate from `mobile-nav.ts` because that script returns
  * early on a page without the drawer's markup, and the copy controls on the
  * install page need the seam whether or not the drawer is there.
  */
@@ -36,7 +38,7 @@
     clipboard: "clipboard",
   };
 
-  const COMPONENT_FOR = {
+  const COMPONENT_FOR: Record<string, string> = {
     [OPERATIONS.drawer]: COMPONENTS.drawer,
     [OPERATIONS.clipboard]: COMPONENTS.clipboard,
   };
@@ -74,12 +76,11 @@
   /**
    * Emit one fixed-schema event, if a host has installed a sink.
    *
-   * @param {string} operation One of `OPERATIONS`.
-   * @param {string} outcome One of `OUTCOMES`.
-   * @param {string} [reason] One of `REASONS`, where the outcome has causes.
-   * @returns {void}
+   * @param operation One of `OPERATIONS`.
+   * @param outcome One of `OUTCOMES`.
+   * @param reason One of `REASONS`, where the outcome has causes.
    */
-  function emit(operation, outcome, reason) {
+  function emit(operation: string, outcome: string, reason?: string): void {
     const sink = globalThis.df12WeaverNavTelemetry;
     if (typeof sink !== "function") {
       return;
@@ -93,7 +94,7 @@
     if (reason !== undefined && !REASON_VALUES.has(reason)) {
       return;
     }
-    const event = {
+    const event: WeaverTelemetryEvent = {
       component: COMPONENT_FOR[operation],
       operation,
       outcome,
@@ -113,10 +114,10 @@
    * The copy controls are inline `onclick` handlers in the templates, so this
    * is the seam they call: `onclick="df12WeaverCopy('cargo install weaver')"`.
    *
-   * @param {string} text What to copy. Never included in an event.
-   * @returns {Promise<boolean>} Whether the write resolved.
+   * @param text What to copy. Never included in an event.
+   * @returns Whether the write resolved.
    */
-  async function copy(text) {
+  async function copy(text: string): Promise<boolean> {
     const clipboard = globalThis.navigator?.clipboard;
     if (!clipboard || typeof clipboard.writeText !== "function") {
       emit(OPERATIONS.clipboard, OUTCOMES.failed, REASONS.unavailable);

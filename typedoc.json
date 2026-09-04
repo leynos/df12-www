@@ -13,6 +13,7 @@
   // Satisfying that would mean writing comments addressed to the type
   // checker rather than to a reader. Their module and function comments are
   // reviewed instead; see section 6 of the developers' guide.
+  "tsconfig": "tsconfig.scripts.json",
   "entryPoints": ["scripts", "src/styles/plugins"],
   "entryPointStrategy": "expand",
 

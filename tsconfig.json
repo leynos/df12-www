@@ -1,17 +1,8 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "Preserve",
-    "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["bun"],
-    "allowJs": true,
-    "checkJs": false,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  },
-  "include": ["scripts/**/*", "src/styles/plugins/**/*"],
-  "exclude": ["node_modules", "public", "**/vendor/**"]
+  // A solution file: it holds no sources of its own and only points editors
+  // and `tsc -b` at the two real projects. `bun run typecheck:js` runs each
+  // project explicitly rather than building this file, so the gate names
+  // the project a failure came from.
+  "files": [],
+  "references": [{ "path": "./tsconfig.browser.json" }, { "path": "./tsconfig.scripts.json" }]
 }

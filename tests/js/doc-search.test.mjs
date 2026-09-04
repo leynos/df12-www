@@ -13,6 +13,8 @@ const require = createRequire(import.meta.url);
 const {
   createIndexCache,
   siteRootFromIndexPath,
+  isDocSearchHit,
+  isIndexPayload,
 } = require("../../public/netsuke/assets/js/doc-search.js");
 
 /* A promise with its resolve and reject exposed, so a test can settle a
@@ -102,5 +104,52 @@ describe("siteRootFromIndexPath", () => {
 
   test("falls back to the site root for unrecognized paths", () => {
     expect(siteRootFromIndexPath("/elsewhere/index.json")).toBe("/");
+  });
+});
+
+describe("isDocSearchHit", () => {
+  const hit = {
+    id: 1,
+    sitePath: "/docs/getting-started/#install",
+    title: "Install",
+    kind: "section",
+    pageTitle: "Getting started",
+  };
+
+  test("accepts a record with the stored fields as strings", () => {
+    expect(isDocSearchHit(hit)).toBe(true);
+    expect(isDocSearchHit({ ...hit, sectionTitle: "Install", excerpt: "…" })).toBe(true);
+  });
+
+  test("rejects a record missing or mistyping a field the list renders", () => {
+    expect(isDocSearchHit({ ...hit, title: undefined })).toBe(false);
+    expect(isDocSearchHit({ ...hit, kind: 3 })).toBe(false);
+    expect(isDocSearchHit({ ...hit, pageTitle: null })).toBe(false);
+    expect(isDocSearchHit({ ...hit, excerpt: { text: "no" } })).toBe(false);
+    expect(isDocSearchHit(null)).toBe(false);
+    expect(isDocSearchHit("Install")).toBe(false);
+  });
+});
+
+describe("isIndexPayload", () => {
+  const payload = {
+    index: "{}",
+    indexOptions: { fields: ["title"], storeFields: ["sitePath"], searchOptions: { prefix: true } },
+  };
+
+  test("accepts the shape the index builder writes", () => {
+    expect(isIndexPayload(payload)).toBe(true);
+  });
+
+  test("rejects a payload the loader could not read back", () => {
+    expect(isIndexPayload({})).toBe(false);
+    expect(isIndexPayload({ index: 5, indexOptions: payload.indexOptions })).toBe(false);
+    expect(isIndexPayload({ index: "{}" })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: { searchOptions: {} } })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: [1], searchOptions: {} } })).toBe(
+      false,
+    );
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: ["title"] } })).toBe(false);
+    expect(isIndexPayload(null)).toBe(false);
   });
 });

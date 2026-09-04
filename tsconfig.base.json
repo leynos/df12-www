@@ -1,0 +1,28 @@
+{
+  // Options shared by every TypeScript project in the repository. The
+  // browser scripts and the build-time scripts are typechecked as separate
+  // projects because they run in different worlds — one has the DOM and no
+  // Node, the other has Bun and no DOM — but they agree on strictness and on
+  // the language level, and those live here so they cannot drift.
+  //
+  // Nothing is emitted from any project: the browser scripts are compiled by
+  // scripts/compile-browser-scripts.ts, and Bun runs the build scripts from
+  // source.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "strict": true,
+    // Beyond `strict`: optional properties may be absent but not explicitly
+    // `undefined`, and a class member that overrides must say so. Both are
+    // free for the code as written; `noUncheckedIndexedAccess` and
+    // `noPropertyAccessFromIndexSignature` are not, since the scripts read
+    // `dataset` and index arrays throughout, so they are left off.
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}

@@ -12,19 +12,158 @@
   const RESULT_LIMIT = 8;
   const TELEMETRY_OPERATION = "episodic-search-index";
 
-  const KIND_LABELS = {
+  const KIND_LABELS: Record<string, string> = {
     page: "Page",
     section: "Section",
     document: "Upstream document",
   };
 
+  type Index = import("minisearch").default;
+  type SearchOptions = import("minisearch").SearchOptions;
+  type SearchResult = import("minisearch").SearchResult;
+
+  /** A host-installed sink for the fixed-schema lifecycle events. */
+  type TelemetrySink = (event: EpisodicSearchTelemetryEvent) => void;
+
+  /** A deserialized index and the query-time options recorded with it. */
+  interface Engine {
+    miniSearch: Index;
+    searchOptions: SearchOptions;
+  }
+
+  /** One result, as the index stores it and the listbox renders it. */
+  interface SearchHit {
+    id?: unknown;
+    sitePath: string;
+    title: string;
+    kind: string;
+    pageTitle?: string;
+    sectionTitle?: string;
+    excerpt?: string;
+  }
+
+  /** Whether `value` is absent or a string, as an optional stored field may be. */
+  function isOptionalString(value: unknown): value is string | undefined {
+    return value === undefined || typeof value === "string";
+  }
+
+  /**
+   * Whether a deserialized result carries the stored fields the listbox
+   * renders and navigates to, each as a string. The index builder always
+   * writes them so, but the index arrives as JSON at runtime; a record that
+   * fails this is dropped rather than rendered or navigated to.
+   */
+  function isSearchHit(value: unknown): value is SearchHit {
+    if (typeof value !== "object" || value === null) {
+      return false;
+    }
+    const hit = value as Record<string, unknown>;
+    return (
+      typeof hit.sitePath === "string" &&
+      typeof hit.title === "string" &&
+      typeof hit.kind === "string" &&
+      isOptionalString(hit.pageTitle) &&
+      isOptionalString(hit.sectionTitle) &&
+      isOptionalString(hit.excerpt)
+    );
+  }
+
+  /** The JSON `scripts/build-episodic-search-index.mjs` writes. */
+  interface IndexPayload {
+    index: string;
+    indexOptions?: {
+      fields?: string[];
+      storeFields?: string[];
+      searchOptions?: SearchOptions;
+    };
+  }
+
+  /** Whether `value` is a list of strings. */
+  function isStringArray(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every((item) => typeof item === "string");
+  }
+
+  /**
+   * Whether `value` is the index payload the build script writes: a
+   * serialized index, and options carrying the `fields` MiniSearch needs to
+   * read it back. The file is fetched at runtime, so its shape is checked
+   * rather than assumed.
+   */
+  function isIndexPayload(value: unknown): value is IndexPayload & {
+    indexOptions: { fields: string[] };
+  } {
+    if (typeof value !== "object" || value === null) {
+      return false;
+    }
+    const payload = value as Record<string, unknown>;
+    if (typeof payload.index !== "string") {
+      return false;
+    }
+    const options = payload.indexOptions;
+    if (typeof options !== "object" || options === null) {
+      return false;
+    }
+    const { fields, storeFields, searchOptions } = options as Record<string, unknown>;
+    return (
+      isStringArray(fields) &&
+      (storeFields === undefined || isStringArray(storeFields)) &&
+      (searchOptions === undefined || (typeof searchOptions === "object" && searchOptions !== null))
+    );
+  }
+
+  /** What `fetchEpisodicSearchIndex` takes from its host; tests pass fakes. */
+  interface FetchDeps {
+    fetchImpl?: typeof fetch;
+    MiniSearch?: typeof globalThis.MiniSearch;
+  }
+
+  /**
+   * What a query returns: the hits to show, and how many records the
+   * stored-field guard dropped, for the caller to report as it sees fit.
+   */
+  interface SearchOutcome {
+    hits: SearchHit[];
+    dropped: number;
+  }
+
+  /** Called with how many results a query dropped for failing `isSearchHit`. */
+  type DropReporter = (count: number) => void;
+
+  /**
+   * A reporter that says so once, for one root, so a malformed index cannot
+   * shrink the results list silently and cannot flood the console either.
+   */
+  function onceDropReporter(): DropReporter {
+    let reported = false;
+    return (count) => {
+      if (count > 0 && !reported) {
+        reported = true;
+        console.warn(`Episodic search dropped ${count} malformed result(s) from the index.`);
+      }
+    };
+  }
+
+  /** The seams `initialiseEpisodicSearch` exposes for testing one root. */
+  interface InitOptions {
+    loadIndex?: (path: string) => Promise<Engine | undefined> | Engine;
+    miniSearch?: unknown;
+    searchIndex?: (engine: Engine, query: string) => SearchOutcome;
+    navigate?: (href: string) => void;
+  }
+
+  /** The settled state of a root's one index load. */
+  interface IndexOutcome {
+    engine: Engine | null | undefined;
+    error?: unknown;
+  }
+
   /**
    * Map a load duration to a bounded telemetry label.
    *
-   * @param {number} duration Milliseconds elapsed while loading an index.
-   * @returns {string} One of the fixed duration buckets.
+   * @param duration Milliseconds elapsed while loading an index.
+   * @returns One of the fixed duration buckets.
    */
-  function durationBucket(duration) {
+  function durationBucket(duration: number): string {
     if (duration < 50) {
       return "under-50ms";
     }
@@ -40,18 +179,23 @@
   /**
    * Emit one fixed-schema, privacy-preserving search-index lifecycle event.
    *
-   * @param {((event: object) => void) | undefined} telemetry Optional event sink.
-   * @param {string} outcome Fixed event outcome.
-   * @param {string} cacheState Fixed cache-state label.
-   * @param {string} attempt Fixed initial or retry label.
-   * @param {number | undefined} duration Load duration when one exists.
-   * @returns {void}
+   * @param telemetry Optional event sink.
+   * @param outcome Fixed event outcome.
+   * @param cacheState Fixed cache-state label.
+   * @param attempt Fixed initial or retry label.
+   * @param duration Load duration when one exists.
    */
-  function emitSearchTelemetry(telemetry, outcome, cacheState, attempt, duration) {
+  function emitSearchTelemetry(
+    telemetry: TelemetrySink | undefined,
+    outcome: string,
+    cacheState: string,
+    attempt: string,
+    duration?: number,
+  ): void {
     if (typeof telemetry !== "function") {
       return;
     }
-    const event = {
+    const event: EpisodicSearchTelemetryEvent = {
       attempt,
       cache_state: cacheState,
       operation: TELEMETRY_OPERATION,
@@ -68,19 +212,21 @@
   /**
    * Cache index-loader promises and report bounded lifecycle telemetry.
    *
-   * @param {(path: string) => Promise<object | undefined>} load Index loader.
-   * @param {{now?: () => number, telemetry?: (event: object) => void}} [options]
-   *     Injectable clock and privacy-preserving telemetry sink.
-   * @returns {(path: string) => Promise<object | undefined>} Cached index loader.
+   * @param load Index loader.
+   * @param options Injectable clock and privacy-preserving telemetry sink.
+   * @returns Cached index loader.
    */
-  function createIndexCache(
-    load,
-    { now = () => globalThis.performance?.now?.() ?? Date.now(), telemetry } = {},
-  ) {
-    const cache = new Map();
-    const retries = new Set();
+  function createIndexCache<T>(
+    load: (path: string) => Promise<T | undefined>,
+    {
+      now = () => globalThis.performance?.now?.() ?? Date.now(),
+      telemetry,
+    }: { now?: () => number; telemetry?: TelemetrySink | undefined } = {},
+  ): (path: string) => Promise<T | undefined> {
+    const cache = new Map<string, Promise<T | undefined>>();
+    const retries = new Set<string>();
 
-    return function loadCached(path) {
+    return function loadCached(path: string): Promise<T | undefined> {
       if (cache.has(path)) {
         emitSearchTelemetry(telemetry, "requested", "hit", retries.has(path) ? "retry" : "initial");
       } else {
@@ -112,16 +258,18 @@
           );
         cache.set(path, pending);
       }
-      return cache.get(path);
+      // Set on the branch above when absent, which `has` does not tell the
+      // checker.
+      return cache.get(path) as Promise<T | undefined>;
     };
   }
 
   // Fetching and MiniSearch deserialization are intentionally outside the UI
   // query path. Supplying the dependencies keeps this boundary testable.
   async function fetchEpisodicSearchIndex(
-    indexPath,
-    { fetchImpl = globalThis.fetch, MiniSearch = globalThis.MiniSearch } = {},
-  ) {
+    indexPath: string,
+    { fetchImpl = globalThis.fetch, MiniSearch = globalThis.MiniSearch }: FetchDeps = {},
+  ): Promise<Engine> {
     if (!fetchImpl || !MiniSearch) {
       throw new Error("Episodic search dependencies are unavailable.");
     }
@@ -131,12 +279,15 @@
       throw new Error(`Index request failed: ${response.status}`);
     }
 
-    const payload = await response.json();
-    const options = payload.indexOptions || {};
+    const payload: unknown = await response.json();
+    if (!isIndexPayload(payload)) {
+      throw new Error("Episodic search index payload is malformed.");
+    }
+    const options = payload.indexOptions;
     return {
       miniSearch: MiniSearch.loadJSON(payload.index, {
         fields: options.fields,
-        storeFields: options.storeFields,
+        ...(options.storeFields === undefined ? {} : { storeFields: options.storeFields }),
       }),
       searchOptions: options.searchOptions || {},
     };
@@ -151,7 +302,9 @@
 
   // Search only consults the already-loaded index. The strict pass gives
   // precise multi-word matches first; the loose pass fills useful fallbacks.
-  function searchEpisodicIndex(engine, query) {
+  // A pure query: the count of records dropped for failing `isSearchHit`
+  // comes back with the hits, and the caller decides what to do with it.
+  function searchEpisodicIndex(engine: Engine, query: string): SearchOutcome {
     const { miniSearch, searchOptions } = engine;
     const strict = miniSearch.search(query, {
       ...searchOptions,
@@ -159,13 +312,18 @@
     });
     const loose = miniSearch.search(query, searchOptions);
 
-    const merged = new Map();
+    const merged = new Map<unknown, SearchResult>();
     for (const result of [...strict, ...loose]) {
       if (!merged.has(result.id)) {
         merged.set(result.id, result);
       }
     }
-    return [...merged.values()].slice(0, RESULT_LIMIT);
+    // The stored fields ride along on each result under an index signature,
+    // so each one is checked before it is trusted.
+    const hits = [...merged.values()].filter((result): result is SearchResult & SearchHit =>
+      isSearchHit(result),
+    );
+    return { hits: hits.slice(0, RESULT_LIMIT), dropped: merged.size - hits.length };
   }
 
   /* Wire one rendered search root. `loadIndex`, `searchIndex`, and `navigate`
@@ -173,20 +331,20 @@
      network or real location change. Returns false when the markup or the
      MiniSearch dependency is absent. */
   function initialiseEpisodicSearch(
-    root,
+    root: HTMLElement,
     {
       loadIndex = loadEpisodicSearchIndex,
       miniSearch = globalThis.MiniSearch,
       searchIndex = searchEpisodicIndex,
-      navigate = (href) => {
+      navigate = (href: string) => {
         globalThis.window.location.href = href;
       },
-    } = {},
-  ) {
-    const input = root.querySelector("[data-search-input]");
-    const panel = root.querySelector("[data-search-panel]");
-    const list = root.querySelector("[data-search-results]");
-    const meta = root.querySelector("[data-search-meta]");
+    }: InitOptions = {},
+  ): boolean {
+    const input = root.querySelector<HTMLInputElement>("[data-search-input]");
+    const panel = root.querySelector<HTMLElement>("[data-search-panel]");
+    const list = root.querySelector<HTMLElement>("[data-search-results]");
+    const meta = root.querySelector<HTMLElement>("[data-search-meta]");
     const indexPath = root.getAttribute("data-search-index");
     const pageDocument = root.ownerDocument;
 
@@ -205,38 +363,39 @@
     input.setAttribute("spellcheck", "false");
     list.setAttribute("role", "listbox");
 
-    let results = [];
+    let results: SearchHit[] = [];
     let active = -1;
     let request = 0;
+    const reportDropped = onceDropReporter();
 
     // This is the one explicit loading boundary for a root. Recording both
     // outcomes makes a failed eager load safe while leaving queries entirely
     // free of loader and network work.
-    let loading;
+    let loading: Promise<Engine | undefined>;
     try {
       loading = Promise.resolve(loadIndex(indexPath));
     } catch (error) {
       loading = Promise.reject(error);
     }
-    const indexReady = loading.then(
+    const indexReady: Promise<IndexOutcome> = loading.then(
       (engine) => ({ engine }),
-      (error) => ({ engine: null, error }),
+      (error: unknown) => ({ engine: null, error }),
     );
 
-    const open = () => {
+    const open = (): void => {
       panel.hidden = false;
       input.setAttribute("aria-expanded", "true");
     };
 
-    const close = () => {
+    const close = (): void => {
       panel.hidden = true;
       input.setAttribute("aria-expanded", "false");
       setActive(-1);
     };
 
-    const setActive = (index) => {
+    const setActive = (index: number): void => {
       active = index;
-      const options = [...list.querySelectorAll('[role="option"]')];
+      const options = [...list.querySelectorAll<HTMLElement>('[role="option"]')];
       options.forEach((option, position) => {
         option.classList.toggle("is-active", position === index);
         option.closest(".search-result")?.classList.toggle("is-active", position === index);
@@ -250,7 +409,7 @@
       }
     };
 
-    const render = (query) => {
+    const render = (query: string): void => {
       if (query.length < MIN_QUERY_LENGTH) {
         list.replaceChildren();
         meta.textContent = `Type at least ${MIN_QUERY_LENGTH} characters.`;
@@ -273,14 +432,14 @@
       setActive(-1);
     };
 
-    const showUnavailable = () => {
+    const showUnavailable = (): void => {
       list.replaceChildren();
       meta.textContent =
         "Search is unavailable in this build. Every document is listed by category below.";
       open();
     };
 
-    const runSearch = async () => {
+    const runSearch = async (): Promise<void> => {
       const query = input.value.trim();
       const currentRequest = ++request;
       if (query.length < MIN_QUERY_LENGTH) {
@@ -306,11 +465,13 @@
         return;
       }
 
-      results = searchIndex(engine, query);
+      const outcome = searchIndex(engine, query);
+      results = outcome.hits;
+      reportDropped(outcome.dropped);
       render(query);
     };
 
-    const go = (index) => {
+    const go = (index: number): void => {
       const result = results[index];
       if (result) {
         navigate(result.sitePath);
@@ -348,7 +509,7 @@
     });
 
     list.addEventListener("mousedown", (event) => {
-      const option = event.target.closest?.("[data-result-index]");
+      const option = (event.target as Element).closest?.<HTMLElement>("[data-result-index]");
       if (option) {
         event.preventDefault();
         go(Number(option.getAttribute("data-result-index")));
@@ -356,7 +517,10 @@
     });
 
     pageDocument.addEventListener("click", (event) => {
-      if (!root.contains(event.target)) {
+      /* A click can be reported against a target that is not a node at all,
+         so check before asking the root whether it contains it. */
+      const target = event.target;
+      if (!(target instanceof Node) || !root.contains(target)) {
         close();
       }
     });
@@ -364,12 +528,15 @@
     return true;
   }
 
-  function initialiseAllEpisodicSearch(pageDocument = globalThis.document, options) {
+  function initialiseAllEpisodicSearch(
+    pageDocument: Document | undefined = globalThis.document,
+    options?: InitOptions,
+  ): void {
     if (!pageDocument) {
       return;
     }
 
-    for (const root of pageDocument.querySelectorAll("[data-search-root]")) {
+    for (const root of pageDocument.querySelectorAll<HTMLElement>("[data-search-root]")) {
       if (root.dataset.searchInitialised === "true") {
         continue;
       }
@@ -383,7 +550,12 @@
     }
   }
 
-  function buildOption(pageDocument, result, index, listId) {
+  function buildOption(
+    pageDocument: Document,
+    result: SearchHit,
+    index: number,
+    listId: string,
+  ): HTMLLIElement {
     const item = pageDocument.createElement("li");
     item.className = "search-result";
     item.setAttribute("role", "presentation");
@@ -441,6 +613,8 @@
       fetchEpisodicSearchIndex,
       initialiseAllEpisodicSearch,
       initialiseEpisodicSearch,
+      isIndexPayload,
+      isSearchHit,
       searchEpisodicIndex,
     };
   }

@@ -5,7 +5,7 @@
 (() => {
   "use strict";
 
-  const onReady = (fn) => {
+  const onReady = (fn: () => void): void => {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", fn, { once: true });
     } else {
@@ -13,7 +13,8 @@
     }
   };
 
-  const isActivation = (event) => event.key === "Enter" || event.key === " ";
+  const isActivation = (event: KeyboardEvent): boolean =>
+    event.key === "Enter" || event.key === " ";
 
   /**
    * Collect the linguistic providers an enabled ruleset pulls in.
@@ -22,7 +23,7 @@
    * rule.  The core extractor is always present, so it is seeded here rather
    * than declared by any rule.
    */
-  function requiredCapabilities(capabilityLists) {
+  function requiredCapabilities(capabilityLists: Iterable<string | null | undefined>): Set<string> {
     const capabilities = new Set(["core"]);
     for (const list of capabilityLists) {
       for (const capability of (list || "").split(" ")) {
@@ -33,7 +34,7 @@
   }
 
   /** Estimated cold start for a capability set; the heaviest provider wins. */
-  function coldStartFor(capabilities) {
+  function coldStartFor(capabilities: Set<string>): string {
     if (capabilities.has("grammar")) return "1.4 s";
     if (capabilities.has("spell")) return "260 ms";
     return "40 ms";
@@ -43,14 +44,14 @@
    * Pair the highlighted source spans with the IR tree, and report the active
    * region's label and byte range in the footer.
    */
-  function initInspector() {
-    const inspector = document.querySelector(".ir-inspector");
+  function initInspector(): void {
+    const inspector = document.querySelector<HTMLElement>(".ir-inspector");
     if (!inspector) return;
 
-    const spans = [...inspector.querySelectorAll(".region[data-region]")];
-    const nodes = [...inspector.querySelectorAll(".tree-node[data-region]")];
-    const label = inspector.querySelector("[data-ir-label]");
-    const range = inspector.querySelector("[data-ir-range]");
+    const spans = [...inspector.querySelectorAll<HTMLElement>(".region[data-region]")];
+    const nodes = [...inspector.querySelectorAll<HTMLElement>(".tree-node[data-region]")];
+    const label = inspector.querySelector<HTMLElement>("[data-ir-label]");
+    const range = inspector.querySelector<HTMLElement>("[data-ir-range]");
     if (!nodes.length) return;
 
     /**
@@ -64,15 +65,15 @@
      */
     // The region the reader actually chose, as opposed to the one currently
     // under the pointer.  The markup ships with one node pressed.
-    let pressed =
+    let pressed: string | null | undefined =
       nodes.find((node) => node.getAttribute("aria-pressed") === "true")?.dataset.region ?? null;
 
-    const select = (id, { press = false } = {}) => {
+    const select = (id: string | undefined, { press = false }: { press?: boolean } = {}): void => {
       if (press) pressed = id;
       for (const span of spans) {
         span.classList.toggle("active", span.dataset.region === id);
       }
-      let active = null;
+      let active: HTMLElement | null = null;
       for (const node of nodes) {
         const on = node.dataset.region === id;
         node.classList.toggle("active", on);
@@ -86,7 +87,7 @@
 
     // Leaving a preview puts the panel back on the chosen region rather than
     // stranding it on whatever the pointer last crossed.
-    const restore = () => {
+    const restore = (): void => {
       if (pressed) select(pressed);
     };
 
@@ -119,24 +120,24 @@
    * Recompute which linguistic providers a ruleset pulls in.  The rule rows
    * declare the capabilities they need; everything else is derived.
    */
-  function initPlanner() {
-    const planner = document.querySelector(".planner");
+  function initPlanner(): void {
+    const planner = document.querySelector<HTMLElement>(".planner");
     if (!planner) return;
 
-    const toggles = [...planner.querySelectorAll(".rule-toggle[data-code]")];
-    const providers = [...planner.querySelectorAll(".provider[data-provider]")];
-    const ruleCount = planner.querySelector("[data-plan-rules]");
-    const providerCount = planner.querySelector("[data-plan-providers]");
-    const coldStart = planner.querySelector("[data-plan-coldstart]");
+    const toggles = [...planner.querySelectorAll<HTMLElement>(".rule-toggle[data-code]")];
+    const providers = [...planner.querySelectorAll<HTMLElement>(".provider[data-provider]")];
+    const ruleCount = planner.querySelector<HTMLElement>("[data-plan-rules]");
+    const providerCount = planner.querySelector<HTMLElement>("[data-plan-providers]");
+    const coldStart = planner.querySelector<HTMLElement>("[data-plan-coldstart]");
     if (!toggles.length || !providers.length) return;
 
-    const update = () => {
+    const update = (): void => {
       const active = toggles.filter((toggle) => toggle.getAttribute("aria-checked") === "true");
       const capabilities = requiredCapabilities(active.map((toggle) => toggle.dataset.caps));
       const enabled = active.length;
 
       for (const provider of providers) {
-        const loaded = capabilities.has(provider.dataset.provider);
+        const loaded = capabilities.has(provider.dataset.provider ?? "");
         provider.classList.toggle("loaded", loaded);
         provider.classList.toggle("skipped", !loaded);
         const tag = provider.querySelector("[data-provider-tag]");
@@ -149,7 +150,7 @@
       if (coldStart) coldStart.textContent = coldStartFor(capabilities);
     };
 
-    const toggle = (element) => {
+    const toggle = (element: HTMLElement): void => {
       const on = element.getAttribute("aria-checked") === "true";
       element.setAttribute("aria-checked", String(!on));
       element.classList.toggle("on", !on);

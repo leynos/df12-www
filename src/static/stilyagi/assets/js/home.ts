@@ -12,7 +12,7 @@
   const TOTAL_MS = 750;
   const LETTER_MS = 260;
 
-  const onReady = (fn) => {
+  const onReady = (fn: () => void): void => {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", fn, { once: true });
     } else {
@@ -28,10 +28,10 @@
    * together, and inline layout is unaffected because opacity does not change
    * a character's advance width.
    */
-  function splitTextNode(node, firstIndex) {
+  function splitTextNode(node: Text, firstIndex: number): number {
     const fragment = document.createDocumentFragment();
     let index = firstIndex;
-    for (const character of node.textContent) {
+    for (const character of node.textContent ?? "") {
       const letter = document.createElement("span");
       letter.className = "typed-letter";
       letter.style.setProperty("--typed-index", String(index));
@@ -44,11 +44,11 @@
   }
 
   /** Split every text node beneath `root`, leaving nested markup in place. */
-  function splitDescendantText(root, firstIndex) {
+  function splitDescendantText(root: Node, firstIndex: number): number {
     let index = firstIndex;
     for (const node of [...root.childNodes]) {
       if (node.nodeType === Node.TEXT_NODE) {
-        index = splitTextNode(node, index);
+        index = splitTextNode(node as Text, index);
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         index = splitDescendantText(node, index);
       }
@@ -63,7 +63,7 @@
    * hidden from assistive technology, so the reading experience is unchanged
    * however far through the animation a screen reader arrives.
    */
-  function prepareTypewriter(element) {
+  function prepareTypewriter(element: HTMLElement): void {
     const text = element.textContent;
     // Splitting the line into one text run per character shifts a glyph or two
     // off their kerned positions, so the served markup is put back once the
@@ -81,7 +81,7 @@
     element.append(label, typed);
 
     const count = splitDescendantText(typed, 0);
-    const letters = typed.querySelectorAll(".typed-letter");
+    const letters = typed.querySelectorAll<HTMLElement>(".typed-letter");
     if (letters.length === 0) {
       element.replaceChildren(...original);
       return;
@@ -107,7 +107,7 @@
 
   onReady(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    for (const element of document.querySelectorAll(".poster-annotation")) {
+    for (const element of document.querySelectorAll<HTMLElement>(".poster-annotation")) {
       prepareTypewriter(element);
     }
   });

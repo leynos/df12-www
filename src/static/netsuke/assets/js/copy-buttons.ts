@@ -26,11 +26,27 @@
   // Gap between emptying the live region and refilling it.
   var ANNOUNCE_DELAY_MS = 100;
 
+  /* The timer pair the toast schedules against; the browser wiring passes
+     `window`'s, and the tests a manually advanced fake. */
+  interface Clock {
+    setTimeout(fn: () => void, ms: number): number;
+    clearTimeout(id: number): void;
+  }
+
+  /* What `createCopyController` needs from its host. `getClipboard` is a
+     getter rather than a value because `navigator.clipboard` is absent in an
+     insecure context, and the outcome has to be checked on each click. */
+  interface CopyDeps {
+    document: Document;
+    clock: Clock;
+    getClipboard(): Clipboard | undefined;
+  }
+
   // A single reusable ghost notification. The visible pill is hidden
   // from assistive tech and paired with an off-screen live region
   // created once and left in the DOM; repeat calls to show() restart
   // the timers rather than stacking further toasts.
-  function createToast(doc, clock) {
+  function createToast(doc: Document, clock: Clock) {
     var element = doc.createElement("div");
     element.className = "hm-toast";
     element.setAttribute("aria-hidden", "true");
@@ -49,7 +65,7 @@
     /* Show `message` in the toast and announce it, styling it as an error when
        `isError` is set. Cancels any pending timers first, so a rapid second
        copy replaces the first rather than racing it. */
-    function show(message, isError) {
+    function show(message: string, isError: boolean): void {
       clock.clearTimeout(lingerTimer);
       clock.clearTimeout(clearTimer);
       clock.clearTimeout(announceTimer);
@@ -85,13 +101,13 @@
   /* The component proper. Takes its `document`, `clock`, and clipboard getter
      as injected dependencies so tests can drive it with fakes. Returns the
      copy handler and the toast it owns. */
-  function createCopyController(deps) {
+  function createCopyController(deps: CopyDeps) {
     var toast = createToast(deps.document, deps.clock);
     var attempt = 0;
 
     // Returns a promise so tests can await settlement; the browser
     // wiring ignores it.
-    function handleCopy(text) {
+    function handleCopy(text: string | null): Promise<void> {
       var id = ++attempt;
       var clipboard = deps.getClipboard();
 
@@ -119,8 +135,8 @@
 
   /* Wire every element carrying `data-copy-text` on the page, returning early
      when there are none. Supplies the real document, timers, and clipboard. */
-  function init() {
-    var buttons = document.querySelectorAll("[data-copy-text]");
+  function init(): void {
+    var buttons = document.querySelectorAll<HTMLElement>("[data-copy-text]");
     if (buttons.length === 0) {
       return;
     }

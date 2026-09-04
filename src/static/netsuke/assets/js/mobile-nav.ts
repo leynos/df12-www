@@ -1,4 +1,5 @@
-/* mobile-nav.js — the Netsuke navbar's narrow-viewport menu.
+/**
+ * @file mobile-nav.ts — the Netsuke navbar's narrow-viewport menu.
  *
  * A plain script module in the shape described in section 6 of the
  * developers' guide: an IIFE loaded with `<script defer>` that addresses its
@@ -19,6 +20,12 @@
  *
  * The toggle starts hidden and is revealed here, so a viewport wide enough
  * for the full navbar never shows a control that does nothing.
+ *
+ * Usage: `templates/netsuke/home_page.jinja` and `doc_page.jinja` load the compiled script
+ * with a plain `<script defer src="/netsuke/assets/js/mobile-nav.js">` tag; `build:js`
+ * compiles that file from this `.ts` source. There is no initialization call — the IIFE
+ * guards on `document.readyState`, calling `init` immediately if the document has already
+ * finished loading and otherwise waiting for `DOMContentLoaded`.
  */
 (() => {
   "use strict";
@@ -34,29 +41,32 @@
   /* Resolve the toggle and menu pane within one navbar root, returning early
      when either is absent, then reveal the toggle and wire the menu's
      behaviour. Each root owns its state and listeners independently. */
-  function initNavbar(navbar) {
-    var toggle = navbar.querySelector(SELECTORS.toggle);
-    var menu = navbar.querySelector(SELECTORS.menu);
+  function initNavbar(navbar: HTMLElement): void {
+    /* Cast rather than narrowed: the functions below are hoisted
+       declarations, which the checker does not narrow through, and the early
+       return on the next line is what makes the casts true at runtime. */
+    const toggle = navbar.querySelector(SELECTORS.toggle) as HTMLElement;
+    const menu = navbar.querySelector(SELECTORS.menu) as HTMLElement;
     if (!toggle || !menu) return;
 
     toggle.classList.remove(CLASSES.hidden);
 
-    var openIcon = toggle.querySelector(".hm-hamburger__open");
-    var closeIcon = toggle.querySelector(".hm-hamburger__close");
+    var openIcon = toggle.querySelector<HTMLElement>(".hm-hamburger__open");
+    var closeIcon = toggle.querySelector<HTMLElement>(".hm-hamburger__close");
 
     /* Whether the menu pane is currently expanded. */
-    function isOpen() {
+    function isOpen(): boolean {
       return menu.classList.contains(CLASSES.open);
     }
 
     /* The menu's tab stops, in document order. */
-    function getFocusableMenuItems() {
-      return menu.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
+    function getFocusableMenuItems(): NodeListOf<HTMLElement> {
+      return menu.querySelectorAll<HTMLElement>('a[href], button, [tabindex]:not([tabindex="-1"])');
     }
 
     /* Whether the toggle is on screen. Focus is only restored to it when it
        is, since a breakpoint change can hide it while the menu is open. */
-    function isToggleVisible() {
+    function isToggleVisible(): boolean {
       var style = window.getComputedStyle(toggle);
       var rect = toggle.getBoundingClientRect();
 
@@ -69,7 +79,7 @@
     }
 
     /* Expand the menu and move focus to its first item. */
-    function openMenu() {
+    function openMenu(): void {
       menu.classList.remove(CLASSES.hidden);
       // Force a reflow so the transition triggers from max-height:0
       void menu.offsetHeight;
@@ -78,7 +88,7 @@
       toggle.setAttribute("aria-label", "Close menu");
       if (openIcon) openIcon.style.display = "none";
       if (closeIcon) closeIcon.style.display = "";
-      var first = menu.querySelector("a, button");
+      var first = menu.querySelector<HTMLElement>("a, button");
       if (first) {
         first.focus();
       } else {
@@ -94,7 +104,7 @@
        toggle is still on screen; `hideImmediately` skips the transition and
        hides the pane at once, which is what the initial no-JS collapse and a
        breakpoint change both want. */
-    function closeMenu(options) {
+    function closeMenu(options?: { restoreFocus?: boolean; hideImmediately?: boolean }): void {
       var opts = options || {};
       var restoreFocus = !!opts.restoreFocus;
       var hideImmediately = !!opts.hideImmediately;
@@ -109,7 +119,7 @@
         menu.classList.add(CLASSES.hidden);
         return;
       }
-      menu.addEventListener("transitionend", function hide(e) {
+      menu.addEventListener("transitionend", function hide(e: TransitionEvent) {
         if (e.propertyName !== "max-height") return;
         if (!isOpen()) menu.classList.add(CLASSES.hidden);
         menu.removeEventListener("transitionend", hide);
@@ -118,7 +128,7 @@
 
     /* Whether a link targets a fragment of the page already on screen, which
        navigates nothing and so needs the menu closed by hand. */
-    function isSamePageAnchor(link) {
+    function isSamePageAnchor(link: HTMLAnchorElement | null): boolean {
       if (!link?.hash) return false;
 
       return (
@@ -146,14 +156,15 @@
 
     // Close on click outside both the navbar shell and the mobile menu pane.
     document.addEventListener("click", (e) => {
-      if (isOpen() && !navbar.contains(e.target) && !menu.contains(e.target)) {
+      var target = e.target as Node | null;
+      if (isOpen() && !navbar.contains(target) && !menu.contains(target)) {
         closeMenu();
       }
     });
 
     // Close after selecting an in-page link from the mobile menu.
     menu.addEventListener("click", (e) => {
-      var link = e.target.closest("a[href]");
+      var link = (e.target as Element).closest<HTMLAnchorElement>("a[href]");
       if (!link || !menu.contains(link) || !isOpen()) return;
       if (isSamePageAnchor(link)) closeMenu();
     });
@@ -162,10 +173,10 @@
     var mql = window.matchMedia("(min-width: 768px)");
     /* Collapse the menu once the viewport is wide enough for the full navbar,
        so a hidden toggle cannot leave an open menu behind it. */
-    function onBreakpoint() {
+    function onBreakpoint(): void {
       if (mql.matches && isOpen()) closeMenu({ hideImmediately: true });
     }
-    if (mql.addEventListener) mql.addEventListener("change", onBreakpoint);
+    if (typeof mql.addEventListener === "function") mql.addEventListener("change", onBreakpoint);
     else mql.addListener(onBreakpoint);
 
     // Focus trap: Tab cycles through the toggle and menu items in both
@@ -209,8 +220,8 @@
   }
 
   /* Enhance every navbar root on the page. */
-  function init() {
-    for (var navbar of document.querySelectorAll(SELECTORS.root)) {
+  function init(): void {
+    for (var navbar of document.querySelectorAll<HTMLElement>(SELECTORS.root)) {
       initNavbar(navbar);
     }
   }

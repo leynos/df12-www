@@ -5,7 +5,7 @@
  * loader and navigation dependencies, and exercise index loading, result
  * ranking, and keyboard interaction without live network requests.
  */
-import { describe, expect, test } from "bun:test";
+import { describe, expect, mock, test } from "bun:test";
 import { createRequire } from "node:module";
 import fc from "fast-check";
 import { Window } from "happy-dom";
@@ -16,6 +16,8 @@ const {
   fetchEpisodicSearchIndex,
   initialiseAllEpisodicSearch,
   initialiseEpisodicSearch,
+  isIndexPayload,
+  isSearchHit,
   searchEpisodicIndex,
 } = require("../../public/episodic/assets/js/site-search.js");
 
@@ -135,6 +137,19 @@ describe("index loading", () => {
     ]);
   });
 
+  test("rejects a malformed payload before handing it to MiniSearch", async () => {
+    const loadJSON = mock(() => ({}));
+    for (const body of [{}, { index: 5, indexOptions: { fields: ["title"] } }, { index: "{}" }]) {
+      await expect(
+        fetchEpisodicSearchIndex("/index.json", {
+          MiniSearch: { loadJSON },
+          fetchImpl: async () => ({ ok: true, json: async () => body }),
+        }),
+      ).rejects.toThrow("Episodic search index payload is malformed.");
+    }
+    expect(loadJSON).not.toHaveBeenCalled();
+  });
+
   test("rejects unsuccessful index requests", async () => {
     await expect(
       fetchEpisodicSearchIndex("/index.json", {
@@ -245,7 +260,7 @@ describe("network-free search", () => {
   test("puts strict matches first, removes duplicates, and bounds the result set", () => {
     const strict = Array.from({ length: 9 }, (_, index) => result(`strict-${index}`));
     const loose = [strict[0], result("loose")];
-    const found = searchEpisodicIndex(engine({ needle: { loose, strict } }), "needle");
+    const { hits: found } = searchEpisodicIndex(engine({ needle: { loose, strict } }), "needle");
 
     expect(found).toHaveLength(8);
     expect(found.map(({ id }) => id)).toEqual(strict.slice(0, 8).map(({ id }) => id));
@@ -265,7 +280,10 @@ describe("network-free search", () => {
         fc.array(resultArbitrary, { maxLength: 20 }),
         fc.array(resultArbitrary, { maxLength: 20 }),
         (strict, loose) => {
-          const found = searchEpisodicIndex(engine({ query: { loose, strict } }), "query");
+          const { hits: found } = searchEpisodicIndex(
+            engine({ query: { loose, strict } }),
+            "query",
+          );
           const expected = [];
           const ids = new Set();
           for (const candidate of [...strict, ...loose]) {
@@ -460,5 +478,53 @@ describe("root event state", () => {
     expect(root.dataset.searchInitialised).toBe("true");
     initialiseAllEpisodicSearch(document, { miniSearch: {} });
     expect(root.dataset.searchInitialised).toBe("true");
+  });
+});
+
+describe("isSearchHit", () => {
+  const hit = { id: "a", sitePath: "/docs/a/", title: "A", kind: "document" };
+
+  test("accepts a record with the stored fields as strings", () => {
+    expect(isSearchHit(hit)).toBe(true);
+    expect(isSearchHit({ ...hit, pageTitle: "A", sectionTitle: "S", excerpt: "…" })).toBe(true);
+  });
+
+  test("rejects a record whose navigation target or labels are not strings", () => {
+    expect(isSearchHit({ ...hit, sitePath: undefined })).toBe(false);
+    expect(isSearchHit({ ...hit, title: 1 })).toBe(false);
+    expect(isSearchHit({ ...hit, excerpt: ["no"] })).toBe(false);
+    expect(isSearchHit(null)).toBe(false);
+  });
+
+  test("keeps a malformed record out of the ranked results", () => {
+    const good = { id: "g", sitePath: "/docs/g/", title: "G", kind: "document" };
+    const bad = { id: "b", sitePath: 42, title: "B", kind: "document" };
+    const miniSearch = { search: () => [bad, good] };
+    const engine = { miniSearch, searchOptions: {} };
+    /* The query stays pure: it returns the count with the hits and leaves
+       the warning to the root that owns the UI. */
+    expect(searchEpisodicIndex(engine, "g")).toEqual({ hits: [good], dropped: 1 });
+  });
+});
+
+describe("isIndexPayload", () => {
+  test("accepts the shape the index builder writes, with optional stored fields", () => {
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: ["title"] } })).toBe(true);
+    expect(
+      isIndexPayload({
+        index: "{}",
+        indexOptions: { fields: ["title"], storeFields: ["sitePath"], searchOptions: {} },
+      }),
+    ).toBe(true);
+  });
+
+  test("rejects a payload without a serialized index or its fields", () => {
+    expect(isIndexPayload({})).toBe(false);
+    expect(isIndexPayload({ index: "{}" })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: {} })).toBe(false);
+    expect(isIndexPayload({ index: "{}", indexOptions: { fields: "title" } })).toBe(false);
+    expect(
+      isIndexPayload({ index: "{}", indexOptions: { fields: ["title"], storeFields: 1 } }),
+    ).toBe(false);
   });
 });

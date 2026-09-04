@@ -359,6 +359,36 @@ describe("createConfigKeys: wide mode", () => {
   });
 });
 
+describe("createConfigKeys: the legacy media-query listener", () => {
+  test("a MediaQueryList with only addListener still drives the mode", () => {
+    /* Safari before 14 had no callable `addEventListener` on a
+       MediaQueryList, so the component falls back to `addListener`. The fake
+       carries a truthy but non-callable `addEventListener`, so a guard that
+       tested the property for truthiness rather than callability would fail
+       here. */
+    const { root, labels } = buildRoot();
+    let listener = null;
+    const media = {
+      matches: false,
+      addEventListener: {},
+      addListener(fn) {
+        listener = fn;
+      },
+    };
+    const controller = createConfigKeys(root, {
+      document: fakeDocument(),
+      matchMedia: () => media,
+    });
+    expect(controller).not.toBeNull();
+    expect(typeof listener).toBe("function");
+    expect(labels.getAttribute("role")).toBe("tablist");
+
+    media.matches = true;
+    listener({ matches: true });
+    expect(labels.getAttribute("role")).toBe("group");
+  });
+});
+
 describe("createConfigKeys: crossing the breakpoint", () => {
   test("narrow to wide restores the spans, the notes, and every panel", () => {
     const ui = mount(false);

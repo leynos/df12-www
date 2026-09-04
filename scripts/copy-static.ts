@@ -6,6 +6,11 @@
  * src/static and are copied here, preserving their relative paths, so that
  * src/static/mxd/assets/site.css lands at public/mxd/assets/site.css.
  *
+ * TypeScript under src/static is not copied. Those files are the browser
+ * scripts, which scripts/compile-browser-scripts.ts compiles to the mirrored
+ * path with a .js extension, and the ambient declarations that only the
+ * typecheck reads; neither has any business in the published tree.
+ *
  * Copies are skipped when the destination is newer than its source, so
  * repeated builds stay cheap. Stale destinations are not pruned: the pages
  * generator and the image variant step also write into public/, and this
@@ -21,13 +26,20 @@ import { dirname, join, relative, sep } from "node:path";
 const SOURCE_ROOT = join(process.cwd(), "src", "static");
 const TARGET_ROOT = join(process.cwd(), "public");
 
+/**
+ * Whether `name` is a TypeScript file, which the compile step owns instead.
+ */
+function isTypeScript(name: string): boolean {
+  return name.endsWith(".ts");
+}
+
 async function findFiles(dir: string, results: string[] = []): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
     const entryPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       await findFiles(entryPath, results);
-    } else if (entry.isFile()) {
+    } else if (entry.isFile() && !isTypeScript(entry.name)) {
       results.push(entryPath);
     }
   }

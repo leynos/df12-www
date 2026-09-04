@@ -44,7 +44,7 @@ export function tearDown() {
 
 /* Build a page with the sidebar markup `templates/weaver/` renders, load the
    drawer into it, and hand back the parts a test needs to drive. */
-export function setUp({ links = ["/install", "/docs"], telemetry = false } = {}) {
+export function setUp({ links = ["/install", "/docs"], telemetry = false, legacy = false } = {}) {
   if (saved === null) {
     saved = {};
     for (const name of TOUCHED) {
@@ -60,7 +60,7 @@ export function setUp({ links = ["/install", "/docs"], telemetry = false } = {})
       <nav>${links.map((href) => `<a href="${href}">${href}</a>`).join("")}</nav>
     </aside>`;
   stubLayout(window);
-  const media = installMatchMedia(window);
+  const media = installMatchMedia(window, { legacy });
   /* The drawer reports through `telemetry.js` when the page loaded it, and
      works the same when it did not. Both are worth exercising, so the script
      is only present when a test asks for it. */

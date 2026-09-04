@@ -2,9 +2,10 @@
  * @file mobile-nav.ts — the Weaver sidebar's narrow-viewport drawer (<1024px).
  *
  * A plain script module in the shape described in section 6 of the
- * developers' guide: an IIFE loaded with `<script defer>` that finds its
- * markup, returns early when any part of it is absent, and enhances what the
- * server already rendered. `templates/weaver/` emits the sidebar, its header,
+ * developers' guide: an IIFE, loaded with a plain `<script>` tag (not
+ * deferred) at the end of `<body>`, that finds its markup, returns early when
+ * any part of it is absent, and enhances what the server already rendered.
+ * `templates/weaver/` emits the sidebar, its header,
  * and the nav; this file builds the hamburger button and the backdrop, which
  * only make sense once script is running, and adds `has-mobile-nav` to the
  * root element so the stylesheet may hide the nav in the knowledge that

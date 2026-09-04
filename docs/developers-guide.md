@@ -794,14 +794,20 @@ modifier order in that file is meaningful.
 ## 6. Browser-side components
 
 Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files
-that follow one convention: a plain immediately invoked function expression
-(IIFE) module, loaded with `<script defer>`, that guards its own initialization
-on `document.readyState` (running immediately if the document has already
-finished loading, or waiting for `DOMContentLoaded` otherwise). Where a
-component's behaviour has a pure decision worth testing in isolation — no DOM,
-no timers — that function is exported via `module.exports` at the end of the
-IIFE, guarded by `typeof module !== "undefined"` so the same file still runs
-unmodified as a plain browser script. `docs-scrollspy.ts` exports
+that follow one shared convention: a plain immediately invoked function
+expression (IIFE) module, guarded by the same `module.exports` hook described
+below. Loading and bootstrap otherwise differ by site. Fourteen of the sixteen
+scripts (Netsuke, Stilyagi, and Episodic) are loaded with `<script defer>` and
+guard their own initialization on `document.readyState` (running immediately
+if the document has already finished loading, or waiting for
+`DOMContentLoaded` otherwise). Weaver's two scripts, `telemetry.ts` and
+`mobile-nav.ts`, are the exception: they are loaded with a plain `<script>` at
+the end of `<body>` and run immediately and unconditionally, with no
+`readyState`/`DOMContentLoaded` gate. Where a component's behaviour has a pure
+decision worth testing in isolation — no DOM, no timers — that function is
+exported via `module.exports` at the end of the IIFE, guarded by
+`typeof module !== "undefined"` so the same file still runs unmodified as a
+plain browser script. `docs-scrollspy.ts` exports
 `pickActiveIndex` (which heading is currently being read); `config-keys.ts`
 exports `nextTabIndex` (which tab an arrow/Home/End keypress should move to).
 `mobile-nav.ts` has no such function — its logic is DOM interaction throughout
@@ -1059,10 +1065,12 @@ crossing is a fifth, and is the one a reader does not initiate.
 
 The Weaver drawer and its copy controls report through the same optional hook
 model as Episodic search. A production host may set
-`window.df12WeaverNavTelemetry` to a function before the deferred scripts run;
-without it, `src/static/weaver/assets/js/telemetry.ts` is a no-op and nothing
-is collected. A sink that throws is caught and ignored because observability
-must not be able to break the drawer or the button it was watching.
+`window.df12WeaverNavTelemetry` to a function before `telemetry.js` runs,
+which happens immediately, at the end of `<body>`, with no `defer` and no
+`DOMContentLoaded` gate; without it, `src/static/weaver/assets/js/telemetry.ts`
+is a no-op and nothing is collected. A sink that throws is caught and ignored
+because observability must not be able to break the drawer or the button it
+was watching.
 
 Every event has the same shape, and the whole of what may leave the page is
 declared as three frozen vocabularies at the top of that file:

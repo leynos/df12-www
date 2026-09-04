@@ -3,8 +3,10 @@
  *
  * Modelled on the Episodic search hook in
  * `src/static/episodic/assets/js/site-search.ts`: a host may install a
- * function at `globalThis.df12WeaverNavTelemetry` before the deferred scripts
- * run. Without it every call here is a no-op, and nothing is collected.
+ * function at `globalThis.df12WeaverNavTelemetry` before this script runs,
+ * which happens immediately, at the end of `<body>`, with no `defer` and no
+ * `DOMContentLoaded` gate. Without it every call here is a no-op, and nothing
+ * is collected.
  *
  * What an event may contain is fixed, and deliberately dull. Every field is
  * drawn from a closed vocabulary declared below, so a reader of this file can

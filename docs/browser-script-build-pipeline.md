@@ -21,8 +21,10 @@ JavaScript the templates already load.
 The migration had to fit the site's existing shape rather than change it:
 
 - **Classic scripts stay classic.** Every browser script remains a plain
-  immediately invoked function expression (IIFE), loaded with `<script defer>`.
-  It is not converted to an ES module. Module scripts have different load
+  immediately invoked function expression (IIFE). Fourteen of the sixteen are
+  loaded with `<script defer>`; Weaver's two, `telemetry.js` and
+  `mobile-nav.js`, are plain `<script>` tags at the end of `<body>`. None is
+  converted to an ES module. Module scripts have different load
   semantics, different `file://` cross-origin resource sharing (CORS)
   behaviour, and implicit strict mode, any of which would be a runtime
   behaviour change disguised as a types-only migration.

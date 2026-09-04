@@ -73,8 +73,9 @@ export function pressTab(window, orderedStops, { shiftKey = false } = {}) {
    implementation has no way to fire a change.
 
    `legacy` models Safari before 14, whose `MediaQueryList` had only
-   `addListener`/`removeListener` and no `addEventListener`; the modules keep
-   a fallback for it, and this is the only way to reach that branch. */
+   `addListener`/`removeListener` and no callable `addEventListener`; the
+   modules keep a fallback for it, and this is the only way to reach that
+   branch. */
 export function installMatchMedia(window, { matches = false, legacy = false } = {}) {
   const listeners = [];
   const subscribe = (fn) => listeners.push(fn);
@@ -92,6 +93,9 @@ export function installMatchMedia(window, { matches = false, legacy = false } = 
     },
   };
   if (legacy) {
+    /* Present but not callable, so a module that merely tested the property
+       for truthiness rather than callability would fail here. */
+    list.addEventListener = {};
     list.addListener = subscribe;
     list.removeListener = unsubscribe;
   } else {

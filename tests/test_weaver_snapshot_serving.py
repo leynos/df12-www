@@ -74,7 +74,9 @@ def test_a_name_that_is_not_a_slug_is_refused(site: str) -> None:
 
 def test_the_default_site_is_still_weaver() -> None:
     """Every existing command and test relies on the default meaning Weaver."""
-    assert paths.DEFAULT_SITE == "weaver"
+    assert paths.DEFAULT_SITE == "weaver", (
+        "the default site is Weaver; every command that names no site relies on it"
+    )
     assert paths._public_root() == paths.PUBLIC_WEAVER, (
         "with no site named, the root is Weaver's, the default site"
     )

@@ -1,0 +1,139 @@
+{#
+  Shared Netsuke page furniture.
+
+  Import as `chrome`. Page bodies are wrapped in `{% raw %}`, so a call has
+  to step out of it first; where the wrapped content is a highlighted code
+  sample the fence already exists and the call joins it:
+
+      {% import "chrome.jinja" as chrome %}
+      ...
+      {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+      ...
+      {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+
+  The windows are opener/closer pairs rather than `{% call %}` blocks so a
+  long body can stay inside the page's raw region instead of leaving and
+  re-entering it around the macro.
+#}
+{% import "components.jinja" as ui %}
+
+{#
+  The traffic-light dots shared by every window titlebar.
+#}
+{% macro _traffic_lights() -%}
+<div class="flex space-x-2">
+    <div class="w-3 h-3 rounded-full bg-vermillion"></div>
+    <div class="w-3 h-3 rounded-full bg-amber"></div>
+    <div class="w-3 h-3 rounded-full bg-matcha"></div>
+</div>
+{%- endmacro %}
+
+{#
+  A faux editor or terminal window: a dark frame, a titlebar with the
+  traffic-light dots and a centred label, and an open body element.
+  Close it with `faux_window_close()`.
+
+  label        the titlebar text, typically a file name or a shell prompt
+  variant      a modifier on `.hm-faux-window`, e.g. `card-bleed`
+  outer_class  layout classes for the surrounding page, typically a margin
+  frame        replaces the default dark-card frame utilities outright, for
+               a window that sits on a dark ground rather than on paper
+  body_class   replaces the default body inset and type utilities
+#}
+{% macro faux_window_open(label, variant='', outer_class='', frame=none, body_class=none) -%}
+<div class="hm-faux-window{% if variant %} hm-faux-window--{{ variant }}{% endif %} {{ frame if frame is not none else 'bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden' }}{% if outer_class %} {{ outer_class }}{% endif %}">
+    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
+        {{ _traffic_lights() | indent(8) }}
+        <span class="text-xs font-mono text-stone-light">{{ label }}</span>
+        <div class="w-12"></div>
+    </div>
+    <div class="hm-faux-window__body {{ body_class if body_class is not none else 'p-6 font-mono text-sm overflow-x-auto' }}">
+{%- endmacro %}
+
+{% macro faux_window_close() -%}
+    </div>
+</div>
+{%- endmacro %}
+
+{#
+  The example detail pages' terminal transcript window. Same shape as the
+  faux window with the tighter titlebar the examples use. Close it with
+  `example_terminal_close()`.
+#}
+{% macro example_terminal_open(label='Terminal') -%}
+<div class="hm-example-terminal bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
+    <div class="hm-example-terminal__titlebar bg-charcoal-mid/30 px-4 py-2 flex items-center justify-between border-b border-white/10">
+        {{ _traffic_lights() | indent(8) }}
+        <div class="text-xs font-mono text-charcoal-light">{{ label }}</div>
+        <div class="w-12"></div>
+    </div>
+    <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
+{%- endmacro %}
+
+{% macro example_terminal_close() -%}
+    </div>
+</div>
+{%- endmacro %}
+
+{#
+  The breadcrumb trail above a page header.
+
+  `trail` is an ordered list of mappings with a `label` and, for every
+  entry but the last, usually an `href`. The last entry is the current
+  page and carries `aria-current`, even when it is the only entry; before
+  it, the first entry is always a link, and a middle entry without an
+  `href` renders as plain text (the examples pages use one for the
+  example's category).
+#}
+{% macro breadcrumb(trail) -%}
+<nav class="flex mb-8 text-sm text-charcoal-mid" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        {%- for crumb in trail %}
+        {%- if loop.last %}
+        <li aria-current="page"><div class="flex items-center">{% if not loop.first %}<span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span>{% endif %}<span class="ml-1 font-medium text-charcoal">{{ crumb.label }}</span></div></li>
+        {%- elif loop.first %}
+        <li class="inline-flex items-center"><a href="{{ crumb.href }}" class="inline-flex items-center hover:text-indigo">{{ crumb.label }}</a></li>
+        {%- elif crumb.href %}
+        <li><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><a href="{{ crumb.href }}" class="ml-1 font-medium hover:text-indigo">{{ crumb.label }}</a></div></li>
+        {%- else %}
+        <li><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium">{{ crumb.label }}</span></div></li>
+        {%- endif %}
+        {%- endfor %}
+    </ol>
+</nav>
+{%- endmacro %}
+
+{#
+  A page header: the kicker pill, the `h1`, and a lede paragraph whose
+  text is the caller's body.
+
+      {% endraw %}{% call chrome.page_header('Reference', 'CLI Commands') %}
+          Build targets, inspect the plan, and control output.
+      {% endcall %}{% raw %}
+
+  kicker      the pill's label; see `ui.kicker` for `accent`, `icon`,
+              `icon_class`, and `dot`, which pass straight through
+  title       the `h1` text
+  hero        the centred hub-page treatment with the larger `h1`, rather
+              than the left-aligned, ruled-off docs treatment
+  id          an `id` for the header element
+#}
+{% macro page_header(kicker, title, hero=false, id='', accent=false, icon='', icon_class='', dot='') -%}
+{%- if hero %}
+<header{% if id %} id="{{ id }}"{% endif %} class="text-center max-w-3xl mx-auto mb-16">
+    {{ ui.kicker(kicker, 'mb-6', accent=accent, icon=icon, icon_class=icon_class, dot=dot) }}
+    <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">{{ title }}</h1>
+    <p class="text-xl text-charcoal-mid font-light leading-relaxed">
+        {{ caller() | trim }}
+    </p>
+</header>
+{%- else %}
+<header{% if id %} id="{{ id }}"{% endif %} class="mb-12 border-b border-stone-light pb-8">
+    {{ ui.kicker(kicker, 'mb-4', accent=accent, icon=icon, icon_class=icon_class, dot=dot) }}
+    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">{{ title }}</h1>
+    <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+        {{ caller() | trim }}
+    </p>
+</header>
+{%- endif %}
+{%- endmacro %}

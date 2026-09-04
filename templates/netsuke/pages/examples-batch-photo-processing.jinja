@@ -1,37 +1,14 @@
 {% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
 {% import "examples_data.jinja" as exdata %}
 {% set active_nav = 'examples' %}
 {% block page_title %}Batch Photo Processing - Netsuke Examples{% endblock %}
 {% block content %}
 {% raw %}
-<main id="main-content" class="flex-grow pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <nav class="flex mb-8 text-sm text-charcoal-mid" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center"><a href="/netsuke/examples/" class="inline-flex items-center hover:text-indigo">Examples</a></li>
-                <li><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium hover:text-indigo">Media Workflows</span></div></li>
-                <li aria-current="page"><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium text-charcoal">Batch Photo Processing</span></div></li>
-            </ol>
-        </nav>
+<main id="main-content" class="flex-grow pt-24 pb-20 site-container">
+        {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Media Workflows'}, {'label': 'Batch Photo Processing'}]) }}{% raw %}
 
-        <header id="example-header" class="mb-12 border-b border-stone pb-12">
-            <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
-                <div class="max-w-3xl">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-matcha/10 text-matcha font-mono border border-matcha/20">Media</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-boxwood text-charcoal font-mono border border-stone">Intermediate</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-matcha/10 text-matcha font-mono border border-matcha/20"><span class="iconify mr-1.5" data-icon="carbon:checkmark" aria-hidden="true"></span> Reviewed syntax</span>
-                    </div>
-                    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Batch Photo Processing</h1>
-                    <p class="text-xl text-charcoal-mid font-light leading-relaxed">
-                        Convert a directory of RAW files into JPEG output and then regenerate a gallery page from the resulting images. This example shows how Netsuke fans one rule over many files and still finishes with a single top-level artefact.
-                    </p>
-                </div>
-                <div class="flex flex-col gap-3 w-full lg:w-auto shrink-0">
-                    <a href="/netsuke/examples/" class="inline-flex items-center justify-center px-6 py-3 bg-indigo text-white rounded-md font-medium shadow-sm hover:bg-indigo-light transition-all w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:arrow-left" aria-hidden="true"></span> Back to Examples</a>
-                    <a href="/netsuke/docs/templating/" class="inline-flex items-center justify-center px-6 py-3 bg-white border border-charcoal/20 text-charcoal rounded-md font-medium hover:bg-stone-light transition-colors w-full lg:w-auto"><span class="iconify mr-2" data-icon="carbon:template" aria-hidden="true"></span> Templating Guide</a>
-                </div>
-            </div>
-        </header>
+        {% endraw %}{{ exdata.example_header('batch-photo-processing') }}{% raw %}
 
         <div class="grid lg:grid-cols-12 gap-12">
             <div class="lg:col-span-8 space-y-12 min-w-0">
@@ -73,18 +50,13 @@
 
                 <section id="terminal-preview">
                     <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center"><span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build</h2>
-                    <div class="hm-example-terminal bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                        <div class="hm-example-terminal__titlebar bg-charcoal-mid/30 px-4 py-2 flex items-center justify-between border-b border-white/10"><div class="flex space-x-2"><div class="w-3 h-3 rounded-full bg-vermillion"></div><div class="w-3 h-3 rounded-full bg-amber"></div><div class="w-3 h-3 rounded-full bg-matcha"></div></div><div class="text-xs font-mono text-charcoal-light">Terminal</div><div class="w-12"></div></div>
-                        <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                    {% endraw %}{{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}{% raw %}
 $ netsuke build processed/gallery.html
 [1/4] mkdir -p processed
 [2/4] Converting RAW photo
 [3/4] Converting RAW photo
 [4/4] make-gallery processed > processed/gallery.html
-{% endraw %}{% endhighlight %}{% raw %}
-                        </div>
-                    </div>
+{% endraw %}{% endhighlight %}{{ chrome.example_terminal_close() }}{% raw %}
                 </section>
 
                 <section id="build-flow" class="bg-white rounded-xl border border-stone shadow-sm p-6 lg:p-8">

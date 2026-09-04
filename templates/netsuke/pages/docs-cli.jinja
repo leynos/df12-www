@@ -1,6 +1,6 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'docs' %}
 {% block page_title %}CLI Commands - Netsuke Build System{% endblock %}
 {% block content %}
@@ -8,91 +8,17 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
 
-        <!-- Sidebar Navigation (Desktop) -->
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
-            <!-- Search -->
-            <div
-                class="mb-8 relative"
-                data-doc-search-root
-                data-doc-search-index="/netsuke/assets/search/docs-search.json"
-            >
-                <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
-                <input
-                    type="text"
-                    placeholder="Search docs..."
-                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
-                    data-doc-search-input
-                    aria-label="Search the documentation"
-                    role="combobox"
-                    aria-autocomplete="list"
-                    aria-expanded="false"
-                >
-                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
-                <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
-                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
-                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
-                            Type at least 2 characters to search the docs.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="space-y-8">
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Introduction</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
-                        <li><a href="/netsuke/docs/getting-started/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Getting Started</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Core Concepts</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
-                        <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
-                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="/netsuke/docs/standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/cli/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">CLI Commands</a></li>
-                        <li><a href="#cli" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Commands</a></li>
-                        <li><a href="#output-streams" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Output streams</a></li>
-                        <li><a href="#accessible-output" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Accessible output</a></li>
-                        <li><a href="#localization" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Localization</a></li>
-                        <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
-                        <li><a href="/netsuke/docs/security/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        {% endraw %}{{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}, {'href': '#output-streams', 'label': 'Output streams'}, {'href': '#accessible-output', 'label': 'Accessible output'}, {'href': '#localization', 'label': 'Localization'}]) }}{% raw %}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 {% endraw %}{{ docsnav.mobile_docs_bar('cli') }}{% raw %}
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">CLI Commands</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center mb-4">
-                    {% endraw %}{{ ui.kicker('Reference') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">CLI Commands</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Build targets, inspect the plan, and control output. Every command's status goes to stderr and its artefacts to stdout, so pipelines capture exactly what they need.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Reference', 'CLI Commands') %}
+                Build targets, inspect the plan, and control output. Every command's status goes to stderr and its artefacts to stdout, so pipelines capture exactly what they need.
+            {% endcall %}{% raw %}
 
             <section id="cli" class="mb-20">
                 <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
@@ -238,18 +164,7 @@
 
                     <!-- Right: Terminal Preview -->
                     <div class="space-y-6 sticky top-24 self-start">
-                        <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                            <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                                <div class="flex space-x-2">
-                                    <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                                    <div class="w-3 h-3 rounded-full bg-amber"></div>
-                                    <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                                </div>
-                                <span class="text-xs font-mono text-stone-light">user@dev:~/netsuke-project</span>
-                                <div class="w-12"></div>
-                            </div>
-                            <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                        {% endraw %}{{ chrome.faux_window_open('user@dev:~/netsuke-project') }}{% highlight 'netsuke-console' %}{% raw %}
 $ netsuke --verbose build app
 Parsed Netsukefile and expanded 3 targets
 Wrote build.ninja
@@ -261,9 +176,7 @@ digraph netsuke {
   "main.o" -> "app"
   "utils.o" -> "app"
 }
-{% endraw %}{% endhighlight %}{% raw %}
-                            </div>
-                        </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                         <!-- Tip Card -->
                         <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
@@ -316,18 +229,7 @@ digraph netsuke {
                     </div>
                 </div>
 
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-6">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Shell examples</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Shell examples', outer_class='mb-6') }}{% highlight 'netsuke-console' %}{% raw %}
 # Capture build graph without status noise
 $ netsuke graph > build.dot
 
@@ -339,9 +241,7 @@ $ netsuke --progress never build
 
 # Inspect generated Ninja file inline
 $ netsuke generate | grep 'rule '
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
                     <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
@@ -408,18 +308,7 @@ $ netsuke generate | grep 'rule '
                     In accessible mode each pipeline stage and each build task produces a labelled line on stderr.
                     No spinners, no cursor movement &mdash; just plain, ordered text a screen reader can follow.
                 </p>
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-8">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">stderr, accessible mode</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('stderr, accessible mode', outer_class='mb-8') }}{% highlight 'netsuke-console' %}{% raw %}
 Stage 1/6: Reading manifest file
 Stage 2/6: Parsing YAML document
 Stage 3/6: Expanding template directives
@@ -429,9 +318,7 @@ Stage 6/6: Synthesizing Ninja plan and executing Build
 Task 1/2: cc -c src/a.c
 Task 2/2: cc -c src/b.c
 Success: Build complete.
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
@@ -528,17 +415,7 @@ Success: Build complete.
                         Fluent messages handle pluralisation and variable interpolation natively.
                         A translator only needs to edit the <code>.ftl</code> file for their locale &mdash; no code changes required.
                     </p>
-                    <div class="hm-faux-window hm-faux-window--card-bleed bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                        <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                            <div class="flex space-x-2">
-                                <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                                <div class="w-3 h-3 rounded-full bg-amber"></div>
-                                <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                            </div>
-                            <span class="text-xs font-mono text-stone-light">en-US.ftl</span>
-                            <div class="w-12"></div>
-                        </div>
-                        <div class="hm-faux-window__body p-6 font-mono text-xs overflow-x-auto [contain:inline-size]">
+                    {% endraw %}{{ chrome.faux_window_open('en-US.ftl', variant='card-bleed', body_class='p-6 font-mono text-xs overflow-x-auto [contain:inline-size]') }}{% raw %}
                         <pre class="font-mono text-xs text-stone-light"><code>progress-target-count = Building { $count -&gt;
     [one] { $count } target...
    *[other] { $count } targets...
@@ -546,8 +423,7 @@ Success: Build complete.
 
 error-file-not-found = Error: File "{ $path }" was not found.
     .hint = Check that the path exists and is readable.</code></pre>
-                        </div>
-                    </div>
+                    {% endraw %}{{ chrome.faux_window_close() }}{% raw %}
                     <p class="text-xs text-charcoal-mid mt-3">
                         See the <a href="/netsuke/guides/translating/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Translating Netsuke guide</a> for the workflow, and the upstream
                         <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization style guide</a> and

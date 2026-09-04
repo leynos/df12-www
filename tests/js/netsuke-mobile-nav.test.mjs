@@ -28,6 +28,9 @@ const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const RENDERED_PAGES = [
   ["homepage", "public/netsuke/index.html"],
   ["documentation page", "public/netsuke/docs/index.html"],
+  ["guide page", "public/netsuke/guides/architecture/index.html"],
+  ["example page", "public/netsuke/examples/hello-world/index.html"],
+  ["install page", "public/netsuke/install/index.html"],
 ];
 
 beforeAll(() => {

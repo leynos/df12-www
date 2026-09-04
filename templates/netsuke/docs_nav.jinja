@@ -2,21 +2,118 @@
   Shared docs navigation data and chrome.
 
   `docs_pages` is the single ordered source of truth for the docs
-  reading order. The mobile sub-menu dropdown and the footer
-  previous/next links both render from it, so adding or reordering a
-  docs page means editing this one list.
+  reading order. The desktop sidebar, the mobile sub-menu dropdown, and
+  the footer previous/next links all render from it, so adding or
+  reordering a docs page means editing this one list. `group` names the
+  sidebar heading a page sits under; `docs_groups` fixes the heading
+  order.
 #}
 {% set docs_pages = [
-    {'slug': '', 'label': 'Documentation Hub'},
-    {'slug': 'getting-started', 'label': 'Getting Started'},
-    {'slug': 'manifest-reference', 'label': 'Manifest Reference'},
-    {'slug': 'rules-and-targets', 'label': 'Rules & Targets'},
-    {'slug': 'templating', 'label': 'Templating'},
-    {'slug': 'standard-library', 'label': 'Standard Library'},
-    {'slug': 'cli', 'label': 'CLI Commands'},
-    {'slug': 'configuration', 'label': 'Configuration'},
-    {'slug': 'security', 'label': 'Security Model'},
+    {'slug': '', 'label': 'Documentation Hub', 'group': 'Introduction'},
+    {'slug': 'getting-started', 'label': 'Getting Started', 'group': 'Introduction'},
+    {'slug': 'manifest-reference', 'label': 'Manifest Reference', 'group': 'Core Concepts'},
+    {'slug': 'rules-and-targets', 'label': 'Rules & Targets', 'group': 'Core Concepts'},
+    {'slug': 'templating', 'label': 'Templating', 'group': 'Core Concepts'},
+    {'slug': 'standard-library', 'label': 'Standard Library', 'group': 'Core Concepts'},
+    {'slug': 'cli', 'label': 'CLI Commands', 'group': 'Reference'},
+    {'slug': 'configuration', 'label': 'Configuration', 'group': 'Reference'},
+    {'slug': 'security', 'label': 'Security Model', 'group': 'Reference'},
 ] %}
+{% set docs_groups = ['Introduction', 'Core Concepts', 'Reference'] %}
+
+{#
+  One entry in the desktop sidebar.
+
+  active  the current page
+  sub     an in-page anchor, indented under its page
+#}
+{% macro sidebar_link(href, label, active=false, sub=false) -%}
+<li><a href="{{ href }}" class="sidebar-link{% if active %} active{% endif %}{% if sub %} sidebar-link--sub{% endif %} block px-2 py-1.5{% if active %} text-sm font-medium{% elif sub %} hover:text-vermillion hover:bg-boxwood-light{% else %} text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light{% endif %} rounded-r-md transition-colors">{{ label }}</a></li>
+{%- endmacro %}
+
+{#
+  The desktop sidebar: the search widget and the grouped link list.
+  Rendered only from the `lg` breakpoint; `mobile_docs_bar` covers the
+  narrower widths.
+
+  active     the current docs page's slug; the sidebar then renders every
+             docs page under its group, marking that one
+  sub_links  in-page anchors listed beneath the active page, each a
+             mapping with `href` and `label`
+  sections   bespoke groups in place of the docs pages, each a mapping
+             with a `title`, its `links`, and optionally `sub: true` to
+             indent every link as an in-page anchor; a link may carry its
+             own `sub` or `active`, which the forthcoming pages use to nest
+             anchors under the current preview. The guides pass an "On
+             this page" list and a "Helpful links" list
+  search     whether to draw the docs search widget
+  nav_label  an `aria-label` for the sidebar's `nav`, where the section
+             list is not the documentation
+#}
+{% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label='') %}
+        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+            {%- if search %}
+            <!-- Search -->
+            <div
+                class="mb-8 relative"
+                data-doc-search-root
+                data-doc-search-index="/netsuke/assets/search/docs-search.json"
+            >
+                <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                <input
+                    type="text"
+                    placeholder="Search docs..."
+                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
+                    data-doc-search-input
+                    aria-label="Search the documentation"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded="false"
+                >
+                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
+                <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
+                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
+                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
+                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                            Type at least 2 characters to search the docs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {%- endif %}
+
+            <nav class="space-y-8"{% if nav_label %} aria-label="{{ nav_label }}"{% endif %}>
+                {%- if sections is none %}
+                {%- for group in docs_groups %}
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">{{ group }}</h3>
+                    <ul class="space-y-1">
+                        {%- for page in docs_pages if page.group == group %}
+                        {{ sidebar_link('/netsuke/docs/' ~ (page.slug ~ '/' if page.slug else ''), page.label, active=(page.slug == active)) }}
+                        {%- if page.slug == active %}
+                        {%- for link in sub_links %}
+                        {{ sidebar_link(link.href, link.label, sub=true) }}
+                        {%- endfor %}
+                        {%- endif %}
+                        {%- endfor %}
+                    </ul>
+                </div>
+                {%- endfor %}
+                {%- else %}
+                {%- for section in sections %}
+                <div>
+                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">{{ section.title }}</h3>
+                    <ul class="space-y-1">
+                        {%- for link in section.links %}
+                        {{ sidebar_link(link.href, link.label, active=link.active | default(false), sub=link.sub | default(section.sub | default(false))) }}
+                        {%- endfor %}
+                    </ul>
+                </div>
+                {%- endfor %}
+                {%- endif %}
+            </nav>
+        </aside>
+{% endmacro %}
 
 {#
   Floating docs sub-menu bar for mobile devices.

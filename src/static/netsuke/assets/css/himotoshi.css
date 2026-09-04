@@ -745,6 +745,12 @@ button.hm-config-keys__label {
   color: var(--netsuke-indigo);
 }
 
+.hm-chip--accent {
+  background: color-mix(in srgb, var(--netsuke-vermillion) 10%, transparent);
+  border-color: color-mix(in srgb, var(--netsuke-vermillion) 20%, transparent);
+  color: var(--netsuke-vermillion);
+}
+
 .hm-chip--filter {
   background: var(--netsuke-white);
   border-color: var(--netsuke-stone);

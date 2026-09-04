@@ -110,8 +110,15 @@ make test-js       # JavaScript suite
 ```
 
 For Markdown changes, run `make markdownlint` and `make nixie`. Rebuild and
-inspect the rendered result as well — the gates do not render the site, so a
+inspect the rendered result as well — the Python tests render real Netsuke
+templates through `ContentPageGenerator` and `SubSiteHomePageBuilder`, but they
+do not build and inspect the complete published site in a real browser, so a
 template change that passes every gate can still produce a broken page.
+
+Because the gates do not exercise the site in a browser, every change to a
+template, stylesheet, or page config is validated in a browser before it is
+committed; §7.5, "Validating rendered pages in a browser", covers the tools and
+the procedure.
 
 ### 2.1. Bun is required
 
@@ -740,6 +747,98 @@ shorthand. At equal specificity the later rule wins, so that declaration has
 never taken effect and the hero pill's border is stone. Moving the rule would
 change how the hero looks, so it has been left as it stands; do not assume the
 modifier order in that file is meaningful.
+
+### 5.2. Netsuke's page furniture: `chrome.jinja`
+
+`templates/netsuke/chrome.jinja` holds the Netsuke page furniture that the
+`doc_page.jinja` layout does not draw: the windows a code sample sits in, the
+page header, and the breadcrumb. Import it as `chrome`. The homepage extends
+`doc_page.jinja` like every other Netsuke content page except the standalone
+`pages/icon-replacements.jinja`, so the navbar, mobile menu, and footer have
+one owner; the layout's `page_scripts` block wraps the docs-only scripts and
+`body_class` carries the flex column, and the homepage overrides both.
+
+The windows are opener/closer pairs rather than `{% call %}` blocks, so a long
+highlighted sample can stay inside the page's `{% raw %}` region and the calls
+join the fence the `{% highlight %}` tag already needs:
+
+```jinja
+{% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+```
+
+`faux_window_open(label, variant='', outer_class='', frame=none, body_class=none)`
+draws the dark frame, the titlebar with the traffic-light dots and a centred
+`label`, and the open body element. `variant` names a modifier on
+`.hm-faux-window`, in practice `card-bleed`; `outer_class` carries layout that
+belongs to the page, such as a margin. `frame` and `body_class` replace the
+default frame and body utilities outright and exist for the two homepage
+windows that sit on their own grounds; a docs page should not need them.
+`example_terminal_open(label='Terminal')` and `example_terminal_close()` are
+the same shape with the tighter titlebar the example pages use.
+
+`page_header(kicker, title, hero=false, id='', accent=false, icon='',
+icon_class='', dot='')` draws the kicker pill, the `h1`, and a lede paragraph
+whose text is the caller's body. The kicker options pass straight through to
+`ui.kicker`. `hero=true` selects the centred hub-page treatment with the larger
+heading; the default is the ruled-off docs treatment.
+
+```jinja
+{% endraw %}{% call chrome.page_header('Reference', 'CLI Commands') %}
+    Build targets, inspect the plan, and control output.
+{% endcall %}{% raw %}
+```
+
+`breadcrumb(trail)` takes an ordered list of mappings with a `label` and,
+for every entry but the last, usually an `href`. It renders a labelled `nav`
+with an `ol` and `aria-current="page"` on the final crumb. A middle entry
+without an `href` renders as plain text; the example pages use one for the
+category.
+
+```jinja
+{% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}{% raw %}
+```
+
+### 5.3. The docs sidebar: `docsnav.sidebar`
+
+`templates/netsuke/docs_nav.jinja` holds `docs_pages`, the ordered list every
+docs navigation renders from, alongside `mobile_docs_bar`, `footer_nav`, and
+`docs_footer`. Each entry names the `group` heading it sits under, and
+`docs_groups` fixes the heading order. `sidebar(active=none, sub_links=[],
+sections=none, search=true)` draws the desktop sidebar from that list: a docs
+page passes its slug and, where it has section anchors, a `sub_links` list of
+`href` and `label` mappings that the macro nests under the active entry.
+
+```jinja
+{% endraw %}{{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}]) }}{% raw %}
+```
+
+The guides pass bespoke `sections` instead, each a mapping with a `title`, its
+`links`, and `sub: true` where every link is an in-page anchor, and turn the
+search widget off with `search=false`. A link may carry its own `sub` or
+`active`, which the forthcoming preview pages use to nest a preview's anchors
+under the current entry in a list that also links its siblings; `nav_label`
+sets an `aria-label` on the `nav` where that list is not the documentation.
+`sidebar_link(href, label, active=false, sub=false)` renders one entry and is
+what both paths call.
+
+Adding a docs page means adding one entry to `docs_pages`; the sidebar, the
+mobile dropdown, and the footer links follow. `tests/test_netsuke_navigation.py`
+pins all three to the list.
+
+### 5.4. The example pages: `exdata.example_header`
+
+`templates/netsuke/examples_data.jinja` holds the `examples` catalogue that the
+hub grid, the filter buttons, and the detail pages' "Up Next" boxes render
+from. Each entry also carries the detail page header: the `level`, the
+category chip's `cat_chip` variant (a modifier on `.hm-chip`), the `lede`, and
+the two header `actions`, each an `href`, an `icon`, and a `label`, the first
+drawn as the primary button. `example_header(key)` renders it:
+
+```jinja
+{% endraw %}{{ exdata.example_header('hello-world') }}{% raw %}
+```
 
 ## 6. Browser-side components
 
@@ -1453,9 +1552,11 @@ untouched.
 
 ### 7.5. Validating rendered pages in a browser
 
-The commit gates do not render the site, so a change to a template, a
-stylesheet, or `config/pages.yaml` is checked in a real browser before it is
-committed. The normative procedure is
+The commit gates render real Netsuke templates through `ContentPageGenerator`
+and `SubSiteHomePageBuilder`, but they do not build and inspect the complete
+published site in a real browser, so a change to a template, a stylesheet, or
+`config/pages.yaml` is checked in a real browser before it is committed. The
+normative procedure is
 [Validating rendered pages](../AGENTS.md#validating-rendered-pages) in
 `AGENTS.md`; this section explains the tools it relies on and why each step is
 there.

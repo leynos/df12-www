@@ -1,5 +1,5 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
+{% import "chrome.jinja" as chrome %}
 {% import "docs_nav.jinja" as docsnav %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Contributing - Netsuke Build System{% endblock %}
@@ -8,54 +8,19 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
 
-        <!-- Sidebar Navigation (Desktop) -->
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
-            <nav class="space-y-8">
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">On this page</h3>
-                    <ul class="space-y-1">
-                        <li><a href="#ways-to-contribute" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Ways to Contribute</a></li>
-                        <li><a href="#dev-workflow" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Development Workflow</a></li>
-                        <li><a href="#quality-gates" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Quality Gates</a></li>
-                        <li><a href="#translation" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Translating Netsuke</a></li>
-                        <li><a href="#commit-style" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Commit Style</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Helpful links</h3>
-                    <ul class="space-y-1">
-                        <li><a href="https://github.com/leynos/netsuke" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">GitHub Repository</a></li>
-                        <li><a href="https://github.com/leynos/netsuke/issues" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Issue Tracker</a></li>
-                        <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation</a></li>
-                        <li><a href="/netsuke/code-of-conduct/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Code of Conduct</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        {% endraw %}{{ docsnav.sidebar(sections=[
+            {'title': 'On this page', 'sub': true, 'links': [{'href': '#ways-to-contribute', 'label': 'Ways to Contribute'}, {'href': '#dev-workflow', 'label': 'Development Workflow'}, {'href': '#quality-gates', 'label': 'Quality Gates'}, {'href': '#translation', 'label': 'Translating Netsuke'}, {'href': '#commit-style', 'label': 'Commit Style'}]},
+            {'title': 'Helpful links', 'links': [{'href': 'https://github.com/leynos/netsuke', 'label': 'GitHub Repository'}, {'href': 'https://github.com/leynos/netsuke/issues', 'label': 'Issue Tracker'}, {'href': '/netsuke/docs/', 'label': 'Documentation'}, {'href': '/netsuke/code-of-conduct/', 'label': 'Code of Conduct'}]},
+        ], search=false) }}{% raw %}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono" aria-label="Breadcrumb">
-                <ol class="flex items-center">
-                    <li><a href="/netsuke/guides/" class="hover:text-vermillion transition-colors">Guides</a></li>
-                    <li aria-hidden="true"><span class="mx-2 text-stone">/</span></li>
-                    <li><span class="text-charcoal font-medium" aria-current="page">Contributing</span></li>
-                </ol>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Contributing'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center justify-between mb-4">
-                    {% endraw %}{{ ui.kicker('Community') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Contributing to Netsuke</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Netsuke is open-source and welcoming to contributors of all backgrounds. Whether you fix a bug, write a test, improve documentation, or translate a message string, every contribution matters.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Community', 'Contributing to Netsuke') %}
+                Netsuke is open-source and welcoming to contributors of all backgrounds. Whether you fix a bug, write a test, improve documentation, or translate a message string, every contribution matters.
+            {% endcall %}{% raw %}
 
             <!-- Ways to Contribute -->
             <section id="ways-to-contribute" class="mb-20">

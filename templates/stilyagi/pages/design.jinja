@@ -1,6 +1,21 @@
 {% extends "_layout.jinja" %}
 {% block title %}Stilyagi · Design — under the bonnet{% endblock %}
 {% block description %}The Stilyagi architecture in full: the boundary between extraction and rule execution, the IR schema, and the packaging split between the Rust core and the Python rule API.{% endblock %}
+{#
+  The nine architecture decision records shown in section F. A card
+  reads as Accepted unless it names another `status`.
+#}
+{% set adr_cards = [
+  {'num': 'ADR-001', 'title': 'Python package, Rust extractor', 'text': 'Ship one wheel per platform. PyO3 bindings. Pre-built wheels for Linux, macOS, Windows; sdist only if requested.'},
+  {'num': 'ADR-002', 'title': 'No bundled spellchecker in base', 'text': 'Spelling is an optional extra. Base install stays small and offline. Network-free by default is a hard contract.'},
+  {'num': 'ADR-003', 'title': 'Rules are trusted code', 'text': 'Plugins run as ordinary Python. No sandbox. Documented loudly in the README, CLI help, and the plugin guide.'},
+  {'num': 'ADR-004', 'title': 'Region IR, not raw AST', 'text': 'Rules subscribe to typed region classes. Raw AST is an implementation detail of the extractor, not a public surface.'},
+  {'num': 'ADR-005', 'title': 'Capability planner', 'text': 'Providers load only when at least one enabled rule declares them. Runtime cost is proportional to the enabled rule set.'},
+  {'num': 'ADR-006', 'title': 'Markdown first; MDX provisional', 'status': 'Provisional', 'status_class': 'prov', 'text': 'MDX support ships behind a feature flag. Tree-sitter grammar stability is the pacing risk.'},
+  {'num': 'ADR-007', 'title': 'SARIF as primary machine format', 'text': 'JSON is the CLI-friendly fallback; SARIF is the CI integration format. One schema for both versions, stable.'},
+  {'num': 'ADR-008', 'title': 'Fix safety is explicit', 'text': 'safe / unsafe / manual are first-class. The --fix flag accepts a safety class; unsafe fixes never run without an opt-in.'},
+  {'num': 'ADR-009', 'title': 'Deterministic ordering', 'text': 'Normalised path, byte offset, rule code, message hash. The same input yields the same output bytes, always.'},
+] %}
 {% block content %}
       <section class="page-intro">
         <div class="wrap">
@@ -544,86 +559,14 @@
           </div>
         </div>
         <div class="adr-grid">
+          {%- for adr in adr_cards %}
           <div class="adr-card">
-            <div class="adr-num">ADR-001</div>
-            <h3>Python package, Rust extractor</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              Ship one wheel per platform. PyO3 bindings. Pre-built wheels for Linux, macOS, Windows;
-              sdist only if requested.
-            </p>
+            <div class="adr-num">{{ adr.num }}</div>
+            <h3>{{ adr.title }}</h3>
+            <span class="adr-status{% if adr.status_class %} {{ adr.status_class }}{% endif %}">{{ adr.status | default('Accepted') }}</span>
+            <p class="editorial">{{ adr.text }}</p>
           </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-002</div>
-            <h3>No bundled spellchecker in base</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              Spelling is an optional extra. Base install stays small and offline. Network-free by default
-              is a hard contract.
-            </p>
-          </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-003</div>
-            <h3>Rules are trusted code</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              Plugins run as ordinary Python. No sandbox. Documented loudly in the README, CLI help, and
-              the plugin guide.
-            </p>
-          </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-004</div>
-            <h3>Region IR, not raw AST</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              Rules subscribe to typed region classes. Raw AST is an implementation detail of the
-              extractor, not a public surface.
-            </p>
-          </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-005</div>
-            <h3>Capability planner</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              Providers load only when at least one enabled rule declares them. Runtime cost is
-              proportional to the enabled rule set.
-            </p>
-          </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-006</div>
-            <h3>Markdown first; MDX provisional</h3>
-            <span class="adr-status prov">Provisional</span>
-            <p class="editorial">
-              MDX support ships behind a feature flag. Tree-sitter grammar stability is the pacing risk.
-            </p>
-          </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-007</div>
-            <h3>SARIF as primary machine format</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              JSON is the CLI-friendly fallback; SARIF is the CI integration format. One schema for both
-              versions, stable.
-            </p>
-          </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-008</div>
-            <h3>Fix safety is explicit</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              safe / unsafe / manual are first-class. The --fix flag accepts a safety class; unsafe fixes
-              never run without an opt-in.
-            </p>
-          </div>
-          <div class="adr-card">
-            <div class="adr-num">ADR-009</div>
-            <h3>Deterministic ordering</h3>
-            <span class="adr-status">Accepted</span>
-            <p class="editorial">
-              Normalised path, byte offset, rule code, message hash. The same input yields the same output
-              bytes, always.
-            </p>
-          </div>
+          {%- endfor %}
         </div>
       </section>
       <section class="closing">

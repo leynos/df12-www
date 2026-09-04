@@ -1,6 +1,6 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Getting Started - Netsuke Build System{% endblock %}
 {% block extra_head %}
@@ -13,88 +13,17 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
 
-        <!-- Sidebar Navigation (Desktop) -->
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
-            <!-- Search -->
-            <div
-                class="mb-8 relative"
-                data-doc-search-root
-                data-doc-search-index="/netsuke/assets/search/docs-search.json"
-            >
-                <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
-                <input
-                    type="text"
-                    placeholder="Search docs..."
-                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
-                    data-doc-search-input
-                    aria-label="Search the documentation"
-                    role="combobox"
-                    aria-autocomplete="list"
-                    aria-expanded="false"
-                >
-                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
-                <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
-                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
-                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
-                            Type at least 2 characters to search the docs.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="space-y-8">
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Introduction</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
-                        <li><a href="/netsuke/docs/getting-started/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Getting Started</a></li>
-                        <li><a href="/netsuke/docs/getting-started/#installation" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Installation</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Core Concepts</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
-                        <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
-                        <li><a href="/netsuke/docs/templating/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="/netsuke/docs/standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/cli/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
-                        <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
-                        <li><a href="/netsuke/docs/security/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        {% endraw %}{{ docsnav.sidebar('getting-started', sub_links=[{'href': '/netsuke/docs/getting-started/#installation', 'label': 'Installation'}]) }}{% raw %}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 {% endraw %}{{ docsnav.mobile_docs_bar('getting-started') }}{% raw %}
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">Getting Started</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Getting Started'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center mb-4">
-                    {% endraw %}{{ ui.kicker('Tutorial') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Getting Started with Netsuke</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    This guide will walk you through installing Netsuke, creating your first build manifest, and running your first successful build.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Tutorial', 'Getting Started with Netsuke') %}
+                This guide will walk you through installing Netsuke, creating your first build manifest, and running your first successful build.
+            {% endcall %}{% raw %}
 
             <!-- Prerequisites Section -->
             <section id="prerequisites" class="mb-16">
@@ -200,18 +129,7 @@ New-Item Netsukefile -ItemType File
                     <!-- Step 2: Content -->
                     <div>
                         <h3 class="font-bold text-charcoal mb-3 text-sm uppercase tracking-wide">2. Define a Simple Rule</h3>
-                        <div class="hm-faux-window bg-charcoal rounded-lg border border-charcoal-mid shadow-lg overflow-hidden">
-                            <div class="hm-faux-window__titlebar flex items-center justify-between px-4 py-3 bg-charcoal-mid/20 border-b border-white/10">
-                                <div class="flex space-x-2">
-                                    <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                                    <div class="w-3 h-3 rounded-full bg-amber"></div>
-                                    <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                                </div>
-                                <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                                <div class="w-12"></div>
-                            </div>
-                            <div class="hm-faux-window__body p-5 font-mono text-sm text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                        {% endraw %}{{ chrome.faux_window_open('Netsukefile', body_class='p-6 font-mono text-sm text-stone-light overflow-x-auto') }}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 
 targets:
@@ -223,9 +141,7 @@ targets:
     sources: "hello.txt"
 
 defaults: ["shout.txt"]
-{% endraw %}{% endhighlight %}{% raw %}
-                            </div>
-                        </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
                     </div>
                 </div>
             </section>
@@ -240,26 +156,13 @@ defaults: ["shout.txt"]
                     Now invoke the CLI to build your target. Netsuke parses YAML first, resolves any templating, generates a Ninja plan, and then executes the required commands.
                 </p>
 
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden mb-8">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/30 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <div class="text-xs font-mono text-charcoal-light">Terminal</div>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Terminal', outer_class='mb-8') }}{% highlight 'netsuke-console' %}{% raw %}
 $ netsuke build shout.txt
 [1/2] printf 'Hello, Netsuke!\n' > hello.txt
 [2/2] tr 'a-z' 'A-Z' < hello.txt > shout.txt
 $ cat shout.txt
 HELLO, NETSUKE!
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <div class="flex p-4 bg-boxwood-pale border border-stone rounded-lg">
                     <div class="flex-shrink-0">

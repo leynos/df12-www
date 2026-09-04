@@ -134,6 +134,54 @@ Use the current examples until the planned commands ship. `patches apply` and
 `symbols rename` remain target wording in the docs, not a promise about the
 current binary.
 
+## 5. Netsuke
+
+Netsuke's documentation begins at [/netsuke/docs/](/netsuke/docs/); the home
+page is [/netsuke/](/netsuke/).
+
+### 5.1. Navigating the documentation
+
+On screens 1024 pixels wide and up, the documentation and guides pages carry a
+sidebar on the left. On a documentation page its entries are grouped under
+"Introduction", "Core Concepts", and "Reference"; the current page is
+highlighted and announced to screen readers as the current page, and its own
+section anchors are listed indented beneath it. A search box sits above the
+groups: enter at least two characters to search the documentation, and the
+search lists matches to follow.
+
+Below 1024 pixels wide, there is no room for the sidebar. On a documentation
+page it is replaced by a bar at the top of the content holding a drop-down of
+the documentation pages — choosing one navigates there — and the same search
+box.
+
+A guide page's sidebar instead lists that guide's sections under "On this
+page" and a short set of "Helpful links", with no search box. Below 1024
+pixels wide, a guide has no sidebar or bar; its sections follow in reading
+order, and the site-wide navigation bar is the way to other pages.
+
+The site-wide navigation bar has its own menu button below 768 pixels wide.
+Pressing it opens the menu; pressing it again, pressing `Escape`, or clicking
+outside the menu closes it. This is the same mobile menu shared across the
+site.
+
+### 5.2. Breadcrumbs
+
+Every documentation, guide, and example page carries a breadcrumb trail above
+its heading, showing the route from the section hub down to that page. The
+final entry in the trail is the current page and is marked as such for
+assistive technology; earlier entries are links back up the route, except
+that an example page's category is shown as plain text.
+
+### 5.3. Example pages
+
+Each example page opens with three labels: the example's category (Basics,
+Web, Media, Design, C / C++, or Docs), its level (Beginner or Intermediate),
+and "Reviewed syntax", meaning the manifest has been checked against the
+shipped example. Two buttons follow the labels: the first usually returns to
+the examples hub, and the second points at the most relevant documentation
+page. Below the manifest, the transcript of the build runs in a
+terminal-styled panel.
+
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the
 [df12 Pages App Design](df12-pages-app-design.md).

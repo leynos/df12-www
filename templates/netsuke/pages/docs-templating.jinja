@@ -1,6 +1,6 @@
 {% extends "doc_page.jinja" %}
-{% import "components.jinja" as ui %}
 {% import "docs_nav.jinja" as docsnav %}
+{% import "chrome.jinja" as chrome %}
 {% set active_nav = 'docs' %}
 {% block page_title %}Templating - Netsuke Build System{% endblock %}
 {% block extra_head %}
@@ -19,95 +19,18 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 flex-grow flex">
 
-        <!-- Sidebar Navigation (Desktop) -->
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
-            <!-- Search -->
-            <div
-                class="mb-8 relative"
-                data-doc-search-root
-                data-doc-search-index="/netsuke/assets/search/docs-search.json"
-            >
-                <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
-                <input
-                    type="text"
-                    placeholder="Search docs..."
-                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
-                    data-doc-search-input
-                    aria-label="Search the documentation"
-                    role="combobox"
-                    aria-autocomplete="list"
-                    aria-expanded="false"
-                >
-                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
-                <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
-                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
-                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
-                            Type at least 2 characters to search the docs.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="space-y-8">
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Introduction</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Documentation Hub</a></li>
-                        <li><a href="/netsuke/docs/getting-started/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Getting Started</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Core Concepts</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/manifest-reference/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Manifest Reference</a></li>
-                        <li><a href="/netsuke/docs/rules-and-targets/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Rules &amp; Targets</a></li>
-                        <li><a href="/netsuke/docs/templating/" class="sidebar-link active block px-2 py-1.5 text-sm font-medium rounded-r-md transition-colors">Templating</a></li>
-                        <li><a href="#why" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Why Jinja inside YAML</a></li>
-                        <li><a href="#yaml" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">YAML foundations</a></li>
-                        <li><a href="#rendering" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">How rendering works</a></li>
-                        <li><a href="#foreach" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Repeating with foreach</a></li>
-                        <li><a href="#when" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Selecting with when</a></li>
-                        <li><a href="#macros" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Macros</a></li>
-                        <li><a href="#patterns" class="sidebar-link sidebar-link--sub block px-2 py-1.5 hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Common patterns</a></li>
-                        <li><a href="/netsuke/docs/standard-library/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Standard Library</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">Reference</h3>
-                    <ul class="space-y-1">
-                        <li><a href="/netsuke/docs/cli/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">CLI Commands</a></li>
-                        <li><a href="/netsuke/docs/configuration/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Configuration</a></li>
-                        <li><a href="/netsuke/docs/security/" class="sidebar-link block px-2 py-1.5 text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light rounded-r-md transition-colors">Security Model</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        {% endraw %}{{ docsnav.sidebar('templating', sub_links=[{'href': '#why', 'label': 'Why Jinja inside YAML'}, {'href': '#yaml', 'label': 'YAML foundations'}, {'href': '#rendering', 'label': 'How rendering works'}, {'href': '#foreach', 'label': 'Repeating with foreach'}, {'href': '#when', 'label': 'Selecting with when'}, {'href': '#macros', 'label': 'Macros'}, {'href': '#patterns', 'label': 'Common patterns'}]) }}{% raw %}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 {% endraw %}{{ docsnav.mobile_docs_bar('templating') }}{% raw %}
 
-            <!-- Breadcrumbs -->
-            <nav class="flex items-center text-sm text-charcoal-light mb-8 font-mono">
-                <a href="/netsuke/docs/" class="hover:text-vermillion transition-colors">Docs</a>
-                <span class="mx-2 text-stone">/</span>
-                <span class="text-charcoal font-medium">Templating</span>
-            </nav>
+            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Templating'}]) }}{% raw %}
 
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center mb-4">
-                    {% endraw %}{{ ui.kicker('Core Concepts') }}{% raw %}
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">Templating</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
-                    Netsuke renders MiniJinja inside YAML values. The structure stays as data; templating fills in strings,
-                    expands entries with <code>foreach</code>, and gates them with <code>when</code> &mdash; all before the build graph exists.
-                </p>
-            </div>
+            {% endraw %}{% call chrome.page_header('Core Concepts', 'Templating') %}
+                Netsuke renders MiniJinja inside YAML values. The structure stays as data; templating fills in strings,
+                expands entries with <code>foreach</code>, and gates them with <code>when</code> &mdash; all before the build graph exists.
+            {% endcall %}{% raw %}
 
             <!-- Why -->
             <section id="why" class="mb-20">
@@ -156,18 +79,7 @@
                     Use <code>|</code> for a multi-line string that preserves line breaks, or <code>&gt;-</code> to fold lines
                     into one string.
                 </p>
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 
 vars:
@@ -185,9 +97,7 @@ targets:
 
 defaults:
   - greeting.txt
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
             </section>
 
             <!-- Rendering -->
@@ -311,18 +221,7 @@ targets:
                     declared as data rather than written as <code>{% macro %}</code> statements, the YAML document stays a
                     document.
                 </p>
-                <div class="hm-faux-window bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
-                    <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
-                        <div class="flex space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber"></div>
-                            <div class="w-3 h-3 rounded-full bg-matcha"></div>
-                        </div>
-                        <span class="text-xs font-mono text-stone-light">Netsukefile</span>
-                        <div class="w-12"></div>
-                    </div>
-                    <div class="hm-faux-window__body p-6 font-mono text-sm overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+                {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
 macros:
   - signature: "obj_name(src)"
     body: |
@@ -333,9 +232,7 @@ targets:
     name: "build/{{ obj_name(item) }}"
     rule: "compile"
     sources: "{{ item }}"
-{% endraw %}{% endhighlight %}{% raw %}
-                    </div>
-                </div>
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
             </section>
 
             <!-- Advanced Patterns -->

@@ -65,7 +65,12 @@ def test_netsuke_pages_do_not_load_the_play_cdn(built_site: Path) -> None:
     """
     del built_site
     offenders: dict[str, list[str]] = {}
-    for page in sorted(PUBLIC_NETSUKE.rglob("*.html")):
+    pages = sorted(PUBLIC_NETSUKE.rglob("*.html"))
+    assert pages, (
+        f"no published Netsuke page under {PUBLIC_NETSUKE}; an empty tree would "
+        "pass this check without checking anything"
+    )
+    for page in pages:
         markup = page.read_text(encoding="utf-8")
         remote = sorted(
             {

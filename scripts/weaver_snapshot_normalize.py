@@ -86,8 +86,12 @@ _ORIGIN_POSITIONS = frozenset({"0px 0px", "0% 0%", "0px", "0%"})
 
 # Properties a running animation samples mid-cycle. `opacity` is what a pulse
 # changes; `transform` is what a spin changes, and it drags the node's
-# bounding box round with it.
+# bounding box round with it. A computed style names the animation but not
+# what it animates, so the ones that move are named here: Tailwind's three
+# transform animations. A pulse, or a border that cycles its colour, leaves
+# its box where it is, and the box stays in the comparison.
 _ANIMATED = ("opacity", "transform")
+_MOVING_ANIMATIONS = frozenset({"spin", "ping", "bounce"})
 
 
 def _drop_invisible_border_colours(style: dict[str, typ.Any]) -> None:
@@ -192,8 +196,9 @@ def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any
         if not key.startswith("--")
     }
     if _is_animated(style):
-        for key in _ANIMATED:
-            style.pop(key, None)
+        style.pop("opacity", None)
+    if _is_moving(style):
+        style.pop("transform", None)
     for key in ("box-shadow", "text-shadow"):
         if isinstance(style.get(key), str):
             style[key] = _canonical_shadow(style[key])
@@ -277,6 +282,12 @@ def _incidental_text(value: str) -> str:
 def _is_animated(style: dict[str, typ.Any]) -> bool:
     """Say whether a node's styles show a CSS animation running on it."""
     return style.get("animation-name", "none") != "none"
+
+
+def _is_moving(style: dict[str, typ.Any]) -> bool:
+    """Say whether a node is running an animation that moves its box."""
+    names = str(style.get("animation-name", "none")).split(", ")
+    return any(name in _MOVING_ANIMATIONS for name in names)
 
 
 def _resolve_tracked(
@@ -535,10 +546,16 @@ def _fold_sibling_margins(
         margins on that axis as they were.
     parent_style
         The parent's normalized styles, from which any ``row-gap`` or
-        ``column-gap`` is read and then removed.
+        ``column-gap`` is read, and removed once a child's gap has absorbed
+        it. A gap that folds into nothing — no children, a child whose
+        margins are not pixel lengths, a gap that is not one itself — stays
+        on the parent, where a change to it is still a change.
     """
     for before, after, logical_before, logical_after, gap_key in _MARGIN_AXES:
-        gap = _pixels(parent_style.pop(gap_key, None)) or 0.0
+        gap = _pixels(parent_style.get(gap_key))
+        if gap is None:
+            continue
+        folded = False
         leading = [
             _pixels(child["styleDiff"].get(f"margin-{before}")) for child in children
         ]
@@ -553,6 +570,7 @@ def _fold_sibling_margins(
             following = leading[index + 1] if index + 1 < len(children) else 0.0
             if previous is None or following is None:
                 continue
+            folded = True
             style = child["styleDiff"]
             for key in (
                 f"margin-{before}",
@@ -571,6 +589,8 @@ def _fold_sibling_margins(
                 style[f"gap-before-{before}"] = f"{gap_before:g}px"
             if gap_after:
                 style[f"gap-after-{after}"] = f"{gap_after:g}px"
+        if folded:
+            parent_style.pop(gap_key, None)
 
 
 # Whatever the walker put in a node's `bbox`. It is a mapping today; the type
@@ -629,9 +649,11 @@ def _normalize(
         The values the parent node carried for the properties in
         :data:`_TRACKS_PARENT`. Empty at the root.
     spinning
-        Whether an ancestor is running an animation. Its box turns with it,
-        and so does every box beneath it: the ``<path>`` inside a spinning
-        icon has no animation of its own and moves all the same.
+        Whether an ancestor is running an animation that moves it. Its box
+        turns with it, and so does every box beneath it: the ``<path>``
+        inside a spinning icon has no animation of its own and moves all the
+        same. An animation that only cycles a colour or an opacity leaves
+        every box in place, and those stay in the comparison.
 
     Returns
     -------
@@ -642,7 +664,7 @@ def _normalize(
     style = _canonical_style(node.get("styleDiff"))
     carried = _resolve_tracked(style, inherited or {})
 
-    spinning = spinning or _is_animated(style)
+    spinning = spinning or _is_moving(style)
     _fold_transform(style, node.get("bbox"))
     normalized = dict(node)
     normalized["styleDiff"] = style

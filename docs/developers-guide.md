@@ -40,11 +40,12 @@ depends on the last:
 bun run build              # build:static, build:js, build:css, build:images, build:pages, build:search, build:static
 bun run build:static       # copy src/static/ verbatim, except .ts (scripts/copy-static.ts)
 bun run build:js           # compile the browser scripts to public/ (scripts/compile-browser-scripts.ts)
-bun run build:css          # compile the main, mxd, Episodic, Weaver and Stilyagi Tailwind entrypoints
+bun run build:css          # compile the main, mxd, Episodic, Weaver, Stilyagi and Netsuke Tailwind entrypoints
 bun run build:css:mxd      # just the mxd entrypoint, for iterating on one sub-site
 bun run build:css:episodic # just the Episodic entrypoint
 bun run build:css:weaver   # just the Weaver entrypoint
 bun run build:css:stilyagi # just the Stilyagi entrypoint
+bun run build:css:netsuke  # just the Netsuke entrypoint
 bun run build:images       # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages        # uv run pages generate --all-sites
 bun run build:search       # build the Netsuke and Episodic search indices

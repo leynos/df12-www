@@ -394,7 +394,9 @@ def test_a_radius_past_a_semicircle_reads_as_the_same_radius(
 ) -> None:
     """`rounded-full` is 9999px in v3 and calc(infinity * 1px) in v4."""
     normalized = normalize._normalize(_node(**{"border-top-left-radius": reported}))
-    assert normalized["styleDiff"]["border-top-left-radius"] == canonical
+    assert normalized["styleDiff"]["border-top-left-radius"] == canonical, (
+        "v3's 9999px and v4's infinite radius draw the same corner"
+    )
 
 
 def _stack(
@@ -452,8 +454,8 @@ def test_a_margin_that_is_not_a_length_is_left_alone() -> None:
     """`auto` centres a block; it is not a gap and is kept as a margin."""
     centred = _stack({"margin-left": "auto", "margin-right": "auto"})
     gaps = _gaps(centred)[0]
-    assert gaps["margin-left"] == "auto"
-    assert "gap-before-left" not in gaps
+    assert gaps["margin-left"] == "auto", "an auto margin is centring, not a gap"
+    assert "gap-before-left" not in gaps, "a child with an auto margin folds no gap"
 
 
 @pytest.mark.parametrize("position", ["0px 0px", "0% 0%"])
@@ -462,16 +464,22 @@ def test_a_background_at_its_origin_is_where_an_unpositioned_one_is(
 ) -> None:
     """Chromium spells the default in percentages and a reset in pixels."""
     normalized = normalize._normalize(_node(**{"background-position": position}))
-    assert "background-position" not in normalized["styleDiff"]
+    assert "background-position" not in normalized["styleDiff"], (
+        "a background at the origin is where an unpositioned one already sits"
+    )
 
     moved = normalize._normalize(_node(**{"background-position": "50% 50%"}))
-    assert moved["styleDiff"]["background-position"] == "50% 50%"
+    assert moved["styleDiff"]["background-position"] == "50% 50%", (
+        "a background moved off the origin is a real position"
+    )
 
 
 def test_a_light_colour_scheme_reads_as_the_default_one() -> None:
     """A page that only offers light renders the same either way."""
     light = normalize._normalize(_node(**{"color-scheme": "light"}))
-    assert "color-scheme" not in light["styleDiff"]
+    assert "color-scheme" not in light["styleDiff"], (
+        "light is the default scheme; only v4 says so"
+    )
 
     dark = normalize._normalize(_node(**{"color-scheme": "dark"}))
     assert dark["styleDiff"]["color-scheme"] == "dark", "dark is a real change"
@@ -537,7 +545,9 @@ def test_a_class_list_is_not_compared() -> None:
     node = _node(color="rgb(1, 2, 3)")
     node["classes"] = ["shadow-sm"]
     normalized = normalize._normalize(node)
-    assert "classes" not in normalized
+    assert "classes" not in normalized, (
+        "the class list is how a node is styled, not what it looks like"
+    )
     assert normalized["styleDiff"]["color"] == "rgba(1, 2, 3, 1.000)", (
         "what the classes computed to is still compared"
     )

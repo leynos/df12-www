@@ -57,7 +57,9 @@ def test_a_page_path_becomes_a_flat_filename_stem(page: str, slug: str) -> None:
 @pytest.mark.parametrize("site", ["weaver", "netsuke", "mxd-2"])
 def test_a_sub_site_name_locates_its_published_tree(site: str) -> None:
     """The root is `public/<site>`, which is where the generator writes."""
-    assert paths._public_root(site) == paths.PUBLIC / site
+    assert paths._public_root(site) == paths.PUBLIC / site, (
+        f"the site {site!r} should be served from its own directory under public/"
+    )
 
 
 @pytest.mark.parametrize("site", ["", "Weaver", "../weaver", "weaver/", "two words"])
@@ -73,7 +75,9 @@ def test_a_name_that_is_not_a_slug_is_refused(site: str) -> None:
 def test_the_default_site_is_still_weaver() -> None:
     """Every existing command and test relies on the default meaning Weaver."""
     assert paths.DEFAULT_SITE == "weaver"
-    assert paths._public_root() == paths.PUBLIC_WEAVER
+    assert paths._public_root() == paths.PUBLIC_WEAVER, (
+        "with no site named, the root is Weaver's, the default site"
+    )
 
 
 def test_the_snapshot_port_refuses_to_borrow_someone_else_s_server() -> None:

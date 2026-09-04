@@ -66,7 +66,10 @@ def test_the_partial_carries_no_doubled_selectors() -> None:
     utility into the component.
     """
     fossils = sorted(
-        {match.group(0) for match in DOUBLED_SELECTOR.finditer(PARTIAL.read_text())}
+        {
+            match.group(0)
+            for match in DOUBLED_SELECTOR.finditer(PARTIAL.read_text(encoding="utf-8"))
+        }
     )
     assert not fossils, f"doubled selectors remain in {PARTIAL.name}: {fossils}"
 
@@ -120,4 +123,6 @@ def test_the_doubled_selector_pattern_tells_a_fossil_from_a_chain(
     selector: str, *, doubled: bool
 ) -> None:
     """The Pygments block's `.p.p-…` chains must not read as fossils."""
-    assert bool(DOUBLED_SELECTOR.search(selector)) is doubled
+    assert bool(DOUBLED_SELECTOR.search(selector)) is doubled, (
+        f"{selector!r} should {'' if doubled else 'not '}read as a doubled selector"
+    )

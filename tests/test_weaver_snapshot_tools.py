@@ -67,7 +67,10 @@ def test_the_browser_session_is_named_for_the_site_and_the_job() -> None:
     assert tools._session_name("netsuke").startswith("netsuke-shots"), (
         f"got {tools._session_name('netsuke')!r}"
     )
-    assert tools._session_name("netsuke", "capture").startswith("netsuke-capture")
+    assert tools._session_name("netsuke", "capture").startswith("netsuke-capture"), (
+        "the session is named for the site and the purpose, so two sites' runs "
+        "cannot share a browser"
+    )
     assert tools._session_name("netsuke") != tools._session_name("weaver"), (
         "a session is one viewport and one page; two sites need two"
     )
@@ -198,11 +201,18 @@ def test_a_page_that_never_settles_is_still_captured(
     )
 
 
-def test_a_snapshot_that_cannot_be_read_counts_no_icons(tmp_path: Path) -> None:
-    """The count is a report, not a gate; an unreadable file is the diff's to name."""
-    assert tools._unrendered_icons(tmp_path / "absent.json") == 0
+def test_a_snapshot_that_cannot_be_read_is_an_error_not_a_count(
+    tmp_path: Path,
+) -> None:
+    """The harness has just written the file, so failing to read it is a bug."""
+    with pytest.raises(FileNotFoundError):
+        tools._unrendered_icons(tmp_path / "absent.json")
     (tmp_path / "broken.json").write_text("{", encoding="utf-8")
-    assert tools._unrendered_icons(tmp_path / "broken.json") == 0
+    with pytest.raises(ValueError, match="Expecting"):
+        tools._unrendered_icons(tmp_path / "broken.json")
+    (tmp_path / "shapeless.json").write_text('{"payload": {}}', encoding="utf-8")
+    with pytest.raises(KeyError):
+        tools._unrendered_icons(tmp_path / "shapeless.json")
 
 
 def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None:

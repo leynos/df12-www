@@ -350,11 +350,15 @@ def _unrendered_icons(snapshot: Path) -> int:
         only the unrendered ones count. After the settle wait these are the
         icons the set does not have, and the count is reported so a page
         whose icons never arrived can be told from one that has none.
+
+    Raises
+    ------
+    OSError, ValueError, KeyError, TypeError
+        If the snapshot cannot be read, parsed, or is not the shape the
+        harness writes. It was written moments before by this process, so
+        any of these is a defect in the capture rather than a page to note.
     """
-    try:
-        tree = json.loads(snapshot.read_text(encoding="utf-8"))["payload"]["tree"]
-    except (OSError, ValueError, KeyError, TypeError):
-        return 0
+    tree = json.loads(snapshot.read_text(encoding="utf-8"))["payload"]["tree"]
 
     def count(node: typ.Any) -> int:  # noqa: ANN401 - the document is untyped upstream data
         if not isinstance(node, cabc.Mapping):

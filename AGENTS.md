@@ -497,6 +497,10 @@ are installed for this and both work without a display:
    neutral. A non-empty diff is
    either a bug or a change that must be described in the commit message.
    Narrow the captured properties with `--props` when the page is large.
+   For a whole sub-site, `scripts/weaver_snapshot.py capture --site <site>`
+   does the same walk over every page from agent-browser, after Iconify has
+   settled, and `diff` normalizes the Tailwind v3/v4 notation differences
+   away; see the Developer's Guide, section 7.
 5. **Run the accessibility audit** over the changed pages, as the
    [Accessibility](#accessibility) section requires.
 

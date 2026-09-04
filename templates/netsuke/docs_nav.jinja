@@ -28,7 +28,7 @@
   sub     an in-page anchor, indented under its page
 #}
 {% macro sidebar_link(href, label, active=false, sub=false) -%}
-<li><a href="{{ href }}" class="sidebar-link{% if active %} active{% endif %}{% if sub %} sidebar-link--sub{% endif %} block {% if sub %}pr-2{% else %}px-2{% endif %} py-1.5{% if active %} text-sm font-medium{% elif sub %} hover:text-accent hover:bg-base-200{% else %} text-sm text-charcoal-mid hover:text-accent hover:bg-base-200{% endif %} rounded-r-md transition-colors">{{ label }}</a></li>
+<li><a href="{{ href }}" class="sidebar-link{% if active %} active{% endif %}{% if sub %} sidebar-link--sub{% endif %} block {% if sub %}pr-2{% else %}px-2{% endif %} py-1.5{% if not sub %} text-sm{% endif %}{% if active %} font-medium{% elif sub %} hover:text-accent hover:bg-base-200{% else %} text-charcoal-mid hover:text-accent hover:bg-base-200{% endif %} rounded-r-md transition-colors">{{ label }}</a></li>
 {%- endmacro %}
 
 {#

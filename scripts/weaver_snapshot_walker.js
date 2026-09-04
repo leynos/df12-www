@@ -32,7 +32,7 @@
     const cached = defaultsCache.get(upper);
     if (cached) return cached;
     const doc = iframe.contentDocument;
-    if (!doc || !doc.body) return {};
+    if (!doc?.body) return {};
     const el = doc.createElement(upper);
     doc.body.appendChild(el);
     const cs = iframe.contentWindow?.getComputedStyle(el);

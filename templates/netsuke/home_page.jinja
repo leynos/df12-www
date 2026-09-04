@@ -1,16 +1,15 @@
-{% extends "doc_page.jinja" %}
+{% extends "_layout.jinja" %}
 {% import "chrome.jinja" as chrome %}
 {#
   The Netsuke homepage.
 
   Extends the shared layout so the navbar, mobile menu, and footer have one
-  owner. The homepage has no docs chrome, so it drops the scrollspy and
-  copy-button scripts, pulls in Plotly for the pipeline chart, and lets the
-  body flow rather than stretching it into the doc-page flex column.
+  owner. It is not a documentation page, so it extends `_layout.jinja` rather
+  than `doc_page.jinja` and never acquires the scrollspy and copy-button
+  scripts or the doc-page flex column in the first place. It adds Plotly for
+  the pipeline chart.
 #}
 {% block page_title %}{{ homepage.title }}{% endblock %}
-{% block body_class %}{% endblock %}
-{% block page_scripts %}{% endblock %}
 {% block extra_head %}
     <script src="https://cdn.plot.ly/plotly-3.1.1.min.js" integrity="sha384-eyWfwv4NWkH7sLjk6s+Al2SBmZhX8gcLellpr+PLrfiNaHoTlAQTG9zDi4Z0liz8" crossorigin="anonymous"></script>
 {% endblock %}

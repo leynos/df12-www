@@ -292,6 +292,19 @@ describe("compile-browser-scripts.ts as a build step", () => {
     expect(status).toBe(0);
     expect(output).toContain("Skipping browser script compile");
   });
+
+  test("fails when the source root cannot be read for any other reason", () => {
+    /* `src` is a file here, so reading `src/static` fails with ENOTDIR rather
+       than ENOENT. A source tree that cannot be read is a fault, not an
+       absent directory, and must not pass as a quiet skip. */
+    const root = mkdtempSync(join(tmpdir(), "df12-compile-broken-"));
+    created.push(root);
+    writeFileSync(join(root, "src"), "not a directory\n");
+    const { status, output } = runScript("compile-browser-scripts.ts", root);
+    expect(status).not.toBe(0);
+    expect(output).not.toContain("Skipping browser script compile");
+    expect(output).toContain("ENOTDIR");
+  });
 });
 
 describe("copy-static.ts beside the compile step", () => {

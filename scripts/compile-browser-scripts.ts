@@ -139,12 +139,16 @@ export async function compileClassicScript(source: string, filename: string): Pr
  * Compile every browser script whose output is missing or stale.
  *
  * Skips the step with a message when `src/static` is absent, so a partial
- * checkout does not fail the build.
+ * checkout does not fail the build. Any other failure to read the directory
+ * (a permission error, say) is a real fault and aborts the build.
  */
 async function main(): Promise<void> {
   try {
     await stat(SOURCE_ROOT);
-  } catch {
+  } catch (error) {
+    if (!isMissing(error)) {
+      throw error;
+    }
     console.log("Skipping browser script compile. Directory src/static does not exist.");
     return;
   }

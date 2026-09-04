@@ -1,0 +1,135 @@
+{% import '_chrome.jinja' as chrome %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block page_title %}{% endblock %}</title>
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/playfair-display-latin-wght-normal.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/weaver/assets/fonts/ibm-plex-sans-latin-wght-normal.woff2">
+    {% block extra_head %}{% endblock %}
+    <link rel="stylesheet" href="/weaver/assets/styles/weaver.css">
+</head>
+<body class="bg-base-100 relative overflow-x-hidden selection:bg-accent-deep selection:text-white">
+
+    {% block texture_overlay %}<div class="texture-overlay"></div>{% endblock %}
+
+    <div class="flex flex-col lg:flex-row min-h-screen relative z-20">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-full lg:w-64 bg-base-100 border-r-2 border-base-content/20 shrink-0 lg:fixed h-auto lg:h-full z-40 flex flex-col justify-between">
+            <div>
+                <div class="p-8 border-b-2 border-base-content/20" data-mobile-nav-header>
+                    <h1 class="font-serif text-3xl font-bold tracking-tight text-base-content">WEAVER</h1>
+                    <p class="font-mono text-xs mt-2 text-base-content/88">AI CODEBASE TOOLING</p>
+                </div>
+                <nav class="p-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+                    {%- set here = chrome.current_href(nav_links) -%}
+                    {{ chrome.nav_link('/weaver/', '00', 'Home', here) }}
+                    {{ chrome.nav_link('/weaver/why-weaver/', '01', 'Philosophy', here) }}
+                    {{ chrome.nav_link('/weaver/how-it-works/', '02', 'Architecture', here) }}
+                    {% block nav_subitems_how %}{% endblock %}
+                    {{ chrome.nav_link('/weaver/commands/', '03', 'Commands', here) }}
+                    {% block nav_subitems_commands %}{% endblock %}
+                    {{ chrome.nav_link('/weaver/safety/', '04', 'Safety', here) }}
+                    {{ chrome.nav_link('/weaver/sempai/', '05', 'Sempai Engine', here) }}
+                    {% block nav_subitems_sempai %}{% endblock %}
+                    {{ chrome.nav_link('/weaver/jacquard/', '06', 'Jacquard', here) }}
+                    {% block nav_subitems_jacquard %}{% endblock %}
+                    <div class="pt-4 mt-2 border-t border-base-content/10">
+                        {{ chrome.nav_link('/weaver/install/', '', 'Install', here, variant='install') }}
+                        {{ chrome.nav_link('/weaver/docs/', '', 'Docs', here) }}
+                        {{ chrome.nav_link('/weaver/roadmap/', '', 'Roadmap', here) }}
+                    </div>
+                </nav>
+            </div>
+
+            {% block sidebar_footer %}
+            <div class="p-6 border-t border-base-content/10 hidden lg:block">
+                <a href="/" class="font-mono text-xs text-accent-ink hover:text-base-content transition-colors block mb-3">&larr; Back to df12 Productions</a>
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 rounded-full bg-status-ok animate-pulse"></div>
+                    <span class="font-mono text-xs text-base-content/82">System Operational</span>
+                </div>
+                <p class="font-mono text-3xs text-base-content/75">0.1.0 target surface</p>
+            </div>
+            {% endblock %}
+        </aside>
+
+        <!-- Main Content -->
+        <main class="{% block main_class %}flex-1 min-w-0 lg:ml-64 grid-bg min-h-screen relative{% block main_extra_class %}{% endblock %}{% endblock %}">
+
+{% block content %}{% endblock %}
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    {% block page_footer %}
+    <footer class="bg-base-100 border-t border-base-content/20 p-8 lg:p-16 relative lg:ml-64">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <div class="flex items-center gap-3 mb-2">
+                        <div class="weaver-brand-mark w-8 h-8 text-lg" aria-hidden="true"></div>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">WEAVER</h2>
+                </div>
+                <p class="font-mono text-xs text-base-content/82 mt-1">© 2026 df12 Productions</p>
+                <p class="font-mono text-xs text-base-content/82 mt-1">Serious tools, <span class="text-accent-ink">playful worlds.</span></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 text-center md:flex md:flex-row md:gap-x-8 md:text-right">
+                <div class="flex flex-col space-y-2">
+                    <span class="font-mono text-xs font-bold text-base-content uppercase mb-3">Project</span>
+                    <a href="/weaver/why-weaver/" class="text-sm text-base-content/80 hover:text-accent-ink transition-colors">Philosophy</a>
+                    <a href="/weaver/roadmap/" class="text-sm text-base-content/80 hover:text-accent-ink transition-colors">Roadmap</a>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <span class="font-mono text-xs font-bold text-base-content uppercase mb-3">Resources</span>
+                    <a href="/weaver/docs/" class="text-sm text-base-content/80 hover:text-accent-ink transition-colors">Documentation</a>
+                    <a href="/weaver/install/" class="text-sm text-base-content/80 hover:text-accent-ink transition-colors">Installation</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hanko Stamp (Decorative) -->
+        <div class="absolute bottom-8 right-8 hidden lg:block opacity-20 hover:opacity-100 transition-opacity duration-500">
+            <div class="w-24 h-24 border-4 border-accent rounded-xs flex items-center justify-center stamp-rotate mix-blend-multiply bg-accent/5">
+                <div class="text-center leading-tight">
+                    <span class="text-accent-ink font-serif font-bold text-xl block">CODE</span>
+                    <span class="text-accent-ink font-serif font-bold text-xl block">SAFE</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const selector = this.getAttribute('href');
+                if (!selector || selector === '#') return;
+
+                let target;
+                try {
+                    target = document.querySelector(selector);
+                } catch {
+                    return;
+                }
+                if (!target) return;
+
+                e.preventDefault();
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                target.scrollIntoView({
+                    behavior: reduceMotion ? 'auto' : 'smooth',
+                    block: 'start'
+                });
+                history.pushState(null, '', selector);
+            });
+        });
+    </script>
+    <script src="/weaver/assets/js/telemetry.js"></script>
+    <script src="/weaver/assets/js/mobile-nav.js"></script>
+</body>
+</html>

@@ -7,14 +7,21 @@
  * as `/netsuke/assets/js/doc-search.js`. swc does the compiling.
  *
  * Only types are removed. The sources are classic scripts — an IIFE per
- * file, loaded with a plain `<script defer>` — and they must stay that way,
- * because the templates load them without `type="module"` and the Bun tests
- * `require` the output for its guarded `module.exports`. So each file is
- * compiled with `isModule: false`, which tells swc to leave the top level
- * alone rather than wrap it as a module, and no module or syntax transform
- * is applied beyond the target. Typechecking is not swc's job: it strips
- * without checking, and `bun run typecheck:js` is the gate that catches a
- * wrongly typed module.
+ * file — and they must stay that way, because the templates load them
+ * without `type="module"` and the Bun tests `require` the output for its
+ * guarded `module.exports`. So each file is compiled with `isModule: false`,
+ * which tells swc to leave the top level alone rather than wrap it as a
+ * module, and no module or syntax transform is applied beyond the target.
+ *
+ * How a page loads the output is the template's business, not this step's,
+ * and it differs by site: fourteen of the sixteen scripts are loaded with
+ * `<script defer>`, while Weaver's `telemetry.ts` and `mobile-nav.ts` are
+ * plain `<script>` tags at the end of `<body>` that run immediately. Both
+ * arrangements need the same classic-script output, which is why the shape
+ * above is a contract rather than a default.
+ *
+ * Typechecking is not swc's job: it strips without checking, and
+ * `bun run typecheck:js` is the gate that catches a wrongly typed module.
  *
  * Ordering matters: this runs after the first `build:static`, alongside the
  * other steps that write into `public/`. A file is skipped when its output is

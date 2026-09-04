@@ -216,6 +216,53 @@ describe("compileClassicScript", () => {
 });
 
 /* ------------------------------------------------------------------------
+ * What the compile step's own header claims about the output.
+ * --------------------------------------------------------------------- */
+
+/* The header comment of `scripts/compile-browser-scripts.ts`, stripped of its
+   comment markers and rewrapped as one line, so a claim may be matched
+   whatever width it happens to be wrapped at. */
+function compilerHeader() {
+  const source = readFileSync(join(REPO_ROOT, "scripts", "compile-browser-scripts.ts"), "utf8");
+  const header = source.slice(0, source.indexOf("@module"));
+  return header
+    .replace(/^\s*\/?\*+\/?/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+describe("the compile step's header", () => {
+  test("does not claim that every browser script is deferred", () => {
+    /* It is not true of Weaver's two, and the header said so for a while.
+       Any sentence tying `defer` to all, every, or each script fails here. */
+    const header = compilerHeader();
+    for (const claim of [
+      /\ball\b[^.]{0,80}scripts?[^.]{0,80}defer/i,
+      /\bevery\b[^.]{0,80}script[^.]{0,80}defer/i,
+      /\beach\b[^.]{0,80}script[^.]{0,80}defer/i,
+      /IIFE per file, loaded with a plain `<script defer>`/i,
+    ]) {
+      expect(header).not.toMatch(claim);
+    }
+  });
+
+  test("names the two loading modes and where each is used", () => {
+    const header = compilerHeader();
+    expect(header).toContain("fourteen of the sixteen scripts are loaded with `<script defer>`");
+    expect(header).toContain("Weaver's `telemetry.ts` and `mobile-nav.ts`");
+    expect(header).toContain("end of `<body>`");
+  });
+
+  test("still explains the classic-script shape the compile preserves", () => {
+    const header = compilerHeader();
+    expect(header).toContain("classic scripts");
+    expect(header).toContain("isModule: false");
+    expect(header).toContain("module.exports");
+    expect(header).toContain("no module or syntax transform is applied");
+  });
+});
+
+/* ------------------------------------------------------------------------
  * The scripts as the build runs them, against an isolated tree.
  * --------------------------------------------------------------------- */
 

@@ -4,10 +4,10 @@
 {% import "docs_nav.jinja" as docsnav %}
 {% block page_title %}Netsukefile Linter (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar(sections=[
+        {{ docsnav.sidebar(sections=[
             {'title': 'Forthcoming', 'links': [
                 {'href': '/netsuke/forthcoming/', 'label': 'All previews'},
                 {'href': '/netsuke/forthcoming/linter/', 'label': 'Netsukefile Linter', 'active': true},
@@ -25,17 +25,17 @@
                 {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md', 'label': 'Rule reference'},
                 {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md', 'label': 'ADR-018'}
             ]},
-        ], search=false, nav_label='Preview pages') }}{% raw %}
+        ], search=false, nav_label='Preview pages') }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': 'Netsukefile Linter'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': 'Netsukefile Linter'}]) }}
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
                 <div class="flex items-center flex-wrap gap-3 mb-4">
-                    {% endraw %}{{ ui.kicker('Forthcoming capability', dot='bg-primary') }}{% raw %}
+                    {{ ui.kicker('Forthcoming capability', dot='bg-primary') }}
                     <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview targeted at v0.2.0</span>
                 </div>
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-base-content mb-6">Netsukefile Linter</h1>
@@ -50,10 +50,10 @@
             <section id="status" class="mb-16">
                 <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
                     <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
-                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {% endraw %}{{ generated_at.strftime('%-d %B %Y') }}{% raw %}
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.strftime('%-d %B %Y') }}
                     </h2>
                     <ul class="space-y-2 text-sm text-charcoal-mid">
-                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{% endraw %}{{ netsuke_version }}{% raw %}.</strong> The released CLI has no <code>check</code> command; the roadmap lists it under the canonical CLI redesign.</span></li>
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> The released CLI has no <code>check</code> command; the roadmap lists it under the canonical CLI redesign.</span></li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">ADR-018</a> (accepted 30 August 2026) places linting under <code>netsuke check</code>; the <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">design document</a> and <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">rule reference</a> are normative. They live on the <a href="https://github.com/leynos/netsuke/pull/592" class="text-primary underline decoration-primary/40 hover:decoration-primary">#592</a> branch until it merges, so the links here point at that branch.</span></li>
                         <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Implemented on a branch.</strong> Issue <a href="https://github.com/leynos/netsuke/issues/592" class="text-primary underline decoration-primary/40 hover:decoration-primary">#592</a> carries the command, all twenty-four rules, the suppression scanner, and contract tests that check the rule reference against the registry in both directions.</span></li>
                         <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.2.0.</strong> Rule names are intended to be permanent from the release that ships them; flags and output shapes may still change before then.</span></li>
@@ -98,13 +98,13 @@
                 </p>
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Invocations from the design document</div>
-                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                    {% highlight 'netsuke-console' %}
 $ netsuke check
 $ netsuke check --explain
 $ netsuke check --explain directory-dep-not-order-only
 $ netsuke check --rule clarity=off --rule literal-recipe-path=error --fail-on warning
 $ netsuke --json check
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
                 <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
                     <table class="min-w-full hm-rows prop-table">
@@ -205,26 +205,26 @@ $ netsuke --json check
                     <div>
                         <p class="text-xs font-mono uppercase tracking-wide text-accent mb-2">Reported</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 targets:
   - name: app
     command: "cc build/main.o -o {{ outs }}"
   - name: build/main.o
     command: "cc -c src/main.c -o {{ outs }}"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                         </div>
                     </div>
                     <div>
                         <p class="text-xs font-mono uppercase tracking-wide text-success mb-2">Fixed</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 targets:
   - name: app
     sources: build/main.o
     command: "cc {{ ins }} -o {{ outs }}"
   - name: build/main.o
     command: "cc -c src/main.c -o {{ outs }}"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                         </div>
                     </div>
                 </div>
@@ -240,24 +240,24 @@ targets:
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Project policy</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Both policy flags layer through the existing configuration precedence, so a project can fix its policy in <code>netsuke.toml</code>. Setting a severity on an off-by-default rule enables it; setting <code>off</code> on any rule disables it. Nothing about policy resolution consults the environment beyond that chain, reads the terminal, or varies with time.</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% endraw %}{% highlight 'toml' %}{% raw %}
+{% highlight 'toml' %}
 [cmds.check]
 rule = ["clarity=off", "unreachable-target=warning"]
 fail_on = "warning"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                         </div>
                     </div>
                     <div>
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Suppression directives</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Suppression is narrow by construction: a directive names one or more rules and must state a reason. There is no blanket disable comment and no <code>all</code> selector. Scoping follows YAML indentation: a directive alone on its line governs the next declaration and everything indented beneath it.</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}
 targets:
   # netsuke-lint: allow background-job -- the previewer is intentionally detached
   - name: preview
     script: |
       feh processed &
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                         </div>
                     </div>
                 </div>
@@ -284,7 +284,7 @@ targets:
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke --json check (passing, abridged from the design document)</div>
-                    {% endraw %}{% highlight 'json' %}{% raw %}
+                    {% highlight 'json' %}{% raw %}
 {
   "schema_version": 1,
   "generator": { "name": "netsuke", "version": "0.2.0" },
@@ -307,7 +307,7 @@ targets:
     ]
   }
 }
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                 </div>
             </section>
 
@@ -346,9 +346,9 @@ targets:
                 </p>
             </section>
 
-{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Forthcoming capabilities', 'href': '/netsuke/forthcoming/'}, {'kicker': 'Next preview', 'label': 'Testing Framework', 'href': '/netsuke/forthcoming/testing-framework/'}) }}{% raw %}
+{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Forthcoming capabilities', 'href': '/netsuke/forthcoming/'}, {'kicker': 'Next preview', 'label': 'Testing Framework', 'href': '/netsuke/forthcoming/testing-framework/'}) }}
 
         </main>
     </div>
-{% endraw %}
+
 {% endblock %}

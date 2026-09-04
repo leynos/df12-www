@@ -15,13 +15,13 @@
     </style>
 {% endblock %}
 {% block content %}
-{% raw %}
+
 <main id="main-content" class="grow pt-24 pb-20 site-container">
 
-        {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'System Programming'}, {'label': 'Basic C Application'}]) }}{% raw %}
+        {{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'System Programming'}, {'label': 'Basic C Application'}]) }}
 
         <!-- Example Header -->
-        {% endraw %}{{ exdata.example_header('basic-c-application') }}{% raw %}
+        {{ exdata.example_header('basic-c-application') }}
 
         <div class="grid lg:grid-cols-12 gap-12">
 
@@ -82,9 +82,9 @@
                         <!-- Code Block -->
                         <div class="hm-example-code-block p-6 text-sm relative shadow-paper-lg">
                             <div class="absolute top-4 right-4 flex space-x-2">
-                                {% endraw %}{{ exdata.copy_manifest_button('basic-c-application') }}{% raw %}
+                                {{ exdata.copy_manifest_button('basic-c-application') }}
                             </div>
-                            {% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_basic_c }}{% endhighlight %}{% raw %}
+                            {% highlight 'netsuke' %}{{ exdata.snippet_basic_c }}{% endhighlight %}
                         </div>
                     </div>
 
@@ -120,14 +120,14 @@
                         <span  class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build
                     </h2>
 
-                    {% endraw %}{{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}{% raw %}
+                    {{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}
 $ netsuke build app
 [1/3] Compiling an object file
 [2/3] Compiling an object file
 [3/3] gcc -Wall -O2 main.o utils.o -o app
 $ ./app
 Hello from C!
-{% endraw %}{% endhighlight %}{{ chrome.example_terminal_close() }}{% raw %}
+{% endhighlight %}{{ chrome.example_terminal_close() }}
                 </section>
 
                 <!-- Section: Visual Graph -->
@@ -218,9 +218,9 @@ Hello from C!
                 </div>
 
                 <!-- Next Example Card -->
-                {% endraw %}
+                
 {{ exdata.up_next('basic-c-application') }}
-{% raw %}
+
 
                 </div>
             </aside>
@@ -228,5 +228,5 @@ Hello from C!
 
     </main>
     <script defer src="/netsuke/assets/js/example-toc.js"></script>
-{% endraw %}
+
 {% endblock %}

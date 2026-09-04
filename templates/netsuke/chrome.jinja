@@ -1,19 +1,20 @@
 {#
   Shared Netsuke page furniture.
 
-  Import as `chrome`. Page bodies are wrapped in `{% raw %}`, so a call has
-  to step out of it first; where the wrapped content is a highlighted code
-  sample the fence already exists and the call joins it:
+  Import as `chrome` and call it like any other macro. Pages are live Jinja
+  by default; `{% raw %}` wraps only the literal examples that must reach the
+  reader unrendered, so only the sample itself sits inside a raw region:
 
       {% import "chrome.jinja" as chrome %}
       ...
-      {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+      {{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
       ...
-      {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+      {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}
 
-  The windows are opener/closer pairs rather than `{% call %}` blocks so a
-  long body can stay inside the page's raw region instead of leaving and
-  re-entering it around the macro.
+  The windows were opener/closer pairs so a long body could stay inside the
+  page's raw region rather than leaving and re-entering it around the macro
+  call. Narrowing the regions removes that reason; the next commit makes them
+  balanced `{% call %}` blocks.
 #}
 {% import "components.jinja" as ui %}
 

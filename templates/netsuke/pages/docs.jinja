@@ -4,21 +4,21 @@
 {% set active_nav = 'docs' %}
 {% block page_title %}Documentation Hub - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar('') }}{% raw %}
+        {{ docsnav.sidebar('') }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
-{% endraw %}{{ docsnav.mobile_docs_bar('') }}{% raw %}
+{{ docsnav.mobile_docs_bar('') }}
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/', 'label': 'Home'}, {'label': 'Documentation'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/', 'label': 'Home'}, {'label': 'Documentation'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Documentation', 'Documentation Hub', accent=true) %}
+            {% call chrome.page_header('Documentation', 'Documentation Hub', accent=true) %}
                 Welcome to the Netsuke documentation. Start with the YAML manifest, learn how Jinja expands it, then follow the path through validation and Ninja execution.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- Start Here Section -->
             <section id="start-here" class="mb-16">
@@ -120,7 +120,7 @@
                             <span>examples/basic/Netsukefile</span>
                             <span>RO</span>
                         </div>
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 # Compile a simple C program
 netsuke_version: "1.0.0"
 
@@ -132,7 +132,7 @@ targets:
   - name: "hello_world"
     command: "gcc {{ ins }} -o {{ outs }}"
     sources: ["main.o", "print.o"]
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                     </div>
                 </div>
             </section>
@@ -244,5 +244,5 @@ targets:
     </div>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

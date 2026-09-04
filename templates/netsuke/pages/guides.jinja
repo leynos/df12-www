@@ -3,13 +3,13 @@
 {% set active_nav = 'guides' %}
 {% block page_title %}Guides Hub - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
 <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Hero Section -->
-        {% endraw %}{% call chrome.page_header('Concepts & Contribution', 'Guides & Deep Dives', hero=true, id='guides-hero') %}
+        {% call chrome.page_header('Concepts & Contribution', 'Guides & Deep Dives', hero=true, id='guides-hero') %}
             Understand the compiler model behind Netsuke, learn where the sharp edges are, and use the same language the manifests use.
-        {% endcall %}{% raw %}
+        {% endcall %}
 
         <!-- Featured Guide (How it works) -->
         <section id="featured-guide" class="mb-20">
@@ -120,7 +120,7 @@
                         <a href="/netsuke/roadmap/" class="hm-guide-card hm-card p-6 block h-full">
                             <h3 class="font-serif text-lg font-bold text-base-content mb-3">Roadmap &amp; Release Status</h3>
                             <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
-                                See what shipped in v{% endraw %}{{ netsuke_version }}{% raw %}, the known limitations, and the phased plan for the work ahead.
+                                See what shipped in v{{ netsuke_version }}, the known limitations, and the phased plan for the work ahead.
                             </p>
                             <span class="text-xs font-mono text-primary font-medium">Open Roadmap &rarr;</span>
                         </a>
@@ -322,5 +322,5 @@
         </div>
 
     </main>
-{% endraw %}
+
 {% endblock %}

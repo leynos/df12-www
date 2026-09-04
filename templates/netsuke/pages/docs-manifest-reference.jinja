@@ -12,21 +12,21 @@
     </style>
 {% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar('manifest-reference') }}{% raw %}
+        {{ docsnav.sidebar('manifest-reference') }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
-{% endraw %}{{ docsnav.mobile_docs_bar('manifest-reference') }}{% raw %}
+{{ docsnav.mobile_docs_bar('manifest-reference') }}
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Manifest Reference'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Manifest Reference'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Reference', 'Manifest Format') %}
+            {% call chrome.page_header('Reference', 'Manifest Format') %}
                 The <code class="font-mono text-accent bg-accent/5 px-1.5 py-0.5 rounded text-lg">Netsukefile</code> is the heart of your build configuration. It is a YAML document with explicit top-level keys and controlled Jinja expansion inside values.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- Anatomy Section -->
             <section id="anatomy" class="mb-16">
@@ -38,7 +38,7 @@
                     Every <code class="font-mono text-sm">Netsukefile</code> is a YAML mapping. Unknown fields and duplicate mapping keys are errors. <code>netsuke_version</code> and <code>targets</code> are required (an empty <code>targets</code> list is valid for an action-only manifest); <code>vars</code>, <code>macros</code>, <code>rules</code>, <code>actions</code>, and <code>defaults</code> are optional.
                 </p>
 
-                {% endraw %}{{ chrome.faux_window_open('Netsukefile', outer_class='relative') }}{% highlight 'netsuke' %}{% raw %}
+                {{ chrome.faux_window_open('Netsukefile', outer_class='relative') }}{% highlight 'netsuke' %}{% raw %}
 # 1. Schema version
 netsuke_version: "1.0.0"
 
@@ -58,7 +58,7 @@ targets:
 
 defaults:
   - "main.o"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                     <!-- Annotation Overlay -->
                     <div class="absolute right-6 top-16 hidden lg:block">
                         <div class="flex items-center mb-10">
@@ -74,7 +74,7 @@ defaults:
                             <span class="text-stone-light text-xs font-mono">Targets and defaults</span>
                         </div>
                     </div>
-                    {% endraw %}{{ chrome.faux_window_close() }}{% raw %}
+                    {{ chrome.faux_window_close() }}
             </section>
 
             <!-- Core Fields Table -->
@@ -168,7 +168,7 @@ defaults:
                     <div>
                         <h4 class="font-serif font-bold text-base-content mb-4">Basic Usage</h4>
                         <div class="bg-base-content rounded-lg border border-charcoal-mid shadow-lg p-5 font-mono text-sm overflow-x-auto text-stone-light">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 targets:
   - name: "page.html"
     sources:
@@ -176,14 +176,14 @@ targets:
       - "body.txt"
       - "footer.txt"
     command: "cat {{ ins }} > {{ outs }}"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                         </div>
                         <div class="mt-4 p-4 bg-base-100 border border-base-300 rounded-lg">
                             <h5 class="text-sm font-bold text-base-content mb-2">Common placeholders</h5>
                             <ul class="text-sm text-charcoal-mid space-y-2">
-                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">{{ ins }}</code> <span>Space-separated list of quoted input paths</span></li>
+{% raw %}                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">{{ ins }}</code> <span>Space-separated list of quoted input paths</span></li>
                                 <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">{{ outs }}</code> <span>Space-separated list of quoted output paths</span></li>
-                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">vars</code> <span>Global and target-local values exposed to Jinja rendering</span></li>
+{% endraw %}                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">vars</code> <span>Global and target-local values exposed to Jinja rendering</span></li>
                                 <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">$PATH</code> <span>Shell dollars are written normally; Netsuke escapes them for Ninja. <code>$in</code>/<code>$out</code> are not Netsuke placeholders &mdash; use the markers above.</span></li>
                             </ul>
                             <p class="text-xs text-charcoal-light mt-3">On POSIX and Bash routes a marker may sit unquoted, single-quoted, or double-quoted, but not inside a command substitution or backticks. In PowerShell, use markers unquoted; quoted and command-substitution marker sites are rejected rather than risking a context escape.</p>
@@ -213,8 +213,8 @@ targets:
                                     <code class="font-mono font-bold text-primary">command</code>
                                     <span class="text-xs text-charcoal-light font-mono">String or List of String</span>
                                 </div>
-                                <p class="text-sm text-charcoal-mid mt-1">One shell command string, or an ordered list of commands run in declaration order and stopped at the first non-zero exit &mdash; the fail-fast behaviour of a handwritten <code>&amp;&amp;</code> chain. Each entry sees the same Jinja context; use <code>{{ ins }}</code> for quoted inputs and <code>{{ outs }}</code> for quoted outputs. An empty command list is rejected at parse time.</p>
-                            </div>
+{% raw %}                                <p class="text-sm text-charcoal-mid mt-1">One shell command string, or an ordered list of commands run in declaration order and stopped at the first non-zero exit &mdash; the fail-fast behaviour of a handwritten <code>&amp;&amp;</code> chain. Each entry sees the same Jinja context; use <code>{{ ins }}</code> for quoted inputs and <code>{{ outs }}</code> for quoted outputs. An empty command list is rejected at parse time.</p>
+{% endraw %}                            </div>
                             <div class="border-l-2 border-primary pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
                                     <code class="font-mono font-bold text-primary">script</code>
@@ -316,12 +316,12 @@ targets:
             </section>
 
             <!-- Help Footer -->
-{% endraw %}{{ docsnav.docs_footer('manifest-reference') }}{% raw %}
+{{ docsnav.docs_footer('manifest-reference') }}
 
         </main>
     </div>
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

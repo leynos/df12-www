@@ -4,23 +4,23 @@
 {% set active_nav = 'guides' %}
 {% block page_title %}Contributing - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar(sections=[
+        {{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#ways-to-contribute', 'label': 'Ways to Contribute'}, {'href': '#dev-workflow', 'label': 'Development Workflow'}, {'href': '#quality-gates', 'label': 'Quality Gates'}, {'href': '#translation', 'label': 'Translating Netsuke'}, {'href': '#commit-style', 'label': 'Commit Style'}]},
             {'title': 'Helpful links', 'links': [{'href': 'https://github.com/leynos/netsuke', 'label': 'GitHub Repository'}, {'href': 'https://github.com/leynos/netsuke/issues', 'label': 'Issue Tracker'}, {'href': '/netsuke/docs/', 'label': 'Documentation'}, {'href': '/netsuke/code-of-conduct/', 'label': 'Code of Conduct'}]},
-        ], search=false) }}{% raw %}
+        ], search=false) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Contributing'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Contributing'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Community', 'Contributing to Netsuke') %}
+            {% call chrome.page_header('Community', 'Contributing to Netsuke') %}
                 Netsuke is open-source and welcoming to contributors of all backgrounds. Whether you fix a bug, write a test, improve documentation, or translate a message string, every contribution matters.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- Ways to Contribute -->
             <section id="ways-to-contribute" class="mb-20">
@@ -77,7 +77,7 @@
 
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Getting started</div>
-                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                    {% highlight 'netsuke-console' %}
 # Clone the repository
 $ git clone https://github.com/leynos/netsuke.git
 $ cd netsuke
@@ -90,7 +90,7 @@ $ cargo test
 
 # Run all quality gates (preferred)
 $ make check-fmt lint test
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
@@ -346,12 +346,12 @@ progress-target-count = Building { $count -&gt;
             </section>
 
             <!-- Footer nav -->
-{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'kicker': 'Open an', 'label': 'Issue on GitHub', 'href': 'https://github.com/leynos/netsuke/issues'}) }}{% raw %}
+{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'kicker': 'Open an', 'label': 'Issue on GitHub', 'href': 'https://github.com/leynos/netsuke/issues'}) }}
 
         </main>
     </div>
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

@@ -587,7 +587,7 @@ nothing. The dimming stops at 75%, not 60%: on the sidebar's cream ground,
 `opacity-60` composites the ink to `#708499`, 3.33:1 against the 4.5:1 that
 12px text needs, while `opacity-75` measures 4.88:1.
 
-A typical call site, from `templates/weaver/doc_page.jinja`:
+A typical call site, from `templates/weaver/_layout.jinja`:
 
 ```jinja
 {%- set here = chrome.current_href(nav_links) -%}
@@ -598,15 +598,20 @@ A typical call site, from `templates/weaver/doc_page.jinja`:
 
 ### 4.9. Weaver's shared page layout
 
-`templates/weaver/doc_page.jinja` is the base layout for every Weaver page. Both
+`templates/weaver/_layout.jinja` is the base layout for every Weaver page.
 `templates/weaver/home_page.jinja` and
-`templates/weaver/shared_content_page.jinja` extend it:
+`templates/weaver/shared_content_page.jinja` extend it directly:
 
 ```jinja
-{% extends "doc_page.jinja" %}
+{% extends "_layout.jinja" %}
 ```
 
-`doc_page.jinja` defines twelve blocks. A page that extends it inherits each
+`templates/weaver/doc_page.jinja` extends it too and adds nothing. It stays
+because `PageContentGenerator` hard-codes that filename and the templates under
+`pages/` extend it, so it is the seam where documentation-only chrome would go
+if Weaver ever grew any — the role Netsuke's `doc_page.jinja` already plays.
+
+`_layout.jinja` defines twelve blocks. A page that extends it inherits each
 block's default content unless it overrides that block.
 
 | Block                   | Default content                |
@@ -624,7 +629,7 @@ block's default content unless it overrides that block.
 | `content`               | empty                          |
 | `page_footer`           | full site footer               |
 
-_Table 5a: every block `doc_page.jinja` defines, and what it renders by
+_Table 5a: every block `_layout.jinja` defines, and what it renders by
 default._
 
 `home_page.jinja` overrides only `page_title` and `content`, and inherits every
@@ -696,8 +701,9 @@ _Table 5b: the blocks a page is most likely to override._
 ### 4.10. Which Weaver templates use the shared layout
 
 Twelve of the thirteen page templates under `templates/weaver/pages/` extend
-`doc_page.jinja`, as do `home_page.jinja` and `shared_content_page.jinja`.
-Adding a page means extending it too — the sidebar, the mobile drawer, and the
+`doc_page.jinja`, and so reach `_layout.jinja` through it; `home_page.jinja`
+and `shared_content_page.jinja` extend the layout directly. Adding a page means
+extending one of the two — the sidebar, the mobile drawer, and the
 footer come with it, and a page that builds its own gets none of the fixes made
 to those.
 
@@ -711,7 +717,7 @@ suite's current-link check accepts a fragment as well as an href: on this page
 the current link is `#overview`, which is correct.
 
 The cost is real and worth stating: a change to the sidebar or the drawer has
-to be made twice, once in `doc_page.jinja` and once here. Anyone touching the
+to be made twice, once in `_layout.jinja` and once here. Anyone touching the
 chrome should grep `design-language.jinja` for the same markup.
 
 ## 5. Template components
@@ -732,18 +738,20 @@ sub-site you're editing as `ui`:
 {% import "components.jinja" as ui %}
 ```
 
-Page bodies are wrapped in `{% raw %}`, so a call has to step out of it and
-back in:
+Call it like any other macro:
 
 ```jinja
-{% endraw %}{{ ui.kicker('Reference') }}{% raw %}
+{{ ui.kicker('Reference') }}
 ```
 
-That escaping is a wart of the current template shape rather than of the macro;
-narrowing the raw regions is tracked separately.
+Netsuke page bodies used to be wrapped in `{% raw %}` from top to bottom, which
+forced every call to step out of the region and back in. They no longer are:
+markup is live Jinja by default, and `{% raw %}` wraps only the literal
+examples that must reach the reader unrendered — chiefly the `{% highlight %}`
+bodies holding Netsukefile snippets, which are themselves full of Jinja.
 
-Stilyagi centralizes its chrome in `templates/stilyagi/_layout.jinja`, which
-every page extends.
+Each sub-site centralizes its chrome in a `_layout.jinja` that every page
+extends, directly or through the sub-site's `doc_page.jinja`.
 
 ### 5.1. `ui.kicker`
 
@@ -803,22 +811,28 @@ modifier order in that file is meaningful.
 
 ### 5.2. Netsuke's page furniture: `chrome.jinja`
 
-`templates/netsuke/chrome.jinja` holds the Netsuke page furniture that the
-`doc_page.jinja` layout does not draw: the windows a code sample sits in, the
-page header, and the breadcrumb. Import it as `chrome`. The homepage extends
-`doc_page.jinja` like every other Netsuke content page except the standalone
-`pages/icon-replacements.jinja`, so the navbar, mobile menu, and footer have
-one owner; the layout's `page_scripts` block wraps the docs-only scripts and
-`body_class` carries the flex column, and the homepage overrides both.
+`templates/netsuke/chrome.jinja` holds the Netsuke page furniture that
+`_layout.jinja` does not draw: the windows a code sample sits in, the page
+header, and the breadcrumb. Import it as `chrome`. Every Netsuke content page
+reaches the layout through `doc_page.jinja`, which adds the docs-only
+scrollspy and copy-button scripts and the flex column; the homepage extends
+`_layout.jinja` directly and so never acquires them. The one standalone
+document is `pages/icon-replacements.jinja`, which carries its own head and
+scripts.
 
-The windows are opener/closer pairs rather than `{% call %}` blocks, so a long
-highlighted sample can stay inside the page's `{% raw %}` region and the calls
-join the fence the `{% highlight %}` tag already needs:
+The windows are opener/closer pairs rather than `{% call %}` blocks, and the
+opener joins the fence the `{% highlight %}` tag already needs. The pairing was
+to keep a long sample inside the page's raw region rather than leaving and
+re-entering it around the macro call, which mattered while page bodies were raw
+from top to bottom. Now that raw wraps only the sample, a `{% call %}` block
+can hold both the `{% highlight %}` tag and its raw fence, and would be the
+better shape; converting is a separate change, because it touches every window
+on the sub-site.
 
 ```jinja
-{% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}
 ```
 
 `faux_window_open(label, variant='', outer_class='', frame=none, body_class=none)`
@@ -838,9 +852,9 @@ whose text is the caller's body. The kicker options pass straight through to
 heading; the default is the ruled-off docs treatment.
 
 ```jinja
-{% endraw %}{% call chrome.page_header('Reference', 'CLI Commands') %}
+{% call chrome.page_header('Reference', 'CLI Commands') %}
     Build targets, inspect the plan, and control output.
-{% endcall %}{% raw %}
+{% endcall %}
 ```
 
 `breadcrumb(trail)` takes an ordered list of mappings with a `label` and,
@@ -850,7 +864,7 @@ without an `href` renders as plain text; the example pages use one for the
 category.
 
 ```jinja
-{% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}{% raw %}
+{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}
 ```
 
 ### 5.3. The docs sidebar: `docsnav.sidebar`
@@ -864,7 +878,7 @@ page passes its slug and, where it has section anchors, a `sub_links` list of
 `href` and `label` mappings that the macro nests under the active entry.
 
 ```jinja
-{% endraw %}{{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}]) }}{% raw %}
+{{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}]) }}
 ```
 
 The guides pass bespoke `sections` instead, each a mapping with a `title`, its
@@ -890,7 +904,7 @@ the two header `actions`, each an `href`, an `icon`, and a `label`, the first
 drawn as the primary button. `example_header(key)` renders it:
 
 ```jinja
-{% endraw %}{{ exdata.example_header('hello-world') }}{% raw %}
+{{ exdata.example_header('hello-world') }}
 ```
 
 ## 6. Browser-side components

@@ -4,11 +4,11 @@
 {% set active_nav = 'examples' %}
 {% block page_title %}Static Site Pipeline - Netsuke Examples{% endblock %}
 {% block content %}
-{% raw %}
-<main id="main-content" class="grow pt-24 pb-20 site-container w-full">
-        {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Web Workflows'}, {'label': 'Static Site Pipeline'}]) }}{% raw %}
 
-        {% endraw %}{{ exdata.example_header('static-site-pipeline') }}{% raw %}
+<main id="main-content" class="grow pt-24 pb-20 site-container w-full">
+        {{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Web Workflows'}, {'label': 'Static Site Pipeline'}]) }}
+
+        {{ exdata.example_header('static-site-pipeline') }}
 
         <div class="grid lg:grid-cols-12 gap-12">
             <div class="lg:col-span-8 space-y-12 min-w-0">
@@ -47,10 +47,10 @@
                         <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
                             <span class="iconify text-accent mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest
                         </h2>
-                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/website.yml</span>{% endraw %}{{ exdata.copy_manifest_button('static-site-pipeline', 'text-charcoal-light hover:text-accent') }}{% raw %}</div>
+                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/website.yml</span>{{ exdata.copy_manifest_button('static-site-pipeline', 'text-charcoal-light hover:text-accent') }}</div>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-paper-lg">
-{% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_static_site }}{% endhighlight %}{% raw %}
+{% highlight 'netsuke' %}{{ exdata.snippet_static_site }}{% endhighlight %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
@@ -64,8 +64,8 @@
                             <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div>
                             <div class="ml-4">
                                 <h4 class="font-bold text-base-content text-sm mb-1">`order_only_deps` sequences the output directory</h4>
-                                <p class="text-sm text-charcoal-mid">Every page target names `{{ site_dir }}` as an order-only dependency: the directory is created first, but touching it never triggers page rebuilds.</p>
-                            </div>
+{% raw %}                                <p class="text-sm text-charcoal-mid">Every page target names `{{ site_dir }}` as an order-only dependency: the directory is created first, but touching it never triggers page rebuilds.</p>
+{% endraw %}                            </div>
                         </div>
                         <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
                             <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">3</div>
@@ -81,13 +81,13 @@
                     <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
                         <span class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build
                     </h2>
-                    {% endraw %}{{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}{% raw %}
+                    {{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}
 $ netsuke build
 [1/4] mkdir -p site
 [2/4] pandoc pages/about.md -o site/about.html
 [3/4] pandoc pages/contact.md -o site/contact.html
 [4/4] pandoc --standalone pages/about.md pages/contact.md -o site/index.html
-{% endraw %}{% endhighlight %}{{ chrome.example_terminal_close() }}{% raw %}
+{% endhighlight %}{{ chrome.example_terminal_close() }}
                 </section>
 
                 <section id="build-flow" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">
@@ -123,13 +123,13 @@ $ netsuke build
                     </div>
                 </div>
 
-                {% endraw %}
+                
 {{ exdata.up_next('static-site-pipeline') }}
-{% raw %}
+
                 </div>
             </aside>
         </div>
     </main>
     <script defer src="/netsuke/assets/js/example-toc.js"></script>
-{% endraw %}
+
 {% endblock %}

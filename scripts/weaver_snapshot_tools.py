@@ -308,10 +308,21 @@ def _walker_result(evaluated: str) -> _WalkerResult:
     return {"tree": result["tree"], "visited": result["visited"]}
 
 
+# Where a snapshot's timestamp comes from: a seam, so a test can pin it.
+type Stamp = cabc.Callable[[], dt.datetime]
+
+
+def _utc_now() -> dt.datetime:
+    """Return the current time in UTC, which is what production records."""
+    return dt.datetime.now(dt.UTC)
+
+
 def _snapshot_document(
     url: str,
     evaluated: str,
     viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
+    *,
+    now: Stamp = _utc_now,
 ) -> dict[str, typ.Any]:
     """Wrap what the walker returned in the envelope css-view writes.
 
@@ -324,6 +335,8 @@ def _snapshot_document(
         JSON-encoded once more by the tool.
     viewport
         The width and height the page was laid out at, for the record.
+    now
+        Where the ``capturedAt`` timestamp comes from.
 
     Returns
     -------
@@ -335,7 +348,7 @@ def _snapshot_document(
     return {
         "meta": {
             "url": url,
-            "capturedAt": dt.datetime.now(dt.UTC).isoformat(),
+            "capturedAt": now().isoformat(),
             "mode": "walker",
             "tool": "agent-browser",
             "viewport": {"width": viewport[0], "height": viewport[1]},
@@ -454,6 +467,9 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     read: Reader,
     site: str = DEFAULT_SITE,
     viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
+    *,
+    walker: cabc.Callable[[], str] = _walker_expression,
+    now: Stamp = _utc_now,
 ) -> None:
     """Snapshot each page in turn, reporting progress as it goes.
 
@@ -482,21 +498,36 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
         The width and height to lay each page out at. A stylesheet's media
         queries only show at the widths they apply to, so a migration is
         proved at more than one.
+    walker
+        Where the walker's source comes from. The default reads the vendored
+        file beside this module.
+    now
+        Where each snapshot's timestamp comes from.
+
+    Raises
+    ------
+    SystemExit
+        If the walker's output for a page is not a snapshot, naming the page.
+        A tree that cannot be read is not a page to note and move on from;
+        every later comparison would fail on it for a reason nobody could see.
     """
     session = ["--session", _session_name(site, "capture")]
 
     def drive(*args: str) -> None:
         run([browser, *args, *session])
 
-    walker = _walker_expression()
+    expression = walker()
     try:
         drive("set", "viewport", str(viewport[0]), str(viewport[1]))
         for page in pages:
             url = f"{base}/{site}/{page}"
             settled = _open_settled(drive, url)
-            document = _snapshot_document(
-                url, read([browser, "eval", walker, *session]), viewport
-            )
+            evaluated = read([browser, "eval", expression, *session])
+            try:
+                document = _snapshot_document(url, evaluated, viewport, now=now)
+            except (ValueError, TypeError) as exc:
+                message = f"{url}: the walker did not return a snapshot: {exc}"
+                raise SystemExit(message) from exc
             output = out_dir / f"{_slug(page)}.json"
             output.write_text(json.dumps(document), encoding="utf-8")
             notes = []

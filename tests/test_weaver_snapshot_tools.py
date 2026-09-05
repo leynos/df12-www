@@ -7,6 +7,7 @@ or a session two runs would share.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
 import subprocess
@@ -332,3 +333,42 @@ def test_capture_lays_pages_out_at_the_viewport_it_was_given(tmp_path: Path) -> 
     assert written["meta"]["viewport"] == {"width": 360, "height": 800}, (
         "the snapshot records the viewport it was laid out at"
     )
+
+
+def test_the_snapshot_records_the_time_it_is_given() -> None:
+    """The timestamp is a seam, so a snapshot's metadata can be pinned exactly."""
+    evaluated = json.dumps({"tree": {"tag": "html", "children": []}, "visited": 1})
+    fixed = dt.datetime(2026, 9, 5, 12, 0, tzinfo=dt.UTC)
+
+    document = tools._snapshot_document("http://x/", evaluated, now=lambda: fixed)
+
+    assert document["meta"]["capturedAt"] == "2026-09-05T12:00:00+00:00", (
+        "capturedAt is whatever the injected clock says, so two captures can "
+        "be compared without a timestamp between them"
+    )
+
+
+def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
+    tmp_path: Path,
+) -> None:
+    """A snapshot with no tree would fail every later diff for an unseen reason."""
+    calls, run, _read = _recording_browser()
+
+    def garbage(argv: cabc.Sequence[str]) -> str:
+        calls.append(list(argv))
+        return json.dumps({"visited": 1})
+
+    with pytest.raises(SystemExit, match=r"http://x/netsuke/docs/.*tree") as caught:
+        tools._capture_pages(
+            ["docs/"],
+            tmp_path,
+            "http://x",
+            "/bin/agent-browser",
+            run,
+            garbage,
+            "netsuke",
+            walker=lambda: "walk()",
+        )
+    assert "docs/" in str(caught.value), "the page that broke is named"
+    assert not list(tmp_path.glob("*.json")), "no half-snapshot is written"
+    assert calls[-1][1] == "close", "the session is still closed on the way out"

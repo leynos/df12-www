@@ -596,8 +596,9 @@ def _public_root(site: str = DEFAULT_SITE) -> Path: ...
 
 (Addendum, 2026-09-05: `_css_view_argv` did not survive Milestone 1.
 `capture` drives agent-browser through `_open_settled` and evaluates
-`_walker_expression()` in the page; `capture` and `shots` also take
-`--width` and `--height`, and `_capture_pages` a `viewport` pair. The
+`_walker_expression()` in the page; `capture` also takes `--width` and
+`--height`, and `_capture_pages` a `viewport` pair, while `shots` takes
+`--site` and keeps its three fixed widths. The
 normalizer that `diff` runs is split across `weaver_snapshot_normalize.py`,
 `weaver_snapshot_folds.py`, `weaver_snapshot_transform.py`, and
 `weaver_snapshot_document.py`.)

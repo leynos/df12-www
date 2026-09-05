@@ -514,48 +514,6 @@ def test_the_head_is_not_compared() -> None:
     assert normalized["children"][1]["tag"] == "body", "the body stays"
 
 
-def test_a_v4_rotation_reads_as_the_matrix_v3_wrote() -> None:
-    """`rotate-2` was a transform in v3 and is a `rotate` property in v4."""
-    v3 = _node(transform="matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0)")
-    v4 = _node(rotate="2deg")
-    assert (
-        normalize._normalize(v3)["styleDiff"]["transform"]
-        == normalize._normalize(v4)["styleDiff"]["transform"]
-    ), "v3's composed matrix and v4's individual rotate must fold alike"
-    assert "rotate" not in normalize._normalize(v4)["styleDiff"], (
-        "v4's individual rotate is folded into the composed transform"
-    )
-
-
-def test_a_v4_translation_resolves_against_the_box() -> None:
-    """`-translate-x-1/2` is a percentage in v4 and was pixels in v3's matrix."""
-    v3 = _node(transform="matrix(1, 0, 0, 1, -64, 0)")
-    v4 = _node(translate="-50%")
-    for node in (v3, v4):
-        node["bbox"] = {"x": 0, "y": 0, "width": 128, "height": 40}
-    assert (
-        normalize._normalize(v3)["styleDiff"]["transform"]
-        == normalize._normalize(v4)["styleDiff"]["transform"]
-    ), "a percentage translation resolves against the box to v3's pixels"
-
-
-def test_an_identity_transform_is_left_unsaid() -> None:
-    """v3's bare `transform` utility wrote an identity matrix; v4 writes none."""
-    v3 = _node(transform="matrix(1, 0, 0, 1, 0, 0)")
-    assert "transform" not in normalize._normalize(v3)["styleDiff"], (
-        "an identity matrix is no transform at all and is left unsaid"
-    )
-
-
-def test_a_real_transform_survives() -> None:
-    """The folding must not swallow a transform that is not one of the pins."""
-    moved = _node(transform="matrix(1, 0, 0, 1, 10, 0)")
-    assert (
-        normalize._normalize(moved)["styleDiff"]["transform"]
-        == "matrix(1, 0, 0, 1, 10, 0)"
-    )
-
-
 def test_a_class_list_is_not_compared() -> None:
     """A rename is the usual reason for a change that is meant to look the same."""
     node = _node(color="rgb(1, 2, 3)")
@@ -566,15 +524,6 @@ def test_a_class_list_is_not_compared() -> None:
     )
     assert normalized["styleDiff"]["color"] == "rgba(1, 2, 3, 1.000)", (
         "what the classes computed to is still compared"
-    )
-
-
-def test_an_undisplayed_node_has_no_transform_to_compare() -> None:
-    """Chromium computes `transform` to none on it but keeps `rotate` as declared."""
-    v3 = _node(display="none", transform="none")
-    v4 = _node(display="none", rotate="2deg")
-    assert (
-        normalize._normalize(v3)["styleDiff"] == normalize._normalize(v4)["styleDiff"]
     )
 
 
@@ -606,31 +555,80 @@ def test_a_parent_gap_stays_when_an_interior_auto_margin_blocks_a_boundary() -> 
     )
 
 
-@pytest.mark.parametrize(
-    ("key", "value"),
-    [("scale", "1 1 2"), ("translate", "0px 0px 1px")],
-    ids=["depth-scale", "depth-translate"],
-)
-def test_a_depth_component_is_not_folded_into_a_flat_matrix(
-    key: str, value: str
-) -> None:
-    """A z component has no 2D matrix, so the properties stay as reported."""
-    style = {key: value, "transform": "none"}
-    transform._fold_transform(style, {"x": 0, "y": 0, "width": 10, "height": 10})
-    assert style[key] == value, f"a non-default depth {key} must survive: {style!r}"
-    assert style["transform"] == "none", "and the transform stays as it was"
+class TestTransformFolding:
+    """v4's individual transform properties fold to the matrix v3 wrote."""
 
+    def test_a_v4_rotation_reads_as_the_matrix_v3_wrote(self) -> None:
+        """`rotate-2` was a transform in v3 and is a `rotate` property in v4."""
+        v3 = _node(transform="matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0)")
+        v4 = _node(rotate="2deg")
+        assert (
+            normalize._normalize(v3)["styleDiff"]["transform"]
+            == normalize._normalize(v4)["styleDiff"]["transform"]
+        ), "v3's composed matrix and v4's individual rotate must fold alike"
+        assert "rotate" not in normalize._normalize(v4)["styleDiff"], (
+            "v4's individual rotate is folded into the composed transform"
+        )
 
-@pytest.mark.parametrize(
-    ("key", "value"),
-    [("scale", "2 2 1"), ("translate", "4px 0px 0px")],
-    ids=["flat-scale", "flat-translate"],
-)
-def test_a_default_depth_component_still_folds(key: str, value: str) -> None:
-    """Chromium reports the z component even when nothing set it."""
-    style = {key: value}
-    transform._fold_transform(style, {"x": 0, "y": 0, "width": 10, "height": 10})
-    assert key not in style, (
-        f"a default depth component folds like a 2D value: {style!r}"
+    def test_a_v4_translation_resolves_against_the_box(self) -> None:
+        """`-translate-x-1/2` is a percentage in v4 and was pixels in v3's matrix."""
+        v3 = _node(transform="matrix(1, 0, 0, 1, -64, 0)")
+        v4 = _node(translate="-50%")
+        for node in (v3, v4):
+            node["bbox"] = {"x": 0, "y": 0, "width": 128, "height": 40}
+        assert (
+            normalize._normalize(v3)["styleDiff"]["transform"]
+            == normalize._normalize(v4)["styleDiff"]["transform"]
+        ), "a percentage translation resolves against the box to v3's pixels"
+
+    def test_an_identity_transform_is_left_unsaid(self) -> None:
+        """v3's bare `transform` utility wrote an identity matrix; v4 writes none."""
+        v3 = _node(transform="matrix(1, 0, 0, 1, 0, 0)")
+        assert "transform" not in normalize._normalize(v3)["styleDiff"], (
+            "an identity matrix is no transform at all and is left unsaid"
+        )
+
+    def test_a_real_transform_survives(self) -> None:
+        """The folding must not swallow a transform that is not one of the pins."""
+        moved = _node(transform="matrix(1, 0, 0, 1, 10, 0)")
+        assert (
+            normalize._normalize(moved)["styleDiff"]["transform"]
+            == "matrix(1, 0, 0, 1, 10, 0)"
+        )
+
+    def test_an_undisplayed_node_has_no_transform_to_compare(self) -> None:
+        """Chromium computes `transform` to none but keeps `rotate` as declared."""
+        v3 = _node(display="none", transform="none")
+        v4 = _node(display="none", rotate="2deg")
+        assert (
+            normalize._normalize(v3)["styleDiff"]
+            == normalize._normalize(v4)["styleDiff"]
+        )
+
+    @pytest.mark.parametrize(
+        ("key", "value"),
+        [("scale", "1 1 2"), ("translate", "0px 0px 1px")],
+        ids=["depth-scale", "depth-translate"],
     )
-    assert style["transform"].startswith("matrix("), "and the matrix is composed"
+    def test_a_depth_component_is_not_folded_into_a_flat_matrix(
+        self, key: str, value: str
+    ) -> None:
+        """A z component has no 2D matrix, so the properties stay as reported."""
+        style = {key: value, "transform": "none"}
+        transform._fold_transform(style, {"x": 0, "y": 0, "width": 10, "height": 10})
+        assert style[key] == value, f"a non-default depth {key} must survive: {style!r}"
+        assert style["transform"] == "none", "and the transform stays as it was"
+
+    @pytest.mark.parametrize(
+        ("key", "value"),
+        [("scale", "2 2 1"), ("translate", "4px 0px 0px")],
+        ids=["flat-scale", "flat-translate"],
+    )
+    def test_a_default_depth_component_still_folds(self, key: str, value: str) -> None:
+        """Chromium reports the z component even when nothing set it."""
+        style = {key: value}
+        transform._fold_transform(style, {"x": 0, "y": 0, "width": 10, "height": 10})
+        assert key not in style, (
+            f"a default depth component folds like a 2D value: {style!r}"
+        )
+        assert style["transform"].startswith("matrix("), "and the matrix is composed"

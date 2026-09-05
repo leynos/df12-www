@@ -182,4 +182,4 @@ def test_a_malformed_snapshot_says_where_and_what_in_attributes() -> None:
     assert (
         str(error)
         == "payload.tree.children[0].styleDiff is int, not a mapping or absent"
-    )
+    ), "the message is built from the three attributes, in that order"

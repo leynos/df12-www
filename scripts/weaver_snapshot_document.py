@@ -40,7 +40,8 @@ class MalformedSnapshotError(SnapshotError):
         self.where = where
         self.expected = expected
         self.actual = actual
-        super().__init__(f"{where} is {actual}, not {expected}")
+        message = f"{where} is {actual}, not {expected}"
+        super().__init__(message)
 
 
 def _check_node(node: Json, where: str) -> None:

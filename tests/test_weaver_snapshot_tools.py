@@ -113,7 +113,10 @@ def test_concurrent_runs_do_not_share_a_browser_session() -> None:
     )
 
 
-type Browser = tuple[list[list[str]], typ.Any, typ.Any]
+# The two ways the harness runs a tool: for its effect, and for what it prints.
+type Runner = cabc.Callable[[cabc.Sequence[str]], None]
+type Reader = cabc.Callable[[cabc.Sequence[str]], str]
+type Browser = tuple[list[list[str]], Runner, Reader]
 
 
 def _recording_browser(

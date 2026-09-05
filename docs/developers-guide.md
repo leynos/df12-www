@@ -1710,7 +1710,7 @@ than a spot check:
    extracting a macro, reorganizing a stylesheet, upgrading a dependency — is
    proven by capturing computed-style snapshots before and after at the same
    viewport — `css-view` for one page, `scripts/weaver_snapshot.py capture
-   --site <site>` for a sub-site — and diffing each node's tag, computed
+   --site <site> <out-dir>` for a sub-site — and diffing each node's tag, computed
    styles, and bounding box.
    Class attributes are left out of the projection on purpose, since
    renaming classes is usually the point. An empty diff is the evidence; a

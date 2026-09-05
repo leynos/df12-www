@@ -34,15 +34,70 @@ from tests.support.netsuke_browser import (
     _evaluate,
     _open,
 )
+from tests.support.stilyagi_browser import normalize_style
 from tests.support.weaver_harness import load
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
 
+    from syrupy.assertion import SnapshotAssertion
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_NETSUKE = REPO_ROOT / "public" / SITE
 
 tools = load("weaver_snapshot_tools")
+
+# One docs page that carries each of the shapes the migration had to pin: a
+# faux window inside a section (the phone-width full-bleed block), a table
+# (the base-layer cell padding), the mobile toggle (a button's pointer), and
+# the narrow-screen docs dropdown (an option's padding).
+COMPONENT_PAGE = "docs/manifest-reference/"
+COMPONENT_SELECTORS = (
+    "main.hm-docs-content",
+    "section .hm-faux-window",
+    "section .hm-faux-window__titlebar",
+    "table td",
+    "#navbar-mobile-toggle",
+    "select option",
+    '#navbar a[href="/netsuke/docs/"]',
+)
+
+# The properties worth pinning: paint, typography, and the box edges the
+# component rules set. Geometry is left out, since it moves with fonts.
+STYLE_PROBE = """(() => {
+  const keys = ["display", "cursor", "color", "backgroundColor", "fontSize",
+    "lineHeight", "fontFamily", "paddingTop", "paddingRight", "paddingBottom",
+    "paddingLeft", "marginLeft", "marginRight", "borderTopWidth",
+    "borderTopStyle", "borderTopColor", "borderTopLeftRadius", "boxShadow",
+    "overflowWrap"];
+  const out = {};
+  for (const selector of __SELECTORS__) {
+    const el = document.querySelector(selector);
+    if (!el) { out[selector] = null; continue; }
+    const style = getComputedStyle(el);
+    out[selector] = Object.fromEntries(keys.map((k) => [k, style[k]]));
+  }
+  // The base layer describes an element before any class touches it, so it
+  // is read off fresh, unclassed elements rather than the page's own, which
+  // carry utilities of their own.
+  const table = document.createElement("table");
+  table.innerHTML = "<tr><td>x</td></tr>";
+  const button = document.createElement("button");
+  const select = document.createElement("select");
+  select.innerHTML = "<option>x</option>";
+  document.body.append(table, button, select);
+  const cell = getComputedStyle(table.querySelector("td"));
+  const option = getComputedStyle(select.querySelector("option"));
+  out["__base__"] = {
+    cellPadding: [cell.paddingTop, cell.paddingRight,
+      cell.paddingBottom, cell.paddingLeft],
+    buttonCursor: getComputedStyle(button).cursor,
+    optionPadding: [option.paddingTop, option.paddingRight,
+      option.paddingBottom, option.paddingLeft],
+  };
+  table.remove(); button.remove(); select.remove();
+  return JSON.stringify(out);
+})()""".replace("__SELECTORS__", json.dumps(list(COMPONENT_SELECTORS)))
 
 # Every element in the fixture, plus the iframe the walker adds to read
 # user-agent defaults from; a budget small enough to cut the walk short; and
@@ -307,3 +362,139 @@ def test_the_capture_command_snapshots_the_netsuke_site_at_a_phone_width(
         assert payload["payload"]["tree"]["bbox"]["width"] <= MOBILE_WIDTH, (
             f"{snapshot.name}'s document is wider than the phone viewport"
         )
+
+
+@pytest.fixture(scope="module")
+def component_styles(
+    drive: cabc.Callable[..., str], served: str
+) -> dict[str, dict[str, typ.Any]]:
+    """Probe the representative components at a phone width and a desktop one."""
+    probed = {}
+    for name, width, height in (
+        ("phone", MOBILE_WIDTH, MOBILE_HEIGHT),
+        ("desktop", DESKTOP_WIDTH, DESKTOP_HEIGHT),
+    ):
+        _open(drive, served, COMPONENT_PAGE, width, height)
+        probed[name] = _evaluate(drive, STYLE_PROBE)
+    return probed
+
+
+@pytest.mark.timeout(300)
+@pytest.mark.parametrize("viewport", ["phone", "desktop"])
+@pytest.mark.parametrize("selector", COMPONENT_SELECTORS)
+def test_component_paint_matches_the_snapshot(
+    component_styles: dict[str, dict[str, typ.Any]],
+    snapshot: SnapshotAssertion,
+    viewport: str,
+    selector: str,
+) -> None:
+    """Each representative component's paint and edges, pinned as a snapshot.
+
+    The migration's proof was a diff against the Play CDN rendering, which
+    no longer exists in the tree. This is what stands in for it from here: a
+    committed record of what the compiled stylesheet renders for the
+    components the migration had to pin by hand, at a phone width and a
+    desktop one, so a change to any of them is a change someone chose.
+    """
+    element = component_styles[viewport][selector]
+    assert element is not None, f"{selector} is not on {COMPONENT_PAGE}"
+    assert normalize_style(element) == snapshot
+
+
+@pytest.mark.timeout(300)
+def test_the_base_layer_restores_what_v3_preflight_left_alone(
+    component_styles: dict[str, dict[str, typ.Any]],
+) -> None:
+    """`site-base.css` pins three element defaults v4's preflight changed.
+
+    Read off fresh, unclassed elements: the base layer describes an element
+    before any class touches it, and the page's own cells and buttons carry
+    utilities that would say something else.
+    """
+    base = component_styles["desktop"]["__base__"]
+    assert base["cellPadding"] == ["1px", "1px", "1px", "1px"], (
+        f"a cell keeps the user agent's 1px padding; got {base['cellPadding']}"
+    )
+    assert base["buttonCursor"] == "pointer", (
+        "a button shows the pointer, as under v3's preflight; got "
+        f"{base['buttonCursor']}"
+    )
+    assert base["optionPadding"] == ["0px", "2px", "1px", "2px"], (
+        f"an option keeps the user agent's padding; got {base['optionPadding']}"
+    )
+
+
+@pytest.mark.timeout(300)
+def test_code_panels_run_edge_to_edge_on_a_phone(
+    component_styles: dict[str, dict[str, typ.Any]],
+) -> None:
+    """Below 460px the full-bleed block beats the panel's own utilities."""
+    phone = component_styles["phone"]
+    main, window, titlebar = (
+        phone["main.hm-docs-content"],
+        phone["section .hm-faux-window"],
+        phone["section .hm-faux-window__titlebar"],
+    )
+    assert main is not None and window is not None and titlebar is not None, (  # noqa: PT018 - one guard for the three probes
+        "the manifest page carries the docs column and a faux window"
+    )
+    assert (main["paddingLeft"], main["paddingRight"]) == ("0px", "0px"), (
+        f"the docs column drops its side padding on a phone; got {main!r}"
+    )
+    assert main["overflowWrap"] == "break-word", "long tokens wrap rather than overflow"
+    assert window["borderTopWidth"] == "0px", "the panel loses its border"
+    assert window["borderTopLeftRadius"] == "0px", "and its rounded corner"
+    assert window["boxShadow"] == "none", "and its shadow"
+    assert (window["marginLeft"], window["marginRight"]) == ("-16px", "-16px"), (
+        f"the panel bleeds through the section's 1rem inset; got {window!r}"
+    )
+    assert titlebar["borderTopLeftRadius"] == "0px", "the titlebar squares off too"
+
+    desktop = component_styles["desktop"]["section .hm-faux-window"]
+    assert desktop is not None, "the window is on the desktop page too"
+    assert desktop["borderTopLeftRadius"] != "0px", (
+        "in the column the panel keeps its rounded corner"
+    )
+
+
+@pytest.mark.timeout(900)
+def test_the_shots_command_screenshots_the_netsuke_site_at_three_widths(
+    built_site: Path, tmp_path: Path
+) -> None:
+    """Run ``shots --site netsuke`` as an operator would.
+
+    ``shots`` serves the tree, settles each page, and screenshots it at the
+    three fixed widths. The command line is the contract, so it is run as
+    one and the images checked for what a reader would open.
+    """
+    del built_site  # the fixture is the build; the tree it returns is Weaver's
+    uv_exe = shutil.which("uv") or pytest.skip("uv is not on PATH")
+    out_dir = tmp_path / "shots"
+    completed = subprocess.run(  # noqa: S603 - fixed argv, no shell
+        [
+            uv_exe,
+            "run",
+            "python",
+            "scripts/weaver_snapshot.py",
+            "shots",
+            "--site",
+            SITE,
+            str(out_dir),
+        ],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=900,
+    )
+    assert completed.returncode == 0, (
+        f"shots exited {completed.returncode}: {completed.stderr[-2000:]}"
+    )
+    written = sorted(out_dir.glob("*.png"))
+    assert len(written) == len(PAGES) * len(tools.SCREENSHOT_WIDTHS), (
+        f"expected one image per page per width, got {len(written)}"
+    )
+    for image in written:
+        header = image.read_bytes()[:8]
+        assert header == b"\x89PNG\r\n\x1a\n", f"{image.name} is not a PNG"
+        assert image.stat().st_size > 1024, f"{image.name} is too small to be a page"  # noqa: PLR2004 - a blank PNG is far smaller

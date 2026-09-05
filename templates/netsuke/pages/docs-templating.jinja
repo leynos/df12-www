@@ -79,7 +79,7 @@
 {% endraw %}                    Use <code>|</code> for a multi-line string that preserves line breaks, or <code>&gt;-</code> to fold lines
                     into one string.
                 </p>
-                {{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 
 vars:
@@ -97,7 +97,7 @@ targets:
 
 defaults:
   - greeting.txt
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endraw %}{% endhighlight %}{% endcall %}
             </section>
 
             <!-- Rendering -->
@@ -221,7 +221,7 @@ targets:
 {% raw %}                    declared as data rather than written as <code>{% macro %}</code> statements, the YAML document stays a
 {% endraw %}                    document.
                 </p>
-                {{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
 macros:
   - signature: "obj_name(src)"
     body: |
@@ -232,7 +232,7 @@ targets:
     name: "build/{{ obj_name(item) }}"
     rule: "compile"
     sources: "{{ item }}"
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endraw %}{% endhighlight %}{% endcall %}
             </section>
 
             <!-- Advanced Patterns -->

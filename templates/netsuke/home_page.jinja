@@ -149,7 +149,7 @@
                 <!-- Code Window -->
                 <div class="relative">
                     <div class="hm-faux-window__shadow absolute -top-6 -right-6 w-full h-full bg-base-300/30 rounded-lg transform rotate-2"></div>
-                    {{ chrome.faux_window_open('Netsukefile', frame='code-window relative z-10 text-sm', body_class='p-6 overflow-x-auto text-stone-light leading-relaxed') }}
+                    {% call chrome.faux_window('Netsukefile', frame='code-window relative z-10 text-sm', body_class='p-6 overflow-x-auto text-stone-light leading-relaxed') %}
 {% highlight 'netsuke' %}{% raw %}
 # Reusable commands live in rules
 netsuke_version: "1.0.0"
@@ -170,7 +170,7 @@ targets:
     command: "pandoc {{ ins }} -o {{ outs }}"
     sources: "README.md"
 {% endraw %}{% endhighlight %}
-                    {{ chrome.faux_window_close() }}
+                    {% endcall %}
                 </div>
             </div>
         </div>
@@ -262,7 +262,7 @@ targets:
                 </p>
             </div>
 
-            {{ chrome.faux_window_open('user@devbox:~/netsuke-demo', frame='bg-charcoal-mid/30 rounded-xl border border-white/10 shadow-2xl overflow-hidden font-mono text-sm', body_class='p-6 space-y-4') }}
+            {% call chrome.faux_window('user@devbox:~/netsuke-demo', frame='bg-charcoal-mid/30 rounded-xl border border-white/10 shadow-2xl overflow-hidden font-mono text-sm', body_class='p-6 space-y-4') %}
                     <!-- Command 1 -->
                     <div>
                         <div class="flex items-center text-stone-light">
@@ -301,7 +301,7 @@ targets:
                             </div>
                         </div>
                     </div>
-            {{ chrome.faux_window_close() }}
+            {% endcall %}
         </div>
     </section>
 

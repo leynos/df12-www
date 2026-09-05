@@ -820,30 +820,32 @@ scrollspy and copy-button scripts and the flex column; the homepage extends
 document is `pages/icon-replacements.jinja`, which carries its own head and
 scripts.
 
-The windows are opener/closer pairs rather than `{% call %}` blocks, and the
-opener joins the fence the `{% highlight %}` tag already needs. The pairing was
-to keep a long sample inside the page's raw region rather than leaving and
-re-entering it around the macro call, which mattered while page bodies were raw
-from top to bottom. Now that raw wraps only the sample, a `{% call %}` block
-can hold both the `{% highlight %}` tag and its raw fence, and would be the
-better shape; converting is a separate change, because it touches every window
-on the sub-site.
+The windows are `{% call %}` blocks, and the call joins the fence the
+`{% highlight %}` tag already needs:
 
 ```jinja
-{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+{% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endraw %}{% endhighlight %}{% endcall %}
 ```
 
-`faux_window_open(label, variant='', outer_class='', frame=none, body_class=none)`
-draws the dark frame, the titlebar with the traffic-light dots and a centred
-`label`, and the open body element. `variant` names a modifier on
+They were opener/closer pairs until the raw regions narrowed, to keep a long
+sample inside the page's raw region rather than leaving and re-entering it
+around the macro call. That mattered while page bodies were raw from top to
+bottom; now that raw wraps only the sample, a block holds both the
+`{% highlight %}` tag and its fence. The block form is worth the change on its
+own: an unclosed window is a template error rather than markup that renders
+wrong, and no macro emits half an element.
+
+`faux_window(label, variant='', outer_class='', frame=none, body_class=none)`
+draws the dark frame and a titlebar with the traffic-light dots and a centred
+`label`, and puts the block body inside. `variant` names a modifier on
 `.hm-faux-window`, in practice `card-bleed`; `outer_class` carries layout that
 belongs to the page, such as a margin. `frame` and `body_class` replace the
 default frame and body utilities outright and exist for the two homepage
 windows that sit on their own grounds; a docs page should not need them.
-`example_terminal_open(label='Terminal')` and `example_terminal_close()` are
-the same shape with the tighter titlebar the example pages use.
+`example_terminal(label='Terminal')` is the same shape with the tighter
+titlebar the example pages use.
 
 `page_header(kicker, title, hero=false, id='', accent=false, icon='',
 icon_class='', dot='')` draws the kicker pill, the `h1`, and a lede paragraph

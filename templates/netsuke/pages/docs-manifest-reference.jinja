@@ -38,7 +38,7 @@
                     Every <code class="font-mono text-sm">Netsukefile</code> is a YAML mapping. Unknown fields and duplicate mapping keys are errors. <code>netsuke_version</code> and <code>targets</code> are required (an empty <code>targets</code> list is valid for an action-only manifest); <code>vars</code>, <code>macros</code>, <code>rules</code>, <code>actions</code>, and <code>defaults</code> are optional.
                 </p>
 
-                {{ chrome.faux_window_open('Netsukefile', outer_class='relative') }}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile', outer_class='relative') %}{% highlight 'netsuke' %}{% raw %}
 # 1. Schema version
 netsuke_version: "1.0.0"
 
@@ -74,7 +74,7 @@ defaults:
                             <span class="text-stone-light text-xs font-mono">Targets and defaults</span>
                         </div>
                     </div>
-                    {{ chrome.faux_window_close() }}
+                    {% endcall %}
             </section>
 
             <!-- Core Fields Table -->

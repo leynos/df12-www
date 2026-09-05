@@ -129,7 +129,7 @@ New-Item Netsukefile -ItemType File
                     <!-- Step 2: Content -->
                     <div>
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">2. Define a Simple Rule</h3>
-                        {{ chrome.faux_window_open('Netsukefile', body_class='p-6 font-mono text-sm text-stone-light overflow-x-auto') }}{% highlight 'netsuke' %}{% raw %}
+                        {% call chrome.faux_window('Netsukefile', body_class='p-6 font-mono text-sm text-stone-light overflow-x-auto') %}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 
 targets:
@@ -141,7 +141,7 @@ targets:
     sources: "hello.txt"
 
 defaults: ["shout.txt"]
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endraw %}{% endhighlight %}{% endcall %}
                     </div>
                 </div>
             </section>
@@ -156,13 +156,13 @@ defaults: ["shout.txt"]
                     Now invoke the CLI to build your target. Netsuke parses YAML first, resolves any templating, generates a Ninja plan, and then executes the required commands.
                 </p>
 
-                {{ chrome.faux_window_open('Terminal', outer_class='mb-8') }}{% highlight 'netsuke-console' %}
+                {% call chrome.faux_window('Terminal', outer_class='mb-8') %}{% highlight 'netsuke-console' %}
 $ netsuke build shout.txt
 [1/2] printf 'Hello, Netsuke!\n' > hello.txt
 [2/2] tr 'a-z' 'A-Z' < hello.txt > shout.txt
 $ cat shout.txt
 HELLO, NETSUKE!
-{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endhighlight %}{% endcall %}
 
                 <div class="flex p-4 bg-base-100 border border-base-300 rounded-lg">
                     <div class="shrink-0">

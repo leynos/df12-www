@@ -101,7 +101,7 @@
                     A Netsuke rule is a reusable command or script template. Targets can reference the rule by name, add their own inputs, and keep duplicated shell out of the manifest.
                 </p>
 
-                {{ chrome.faux_window_open('Netsukefile', outer_class='mb-8', body_class='p-6 font-mono text-sm overflow-x-auto text-stone-light') }}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile', outer_class='mb-8', body_class='p-6 font-mono text-sm overflow-x-auto text-stone-light') %}{% highlight 'netsuke' %}{% raw %}
 rules:
   - name: "compile"
     command: "gcc -c {{ ins }} -o {{ outs }}"
@@ -114,7 +114,7 @@ targets:
   - name: "app"
     rule: "link"
     sources: ["main.o", "utils.o"]
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endraw %}{% endhighlight %}{% endcall %}
 
                 <div class="grid md:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-lg border border-base-300 shadow-xs">
@@ -226,7 +226,7 @@ targets:
                     later ones in the list do not start through the serial path.
                 </p>
 
-                {{ chrome.faux_window_open('Netsukefile', outer_class='mb-8', body_class='p-6 font-mono text-sm overflow-x-auto text-stone-light') }}{% highlight 'netsuke' %}
+                {% call chrome.faux_window('Netsukefile', outer_class='mb-8', body_class='p-6 font-mono text-sm overflow-x-auto text-stone-light') %}{% highlight 'netsuke' %}
 actions:
   - name: check-fmt
     command: "make check-fmt"
@@ -240,7 +240,7 @@ actions:
       - check-fmt
       - lint
       - test
-{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endhighlight %}{% endcall %}
 
                 <div class="mb-8 bg-base-100 border-l-4 border-success p-5 rounded-r-lg">
                     <div class="flex items-start">

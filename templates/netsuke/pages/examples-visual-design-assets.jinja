@@ -50,11 +50,11 @@
 
                 <section id="terminal-preview">
                     <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center"><span class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build</h2>
-                    {{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}
+                    {% call chrome.example_terminal() %}{% highlight 'netsuke-console' %}
 $ netsuke build build/raster/hero.png
 [1/2] mkdir -p build/raster
 [2/2] Rasterising an SVG file
-{% endhighlight %}{{ chrome.example_terminal_close() }}
+{% endhighlight %}{% endcall %}
                 </section>
 
                 <section id="build-flow" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">

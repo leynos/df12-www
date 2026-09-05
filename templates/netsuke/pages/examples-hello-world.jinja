@@ -48,13 +48,13 @@
 
                 <section id="terminal-preview">
                     <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center"><span class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build</h2>
-                    {{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}
+                    {% call chrome.example_terminal() %}{% highlight 'netsuke-console' %}
 $ netsuke
 [1/2] cat input.txt | tr 'a-z' 'A-Z' > output.txt
 [2/2] printf '%s\n' 'Hello from Netsuke!' > greeting.txt
 $ cat greeting.txt
 Hello from Netsuke!
-{% endhighlight %}{{ chrome.example_terminal_close() }}
+{% endhighlight %}{% endcall %}
                 </section>
 
                 <section id="build-flow" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">

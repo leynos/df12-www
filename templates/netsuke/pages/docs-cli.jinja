@@ -164,7 +164,7 @@
 
                     <!-- Right: Terminal Preview -->
                     <div class="space-y-6 sticky top-24 self-start">
-                        {{ chrome.faux_window_open('user@dev:~/netsuke-project') }}{% highlight 'netsuke-console' %}
+                        {% call chrome.faux_window('user@dev:~/netsuke-project') %}{% highlight 'netsuke-console' %}
 $ netsuke --verbose build app
 Parsed Netsukefile and expanded 3 targets
 Wrote build.ninja
@@ -176,7 +176,7 @@ digraph netsuke {
   "main.o" -> "app"
   "utils.o" -> "app"
 }
-{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endhighlight %}{% endcall %}
 
                         <!-- Tip Card -->
                         <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
@@ -229,7 +229,7 @@ digraph netsuke {
                     </div>
                 </div>
 
-                {{ chrome.faux_window_open('Shell examples', outer_class='mb-6') }}{% highlight 'netsuke-console' %}
+                {% call chrome.faux_window('Shell examples', outer_class='mb-6') %}{% highlight 'netsuke-console' %}
 # Capture build graph without status noise
 $ netsuke graph > build.dot
 
@@ -241,7 +241,7 @@ $ netsuke --progress never build
 
 # Inspect generated Ninja file inline
 $ netsuke generate | grep 'rule '
-{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endhighlight %}{% endcall %}
 
                 <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
                     <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
@@ -308,7 +308,7 @@ $ netsuke generate | grep 'rule '
                     In accessible mode each pipeline stage and each build task produces a labelled line on stderr.
                     No spinners, no cursor movement &mdash; just plain, ordered text a screen reader can follow.
                 </p>
-                {{ chrome.faux_window_open('stderr, accessible mode', outer_class='mb-8') }}{% highlight 'netsuke-console' %}
+                {% call chrome.faux_window('stderr, accessible mode', outer_class='mb-8') %}{% highlight 'netsuke-console' %}
 Stage 1/6: Reading manifest file
 Stage 2/6: Parsing YAML document
 Stage 3/6: Expanding template directives
@@ -318,7 +318,7 @@ Stage 6/6: Synthesizing Ninja plan and executing Build
 Task 1/2: cc -c src/a.c
 Task 2/2: cc -c src/b.c
 Success: Build complete.
-{% endhighlight %}{{ chrome.faux_window_close() }}
+{% endhighlight %}{% endcall %}
 
                 <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
@@ -415,7 +415,7 @@ Success: Build complete.
                         Fluent messages handle pluralisation and variable interpolation natively.
                         A translator only needs to edit the <code>.ftl</code> file for their locale &mdash; no code changes required.
                     </p>
-                    {{ chrome.faux_window_open('en-US.ftl', variant='card-bleed', body_class='p-6 font-mono text-xs overflow-x-auto [contain:inline-size]') }}
+                    {% call chrome.faux_window('en-US.ftl', variant='card-bleed', body_class='p-6 font-mono text-xs overflow-x-auto [contain:inline-size]') %}
                         <pre class="font-mono text-xs text-stone-light"><code>progress-target-count = Building { $count -&gt;
     [one] { $count } target...
    *[other] { $count } targets...
@@ -423,7 +423,7 @@ Success: Build complete.
 
 error-file-not-found = Error: File "{ $path }" was not found.
     .hint = Check that the path exists and is readable.</code></pre>
-                    {{ chrome.faux_window_close() }}
+                    {% endcall %}
                     <p class="text-xs text-charcoal-mid mt-3">
                         See the <a href="/netsuke/guides/translating/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Translating Netsuke guide</a> for the workflow, and the upstream
                         <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization style guide</a> and

@@ -26,7 +26,7 @@
     "bump": "uv run pages bump"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.7",
+    "@biomejs/biome": "2.5.11",
     "@happy-dom/global-registrator": "20.11.2",
     "@iconify-json/carbon": "^1.2.25",
     "@swc/core": "^1.16.1",

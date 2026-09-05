@@ -164,3 +164,22 @@ def test_a_well_formed_snapshot_is_still_accepted(tmp_path: Path) -> None:
     assert "rgba(1, 2, 3, 1.000)" in rendered, (
         f"the tree should have normalized rather than been rejected; got {rendered!r}"
     )
+
+
+def test_a_malformed_snapshot_says_where_and_what_in_attributes() -> None:
+    """A caller can read the node, the expectation, and the finding without parsing."""
+    with pytest.raises(document.MalformedSnapshotError) as caught:
+        document._check_node(
+            {"tag": "html", "children": [{"styleDiff": 3}]}, "payload.tree"
+        )
+    error = caught.value
+    assert error.where == "payload.tree.children[0].styleDiff", (
+        "the breadcrumb names the node"
+    )
+    assert error.expected == "a mapping or absent", "what the harness assumed"
+    assert error.actual == "int", "what it found instead"
+    assert isinstance(error, document.SnapshotError), "it is a snapshot error first"
+    assert (
+        str(error)
+        == "payload.tree.children[0].styleDiff is int, not a mapping or absent"
+    )

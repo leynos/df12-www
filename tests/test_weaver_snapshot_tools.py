@@ -113,11 +113,14 @@ def test_concurrent_runs_do_not_share_a_browser_session() -> None:
     )
 
 
+type Browser = tuple[list[list[str]], typ.Any, typ.Any]
+
+
 def _recording_browser(
     *,
     settle_fails: bool = False,
     unrendered: int = 0,
-) -> tuple[list[list[str]], typ.Any, typ.Any]:
+) -> Browser:
     """Stand in for agent-browser, recording each call and answering `eval`."""
     calls: list[list[str]] = []
 
@@ -138,14 +141,22 @@ def _recording_browser(
     return calls, run, read
 
 
-def test_capture_settles_each_page_before_walking_it(tmp_path: Path) -> None:
+@pytest.fixture
+def recording_browser() -> cabc.Callable[..., Browser]:
+    """Hand each test the stand-in browser factory, so it asks for the run it needs."""
+    return _recording_browser
+
+
+def test_capture_settles_each_page_before_walking_it(
+    recording_browser: cabc.Callable[..., Browser], tmp_path: Path
+) -> None:
     """Open, wait for the network, wait for the icons, then walk — in that order.
 
     A walk taken before Iconify has drawn its glyphs records placeholders
     where the icons will be, which moves every line below them: a layout
     change that is not a style change. The order is the whole point.
     """
-    calls, run, read = _recording_browser()
+    calls, run, read = recording_browser()
     pages = ["", "install/"]
     tools._capture_pages(
         pages,
@@ -182,10 +193,12 @@ def test_capture_settles_each_page_before_walking_it(tmp_path: Path) -> None:
 
 
 def test_a_page_that_never_settles_is_still_captured(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    recording_browser: cabc.Callable[..., Browser],
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """An icon the set lacks keeps its placeholder; the page is captured and said so."""
-    calls, run, read = _recording_browser(settle_fails=True, unrendered=1)
+    calls, run, read = recording_browser(settle_fails=True, unrendered=1)
     tools._capture_pages(
         ["docs/"], tmp_path, "http://x", "/usr/bin/agent-browser", run, read, "netsuke"
     )
@@ -313,9 +326,11 @@ def test_a_missing_tool_names_itself_rather_than_failing_obscurely() -> None:
     )
 
 
-def test_capture_lays_pages_out_at_the_viewport_it_was_given(tmp_path: Path) -> None:
+def test_capture_lays_pages_out_at_the_viewport_it_was_given(
+    recording_browser: cabc.Callable[..., Browser], tmp_path: Path
+) -> None:
     """A phone width proves the narrow media queries; the default is the desktop."""
-    calls, run, read = _recording_browser()
+    calls, run, read = recording_browser()
     tools._capture_pages(
         [""],
         tmp_path,
@@ -349,10 +364,11 @@ def test_the_snapshot_records_the_time_it_is_given() -> None:
 
 
 def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
+    recording_browser: cabc.Callable[..., Browser],
     tmp_path: Path,
 ) -> None:
     """A snapshot with no tree would fail every later diff for an unseen reason."""
-    calls, run, _read = _recording_browser()
+    calls, run, _read = recording_browser()
 
     def garbage(argv: cabc.Sequence[str]) -> str:
         calls.append(list(argv))
@@ -372,3 +388,10 @@ def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
     assert "docs/" in str(caught.value), "the page that broke is named"
     assert not list(tmp_path.glob("*.json")), "no half-snapshot is written"
     assert calls[-1][1] == "close", "the session is still closed on the way out"
+
+
+def test_a_boolean_visit_count_is_not_a_count() -> None:
+    """`True` is an `int` to `isinstance`, and would be written as `visited: true`."""
+    evaluated = json.dumps({"tree": {"tag": "html", "children": []}, "visited": True})
+    with pytest.raises(TypeError, match="visit count"):
+        tools._snapshot_document("http://x/", evaluated)

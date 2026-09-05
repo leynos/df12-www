@@ -12,6 +12,9 @@ from __future__ import annotations
 import re
 import typing as typ
 
+if typ.TYPE_CHECKING:
+    from weaver_snapshot_types import Json, Style, WalkerNode
+
 # The origin the harness serves on, port and all, as it appears inside a
 # computed `url()`. Chromium resolves `background-image` against the document,
 # so an inline `style="background-image: url(/netsuke/assets/x.jpg)"` is
@@ -119,7 +122,7 @@ _MARGIN_AXES = (
 )
 
 
-def _pixels(value: str | None) -> float | None:
+def _pixels(value: Json) -> float | None:
     """Read a computed length as pixels, or ``None`` if it is not one.
 
     Parameters
@@ -136,15 +139,103 @@ def _pixels(value: str | None) -> float | None:
         The length in pixels, or ``None`` for ``auto``, a percentage, or
         anything else that is not a bare pixel length.
     """
+    if not isinstance(value, str | None):
+        return None
     if value is None or value == "normal":
         return 0.0
     match = _PX.fullmatch(value)
     return float(match.group(1)) if match else None
 
 
-def _fold_sibling_margins(
-    children: list[dict[str, typ.Any]], parent_style: dict[str, typ.Any]
+def _boundary_gaps(
+    index: int,
+    leading: list[float | None],
+    trailing: list[float | None],
+    gap: float,
+) -> tuple[float, float] | None:
+    """Work out the space before and after one child on one axis.
+
+    Parameters
+    ----------
+    index
+        Which child.
+    leading, trailing
+        Every child's leading and trailing margin on the axis, in pixels, or
+        ``None`` where a margin is not a pixel length.
+    gap
+        The parent's gap on the axis, in pixels.
+
+    Returns
+    -------
+    tuple of float or None
+        The gap before and after the child, or ``None`` if the child or a
+        neighbour it meets carries a margin that is not a pixel length.
+    """
+    own_leading, own_trailing = leading[index], trailing[index]
+    previous = trailing[index - 1] if index else 0.0
+    following = leading[index + 1] if index + 1 < len(leading) else 0.0
+    if (
+        own_leading is None
+        or own_trailing is None
+        or previous is None
+        or following is None
+    ):
+        return None
+    before = own_leading + previous + (gap if index else 0.0)
+    after = own_trailing + following + (gap if index + 1 < len(leading) else 0.0)
+    return before, after
+
+
+def _style_of(node: WalkerNode) -> Style:
+    """Return a node's styles, giving it an empty mapping if it had none.
+
+    The fold writes gaps into the mapping, so it has to be the node's own,
+    not a stand-in that would take the gaps with it.
+    """
+    style = node.get("styleDiff")
+    if style is None:
+        style = node["styleDiff"] = {}
+    return style
+
+
+def _fold_axis(
+    children: list[WalkerNode], parent_style: Style, axis: tuple[str, ...]
 ) -> None:
+    """Fold every child's margins on one axis into gaps; see the caller."""
+    before, after, logical_before, logical_after, gap_key = axis
+    gap = _pixels(parent_style.get(gap_key))
+    if gap is None:
+        return
+    styles = [_style_of(child) for child in children]
+    leading = [_pixels(style.get(f"margin-{before}")) for style in styles]
+    trailing = [_pixels(style.get(f"margin-{after}")) for style in styles]
+    folded = 0
+    for index, style in enumerate(styles):
+        gaps = _boundary_gaps(index, leading, trailing, gap)
+        if gaps is None:
+            continue
+        folded += 1
+        for key in (
+            f"margin-{before}",
+            f"margin-{after}",
+            logical_before,
+            logical_after,
+        ):
+            style.pop(key, None)
+        # A zero gap is what an absent margin already meant, so it is left
+        # unsaid, as the margin would have been.
+        if gaps[0]:
+            style[f"gap-before-{before}"] = f"{gaps[0]:g}px"
+        if gaps[1]:
+            style[f"gap-after-{after}"] = f"{gaps[1]:g}px"
+    # The parent's gap is spoken for only once every child has absorbed it.
+    # A boundary that could not fold still needs the gap on the parent to
+    # show a change to it.
+    if children and folded == len(children):
+        parent_style.pop(gap_key, None)
+
+
+def _fold_sibling_margins(children: list[WalkerNode], parent_style: Style) -> None:
     """Rewrite each child's margins as the gaps between it and its siblings.
 
     Tailwind v3's ``space-y-*`` put a top margin on every child but the first;
@@ -162,51 +253,14 @@ def _fold_sibling_margins(
     children
         A node's normalized children, modified in place. A child whose margin
         on an axis is not a pixel length — ``auto``, a percentage — keeps its
-        margins on that axis as they were.
+        margins on that axis as they were, and so does each neighbour it
+        meets, since the space between them cannot be summed.
     parent_style
         The parent's normalized styles, from which any ``row-gap`` or
-        ``column-gap`` is read, and removed once a child's gap has absorbed
-        it. A gap that folds into nothing — no children, a child whose
-        margins are not pixel lengths, a gap that is not one itself — stays
-        on the parent, where a change to it is still a change.
+        ``column-gap`` is read, and removed once every child's gaps have
+        absorbed it. A gap that any boundary could not fold — no children, a
+        margin that is not a pixel length, a gap that is not one itself —
+        stays on the parent, where a change to it is still a change.
     """
-    for before, after, logical_before, logical_after, gap_key in _MARGIN_AXES:
-        gap = _pixels(parent_style.get(gap_key))
-        if gap is None:
-            continue
-        folded = False
-        leading = [
-            _pixels(child["styleDiff"].get(f"margin-{before}")) for child in children
-        ]
-        trailing = [
-            _pixels(child["styleDiff"].get(f"margin-{after}")) for child in children
-        ]
-        for index, child in enumerate(children):
-            own_leading, own_trailing = leading[index], trailing[index]
-            if own_leading is None or own_trailing is None:
-                continue
-            previous = trailing[index - 1] if index else 0.0
-            following = leading[index + 1] if index + 1 < len(children) else 0.0
-            if previous is None or following is None:
-                continue
-            folded = True
-            style = child["styleDiff"]
-            for key in (
-                f"margin-{before}",
-                f"margin-{after}",
-                logical_before,
-                logical_after,
-            ):
-                style.pop(key, None)
-            gap_before = own_leading + previous + (gap if index else 0.0)
-            gap_after = (
-                own_trailing + following + (gap if index + 1 < len(children) else 0.0)
-            )
-            # A zero gap is what an absent margin already meant, so it is
-            # left unsaid, as the margin would have been.
-            if gap_before:
-                style[f"gap-before-{before}"] = f"{gap_before:g}px"
-            if gap_after:
-                style[f"gap-after-{after}"] = f"{gap_after:g}px"
-        if folded:
-            parent_style.pop(gap_key, None)
+    for axis in _MARGIN_AXES:
+        _fold_axis(children, parent_style, axis)

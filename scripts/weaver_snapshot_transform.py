@@ -17,6 +17,8 @@ from weaver_snapshot_folds import _pixels
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
 
+    from weaver_snapshot_types import Json, Style
+
 # A 2D transform matrix as Chromium reports it: six numbers, in the order
 # `matrix(a, b, c, d, e, f)`.
 _MATRIX = re.compile(r"matrix\(([^)]*)\)")
@@ -86,7 +88,11 @@ def _scale_matrix(value: str) -> tuple[float, ...] | None:
     try:
         sx = float(factors[0])
         sy = float(factors[1]) if len(factors) > 1 else sx
+        sz = float(factors[2]) if len(factors) > 2 else 1.0  # noqa: PLR2004 - x, y, z
     except (ValueError, IndexError):
+        return None
+    # A depth scale has no 2D matrix; only the default one folds.
+    if sz != 1.0:
         return None
     return (sx, 0.0, 0.0, sy, 0.0, 0.0)
 
@@ -103,7 +109,12 @@ def _rotate_matrix(value: str) -> tuple[float, ...] | None:
     return (cos, sin, -sin, cos, 0.0, 0.0)
 
 
-def _translate_matrix(value: str, bbox: _Bbox) -> tuple[float, ...] | None:
+def _extent(value: Json) -> float:
+    """Read a bounding-box dimension as a number, or zero if it is not one."""
+    return float(value) if isinstance(value, (int, float)) else 0.0
+
+
+def _translate_matrix(value: str, bbox: Json) -> tuple[float, ...] | None:
     """Read a computed ``translate`` as a matrix, resolving percentages.
 
     Parameters
@@ -124,14 +135,17 @@ def _translate_matrix(value: str, bbox: _Bbox) -> tuple[float, ...] | None:
     parts = value.split()
     if not parts:
         return None
-    tx = _length(parts[0], float(bbox.get("width", 0)))
-    ty = _length(parts[1], float(bbox.get("height", 0))) if len(parts) > 1 else 0.0
-    if tx is None or ty is None:
+    width, height = _extent(bbox.get("width")), _extent(bbox.get("height"))
+    tx = _length(parts[0], width)
+    ty = _length(parts[1], height) if len(parts) > 1 else 0.0
+    tz = _pixels(parts[2]) if len(parts) > 2 else 0.0  # noqa: PLR2004 - x, y, z
+    # A depth translation has no 2D matrix; only the default one folds.
+    if tx is None or ty is None or tz != 0.0:
         return None
     return (1.0, 0.0, 0.0, 1.0, tx, ty)
 
 
-def _fold_transform(style: dict[str, typ.Any], bbox: _Bbox) -> None:
+def _fold_transform(style: Style, bbox: Json) -> None:
     """Compose the individual transform properties into ``transform``.
 
     Tailwind v3 wrote ``rotate-2`` and ``-translate-x-1/2`` into
@@ -186,10 +200,3 @@ def _fold_transform(style: dict[str, typ.Any], bbox: _Bbox) -> None:
         style.pop("transform", None)
         return
     style["transform"] = f"matrix({', '.join(f'{part:g}' for part in rounded)})"
-
-
-# Whatever the walker put in a node's `bbox`. It is a mapping today; the type
-# says "some JSON value" because the normalization deliberately does not
-# require that, and a snapshot reporting it otherwise should reach the diff
-# rather than be dropped on the way.
-type _Bbox = dict[str, typ.Any] | list[typ.Any] | str | float | bool | None

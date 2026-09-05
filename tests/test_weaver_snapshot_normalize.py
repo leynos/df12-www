@@ -14,6 +14,8 @@ import pytest
 from tests.support.weaver_harness import load
 
 normalize = load("weaver_snapshot_normalize")
+folds = load("weaver_snapshot_folds")
+transform = load("weaver_snapshot_transform")
 
 
 def _node(**style: str) -> dict[str, typ.Any]:
@@ -574,3 +576,61 @@ def test_an_undisplayed_node_has_no_transform_to_compare() -> None:
     assert (
         normalize._normalize(v3)["styleDiff"] == normalize._normalize(v4)["styleDiff"]
     )
+
+
+def test_a_parent_gap_stays_when_an_interior_auto_margin_blocks_a_boundary() -> None:
+    """One boundary that cannot fold keeps the gap on the parent for all of them.
+
+    With three children and `auto` on the middle one, the outer children can
+    still fold their far boundaries, but the two boundaries that meet the
+    middle child cannot be summed. Dropping the parent's gap then would hide
+    a change to it on exactly those boundaries.
+    """
+    parent = {"row-gap": "16px"}
+    children = [
+        _node(**{"margin-top": "0px", "margin-bottom": "0px"}) for _ in range(3)
+    ]
+    children[1]["styleDiff"]["margin-top"] = "auto"
+    folds._fold_sibling_margins(children, parent)
+    assert parent["row-gap"] == "16px", (
+        "the gap stays on the parent while any boundary is unrepresentable"
+    )
+    assert children[1]["styleDiff"]["margin-top"] == "auto", (
+        "the auto margin is left as declared"
+    )
+    assert "gap-after-bottom" not in children[0]["styleDiff"], (
+        "the boundary that meets the auto margin is not folded on either side"
+    )
+    assert children[2]["styleDiff"]["gap-before-top"] == "16px", (
+        "the boundary the auto margin does not touch still folds, with the gap"
+    )
+
+
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [("scale", "1 1 2"), ("translate", "0px 0px 1px")],
+    ids=["depth-scale", "depth-translate"],
+)
+def test_a_depth_component_is_not_folded_into_a_flat_matrix(
+    key: str, value: str
+) -> None:
+    """A z component has no 2D matrix, so the properties stay as reported."""
+    style = {key: value, "transform": "none"}
+    transform._fold_transform(style, {"x": 0, "y": 0, "width": 10, "height": 10})
+    assert style[key] == value, f"a non-default depth {key} must survive: {style!r}"
+    assert style["transform"] == "none", "and the transform stays as it was"
+
+
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [("scale", "2 2 1"), ("translate", "4px 0px 0px")],
+    ids=["flat-scale", "flat-translate"],
+)
+def test_a_default_depth_component_still_folds(key: str, value: str) -> None:
+    """Chromium reports the z component even when nothing set it."""
+    style = {key: value}
+    transform._fold_transform(style, {"x": 0, "y": 0, "width": 10, "height": 10})
+    assert key not in style, (
+        f"a default depth component folds like a 2D value: {style!r}"
+    )
+    assert style["transform"].startswith("matrix("), "and the matrix is composed"

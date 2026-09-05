@@ -301,7 +301,7 @@ def _walker_result(evaluated: str) -> _WalkerResult:
     if (
         not isinstance(result, dict)
         or not isinstance(result.get("tree"), dict)
-        or not isinstance(result.get("visited"), int)
+        or type(result.get("visited")) is not int  # a bool is an int to isinstance
     ):
         message = f"the walker did not return a tree and a visit count: {result!r:.200}"
         raise TypeError(message)

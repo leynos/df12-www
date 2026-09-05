@@ -295,6 +295,8 @@ Every published file has a source elsewhere in the repository:
 | `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                                              |
 | `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                                              |
 | `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                                              |
+| `stilyagi/assets/styles/stilyagi.css` | Tailwind compiling `src/styles/`                                              |
+| `netsuke/assets/css/himotoshi.css`    | Tailwind compiling `src/styles/`                                              |
 | `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                                          |
 | `*/assets/js/*.js`                    | `scripts/compile-browser-scripts.ts` compiling `src/static/**/assets/js/*.ts` |
 | `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`                                      |
@@ -1333,7 +1335,7 @@ convention test confines the flag to it.
 ### 7.1. Verifying a styling change against Weaver
 
 `scripts/weaver_snapshot.py` is the command surface; the work sits in
-thirteen siblings beside it, none over 400 lines, named for what they do:
+fourteen siblings beside it, none over 400 lines, named for what they do:
 `_paths` (the published tree, the page list, and each page's filename stem),
 `_locking` (advisory locks and lock-file hygiene), `_output` (staging and
 failure-atomic publication), `_ownership` (proving whose server answered),
@@ -1344,6 +1346,8 @@ a reader could see), `_folds` (the transition, radius, incidental-text and
 sibling-margin folds that make v4's notation read as v3's), `_transform`
 (composing v4's individual transform properties into v3's matrix),
 `_document` (reading a snapshot from disk and rendering its normalized tree),
+`_types` (the JSON, style, and walker-node shapes the modules pass between
+them),
 `_clock` (the passage of time, as something a caller can supply), and
 `_process` (starting, polling, and stopping the server child). They are plain
 modules rather than a package, so a script run by path finds them on
@@ -1669,7 +1673,11 @@ the viewport with `agent-browser set viewport <w> <h>`, and evaluates
 JavaScript against the page. `css-view` captures every element's computed
 styles and bounding box as JSON, which `jq` can then query or `diff` can
 compare. Both have a skill under the agent's skills directory that carries the
-current command reference; load it rather than working from memory.
+current command reference; load it rather than working from memory. For a
+whole sub-site the snapshot harness in section 7.1 does the capture instead:
+it drives `agent-browser`, waits for the page to settle, and evaluates a
+vendored copy of css-view's walker, so `css-view` itself is the ad hoc tool
+for one page and the origin of the walker, not the harness's capture path.
 
 The dev server is the target. `bun run dev` watches `src/`, `df12_pages/`,
 `config/`, `scripts/`, and `pyproject.toml` and rebuilds on change; `bun run
@@ -1700,8 +1708,10 @@ than a spot check:
 4. **Diff before and after for output-neutral changes.** A refactor that is
    meant to change nothing visible — moving utilities into a component class,
    extracting a macro, reorganizing a stylesheet, upgrading a dependency — is
-   proven by capturing `css-view` snapshots before and after at the same
-   viewport and diffing each node's tag, computed styles, and bounding box.
+   proven by capturing computed-style snapshots before and after at the same
+   viewport — `css-view` for one page, `scripts/weaver_snapshot.py capture
+   --site <site>` for a sub-site — and diffing each node's tag, computed
+   styles, and bounding box.
    Class attributes are left out of the projection on purpose, since
    renaming classes is usually the point. An empty diff is the evidence; a
    non-empty diff is either a bug or a change the commit message must

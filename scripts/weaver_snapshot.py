@@ -47,6 +47,7 @@ run by path, so its own directory is on `sys.path`.
 - ``weaver_snapshot_folds``     — the folds that make v4's notation read as v3's
 - ``weaver_snapshot_transform`` — composing individual transforms into one matrix
 - ``weaver_snapshot_document``  — reading a snapshot and rendering its tree
+- ``weaver_snapshot_types``     — the shapes the modules pass between them
 """
 
 from __future__ import annotations

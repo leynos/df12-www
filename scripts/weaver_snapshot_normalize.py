@@ -17,7 +17,10 @@ from weaver_snapshot_folds import (
     _fold_sibling_margins,
     _incidental_text,
 )
-from weaver_snapshot_transform import _Bbox, _fold_transform
+from weaver_snapshot_transform import _fold_transform
+
+if typ.TYPE_CHECKING:
+    from weaver_snapshot_types import Json, Style, WalkerNode
 
 # The physical and logical names for each border edge, paired so a width can
 # be looked up from a colour property and vice versa.
@@ -39,7 +42,7 @@ _ORIGIN_POSITIONS = frozenset({"0px 0px", "0% 0%", "0px", "0%"})
 _MOVING_ANIMATIONS = frozenset({"spin", "ping", "bounce"})
 
 
-def _drop_invisible_border_colours(style: dict[str, typ.Any]) -> None:
+def _drop_invisible_border_colours(style: Style) -> None:
     """Remove the colour of any border edge that is not drawn.
 
     Tailwind v3's preflight defaulted every border to ``gray-200``; v4 leaves
@@ -81,7 +84,7 @@ _TRACKS_PARENT = frozenset(
 )
 
 
-def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any]:
+def _canonical_style(style_diff: Style | None) -> Style:
     """Strip incidental variation from one node's reported styles.
 
     Five kinds of variation are incidental:
@@ -145,8 +148,9 @@ def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any
     if _is_moving(style):
         style.pop("transform", None)
     for key in ("box-shadow", "text-shadow"):
-        if isinstance(style.get(key), str):
-            style[key] = _canonical_shadow(style[key])
+        shadow = style.get(key)
+        if isinstance(shadow, str):
+            style[key] = _canonical_shadow(shadow)
     # A background positioned at the origin is where an unpositioned one
     # already is; Chromium reports the one in pixels and the default in
     # percentages, and a `background:` shorthand in a layered rule resets it
@@ -158,10 +162,9 @@ def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any
     # also offers dark. daisyUI's theme declares it on the root.
     if style.get("color-scheme") in {"light", "normal"}:
         del style["color-scheme"]
-    if isinstance(style.get("transition-property"), str):
-        style["transition-property"] = _canonical_transition(
-            style["transition-property"]
-        )
+    transition = style.get("transition-property")
+    if isinstance(transition, str):
+        style["transition-property"] = _canonical_transition(transition)
     for key, value in style.items():
         if key.endswith("-radius") and isinstance(value, str):
             style[key] = _capped_radius(value)
@@ -169,21 +172,21 @@ def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any
     return style
 
 
-def _is_animated(style: dict[str, typ.Any]) -> bool:
+def _is_animated(style: Style) -> bool:
     """Say whether a node's styles show a CSS animation running on it."""
     return style.get("animation-name", "none") != "none"
 
 
-def _is_moving(style: dict[str, typ.Any]) -> bool:
+def _is_moving(style: Style) -> bool:
     """Say whether a node is running an animation that moves its box."""
     names = str(style.get("animation-name", "none")).split(", ")
     return any(name in _MOVING_ANIMATIONS for name in names)
 
 
 def _resolve_tracked(
-    style: dict[str, typ.Any],
-    inherited: dict[str, typ.Any],
-) -> dict[str, typ.Any]:
+    style: Style,
+    inherited: Style,
+) -> Style:
     """Drop the tracked properties a node merely repeats from its parent.
 
     The walker compares the properties in :data:`_TRACKS_PARENT` against the
@@ -215,7 +218,7 @@ def _resolve_tracked(
     return carried
 
 
-def _rounded_bbox(bbox: _Bbox) -> _Bbox:
+def _rounded_bbox(bbox: Json) -> Json:
     """Round a bounding box's numbers, absorbing subpixel text-shaping jitter.
 
     Two decimal places is finer than any layout shift worth reporting and
@@ -245,11 +248,11 @@ def _rounded_bbox(bbox: _Bbox) -> _Bbox:
 
 
 def _normalize(
-    node: dict[str, typ.Any],
-    inherited: dict[str, typ.Any] | None = None,
+    node: WalkerNode,
+    inherited: Style | None = None,
     *,
     spinning: bool = False,
-) -> dict[str, typ.Any]:
+) -> WalkerNode:
     """Strip incidental variation from one walker node and its descendants.
 
     The normalization itself lives in :func:`_canonical_style`,
@@ -281,7 +284,7 @@ def _normalize(
 
     spinning = spinning or _is_moving(style)
     _fold_transform(style, node.get("bbox"))
-    normalized = dict(node)
+    normalized = node.copy()
     normalized["styleDiff"] = style
     # The class list is how a node is styled, not what it looks like, and a
     # rename is the usual reason for a change that is meant to look the same.
@@ -299,8 +302,9 @@ def _normalize(
             del normalized["bbox"]
         else:
             normalized["bbox"] = _rounded_bbox(node["bbox"])
-    if isinstance(node.get("id"), str):
-        normalized["id"] = _incidental_text(node["id"])
+    identifier = node.get("id")
+    if isinstance(identifier, str):
+        normalized["id"] = _incidental_text(identifier)
     # Nothing in the head is rendered, and the two <script> elements the
     # Play CDN needed are exactly what a cutover removes: the change is the
     # point, and reporting it on every page would bury whatever else moved.

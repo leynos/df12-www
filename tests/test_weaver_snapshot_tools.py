@@ -7,6 +7,8 @@ or a session two runs would share.
 
 from __future__ import annotations
 
+import datetime as dt
+import json
 import os
 import subprocess
 import typing as typ
@@ -23,27 +25,60 @@ paths = load("weaver_snapshot_paths")
 tools = load("weaver_snapshot_tools")
 
 
-def test_the_css_view_argv_pins_the_browser_and_names_the_output() -> None:
-    """A comparison is only meaningful if both sides rendered the same way."""
-    argv = tools._css_view_argv(
-        "/usr/bin/bun", "http://127.0.0.1:8099", "commands/act/", Path("/out")
+def test_the_walker_expression_carries_its_parameters() -> None:
+    """The evaluator is a template; every placeholder has to be filled in."""
+    expression = tools._walker_expression(
+        tools._read_walker(), max_nodes=123, text_clip=45
     )
 
-    assert argv[:2] == ["/usr/bin/bun", "x"], (
-        f"css-view is run through bun; argv starts {argv[:2]!r}"
+    filled = tools._with_defaults(
+        expression, json.dumps(json.dumps({"base": {}, "deltas": {}}))
     )
-    assert "--browser" in argv, (
-        "the engine must be pinned rather than left to css-view's default, or "
-        f"a change to that default silently reshapes the comparison: {argv!r}"
+    assert "__" not in filled.replace("__snapshotSettle", ""), (
+        "a placeholder left unfilled would be a syntax error in the page"
     )
-    assert argv[argv.index("--browser") + 1] == "chromium", (
-        f"the pinned engine should be chromium; got {argv!r}"
+    assert expression.rstrip().endswith("123, 45, __DEFAULTS__);"), (
+        f"the parameters are the final call's arguments; got {expression[-60:]!r}"
     )
-    assert argv[argv.index("--output") + 1] == str(Path("/out/commands__act.json")), (
-        f"the snapshot should be named after the page's slug; got {argv!r}"
+    assert '"line-height"' in expression, (
+        "the inherited-property list is what makes a child's value a diff "
+        "against its parent rather than the user-agent default"
     )
-    assert argv[-1] == "http://127.0.0.1:8099/weaver/commands/act/", (
-        f"the page URL is the final positional argument; got {argv[-1]!r}"
+    assert '"margin-bottom"' in expression, (
+        "margins are reported whatever they equal, or a paragraph's default "
+        "16px below would go unrecorded and the gap folding would read it as 0"
+    )
+
+
+def test_the_snapshot_document_puts_the_tree_where_readers_look() -> None:
+    """`payload.tree` is the contract every reader of a snapshot relies on."""
+    tree = {"tag": "html", "classes": [], "styleDiff": {}, "children": []}
+    # agent-browser prints the expression's string result JSON-encoded once
+    # more, so the walker's JSON arrives double-encoded.
+    evaluated = json.dumps(json.dumps({"tree": tree, "visited": 1}))
+
+    document = tools._snapshot_document("http://x/netsuke/", evaluated)
+
+    assert document["payload"]["tree"] == tree, "the tree sits where css-view put it"
+    assert document["payload"]["meta"]["visited"] == 1, "the visit count travels too"
+    assert document["meta"]["url"] == "http://x/netsuke/", "the page is recorded"
+    assert document["meta"]["viewport"] == {
+        "width": tools.CAPTURE_WIDTH,
+        "height": tools.CAPTURE_HEIGHT,
+    }, "an unstated viewport is the default one"
+
+
+def test_the_browser_session_is_named_for_the_site_and_the_job() -> None:
+    """Two sites, or a capture and a screenshot run, must not share a session."""
+    assert tools._session_name("netsuke").startswith("netsuke-shots"), (
+        f"got {tools._session_name('netsuke')!r}"
+    )
+    assert tools._session_name("netsuke", "capture").startswith("netsuke-capture"), (
+        "the session is named for the site and the purpose, so two sites' runs "
+        "cannot share a browser"
+    )
+    assert tools._session_name("netsuke") != tools._session_name("weaver"), (
+        "a session is one viewport and one page; two sites need two"
     )
 
 
@@ -83,26 +118,140 @@ def test_concurrent_runs_do_not_share_a_browser_session() -> None:
     )
 
 
-def test_capture_drives_one_tool_run_per_page() -> None:
-    """Page discovery feeds the runner, and nothing is silently skipped."""
+# The two ways the harness runs a tool: for its effect, and for what it prints.
+type Runner = cabc.Callable[[cabc.Sequence[str]], None]
+type Reader = cabc.Callable[[cabc.Sequence[str]], str]
+type Browser = tuple[list[list[str]], Runner, Reader]
+
+
+def _recording_browser(
+    *,
+    settle_fails: bool = False,
+    unrendered: int = 0,
+) -> Browser:
+    """Stand in for agent-browser, recording each call and answering `eval`."""
     calls: list[list[str]] = []
-    pages = ["", "install/", "commands/act/"]
+
+    def run(argv: cabc.Sequence[str]) -> None:
+        calls.append(list(argv))
+        if settle_fails and argv[1] == "wait" and "--fn" in argv:
+            raise subprocess.CalledProcessError(1, list(argv))
+
+    def read(argv: cabc.Sequence[str]) -> str:
+        calls.append(list(argv))
+        if argv[2] == "probe()":
+            return json.dumps(json.dumps({"base": {}, "deltas": {}}))
+        spans = [
+            {"tag": "span", "classes": ["iconify"], "styleDiff": {}, "children": []}
+            for _ in range(unrendered)
+        ]
+        tree = {"tag": "html", "classes": [], "styleDiff": {}, "children": spans}
+        return json.dumps(json.dumps({"tree": tree, "visited": 1 + unrendered}))
+
+    return calls, run, read
+
+
+@pytest.fixture
+def recording_browser() -> cabc.Callable[..., Browser]:
+    """Hand each test the stand-in browser factory, so it asks for the run it needs."""
+    return _recording_browser
+
+
+def test_capture_settles_each_page_before_walking_it(
+    recording_browser: cabc.Callable[..., Browser], tmp_path: Path
+) -> None:
+    """Open, wait for the network, wait for the icons, then walk — in that order.
+
+    A walk taken before Iconify has drawn its glyphs records placeholders
+    where the icons will be, which moves every line below them: a layout
+    change that is not a style change. The order is the whole point.
+    """
+    calls, run, read = recording_browser()
+    pages = ["", "install/"]
     tools._capture_pages(
         pages,
-        Path("/out"),
+        tmp_path,
         "http://127.0.0.1:8099",
-        "/usr/bin/bun",
-        lambda argv: calls.append(list(argv)),
+        "/usr/bin/agent-browser",
+        run,
+        read,
+        "netsuke",
+        walker="walk()",
+        defaults="probe()",
     )
 
-    assert len(calls) == len(pages), (
-        f"expected one run per page, got {len(calls)} for {len(pages)} pages"
+    assert calls[0][1:5] == ["set", "viewport", "1280", "720"], (
+        f"the viewport should be pinned before any page loads; got {calls[0]}"
     )
-    assert [argv[-1].rsplit("/weaver/", 1)[1] for argv in calls] == [
-        "",
-        "install/",
-        "commands/act/",
-    ], f"each page should be captured once, in order; got {calls!r}"
+    assert [argv[1:3] for argv in calls[1:3]] == [
+        ["open", "about:blank"],
+        ["eval", "probe()"],
+    ], f"the defaults are measured on a blank page first; got {calls[1:3]}"
+    per_page = [argv[1] for argv in calls[3:-1]]
+    assert per_page == ["open", "wait", "wait", "eval"] * len(pages), (
+        f"each page should be opened, settled twice over, then walked; got {per_page}"
+    )
+    opened = [
+        argv[2] for argv in calls if argv[1] == "open" and argv[2] != "about:blank"
+    ]
+    assert opened == [
+        "http://127.0.0.1:8099/netsuke/",
+        "http://127.0.0.1:8099/netsuke/install/",
+    ], f"every page should be opened under the site; got {opened}"
+    settles = [argv for argv in calls if argv[1] == "wait" and "--fn" in argv]
+    assert all("Iconify" in argv[argv.index("--fn") + 1] for argv in settles), (
+        "the settle wait should ask Iconify whether its icons have arrived"
+    )
+    assert calls[-1][1] == "close", "the session should be closed on the way out"
+    for page in pages:
+        written = json.loads((tmp_path / f"{paths._slug(page)}.json").read_text())
+        assert written["payload"]["tree"]["tag"] == "html", (
+            f"the walk should be written under payload.tree; got {written}"
+        )
+
+
+def test_a_page_that_never_settles_is_still_captured(
+    recording_browser: cabc.Callable[..., Browser],
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """An icon the set lacks keeps its placeholder; the page is captured and said so."""
+    calls, run, read = recording_browser(settle_fails=True, unrendered=1)
+    tools._capture_pages(
+        ["docs/"],
+        tmp_path,
+        "http://x",
+        "/usr/bin/agent-browser",
+        run,
+        read,
+        "netsuke",
+        walker="walk()",
+        defaults="probe()",
+    )
+
+    assert [argv[1] for argv in calls].count("eval") == 2, (  # noqa: PLR2004 - the probe, then the one walk
+        "the walk should still be taken once the settle wait gives up"
+    )
+    assert (tmp_path / "docs.json").is_file(), "the unsettled page is still written"
+    report = capsys.readouterr().out
+    assert "did not settle" in report, f"the report should say so; got {report!r}"
+    assert "1 icons the set does not have" in report, (
+        f"the report should count the placeholders left; got {report!r}"
+    )
+
+
+def test_a_snapshot_that_cannot_be_read_is_an_error_not_a_count(
+    tmp_path: Path,
+) -> None:
+    """The harness has just written the file, so failing to read it is a bug."""
+    with pytest.raises(FileNotFoundError):
+        tools._unrendered_icons(tmp_path / "absent.json")
+    (tmp_path / "broken.json").write_text("{", encoding="utf-8")
+    with pytest.raises(json.JSONDecodeError, match="Expecting"):
+        tools._unrendered_icons(tmp_path / "broken.json")
+    (tmp_path / "shapeless.json").write_text('{"payload": {}}', encoding="utf-8")
+    with pytest.raises(KeyError):
+        tools._unrendered_icons(tmp_path / "shapeless.json")
 
 
 def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None:
@@ -112,20 +261,41 @@ def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None
     the first failure and carried on would produce a directory missing one
     page, which compares clean against a baseline that has it.
     """
-    attempted: list[str] = []
+    attempted: list[list[str]] = []
 
     def explode(argv: cabc.Sequence[str]) -> None:
-        attempted.append(argv[-1])
+        attempted.append(list(argv))
+        # The viewport, the blank page the defaults are measured on, and the
+        # close on the way out all succeed; the first selected page does not.
+        if argv[1] in {"set", "close"} or argv[2] == "about:blank":
+            return
         raise subprocess.CalledProcessError(1, list(argv))
+
+    def probe(argv: cabc.Sequence[str]) -> str:
+        attempted.append(list(argv))
+        return json.dumps(json.dumps({"base": {}, "deltas": {}}))
 
     with pytest.raises(subprocess.CalledProcessError):
         tools._capture_pages(
-            ["", "install/"], Path("/out"), "http://x", "/usr/bin/bun", explode
+            ["", "install/"],
+            Path("/out"),
+            "http://x",
+            "/usr/bin/agent-browser",
+            explode,
+            probe,
+            walker="walk()",
+            defaults="probe()",
         )
 
-    assert len(attempted) == 1, (
-        f"the run should stop at the first failure, but it attempted "
-        f"{len(attempted)} pages: {attempted}"
+    assert ["eval", "probe()"] in [argv[1:3] for argv in attempted], (
+        "the defaults were measured before the first page was tried"
+    )
+    opened = [
+        argv for argv in attempted if argv[1] == "open" and argv[2] != "about:blank"
+    ]
+    assert len(opened) == 1, (
+        f"the run should stop at the first failure, but it opened "
+        f"{len(opened)} pages: {opened}"
     )
 
 
@@ -193,3 +363,79 @@ def test_a_missing_tool_names_itself_rather_than_failing_obscurely() -> None:
     assert "definitely-not-a-real-tool-name" in str(caught.value.code), (
         f"the message should name the missing tool; got {caught.value.code!r}"
     )
+
+
+def test_capture_lays_pages_out_at_the_viewport_it_was_given(
+    recording_browser: cabc.Callable[..., Browser], tmp_path: Path
+) -> None:
+    """A phone width proves the narrow media queries; the default is the desktop."""
+    calls, run, read = recording_browser()
+    tools._capture_pages(
+        [""],
+        tmp_path,
+        "http://x",
+        "/usr/bin/agent-browser",
+        run,
+        read,
+        "netsuke",
+        (360, 800),
+        walker="walk()",
+        defaults="probe()",
+    )
+    assert calls[0][1:5] == ["set", "viewport", "360", "800"], (
+        f"the viewport is set before any page is opened; got {calls[0]!r}"
+    )
+    written = json.loads((tmp_path / "__home.json").read_text(encoding="utf-8"))
+    assert written["meta"]["viewport"] == {"width": 360, "height": 800}, (
+        "the snapshot records the viewport it was laid out at"
+    )
+
+
+def test_the_snapshot_records_the_time_it_is_given() -> None:
+    """The timestamp is a seam, so a snapshot's metadata can be pinned exactly."""
+    evaluated = json.dumps({"tree": {"tag": "html", "children": []}, "visited": 1})
+    fixed = dt.datetime(2026, 9, 5, 12, 0, tzinfo=dt.UTC)
+
+    document = tools._snapshot_document("http://x/", evaluated, now=lambda: fixed)
+
+    assert document["meta"]["capturedAt"] == "2026-09-05T12:00:00+00:00", (
+        "capturedAt is whatever the injected clock says, so two captures can "
+        "be compared without a timestamp between them"
+    )
+
+
+def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
+    recording_browser: cabc.Callable[..., Browser],
+    tmp_path: Path,
+) -> None:
+    """A snapshot with no tree would fail every later diff for an unseen reason."""
+    calls, run, _read = recording_browser()
+
+    def garbage(argv: cabc.Sequence[str]) -> str:
+        calls.append(list(argv))
+        if argv[2] == "probe()":
+            return json.dumps(json.dumps({"base": {}, "deltas": {}}))
+        return json.dumps({"visited": 1})
+
+    with pytest.raises(SystemExit, match=r"http://x/netsuke/docs/.*tree") as caught:
+        tools._capture_pages(
+            ["docs/"],
+            tmp_path,
+            "http://x",
+            "/bin/agent-browser",
+            run,
+            garbage,
+            "netsuke",
+            walker="walk()",
+            defaults="probe()",
+        )
+    assert "docs/" in str(caught.value), "the page that broke is named"
+    assert not list(tmp_path.glob("*.json")), "no half-snapshot is written"
+    assert calls[-1][1] == "close", "the session is still closed on the way out"
+
+
+def test_a_boolean_visit_count_is_not_a_count() -> None:
+    """`True` is an `int` to `isinstance`, and would be written as `visited: true`."""
+    evaluated = json.dumps({"tree": {"tag": "html", "children": []}, "visited": True})
+    with pytest.raises(TypeError, match="visit count"):
+        tools._snapshot_document("http://x/", evaluated)

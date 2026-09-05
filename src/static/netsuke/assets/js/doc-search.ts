@@ -353,13 +353,13 @@
               href="${href}"
               data-doc-search-option
               data-doc-search-index="${index}"
-              class="doc-search-option block px-4 py-3 transition-colors hover:bg-boxwood-pale focus:bg-boxwood-pale focus:outline-none"
+              class="doc-search-option block px-4 py-3 transition-colors hover:bg-base-100 focus:bg-base-100 focus:outline-none"
             >
               <div class="flex items-center justify-between gap-3">
-                <span class="text-sm font-semibold text-charcoal">${escapeHtml(result.title)}</span>
-                <span class="shrink-0 rounded-full border border-stone bg-white px-2 py-0.5 text-[11px] font-mono uppercase tracking-wide text-charcoal-light">${escapeHtml(result.kind)}</span>
+                <span class="text-sm font-semibold text-base-content">${escapeHtml(result.title)}</span>
+                <span class="shrink-0 rounded-full border border-base-300 bg-white px-2 py-0.5 text-[11px] font-mono uppercase tracking-wide text-charcoal-light">${escapeHtml(result.kind)}</span>
               </div>
-              <div class="mt-1 text-xs font-mono text-indigo">${escapeHtml(subtitle)}</div>
+              <div class="mt-1 text-xs font-mono text-primary">${escapeHtml(subtitle)}</div>
               <p class="mt-2 text-sm leading-relaxed text-charcoal-mid">${excerpt}</p>
             </a>
           </li>
@@ -380,9 +380,9 @@
     for (const option of options) {
       const optionIndex = Number(option.getAttribute("data-doc-search-index"));
       const isActive = optionIndex === activeIndex;
-      option.classList.toggle("bg-boxwood-pale", isActive);
+      option.classList.toggle("bg-base-100", isActive);
       option.classList.toggle("border-l-4", isActive);
-      option.classList.toggle("border-vermillion", isActive);
+      option.classList.toggle("border-accent", isActive);
     }
   }
 

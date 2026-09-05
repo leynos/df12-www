@@ -1,10 +1,11 @@
-"""Capture and compare computed-style snapshots of the Weaver sub-site.
+"""Capture and compare computed-style snapshots of a sub-site.
 
-The Weaver sub-site is being migrated from the Tailwind Play CDN to the
-repository's compiled Tailwind v4 and daisyUI v5 pipeline. The migration is
-meant to be behaviour-preserving, so each step is judged by diffing a fresh
-snapshot against a baseline taken before any edit. See
-``docs/execplans/weaver-daisy-migration.md``.
+The Weaver sub-site was migrated from the Tailwind Play CDN to the
+repository's compiled Tailwind v4 and daisyUI v5 pipeline, and Netsuke is
+following it. Each migration is meant to be behaviour-preserving, so each step
+is judged by diffing a fresh snapshot against a baseline taken before any
+edit. See ``docs/execplans/weaver-daisy-migration.md`` and
+``docs/execplans/netsuke-daisy-migration.md``.
 
 Three subcommands, each safe to re-run:
 
@@ -12,11 +13,19 @@ Three subcommands, each safe to re-run:
     uv run python scripts/weaver_snapshot.py shots .weaver-baseline-shots
     uv run python scripts/weaver_snapshot.py diff .weaver-baseline .weaver-after
 
-``capture`` records computed styles via ``css-view`` and is the objective
-gate; ``diff`` exits non-zero when any page changed. ``shots`` records
-full-page screenshots via ``agent-browser`` for human review, because some
-regressions — a wrong icon glyph, a texture that failed to load — are obvious
-to the eye and invisible in a style diff.
+``capture`` and ``shots`` take ``--site`` to drive another sub-site; the
+default is Weaver, which the harness was written for and is named after:
+
+    uv run python scripts/weaver_snapshot.py capture --site netsuke .netsuke-baseline
+
+``capture`` records computed styles and is the objective gate; ``diff`` exits
+non-zero when any page changed. ``shots`` records full-page screenshots for
+human review, because some regressions — a wrong icon glyph, a texture that
+failed to load — are obvious to the eye and invisible in a style diff. Both
+drive ``agent-browser``, and both wait for a page to settle — the network
+idle, and every Iconify glyph either drawn or reported missing — before
+taking anything; a capture taken a moment too early records a different
+layout, not a different style.
 
 All three read the published tree under ``public/``, so run ``bun run build``
 first. Each serves that tree itself on a local port and stops the server
@@ -31,9 +40,15 @@ run by path, so its own directory is on `sys.path`.
 - ``weaver_snapshot_output``    — staging and failure-atomic publication
 - ``weaver_snapshot_ownership`` — proving whose server answered
 - ``weaver_snapshot_serving``   — ports, the server, and its lifecycle
-- ``weaver_snapshot_tools``     — argv for css-view and agent-browser
+- ``weaver_snapshot_tools``     — driving agent-browser, and the walker
+- ``weaver_snapshot_defaults.js`` — the user-agent defaults, measured on a blank page
+- ``weaver_snapshot_walker.js`` — the computed-style walk, run in the page
 - ``weaver_snapshot_colour``    — one colour written one way
 - ``weaver_snapshot_normalize`` — reducing a tree to what is visible
+- ``weaver_snapshot_folds``     — the folds that make v4's notation read as v3's
+- ``weaver_snapshot_transform`` — composing individual transforms into one matrix
+- ``weaver_snapshot_document``  — reading a snapshot and rendering its tree
+- ``weaver_snapshot_types``     — the shapes the modules pass between them
 """
 
 from __future__ import annotations
@@ -49,28 +64,44 @@ import sys
 from pathlib import Path  # noqa: TC003
 
 import cyclopts
+from weaver_snapshot_document import _normalized_tree
 from weaver_snapshot_locking import _exclusive, _output_lock_path
-from weaver_snapshot_normalize import _normalized_tree
 from weaver_snapshot_output import _staged
-from weaver_snapshot_paths import _page_paths
+from weaver_snapshot_paths import DEFAULT_SITE, _page_paths, _public_root
 from weaver_snapshot_serving import _served
 from weaver_snapshot_tools import (
+    CAPTURE_HEIGHT,
+    CAPTURE_WIDTH,
+    DEFAULTS,
     SCREENSHOT_WIDTHS,
+    WALKER,
     _capture_pages,
+    _read_defaults_probe,
+    _read_tool,
+    _read_walker,
     _run_tool,
     _shoot_pages,
     _tool,
+    _walker_expression,
 )
 
 app = cyclopts.App(
     name="weaver-snapshot",
-    help="Capture and compare Weaver computed-style snapshots.",
+    help="Capture and compare a sub-site's computed-style snapshots.",
 )
 
 
 @app.command
-def capture(out_dir: Path, /, *, port: int = 0) -> None:
-    """Record a computed-style snapshot of every Weaver page.
+def capture(
+    out_dir: Path,
+    /,
+    *,
+    port: int = 0,
+    site: str = DEFAULT_SITE,
+    width: int = CAPTURE_WIDTH,
+    height: int = CAPTURE_HEIGHT,
+) -> None:
+    """Record a computed-style snapshot of every page of one sub-site.
 
     Parameters
     ----------
@@ -81,20 +112,50 @@ def capture(out_dir: Path, /, *, port: int = 0) -> None:
         Port to serve ``public/`` on. The default of ``0`` asks the kernel for
         a free one, so two runs in two worktrees do not contend at all; pass a
         number only to reach the served tree from a browser by hand.
+    site
+        The sub-site to capture, named as under ``sites:`` in
+        ``config/pages.yaml``. Its pages are read from ``public/<site>``.
+    width
+        Viewport width to lay the pages out at. The default is the desktop
+        width the baselines were taken at; a phone width such as 360 proves
+        the rules behind the narrow media queries as well.
+    height
+        Viewport height, for the same reason.
     """
-    pages = _page_paths()
-    bun = _tool("bun")
-    print(f"capturing {len(pages)} Weaver pages into {out_dir}")
+    pages = _page_paths(_public_root(site))
+    browser = _tool("agent-browser")
+    try:
+        walker = _walker_expression(_read_walker())
+    except OSError as exc:
+        message = f"the walker at {WALKER} could not be read ({exc})"
+        raise SystemExit(message) from exc
+    try:
+        defaults = _read_defaults_probe()
+    except OSError as exc:
+        message = f"the defaults probe at {DEFAULTS} could not be read ({exc})"
+        raise SystemExit(message) from exc
+    print(f"capturing {len(pages)} {site} pages at {width}x{height} into {out_dir}")
 
-    with _staged(out_dir, ".json") as staging, _served(port) as base:
-        _capture_pages(pages, staging, base, bun, _run_tool)
+    with _staged(out_dir, ".json") as staging, _served(port, site=site) as base:
+        _capture_pages(
+            pages,
+            staging,
+            base,
+            browser,
+            _run_tool,
+            _read_tool,
+            site,
+            (width, height),
+            walker=walker,
+            defaults=defaults,
+        )
 
     print(f"done: {out_dir.resolve()}")
 
 
 @app.command
-def shots(out_dir: Path, /, *, port: int = 0) -> None:
-    """Record full-page screenshots of every Weaver page at three widths.
+def shots(out_dir: Path, /, *, port: int = 0, site: str = DEFAULT_SITE) -> None:
+    """Record full-page screenshots of every page of one sub-site at three widths.
 
     Parameters
     ----------
@@ -104,14 +165,17 @@ def shots(out_dir: Path, /, *, port: int = 0) -> None:
         Port to serve ``public/`` on. The default of ``0`` asks the kernel for
         a free one, so two runs in two worktrees do not contend at all; pass a
         number only to reach the served tree from a browser by hand.
+    site
+        The sub-site to screenshot, named as under ``sites:`` in
+        ``config/pages.yaml``.
     """
     browser = _tool("agent-browser")
-    pages = _page_paths()
+    pages = _page_paths(_public_root(site))
     widths = " ".join(str(width) for width in SCREENSHOT_WIDTHS)
-    print(f"screenshotting {len(pages)} Weaver pages at {widths} into {out_dir}")
+    print(f"screenshotting {len(pages)} {site} pages at {widths} into {out_dir}")
 
-    with _staged(out_dir, ".png") as staging, _served(port) as base:
-        _shoot_pages(pages, staging, base, browser, _run_tool)
+    with _staged(out_dir, ".png") as staging, _served(port, site=site) as base:
+        _shoot_pages(pages, staging, base, browser, _run_tool, site)
 
     print(f"done: {out_dir.resolve()}")
 

@@ -14,7 +14,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('standard-library', sub_links=[{'href': '#stdlib-reference', 'label': 'Core reference'}, {'href': '#stdlib-extended', 'label': 'Extended library'}, {'href': '#purity', 'label': 'Pure vs host-observing'}]) }}{% raw %}
 
@@ -32,77 +32,77 @@
 
             <!-- Standard Library Reference -->
             <section id="stdlib-reference" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-8">Standard Library Reference</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-8">Standard Library Reference</h2>
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <!-- Function Card 1 -->
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">fetch()</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Network</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">fetch()</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Network</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. HTTPS is the only allowed scheme by default; the <code>--fetch-*</code> CLI options widen or narrow the policy. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             fetch("https://example.com/data", cache=true)
                         </div>
                     </div>
 
                     <!-- Function Card 2 -->
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">command_available()</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Discovery</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">command_available()</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Discovery</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns <code>true</code> when an executable can be found on <code>PATH</code>, <code>false</code> otherwise. Accepts the same keyword arguments as <code>which</code>. Ideal in <code>when</code> conditions.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             when: command_available('pandoc')
                         </div>
                     </div>
 
                     <!-- Function Card 3 -->
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">with_suffix</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">with_suffix</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Path</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Replaces the file extension of a path. Accepts an optional count to replace multiple trailing extensions, and an optional separator (default <code>.</code>).</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ item | basename | with_suffix('.o') }}
                         </div>
                     </div>
 
                     <!-- Function Card 4 -->
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">env()</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Data</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">env()</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Data</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Reads one required environment variable. There is no default-value argument; a missing or non-Unicode value is an error.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             env("CC")
                         </div>
                     </div>
 
                     <!-- Function Card 5 -->
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">basename / dirname</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">basename / dirname</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Path</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Pure path filters: <code>basename</code> returns the final path component; <code>dirname</code> returns the parent (or <code>.</code> when there is none).</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ 'reports/daily.csv' | basename }}
                         </div>
                     </div>
 
                     <!-- Function Card 6 -->
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">glob</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">glob</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Finds workspace paths matching a pattern, sorted, including parent-relative patterns such as <code>glob('../shared/*.h')</code>. Expansion holds only the authority of the pattern's literal directory prefix; a match reached through a symbolic link that escapes the prefix is skipped. Matched paths must be portable unquoted shell words (letters, digits, <code>/</code>, <code>:</code>, comma, full stop, underscore, hyphen); anything else is rejected so a checkout filename cannot become shell syntax. Host-observing: results depend on workspace contents and platform. Use sparingly to maintain explicit dependencies.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             glob('src/*.c')
                         </div>
                     </div>
@@ -111,209 +111,209 @@
 
             <!-- Extended Standard Library -->
             <section id="stdlib-extended" class="mb-16 pt-8 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-3">Extended Standard Library</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-3">Extended Standard Library</h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     Beyond the core functions, Netsuke provides a rich set of filters and helpers covering time, file inspection, paths, collections, shell execution, and executable discovery.
                 </p>
 
                 <!-- Time Helpers -->
-                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                    <span class="iconify text-indigo mr-2" data-icon="carbon:time" aria-hidden="true"></span> Time helpers
+                <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                    <span class="iconify text-primary mr-2" data-icon="carbon:time" aria-hidden="true"></span> Time helpers
                 </h3>
                 <div class="grid md:grid-cols-2 gap-6 mb-10">
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">now()</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Time</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">now()</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Time</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns the current time as a timezone-aware object (defaults to UTC). Exposes <code>.iso8601</code>, <code>.unix_timestamp</code>, and <code>.offset</code>. Accepts an optional UTC offset string such as <code>'+02:00'</code> or <code>'Z'</code>.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ now().iso8601 }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">timedelta()</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Time</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">timedelta()</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Time</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Creates a duration object for age comparisons and arithmetic. Accepts <code>weeks</code>, <code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code>, <code>milliseconds</code>, <code>microseconds</code>, <code>nanoseconds</code>. Exposes <code>.iso8601</code>, <code>.seconds</code>, <code>.nanoseconds</code>.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             timedelta(days=7)
                         </div>
                     </div>
                 </div>
 
                 <!-- File Content Filters -->
-                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                    <span class="iconify text-indigo mr-2" data-icon="carbon:document-view" aria-hidden="true"></span> File content filters
+                <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                    <span class="iconify text-primary mr-2" data-icon="carbon:document-view" aria-hidden="true"></span> File content filters
                 </h3>
                 <div class="grid md:grid-cols-2 gap-6 mb-10">
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">contents</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">contents</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional encoding argument; <code>'utf-8'</code> (alias <code>'utf8'</code>) is currently the only supported encoding.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ "VERSION" | contents }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">size</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">size</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns the file size in bytes. Useful for gating large downloads or asserting build artefact bounds.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ path | size }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">linecount</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">linecount</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Counts the number of lines in a text file. Does not load the entire file into memory.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ "src/main.c" | linecount }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">hash</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">hash</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns the full hex digest of a file. Supports <code>sha256</code> (default) and <code>sha512</code>; MD5 and SHA-1 need the <code>legacy-digests</code> build feature.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ path | hash('sha512') }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">digest</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">File</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">digest</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns a truncated hex digest of a file. Accepts a length (default: <code>8</code>) and an algorithm (default: <code>sha256</code>). Useful for short cache-busting hashes in output filenames.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ path | digest(12, 'sha512') }}
                         </div>
                     </div>
                 </div>
 
                 <!-- Path Filters -->
-                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                    <span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span> Path filters
+                <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                    <span class="iconify text-primary mr-2" data-icon="carbon:folder" aria-hidden="true"></span> Path filters
                 </h3>
                 <div class="grid md:grid-cols-2 gap-6 mb-10">
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">relative_to</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">relative_to</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Path</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Makes an absolute path relative to a given base. <code>'/a/b/c' | relative_to('/a/b')</code> &rarr; <code>'c'</code>.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ path | relative_to(base_dir) }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">realpath</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">realpath</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Path</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Canonicalises a path, resolving all symlinks and relative components to an absolute path.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ item | realpath }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">expanduser</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Path</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">expanduser</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Path</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Expands a leading <code>~</code> to the current user's home directory.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ "~/.config/app" | expanduser }}
                         </div>
                     </div>
                 </div>
 
                 <!-- Collection Filters -->
-                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                    <span class="iconify text-indigo mr-2" data-icon="carbon:list" aria-hidden="true"></span> Collection filters
+                <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                    <span class="iconify text-primary mr-2" data-icon="carbon:list" aria-hidden="true"></span> Collection filters
                 </h3>
                 <div class="grid md:grid-cols-2 gap-6 mb-10">
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">uniq</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Collection</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">uniq</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Collection</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Removes duplicate items from a list, preserving the original order of first occurrences.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             glob('**/*.h') | uniq
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">flatten</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Collection</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">flatten</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Collection</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Flattens a nested list into a single flat list. <code>[[1], [2, 3]] | flatten</code> &rarr; <code>[1, 2, 3]</code>.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             source_groups | flatten
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">group_by</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Collection</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">group_by</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Collection</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Groups a list of dicts or objects by the value of a named attribute, returning a dict of lists keyed by the grouped value.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             files | group_by('extension')
                         </div>
                     </div>
                 </div>
 
                 <!-- Command Filters (Impure) -->
-                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                    <span class="iconify text-indigo mr-2" data-icon="carbon:terminal" aria-hidden="true"></span> Command filters
-                    <span class="ml-3 px-2 py-0.5 rounded text-xs font-mono bg-amber/10 text-amber border border-amber/20">Impure</span>
+                <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                    <span class="iconify text-primary mr-2" data-icon="carbon:terminal" aria-hidden="true"></span> Command filters
+                    <span class="ml-3 px-2 py-0.5 rounded text-xs font-mono bg-warning/10 text-warning border border-warning/20">Impure</span>
                 </h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                     These filters execute external processes at template evaluation time, making the template <em>impure</em> &mdash; its output depends on the environment, not just the manifest. Use judiciously.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6 mb-10">
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">shell()</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">shell()</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Command</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Pipes the input value as stdin to a shell command string. Capture mode (the default) returns the command's stdout. Pass <code>{'mode': 'tempfile'}</code> (also spelled <code>stream</code> or <code>streaming</code>) to write bounded output to a persisted temporary file; those modes return the file's path, not its contents.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ user_list | shell('grep admin') }}
                         </div>
                     </div>
-                    <div class="function-card bg-white p-6 rounded-xl border border-stone transition-all duration-300 group cursor-pointer">
+                    <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">grep()</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Command</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">grep()</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Command</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Runs the host <code>grep</code> executable over the input value. The <code>flags</code> argument is a sequence such as <code>['-i']</code>; availability and flag spelling are platform-dependent. Options share the same modes as <code>shell</code>.</p>
-                        <div class="text-xs font-mono text-stone-light bg-charcoal p-3 rounded group-hover:bg-charcoal-mid transition-colors">
+                        <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             {{ log_lines | grep('ERROR', ['-i']) }}
                         </div>
                     </div>
                 </div>
 
                 <!-- Executable Discovery -->
-                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                    <span class="iconify text-indigo mr-2" data-icon="carbon:search-locate" aria-hidden="true"></span> Executable discovery
+                <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                    <span class="iconify text-primary mr-2" data-icon="carbon:search-locate" aria-hidden="true"></span> Executable discovery
                 </h3>
-                <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden mb-10">
+                <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden mb-10">
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-3">
-                            <code class="text-indigo font-bold font-mono text-sm bg-indigo/5 px-2 py-1 rounded">which</code>
-                            <span class="text-xs text-charcoal-light border border-stone px-1.5 rounded">Discovery</span>
+                            <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">which</code>
+                            <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Discovery</span>
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                             Resolves executables using the current <code>PATH</code> without marking the template impure.
@@ -323,33 +323,33 @@
                         </p>
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
-                                <h4 class="font-bold text-charcoal text-xs uppercase tracking-wide mb-3">Keyword arguments</h4>
+                                <h4 class="font-bold text-base-content text-xs uppercase tracking-wide mb-3">Keyword arguments</h4>
                                 <div class="space-y-2 text-xs font-mono">
                                     <div class="flex items-start">
-                                        <span class="text-indigo w-24 shrink-0">all</span>
+                                        <span class="text-primary w-24 shrink-0">all</span>
                                         <span class="text-charcoal-mid">Return every match, ordered by <code>PATH</code> (default: <code>false</code>)</span>
                                     </div>
                                     <div class="flex items-start">
-                                        <span class="text-indigo w-24 shrink-0">canonical</span>
+                                        <span class="text-primary w-24 shrink-0">canonical</span>
                                         <span class="text-charcoal-mid">Resolve symlinks and deduplicate by canonical path (default: <code>false</code>)</span>
                                     </div>
                                     <div class="flex items-start">
-                                        <span class="text-indigo w-24 shrink-0">fresh</span>
+                                        <span class="text-primary w-24 shrink-0">fresh</span>
                                         <span class="text-charcoal-mid">Bypass the resolver cache for this lookup (default: <code>false</code>)</span>
                                     </div>
                                     <div class="flex items-start">
-                                        <span class="text-indigo w-24 shrink-0">cwd_mode</span>
+                                        <span class="text-primary w-24 shrink-0">cwd_mode</span>
                                         <span class="text-charcoal-mid"><code>auto</code> | <code>always</code> | <code>never</code> &mdash; control the bounded project-directory fallback search</span>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <h4 class="font-bold text-charcoal text-xs uppercase tracking-wide mb-3">Diagnostic codes</h4>
+                                <h4 class="font-bold text-base-content text-xs uppercase tracking-wide mb-3">Diagnostic codes</h4>
                                 <div class="space-y-2 text-xs font-mono text-charcoal-mid">
-                                    <div><code class="text-vermillion">netsuke::jinja::which::not_found</code> &mdash; executable not on PATH; includes a preview of the scanned PATH</div>
-                                    <div class="mt-2"><code class="text-vermillion">netsuke::jinja::which::args</code> &mdash; unknown or invalid keyword argument</div>
+                                    <div><code class="text-accent">netsuke::jinja::which::not_found</code> &mdash; executable not on PATH; includes a preview of the scanned PATH</div>
+                                    <div><code class="text-accent">netsuke::jinja::which::args</code> &mdash; unknown or invalid keyword argument</div>
                                 </div>
-                                <div class="mt-4 text-xs font-mono text-stone-light bg-charcoal p-3 rounded">
+                                <div class="mt-4 text-xs font-mono text-stone-light bg-base-content p-3 rounded">
                                     {{ 'clang++' | which(all=true, canonical=true) }}
                                 </div>
                             </div>
@@ -358,32 +358,32 @@
                 </div>
 
                 <!-- Filesystem Tests -->
-                <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                    <span class="iconify text-indigo mr-2" data-icon="carbon:checkmark-outline" aria-hidden="true"></span> Filesystem tests
+                <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                    <span class="iconify text-primary mr-2" data-icon="carbon:checkmark-outline" aria-hidden="true"></span> Filesystem tests
                 </h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                     Use Jinja's <code>is</code> keyword with these tests to gate targets conditionally.
                     Tests are host-observing; a missing path or non-string value yields <code>false</code>, and the symlink test does not follow links.
                 </p>
                 <div class="grid md:grid-cols-2 gap-4 mb-4">
-                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
-                        <div class="font-bold text-charcoal mb-2">Type tests</div>
+                    <div class="bg-white p-4 rounded-lg border border-base-300 text-xs">
+                        <div class="font-bold text-base-content mb-2">Type tests</div>
                         <div class="space-y-1 font-mono text-charcoal-mid">
-                            <div><code class="text-indigo">is file</code> &mdash; regular file</div>
-                            <div><code class="text-indigo">is dir</code> &mdash; directory</div>
-                            <div><code class="text-indigo">is symlink</code> &mdash; symbolic link</div>
+                            <div><code class="text-primary">is file</code> &mdash; regular file</div>
+                            <div><code class="text-primary">is dir</code> &mdash; directory</div>
+                            <div><code class="text-primary">is symlink</code> &mdash; symbolic link</div>
                         </div>
                     </div>
-                    <div class="bg-white p-4 rounded-lg border border-stone text-xs">
-                        <div class="font-bold text-charcoal mb-2">Special-file tests <span class="text-charcoal-light font-normal">(always <code>false</code> off Unix)</span></div>
+                    <div class="bg-white p-4 rounded-lg border border-base-300 text-xs">
+                        <div class="font-bold text-base-content mb-2">Special-file tests <span class="text-charcoal-light font-normal">(always <code>false</code> off Unix)</span></div>
                         <div class="space-y-1 font-mono text-charcoal-mid">
-                            <div><code class="text-indigo">is pipe</code> &mdash; named pipe</div>
-                            <div><code class="text-indigo">is block_device</code> / <code class="text-indigo">is char_device</code></div>
-                            <div><code class="text-indigo">is device</code> &mdash; either device kind</div>
+                            <div><code class="text-primary">is pipe</code> &mdash; named pipe</div>
+                            <div><code class="text-primary">is block_device</code> / <code class="text-primary">is char_device</code></div>
+                            <div><code class="text-primary">is device</code> &mdash; either device kind</div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-charcoal rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
                     {% endraw %}{% highlight 'netsuke' %}{% raw %}
 targets:
   - when: 'src/main.c' is file and command_available('clang')
@@ -395,8 +395,8 @@ targets:
 
             <!-- Purity -->
             <section id="purity" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:certificate" aria-hidden="true"></span> Pure vs host-observing
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate" aria-hidden="true"></span> Pure vs host-observing
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     &ldquo;Pure&rdquo; means the result depends only on the supplied value and arguments. Host-observing helpers
@@ -405,16 +405,16 @@ targets:
                     host-observing helpers are useful for discovery and conditional planning, but their results can vary
                     between machines or invocations.
                 </p>
-                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start mb-6">
-                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:idea" aria-hidden="true"></span>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start mb-6">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:idea" aria-hidden="true"></span>
                     <p class="text-xs text-charcoal-mid">
                         Prefer explicit manifest inputs when a value is part of the build's reproducibility contract, and keep
                         network or command execution out of untrusted <code>Netsukefile</code> content &mdash; Netsuke bounds
                         helper output, but it does not sandbox template evaluation.
                     </p>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                    <h3 class="font-bold text-charcoal mb-3 text-sm">The <code>help targets</code> query allowlist</h3>
+                <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                    <h3 class="font-bold text-base-content mb-3 text-sm">The <code>help targets</code> query allowlist</h3>
                     <p class="text-xs text-charcoal-mid mb-3">
                         <code>netsuke help targets</code> renders the manifest through a restricted, side-effect-free surface. Only the lexical
                         path filters <code>basename</code>, <code>dirname</code>, <code>with_suffix</code>, and <code>relative_to</code>, the collection

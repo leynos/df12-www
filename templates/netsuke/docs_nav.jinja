@@ -28,7 +28,7 @@
   sub     an in-page anchor, indented under its page
 #}
 {% macro sidebar_link(href, label, active=false, sub=false) -%}
-<li><a href="{{ href }}" class="sidebar-link{% if active %} active{% endif %}{% if sub %} sidebar-link--sub{% endif %} block px-2 py-1.5{% if active %} text-sm font-medium{% elif sub %} hover:text-vermillion hover:bg-boxwood-light{% else %} text-sm text-charcoal-mid hover:text-vermillion hover:bg-boxwood-light{% endif %} rounded-r-md transition-colors">{{ label }}</a></li>
+<li><a href="{{ href }}" class="sidebar-link{% if active %} active{% endif %}{% if sub %} sidebar-link--sub{% endif %} block {% if sub %}pr-2{% else %}px-2{% endif %} py-1.5{% if not sub %} text-sm{% endif %}{% if active %} font-medium{% elif sub %} hover:text-accent hover:bg-base-200{% else %} text-charcoal-mid hover:text-accent hover:bg-base-200{% endif %} rounded-r-md transition-colors">{{ label }}</a></li>
 {%- endmacro %}
 
 {#
@@ -51,7 +51,7 @@
              list is not the documentation
 #}
 {% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label='') %}
-        <aside id="sidebar" class="hidden lg:block w-64 flex-shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
+        <aside id="sidebar" class="hidden lg:block w-64 shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
             {%- if search %}
             <!-- Search -->
             <div
@@ -59,22 +59,22 @@
                 data-doc-search-root
                 data-doc-search-index="/netsuke/assets/search/docs-search.json"
             >
-                <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                <span class="iconify absolute left-3 top-2.5 text-base-300 text-sm" data-icon="carbon:search" aria-hidden="true"></span>
                 <input
                     type="text"
                     placeholder="Search docs..."
-                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo transition-colors shadow-sm"
+                    class="search-input w-full pl-9 pr-4 py-2 bg-white border border-base-300 rounded-md text-sm text-base-content placeholder-base-300 focus:border-primary transition-colors shadow-xs"
                     data-doc-search-input
                     aria-label="Search the documentation"
                     role="combobox"
                     aria-autocomplete="list"
                     aria-expanded="false"
                 >
-                <div class="absolute right-3 top-2.5 text-xs text-stone font-mono">⌘K</div>
+                <div class="absolute right-3 top-2.5 text-xs text-base-300 font-mono">⌘K</div>
                 <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
-                    <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                        <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
-                        <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                    <div class="overflow-hidden rounded-xl border border-base-300 bg-white shadow-paper-lg">
+                        <ul class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>
+                        <p class="border-t border-stone-light bg-base-100 px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
                             Type at least 2 characters to search the docs.
                         </p>
                     </div>
@@ -86,7 +86,7 @@
                 {%- if sections is none %}
                 {%- for group in docs_groups %}
                 <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">{{ group }}</h3>
+                    <h3 class="font-serif font-bold text-base-content text-sm mb-3 px-2">{{ group }}</h3>
                     <ul class="space-y-1">
                         {%- for page in docs_pages if page.group == group %}
                         {{ sidebar_link('/netsuke/docs/' ~ (page.slug ~ '/' if page.slug else ''), page.label, active=(page.slug == active)) }}
@@ -102,7 +102,7 @@
                 {%- else %}
                 {%- for section in sections %}
                 <div>
-                    <h3 class="font-serif font-bold text-charcoal text-sm mb-3 px-2">{{ section.title }}</h3>
+                    <h3 class="font-serif font-bold text-base-content text-sm mb-3 px-2">{{ section.title }}</h3>
                     <ul class="space-y-1">
                         {%- for link in section.links %}
                         {{ sidebar_link(link.href, link.label, active=link.active | default(false), sub=link.sub | default(section.sub | default(false))) }}
@@ -132,29 +132,29 @@
             <div class="hm-filter-shell__row flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div class="relative w-full sm:w-auto sm:flex-1 sm:max-w-[16rem]">
                     <label for="docs-nav-select" class="visually-hidden">Documentation pages</label>
-                    <span class="iconify absolute left-3 top-2.5 text-stone text-sm pointer-events-none" data-icon="carbon:book" aria-hidden="true"></span>
+                    <span class="iconify absolute left-3 top-2.5 text-base-300 text-sm pointer-events-none" data-icon="carbon:book" aria-hidden="true"></span>
                     <select
                         id="docs-nav-select"
                         data-docs-nav-select
-                        class="search-input w-full appearance-none pl-9 pr-8 py-1.5 bg-white border border-stone rounded-md text-sm text-charcoal focus:border-indigo focus:ring-1 focus:ring-indigo transition-colors"
+                        class="search-input w-full appearance-none pl-9 pr-8 py-1.5 bg-white border border-base-300 rounded-md text-sm text-base-content focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                     >
                         {% for page in docs_pages %}
                         <option value="/netsuke/docs/{% if page.slug %}{{ page.slug }}/{% endif %}"{% if active == page.slug %} selected{% endif %}>{{ page.label }}</option>
                         {% endfor %}
                     </select>
-                    <span class="iconify absolute right-3 top-2.5 text-stone text-sm pointer-events-none" data-icon="carbon:chevron-down" aria-hidden="true"></span>
+                    <span class="iconify absolute right-3 top-2.5 text-base-300 text-sm pointer-events-none" data-icon="carbon:chevron-down" aria-hidden="true"></span>
                 </div>
 
                 <div
-                    class="relative w-full sm:w-64 sm:flex-shrink-0"
+                    class="relative w-full sm:w-64 sm:shrink-0"
                     data-doc-search-root
                     data-doc-search-index="/netsuke/assets/search/docs-search.json"
                 >
-                    <span class="iconify absolute left-3 top-2.5 text-stone text-sm" data-icon="carbon:search" aria-hidden="true"></span>
+                    <span class="iconify absolute left-3 top-2.5 text-base-300 text-sm" data-icon="carbon:search" aria-hidden="true"></span>
                     <input
                         type="text"
                         placeholder="Search docs..."
-                        class="search-input w-full pl-9 pr-4 py-1.5 bg-white border border-stone rounded-md text-sm text-charcoal placeholder-stone focus:border-indigo focus:ring-1 focus:ring-indigo transition-colors"
+                        class="search-input w-full pl-9 pr-4 py-1.5 bg-white border border-base-300 rounded-md text-sm text-base-content placeholder-base-300 focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                         data-doc-search-input
                         aria-label="Search the documentation"
                         role="combobox"
@@ -162,9 +162,9 @@
                         aria-expanded="false"
                     >
                     <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
-                        <div class="overflow-hidden rounded-xl border border-stone bg-white shadow-paper-lg">
-                            <ul class="max-h-96 overflow-y-auto divide-y divide-stone-light" data-doc-search-results role="listbox"></ul>
-                            <p class="border-t border-stone-light bg-boxwood-pale px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
+                        <div class="overflow-hidden rounded-xl border border-base-300 bg-white shadow-paper-lg">
+                            <ul class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>
+                            <p class="border-t border-stone-light bg-base-100 px-4 py-3 text-xs text-charcoal-light" data-doc-search-meta>
                                 Type at least 2 characters to search the docs.
                             </p>
                         </div>
@@ -191,8 +191,8 @@
             <div class="mt-10 pt-10 border-t border-stone-light">
                 <div class="flex justify-between items-center">
                     {% if prev %}
-                    <a href="{{ prev.href }}" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center mr-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                    <a href="{{ prev.href }}" class="group flex items-center text-charcoal-mid hover:text-base-content transition-colors">
+                        <div class="w-8 h-8 rounded-full border border-base-300 flex items-center justify-center mr-3 group-hover:border-primary group-hover:text-primary transition-colors">
                             <span class="iconify text-xs" data-icon="carbon:arrow-left" aria-hidden="true"></span>
                         </div>
                         <div class="text-left">
@@ -205,12 +205,12 @@
                     {% endif %}
 
                     {% if next %}
-                    <a href="{{ next.href }}" class="group flex items-center text-charcoal-mid hover:text-charcoal transition-colors">
+                    <a href="{{ next.href }}" class="group flex items-center text-charcoal-mid hover:text-base-content transition-colors">
                         <div class="text-right">
                             <div class="text-xs text-charcoal-light uppercase tracking-wide">{{ next.kicker | default('Next') }}</div>
                             <div class="font-medium text-sm">{{ next.label }}</div>
                         </div>
-                        <div class="w-8 h-8 rounded-full border border-stone flex items-center justify-center ml-3 group-hover:border-indigo group-hover:text-indigo transition-colors">
+                        <div class="w-8 h-8 rounded-full border border-base-300 flex items-center justify-center ml-3 group-hover:border-primary group-hover:text-primary transition-colors">
                             <span class="iconify text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
                         </div>
                     </a>

@@ -5,37 +5,37 @@
 {% block page_title %}Static Site Pipeline - Netsuke Examples{% endblock %}
 {% block content %}
 {% raw %}
-<main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
+<main id="main-content" class="grow pt-24 pb-20 site-container w-full">
         {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Web Workflows'}, {'label': 'Static Site Pipeline'}]) }}{% raw %}
 
         {% endraw %}{{ exdata.example_header('static-site-pipeline') }}{% raw %}
 
         <div class="grid lg:grid-cols-12 gap-12">
             <div class="lg:col-span-8 space-y-12 min-w-0">
-                <section id="structure" class="bg-white rounded-xl border border-stone shadow-sm p-6 lg:p-8">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                        <span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:folder-open" aria-hidden="true"></span> Directory Structure
+                <section id="structure" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                        <span class="iconify text-accent mr-3 text-lg" data-icon="carbon:folder-open" aria-hidden="true"></span> Directory Structure
                     </h2>
                     <div class="grid md:grid-cols-2 gap-8">
-                        <div class="font-mono text-sm text-charcoal-mid bg-boxwood-pale p-6 rounded-lg border border-stone">
+                        <div class="font-mono text-sm text-charcoal-mid bg-base-100 p-6 rounded-lg border border-base-300">
                             <div class="flex items-center mb-2">
-                                <span class="iconify text-indigo mr-2" data-icon="carbon:folder" aria-hidden="true"></span>
+                                <span class="iconify text-primary mr-2" data-icon="carbon:folder" aria-hidden="true"></span>
                                 <span class="font-bold">site-example/</span>
                             </div>
                             <ul class="hm-file-tree">
-                                <li class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>pages/</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>index.md</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-stone" data-icon="carbon:document" aria-hidden="true"></span><span>about.md</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-indigo" data-icon="carbon:folder" aria-hidden="true"></span><span>site/</span></li>
-                                <li class="hm-file-tree-item"><span class="iconify text-vermillion" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-charcoal">Netsukefile</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-primary" data-icon="carbon:folder" aria-hidden="true"></span><span>pages/</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-base-300" data-icon="carbon:document" aria-hidden="true"></span><span>index.md</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-base-300" data-icon="carbon:document" aria-hidden="true"></span><span>about.md</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-primary" data-icon="carbon:folder" aria-hidden="true"></span><span>site/</span></li>
+                                <li class="hm-file-tree-item"><span class="iconify text-accent" data-icon="carbon:cube" aria-hidden="true"></span><span class="font-bold text-base-content">Netsukefile</span></li>
                             </ul>
                         </div>
                         <div class="flex flex-col justify-center space-y-4">
                             <p class="text-charcoal-mid">
-                                The manifest reads Markdown from <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">pages/</code>, writes HTML into <code class="bg-boxwood-pale px-1.5 py-0.5 rounded border border-stone text-xs">site/</code>, then synthesises an index page from the same sources.
+                                The manifest reads Markdown from <code class="bg-base-100 px-1.5 py-0.5 rounded border border-base-300 text-xs">pages/</code>, writes HTML into <code class="bg-base-100 px-1.5 py-0.5 rounded border border-base-300 text-xs">site/</code>, then synthesises an index page from the same sources.
                             </p>
-                            <div class="text-sm border-l-2 border-indigo pl-4 py-1">
-                                <p class="text-indigo font-medium mb-1">Why it matters</p>
+                            <div class="text-sm border-l-2 border-primary pl-4 py-1">
+                                <p class="text-primary font-medium mb-1">Why it matters</p>
                                 <p class="text-charcoal-light">This is the design-doc workflow in miniature: templating resolves first, then Netsuke turns an explicit file graph into Ninja rules.</p>
                             </div>
                         </div>
@@ -44,33 +44,33 @@
 
                 <section id="manifest">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center">
-                            <span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest
+                        <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
+                            <span class="iconify text-accent mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest
                         </h2>
-                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-stone bg-charcoal px-2 py-1 rounded">examples/website.yml</span>{% endraw %}{{ exdata.copy_manifest_button('static-site-pipeline', 'text-charcoal-light hover:text-vermillion') }}{% raw %}</div>
+                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/website.yml</span>{% endraw %}{{ exdata.copy_manifest_button('static-site-pipeline', 'text-charcoal-light hover:text-accent') }}{% raw %}</div>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-paper-lg">
 {% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_static_site }}{% endhighlight %}{% raw %}
                     </div>
                     <div class="grid gap-4 mt-6">
-                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
-                            <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div>
+                        <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
+                            <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div>
                             <div class="ml-4">
-                                <h4 class="font-bold text-charcoal text-sm mb-1">`foreach` expands the page set</h4>
+                                <h4 class="font-bold text-base-content text-sm mb-1">`foreach` expands the page set</h4>
                                 <p class="text-sm text-charcoal-mid">The target list comes from the `pages` variable, so each Markdown file becomes one `.html` output without duplicating the rule block. Discovery with `glob(pages_dir ~ '/*.md')` works too when the page set should track the filesystem.</p>
                             </div>
                         </div>
-                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
-                            <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div>
+                        <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
+                            <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">2</div>
                             <div class="ml-4">
-                                <h4 class="font-bold text-charcoal text-sm mb-1">`order_only_deps` sequences the output directory</h4>
+                                <h4 class="font-bold text-base-content text-sm mb-1">`order_only_deps` sequences the output directory</h4>
                                 <p class="text-sm text-charcoal-mid">Every page target names `{{ site_dir }}` as an order-only dependency: the directory is created first, but touching it never triggers page rebuilds.</p>
                             </div>
                         </div>
-                        <div class="flex items-start p-4 rounded-lg bg-boxwood-pale border border-stone">
-                            <div class="shrink-0 w-6 h-6 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center mt-0.5">3</div>
+                        <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300">
+                            <div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">3</div>
                             <div class="ml-4">
-                                <h4 class="font-bold text-charcoal text-sm mb-1">Defaults name the deployable artefact</h4>
+                                <h4 class="font-bold text-base-content text-sm mb-1">Defaults name the deployable artefact</h4>
                                 <p class="text-sm text-charcoal-mid">Running `netsuke` with no target builds `site/index.html`, not an abstract package target.</p>
                             </div>
                         </div>
@@ -78,8 +78,8 @@
                 </section>
 
                 <section id="terminal-preview">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                        <span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                        <span class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build
                     </h2>
                     {% endraw %}{{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}{% raw %}
 $ netsuke build
@@ -90,35 +90,35 @@ $ netsuke build
 {% endraw %}{% endhighlight %}{{ chrome.example_terminal_close() }}{% raw %}
                 </section>
 
-                <section id="build-flow" class="bg-white rounded-xl border border-stone shadow-sm p-6 lg:p-8">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                        <span class="iconify text-vermillion mr-3 text-lg" data-icon="carbon:flow-data" aria-hidden="true"></span> Build Flow
+                <section id="build-flow" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                        <span class="iconify text-accent mr-3 text-lg" data-icon="carbon:flow-data" aria-hidden="true"></span> Build Flow
                     </h2>
                     <div class="grid md:grid-cols-4 gap-4 text-sm">
-                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">1. Declare</p><p class="text-charcoal-mid">List the page names once in `vars.pages`.</p></div>
-                        <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">2. Expand</p><p class="text-charcoal-mid">`foreach` creates one `page` target per entry.</p></div>
-                        <div class="rounded-lg border border-stone bg-white p-4"><p class="font-bold text-charcoal mb-1">3. Render</p><p class="text-charcoal-mid">Invoke Pandoc for each Markdown page.</p></div>
-                        <div class="rounded-lg border border-stone bg-boxwood-pale p-4"><p class="font-bold text-charcoal mb-1">4. Assemble</p><p class="text-charcoal-mid">Build `site/index.html` from the source pages with `pandoc --standalone`.</p></div>
+                        <div class="rounded-lg border border-base-300 bg-base-100 p-4"><p class="font-bold text-base-content mb-1">1. Declare</p><p class="text-charcoal-mid">List the page names once in `vars.pages`.</p></div>
+                        <div class="rounded-lg border border-base-300 bg-white p-4"><p class="font-bold text-base-content mb-1">2. Expand</p><p class="text-charcoal-mid">`foreach` creates one `page` target per entry.</p></div>
+                        <div class="rounded-lg border border-base-300 bg-white p-4"><p class="font-bold text-base-content mb-1">3. Render</p><p class="text-charcoal-mid">Invoke Pandoc for each Markdown page.</p></div>
+                        <div class="rounded-lg border border-base-300 bg-base-100 p-4"><p class="font-bold text-base-content mb-1">4. Assemble</p><p class="text-charcoal-mid">Build `site/index.html` from the source pages with `pandoc --standalone`.</p></div>
                     </div>
                 </section>
             </div>
 
             <aside class="lg:col-span-4">
                 <div class="sticky top-24 space-y-8">
-                <div class="bg-white rounded-lg shadow-sm border border-stone p-6">
-                    <h3 class="font-serif text-lg font-bold text-charcoal mb-4">On this page</h3>
+                <div class="bg-white rounded-lg shadow-xs border border-base-300 p-6">
+                    <h3 class="font-serif text-lg font-bold text-base-content mb-4">On this page</h3>
                     <ul class="space-y-3 text-sm border-l border-stone-light ml-1" data-page-toc>
-                        <li><a href="#structure" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Directory Structure</a></li>
-                        <li><a href="#manifest" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Annotated Manifest</a></li>
-                        <li><a href="#terminal-preview" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Running the Build</a></li>
-                        <li><a href="#build-flow" class="block pl-4 text-charcoal-mid hover:text-indigo border-l-2 border-transparent hover:border-indigo -ml-[1px] transition-colors">Build Flow</a></li>
+                        <li><a href="#structure" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Directory Structure</a></li>
+                        <li><a href="#manifest" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Annotated Manifest</a></li>
+                        <li><a href="#terminal-preview" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Running the Build</a></li>
+                        <li><a href="#build-flow" class="block pl-4 hover:text-primary border-l-2 hover:border-primary -ml-[1px] transition-colors">Build Flow</a></li>
                     </ul>
                     <div class="mt-8 pt-6 border-t border-stone-light">
-                        <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Related Documentation</h3>
+                        <h3 class="font-serif text-lg font-bold text-base-content mb-4">Related Documentation</h3>
                         <ul class="space-y-3">
-                            <li><a href="/netsuke/docs/getting-started/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Getting Started</span><span class="text-xs text-charcoal-light">Build defaults and named targets</span></div></a></li>
-                            <li><a href="/netsuke/docs/rules-and-targets/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Rules &amp; Targets</span><span class="text-xs text-charcoal-light">Reusable rules, `foreach`, and dependencies</span></div></a></li>
-                            <li><a href="/netsuke/docs/templating/" class="flex items-start group"><span class="iconify text-stone mt-1 mr-2 group-hover:text-indigo transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Templating</span><span class="text-xs text-charcoal-light">Jinja helpers such as `glob` and `basename`</span></div></a></li>
+                            <li><a href="/netsuke/docs/getting-started/" class="flex items-start group"><span class="iconify text-base-300 mt-1 mr-2 group-hover:text-primary transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-base-content group-hover:text-primary transition-colors">Getting Started</span><span class="text-xs text-charcoal-light">Build defaults and named targets</span></div></a></li>
+                            <li><a href="/netsuke/docs/rules-and-targets/" class="flex items-start group"><span class="iconify text-base-300 mt-1 mr-2 group-hover:text-primary transition-colors" data-icon="carbon:book" aria-hidden="true"></span><div><span class="block text-sm font-medium text-base-content group-hover:text-primary transition-colors">Rules &amp; Targets</span><span class="text-xs text-charcoal-light">Reusable rules, `foreach`, and dependencies</span></div></a></li>
+                            <li><a href="/netsuke/docs/templating/" class="flex items-start group"><span class="iconify text-base-300 mt-1 mr-2 group-hover:text-primary transition-colors" data-icon="carbon:template" aria-hidden="true"></span><div><span class="block text-sm font-medium text-base-content group-hover:text-primary transition-colors">Templating</span><span class="text-xs text-charcoal-light">Jinja helpers such as `glob` and `basename`</span></div></a></li>
                         </ul>
                     </div>
                 </div>

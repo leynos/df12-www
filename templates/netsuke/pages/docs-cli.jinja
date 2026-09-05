@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}, {'href': '#output-streams', 'label': 'Output streams'}, {'href': '#accessible-output', 'label': 'Accessible output'}, {'href': '#localization', 'label': 'Localization'}]) }}{% raw %}
 
@@ -21,142 +21,142 @@
             {% endcall %}{% raw %}
 
             <section id="cli" class="mb-20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> CLI Commands
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> CLI Commands
                 </h2>
 
                 <div class="grid lg:grid-cols-2 gap-12">
                     <!-- Left: Command List -->
                     <div class="space-y-6">
-                        <div id="build-commands" class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden group hover:border-indigo transition-colors">
+                        <div id="build-commands" class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden group hover:border-primary transition-colors">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-mono text-lg font-bold text-charcoal">build</h3>
-                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-matcha/10 text-matcha">Primary</span>
+                                    <h3 class="font-mono text-lg font-bold text-base-content">build</h3>
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-success/10 text-success">Primary</span>
                                 </div>
                                 <p class="text-charcoal-mid text-sm mb-4">Builds the specified targets and their dependencies. This is the default subcommand when none is given. Global flags such as those below are written before the subcommand.</p>
 
                                 <div class="space-y-2 mb-4">
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--jobs, -j</span>
+                                        <span class="text-primary w-32 shrink-0">--jobs, -j</span>
                                         <span class="text-charcoal-light">Number of parallel jobs (1&ndash;64)</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--verbose, -v</span>
+                                        <span class="text-primary w-32 shrink-0">--verbose, -v</span>
                                         <span class="text-charcoal-light">Verbose diagnostics and timing summaries</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--file, -f</span>
+                                        <span class="text-primary w-32 shrink-0">--file, -f</span>
                                         <span class="text-charcoal-light">Read a manifest from a custom path (default <code>Netsukefile</code>)</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--directory, -C</span>
+                                        <span class="text-primary w-32 shrink-0">--directory, -C</span>
                                         <span class="text-charcoal-light">Run as if started in this directory</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--progress</span>
+                                        <span class="text-primary w-32 shrink-0">--progress</span>
                                         <span class="text-charcoal-light">Progress policy: <code>auto</code> | <code>always</code> | <code>never</code></span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--accessibility</span>
+                                        <span class="text-primary w-32 shrink-0">--accessibility</span>
                                         <span class="text-charcoal-light">Accessible output policy: <code>auto</code> | <code>on</code> | <code>off</code></span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--locale</span>
+                                        <span class="text-primary w-32 shrink-0">--locale</span>
                                         <span class="text-charcoal-light">Locale for messages, e.g. <code>en-US</code> or <code>es-ES</code></span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--json</span>
+                                        <span class="text-primary w-32 shrink-0">--json</span>
                                         <span class="text-charcoal-light">Emit one machine-readable JSON result document</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--no-input</span>
+                                        <span class="text-primary w-32 shrink-0">--no-input</span>
                                         <span class="text-charcoal-light">State that the run must never prompt (Netsuke has no interactive mode)</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--config</span>
+                                        <span class="text-primary w-32 shrink-0">--config</span>
                                         <span class="text-charcoal-light">Use an explicit configuration file instead of automatic discovery</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-32 shrink-0">--color, --emoji</span>
+                                        <span class="text-primary w-32 shrink-0">--color, --emoji</span>
                                         <span class="text-charcoal-light">Policy: <code>auto</code> | <code>always</code> | <code>never</code> (colour rendering is not yet implemented)</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
+                            <div class="bg-base-100 px-6 py-3 border-t border-base-300 text-xs font-mono text-charcoal-mid">
                                 netsuke build app
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden group hover:border-indigo transition-colors">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden group hover:border-primary transition-colors">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-mono text-lg font-bold text-charcoal">generate</h3>
-                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-indigo/10 text-indigo">Inspect</span>
+                                    <h3 class="font-mono text-lg font-bold text-base-content">generate</h3>
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-primary/10 text-primary">Inspect</span>
                                 </div>
                                 <p class="text-charcoal-mid text-sm mb-4">Generates the Ninja manifest without invoking Ninja. The manifest streams to stdout by default; pass <code>--output</code> to write it to a file instead.</p>
 
                                 <div class="space-y-2 mb-4">
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-24 shrink-0">--output</span>
+                                        <span class="text-primary w-24 shrink-0">--output</span>
                                         <span class="text-charcoal-light">Write the generated Ninja manifest to FILE instead of stdout</span>
                                     </div>
                                     <div class="flex items-start text-xs font-mono">
-                                        <span class="text-indigo w-24 shrink-0">--file, -f</span>
+                                        <span class="text-primary w-24 shrink-0">--file, -f</span>
                                         <span class="text-charcoal-light">Read manifest from a custom path (global flag, before the subcommand)</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
+                            <div class="bg-base-100 px-6 py-3 border-t border-base-300 text-xs font-mono text-charcoal-mid">
                                 netsuke generate --output build.ninja
                             </div>
                         </div>
 
-                        <div id="query-graph" class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden group hover:border-indigo transition-colors">
+                        <div id="query-graph" class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden group hover:border-primary transition-colors">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-mono text-lg font-bold text-charcoal">graph</h3>
-                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-indigo/10 text-indigo">Analysis</span>
+                                    <h3 class="font-mono text-lg font-bold text-base-content">graph</h3>
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-primary/10 text-primary">Analysis</span>
                                 </div>
                                 <p class="text-charcoal-mid text-sm mb-4">Renders the build dependency graph in-process and outputs DOT to stdout, suitable for Graphviz. Pass <code>--html</code> for a self-contained HTML page, and <code>--output FILE</code> to write the artefact to a file (<code>-</code> for stdout).</p>
                             </div>
-                            <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
+                            <div class="bg-base-100 px-6 py-3 border-t border-base-300 text-xs font-mono text-charcoal-mid">
                                 netsuke graph &gt; build.dot &nbsp;&middot;&nbsp; netsuke graph --html --output graph.html
                             </div>
                         </div>
 
-                        <div id="help-targets" class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden group hover:border-indigo transition-colors">
+                        <div id="help-targets" class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden group hover:border-primary transition-colors">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-mono text-lg font-bold text-charcoal">help targets</h3>
-                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-indigo/10 text-indigo">Discovery</span>
+                                    <h3 class="font-mono text-lg font-bold text-base-content">help targets</h3>
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-primary/10 text-primary">Discovery</span>
                                 </div>
                                 <p class="text-charcoal-mid text-sm mb-4">Prints the target and action catalogue for the selected manifest &mdash; actions first, then targets &mdash; with a <code>[★ default]</code> marker on manifest defaults and each entry's <code>description</code> metadata. The manifest is loaded and validated through the same stages as a build, but no recipes run and no outputs are created; rendering uses a restricted, side-effect-free Jinja surface that rejects <code>env()</code>, <code>glob()</code>, and other host-observing helpers, and skips <code>command</code> and <code>script</code> bodies entirely, so build-only helpers in recipes never make discovery fail. An entry whose <code>when</code> expression needs a disabled helper is kept and marked <code>[◇ conditional]</code> (<code>[? conditional]</code> in ASCII output; a boolean <code>conditional</code> field in JSON) rather than resolved. Honours <code>--file</code>, <code>-C</code>, and the usual colour, accessibility, locale, and <code>--json</code> conventions, and works without Ninja installed.</p>
                             </div>
-                            <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
+                            <div class="bg-base-100 px-6 py-3 border-t border-base-300 text-xs font-mono text-charcoal-mid">
                                 netsuke help targets
                             </div>
                         </div>
 
-                        <div id="clean-maintenance" class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden group hover:border-indigo transition-colors">
+                        <div id="clean-maintenance" class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden group hover:border-primary transition-colors">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-mono text-lg font-bold text-charcoal">clean</h3>
-                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-vermillion/10 text-vermillion">Maintenance</span>
+                                    <h3 class="font-mono text-lg font-bold text-base-content">clean</h3>
+                                    <span class="px-2 py-0.5 rounded text-xs font-mono bg-accent/10 text-accent">Maintenance</span>
                                 </div>
                                 <p class="text-charcoal-mid text-sm mb-4">Removes the file outputs Ninja tracks by running <code>ninja -t clean</code> against a temporary Ninja file. Phony targets and actions do not represent files and are not removed.</p>
                             </div>
-                            <div class="bg-boxwood-pale px-6 py-3 border-t border-stone text-xs font-mono text-charcoal-mid">
+                            <div class="bg-base-100 px-6 py-3 border-t border-base-300 text-xs font-mono text-charcoal-mid">
                                 netsuke clean
                             </div>
                         </div>
 
-                        <div id="windows-recipes" class="bg-amber/5 border border-amber/30 rounded-xl p-5 flex items-start">
-                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:logo-windows" aria-hidden="true"></span>
+                        <div id="windows-recipes" class="bg-warning/5 border border-warning/30 rounded-xl p-5 flex items-start">
+                            <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:logo-windows" aria-hidden="true"></span>
                             <div>
-                                <h4 class="font-bold text-charcoal text-sm mb-1">Windows recipes run in PowerShell</h4>
+                                <h4 class="font-bold text-base-content text-sm mb-1">Windows recipes run in PowerShell</h4>
                                 <p class="text-xs text-charcoal-mid">
-                                    On Windows, <code>build</code> and <code>clean</code> hand every <code>command</code>, command list, and <code>script</code> to Windows PowerShell (<code>powershell.exe</code>), whichever shell launched <code>netsuke</code>. Set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2; Netsuke checks that <code>bash.exe --version</code> works before executing and stops with install instructions otherwise. <code>generate</code> and <code>help targets</code> never execute recipes, so they need neither route. See the <a href="/netsuke/docs/security/#recipe-shells" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">recipe shell contract</a>.
+                                    On Windows, <code>build</code> and <code>clean</code> hand every <code>command</code>, command list, and <code>script</code> to Windows PowerShell (<code>powershell.exe</code>), whichever shell launched <code>netsuke</code>. Set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2; Netsuke checks that <code>bash.exe --version</code> works before executing and stops with install instructions otherwise. <code>generate</code> and <code>help targets</code> never execute recipes, so they need neither route. See the <a href="/netsuke/docs/security/#recipe-shells" class="text-primary underline decoration-primary/40 hover:decoration-primary">recipe shell contract</a>.
                                 </p>
                             </div>
                         </div>
@@ -179,12 +179,12 @@ digraph netsuke {
 {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                         <!-- Tip Card -->
-                        <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
-                            <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:idea" aria-hidden="true"></span>
+                        <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                            <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:idea" aria-hidden="true"></span>
                             <div>
-                                <h4 class="font-bold text-indigo text-sm mb-1">Tip: Inspect the Ninja plan</h4>
+                                <h4 class="font-bold text-primary text-sm mb-1">Tip: Inspect the Ninja plan</h4>
                                 <p class="text-xs text-charcoal-mid">
-                                    Use <code class="bg-white px-1 py-0.5 rounded border border-indigo/10 text-indigo font-mono">netsuke generate</code> to stream the generated Ninja file to stdout. Pipe it into <code class="bg-white px-1 py-0.5 rounded border border-indigo/10 text-indigo font-mono">grep</code> or a pager to understand exactly what Netsuke handed to Ninja.
+                                    Use <code class="bg-white px-1 py-0.5 rounded border border-primary/10 text-primary font-mono">netsuke generate</code> to stream the generated Ninja file to stdout. Pipe it into <code class="bg-white px-1 py-0.5 rounded border border-primary/10 text-primary font-mono">grep</code> or a pager to understand exactly what Netsuke handed to Ninja.
                                 </p>
                             </div>
                         </div>
@@ -193,8 +193,8 @@ digraph netsuke {
             </section>
 
             <section id="output-streams" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:datastore" aria-hidden="true"></span> Output Streams
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:datastore" aria-hidden="true"></span> Output Streams
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     Netsuke separates its output into two streams so that scripts and pipelines can capture exactly what they need.
@@ -203,10 +203,10 @@ digraph netsuke {
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-3">
-                            <span class="px-2 py-0.5 rounded text-xs font-mono bg-indigo/10 text-indigo mr-3">stderr</span>
-                            <h3 class="font-bold text-charcoal text-sm">Status &amp; diagnostics</h3>
+                            <span class="px-2 py-0.5 rounded text-xs font-mono bg-primary/10 text-primary mr-3">stderr</span>
+                            <h3 class="font-bold text-base-content text-sm">Status &amp; diagnostics</h3>
                         </div>
                         <ul class="space-y-1.5 text-xs text-charcoal-mid">
                             <li>Stage progress indicators</li>
@@ -216,10 +216,10 @@ digraph netsuke {
                             <li>Accessible mode stage labels</li>
                         </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-3">
-                            <span class="px-2 py-0.5 rounded text-xs font-mono bg-matcha/10 text-matcha mr-3">stdout</span>
-                            <h3 class="font-bold text-charcoal text-sm">Subprocess output</h3>
+                            <span class="px-2 py-0.5 rounded text-xs font-mono bg-success/10 text-success mr-3">stdout</span>
+                            <h3 class="font-bold text-base-content text-sm">Subprocess output</h3>
                         </div>
                         <ul class="space-y-1.5 text-xs text-charcoal-mid">
                             <li>DOT graph from <code>netsuke graph</code></li>
@@ -243,14 +243,14 @@ $ netsuke --progress never build
 $ netsuke generate | grep 'rule '
 {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
-                <div class="bg-indigo/5 border border-indigo/20 rounded-lg p-5 flex items-start">
-                    <span class="iconify text-indigo mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
                     <div>
-                        <h4 class="font-bold text-indigo text-sm mb-1">CI and automation</h4>
+                        <h4 class="font-bold text-primary text-sm mb-1">CI and automation</h4>
                         <p class="text-xs text-charcoal-mid">
                             When stderr is not a TTY (e.g. in CI pipelines), task progress automatically falls back to
                             plain-text updates, keeping logs readable without interactive spinners. Use
-                            <code class="bg-white px-1 py-0.5 rounded border border-indigo/10 text-indigo font-mono">--progress never</code>
+                            <code class="bg-white px-1 py-0.5 rounded border border-primary/10 text-primary font-mono">--progress never</code>
                             to suppress progress entirely in environments where clean log output matters most.
                         </p>
                     </div>
@@ -258,8 +258,8 @@ $ netsuke generate | grep 'rule '
             </section>
 
             <section id="accessible-output" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessible Output
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessible Output
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     Netsuke supports an accessible output mode that replaces animated spinners with static, labelled status lines.
@@ -270,40 +270,40 @@ $ netsuke generate | grep 'rule '
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
                     <div>
-                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Auto-detection</h3>
+                        <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Auto-detection</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Accessible mode is automatically enabled when either of these environment variables is set:</p>
                         <div class="space-y-3">
-                            <div class="bg-white p-4 rounded-lg border border-stone">
-                                <code class="text-sm font-mono text-amber">TERM=dumb</code>
+                            <div class="bg-white p-4 rounded-lg border border-base-300">
+                                <code class="text-sm font-mono text-warning">TERM=dumb</code>
                                 <p class="text-xs text-charcoal-mid mt-1">Terminal does not support cursor movement or ANSI sequences.</p>
                             </div>
-                            <div class="bg-white p-4 rounded-lg border border-stone">
-                                <code class="text-sm font-mono text-amber">NO_COLOR</code> <span class="text-xs text-charcoal-light">(any value)</span>
+                            <div class="bg-white p-4 rounded-lg border border-base-300">
+                                <code class="text-sm font-mono text-warning">NO_COLOR</code> <span class="text-xs text-charcoal-light">(any value)</span>
                                 <p class="text-xs text-charcoal-mid mt-1">Standard signal to disable colour output across all tools.</p>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Manual control</h3>
+                        <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Manual control</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Force accessible mode on or off regardless of auto-detection. Any explicit setting disables auto-detection; if more than one is present, CLI flags override environment variables, which override config.</p>
                         <div class="space-y-2 text-xs font-mono">
-                            <div class="flex items-start bg-white p-3 rounded border border-stone">
-                                <span class="text-indigo mr-2 shrink-0">CLI:</span>
-                                <span class="text-charcoal">--accessibility on | off | auto</span>
+                            <div class="flex items-start bg-white p-3 rounded border border-base-300">
+                                <span class="text-primary mr-2 shrink-0">CLI:</span>
+                                <span class="text-base-content">--accessibility on | off | auto</span>
                             </div>
-                            <div class="flex items-start bg-white p-3 rounded border border-stone">
-                                <span class="text-matcha mr-2 shrink-0">Env:</span>
-                                <span class="text-charcoal">NETSUKE_ACCESSIBILITY=on</span>
+                            <div class="flex items-start bg-white p-3 rounded border border-base-300">
+                                <span class="text-success mr-2 shrink-0">Env:</span>
+                                <span class="text-base-content">NETSUKE_ACCESSIBILITY=on</span>
                             </div>
-                            <div class="flex items-start bg-white p-3 rounded border border-stone">
-                                <span class="text-amber mr-2 shrink-0">Config:</span>
-                                <span class="text-charcoal">accessibility = "on"</span>
+                            <div class="flex items-start bg-white p-3 rounded border border-base-300">
+                                <span class="text-warning mr-2 shrink-0">Config:</span>
+                                <span class="text-base-content">accessibility = "on"</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Accessible mode output</h3>
+                <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Accessible mode output</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                     In accessible mode each pipeline stage and each build task produces a labelled line on stderr.
                     No spinners, no cursor movement &mdash; just plain, ordered text a screen reader can follow.
@@ -320,34 +320,34 @@ Task 2/2: cc -c src/b.c
 Success: Build complete.
 {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
-                <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
+                <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                     Emoji glyphs in output can be suppressed separately from accessible mode.
                     This is useful for terminals where emoji render as boxes, or for users who prefer plain ASCII.
                 </p>
                 <div class="grid md:grid-cols-3 gap-4">
-                    <div class="bg-white p-4 rounded-lg border border-stone text-xs font-mono">
+                    <div class="bg-white p-4 rounded-lg border border-base-300 text-xs font-mono">
                         <div class="text-charcoal-light mb-1">Env var:</div>
-                        <code class="text-amber">NETSUKE_EMOJI=never</code>
+                        <code class="text-warning">NETSUKE_EMOJI=never</code>
                     </div>
-                    <div class="bg-white p-4 rounded-lg border border-stone text-xs font-mono">
+                    <div class="bg-white p-4 rounded-lg border border-base-300 text-xs font-mono">
                         <div class="text-charcoal-light mb-1">CLI flag:</div>
-                        <code class="text-indigo">--emoji never</code>
+                        <code class="text-primary">--emoji never</code>
                     </div>
-                    <div class="bg-white p-4 rounded-lg border border-stone text-xs font-mono">
+                    <div class="bg-white p-4 rounded-lg border border-base-300 text-xs font-mono">
                         <div class="text-charcoal-light mb-1">Config file:</div>
-                        <code class="text-indigo">emoji = "never"</code>
+                        <code class="text-primary">emoji = "never"</code>
                     </div>
                 </div>
             </section>
 
             <section id="localization" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:language" aria-hidden="true"></span> Localization
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:language" aria-hidden="true"></span> Localization
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     All user-facing text in Netsuke &mdash; help messages, status lines, error explanations, hints &mdash; is externalised into
-                    <a href="https://projectfluent.org/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Fluent</a> <code>.ftl</code> resource files.
+                    <a href="https://projectfluent.org/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Fluent</a> <code>.ftl</code> resource files.
                     This means the entire CLI can be translated to a new language without changing a line of Rust.
                     Thirty-five locale catalogues ship, from Arabic (<code>ar</code>) to Traditional Chinese (<code>zh-Hant</code>).
                     Catalogues are selected by exact locale tag with deliberate per-language fallback rules, so
@@ -357,58 +357,58 @@ Success: Build complete.
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
                     <div>
-                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">Locale selection</h3>
+                        <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Locale selection</h3>
                         <p class="text-sm text-charcoal-mid mb-4">The first source that yields a valid BCP 47 tag wins:</p>
                         <ol class="space-y-2 text-sm">
                             <li class="flex items-center">
-                                <span class="w-6 h-6 rounded-full bg-indigo text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">1</span>
-                                <span class="text-charcoal-mid">CLI flag: <code class="font-mono text-indigo">--locale es-ES</code></span>
+                                <span class="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">1</span>
+                                <span class="text-charcoal-mid">CLI flag: <code class="font-mono text-primary">--locale es-ES</code></span>
                             </li>
                             <li class="flex items-center">
-                                <span class="w-6 h-6 rounded-full bg-indigo/70 text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">2</span>
-                                <span class="text-charcoal-mid">Environment: <code class="font-mono text-indigo">NETSUKE_LOCALE=es-ES</code></span>
+                                <span class="w-6 h-6 rounded-full bg-primary/70 text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">2</span>
+                                <span class="text-charcoal-mid">Environment: <code class="font-mono text-primary">NETSUKE_LOCALE=es-ES</code></span>
                             </li>
                             <li class="flex items-center">
-                                <span class="w-6 h-6 rounded-full bg-indigo/40 text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">3</span>
-                                <span class="text-charcoal-mid">Config file: <code class="font-mono text-indigo">locale = "es-ES"</code></span>
+                                <span class="w-6 h-6 rounded-full bg-primary/40 text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">3</span>
+                                <span class="text-charcoal-mid">Config file: <code class="font-mono text-primary">locale = "es-ES"</code></span>
                             </li>
                             <li class="flex items-center">
-                                <span class="w-6 h-6 rounded-full bg-stone text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">4</span>
-                                <span class="text-charcoal-mid">System default locale (<code class="font-mono">en_GB.UTF-8</code> is read as <code class="font-mono">en-GB</code>), then <code class="font-mono text-indigo">en-US</code></span>
+                                <span class="w-6 h-6 rounded-full bg-base-300 text-white text-xs flex items-center justify-center mr-3 shrink-0 font-bold">4</span>
+                                <span class="text-charcoal-mid">System default locale (<code class="font-mono">en_GB.UTF-8</code> is read as <code class="font-mono">en-GB</code>), then <code class="font-mono text-primary">en-US</code></span>
                             </li>
                         </ol>
                         <p class="text-xs text-charcoal-mid mt-3">Help text, usage, and command-line validation errors are rendered before any configuration file is read, so they skip step 3. Diagnostics, progress, and status output are rendered after the configuration merge and consult it.</p>
                     </div>
                     <div>
-                        <h3 class="font-bold text-charcoal mb-4 text-sm uppercase tracking-wide">What is localised</h3>
+                        <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">What is localised</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 CLI help text and subcommand descriptions
                             </li>
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 Stage and task progress labels
                             </li>
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 Error messages and contextual hints
                             </li>
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 Manifest parse and schema errors
                             </li>
                             <li class="flex items-start">
-                                <span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                <span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 Template and intermediate representation (IR) validation errors
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="bg-boxwood-pale border border-stone rounded-xl p-6">
-                    <h3 class="font-bold text-charcoal mb-3 text-sm flex items-center">
-                        <span class="iconify mr-2 text-amber" data-icon="carbon:translate" aria-hidden="true"></span>
+                <div class="bg-base-100 border border-base-300 rounded-xl p-6">
+                    <h3 class="font-bold text-base-content mb-3 text-sm flex items-center">
+                        <span class="iconify mr-2 text-warning" data-icon="carbon:translate" aria-hidden="true"></span>
                         Fluent message format
                     </h3>
                     <p class="text-sm text-charcoal-mid mb-4">
@@ -425,48 +425,48 @@ error-file-not-found = Error: File "{ $path }" was not found.
     .hint = Check that the path exists and is readable.</code></pre>
                     {% endraw %}{{ chrome.faux_window_close() }}{% raw %}
                     <p class="text-xs text-charcoal-mid mt-3">
-                        See the <a href="/netsuke/guides/translating/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Translating Netsuke guide</a> for the workflow, and the upstream
-                        <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization style guide</a> and
-                        <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">glossary</a> for voice, tone, and terminology.
+                        See the <a href="/netsuke/guides/translating/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Translating Netsuke guide</a> for the workflow, and the upstream
+                        <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization style guide</a> and
+                        <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">glossary</a> for voice, tone, and terminology.
                     </p>
                 </div>
             </section>
 
             <section id="troubleshooting" class="mb-16">
-                <div class="bg-boxwood-pale border border-amber/30 rounded-xl p-8 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-amber/10 rounded-full blur-3xl"></div>
+                <div class="bg-base-100 border border-warning/30 rounded-xl p-8 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-warning/10 rounded-full blur-3xl"></div>
 
                     <div class="relative z-10">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-4 flex items-center">
-                            <span class="iconify text-amber mr-3" data-icon="carbon:tools" aria-hidden="true"></span> Troubleshooting
+                        <h3 class="font-serif text-xl font-bold text-base-content mb-4 flex items-center">
+                            <span class="iconify text-warning mr-3" data-icon="carbon:tools" aria-hidden="true"></span> Troubleshooting
                         </h3>
                         <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-bold text-sm text-charcoal mb-2">Common Issues</h4>
+                                <h4 class="font-bold text-sm text-base-content mb-2">Common Issues</h4>
                                 <ul class="space-y-3 text-sm text-charcoal-mid">
                                     <li class="flex items-start">
-                                        <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
+                                        <span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
                                         <span><strong>Rule mismatch:</strong> A target defined more than one of <code>rule</code>, <code>command</code>, or <code>script</code>. Keep the recipe singular.</span>
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
+                                        <span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
                                         <span><strong>Template failure:</strong> A variable or macro expanded unexpectedly. Check the rendered string fields and the <code>vars</code> precedence.</span>
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
+                                        <span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
                                         <span><strong>Non-UTF-8 path:</strong> Manifest, <code>--directory</code>, and Ninja working-directory paths must be valid UTF-8. Netsuke rejects an invalid path while parsing the command line and names the affected option.</span>
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="iconify text-vermillion mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
+                                        <span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span>
                                         <span><strong>Surprising configuration:</strong> Run with <code>--verbose</code> to see whether <code>--config</code>, <code>NETSUKE_CONFIG</code>, or automatic discovery selected the configuration, and a bounded metrics snapshot after the command completes.</span>
                                     </li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-bold text-sm text-charcoal mb-2">Need more help?</h4>
+                                <h4 class="font-bold text-sm text-base-content mb-2">Need more help?</h4>
                                 <p class="text-sm text-charcoal-mid mb-4">Check the full troubleshooting guide or join our community.</p>
                                 <div class="flex items-center space-x-3">
-                                    <span class="px-4 py-2 bg-white border border-stone text-charcoal rounded text-xs font-bold shadow-sm">
+                                    <span class="px-4 py-2 bg-white border border-base-300 text-base-content rounded text-xs font-bold shadow-xs">
                                         Debug guide coming soon
                                     </span>
                                     <span class="text-xs font-bold text-charcoal-mid">Discord coming soon</span>

@@ -4,7 +4,7 @@
 {% block page_title %}Guides Hub - Netsuke Build System{% endblock %}
 {% block content %}
 {% raw %}
-<main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
+<main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Hero Section -->
         {% endraw %}{% call chrome.page_header('Concepts & Contribution', 'Guides & Deep Dives', hero=true, id='guides-hero') %}
@@ -16,72 +16,72 @@
             <div class="hm-card hm-card--interactive overflow-hidden group">
                 <div class="grid lg:grid-cols-2">
                     <div class="p-8 lg:p-12 flex flex-col justify-center">
-                        <div class="flex items-center space-x-2 text-indigo font-mono text-sm mb-4">
+                        <div class="flex items-center space-x-2 text-primary font-mono text-sm mb-4">
                             <span  class="iconify" data-icon="carbon:layers" aria-hidden="true"></span>
                             <span>Architecture</span>
                         </div>
-                        <h2 class="font-serif text-3xl font-bold text-charcoal mb-4 group-hover:text-indigo transition-colors">How Netsuke Works</h2>
+                        <h2 class="font-serif text-3xl font-bold text-base-content mb-4 group-hover:text-primary transition-colors">How Netsuke Works</h2>
                         <p class="text-charcoal-mid mb-8 leading-relaxed">
                             Explore the six-stage pipeline that turns a YAML manifest into a static Ninja plan. The dynamic work happens up front, so execution stays fast and legible.
                         </p>
 
                         <div class="space-y-4 mb-8">
                             <div class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-boxwood flex items-center justify-center text-charcoal text-xs font-bold mt-0.5 mr-3">1</div>
+                                <div class="w-6 h-6 rounded-full bg-boxwood flex items-center justify-center text-base-content text-xs font-bold mt-0.5 mr-3">1</div>
                                 <div>
-                                    <h4 class="font-bold text-charcoal text-sm">Manifest Parsing</h4>
+                                    <h4 class="font-bold text-base-content text-sm">Manifest Parsing</h4>
                                     <p class="text-xs text-charcoal-light">YAML validation and raw manifest loading</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-boxwood flex items-center justify-center text-charcoal text-xs font-bold mt-0.5 mr-3">2</div>
+                                <div class="w-6 h-6 rounded-full bg-boxwood flex items-center justify-center text-base-content text-xs font-bold mt-0.5 mr-3">2</div>
                                 <div>
-                                    <h4 class="font-bold text-charcoal text-sm">Graph Analysis</h4>
+                                    <h4 class="font-bold text-base-content text-sm">Graph Analysis</h4>
                                     <p class="text-xs text-charcoal-light">Dependency resolution and cycle detection</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
-                                <div class="w-6 h-6 rounded-full bg-boxwood flex items-center justify-center text-charcoal text-xs font-bold mt-0.5 mr-3">3</div>
+                                <div class="w-6 h-6 rounded-full bg-boxwood flex items-center justify-center text-base-content text-xs font-bold mt-0.5 mr-3">3</div>
                                 <div>
-                                    <h4 class="font-bold text-charcoal text-sm">Action Execution</h4>
+                                    <h4 class="font-bold text-base-content text-sm">Action Execution</h4>
                                     <p class="text-xs text-charcoal-light">Generated Ninja execution with clear diagnostics</p>
                                 </div>
                             </div>
                         </div>
 
-                        <a href="/netsuke/guides/architecture/" class="inline-flex items-center text-indigo font-bold hover:text-vermillion transition-colors">
+                        <a href="/netsuke/guides/architecture/" class="inline-flex items-center text-primary font-bold hover:text-accent transition-colors">
                             Read the architecture guide <span  class="iconify ml-2" data-icon="carbon:arrow-right" aria-hidden="true"></span>
                         </a>
                     </div>
-                    <div class="bg-boxwood-pale p-8 lg:p-12 border-t lg:border-t-0 lg:border-l border-stone flex items-center justify-center relative overflow-hidden">
+                    <div class="bg-base-100 p-8 lg:p-12 border-t lg:border-t-0 lg:border-l border-base-300 flex items-center justify-center relative overflow-hidden">
                         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#8A8279 1px, transparent 1px); background-size: 24px 24px;"></div>
 
                         <!-- Abstract Diagram Visualization -->
-                        <div class="relative z-10 w-full max-w-md aspect-square bg-white rounded-xl shadow-sm border border-stone p-6 flex flex-col justify-between">
-                            <div class="flex justify-between items-center border-b border-stone pb-4 mb-4">
+                        <div class="relative z-10 w-full max-w-md aspect-square bg-white rounded-xl shadow-xs border border-base-300 p-6 flex flex-col justify-between">
+                            <div class="flex justify-between items-center border-b border-base-300 pb-4 mb-4">
                                 <span class="font-mono text-xs text-charcoal-light">pipeline_state.rs</span>
                                 <div class="flex space-x-1">
-                                    <div class="w-2 h-2 rounded-full bg-vermillion"></div>
-                                    <div class="w-2 h-2 rounded-full bg-amber"></div>
-                                    <div class="w-2 h-2 rounded-full bg-matcha"></div>
+                                    <div class="w-2 h-2 rounded-full bg-accent"></div>
+                                    <div class="w-2 h-2 rounded-full bg-warning"></div>
+                                    <div class="w-2 h-2 rounded-full bg-success"></div>
                                 </div>
                             </div>
                             <div class="space-y-3 font-mono text-xs">
-                                <div class="bg-boxwood-pale p-2 rounded border border-stone/50 text-charcoal-mid">
-                                    <span class="text-indigo">fn</span> <span class="text-vermillion">construct_graph</span>(manifest) -> Graph {
+                                <div class="bg-base-100 p-2 rounded border border-base-300/50 text-charcoal-mid">
+                                    <span class="text-primary">fn</span> <span class="text-accent">construct_graph</span>(manifest) -> Graph {
                                 </div>
                                 <div class="pl-4 text-stone-light">... internal logic ...</div>
-                                <div class="bg-indigo/5 p-2 rounded border border-indigo/10 text-indigo flex justify-between items-center">
+                                <div class="bg-primary/5 p-2 rounded border border-primary/10 text-primary flex justify-between items-center">
                                     <span>Analysis Phase</span>
-                                    <span  class="iconify text-matcha" data-icon="carbon:checkmark" aria-hidden="true"></span>
+                                    <span  class="iconify text-success" data-icon="carbon:checkmark" aria-hidden="true"></span>
                                 </div>
-                                <div class="bg-boxwood p-2 rounded border border-stone text-charcoal shadow-sm flex justify-between items-center">
+                                <div class="bg-boxwood p-2 rounded border border-base-300 text-base-content shadow-xs flex justify-between items-center">
                                     <span>Execution Phase</span>
                                     <span  class="iconify text-charcoal-mid animate-spin" data-icon="carbon:rotate-360" aria-hidden="true"></span>
                                 </div>
                                 <div class="text-charcoal-mid">}</div>
                             </div>
-                            <div class="mt-4 pt-4 border-t border-stone flex justify-between text-xs text-charcoal-light">
+                            <div class="mt-4 pt-4 border-t border-base-300 flex justify-between text-xs text-charcoal-light">
                                 <span>Input: 14kb</span>
                                 <span>Output: Binary</span>
                             </div>
@@ -100,29 +100,29 @@
                 <!-- Section: Philosophy -->
                 <section id="philosophy">
                     <div class="flex items-center mb-8">
-                        <div class="w-10 h-10 rounded-full bg-indigo/10 text-indigo flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-4">
                             <span  class="iconify" data-icon="carbon:idea" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Philosophy & Context</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">Philosophy & Context</h2>
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6">
                         <!-- Card 1 -->
                         <a href="/netsuke/docs/" class="hm-guide-card hm-card p-6 block h-full">
-                            <h3 class="font-serif text-lg font-bold text-charcoal mb-3">Documentation Hub</h3>
+                            <h3 class="font-serif text-lg font-bold text-base-content mb-3">Documentation Hub</h3>
                             <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
                                 Start in the docs hub for the core ideas behind Netsuke, then branch into manifests, templating, and execution details.
                             </p>
-                            <span class="text-xs font-mono text-indigo font-medium">Open Docs Hub &rarr;</span>
+                            <span class="text-xs font-mono text-primary font-medium">Open Docs Hub &rarr;</span>
                         </a>
 
                         <!-- Card 2 -->
                         <a href="/netsuke/roadmap/" class="hm-guide-card hm-card p-6 block h-full">
-                            <h3 class="font-serif text-lg font-bold text-charcoal mb-3">Roadmap &amp; Release Status</h3>
+                            <h3 class="font-serif text-lg font-bold text-base-content mb-3">Roadmap &amp; Release Status</h3>
                             <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
                                 See what shipped in v{% endraw %}{{ netsuke_version }}{% raw %}, the known limitations, and the phased plan for the work ahead.
                             </p>
-                            <span class="text-xs font-mono text-indigo font-medium">Open Roadmap &rarr;</span>
+                            <span class="text-xs font-mono text-primary font-medium">Open Roadmap &rarr;</span>
                         </a>
                     </div>
                 </section>
@@ -130,32 +130,32 @@
                 <!-- Section: Forthcoming -->
                 <section id="forthcoming">
                     <div class="flex items-center mb-8">
-                        <div class="w-10 h-10 rounded-full bg-amber/10 text-amber flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 rounded-full bg-warning/10 text-warning flex items-center justify-center mr-4">
                             <span  class="iconify" data-icon="carbon:idea" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Forthcoming Capabilities</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">Forthcoming Capabilities</h2>
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6">
                         <a href="/netsuke/forthcoming/linter/" class="hm-guide-card hm-card p-6 block h-full">
                             <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-serif text-lg font-bold text-charcoal">Netsukefile Linter</h3>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> v0.2.0</span>
+                                <h3 class="font-serif text-lg font-bold text-base-content">Netsukefile Linter</h3>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> v0.2.0</span>
                             </div>
                             <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
                                 What <code>netsuke check</code> will lint, how rule severities are configured, and what the preview deliberately leaves out.
                             </p>
-                            <span class="text-xs font-mono text-indigo font-medium">Read the preview &rarr;</span>
+                            <span class="text-xs font-mono text-primary font-medium">Read the preview &rarr;</span>
                         </a>
                         <a href="/netsuke/forthcoming/testing-framework/" class="hm-guide-card hm-card p-6 block h-full">
                             <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-serif text-lg font-bold text-charcoal">Testing Framework</h3>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> v0.4.0</span>
+                                <h3 class="font-serif text-lg font-bold text-base-content">Testing Framework</h3>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> v0.4.0</span>
                             </div>
                             <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
                                 The <code>netsuke test</code> dialect: mocks, fixtures, and assertions over the expanded manifest, graph, and generated Ninja.
                             </p>
-                            <span class="text-xs font-mono text-indigo font-medium">Read the preview &rarr;</span>
+                            <span class="text-xs font-mono text-primary font-medium">Read the preview &rarr;</span>
                         </a>
                     </div>
                 </section>
@@ -163,53 +163,53 @@
                 <!-- Section: Contributing -->
                 <section id="contributing">
                     <div class="flex items-center mb-8">
-                        <div class="w-10 h-10 rounded-full bg-matcha/10 text-matcha flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center mr-4">
                             <span  class="iconify" data-icon="carbon:branch" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Contributing</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">Contributing</h2>
                     </div>
 
                     <div class="hm-card overflow-hidden">
-                        <div class="divide-y divide-stone-light">
-                            <a href="/netsuke/guides/contributing/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
+                        <div class="hm-rows">
+                            <a href="/netsuke/guides/contributing/" class="block p-6 hover:bg-base-100 transition-colors group">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
-                                        <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:notebook" aria-hidden="true"></span>
+                                    <div class="shrink-0 mt-1">
+                                        <span  class="iconify text-base-300 group-hover:text-primary transition-colors" data-icon="carbon:notebook" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">
-                                        <h3 class="text-base font-bold text-charcoal group-hover:text-indigo transition-colors">Contribution Guidelines</h3>
+                                        <h3 class="text-base font-bold text-base-content group-hover:text-primary transition-colors">Contribution Guidelines</h3>
                                         <p class="text-sm text-charcoal-mid mt-1">Start here. Code of conduct, setting up your dev environment, and pull request etiquette.</p>
                                     </div>
                                     <div class="ml-auto pl-4">
-                                        <span  class="iconify text-stone text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
+                                        <span  class="iconify text-base-300 text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
                                     </div>
                                 </div>
                             </a>
-                            <a href="/netsuke/guides/translating/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
+                            <a href="/netsuke/guides/translating/" class="block p-6 hover:bg-base-100 transition-colors group">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
-                                        <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:language" aria-hidden="true"></span>
+                                    <div class="shrink-0 mt-1">
+                                        <span  class="iconify text-base-300 group-hover:text-primary transition-colors" data-icon="carbon:language" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">
-                                        <h3 class="text-base font-bold text-charcoal group-hover:text-indigo transition-colors">Translating Netsuke</h3>
+                                        <h3 class="text-base font-bold text-base-content group-hover:text-primary transition-colors">Translating Netsuke</h3>
                                         <p class="text-sm text-charcoal-mid mt-1">Full localization guide: Fluent files, message keys, plurals, the style guide and glossary, and adding a new locale.</p>
                                     </div>
                                     <div class="ml-auto pl-4">
-                                        <span  class="iconify text-stone text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
+                                        <span  class="iconify text-base-300 text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
                                     </div>
                                 </div>
                             </a>
-                            <a href="/netsuke/guides/writing-examples/" class="block p-6 hover:bg-boxwood-pale transition-colors group">
+                            <a href="/netsuke/guides/writing-examples/" class="block p-6 hover:bg-base-100 transition-colors group">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0 mt-1">
-                                        <span  class="iconify text-stone group-hover:text-indigo transition-colors" data-icon="carbon:cube" aria-hidden="true"></span>
+                                    <div class="shrink-0 mt-1">
+                                        <span  class="iconify text-base-300 group-hover:text-primary transition-colors" data-icon="carbon:cube" aria-hidden="true"></span>
                                     </div>
                                     <div class="ml-4">
-                                        <h3 class="text-base font-bold text-charcoal group-hover:text-indigo transition-colors">Writing Examples &amp; Showcases</h3>
+                                        <h3 class="text-base font-bold text-base-content group-hover:text-primary transition-colors">Writing Examples &amp; Showcases</h3>
                                         <p class="text-sm text-charcoal-mid mt-1">Full guide to contributing example manifests and turning them into showcase pages.</p>
                                     </div>
                                     <div class="ml-auto pl-4">
-                                        <span  class="iconify text-stone text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
+                                        <span  class="iconify text-base-300 text-xs" data-icon="carbon:chevron-right" aria-hidden="true"></span>
                                     </div>
                                 </div>
                             </a>
@@ -220,30 +220,30 @@
                 <!-- Section: Community -->
                 <section id="community">
                     <div class="flex items-center mb-8">
-                        <div class="w-10 h-10 rounded-full bg-vermillion/10 text-vermillion flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 rounded-full bg-accent/10 text-accent flex items-center justify-center mr-4">
                             <span  class="iconify" data-icon="carbon:group" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Community Resources</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">Community Resources</h2>
                     </div>
 
                     <div class="grid md:grid-cols-3 gap-6">
                         <div class="hm-card hm-card--accent p-6 text-center">
-                            <span  class="iconify block mx-auto text-3xl text-vermillion mb-4" data-icon="carbon:logo-git" aria-hidden="true"></span>
-                            <h3 class="font-bold text-charcoal mb-2">Project Repository</h3>
+                            <span  class="iconify block mx-auto text-3xl text-accent mb-4" data-icon="carbon:logo-git" aria-hidden="true"></span>
+                            <h3 class="font-bold text-base-content mb-2">Project Repository</h3>
                             <p class="text-xs text-charcoal-mid mb-4">Browse the prototype source, assets, and roadmap in one place.</p>
-                            <a href="https://github.com/leynos/netsuke" class="text-indigo text-sm font-bold hover:underline">Open Repository</a>
+                            <a href="https://github.com/leynos/netsuke" class="text-primary text-sm font-bold hover:underline">Open Repository</a>
                         </div>
                         <div class="hm-card hm-card--accent p-6 text-center">
-                            <span  class="iconify block mx-auto text-3xl text-charcoal mb-4" data-icon="carbon:logo-github" aria-hidden="true"></span>
-                            <h3 class="font-bold text-charcoal mb-2">Issue Tracker</h3>
+                            <span  class="iconify block mx-auto text-3xl text-base-content mb-4" data-icon="carbon:logo-github" aria-hidden="true"></span>
+                            <h3 class="font-bold text-base-content mb-2">Issue Tracker</h3>
                             <p class="text-xs text-charcoal-mid mb-4">Report bugs, request improvements, and track the prototype backlog.</p>
-                            <a href="https://github.com/leynos/netsuke/issues" class="text-indigo text-sm font-bold hover:underline">Open Issues</a>
+                            <a href="https://github.com/leynos/netsuke/issues" class="text-primary text-sm font-bold hover:underline">Open Issues</a>
                         </div>
                         <div class="hm-card hm-card--accent p-6 text-center">
-                            <span  class="iconify block mx-auto text-3xl text-vermillion mb-4" data-icon="carbon:roadmap" aria-hidden="true"></span>
-                            <h3 class="font-bold text-charcoal mb-2">Roadmap</h3>
+                            <span  class="iconify block mx-auto text-3xl text-accent mb-4" data-icon="carbon:roadmap" aria-hidden="true"></span>
+                            <h3 class="font-bold text-base-content mb-2">Roadmap</h3>
                             <p class="text-xs text-charcoal-mid mb-4">Follow what shipped, what is still rough, and the phased plan ahead.</p>
-                            <a href="/netsuke/roadmap/" class="text-indigo text-sm font-bold hover:underline">View the Roadmap</a>
+                            <a href="/netsuke/roadmap/" class="text-primary text-sm font-bold hover:underline">View the Roadmap</a>
                         </div>
                     </div>
                 </section>
@@ -254,33 +254,33 @@
 
                 <!-- Recommended Path -->
                 <div class="hm-sidebar-card p-6">
-                    <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Recommended Path</h3>
+                    <h3 class="font-serif text-lg font-bold text-base-content mb-4">Recommended Path</h3>
                     <p class="text-sm text-charcoal-mid mb-6">New to build systems? Here is a suggested reading order to get up to speed.</p>
 
                     <div class="relative pl-4 border-l-2 border-stone-light space-y-6">
                         <div class="relative">
-                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-indigo border-2 border-white"></div>
-                            <h4 class="text-sm font-bold text-indigo">1. Why Netsuke?</h4>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-primary border-2 border-white"></div>
+                            <h4 class="text-sm font-bold text-primary">1. Why Netsuke?</h4>
                             <p class="text-xs text-charcoal-mid mt-1">Understanding the problem space.</p>
                         </div>
                         <div class="relative">
-                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-base-300 border-2 border-white"></div>
                             <a href="/netsuke/docs/getting-started/" class="group block">
-                                <h4 class="text-sm font-bold text-charcoal group-hover:text-indigo transition-colors">2. Getting Started</h4>
+                                <h4 class="text-sm font-bold text-base-content group-hover:text-primary transition-colors">2. Getting Started</h4>
                                 <p class="text-xs text-charcoal-mid mt-1">Installation and first build.</p>
                             </a>
                         </div>
                         <div class="relative">
-                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-base-300 border-2 border-white"></div>
                             <a href="/netsuke/docs/" class="group block">
-                                <h4 class="text-sm font-bold text-charcoal group-hover:text-indigo transition-colors">3. How it Works</h4>
+                                <h4 class="text-sm font-bold text-base-content group-hover:text-primary transition-colors">3. How it Works</h4>
                                 <p class="text-xs text-charcoal-mid mt-1">Deep dive into the graph.</p>
                             </a>
                         </div>
                         <div class="relative">
-                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-stone border-2 border-white"></div>
+                            <div class="absolute -left-[23px] top-1 w-3 h-3 rounded-full bg-base-300 border-2 border-white"></div>
                             <a href="/netsuke/guides/writing-examples/" class="group block">
-                                <h4 class="text-sm font-bold text-charcoal group-hover:text-indigo transition-colors">4. Writing Examples</h4>
+                                <h4 class="text-sm font-bold text-base-content group-hover:text-primary transition-colors">4. Writing Examples</h4>
                                 <p class="text-xs text-charcoal-mid mt-1">Contributing your own manifests.</p>
                             </a>
                         </div>
@@ -288,31 +288,31 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="bg-boxwood-pale rounded-lg border border-stone p-6">
-                    <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Top Articles</h3>
+                <div class="bg-base-100 rounded-lg border border-base-300 p-6">
+                    <h3 class="font-serif text-lg font-bold text-base-content mb-4">Top Articles</h3>
                     <ul class="space-y-3">
                         <li>
                             <a href="/netsuke/docs/rules-and-targets/" class="flex items-start group">
-                                <span class="text-stone mr-3 text-xs mt-1">01</span>
-                                <span class="text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Rules &amp; Targets</span>
+                                <span class="text-base-300 mr-3 text-xs mt-1">01</span>
+                                <span class="text-sm font-medium text-base-content group-hover:text-primary transition-colors">Rules &amp; Targets</span>
                             </a>
                         </li>
                         <li>
                             <a href="/netsuke/roadmap/" class="flex items-start group">
-                                <span class="text-stone mr-3 text-xs mt-1">02</span>
-                                <span class="text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Roadmap</span>
+                                <span class="text-base-300 mr-3 text-xs mt-1">02</span>
+                                <span class="text-sm font-medium text-base-content group-hover:text-primary transition-colors">Roadmap</span>
                             </a>
                         </li>
                         <li>
                             <a href="/netsuke/docs/cli/" class="flex items-start group">
-                                <span class="text-stone mr-3 text-xs mt-1">03</span>
-                                <span class="text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Command Line</span>
+                                <span class="text-base-300 mr-3 text-xs mt-1">03</span>
+                                <span class="text-sm font-medium text-base-content group-hover:text-primary transition-colors">Command Line</span>
                             </a>
                         </li>
                         <li>
                             <a href="/netsuke/docs/configuration/" class="flex items-start group">
-                                <span class="text-stone mr-3 text-xs mt-1">04</span>
-                                <span class="text-sm font-medium text-charcoal group-hover:text-indigo transition-colors">Configuration</span>
+                                <span class="text-base-300 mr-3 text-xs mt-1">04</span>
+                                <span class="text-sm font-medium text-base-content group-hover:text-primary transition-colors">Configuration</span>
                             </a>
                         </li>
                     </ul>

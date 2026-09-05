@@ -18,7 +18,7 @@ import urllib.error
 import urllib.request
 
 from weaver_snapshot_clock import SYSTEM_CLOCK, Clock
-from weaver_snapshot_paths import REPO_ROOT
+from weaver_snapshot_paths import DEFAULT_SITE, REPO_ROOT
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -203,12 +203,13 @@ def _probe_failure_category(failure: OSError | None) -> str:
             return "connection_failed"
 
 
-def _await_server(
+def _await_server(  # noqa: PLR0913 - one seam per outward dependency
     server: _Pollable,
     base: str,
     port: int,
     clock: Clock = SYSTEM_CLOCK,
     probe: Probe = _probe_url,
+    site: str = DEFAULT_SITE,
 ) -> None:
     """Wait until the spawned server answers, and confirm it is the one that did.
 
@@ -227,6 +228,10 @@ def _await_server(
     probe
         How to ask whether the server is answering. Injected so readiness can
         be checked without an HTTP request.
+    site
+        The sub-site whose home page the probe requests. Asking for the
+        sub-site rather than the tree's root is what proves the pages about
+        to be captured are actually there.
 
     Raises
     ------
@@ -249,7 +254,7 @@ def _await_server(
             )
             raise SystemExit(message)
         try:
-            probe(f"{base}/weaver/")
+            probe(f"{base}/{site}/")
         except OSError as exc:
             last_failure = exc
             clock.sleep(READINESS_POLL_SECONDS)

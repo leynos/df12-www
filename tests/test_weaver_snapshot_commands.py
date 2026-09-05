@@ -8,6 +8,7 @@ one output per page.
 from __future__ import annotations
 
 import contextlib
+import json
 import subprocess
 import typing as typ
 
@@ -184,11 +185,22 @@ def _driven(
 
     monkeypatch.setattr(commands, "_served", served)
     monkeypatch.setattr(commands, "_staged", staged)
-    monkeypatch.setattr(commands, "_page_paths", lambda: list(pages))
+    # The command passes the sub-site's root; the stand-in ignores it, since
+    # the page list here is the test's to choose.
+    monkeypatch.setattr(commands, "_page_paths", lambda _root: list(pages))
     monkeypatch.setattr(commands, "_tool", lambda name: tool_paths[name])
     monkeypatch.setattr(
         commands, "_run_tool", lambda argv: record["argv"].append(list(argv))
     )
+
+    def read(argv: cabc.Sequence[str]) -> str:
+        record["argv"].append(list(argv))
+        if "x-unknown" in argv[2]:  # the defaults probe, evaluated on about:blank
+            return json.dumps(json.dumps({"base": {}, "deltas": {}}))
+        tree = {"tag": "html", "classes": [], "styleDiff": {}, "children": []}
+        return json.dumps(json.dumps({"tree": tree, "visited": 1}))
+
+    monkeypatch.setattr(commands, "_read_tool", read)
     yield record
 
 
@@ -232,7 +244,9 @@ def test_the_capture_command_wires_its_helpers_together(
 ) -> None:
     """The same for `capture`, whose only other coverage needs a real browser."""
     pages = ["", "commands/act/"]
-    with _driven(monkeypatch, pages, {"bun": "/usr/bin/bun"}) as run:
+    with _driven(
+        monkeypatch, pages, {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
         commands.capture(tmp_path / "out", port=8124)
 
     assert run["served"] == [8124], f"the named port should be served; got {run}"
@@ -241,15 +255,81 @@ def test_the_capture_command_wires_its_helpers_together(
         f"captures should stage as .json; got {run['staged']}"
     )
 
-    outputs = [argv[argv.index("--output") + 1] for argv in run["argv"]]
-    expected = [
-        f"{tmp_path / 'out' / '.staging'}/{paths._slug(page)}.json" for page in pages
-    ]
-    assert outputs == expected, (
-        f"expected one snapshot per page, into the staging directory; got {outputs}"
+    written = sorted(path.name for path in (tmp_path / "out" / ".staging").iterdir())
+    expected = sorted(f"{paths._slug(page)}.json" for page in pages)
+    assert written == expected, (
+        f"expected one snapshot per page, into the staging directory; got {written}"
     )
-    assert all(argv[0] == "/usr/bin/bun" for argv in run["argv"]), (
-        f"every command should run through the resolved bun; got {run['argv']}"
+    assert all(argv[0] == "/usr/bin/agent-browser" for argv in run["argv"]), (
+        f"every command should run through the resolved browser; got {run['argv']}"
+    )
+
+
+def test_the_capture_command_addresses_the_site_it_was_given(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`--site` has to reach the URL, the page list, and the server's probe.
+
+    A site that reached one and not the others would capture Weaver's pages
+    under Netsuke's name — a baseline of the wrong sub-site that compares
+    clean against itself forever.
+    """
+    roots: list[Path] = []
+    sites: list[str] = []
+    with _driven(
+        monkeypatch, ["", "docs/"], {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
+
+        def pages_under(root: Path) -> list[str]:
+            roots.append(root)
+            return ["", "docs/"]
+
+        @contextlib.contextmanager
+        def served(port: int, *_args: object, **kwargs: object) -> cabc.Iterator[str]:
+            sites.append(str(kwargs.get("site")))
+            run["served"].append(port)
+            yield "http://127.0.0.1:9999"
+
+        monkeypatch.setattr(commands, "_page_paths", pages_under)
+        monkeypatch.setattr(commands, "_served", served)
+        commands.capture(tmp_path / "out", port=8126, site="netsuke")
+
+    assert roots == [paths._public_root("netsuke")], (
+        f"the page list should be read from public/netsuke; got {roots}"
+    )
+    assert sites == ["netsuke"], (
+        f"the server's readiness probe should ask for the named site; got {sites}"
+    )
+    urls = [
+        argv[2]
+        for argv in run["argv"]
+        if argv[1] == "open" and argv[2] != "about:blank"
+    ]
+    assert urls == [
+        "http://127.0.0.1:9999/netsuke/",
+        "http://127.0.0.1:9999/netsuke/docs/",
+    ], f"every page should be requested under /netsuke/; got {urls}"
+
+
+def test_the_shots_command_addresses_the_site_it_was_given(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The same for `shots`, whose session name and URLs both carry the site."""
+    with _driven(
+        monkeypatch, ["", "docs/"], {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
+        monkeypatch.setattr(commands, "_page_paths", lambda _root: ["", "docs/"])
+        commands.shots(tmp_path / "out", port=8127, site="netsuke")
+
+    opened = [argv[2] for argv in run["argv"] if argv[1] == "open"]
+    assert opened, "no page was opened at all"
+    assert all(url.startswith("http://127.0.0.1:9999/netsuke/") for url in opened), (
+        f"every page should be opened under /netsuke/; got {opened}"
+    )
+    sessions = {argv[argv.index("--session") + 1] for argv in run["argv"]}
+    assert len(sessions) == 1, f"one run should drive one session; got {sessions}"
+    assert next(iter(sessions)).startswith("netsuke-shots"), (
+        f"the browser session should be named for the site; got {sessions}"
     )
 
 
@@ -257,10 +337,12 @@ def test_a_command_stops_its_server_even_when_a_page_fails(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """A browser that fails on page two must not strand the server on port one."""
-    with _driven(monkeypatch, ["", "install/"], {"bun": "/usr/bin/bun"}) as run:
+    with _driven(
+        monkeypatch, ["", "install/"], {"agent-browser": "/usr/bin/agent-browser"}
+    ) as run:
 
         def refuse(_argv: cabc.Sequence[str]) -> None:
-            raise subprocess.CalledProcessError(1, "bun")
+            raise subprocess.CalledProcessError(1, "agent-browser")
 
         monkeypatch.setattr(commands, "_run_tool", refuse)
         with pytest.raises(subprocess.CalledProcessError):
@@ -269,3 +351,26 @@ def test_a_command_stops_its_server_even_when_a_page_fails(
     assert run["closed"] == [8125], (
         f"the server should be stopped however the run ends; got {run['closed']}"
     )
+
+
+def test_the_capture_command_names_a_walker_it_cannot_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The walker is read before any server or browser starts, and named if absent."""
+
+    def unreadable() -> str:
+        message = "gone"
+        raise FileNotFoundError(message)
+
+    monkeypatch.setattr(commands, "_read_walker", unreadable)
+    with (
+        _driven(monkeypatch, [""], {"agent-browser": "/usr/bin/agent-browser"}) as run,
+        pytest.raises(SystemExit) as caught,
+    ):
+        commands.capture(tmp_path / "out", port=8124)
+
+    assert "weaver_snapshot_walker.js" in str(caught.value.code), (
+        f"the message should name the walker file; got {caught.value.code!r}"
+    )
+    assert "gone" in str(caught.value.code), "and carry the reason"
+    assert run["served"] == [], f"no server should have started; got {run}"

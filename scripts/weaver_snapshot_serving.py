@@ -13,7 +13,7 @@ import socket
 
 from weaver_snapshot_locking import _startup_lock
 from weaver_snapshot_ownership import _confirm_ownership, _ownership_marker
-from weaver_snapshot_paths import HTTP_SERVER
+from weaver_snapshot_paths import DEFAULT_SITE, HTTP_SERVER
 from weaver_snapshot_process import (
     Launcher,
     ServerProcess,
@@ -157,6 +157,7 @@ def _start_server(
     *,
     named: bool = True,
     launch: Launcher = _launch,
+    site: str = DEFAULT_SITE,
 ) -> ServerProcess:
     """Acquire the port and return a server already answering on it, as itself.
 
@@ -173,6 +174,8 @@ def _start_server(
     launch
         How to start the server process. Injected so the argv a start would
         use can be checked without a child process.
+    site
+        The sub-site the readiness poll asks for.
 
     Returns
     -------
@@ -202,7 +205,7 @@ def _start_server(
         _refuse_occupied_port(port)
         server = launch(_server_argv(port))
         try:
-            _await_server(server, base, port)
+            _await_server(server, base, port, site=site)
         except BaseException:
             # Otherwise a failed start leaves a child holding the port, and
             # the next run's probe refuses to start because of it.
@@ -220,7 +223,9 @@ def _start_server(
 
 
 @contextlib.contextmanager
-def _served(port: int, allocate: PortAllocator = _allocate_port) -> cabc.Iterator[str]:
+def _served(
+    port: int, allocate: PortAllocator = _allocate_port, site: str = DEFAULT_SITE
+) -> cabc.Iterator[str]:
     """Serve ``public/`` locally for the duration of the context.
 
     Parameters
@@ -230,6 +235,9 @@ def _served(port: int, allocate: PortAllocator = _allocate_port) -> cabc.Iterato
     allocate
         How to obtain that free one. The default binds a loopback socket; a
         caller with its own port source can pass one instead.
+    site
+        The sub-site the readiness poll asks for. The whole tree is served
+        either way; this only decides which page proves it came up.
 
     Yields
     ------
@@ -252,7 +260,7 @@ def _served(port: int, allocate: PortAllocator = _allocate_port) -> cabc.Iterato
     resolved = _resolve_port(port, allocate)
     base = f"http://127.0.0.1:{resolved}"
     with _ownership_marker() as marker:
-        server = _start_server(resolved, marker, named=bool(port))
+        server = _start_server(resolved, marker, named=bool(port), site=site)
         try:
             yield base
             # Ownership is checked again on the way out, so a capture is only

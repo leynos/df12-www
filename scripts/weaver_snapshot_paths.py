@@ -1,24 +1,67 @@
-"""Where the Weaver snapshot harness reads from and writes to.
+"""Where the snapshot harness reads from and writes to.
 
 The published tree it captures, the page list it derives from that tree, and
 the filename each page's snapshot takes. Kept apart from the rest because
 nothing here starts a process or opens a socket: it is the part that can be
 reasoned about by reading it.
+
+The harness was written for Weaver and its modules still carry that name; the
+sub-site is a parameter now, so the same tooling drives the Netsuke migration.
+``DEFAULT_SITE`` keeps every existing call and command meaning what it did.
 """
 
 from __future__ import annotations
 
 import os
+import re
 import typing as typ
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PUBLIC_WEAVER = REPO_ROOT / "public" / "weaver"
+PUBLIC = REPO_ROOT / "public"
 HTTP_SERVER = REPO_ROOT / "node_modules" / ".bin" / "http-server"
+
+# The sub-site every command and helper serves when none is named.
+DEFAULT_SITE = "weaver"
+
+# What a sub-site name may look like: the `sites:` keys in config/pages.yaml
+# are lower-case slugs, and the name is spliced into a filesystem path and a
+# URL, so anything else is refused rather than resolved.
+SITE_NAME = re.compile(r"[a-z][a-z0-9-]*")
+
+
+def _public_root(site: str = DEFAULT_SITE) -> Path:
+    """Locate one sub-site's published tree.
+
+    Parameters
+    ----------
+    site
+        The sub-site's name as it appears under ``sites:`` in
+        ``config/pages.yaml`` and as the first segment of its URLs.
+
+    Returns
+    -------
+    Path
+        ``public/<site>``.
+
+    Raises
+    ------
+    SystemExit
+        If the name is not a plain lower-case slug. The name becomes a path
+        segment and a URL segment, so ``../`` or a space would not point at a
+        sub-site at all.
+    """
+    if not SITE_NAME.fullmatch(site):
+        message = f"{site!r} is not a sub-site name; expected a slug such as 'weaver'"
+        raise SystemExit(message)
+    return PUBLIC / site
+
+
+PUBLIC_WEAVER = _public_root(DEFAULT_SITE)
 
 
 def _page_paths(root: Path = PUBLIC_WEAVER) -> list[str]:
-    """List the published Weaver pages as base-relative URL paths.
+    """List one sub-site's published pages as base-relative URL paths.
 
     Derived from the published tree rather than hard-coded, so a page added to
     ``config/pages.yaml`` is captured without editing this script.
@@ -32,8 +75,8 @@ def _page_paths(root: Path = PUBLIC_WEAVER) -> list[str]:
     Returns
     -------
     list of str
-        Paths relative to ``/weaver/``, such as ``""`` for the home page and
-        ``"commands/act/"`` for a nested one, in sorted order.
+        Paths relative to the sub-site's base path, such as ``""`` for the
+        home page and ``"commands/act/"`` for a nested one, in sorted order.
 
     Raises
     ------
@@ -86,7 +129,8 @@ def _slug(page: str) -> str:
     Parameters
     ----------
     page
-        A path relative to ``/weaver/``, such as ``"commands/act/"``.
+        A path relative to the sub-site's base path, such as
+        ``"commands/act/"``.
 
     Returns
     -------

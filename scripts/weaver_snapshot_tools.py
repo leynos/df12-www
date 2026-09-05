@@ -1,31 +1,127 @@
-"""Driving the external tools, and the argv each command hands them.
+"""Driving agent-browser, and the argv each command hands it.
+
+Both commands drive the same browser session the same way: size the
+viewport, open the page, wait for the network to go idle and then for the
+page to say it has settled, and only then take the capture — a computed-style
+walk for ``capture``, a full-page image for ``shots``.
 
 The argv builders are pure, so what a command would run can be asserted
-without a browser; `Runner` is the seam the commands take their process
-launcher through, for the same reason.
+without a browser; `Runner` and `Reader` are the seams the commands take
+their process launcher through, for the same reason.
 """
 
 from __future__ import annotations
 
 import collections.abc as cabc
 import contextlib
+import datetime as dt
+import json
 import os
 import shutil
 import subprocess
 import typing as typ
+from pathlib import Path
 
-from weaver_snapshot_paths import REPO_ROOT, _slug
+from weaver_snapshot_paths import DEFAULT_SITE, REPO_ROOT, _slug
 
 if typ.TYPE_CHECKING:
-    from pathlib import Path
+    from weaver_snapshot_types import Json
 
 # 360 exercises the mobile drawer, 768 the tablet breakpoint, and 1440 the
 # fixed-sidebar layout the site was designed against.
 SCREENSHOT_WIDTHS = (360, 768, 1440)
 
-# The walker mode's node budget. The largest Weaver page is well under this;
-# the ceiling only guards against a runaway capture.
+# The walker's node budget. The largest page is well under this; the ceiling
+# only guards against a runaway capture.
 MAX_NODES = 8000
+
+# How much of each element's text the walker keeps. Enough to tell two
+# elements apart in a diff, not enough to reproduce the page.
+TEXT_CLIP = 80
+
+# The viewport every capture is taken at. css-view's Playwright default, which
+# the first baselines were taken against; agent-browser's own default is not
+# the same height, and `min-h-screen` would otherwise move.
+CAPTURE_WIDTH, CAPTURE_HEIGHT = 1280, 720
+
+# The properties the walker compares against the parent rather than the
+# user-agent default — css-view's DEFAULT_INHERITED_PROPERTIES, which every
+# baseline was taken with.
+INHERITED_PROPERTIES = (
+    "color",
+    "font",
+    "font-family",
+    "font-size",
+    "font-style",
+    "font-weight",
+    "font-stretch",
+    "font-variant",
+    "font-feature-settings",
+    "font-kerning",
+    "line-height",
+    "letter-spacing",
+    "word-spacing",
+    "text-align",
+    "text-indent",
+    "text-transform",
+    "text-decoration-color",
+    "text-decoration-line",
+    "text-decoration-style",
+    "white-space",
+    "visibility",
+    "cursor",
+    "direction",
+    "unicode-bidi",
+    "list-style-type",
+    "list-style-position",
+    "list-style-image",
+    "quotes",
+)
+
+# The properties the walker reports on every node whatever they equal. A
+# margin equal to the user-agent default — a paragraph's 16px below — would
+# otherwise be left out, and the normalizer folds margins into the gaps
+# between siblings, which needs every margin.
+ALWAYS_PROPERTIES = ("margin-top", "margin-right", "margin-bottom", "margin-left")
+
+# The walker evaluator, read once per run. See the file's own header.
+WALKER = Path(__file__).with_name("weaver_snapshot_walker.js")
+# The probe that measures user-agent defaults on a blank page, evaluated once
+# per capture so the walker never has to append anything to a page it reads.
+DEFAULTS = Path(__file__).with_name("weaver_snapshot_defaults.js")
+
+# What "the page has settled" means, as an expression `agent-browser wait
+# --fn` polls until it is truthy.
+#
+# Netsuke draws its icons with Iconify, a script that fetches each glyph from
+# a CDN after the page loads and swaps the placeholder `<span class="iconify">`
+# for an `<svg>` — and it asks for them a moment *after* the network has gone
+# idle, so a capture taken at network-idle catches the placeholders, which is a
+# layout change rather than a style one. The expression asks Iconify itself to
+# say when every icon on the page has either arrived or been reported missing,
+# and then waits for the arrived ones to be drawn. A page without Iconify is
+# settled as soon as it is asked. State is parked on `window` so the poll can
+# ask the same question repeatedly and register the callback only once.
+SETTLED = """(() => {
+  const spans = () => [...document.querySelectorAll('span.iconify[data-icon]')];
+  if (!window.Iconify) return true;
+  if (window.__snapshotSettle === undefined) {
+    const state = { done: false, missing: new Set() };
+    window.__snapshotSettle = state;
+    const names = [...new Set(spans().map((s) => s.dataset.icon))];
+    if (!names.length) {
+      state.done = true;
+    } else {
+      Iconify.loadIcons(names, (_loaded, missing, pending) => {
+        if (pending.length) return;
+        for (const icon of missing) state.missing.add(`${icon.prefix}:${icon.name}`);
+        state.done = true;
+      });
+    }
+  }
+  const state = window.__snapshotSettle;
+  return state.done && spans().every((s) => state.missing.has(s.dataset.icon));
+})()"""
 
 # How long a browser-driving subprocess may take before the run is called off.
 # A headless browser that never returns would otherwise hang the snapshot
@@ -65,6 +161,41 @@ def _tool(name: str) -> str:
 type Runner = cabc.Callable[[cabc.Sequence[str]], None]
 
 
+# The same, for a tool whose standard output is the result — `agent-browser
+# eval`, which prints what the expression returned.
+type Reader = cabc.Callable[[cabc.Sequence[str]], str]
+
+
+def _read_tool(argv: cabc.Sequence[str]) -> str:
+    """Run an external tool to completion and return what it printed.
+
+    Parameters
+    ----------
+    argv
+        The command to run, already resolved to an absolute executable.
+
+    Returns
+    -------
+    str
+        The tool's standard output.
+
+    Raises
+    ------
+    subprocess.CalledProcessError
+        If the tool exits non-zero.
+    subprocess.TimeoutExpired
+        If it has not finished within :data:`TOOL_TIMEOUT_SECONDS`.
+    """
+    return subprocess.run(  # noqa: S603 - fixed argv built from the published tree
+        list(argv),
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=TOOL_TIMEOUT_SECONDS,
+    ).stdout
+
+
 def _run_tool(argv: cabc.Sequence[str]) -> None:
     """Run an external tool to completion, or raise.
 
@@ -90,7 +221,7 @@ def _run_tool(argv: cabc.Sequence[str]) -> None:
     )
 
 
-def _session_name() -> str:
+def _session_name(site: str = DEFAULT_SITE, purpose: str = "shots") -> str:
     """Name the browser session this process should drive.
 
     A dedicated session keeps the run clear of any interactive browsing. It
@@ -100,51 +231,228 @@ def _session_name() -> str:
     viewport while the other screenshots, producing images at a width neither
     asked for and reporting success for both.
 
+    Parameters
+    ----------
+    site
+        The sub-site being captured, so the name says what the session is
+        for.
+    purpose
+        ``shots`` or ``capture``, for the same reason.
+
     Returns
     -------
     str
         A session name unique to this process.
     """
-    return f"weaver-shots-{os.getpid()}"
+    return f"{site}-{purpose}-{os.getpid()}"
 
 
-def _css_view_argv(bun: str, base: str, page: str, out_dir: Path) -> list[str]:
-    """Build the ``css-view`` command that snapshots one page.
+def _read_walker(path: Path = WALKER) -> str:
+    """Read the walker evaluator's source.
 
     Parameters
     ----------
-    bun
-        Absolute path to the ``bun`` executable.
-    base
-        The origin the local server is listening on, without a trailing slash.
-    page
-        A page path relative to ``/weaver/``, as :func:`_page_paths` returns.
-    out_dir
-        Directory the JSON snapshot is written into.
+    path
+        The vendored walker. The default is the file beside this module.
 
     Returns
     -------
-    list of str
-        The full argv. The browser is pinned rather than left to css-view's
-        default, so a change to that default cannot swap the engine — and the
-        rendering — out from under a comparison.
+    str
+        The JavaScript source, with its parameter placeholders unfilled.
+
+    Raises
+    ------
+    OSError
+        If the file cannot be read. The command boundary turns this into a
+        message naming the file; nothing below it should have to.
     """
-    return [
-        bun,
-        "x",
-        "css-view",
-        "--mode",
-        "walker",
-        "--browser",
-        "chromium",
-        "--max-nodes",
-        str(MAX_NODES),
-        "--wait-until",
-        "networkidle",
-        "--output",
-        str(out_dir / f"{_slug(page)}.json"),
-        f"{base}/weaver/{page}",
-    ]
+    return path.read_text(encoding="utf-8")
+
+
+def _read_defaults_probe(path: Path = DEFAULTS) -> str:
+    """Read the defaults probe's source.
+
+    Parameters
+    ----------
+    path
+        The probe script. The default is the file beside this module.
+
+    Returns
+    -------
+    str
+        A JavaScript expression that evaluates, on a blank page, to the
+        user-agent defaults as a JSON string.
+
+    Raises
+    ------
+    OSError
+        If the file cannot be read; the command boundary names it.
+    """
+    return path.read_text(encoding="utf-8")
+
+
+def _decoded(evaluated: str) -> Json:
+    """Decode what ``agent-browser eval`` printed for a JSON-string result."""
+    result = json.loads(evaluated.strip())
+    return json.loads(result) if isinstance(result, str) else result
+
+
+def _with_defaults(expression: str, evaluated: str) -> str:
+    """Fill the walker's ``__DEFAULTS__`` parameter from the probe's output.
+
+    Parameters
+    ----------
+    expression
+        A walker expression from :func:`_walker_expression`.
+    evaluated
+        What ``agent-browser eval`` printed for the defaults probe.
+
+    Returns
+    -------
+    str
+        The walker expression with the measured defaults in place.
+
+    Raises
+    ------
+    TypeError
+        If the probe did not return a mapping with ``base`` and ``deltas``.
+    """
+    defaults = _decoded(evaluated)
+    if (
+        not isinstance(defaults, dict)
+        or not isinstance(defaults.get("base"), dict)
+        or not isinstance(defaults.get("deltas"), dict)
+    ):
+        message = (
+            f"the defaults probe did not return base and deltas: {defaults!r:.200}"
+        )
+        raise TypeError(message)
+    return expression.replace(
+        "__DEFAULTS__", json.dumps(defaults, separators=(",", ":"))
+    )
+
+
+def _walker_expression(
+    source: str, max_nodes: int = MAX_NODES, text_clip: int = TEXT_CLIP
+) -> str:
+    """Fill the walker evaluator's parameters in, all but the defaults.
+
+    Parameters
+    ----------
+    source
+        The walker's source, as :func:`_read_walker` returns it.
+    max_nodes
+        How many elements the walk may visit before it stops.
+    text_clip
+        How many characters of each element's text to keep.
+
+    Returns
+    -------
+    str
+        A JavaScript expression that evaluates to the snapshot as a JSON
+        string once :func:`_with_defaults` has filled ``__DEFAULTS__``.
+    """
+    return (
+        source.replace("__INHERITED__", json.dumps(list(INHERITED_PROPERTIES)))
+        .replace("__ALWAYS__", json.dumps(list(ALWAYS_PROPERTIES)))
+        .replace("__MAX_NODES__", str(max_nodes))
+        .replace("__TEXT_CLIP__", str(text_clip))
+    )
+
+
+class _WalkerResult(typ.TypedDict):
+    """What the walker returns: the tree and how many elements it visited."""
+
+    tree: dict[str, Json]
+    visited: int
+
+
+def _walker_result(evaluated: str) -> _WalkerResult:
+    """Decode what ``agent-browser eval`` printed into the walker's result.
+
+    Parameters
+    ----------
+    evaluated
+        The tool's stdout: the walker's JSON string, itself JSON-encoded once
+        more by the tool.
+
+    Returns
+    -------
+    _WalkerResult
+        The decoded result, checked for the two members the harness reads.
+
+    Raises
+    ------
+    ValueError
+        If the output is not JSON.
+    TypeError
+        If it decodes to something other than a mapping with a ``tree``
+        mapping and an integer ``visited``.
+    """
+    result = _decoded(evaluated)
+    tree = result.get("tree") if isinstance(result, dict) else None
+    visited = result.get("visited") if isinstance(result, dict) else None
+    # A bool is an int to `isinstance`, and would be written as `visited: true`.
+    if not isinstance(tree, dict) or type(visited) is not int:
+        message = f"the walker did not return a tree and a visit count: {result!r:.200}"
+        raise TypeError(message)
+    return {"tree": tree, "visited": visited}
+
+
+# Where a snapshot's timestamp comes from: a seam, so a test can pin it.
+type Stamp = cabc.Callable[[], dt.datetime]
+
+
+def _utc_now() -> dt.datetime:
+    """Return the current time in UTC, which is what production records."""
+    return dt.datetime.now(dt.UTC)
+
+
+def _snapshot_document(
+    url: str,
+    evaluated: str,
+    viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
+    *,
+    now: Stamp = _utc_now,
+) -> dict[str, typ.Any]:
+    """Wrap what the walker returned in the envelope css-view writes.
+
+    Parameters
+    ----------
+    url
+        The page the walk was taken over.
+    evaluated
+        What ``agent-browser eval`` printed: the walker's JSON string, itself
+        JSON-encoded once more by the tool.
+    viewport
+        The width and height the page was laid out at, for the record.
+    now
+        Where the ``capturedAt`` timestamp comes from.
+
+    Returns
+    -------
+    dict
+        A document with ``payload.tree`` where every reader of a snapshot
+        expects it, and a ``meta`` recording when and how it was taken.
+    """
+    result = _walker_result(evaluated)
+    return {
+        "meta": {
+            "url": url,
+            "capturedAt": now().isoformat(),
+            "mode": "walker",
+            "tool": "agent-browser",
+            "viewport": {"width": viewport[0], "height": viewport[1]},
+        },
+        "payload": {
+            "tree": result["tree"],
+            "meta": {
+                "visited": result["visited"],
+                "maxNodes": MAX_NODES,
+                "textClip": TEXT_CLIP,
+            },
+        },
+    }
 
 
 def _screenshot_argv(path: Path) -> list[str]:
@@ -168,40 +476,179 @@ def _screenshot_argv(path: Path) -> list[str]:
     return ["screenshot", str(path), "--full"]
 
 
-def _capture_pages(
-    pages: cabc.Sequence[str],
-    out_dir: Path,
-    base: str,
-    bun: str,
-    run: Runner,
-) -> None:
-    """Snapshot each page in turn, reporting progress as it goes.
+def _unrendered_icons(snapshot: Path) -> int:
+    """Count the Iconify placeholders a captured page still carries.
 
     Parameters
     ----------
-    pages
-        Page paths relative to ``/weaver/``.
-    out_dir
-        Directory to write one JSON snapshot per page into.
-    base
-        The origin the local server is listening on.
-    bun
-        Absolute path to the ``bun`` executable.
-    run
-        How to run a tool. Injected so a test can assert the argv without
-        launching a browser.
+    snapshot
+        A walker-mode snapshot the harness has just written.
+
+    Returns
+    -------
+    int
+        How many ``<span class="iconify">`` nodes the tree holds. Once Iconify
+        has rendered an icon the span is an ``<svg>``, whose classes the
+        walker reports as an ``SVGAnimatedString`` rather than by name, so
+        only the unrendered ones count. After the settle wait these are the
+        icons the set does not have, and the count is reported so a page
+        whose icons never arrived can be told from one that has none.
+
+    Raises
+    ------
+    OSError, ValueError, KeyError, TypeError
+        If the snapshot cannot be read, parsed, or is not the shape the
+        harness writes. It was written moments before by this process, so
+        any of these is a defect in the capture rather than a page to note.
     """
-    for page in pages:
-        run(_css_view_argv(bun, base, page, out_dir))
-        print(f"  {_slug(page)}")
+    tree = json.loads(snapshot.read_text(encoding="utf-8"))["payload"]["tree"]
+
+    def count(node: typ.Any) -> int:  # noqa: ANN401 - the document is untyped upstream data
+        if not isinstance(node, cabc.Mapping):
+            return 0
+        classes = node.get("classes")
+        own = int(
+            node.get("tag") == "span"
+            and isinstance(classes, list)
+            and "iconify" in classes
+        )
+        children = node.get("children")
+        if not isinstance(children, list):
+            return own
+        return own + sum(count(child) for child in children)
+
+    return count(tree)
 
 
-def _shoot_pages(
+def _open_settled(drive: cabc.Callable[..., None], url: str) -> bool:
+    """Load a page and wait until it has settled.
+
+    Parameters
+    ----------
+    drive
+        Runs one ``agent-browser`` subcommand in the session.
+    url
+        The page to open.
+
+    Returns
+    -------
+    bool
+        Whether the page settled within the tool's timeout. One that did not
+        is captured anyway — a page that never settles is still a page — and
+        the caller says so beside its name.
+    """
+    drive("open", url)
+    drive("wait", "--load", "networkidle")
+    try:
+        drive("wait", "--fn", SETTLED)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        # agent-browser gives up on its own deadline, or the subprocess hits
+        # this module's; either way the page is walked as it stands and the
+        # capture says so.
+        return False
+    return True
+
+
+def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     pages: cabc.Sequence[str],
     out_dir: Path,
     base: str,
     browser: str,
     run: Runner,
+    read: Reader,
+    site: str = DEFAULT_SITE,
+    viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
+    *,
+    walker: str,
+    defaults: str,
+    now: Stamp = _utc_now,
+) -> None:
+    """Snapshot each page in turn, reporting progress as it goes.
+
+    The session is closed in a ``finally`` so an interrupted run does not
+    strand a browser daemon holding the viewport it last set.
+
+    Parameters
+    ----------
+    pages
+        Page paths relative to the sub-site's base path.
+    out_dir
+        Directory to write one JSON snapshot per page into.
+    base
+        The origin the local server is listening on.
+    browser
+        Absolute path to the ``agent-browser`` executable.
+    run
+        How to run a tool whose output is not wanted. Injected so a test can
+        assert the argv without launching a browser.
+    read
+        How to run a tool and keep what it printed. The walker's result comes
+        back this way.
+    site
+        The sub-site the pages belong to.
+    viewport
+        The width and height to lay each page out at. A stylesheet's media
+        queries only show at the widths they apply to, so a migration is
+        proved at more than one.
+    walker
+        The walker expression to evaluate in each page, as
+        :func:`_walker_expression` builds it, its ``__DEFAULTS__`` still to
+        fill. Read at the command boundary, so a missing or unreadable walker
+        is reported there, before any server or browser is started.
+    defaults
+        The defaults probe, as :func:`_read_defaults_probe` returns it. It is
+        evaluated once on a blank page before the first target page opens,
+        so measuring an element's defaults never touches a page being read.
+    now
+        Where each snapshot's timestamp comes from.
+
+    Raises
+    ------
+    SystemExit
+        If the walker's output for a page is not a snapshot, naming the page.
+        A tree that cannot be read is not a page to note and move on from;
+        every later comparison would fail on it for a reason nobody could see.
+    """
+    session = ["--session", _session_name(site, "capture")]
+
+    def drive(*args: str) -> None:
+        run([browser, *args, *session])
+
+    try:
+        drive("set", "viewport", str(viewport[0]), str(viewport[1]))
+        drive("open", "about:blank")
+        walk = _with_defaults(walker, read([browser, "eval", defaults, *session]))
+        for page in pages:
+            url = f"{base}/{site}/{page}"
+            settled = _open_settled(drive, url)
+            evaluated = read([browser, "eval", walk, *session])
+            try:
+                document = _snapshot_document(url, evaluated, viewport, now=now)
+            except (ValueError, TypeError) as exc:
+                message = f"{url}: the walker did not return a snapshot: {exc}"
+                raise SystemExit(message) from exc
+            output = out_dir / f"{_slug(page)}.json"
+            output.write_text(json.dumps(document), encoding="utf-8")
+            notes = []
+            if not settled:
+                notes.append("did not settle")
+            if remaining := _unrendered_icons(output):
+                notes.append(f"{remaining} icons the set does not have")
+            print(f"  {_slug(page)}" + (f" ({'; '.join(notes)})" if notes else ""))
+    finally:
+        with contextlib.suppress(
+            subprocess.CalledProcessError, subprocess.TimeoutExpired
+        ):
+            drive("close")
+
+
+def _shoot_pages(  # noqa: PLR0913 - one seam per outward dependency
+    pages: cabc.Sequence[str],
+    out_dir: Path,
+    base: str,
+    browser: str,
+    run: Runner,
+    site: str = DEFAULT_SITE,
 ) -> None:
     """Screenshot each page at each width, closing the session afterwards.
 
@@ -211,7 +658,7 @@ def _shoot_pages(
     Parameters
     ----------
     pages
-        Page paths relative to ``/weaver/``.
+        Page paths relative to the sub-site's base path.
     out_dir
         Directory to write the PNG files into.
     base
@@ -221,8 +668,10 @@ def _shoot_pages(
     run
         How to run a tool. Injected so a test can assert the argv without
         launching a browser.
+    site
+        The sub-site the pages belong to.
     """
-    session = ["--session", _session_name()]
+    session = ["--session", _session_name(site)]
 
     def drive(*args: str) -> None:
         run([browser, *args, *session])
@@ -231,7 +680,7 @@ def _shoot_pages(
         for width in SCREENSHOT_WIDTHS:
             drive("set", "viewport", str(width), "900")
             for page in pages:
-                drive("open", f"{base}/weaver/{page}")
+                _open_settled(drive, f"{base}/{site}/{page}")
                 drive(*_screenshot_argv(out_dir / f"{_slug(page)}@{width}.png"))
             print(f"  {width}px done")
     finally:

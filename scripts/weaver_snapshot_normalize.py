@@ -8,14 +8,19 @@ diff is a change to the page.
 
 from __future__ import annotations
 
-import collections.abc as cabc
-import json
 import typing as typ
 
 from weaver_snapshot_colour import _canonical_shadow, _canonical_value
+from weaver_snapshot_folds import (
+    _canonical_transition,
+    _capped_radius,
+    _fold_sibling_margins,
+    _incidental_text,
+)
+from weaver_snapshot_transform import _fold_transform
 
 if typ.TYPE_CHECKING:
-    from pathlib import Path
+    from weaver_snapshot_types import Json, Style, WalkerNode
 
 # The physical and logical names for each border edge, paired so a width can
 # be looked up from a colour property and vice versa.
@@ -25,12 +30,19 @@ _BORDER_EDGES = (
     ("border-bottom", "border-block-end"),
     ("border-left", "border-inline-start"),
 )
-
-
 _ZERO_WIDTHS = frozenset({"0px", "0", "medium"})
+# The ways Chromium spells a background at its origin.
+_ORIGIN_POSITIONS = frozenset({"0px 0px", "0% 0%", "0px", "0%"})
+# A running animation samples `opacity` mid-cycle, and a moving one samples
+# `transform` and drags the node's bounding box round with it. A computed
+# style names the animation but not what it animates, so the ones that move
+# are named here: Tailwind's three transform animations. A pulse, or a border
+# that cycles its colour, leaves its box where it is, and the box stays in
+# the comparison.
+_MOVING_ANIMATIONS = frozenset({"spin", "ping", "bounce"})
 
 
-def _drop_invisible_border_colours(style: dict[str, typ.Any]) -> None:
+def _drop_invisible_border_colours(style: Style) -> None:
     """Remove the colour of any border edge that is not drawn.
 
     Tailwind v3's preflight defaulted every border to ``gray-200``; v4 leaves
@@ -72,27 +84,45 @@ _TRACKS_PARENT = frozenset(
 )
 
 
-def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any]:
+def _canonical_style(style_diff: Style | None) -> Style:
     """Strip incidental variation from one node's reported styles.
 
     Five kinds of variation are incidental:
 
-    - ``--tw-*`` custom properties. These are Tailwind's own plumbing, and
-      which of them exist is an implementation detail of the version in use,
-      not something a reader can see.
+    - Custom properties. ``--tw-*`` are Tailwind's own plumbing, and the
+      theme tokens a compiled stylesheet declares on ``:root`` — several
+      hundred of them — are what the visible properties are computed from,
+      not something a reader can see; a token that changes shows up in every
+      property that consumes it.
     - Colour notation. Tailwind v3 resolved `text-primary/80` to `rgba(...)`;
       v4 resolves it through `color-mix()` and Chromium reports `oklab(...)`.
       Comparing the strings would report every translucent colour on the site
       as changed and bury the handful that really did. Each colour is
       therefore converted to 8-bit sRGB before comparison, which is the
       precision a screen has anyway.
-    - ``opacity`` on a node running a CSS animation. The Weaver pages carry an
-      ``animate-pulse`` status dot whose opacity is sampled mid-cycle.
+    - ``opacity`` and ``transform`` on a node running a CSS animation. The
+      Weaver pages carry an ``animate-pulse`` status dot whose opacity is
+      sampled mid-cycle; the Netsuke guides hub carries an ``animate-spin``
+      icon whose rotation is.
+    - The loopback port inside a ``url()``. The server is given a free port
+      per run, and Chromium reports a resolved ``background-image`` with the
+      origin it was loaded from.
     - Placeholder shadow layers. v4 composes ``box-shadow`` from more slots
       than v3 did, so an unchanged shadow arrives behind a different number of
       fully transparent, zero-size layers. See :func:`_canonical_shadow`.
     - The colour of a border edge with no width. See
       :func:`_drop_invisible_border_colours`.
+    - The members of a ``transition-property`` list that only one Tailwind
+      version names, and a corner radius past the point where the corner is
+      a semicircle. See :func:`_canonical_transition` and
+      :func:`_capped_radius`.
+    - A background positioned at its origin, and ``color-scheme: light``,
+      neither of which a light page renders any differently for.
+
+    :func:`_normalize` handles three more that need the node rather than its
+    styles alone: the individual transform properties are composed into the
+    matrix (see :func:`_fold_transform`), the ``<head>`` is not compared, and
+    neither is a node's class list.
 
     Parameters
     ----------
@@ -107,23 +137,56 @@ def _canonical_style(style_diff: dict[str, typ.Any] | None) -> dict[str, typ.Any
         alone.
     """
     style = {
-        key: _canonical_value(value) if isinstance(value, str) else value
+        key: _incidental_text(_canonical_value(value))
+        if isinstance(value, str)
+        else value
         for key, value in (style_diff or {}).items()
-        if not key.startswith("--tw-")
+        if not key.startswith("--")
     }
-    if style.get("animation-name", "none") != "none":
+    if _is_animated(style):
         style.pop("opacity", None)
+    if _is_moving(style):
+        style.pop("transform", None)
     for key in ("box-shadow", "text-shadow"):
-        if isinstance(style.get(key), str):
-            style[key] = _canonical_shadow(style[key])
+        shadow = style.get(key)
+        if isinstance(shadow, str):
+            style[key] = _canonical_shadow(shadow)
+    # A background positioned at the origin is where an unpositioned one
+    # already is; Chromium reports the one in pixels and the default in
+    # percentages, and a `background:` shorthand in a layered rule resets it
+    # to the former.
+    if style.get("background-position") in _ORIGIN_POSITIONS:
+        del style["background-position"]
+    # A light page renders the same whether it declares `color-scheme: light`
+    # or leaves it `normal`; the declaration only matters to a page that
+    # also offers dark. daisyUI's theme declares it on the root.
+    if style.get("color-scheme") in {"light", "normal"}:
+        del style["color-scheme"]
+    transition = style.get("transition-property")
+    if isinstance(transition, str):
+        style["transition-property"] = _canonical_transition(transition)
+    for key, value in style.items():
+        if key.endswith("-radius") and isinstance(value, str):
+            style[key] = _capped_radius(value)
     _drop_invisible_border_colours(style)
     return style
 
 
+def _is_animated(style: Style) -> bool:
+    """Say whether a node's styles show a CSS animation running on it."""
+    return style.get("animation-name", "none") != "none"
+
+
+def _is_moving(style: Style) -> bool:
+    """Say whether a node is running an animation that moves its box."""
+    names = str(style.get("animation-name", "none")).split(", ")
+    return any(name in _MOVING_ANIMATIONS for name in names)
+
+
 def _resolve_tracked(
-    style: dict[str, typ.Any],
-    inherited: dict[str, typ.Any],
-) -> dict[str, typ.Any]:
+    style: Style,
+    inherited: Style,
+) -> Style:
     """Drop the tracked properties a node merely repeats from its parent.
 
     The walker compares the properties in :data:`_TRACKS_PARENT` against the
@@ -155,14 +218,7 @@ def _resolve_tracked(
     return carried
 
 
-# Whatever the walker put in a node's `bbox`. It is a mapping today; the type
-# says "some JSON value" because the normalization deliberately does not
-# require that, and a snapshot reporting it otherwise should reach the diff
-# rather than be dropped on the way.
-type _Bbox = dict[str, typ.Any] | list[typ.Any] | str | float | bool | None
-
-
-def _rounded_bbox(bbox: _Bbox) -> _Bbox:
+def _rounded_bbox(bbox: Json) -> Json:
     """Round a bounding box's numbers, absorbing subpixel text-shaping jitter.
 
     Two decimal places is finer than any layout shift worth reporting and
@@ -192,9 +248,11 @@ def _rounded_bbox(bbox: _Bbox) -> _Bbox:
 
 
 def _normalize(
-    node: dict[str, typ.Any],
-    inherited: dict[str, typ.Any] | None = None,
-) -> dict[str, typ.Any]:
+    node: WalkerNode,
+    inherited: Style | None = None,
+    *,
+    spinning: bool = False,
+) -> WalkerNode:
     """Strip incidental variation from one walker node and its descendants.
 
     The normalization itself lives in :func:`_canonical_style`,
@@ -208,6 +266,12 @@ def _normalize(
     inherited
         The values the parent node carried for the properties in
         :data:`_TRACKS_PARENT`. Empty at the root.
+    spinning
+        Whether an ancestor is running an animation that moves it. Its box
+        turns with it, and so does every box beneath it: the ``<path>``
+        inside a spinning icon has no animation of its own and moves all the
+        same. An animation that only cycles a colour or an opacity leaves
+        every box in place, and those stay in the comparison.
 
     Returns
     -------
@@ -218,153 +282,36 @@ def _normalize(
     style = _canonical_style(node.get("styleDiff"))
     carried = _resolve_tracked(style, inherited or {})
 
-    normalized = dict(node)
+    spinning = spinning or _is_moving(style)
+    _fold_transform(style, node.get("bbox"))
+    normalized = node.copy()
     normalized["styleDiff"] = style
+    # The class list is how a node is styled, not what it looks like, and a
+    # rename is the usual reason for a change that is meant to look the same.
+    # Only the computed result is compared, as the projection in AGENTS.md
+    # does. The root's text is the head's — the title and any inline style —
+    # and goes with the head.
+    normalized.pop("classes", None)
+    if node.get("tag") in {"html", "head"}:
+        normalized.pop("text", None)
     if "bbox" in node:
-        normalized["bbox"] = _rounded_bbox(node["bbox"])
+        # A spinning node's box is whatever its rotation was when sampled;
+        # rounding cannot settle that, so the box goes rather than the diff
+        # reporting a spinner on every capture.
+        if spinning:
+            del normalized["bbox"]
+        else:
+            normalized["bbox"] = _rounded_bbox(node["bbox"])
+    identifier = node.get("id")
+    if isinstance(identifier, str):
+        normalized["id"] = _incidental_text(identifier)
+    # Nothing in the head is rendered, and the two <script> elements the
+    # Play CDN needed are exactly what a cutover removes: the change is the
+    # point, and reporting it on every page would bury whatever else moved.
+    # A stylesheet that stopped being linked shows up in every style it set.
+    children = [] if node.get("tag") == "head" else node.get("children") or []
     normalized["children"] = [
-        _normalize(child, carried) for child in node.get("children") or []
+        _normalize(child, carried, spinning=spinning) for child in children
     ]
+    _fold_sibling_margins(normalized["children"], style)
     return normalized
-
-
-class _MalformedSnapshotError(ValueError):
-    """A parsed snapshot that is not the shape ``css-view`` writes."""
-
-
-def _check_node(node: typ.Any, where: str) -> None:  # noqa: ANN401 - the document is untyped upstream data
-    """Check one walker node, and everything below it, is the shape assumed.
-
-    The normalization reaches for ``.get`` on every node and ``.items`` on
-    every ``styleDiff``, so anything that is not a mapping surfaces from deep
-    inside the recursion as ``'str' object has no attribute 'get'`` — an
-    ``AttributeError``, which the read boundary was not catching, naming
-    neither the file nor the node. Walking the shape first means the failure
-    can say where in the tree it is.
-
-    Parameters
-    ----------
-    node
-        The node to check.
-    where
-        A breadcrumb naming its position, such as ``payload.tree.children[2]``.
-
-    Raises
-    ------
-    _MalformedSnapshotError
-        If the node, its ``styleDiff``, or any descendant is not the shape the
-        normalization assumes.
-    """
-    if not isinstance(node, cabc.Mapping):
-        message = f"{where} is {type(node).__name__}, not a mapping"
-        raise _MalformedSnapshotError(message)
-
-    style = node.get("styleDiff")
-    if style is not None and not isinstance(style, cabc.Mapping):
-        message = (
-            f"{where}.styleDiff is {type(style).__name__}, not a mapping or absent"
-        )
-        raise _MalformedSnapshotError(message)
-
-    children = node.get("children")
-    if children is None:
-        return
-    # A string is a Sequence, and iterating one yields characters rather than
-    # nodes, so it has to be excluded by name.
-    if isinstance(children, str) or not isinstance(children, cabc.Sequence):
-        message = f"{where}.children is {type(children).__name__}, not a list or absent"
-        raise _MalformedSnapshotError(message)
-    for index, child in enumerate(children):
-        _check_node(child, f"{where}.children[{index}]")
-    # Explicit, to match the early return above: a node with no children and a
-    # node whose children all check out leave this function the same way.
-    return
-
-
-def _rendered_tree(payload: dict[str, typ.Any]) -> str:
-    """Render a parsed snapshot's tree as stable, comparable text.
-
-    Kept free of I/O, so the normalization and its serialization can be
-    exercised on a literal payload rather than a file on disk.
-
-    Parameters
-    ----------
-    payload
-        A parsed ``css-view`` snapshot document.
-
-    Returns
-    -------
-    str
-        Pretty-printed JSON with sorted keys, ready to hand to a line differ.
-        The capture envelope — URL, timestamp, browser — is dropped, since it
-        records when the snapshot was taken, not what the page looks like.
-
-    Raises
-    ------
-    KeyError
-        If the document has no ``payload.tree``. :func:`_normalized_tree`
-        converts this into a ``SystemExit`` naming the file.
-    TypeError
-        If either level is not a mapping, for the same reason.
-    _MalformedSnapshotError
-        If the tree is not mappings all the way down, naming the node that is
-        not. :func:`_normalized_tree` converts this the same way.
-    """
-    tree = payload["payload"]["tree"]
-    _check_node(tree, "payload.tree")
-    return json.dumps(_normalize(tree), indent=2, sort_keys=True, ensure_ascii=False)
-
-
-def _normalized_tree(snapshot: Path) -> str:
-    """Read a snapshot and render its tree as stable, comparable text.
-
-    This is the I/O boundary. A snapshot directory is written by ``capture``
-    but read here by path, so it can be stale, truncated by an interrupted
-    run, or simply not a snapshot at all. Each of those surfaces as a
-    ``SystemExit`` naming the file rather than as a traceback partway through
-    a comparison, where the file at fault is the one thing not on screen.
-
-    Parameters
-    ----------
-    snapshot
-        Path to a ``css-view`` JSON snapshot.
-
-    Returns
-    -------
-    str
-        The rendering :func:`_rendered_tree` produces.
-
-    Raises
-    ------
-    SystemExit
-        If the file cannot be read, does not hold valid JSON, or does not have
-        the shape ``css-view`` writes.
-    """
-    try:
-        text = snapshot.read_text(encoding="utf-8")
-    except OSError as exc:
-        message = f"{snapshot} could not be read ({exc})"
-        raise SystemExit(message) from exc
-    try:
-        payload = json.loads(text)
-    except json.JSONDecodeError as exc:
-        message = (
-            f"{snapshot} is not valid JSON ({exc}); an interrupted capture "
-            f"can leave a partial file behind, so recapture it"
-        )
-        raise SystemExit(message) from exc
-    try:
-        return _rendered_tree(payload)
-    except (KeyError, TypeError) as exc:
-        message = (
-            f"{snapshot} has no payload.tree, so it is not a css-view "
-            f"snapshot ({exc!r})"
-        )
-        raise SystemExit(message) from exc
-    except _MalformedSnapshotError as exc:
-        message = (
-            f"{snapshot} is not the shape css-view writes: {exc}. An "
-            f"interrupted capture, or a snapshot from a different tool, would "
-            f"look like this; recapture it."
-        )
-        raise SystemExit(message) from exc

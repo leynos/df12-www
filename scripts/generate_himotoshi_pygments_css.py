@@ -3,7 +3,9 @@
 Reads the token colours from
 :class:`df12_pages.highlighting.HimotoshiStyle`, exposes each as a
 ``--netsuke-syntax-*`` CSS variable, and rewrites the marked block in
-``src/static/netsuke/assets/css/himotoshi.css``. The stylesheet path is
+``src/styles/netsuke/himotoshi.css``, the partial the Netsuke Tailwind
+entrypoint compiles into ``public/netsuke/assets/css/himotoshi.css``. The
+stylesheet path is
 resolved relative to this script, so it may be run from any directory:
 
     uv run python scripts/generate_himotoshi_pygments_css.py
@@ -26,10 +28,8 @@ from scripts.pygments_css import token_rules
 STYLESHEET = (
     Path(__file__).resolve().parent.parent
     / "src"
-    / "static"
+    / "styles"
     / "netsuke"
-    / "assets"
-    / "css"
     / "himotoshi.css"
 )
 BEGIN = (

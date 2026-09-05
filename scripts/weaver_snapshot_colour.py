@@ -169,14 +169,21 @@ _EMPTY_SHADOW = "rgba(0, 0, 0, 0.000) 0px 0px 0px 0px"
 _SHADOW_ALPHA = re.compile(r"rgba\([^)]*,\s*0\.000\s*\)")
 
 
+# A layer with no geometry at all: no offset, no blur, no spread. Whatever its
+# colour, it covers nothing. Tailwind v3's ring composed one in for the ring
+# offset, in white, where v4 composes none.
+_NO_GEOMETRY = re.compile(r"\)\s+0px 0px 0px 0px(?:\s+inset)?$")
+
+
 def _is_transparent_shadow(layer: str) -> bool:
     """Report whether a shadow layer paints nothing.
 
-    Alpha decides this on its own. Matching the fully-zero placeholder by its
-    exact text missed any transparent layer that carried a geometry — an
-    offset, a blur, a spread — even though a shadow at alpha zero is invisible
-    whatever its dimensions. Two snapshots then differed over a layer neither
-    of them drew.
+    Alpha decides this on its own, and so does geometry. Matching the
+    fully-zero placeholder by its exact text missed any transparent layer that
+    carried a geometry — an offset, a blur, a spread — even though a shadow at
+    alpha zero is invisible whatever its dimensions; and it missed an opaque
+    layer with no geometry, which covers nothing whatever its colour. Two
+    snapshots then differed over a layer neither of them drew.
 
     Parameters
     ----------
@@ -188,7 +195,11 @@ def _is_transparent_shadow(layer: str) -> bool:
     bool
         True when the layer is fully transparent and so paints nothing.
     """
-    return layer == _EMPTY_SHADOW or bool(_SHADOW_ALPHA.search(layer))
+    return (
+        layer == _EMPTY_SHADOW
+        or bool(_SHADOW_ALPHA.search(layer))
+        or bool(_NO_GEOMETRY.search(layer))
+    )
 
 
 def _canonical_shadow(value: str) -> str:

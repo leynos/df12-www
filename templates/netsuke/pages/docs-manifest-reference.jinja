@@ -14,7 +14,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('manifest-reference') }}{% raw %}
 
@@ -25,12 +25,12 @@
             {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Manifest Reference'}]) }}{% raw %}
 
             {% endraw %}{% call chrome.page_header('Reference', 'Manifest Format') %}
-                The <code class="font-mono text-vermillion bg-vermillion/5 px-1.5 py-0.5 rounded text-lg">Netsukefile</code> is the heart of your build configuration. It is a YAML document with explicit top-level keys and controlled Jinja expansion inside values.
+                The <code class="font-mono text-accent bg-accent/5 px-1.5 py-0.5 rounded text-lg">Netsukefile</code> is the heart of your build configuration. It is a YAML document with explicit top-level keys and controlled Jinja expansion inside values.
             {% endcall %}{% raw %}
 
             <!-- Anatomy Section -->
             <section id="anatomy" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
                     Anatomy of a Manifest
                 </h2>
 
@@ -79,68 +79,68 @@ defaults:
 
             <!-- Core Fields Table -->
             <section id="common-attributes" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
                     Common Attributes
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     These fields show up frequently across rules, targets, and actions. They define identity, reuse, and execution behaviour.
                 </p>
 
-                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto [contain:inline-size]">
-                    <table class="min-w-full divide-y divide-stone-light prop-table">
-                        <thead class="bg-boxwood-pale">
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size]">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Attribute</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Type</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Description</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Attribute</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Type</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Description</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-stone-light">
+                        <tbody class="bg-white hm-rows">
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">netsuke_version</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">netsuke_version</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">String</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-vermillion/10 text-vermillion mb-1">Required</span><br>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent/10 text-accent mb-1">Required</span><br>
                                     Declares which manifest schema version the file follows.
                                 </td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">vars</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">vars</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">Mapping</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
                                     Global strings, numbers, booleans, or lists available to Jinja. Keys named <code class="bg-stone-light/30 px-1 rounded">env</code> or <code class="bg-stone-light/30 px-1 rounded">glob</code> are rejected at parse time because they would shadow the built-in helpers.
                                 </td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">macros[]</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">macros[]</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">List of Mapping</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
                                     Named Jinja macros, each with a <code class="bg-stone-light/30 px-1 rounded">signature</code> and a <code class="bg-stone-light/30 px-1 rounded">body</code>, registered before other fields render.
                                 </td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">rules[].name</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">rules[].name</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">String</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
                                     Names a reusable command or script template that targets can reference.
                                 </td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">targets[].sources</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">targets[].sources</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">String or List</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
                                     Lists the input files or previously generated outputs required by a target.
                                 </td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">description</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">description</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">String</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
                                     On a rule, the text Ninja shows in its progress display. On a target or action, discovery metadata surfaced by <code class="bg-stone-light/30 px-1 rounded">netsuke help targets</code>.
                                 </td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">defaults</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">defaults</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">List of String</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">
                                     Lists the target or action names built when <code class="bg-stone-light/30 px-1 rounded">netsuke</code> runs without explicit targets. Entries are literal names; Jinja expressions are not rendered in this field.
@@ -154,7 +154,7 @@ defaults:
             <!-- Inline command deep dive -->
             <section id="inline-commands" class="mb-16">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal flex items-center">
+                    <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
                         Inline commands and scripts
                     </h2>
                 </div>
@@ -166,8 +166,8 @@ defaults:
                 <div class="grid lg:grid-cols-2 gap-8 mb-8">
                     <!-- Example -->
                     <div>
-                        <h4 class="font-serif font-bold text-charcoal mb-4">Basic Usage</h4>
-                        <div class="bg-charcoal rounded-lg border border-charcoal-mid shadow-lg p-5 font-mono text-sm overflow-x-auto text-stone-light">
+                        <h4 class="font-serif font-bold text-base-content mb-4">Basic Usage</h4>
+                        <div class="bg-base-content rounded-lg border border-charcoal-mid shadow-lg p-5 font-mono text-sm overflow-x-auto text-stone-light">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
 targets:
   - name: "page.html"
@@ -178,13 +178,13 @@ targets:
     command: "cat {{ ins }} > {{ outs }}"
 {% endraw %}{% endhighlight %}{% raw %}
                         </div>
-                        <div class="mt-4 p-4 bg-boxwood-pale border border-stone rounded-lg">
-                            <h5 class="text-sm font-bold text-charcoal mb-2">Common placeholders</h5>
+                        <div class="mt-4 p-4 bg-base-100 border border-base-300 rounded-lg">
+                            <h5 class="text-sm font-bold text-base-content mb-2">Common placeholders</h5>
                             <ul class="text-sm text-charcoal-mid space-y-2">
-                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">{{ ins }}</code> <span>Space-separated list of quoted input paths</span></li>
-                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">{{ outs }}</code> <span>Space-separated list of quoted output paths</span></li>
-                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">vars</code> <span>Global and target-local values exposed to Jinja rendering</span></li>
-                                <li class="flex items-start"><code class="font-mono text-indigo w-24 shrink-0 whitespace-nowrap">$PATH</code> <span>Shell dollars are written normally; Netsuke escapes them for Ninja. <code>$in</code>/<code>$out</code> are not Netsuke placeholders &mdash; use the markers above.</span></li>
+                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">{{ ins }}</code> <span>Space-separated list of quoted input paths</span></li>
+                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">{{ outs }}</code> <span>Space-separated list of quoted output paths</span></li>
+                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">vars</code> <span>Global and target-local values exposed to Jinja rendering</span></li>
+                                <li class="flex items-start"><code class="font-mono text-primary w-24 shrink-0 whitespace-nowrap">$PATH</code> <span>Shell dollars are written normally; Netsuke escapes them for Ninja. <code>$in</code>/<code>$out</code> are not Netsuke placeholders &mdash; use the markers above.</span></li>
                             </ul>
                             <p class="text-xs text-charcoal-light mt-3">On POSIX and Bash routes a marker may sit unquoted, single-quoted, or double-quoted, but not inside a command substitution or backticks. In PowerShell, use markers unquoted; quoted and command-substitution marker sites are rejected rather than risking a context escape.</p>
                         </div>
@@ -192,39 +192,39 @@ targets:
 
                     <!-- Attributes -->
                     <div>
-                        <h4 class="font-serif font-bold text-charcoal mb-4">Specific Attributes</h4>
+                        <h4 class="font-serif font-bold text-base-content mb-4">Specific Attributes</h4>
                         <div class="space-y-4">
-                            <div class="border-l-2 border-indigo pl-4 py-1">
+                            <div class="border-l-2 border-primary pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
-                                    <code class="font-mono font-bold text-indigo">name</code>
+                                    <code class="font-mono font-bold text-primary">name</code>
                                     <span class="text-xs text-charcoal-light font-mono text-right">String (single-output) or<br>List of String (multi-output)</span>
                                 </div>
                                 <p class="text-sm text-charcoal-mid mt-1">Primary output path for this target. For single-output targets, use a String. For multi-output targets, use a List of Strings; all listed paths are produced by the same target and share a single identity in the build graph. Dependencies and <code class="bg-stone-light/30 px-1 rounded">sources</code> entries refer to the target as a whole, not to individual output paths.</p>
                             </div>
-                            <div class="border-l-2 border-indigo pl-4 py-1">
+                            <div class="border-l-2 border-primary pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
-                                    <code class="font-mono font-bold text-indigo">sources</code>
+                                    <code class="font-mono font-bold text-primary">sources</code>
                                     <span class="text-xs text-charcoal-light font-mono">String or List</span>
                                 </div>
                                 <p class="text-sm text-charcoal-mid mt-1">Input file path(s) required to build this target. If a <code>sources</code> entry matches another target's <code>name</code>, an implicit dependency on that target is created. For multi-output targets (where <code>name</code> is a List of Strings), the lookup checks each string in the list; a match on any of them creates a dependency on the target as a whole. To depend on a specific output of a multi-output target, reference the exact output path as it appears in the target's <code>name</code> list.</p>
                             </div>
-                            <div class="border-l-2 border-indigo pl-4 py-1">
+                            <div class="border-l-2 border-primary pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
-                                    <code class="font-mono font-bold text-indigo">command</code>
+                                    <code class="font-mono font-bold text-primary">command</code>
                                     <span class="text-xs text-charcoal-light font-mono">String or List of String</span>
                                 </div>
                                 <p class="text-sm text-charcoal-mid mt-1">One shell command string, or an ordered list of commands run in declaration order and stopped at the first non-zero exit &mdash; the fail-fast behaviour of a handwritten <code>&amp;&amp;</code> chain. Each entry sees the same Jinja context; use <code>{{ ins }}</code> for quoted inputs and <code>{{ outs }}</code> for quoted outputs. An empty command list is rejected at parse time.</p>
                             </div>
-                            <div class="border-l-2 border-indigo pl-4 py-1">
+                            <div class="border-l-2 border-primary pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
-                                    <code class="font-mono font-bold text-indigo">script</code>
+                                    <code class="font-mono font-bold text-primary">script</code>
                                     <span class="text-xs text-charcoal-light font-mono">String (multiline)</span>
                                 </div>
                                 <p class="text-sm text-charcoal-mid mt-1">A multi-line script interpreted by the selected recipe shell: <code>/bin/sh -e</code> on Unix, so any line failing aborts the step, and Windows PowerShell on Windows unless <code>NETSUKE_WINDOWS_SHELL=bash</code> selects the Bash compatibility route. Mutually exclusive with <code>command</code> and <code>rule</code>.</p>
                             </div>
-                            <div class="border-l-2 border-indigo pl-4 py-1">
+                            <div class="border-l-2 border-primary pl-4 py-1">
                                 <div class="flex items-baseline justify-between">
-                                    <code class="font-mono font-bold text-indigo">deps</code>
+                                    <code class="font-mono font-bold text-primary">deps</code>
                                     <span class="text-xs text-charcoal-light font-mono">String or List</span>
                                 </div>
                                 <p class="text-sm text-charcoal-mid mt-1">Implicit dependencies: they affect freshness and ordering but are not appended to the recipe. Declared per target or action; reusable rules reject <code>deps</code>. Pair with <code>dependency_order: serial</code> to run the list in declaration order.</p>
@@ -236,53 +236,53 @@ targets:
 
             <!-- Best Practices -->
             <section id="best-practices" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
                     Best Practices
                 </h2>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">Granularity is Key</h3>
+                            <h3 class="font-bold text-base-content">Granularity is Key</h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             Keep targets small. Instead of one huge <code class="font-mono text-xs bg-stone-light/30 px-1 rounded">compile_all</code> rule, break your project into smaller libraries. This maximizes parallelism and cache hits.
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-matcha flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-success flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:checkmark" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">Use Globs Wisely</h3>
+                            <h3 class="font-bold text-base-content">Use Globs Wisely</h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             <code class="font-mono text-xs bg-stone-light/30 px-1 rounded">glob()</code> is convenient but can be brittle. Explicitly listing sources is often safer for critical libraries, as it prevents accidental inclusion of unwanted files.
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:close" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">Avoid Non-Determinism</h3>
+                            <h3 class="font-bold text-base-content">Avoid Non-Determinism</h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             Don't use timestamps, random numbers, or absolute paths in your build commands. These break caching and make builds unreproducible.
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-4">
-                            <div class="w-8 h-8 rounded-full bg-vermillion flex items-center justify-center text-white mr-3">
+                            <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white mr-3">
                                 <span class="iconify text-sm" data-icon="carbon:close" aria-hidden="true"></span>
                             </div>
-                            <h3 class="font-bold text-charcoal">No Circular Dependencies</h3>
+                            <h3 class="font-bold text-base-content">No Circular Dependencies</h3>
                         </div>
                         <p class="text-sm text-charcoal-mid leading-relaxed">
                             Netsuke enforces a Directed Acyclic Graph (DAG). If package A depends on B, B cannot depend on A. Refactor common code into a third package C.
@@ -293,24 +293,24 @@ targets:
 
             <!-- Related Topics -->
             <section id="related" class="mb-20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Related Topics</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">Related Topics</h2>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <a href="/netsuke/docs/rules-and-targets/" class="block p-6 bg-boxwood-pale rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-indigo transition-all group">
-                        <h3 class="font-bold text-charcoal mb-2 group-hover:text-indigo transition-colors">Rules &amp; Targets</h3>
+                    <a href="/netsuke/docs/rules-and-targets/" class="block p-6 bg-base-100 rounded-xl border border-base-300 shadow-xs hover:shadow-paper hover:border-primary transition-all group">
+                        <h3 class="font-bold text-base-content mb-2 group-hover:text-primary transition-colors">Rules &amp; Targets</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Learn how to define custom macros and rules for your specific needs.</p>
-                        <span class="text-indigo text-xs font-mono font-medium">Read more &rarr;</span>
+                        <span class="text-primary text-xs font-mono font-medium">Read more &rarr;</span>
                     </a>
 
-                    <a href="/netsuke/docs/templating/" class="block p-6 bg-boxwood-pale rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-vermillion transition-all group">
-                        <h3 class="font-bold text-charcoal mb-2 group-hover:text-vermillion transition-colors">Templating</h3>
+                    <a href="/netsuke/docs/templating/" class="block p-6 bg-base-100 rounded-xl border border-base-300 shadow-xs hover:shadow-paper hover:border-accent transition-all group">
+                        <h3 class="font-bold text-base-content mb-2 group-hover:text-accent transition-colors">Templating</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Understand how MiniJinja, <code>foreach</code>, and helper functions shape values inside manifests.</p>
-                        <span class="text-vermillion text-xs font-mono font-medium">Read more &rarr;</span>
+                        <span class="text-accent text-xs font-mono font-medium">Read more &rarr;</span>
                     </a>
 
-                    <a href="/netsuke/docs/configuration/" class="block p-6 bg-boxwood-pale rounded-xl border border-stone shadow-sm hover:shadow-paper hover:border-matcha transition-all group">
-                        <h3 class="font-bold text-charcoal mb-2 group-hover:text-matcha transition-colors">Configuration</h3>
+                    <a href="/netsuke/docs/configuration/" class="block p-6 bg-base-100 rounded-xl border border-base-300 shadow-xs hover:shadow-paper hover:border-success transition-all group">
+                        <h3 class="font-bold text-base-content mb-2 group-hover:text-success transition-colors">Configuration</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Layer CLI flags, environment variables, and config files without hiding what the build does.</p>
-                        <span class="text-matcha text-xs font-mono font-medium">Read more &rarr;</span>
+                        <span class="text-success text-xs font-mono font-medium">Read more &rarr;</span>
                     </a>
                 </div>
             </section>

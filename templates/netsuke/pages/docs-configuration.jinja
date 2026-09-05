@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('configuration') }}{% raw %}
 
@@ -21,8 +21,8 @@
             {% endcall %}{% raw %}
 
             <section id="configuration" class="mb-20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:settings-adjust" aria-hidden="true"></span> Configuration
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:settings-adjust" aria-hidden="true"></span> Configuration
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     When neither <code>--config</code> nor <code>NETSUKE_CONFIG</code> selects a file, Netsuke layers configuration in this order, with later entries overriding earlier ones:
@@ -30,19 +30,19 @@
                     Automatic discovery picks exactly one base file rather than merging system and user scopes, then appends the project layer so project values can override it while fields present only in the winner remain available. An explicit selector bypasses discovery entirely: the selected file replaces the discovered base and project layers, and environment variables and flags still apply on top. A flag on the command line always wins, and project config files can be overridden per-invocation without editing them.
                 </p>
 
-                <div class="bg-amber/5 border border-amber/30 rounded-lg p-4 flex items-start mb-6 max-w-3xl">
-                    <span class="iconify text-amber mt-0.5 mr-3 shrink-0" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
+                <div class="bg-warning/5 border border-warning/30 rounded-lg p-4 flex items-start mb-6 max-w-3xl">
+                    <span class="iconify text-warning mt-0.5 mr-3 shrink-0" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
                     <p class="text-xs text-charcoal-mid">
-                        <strong class="text-charcoal">Note:</strong> The keys below mirror <code>docs/sample-netsuke.toml</code> in the repository as of v{% endraw %}{{ netsuke_version }}{% raw %}.
+                        <strong class="text-base-content">Note:</strong> The keys below mirror <code>docs/sample-netsuke.toml</code> in the repository as of v{% endraw %}{{ netsuke_version }}{% raw %}.
                         Netsuke is pre-1.0 &mdash; some key names and default values may still change before a stable release.
-                        Check the <a href="https://github.com/leynos/netsuke" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">project repository</a> for the latest status.
+                        Check the <a href="https://github.com/leynos/netsuke" class="text-primary underline decoration-primary/40 hover:decoration-primary">project repository</a> for the latest status.
                     </p>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm flex items-center">
-                            <span class="iconify mr-2 text-indigo" data-icon="carbon:document" aria-hidden="true"></span> Config file discovery
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm flex items-center">
+                            <span class="iconify mr-2 text-primary" data-icon="carbon:document" aria-hidden="true"></span> Config file discovery
                         </h3>
                         <p class="text-xs text-charcoal-mid mb-3">An explicit selector bypasses discovery entirely. Selectors are checked in this order:</p>
                         <ol class="space-y-1 text-xs font-mono text-charcoal-mid list-decimal list-inside">
@@ -53,23 +53,23 @@
                         <p class="text-xs text-charcoal-mid mt-3">CLI-only controls such as <code>--config</code>, <code>--directory</code>, and subcommands are not read from configuration files. <code>--directory</code> does not rebase a relative <code>--config</code> or <code>NETSUKE_CONFIG</code> path; pass an absolute selector when it must not depend on the invoking directory.</p>
                         <p class="text-xs text-charcoal-mid mt-3">When discovery finds no file, Netsuke uses its built-in defaults. When it finds a file that cannot be loaded &mdash; malformed TOML, for example &mdash; it reports the load error rather than treating the broken file as absent. An explicit <code>--config</code> or <code>NETSUKE_CONFIG</code> selection that is missing or invalid is likewise an error; Netsuke does not fall back to discovery.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm flex items-center">
-                            <span class="iconify mr-2 text-indigo" data-icon="carbon:parameter" aria-hidden="true"></span> Environment variables
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm flex items-center">
+                            <span class="iconify mr-2 text-primary" data-icon="carbon:parameter" aria-hidden="true"></span> Environment variables
                         </h3>
                         <p class="text-xs text-charcoal-mid mb-3">Settings can be controlled via <code>NETSUKE_</code>-prefixed env vars:</p>
                         <div class="space-y-1.5 text-xs font-mono">
-                            <div><code class="text-matcha">NETSUKE_JOBS</code>=<code class="text-amber">8</code></div>
-                            <div><code class="text-matcha">NETSUKE_LOCALE</code>=<code class="text-amber">es-ES</code></div>
-                            <div><code class="text-matcha">NETSUKE_PROGRESS</code>=<code class="text-amber">never</code></div>
-                            <div><code class="text-matcha">NETSUKE_ACCESSIBILITY</code>=<code class="text-amber">on</code></div>
-                            <div><code class="text-matcha">NETSUKE_EMOJI</code>=<code class="text-amber">never</code></div>
-                            <div><code class="text-matcha">NETSUKE_JSON</code>=<code class="text-amber">1</code></div>
-                            <div><code class="text-matcha">NETSUKE_NO_INPUT</code>=<code class="text-amber">true</code></div>
-                            <div><code class="text-matcha">NETSUKE_DEFAULT_TARGETS__0</code>=<code class="text-amber">hello.txt</code></div>
-                            <div><code class="text-matcha">NETSUKE_NINJA</code>=<code class="text-amber">/opt/ninja/bin/ninja</code></div>
-                            <div><code class="text-matcha">NETSUKE_WINDOWS_SHELL</code>=<code class="text-amber">bash</code></div>
-                            <div><code class="text-matcha">NETSUKE_WHICH_WORKSPACE</code>=<code class="text-amber">0</code></div>
+                            <div><code class="text-success">NETSUKE_JOBS</code>=<code class="text-warning">8</code></div>
+                            <div><code class="text-success">NETSUKE_LOCALE</code>=<code class="text-warning">es-ES</code></div>
+                            <div><code class="text-success">NETSUKE_PROGRESS</code>=<code class="text-warning">never</code></div>
+                            <div><code class="text-success">NETSUKE_ACCESSIBILITY</code>=<code class="text-warning">on</code></div>
+                            <div><code class="text-success">NETSUKE_EMOJI</code>=<code class="text-warning">never</code></div>
+                            <div><code class="text-success">NETSUKE_JSON</code>=<code class="text-warning">1</code></div>
+                            <div><code class="text-success">NETSUKE_NO_INPUT</code>=<code class="text-warning">true</code></div>
+                            <div><code class="text-success">NETSUKE_DEFAULT_TARGETS__0</code>=<code class="text-warning">hello.txt</code></div>
+                            <div><code class="text-success">NETSUKE_NINJA</code>=<code class="text-warning">/opt/ninja/bin/ninja</code></div>
+                            <div><code class="text-success">NETSUKE_WINDOWS_SHELL</code>=<code class="text-warning">bash</code></div>
+                            <div><code class="text-success">NETSUKE_WHICH_WORKSPACE</code>=<code class="text-warning">0</code></div>
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3">Policy values are matched case-insensitively. <code>NETSUKE_JSON</code> accepts <code>true</code>/<code>1</code> and <code>false</code>/<code>0</code>; anything else is a validation error rather than a silent fallback. <code>NETSUKE_NINJA</code> overrides the Ninja executable used by <code>build</code> and <code>clean</code>; empty or non-UTF-8 values fall back to <code>ninja</code> on <code>PATH</code>.</p>
                     </div>
@@ -138,8 +138,8 @@ fetch_block_host = ["metadata.internal"]
             </section>
 
             <section id="diagnostics" class="mb-20 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6 flex items-center">
-                    <span class="iconify text-indigo mr-3 text-lg" data-icon="carbon:debug" aria-hidden="true"></span> Diagnose configuration selection
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:debug" aria-hidden="true"></span> Diagnose configuration selection
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Pass <code>--verbose</code> to see how Netsuke chose its configuration. Structured events on stderr report whether
@@ -149,12 +149,12 @@ fetch_block_host = ["metadata.internal"]
                     and a bounded <code>reason</code>.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm">What a broken file does</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">What a broken file does</h3>
                         <p class="text-xs text-charcoal-mid">A discovered file that cannot be loaded &mdash; malformed TOML, or an <code>extends</code> parent that is missing &mdash; is reported as a load error, not treated as absent. An explicit selector that is missing or invalid is likewise an error; Netsuke never falls back to discovery from an explicit file. The warning records <code>failure_kind</code> as <code>Missing</code> or <code>LoadError</code>.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm">Metrics snapshot</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">Metrics snapshot</h3>
                         <p class="text-xs text-charcoal-mid">With <code>--verbose</code>, Netsuke emits one final <code>metrics snapshot</code> debug event before exiting: bounded counters and histograms for configuration loading (<code>config_load_total</code>, <code>config_load_duration_seconds</code>), cached discovery, raw CLI path validation, and legacy recipe execution. It is an in-process diagnostic record, not a metrics endpoint. JSON mode suppresses all of this tracing so stderr stays a single machine-readable document.</p>
                     </div>
                 </div>

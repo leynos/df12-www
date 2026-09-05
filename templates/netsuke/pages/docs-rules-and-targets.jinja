@@ -14,7 +14,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar('rules-and-targets') }}{% raw %}
 
@@ -30,45 +30,45 @@
 
             <!-- Conceptual Overview -->
             <section id="concepts" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">The Build Graph</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">The Build Graph</h2>
                 <div class="grid lg:grid-cols-2 gap-8 mb-8">
-                    <div class="prose text-charcoal-mid">
+                    <div class="text-charcoal-mid">
                         <p class="mb-4">
-                            Netsuke constructs a Directed Acyclic Graph (DAG) where nodes are targets and edges are dependencies. When you run <code class="bg-stone-light/30 px-1 rounded text-sm text-indigo">netsuke build app</code>, the system:
+                            Netsuke constructs a Directed Acyclic Graph (DAG) where nodes are targets and edges are dependencies. When you run <code class="bg-stone-light/30 px-1 rounded text-sm text-primary">netsuke build app</code>, the system:
                         </p>
-                        <ol class="list-decimal pl-5 space-y-2 mb-6 marker:text-indigo marker:font-bold">
+                        <ol class="list-decimal pl-5 space-y-2 mb-6 marker:text-primary marker:font-bold">
                             <li>Parses the manifest for the requested target.</li>
                             <li>Identifies all transitive dependencies.</li>
                             <li>Constructs the action graph (commands to run).</li>
                             <li>Executes actions in parallel, topologically sorted.</li>
                         </ol>
-                        <div class="p-4 bg-boxwood-pale border border-stone rounded-lg flex items-start space-x-3">
-                            <span class="iconify text-amber mt-1" data-icon="carbon:idea" aria-hidden="true"></span>
+                        <div class="p-4 bg-base-100 border border-base-300 rounded-lg flex items-start space-x-3">
+                            <span class="iconify text-warning mt-1" data-icon="carbon:idea" aria-hidden="true"></span>
                             <div class="text-sm">
-                                <span class="font-bold text-charcoal block mb-1">Static graph first</span>
+                                <span class="font-bold text-base-content block mb-1">Static graph first</span>
                                 Rules and targets are resolved before execution begins. That is what lets Netsuke hand a concrete plan to Ninja.
                             </div>
                         </div>
                     </div>
 
                     <!-- Graph Visualization Placeholder -->
-                    <div class="bg-white rounded-xl border border-stone shadow-sm p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="bg-white rounded-xl border border-base-300 shadow-xs p-6 flex flex-col items-center justify-center relative overflow-hidden">
                          <div class="absolute inset-0 opacity-[0.03] bg-[url('/netsuke/assets/graphy.png')]"></div>
                          <!-- Simple CSS Graph Representation -->
                          <div class="relative z-10 w-full max-w-xs h-64">
                             <!-- Nodes -->
-                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-10 bg-indigo text-white rounded flex items-center justify-center text-xs font-mono shadow-md border border-indigo-light z-20">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-10 bg-primary text-white rounded flex items-center justify-center text-xs font-mono shadow-md border border-secondary z-20">
                                 app
                             </div>
 
-                            <div class="absolute top-24 left-8 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-sm border border-stone z-20">
+                            <div class="absolute top-24 left-8 w-28 h-10 bg-white text-base-content rounded flex items-center justify-center text-xs font-mono shadow-xs border border-base-300 z-20">
                                 main.o
                             </div>
-                            <div class="absolute top-24 right-8 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-sm border border-stone z-20">
+                            <div class="absolute top-24 right-8 w-28 h-10 bg-white text-base-content rounded flex items-center justify-center text-xs font-mono shadow-xs border border-base-300 z-20">
                                 utils.o
                             </div>
 
-                            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-10 bg-white text-charcoal rounded flex items-center justify-center text-xs font-mono shadow-sm border border-stone z-20">
+                            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-28 h-10 bg-white text-base-content rounded flex items-center justify-center text-xs font-mono shadow-xs border border-base-300 z-20">
                                 compile
                             </div>
 
@@ -93,8 +93,8 @@
             <!-- Defining Rules Section -->
             <section id="defining-rules" class="mb-16">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal">Defining reusable rules</h2>
-                    <span class="text-xs font-mono text-indigo bg-indigo/10 px-2 py-1 rounded">Core</span>
+                    <h2 class="font-serif text-2xl font-bold text-base-content">Defining reusable rules</h2>
+                    <span class="text-xs font-mono text-primary bg-primary/10 px-2 py-1 rounded">Core</span>
                 </div>
 
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
@@ -117,19 +117,19 @@ targets:
 {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">1</div>
-                        <h4 class="font-bold text-charcoal mb-2">Rule name</h4>
+                    <div class="bg-white p-5 rounded-lg border border-base-300 shadow-xs">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mb-3">1</div>
+                        <h4 class="font-bold text-base-content mb-2">Rule name</h4>
                         <p class="text-sm text-charcoal-mid">Targets refer to a rule by <code class="font-mono text-xs">name</code>. Keep names short and literal.</p>
                     </div>
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">2</div>
-                        <h4 class="font-bold text-charcoal mb-2">Recipe field</h4>
+                    <div class="bg-white p-5 rounded-lg border border-base-300 shadow-xs">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mb-3">2</div>
+                        <h4 class="font-bold text-base-content mb-2">Recipe field</h4>
                         <p class="text-sm text-charcoal-mid">A rule carries exactly one recipe: <code class="font-mono text-xs">command</code> or <code class="font-mono text-xs">script</code>. A <code class="font-mono text-xs">command</code> may be one shell string or an ordered list of commands chained fail-fast with <code class="font-mono text-xs">&amp;&amp;</code>. Rules never declare <code class="font-mono text-xs">deps</code>; dependencies belong on the target or action.</p>
                     </div>
-                    <div class="bg-white p-5 rounded-lg border border-stone shadow-sm">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mb-3">3</div>
-                        <h4 class="font-bold text-charcoal mb-2">Target wiring</h4>
+                    <div class="bg-white p-5 rounded-lg border border-base-300 shadow-xs">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mb-3">3</div>
+                        <h4 class="font-bold text-base-content mb-2">Target wiring</h4>
                         <p class="text-sm text-charcoal-mid">Targets supply the concrete <code class="font-mono text-xs">sources</code>, outputs, and optional per-target variables.</p>
                     </div>
                 </div>
@@ -137,53 +137,53 @@ targets:
 
             <!-- Target Patterns -->
             <section id="target-patterns" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Target fields</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">Target fields</h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Netsuke target references are plain names and paths. The important distinction is between normal dependencies, order-only dependencies, and phony or always-run targets.
                 </p>
 
-                <div class="overflow-x-auto [contain:inline-size] shadow ring-1 ring-black ring-opacity-5 rounded-lg border border-stone-light mb-8">
-                    <table class="min-w-full divide-y divide-stone-light prop-table">
-                        <thead class="bg-boxwood-pale">
+                <div class="overflow-x-auto [contain:inline-size] shadow ring-1 ring-black/5 rounded-lg border border-stone-light mb-8">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Field</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Example</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Meaning</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Field</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Example</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Meaning</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-stone-light">
+                        <tbody class="bg-white hm-rows">
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">sources</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">sources</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">["main.o", "utils.o"]</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Build inputs whose changes should trigger a rebuild.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">deps</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">deps</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">["build"]</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Implicit dependencies that must be built first and do trigger rebuilds, but never appear as recipe arguments. A target or action with a non-empty <code>deps</code> list may omit its recipe and become a dependency-only aggregate.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">vars</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">vars</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">{ opt: "-O2" }</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Values that override global <code>vars</code> for this target only. <code>env</code> and <code>glob</code> are rejected as keys here too.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">order_only_deps</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">order_only_deps</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">["build-dir"]</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Dependencies that must run first but do not trigger rebuilds when they change.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">dependency_order</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">dependency_order</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">serial</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Scheduling policy for the <code>deps</code> list. <code>parallel</code> (the default) keeps Ninja's ordinary concurrent scheduling; <code>serial</code> runs the direct dependencies in declaration order.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">description</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">description</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">"Package a release"</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Discovery metadata shown by <code>netsuke help targets</code>. On a rule, <code>description</code> instead drives Ninja's progress display.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">phony / always</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">phony / always</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">true / false</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Control whether a target is logical only or should run every time.</td>
                             </tr>
@@ -192,16 +192,16 @@ targets:
                 </div>
 
                 <!-- Callout for CLI Usage -->
-                <div class="bg-boxwood-pale border-l-4 border-indigo p-6 rounded-r-lg">
+                <div class="bg-base-100 border-l-4 border-primary p-6 rounded-r-lg">
                     <div class="flex">
-                        <div class="flex-shrink-0">
-                            <span class="iconify text-indigo mt-1" data-icon="carbon:terminal" aria-hidden="true"></span>
+                        <div class="shrink-0">
+                            <span class="iconify text-primary mt-1" data-icon="carbon:terminal" aria-hidden="true"></span>
                         </div>
                         <div class="ml-4">
-                            <h3 class="text-sm font-bold text-charcoal">CLI Tip: Querying Targets</h3>
+                            <h3 class="text-sm font-bold text-base-content">CLI Tip: Querying Targets</h3>
                             <div class="mt-2 text-sm text-charcoal-mid">
-                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke help targets</code> to list the catalogue of targets and actions with their descriptions, and <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">netsuke generate</code> to inspect the plan without running a full build.</p>
-                                <div class="bg-charcoal text-stone-light p-3 rounded font-mono text-xs">
+                                <p class="mb-2">Use <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">netsuke help targets</code> to list the catalogue of targets and actions with their descriptions, and <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">netsuke graph</code> or <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">netsuke generate</code> to inspect the plan without running a full build.</p>
+                                <div class="bg-base-content text-stone-light p-3 rounded font-mono text-xs">
                                     $ netsuke help targets<br>
                                     $ netsuke graph --output build.dot
                                 </div>
@@ -214,8 +214,8 @@ targets:
             <!-- Serial dependency ordering -->
             <section id="serial-ordering" class="mb-16">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal">Serial dependency ordering</h2>
-                    <span class="text-xs font-mono text-matcha bg-matcha/10 px-2 py-1 rounded">Since v0.1.0-beta2</span>
+                    <h2 class="font-serif text-2xl font-bold text-base-content">Serial dependency ordering</h2>
+                    <span class="text-xs font-mono text-success bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta2</span>
                 </div>
 
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
@@ -242,28 +242,28 @@ actions:
       - test
 {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
 
-                <div class="mb-8 bg-boxwood-pale border-l-4 border-matcha p-5 rounded-r-lg">
+                <div class="mb-8 bg-base-100 border-l-4 border-success p-5 rounded-r-lg">
                     <div class="flex items-start">
-                        <span class="text-xs font-mono text-matcha bg-matcha/10 px-2 py-1 rounded mr-4 shrink-0">New in v0.1.0-beta3</span>
+                        <span class="text-xs font-mono text-success bg-success/10 px-2 py-1 rounded mr-4 shrink-0">New in v0.1.0-beta3</span>
                         <p class="text-sm text-charcoal-mid">The <code>all</code> action above has no recipe: its dependencies are the whole workflow, so Netsuke lowers it to a native Ninja <code>phony</code> node with no shell no-op of its own. Any action or target with a non-empty <code>deps</code> list may omit <code>rule</code>, <code>command</code>, and <code>script</code> this way. Prefer it to the old <code>command: ":"</code> idiom.</p>
                     </div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm">What serial ordering guarantees</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">What serial ordering guarantees</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
-                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Direct <code>deps</code> run in declaration order, each starting only after the previous one succeeds.</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Repeated or shared dependencies still execute at most once in the Ninja invocation.</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A failed dependency stops later entries from starting through the serial path.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Direct <code>deps</code> run in declaration order, each starting only after the previous one succeeds.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Repeated or shared dependencies still execute at most once in the Ninja invocation.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A failed dependency stops later entries from starting through the serial path.</span></li>
                         </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-3 text-sm">What to watch for</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">What to watch for</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
-                            <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Only the direct <code>deps</code> list is serialized &mdash; not <code>sources</code>, <code>order_only_deps</code>, or unrelated work. A dependency reachable through another path can still start there; use a dedicated aggregate action when the whole workflow must share one ordered entry point.</span></li>
-                            <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Serial lists with two or more dependencies use Ninja's <code>dyndep</code> support and require Ninja 1.10 or newer.</span></li>
-                            <li class="flex items-start"><span class="iconify text-amber mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Netsuke materializes content-addressed sidecars under <code>.netsuke/dyndep</code>; the paths <code>.netsuke/serial</code> and <code>.netsuke/dyndep</code> are reserved and must not appear in the build graph.</span></li>
+                            <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Only the direct <code>deps</code> list is serialized &mdash; not <code>sources</code>, <code>order_only_deps</code>, or unrelated work. A dependency reachable through another path can still start there; use a dedicated aggregate action when the whole workflow must share one ordered entry point.</span></li>
+                            <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Serial lists with two or more dependencies use Ninja's <code>dyndep</code> support and require Ninja 1.10 or newer.</span></li>
+                            <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Netsuke materializes content-addressed sidecars under <code>.netsuke/dyndep</code>; the paths <code>.netsuke/serial</code> and <code>.netsuke/dyndep</code> are reserved and must not appear in the build graph.</span></li>
                         </ul>
                     </div>
                 </div>
@@ -271,84 +271,84 @@ actions:
 
             <!-- Outputs & Determinism -->
             <section id="determinism" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Outputs &amp; Determinism</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">Outputs &amp; Determinism</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-vermillion/10 flex items-center justify-center text-vermillion mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent mb-4">
                             <span class="iconify" data-icon="carbon:fingerprint-recognition" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-3">Deterministic Output</h3>
+                        <h3 class="font-bold text-base-content mb-3">Deterministic Output</h3>
                         <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
                             Netsuke generates the same static plan from the same manifest and environment. Deterministic manifests make rebuild decisions easier to explain and verify.
                         </p>
                         <ul class="text-sm text-charcoal-mid space-y-2">
-                            <li class="flex items-center"><span class="iconify text-matcha mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Consistent across machines</li>
-                            <li class="flex items-center"><span class="iconify text-matcha mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Bit-for-bit identical builds</li>
-                            <li class="flex items-center"><span class="iconify text-matcha mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Byte-for-byte stable <code>build.ninja</code> output</span></li>
+                            <li class="flex items-center"><span class="iconify text-success mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Consistent across machines</li>
+                            <li class="flex items-center"><span class="iconify text-success mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Bit-for-bit identical builds</li>
+                            <li class="flex items-center"><span class="iconify text-success mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Byte-for-byte stable <code>build.ninja</code> output</span></li>
                         </ul>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-amber/10 flex items-center justify-center text-amber mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning mb-4">
                             <span class="iconify" data-icon="carbon:security" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-3">Validation boundaries</h3>
+                        <h3 class="font-bold text-base-content mb-3">Validation boundaries</h3>
                         <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
                             Schema validation, deterministic plan generation, quoted <code>{{ ins }}</code> and <code>{{ outs }}</code> markers, and a documented recipe-shell contract are the safety story. Build and default-target paths reject <code>$</code>, spaces, colons, <code>|</code>, and control characters because Ninja cannot represent them unambiguously.
                         </p>
-                        <a href="/netsuke/docs/security/" class="text-indigo text-sm font-medium hover:underline">Read Security Model &rarr;</a>
+                        <a href="/netsuke/docs/security/" class="text-primary text-sm font-medium hover:underline">Read Security Model &rarr;</a>
                     </div>
                 </div>
             </section>
 
             <!-- Clean & Incremental Builds -->
             <section id="performance" class="mb-20 pt-8 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Clean and incremental builds</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">Clean and incremental builds</h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     Netsuke does not execute the build itself. It compiles the manifest into a static plan and hands that plan to Ninja, which decides what actually needs to run. How granular the rules and targets are therefore determines how much work an incremental build can skip.
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-indigo/10 flex items-center justify-center text-indigo mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
                             <span class="iconify" data-icon="carbon:play-outline" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-3">Clean build</h3>
+                        <h3 class="font-bold text-base-content mb-3">Clean build</h3>
                         <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
                             With no outputs on disk, every edge in the plan is out of date, so Ninja runs every command once. This is the upper bound on build work: the whole graph, in dependency order.
                         </p>
                         <ul class="text-sm text-charcoal-mid space-y-2">
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Each target's recipe executes exactly once</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordering follows <code class="font-mono text-xs">sources</code>, <code class="font-mono text-xs">deps</code>, and <code class="font-mono text-xs">order_only_deps</code></span></li>
+                            <li class="flex items-start"><span class="iconify text-success mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Each target's recipe executes exactly once</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordering follows <code class="font-mono text-xs">sources</code>, <code class="font-mono text-xs">deps</code>, and <code class="font-mono text-xs">order_only_deps</code></span></li>
                         </ul>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <div class="w-10 h-10 rounded-full bg-matcha/10 flex items-center justify-center text-matcha mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success mb-4">
                             <span class="iconify" data-icon="carbon:renew" aria-hidden="true"></span>
                         </div>
-                        <h3 class="font-bold text-charcoal mb-3">Incremental build</h3>
+                        <h3 class="font-bold text-base-content mb-3">Incremental build</h3>
                         <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
                             Ninja walks the same static graph and compares each edge's declared inputs against its outputs. Only the commands whose inputs changed are re-run, along with whatever depends on their results.
                         </p>
                         <ul class="text-sm text-charcoal-mid space-y-2">
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unchanged subgraphs are skipped, not re-checked command by command</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code class="font-mono text-xs">order_only_deps</code> constrain ordering without forcing a rebuild</span></li>
-                            <li class="flex items-start"><span class="iconify text-matcha mr-2 mt-1 text-xs flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Targets marked <code class="font-mono text-xs">always</code> run regardless of input state</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unchanged subgraphs are skipped, not re-checked command by command</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code class="font-mono text-xs">order_only_deps</code> constrain ordering without forcing a rebuild</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mr-2 mt-1 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Targets marked <code class="font-mono text-xs">always</code> run regardless of input state</span></li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="bg-boxwood-pale border-l-4 border-indigo p-6 rounded-r-lg">
+                <div class="bg-base-100 border-l-4 border-primary p-6 rounded-r-lg">
                     <div class="flex">
-                        <div class="flex-shrink-0">
-                            <span class="iconify text-indigo mt-1" data-icon="carbon:flow" aria-hidden="true"></span>
+                        <div class="shrink-0">
+                            <span class="iconify text-primary mt-1" data-icon="carbon:flow" aria-hidden="true"></span>
                         </div>
                         <div class="ml-4">
-                            <h3 class="text-sm font-bold text-charcoal">Where the cost sits</h3>
+                            <h3 class="text-sm font-bold text-base-content">Where the cost sits</h3>
                             <div class="mt-2 text-sm text-charcoal-mid space-y-2">
-                                <p>All the dynamic work happens once, at generation time. Jinja expansion, <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">foreach</code>, <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">when</code>, and glob resolution are all evaluated before <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">build.ninja</code> is written. The plan Ninja receives contains no conditionals, no string manipulation, and no filesystem discovery, so the execution phase spends its time on dependency checking and on running commands.</p>
-                                <p>Generation is deterministic: the same manifest and environment produce a byte-for-byte identical <code class="font-mono bg-white px-1 py-0.5 rounded border border-stone">build.ninja</code>. An unchanged manifest therefore yields an unchanged plan, and a build with nothing to do collapses to a dependency check with no recipes executed.</p>
+                                <p>All the dynamic work happens once, at generation time. Jinja expansion, <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">foreach</code>, <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">when</code>, and glob resolution are all evaluated before <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">build.ninja</code> is written. The plan Ninja receives contains no conditionals, no string manipulation, and no filesystem discovery, so the execution phase spends its time on dependency checking and on running commands.</p>
+                                <p>Generation is deterministic: the same manifest and environment produce a byte-for-byte identical <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">build.ninja</code>. An unchanged manifest therefore yields an unchanged plan, and a build with nothing to do collapses to a dependency check with no recipes executed.</p>
                             </div>
                         </div>
                     </div>

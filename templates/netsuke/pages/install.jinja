@@ -28,12 +28,12 @@
 {% endblock %}
 {% block content %}
 {% raw %}
-<main id="main-content" class="flex-grow pt-24 pb-20 site-container">
+<main id="main-content" class="grow pt-24 pb-20 site-container">
 
         <!-- Hero Section -->
         <header id="install-hero" class="mb-16 text-center max-w-3xl mx-auto">
-            {% endraw %}{{ ui.kicker('Get Started · v' ~ netsuke_version, 'mb-6', icon='carbon:download', icon_class='text-indigo') }}{% raw %}
-            <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">Install Netsuke</h1>
+            {% endraw %}{{ ui.kicker('Get Started · v' ~ netsuke_version, 'mb-6', icon='carbon:download', icon_class='text-primary') }}{% raw %}
+            <h1 class="font-serif text-5xl lg:text-6xl font-bold text-base-content mb-6">Install Netsuke</h1>
             <p class="text-xl text-charcoal-mid font-light leading-relaxed mb-8">
                 Install the CLI, make sure <code>ninja</code> is available, and start with a small <code>Netsukefile</code>. Netsuke works best when the first build is boring.
             </p>
@@ -48,17 +48,17 @@
         <section id="install-widget" class="max-w-4xl mx-auto mb-20">
             <div class="hm-card overflow-hidden">
                 <!-- OS Tabs -->
-                <div class="flex border-b border-stone bg-boxwood-pale/50 overflow-x-auto" role="tablist" aria-label="Installation methods">
-                    <button type="button" id="install-tab-cargo" class="tab-btn active px-6 py-4 text-sm font-bold text-charcoal border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="cargo" role="tab" aria-selected="true" aria-controls="install-panel-cargo" tabindex="0">
+                <div class="flex border-b border-base-300 bg-base-100/50 overflow-x-auto" role="tablist" aria-label="Installation methods">
+                    <button type="button" id="install-tab-cargo" class="tab-btn active px-6 py-4 text-sm font-bold text-base-content border-r border-base-300 hover:bg-base-100 transition-colors flex items-center whitespace-nowrap" data-install-tab="cargo" role="tab" aria-selected="true" aria-controls="install-panel-cargo" tabindex="0">
                         <span  class="iconify mr-2" data-icon="carbon:development" aria-hidden="true"></span> Cargo
                     </button>
-                    <button type="button" id="install-tab-linux" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="linux" role="tab" aria-selected="false" aria-controls="install-panel-linux" tabindex="-1">
+                    <button type="button" id="install-tab-linux" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-base-300 hover:bg-base-100 transition-colors flex items-center whitespace-nowrap" data-install-tab="linux" role="tab" aria-selected="false" aria-controls="install-panel-linux" tabindex="-1">
                         <span  class="iconify mr-2" data-icon="carbon:linux" aria-hidden="true"></span> Linux
                     </button>
-                    <button type="button" id="install-tab-macos" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-stone hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="macos" role="tab" aria-selected="false" aria-controls="install-panel-macos" tabindex="-1">
+                    <button type="button" id="install-tab-macos" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid border-r border-base-300 hover:bg-base-100 transition-colors flex items-center whitespace-nowrap" data-install-tab="macos" role="tab" aria-selected="false" aria-controls="install-panel-macos" tabindex="-1">
                         <span  class="iconify mr-2" data-icon="carbon:apple" aria-hidden="true"></span> macOS
                     </button>
-                    <button type="button" id="install-tab-windows" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid hover:bg-boxwood-pale transition-colors flex items-center whitespace-nowrap" data-install-tab="windows" role="tab" aria-selected="false" aria-controls="install-panel-windows" tabindex="-1">
+                    <button type="button" id="install-tab-windows" class="tab-btn px-6 py-4 text-sm font-medium text-charcoal-mid hover:bg-base-100 transition-colors flex items-center whitespace-nowrap" data-install-tab="windows" role="tab" aria-selected="false" aria-controls="install-panel-windows" tabindex="-1">
                         <span  class="iconify mr-2" data-icon="carbon:windows" aria-hidden="true"></span> Windows
                     </button>
                 </div>
@@ -66,40 +66,40 @@
                 <!-- Cargo panel -->
                 <div class="p-8 lg:p-10" id="install-panel-cargo" data-install-panel="cargo" role="tabpanel" aria-labelledby="install-tab-cargo">
                     <div class="mb-8">
-                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Install with Cargo</h3>
-                        <p class="text-charcoal-mid text-sm">Netsuke <span class="font-semibold">v{% endraw %}{{ netsuke_version }}{% raw %}</span> is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Where <a href="https://github.com/cargo-bins/cargo-binstall" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo"><code>cargo binstall</code></a> is available, prefer it: it fetches a prebuilt release binary and avoids the nightly toolchain requirement below. <code>ninja</code> must be installed separately.</p>
+                        <h3 class="font-serif text-2xl font-bold text-base-content mb-2">Install with Cargo</h3>
+                        <p class="text-charcoal-mid text-sm">Netsuke <span class="font-semibold">v{% endraw %}{{ netsuke_version }}{% raw %}</span> is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Where <a href="https://github.com/cargo-bins/cargo-binstall" class="text-primary underline decoration-primary/40 hover:decoration-primary"><code>cargo binstall</code></a> is available, prefer it: it fetches a prebuilt release binary and avoids the nightly toolchain requirement below. <code>ninja</code> must be installed separately.</p>
                     </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper">
+                    <div class="bg-base-content rounded-lg p-6 code-block-wrapper">
                         {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ cargo binstall netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}
                         {% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="mt-6 mb-2">
-                        <h4 class="font-bold text-sm text-charcoal mb-2">Build from crates.io instead</h4>
+                        <h4 class="font-bold text-sm text-base-content mb-2">Build from crates.io instead</h4>
                         <p class="text-charcoal-mid text-xs mb-3">Netsuke builds with the Polonius borrow checker, which recent nightlies enable by default. A registry build runs outside a repository checkout, so it must select the dated Rust nightly toolchain explicitly:</p>
                     </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper">
+                    <div class="bg-base-content rounded-lg p-6 code-block-wrapper">
                         {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ rustup toolchain install nightly-2026-08-23
 $ cargo +nightly-2026-08-23 install netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}
                         {% endraw %}{% endhighlight %}{% raw %}
                     </div>
                     <div class="mt-8 grid md:grid-cols-2 gap-6">
-                        <div class="bg-boxwood-pale p-4 rounded-lg border border-stone">
-                            <h4 class="font-bold text-sm text-charcoal mb-2 flex items-center">
-                                <span  class="iconify mr-2 text-amber" data-icon="carbon:chemistry" aria-hidden="true"></span> Build from a source checkout
+                        <div class="bg-base-100 p-4 rounded-lg border border-base-300">
+                            <h4 class="font-bold text-sm text-base-content mb-2 flex items-center">
+                                <span  class="iconify mr-2 text-warning" data-icon="carbon:chemistry" aria-hidden="true"></span> Build from a source checkout
                             </h4>
-                            <div class="bg-white p-3 rounded border border-stone font-mono text-xs text-charcoal-mid">
+                            <div class="bg-white p-3 rounded border border-base-300 font-mono text-xs text-charcoal-mid">
                                 git clone https://github.com/leynos/netsuke.git<br>
                                 cd netsuke &amp;&amp; cargo install --path .
                             </div>
                             <p class="mt-2 text-xs text-charcoal-mid">The checkout's <code>rust-toolchain.toml</code> selects the pinned nightly automatically, so no toolchain argument is passed here.</p>
                         </div>
-                        <div class="bg-boxwood-pale p-4 rounded-lg border border-stone">
-                            <h4 class="font-bold text-sm text-charcoal mb-2 flex items-center">
-                                <span  class="iconify mr-2 text-indigo" data-icon="carbon:cube" aria-hidden="true"></span> Verify
+                        <div class="bg-base-100 p-4 rounded-lg border border-base-300">
+                            <h4 class="font-bold text-sm text-base-content mb-2 flex items-center">
+                                <span  class="iconify mr-2 text-primary" data-icon="carbon:cube" aria-hidden="true"></span> Verify
                             </h4>
-                            <div class="bg-white p-3 rounded border border-stone font-mono text-xs text-charcoal-mid">
+                            <div class="bg-white p-3 rounded border border-base-300 font-mono text-xs text-charcoal-mid">
                                 netsuke --version
                             </div>
                         </div>
@@ -109,10 +109,10 @@ $ cargo +nightly-2026-08-23 install netsuke-build@{% endraw %}{{ netsuke_version
                 <!-- Linux panel -->
                 <div class="p-8 lg:p-10 hidden" id="install-panel-linux" data-install-panel="linux" role="tabpanel" aria-labelledby="install-tab-linux">
                     <div class="mb-8">
-                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Linux packages</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
+                        <h3 class="font-serif text-2xl font-bold text-base-content mb-2">Linux packages</h3>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
                     </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
+                    <div class="bg-base-content rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
 {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 # Debian or Ubuntu
 $ sudo apt install ./PACKAGE.deb
@@ -127,10 +127,10 @@ $ sudo dnf install ./PACKAGE.rpm
                 <!-- macOS panel -->
                 <div class="p-8 lg:p-10 hidden" id="install-panel-macos" data-install-panel="macos" role="tabpanel" aria-labelledby="install-tab-macos">
                     <div class="mb-8">
-                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">macOS installer package</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
+                        <h3 class="font-serif text-2xl font-bold text-base-content mb-2">macOS installer package</h3>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
                     </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
+                    <div class="bg-base-content rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
 {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 # Install the downloaded package
 $ sudo installer -pkg ./PACKAGE.pkg -target /
@@ -145,10 +145,10 @@ $ brew install ninja
                 <!-- Windows panel -->
                 <div class="p-8 lg:p-10 hidden" id="install-panel-windows" data-install-panel="windows" role="tabpanel" aria-labelledby="install-tab-windows">
                     <div class="mb-8">
-                        <h3 class="font-serif text-2xl font-bold text-charcoal mb-2">Windows installer</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts. On Windows, recipes run in Windows PowerShell by default; set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2 (see the <a href="/netsuke/docs/security/#recipe-shells" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">recipe shell contract</a>). An MSI product version cannot carry a pre-release suffix, so every beta in the 0.1.0 series shares the numeric version <code>0.1.0</code>: installing a later pre-release MSI replaces the existing installation rather than sitting alongside it.</p>
+                        <h3 class="font-serif text-2xl font-bold text-base-content mb-2">Windows installer</h3>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts. On Windows, recipes run in Windows PowerShell by default; set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2 (see the <a href="/netsuke/docs/security/#recipe-shells" class="text-primary underline decoration-primary/40 hover:decoration-primary">recipe shell contract</a>). An MSI product version cannot carry a pre-release suffix, so every beta in the 0.1.0 series shares the numeric version <code>0.1.0</code>: installing a later pre-release MSI replaces the existing installation rather than sitting alongside it.</p>
                     </div>
-                    <div class="bg-charcoal rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light overflow-x-auto">
+                    <div class="bg-base-content rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light overflow-x-auto">
 {% endraw %}{% highlight 'powershell' %}{% raw %}
 # Install the downloaded package
 msiexec.exe /i PACKAGE.msi
@@ -162,11 +162,11 @@ $env:Path = "$env:Path;$dir"
 netsuke --version
 {% endraw %}{% endhighlight %}{% raw %}
                     </div>
-                    <p class="mt-6 text-xs text-charcoal-mid">See the <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#complete-windows-setup" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">complete Windows setup</a> for the idempotent PATH script and the PowerShell help module install.</p>
+                    <p class="mt-6 text-xs text-charcoal-mid">See the <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#complete-windows-setup" class="text-primary underline decoration-primary/40 hover:decoration-primary">complete Windows setup</a> for the idempotent PATH script and the PowerShell help module install.</p>
                 </div>
 
                 <div class="px-8 lg:px-10 pb-8 pt-2 border-t border-stone-light flex items-start gap-3">
-                    <span  class="iconify text-indigo mt-3" data-icon="carbon:information-filled" aria-hidden="true"></span>
+                    <span  class="iconify text-primary mt-3" data-icon="carbon:information-filled" aria-hidden="true"></span>
                     <p class="text-xs text-charcoal-mid pt-2.5">
                         <strong>Note:</strong> Netsuke delegates execution to <code>ninja</code>; make sure it is on your <code>PATH</code>. You may need to restart your terminal after installation for the <code>netsuke</code> command to be recognized.
                     </p>
@@ -182,10 +182,10 @@ netsuke --version
 
                     <!-- Step 1 -->
                     <div class="relative pl-10 border-l-2 border-stone-light">
-                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-sm">1</div>
-                        <h3 class="text-xl font-bold text-charcoal mb-4">Verify Installation</h3>
+                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-base-300 text-base-content font-bold flex items-center justify-center font-serif text-lg shadow-xs">1</div>
+                        <h3 class="text-xl font-bold text-base-content mb-4">Verify Installation</h3>
                         <p class="text-charcoal-mid mb-4">Run the version command to ensure Netsuke is correctly installed and accessible in your path.</p>
-                        <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
+                        <div class="bg-base-content rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
                             {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ netsuke --version
 netsuke {% endraw %}{{ netsuke_version }}{% raw %}
@@ -195,10 +195,10 @@ netsuke {% endraw %}{{ netsuke_version }}{% raw %}
 
                     <!-- Step 2 -->
                     <div class="relative pl-10 border-l-2 border-stone-light">
-                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-sm">2</div>
-                        <h3 class="text-xl font-bold text-charcoal mb-4">Create a Manifest</h3>
+                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-base-300 text-base-content font-bold flex items-center justify-center font-serif text-lg shadow-xs">2</div>
+                        <h3 class="text-xl font-bold text-base-content mb-4">Create a Manifest</h3>
                         <p class="text-charcoal-mid mb-4">Create a <code>Netsukefile</code> in the project root. Start with one rule, one target, and one default.</p>
-                        <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
+                        <div class="bg-base-content rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
 {% endraw %}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 targets:
@@ -212,10 +212,10 @@ defaults: ["hello.txt"]
 
                     <!-- Step 3 -->
                     <div class="relative pl-10 border-l-2 border-stone-light">
-                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-stone text-charcoal font-bold flex items-center justify-center font-serif text-lg shadow-sm">3</div>
-                        <h3 class="text-xl font-bold text-charcoal mb-4">Run Your First Build</h3>
+                        <div class="absolute -left-[21px] top-0 w-10 h-10 rounded-full bg-white border-2 border-base-300 text-base-content font-bold flex items-center justify-center font-serif text-lg shadow-xs">3</div>
+                        <h3 class="text-xl font-bold text-base-content mb-4">Run Your First Build</h3>
                         <p class="text-charcoal-mid mb-4">Execute the default target defined in your manifest. Netsuke validates the manifest, expands templates, writes a Ninja plan, and hands execution over.</p>
-                        <div class="bg-charcoal rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
+                        <div class="bg-base-content rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
                             {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
 $ netsuke build
 [1/1] printf 'hello\n' > hello.txt
@@ -233,31 +233,31 @@ $ netsuke build
 
                 <!-- Troubleshooting Sidebar -->
                 <div class="lg:col-span-4 space-y-8">
-                    <div class="bg-boxwood-pale p-6 rounded-xl border border-stone">
-                        <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                            <span  class="iconify text-amber mr-2 text-sm" data-icon="carbon:tool-box" aria-hidden="true"></span> Troubleshooting
+                    <div class="bg-base-100 p-6 rounded-xl border border-base-300">
+                        <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                            <span  class="iconify text-warning mr-2 text-sm" data-icon="carbon:tool-box" aria-hidden="true"></span> Troubleshooting
                         </h3>
                         <div class="space-y-4">
-                            <div class="p-3 bg-white rounded border border-stone">
-                                <h4 class="font-bold text-sm text-charcoal mb-1">Command not found?</h4>
+                            <div class="p-3 bg-white rounded border border-base-300">
+                                <h4 class="font-bold text-sm text-base-content mb-1">Command not found?</h4>
                                 <p class="text-xs text-charcoal-mid">Ensure <code>~/.cargo/bin</code> or <code>/usr/local/bin</code> is in your PATH environment variable.</p>
                             </div>
-                            <div class="p-3 bg-white rounded border border-stone">
-                                <h4 class="font-bold text-sm text-charcoal mb-1">`ninja` missing?</h4>
+                            <div class="p-3 bg-white rounded border border-base-300">
+                                <h4 class="font-bold text-sm text-base-content mb-1">`ninja` missing?</h4>
                                 <p class="text-xs text-charcoal-mid">Install Ninja separately and make sure it is on your <code>PATH</code>. Netsuke delegates execution to it.</p>
                             </div>
-                            <div class="p-3 bg-white rounded border border-stone">
-                                <h4 class="font-bold text-sm text-charcoal mb-1">Manifest errors?</h4>
+                            <div class="p-3 bg-white rounded border border-base-300">
+                                <h4 class="font-bold text-sm text-base-content mb-1">Manifest errors?</h4>
                                 <p class="text-xs text-charcoal-mid">Start by checking YAML structure first. Netsuke validates YAML before any Jinja rendering happens.</p>
                             </div>
                         </div>
                         <div class="mt-4 pt-4 border-t border-stone-light text-center">
-                            <a href="https://github.com/leynos/netsuke/issues" class="text-xs font-bold text-indigo hover:text-vermillion transition-colors">Visit GitHub Issues &rarr;</a>
+                            <a href="https://github.com/leynos/netsuke/issues" class="text-xs font-bold text-primary hover:text-accent transition-colors">Visit GitHub Issues &rarr;</a>
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                         <h3 class="font-serif text-lg font-bold text-charcoal mb-4">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                         <h3 class="font-serif text-lg font-bold text-base-content mb-4">
                             Manual Download
                         </h3>
                         <p class="text-xs text-charcoal-mid mb-4">The v{% endraw %}{{ netsuke_version }}{% raw %} release ships installers: Debian and RPM packages for Linux (x86-64 and Arm64), a macOS installer package, and a Windows MSI. Ninja must be installed separately on macOS and Windows.</p>
@@ -276,7 +276,7 @@ $ netsuke build
         <section class="py-16 bg-white border-y border-stone-light mb-12">
              <div class="site-container">
                  <div class="max-w-2xl">
-                     <h2 class="font-serif text-3xl font-bold text-charcoal mb-4">Open source</h2>
+                     <h2 class="font-serif text-3xl font-bold text-base-content mb-4">Open source</h2>
                      <p class="text-charcoal-mid mb-6">
                          Netsuke is free and open source. The source, issues, and contribution guide are all on GitHub.
                      </p>
@@ -289,25 +289,25 @@ $ netsuke build
 
         <!-- FAQ Section -->
         <section id="faq" class="max-w-3xl mx-auto">
-            <h2 class="font-serif text-3xl font-bold text-charcoal mb-8 text-center">Common Questions</h2>
+            <h2 class="font-serif text-3xl font-bold text-base-content mb-8 text-center">Common Questions</h2>
 
             <div class="space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                    <h3 class="font-bold text-charcoal text-lg mb-2">Can I install a specific version?</h3>
+                <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                    <h3 class="font-bold text-base-content text-lg mb-2">Can I install a specific version?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +nightly-2026-08-23 install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{% endraw %}{{ netsuke_version }}{% raw %}</code>, not <code>v{% endraw %}{{ netsuke_version }}{% raw %}</code>). Pre-release versions such as <code>{% endraw %}{{ netsuke_version }}{% raw %}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">crates.io</a> for available versions.
+                        Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +nightly-2026-08-23 install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{% endraw %}{{ netsuke_version }}{% raw %}</code>, not <code>v{% endraw %}{{ netsuke_version }}{% raw %}</code>). Pre-release versions such as <code>{% endraw %}{{ netsuke_version }}{% raw %}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="text-primary underline decoration-primary/40 hover:decoration-primary">crates.io</a> for available versions.
                     </p>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                    <h3 class="font-bold text-charcoal text-lg mb-2">How do I update Netsuke?</h3>
+                <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                    <h3 class="font-bold text-base-content text-lg mb-2">How do I update Netsuke?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
                         Re-run <code>cargo binstall netsuke-build@&lt;VERSION&gt;</code> with the new version to fetch its prebuilt release, or run <code>cargo +nightly-2026-08-23 install netsuke-build --force</code> to rebuild from crates.io with the pinned nightly shown above. Either way the existing <code>netsuke</code> binary is replaced.
                     </p>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                    <h3 class="font-bold text-charcoal text-lg mb-2">Does it work with CI/CD?</h3>
+                <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                    <h3 class="font-bold text-base-content text-lg mb-2">Does it work with CI/CD?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
                         Yes. Install Netsuke on your continuous integration (CI) agent via <code>cargo binstall netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}</code> (pin the version in automated workflows) and run <code>netsuke build</code> as a build step. When standard error (stderr) is not a teletype/terminal (TTY), progress falls back to plain text automatically, and <code>--json</code> emits a machine-readable result document. Dedicated CI integrations are planned but not yet available.
                     </p>
@@ -332,7 +332,7 @@ $ netsuke build
                     const active = other === tab;
                     other.classList.toggle('active', active);
                     other.classList.toggle('font-bold', active);
-                    other.classList.toggle('text-charcoal', active);
+                    other.classList.toggle('text-base-content', active);
                     other.classList.toggle('font-medium', !active);
                     other.classList.toggle('text-charcoal-mid', !active);
                     other.setAttribute('aria-selected', String(active));

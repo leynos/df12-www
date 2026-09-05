@@ -6,7 +6,7 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area with Sidebar -->
-    <div class="site-container pt-16 flex-grow flex">
+    <div class="site-container pt-16 grow flex">
 
         {% endraw %}{{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#compiler', 'label': 'A build-system compiler'}, {'href': '#pipeline', 'label': 'The six-stage pipeline'}, {'href': '#static-graph', 'label': 'The static graph mandate'}, {'href': '#ir', 'label': 'The intermediate representation'}, {'href': '#execution', 'label': 'Handing off to Ninja'}, {'href': '#errors', 'label': 'When it breaks'}, {'href': '#crate', 'label': 'Inside the crate'}]},
@@ -24,7 +24,7 @@
 
             <!-- A build-system compiler -->
             <section id="compiler" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">A build-system compiler</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">A build-system compiler</h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Ninja describes itself as an assembler for build systems: deliberately constrained, no string manipulation, no conditionals, built to run builds as fast as possible. That constraint creates a job opening for a higher-level generator. Netsuke fills it.
                 </p>
@@ -32,12 +32,12 @@
                     The manifest describes the <em>what</em> and <em>why</em> of a build &mdash; the project's structure, its logical rules, its configurable parameters. Netsuke compiles that description into a low-level execution plan that Ninja understands. Netsuke manages build logic; Ninja manages execution. Every other design decision follows from that separation.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-2 flex items-center"><span class="iconify text-indigo mr-2" data-icon="carbon:document" aria-hidden="true"></span> Netsuke: the compiler</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-2 flex items-center"><span class="iconify text-primary mr-2" data-icon="carbon:document" aria-hidden="true"></span> Netsuke: the compiler</h3>
                         <p class="text-sm text-charcoal-mid">Parses the manifest, expands templates, validates the graph, and writes <code>build.ninja</code>. All the thinking happens here.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-2 flex items-center"><span class="iconify text-vermillion mr-2" data-icon="carbon:lightning" aria-hidden="true"></span> Ninja: the assembler</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-2 flex items-center"><span class="iconify text-accent mr-2" data-icon="carbon:lightning" aria-hidden="true"></span> Ninja: the assembler</h3>
                         <p class="text-sm text-charcoal-mid">Executes a pre-computed static graph with maximum parallelism. No runtime queries, no surprises. All the running happens here.</p>
                     </div>
                 </div>
@@ -45,63 +45,63 @@
 
             <!-- The six-stage pipeline -->
             <section id="pipeline" class="mb-16">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">The six-stage pipeline</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">The six-stage pipeline</h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     A build transforms the <code>Netsukefile</code> into artefacts through six stages. YAML validity comes first, dynamic logic resolves in the middle, and execution comes last.
                 </p>
                 <div class="space-y-4">
-                    <div class="bg-white p-5 rounded-xl border border-stone shadow-sm flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">1</div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">1</div>
                         <div>
-                            <h3 class="font-bold text-charcoal mb-1">Manifest ingestion</h3>
+                            <h3 class="font-bold text-base-content mb-1">Manifest ingestion</h3>
                             <p class="text-sm text-charcoal-mid">Locate the project manifest and read it into memory as a raw string. Nothing is interpreted yet.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl border border-stone shadow-sm flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">2</div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">2</div>
                         <div>
-                            <h3 class="font-bold text-charcoal mb-1">Initial YAML parsing</h3>
+                            <h3 class="font-bold text-base-content mb-1">Initial YAML parsing</h3>
                             <p class="text-sm text-charcoal-mid">The raw string is parsed with <code>serde_saphyr</code> into an untyped value. The manifest must be valid YAML before any templating takes place &mdash; template errors never masquerade as syntax errors.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl border border-stone shadow-sm flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">3</div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">3</div>
                         <div>
-                            <h3 class="font-bold text-charcoal mb-1">Template expansion</h3>
+                            <h3 class="font-bold text-base-content mb-1">Template expansion</h3>
                             <p class="text-sm text-charcoal-mid">Netsuke walks the parsed value, evaluating Jinja macros, variables, and the <code>foreach</code> and <code>when</code> keys on targets and actions. Control flow lives only in these explicit keys; structural <code>{% ... %}</code> blocks may not reshape mappings or sequences. Variable lookups respect the precedence <code>globals</code> &lt; <code>entry.vars</code> &lt; per-iteration locals.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl border border-stone shadow-sm flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">4</div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">4</div>
                         <div>
-                            <h3 class="font-bold text-charcoal mb-1">Deserialization and final rendering</h3>
+                            <h3 class="font-bold text-base-content mb-1">Deserialization and final rendering</h3>
                             <p class="text-sm text-charcoal-mid">The expanded value is deserialized into strongly typed Rust structs. Jinja expressions render inside string fields only. The structure is now fixed; only the strings were ever negotiable.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl border border-stone shadow-sm flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">5</div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">5</div>
                         <div>
-                            <h3 class="font-bold text-charcoal mb-1">IR generation and validation</h3>
+                            <h3 class="font-bold text-base-content mb-1">IR generation and validation</h3>
                             <p class="text-sm text-charcoal-mid">The typed manifest becomes a canonical intermediate representation: a static dependency graph with every path, command, and dependency explicit. Validation happens here &mdash; referenced rules must exist, each rule carries exactly one of <code>command</code> or <code>script</code>, every target names exactly one recipe, and circular dependencies and missing inputs are rejected.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl border border-stone shadow-sm flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-indigo text-white flex items-center justify-center font-bold text-sm mr-4 flex-shrink-0">6</div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">6</div>
                         <div>
-                            <h3 class="font-bold text-charcoal mb-1">Ninja synthesis and execution</h3>
+                            <h3 class="font-bold text-base-content mb-1">Ninja synthesis and execution</h3>
                             <p class="text-sm text-charcoal-mid">A code generator traverses the validated IR and writes <code>build.ninja</code>, translating nodes and edges into Ninja rule and build statements. Netsuke then invokes <code>ninja</code> as a subprocess and hands over dependency checking and command execution.</p>
                         </div>
                     </div>
                 </div>
-                <div class="mt-8 p-4 bg-boxwood-pale border border-stone rounded-lg flex items-start">
-                    <span class="iconify text-matcha mt-1 mr-3 flex-shrink-0" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
-                    <p class="text-sm text-charcoal-mid"><strong class="text-charcoal">Deterministic by construction.</strong> Given the same <code>Netsukefile</code> and environment variables, the generated <code>build.ninja</code> is byte-for-byte identical &mdash; so long as the manifest avoids impure helpers such as <code>fetch()</code> and <code>shell()</code>, which observe the host at evaluation time, or explicitly declares their outputs as inputs. Under that discipline, reproducible builds fall out for free, and the output is safe to cache or commit.</p>
+                <div class="mt-8 p-4 bg-base-100 border border-base-300 rounded-lg flex items-start">
+                    <span class="iconify text-success mt-1 mr-3 shrink-0" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
+                    <p class="text-sm text-charcoal-mid"><strong class="text-base-content">Deterministic by construction.</strong> Given the same <code>Netsukefile</code> and environment variables, the generated <code>build.ninja</code> is byte-for-byte identical &mdash; so long as the manifest avoids impure helpers such as <code>fetch()</code> and <code>shell()</code>, which observe the host at evaluation time, or explicitly declares their outputs as inputs. Under that discipline, reproducible builds fall out for free, and the output is safe to cache or commit.</p>
                 </div>
             </section>
 
             <!-- The static graph mandate -->
             <section id="static-graph" class="mb-16 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">The static graph mandate</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">The static graph mandate</h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Ninja's incremental-build speed comes from operating on a pre-computed graph and refusing costly runtime operations &mdash; no glob expansion, no string manipulation, no conditionals. A friendlier build system still needs dynamic capability: different flags per platform, source discovery, configuration. Something has to give.
                 </p>
@@ -115,17 +115,17 @@
 
             <!-- The intermediate representation -->
             <section id="ir" class="mb-16 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">The intermediate representation</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">The intermediate representation</h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     The IR is the build graph with nothing left to decide: fully resolved, validated, and canonical. It is also a deliberate decoupling layer between the YAML front-end and the Ninja back-end &mdash; the object code of the Netsuke compiler.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-2">Front-end freedom</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-2">Front-end freedom</h3>
                         <p class="text-sm text-charcoal-mid">The YAML schema can evolve &mdash; even radically &mdash; and as long as the transformation still produces the same stable IR, the Ninja generator never notices.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <h3 class="font-bold text-charcoal mb-2">Back-end freedom</h3>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <h3 class="font-bold text-base-content mb-2">Back-end freedom</h3>
                         <p class="text-sm text-charcoal-mid">Supporting another execution backend means writing one new generator from the IR. The parsing, expansion, and validation front-end is untouched.</p>
                     </div>
                 </div>
@@ -136,37 +136,37 @@
 
             <!-- Handing off to Ninja -->
             <section id="execution" class="mb-16 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Handing off to Ninja</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">Handing off to Ninja</h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Execution is delegated, not abandoned. Netsuke spawns <code>ninja</code> through Rust's <code>std::process::Command</code>, forwarding relevant CLI arguments &mdash; a target name, <code>-j</code> for parallelism &mdash; and capturing stdout and stderr so progress can be streamed back with Netsuke's own status reporting.
                 </p>
                 <ul class="space-y-3 mb-6 max-w-3xl">
-                    <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-3 flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span><span class="text-charcoal-mid text-sm">Directory changes via <code>-C</code> are canonicalized and applied to the child process's working directory rather than forwarded as flags.</span></li>
-                    <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-3 flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span><span class="text-charcoal-mid text-sm">Interpolated values in generated commands are shell-escaped by default, so a filename with a space is a filename with a space, not two arguments.</span></li>
-                    <li class="flex items-start"><span class="iconify text-matcha mt-1 mr-3 flex-shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span><span class="text-charcoal-mid text-sm">Network access from templating (<code>fetch()</code>) is governed by an auditable policy &mdash; HTTPS only by default, widened or narrowed by explicit flags.</span></li>
+                    <li class="flex items-start"><span class="iconify text-success mt-1 mr-3 shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span><span class="text-charcoal-mid text-sm">Directory changes via <code>-C</code> are canonicalized and applied to the child process's working directory rather than forwarded as flags.</span></li>
+                    <li class="flex items-start"><span class="iconify text-success mt-1 mr-3 shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span><span class="text-charcoal-mid text-sm">Interpolated values in generated commands are shell-escaped by default, so a filename with a space is a filename with a space, not two arguments.</span></li>
+                    <li class="flex items-start"><span class="iconify text-success mt-1 mr-3 shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span><span class="text-charcoal-mid text-sm">Network access from templating (<code>fetch()</code>) is governed by an auditable policy &mdash; HTTPS only by default, widened or narrowed by explicit flags.</span></li>
                 </ul>
-                <a href="/netsuke/docs/security/" class="inline-flex items-center text-indigo font-medium hover:text-vermillion transition-colors text-sm">
+                <a href="/netsuke/docs/security/" class="inline-flex items-center text-primary font-medium hover:text-accent transition-colors text-sm">
                     Read the full security model <span class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
                 </a>
             </section>
 
             <!-- When it breaks -->
             <section id="errors" class="mb-16 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">When it breaks</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">When it breaks</h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Errors are not exceptional events; they are part of the development workflow. Every error Netsuke reports sets out to answer three questions:
                 </p>
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <div class="text-indigo font-mono text-sm font-bold mb-2">What went wrong?</div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="text-primary font-mono text-sm font-bold mb-2">What went wrong?</div>
                         <p class="text-sm text-charcoal-mid">A concise summary of the failure. "YAML parsing failed." "Build configuration is invalid."</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm">
-                        <div class="text-indigo font-mono text-sm font-bold mb-2">Where did it go wrong?</div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
+                        <div class="text-primary font-mono text-sm font-bold mb-2">Where did it go wrong?</div>
                         <p class="text-sm text-charcoal-mid">File, line, and column where applicable. "In <code>Netsukefile</code> at line 15, column 3."</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-stone shadow-sm md:col-span-2">
-                        <div class="text-indigo font-mono text-sm font-bold mb-2">Why &mdash; and what can be done about it?</div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs md:col-span-2">
+                        <div class="text-primary font-mono text-sm font-bold mb-2">Why &mdash; and what can be done about it?</div>
                         <p class="text-sm text-charcoal-mid">The underlying cause and a concrete fix. "Cause: found a tab character, which is not allowed. Hint: use spaces for indentation instead."</p>
                     </div>
                 </div>
@@ -177,48 +177,48 @@
 
             <!-- Inside the crate -->
             <section id="crate" class="mb-16 pt-10 border-t border-stone-light">
-                <h2 class="font-serif text-2xl font-bold text-charcoal mb-6">Inside the crate</h2>
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6">Inside the crate</h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     The pipeline maps directly onto the source tree. Each module owns one boundary:
                 </p>
-                <div class="bg-white rounded-lg border border-stone shadow-sm overflow-x-auto [contain:inline-size] mb-6">
-                    <table class="min-w-full divide-y divide-stone-light prop-table">
-                        <thead class="bg-boxwood-pale">
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Module</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-charcoal uppercase tracking-wider">Responsibility</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Module</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Responsibility</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-stone-light">
+                        <tbody class="bg-white hm-rows">
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">src/cli/</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">src/cli/</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Command-line configuration, parsing, validation, and merge logic.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">src/manifest/</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">src/manifest/</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Manifest parsing, expansion, rendering, and diagnostics &mdash; stages one to four.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">src/ir/</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">src/ir/</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Intermediate representation generation, interpolation, graph, and cycle logic &mdash; stage five.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">src/runner/</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">src/runner/</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Process execution, path handling, runner errors, and command orchestration &mdash; stage six.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">src/stdlib/</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">src/stdlib/</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">The standard library exposed to manifest rendering: paths, files, collections, time, command discovery, and network access.</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-indigo">src/localization/</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">src/localization/</td>
                                 <td class="px-6 py-4 text-sm text-charcoal-mid">Fluent-backed localization for user-facing messages.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <p class="text-charcoal-mid max-w-3xl">
-                    For the complete rationale &mdash; schema decisions, the templating trade-offs, error-crate selection, and the CLI design &mdash; read the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-design.md" class="text-indigo hover:text-vermillion font-medium">full design document</a> in the repository.
+                    For the complete rationale &mdash; schema decisions, the templating trade-offs, error-crate selection, and the CLI design &mdash; read the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-design.md" class="text-primary hover:text-accent font-medium">full design document</a> in the repository.
                 </p>
             </section>
 

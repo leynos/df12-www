@@ -91,6 +91,23 @@ def test_the_readiness_poll_retries_until_the_server_answers() -> None:
     )
 
 
+def test_the_readiness_poll_asks_for_the_named_site() -> None:
+    """A tree that serves Weaver but not Netsuke must not pass a Netsuke capture."""
+    attempts: list[str] = []
+
+    def answer(url: str) -> None:
+        """Record the ask and answer it."""
+        attempts.append(url)
+
+    process._await_server(
+        _Running(), "http://127.0.0.1:9999", PORT, _FakeClock(), answer, "netsuke"
+    )
+
+    assert attempts == ["http://127.0.0.1:9999/netsuke/"], (
+        f"the probe should ask for the named sub-site's home page; got {attempts}"
+    )
+
+
 def test_a_server_that_never_answers_gives_up_after_a_bounded_wait() -> None:
     """Fifty attempts rather than forever, and the message names the port."""
     attempts: list[str] = []

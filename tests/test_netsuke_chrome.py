@@ -175,7 +175,7 @@ class TestWindows:
         window = soup.select_one("div.hm-faux-window")
 
         assert window is not None, "the opener renders the window element"
-        assert {"bg-charcoal", "rounded-xl", "border-charcoal-mid"} <= set(
+        assert {"bg-base-content", "rounded-xl", "border-charcoal-mid"} <= set(
             window["class"]
         ), "the default frame is the docs dark card"
         titlebar = window.select_one(".hm-faux-window__titlebar")
@@ -212,7 +212,7 @@ class TestWindows:
         assert "hm-faux-window--card-bleed" in classes, "variant is a modifier"
         assert "mb-8" in classes, "outer_class is appended"
         assert "code-window" in classes, "frame is rendered"
-        assert "bg-charcoal" not in classes, "frame replaces the default outright"
+        assert "bg-base-content" not in classes, "frame replaces the default outright"
         body = window.select_one(".hm-faux-window__body")
         assert body is not None, "the window has a body"
         assert body["class"] == ["hm-faux-window__body", "p-2"], (
@@ -298,7 +298,7 @@ class TestPageHeader:
         """The hero treatment is centred, larger, and can carry an id."""
         soup = _render_macro(
             "{% call chrome.page_header('Hub', 'Guides', hero=true, "
-            "id='guides-hero', dot='bg-amber') %}Lede{% endcall %}"
+            "id='guides-hero', dot='bg-warning') %}Lede{% endcall %}"
         )
         header = soup.select_one("header#guides-hero")
 
@@ -306,7 +306,7 @@ class TestPageHeader:
         assert "text-center" in header["class"], "the hero treatment is centred"
         assert header.h1 is not None, "the header carries an h1"
         assert "lg:text-6xl" in header.h1["class"], "the hero heading is larger"
-        assert header.select_one(".hm-kicker__dot.bg-amber") is not None, (
+        assert header.select_one(".hm-kicker__dot.bg-warning") is not None, (
             "kicker options pass through"
         )
 
@@ -716,7 +716,7 @@ class TestPreviewPagesAndTokens:
 
     def test_accent_chip_is_a_named_modifier(self) -> None:
         """The vermillion chip the Design example uses exists in the stylesheet."""
-        stylesheet = Path("src/static/netsuke/assets/css/himotoshi.css").read_text(
+        stylesheet = Path("src/styles/netsuke/himotoshi.css").read_text(
             encoding="utf-8"
         )
         rule = re.search(r"\.hm-chip--accent\s*\{([^}]*)\}", stylesheet)

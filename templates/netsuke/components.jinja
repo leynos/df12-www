@@ -9,7 +9,7 @@
       {% endraw %}{{ ui.kicker('Reference') }}{% raw %}
 
   The presentation lives in `.hm-kicker` and its modifiers in
-  `src/static/netsuke/assets/css/himotoshi.css`, not in the class strings
+  `src/styles/netsuke/himotoshi.css`, not in the class strings
   here: a macro that merely relocated a utility soup would leave the same
   duplication one indirection further away. See the "Styling" section of
   AGENTS.md.
@@ -24,7 +24,7 @@
   accent      use the docs-hub colouring rather than the default boxwood
   icon        an Iconify icon name, e.g. `carbon:download`
   icon_class  utility classes for the icon, typically a colour
-  dot         a background utility for a leading status dot, e.g. `bg-amber`
+  dot         a background utility for a leading status dot, e.g. `bg-warning`
 #}
 {% macro kicker(label, extra='', accent=false, icon='', icon_class='', dot='') -%}
 <div class="hm-kicker hm-kicker--section{% if accent %} hm-kicker--accent{% endif %}{% if extra %} {{ extra }}{% endif %}">

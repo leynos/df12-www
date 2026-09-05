@@ -93,6 +93,8 @@ Every published file therefore has a source elsewhere in the repository:
 | `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                      |
 | `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                      |
 | `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
+| `stilyagi/assets/styles/stilyagi.css` | Tailwind compiling `src/styles/`                      |
+| `netsuke/assets/css/himotoshi.css`    | Tailwind compiling `src/styles/`                      |
 | `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
 | `*/assets/js/*.js`                    | swc compiling `src/static/**/assets/js/*.ts`          |
 | `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |
@@ -137,12 +139,13 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Five entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Six entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode), `src/styles/mxd.css` for the mxd sub-site (the `mxd`
 theme), `src/styles/episodic.css` for Episodic (the `episodic` theme),
-`src/styles/weaver.css` for Weaver (the `weaver` theme), and
-`src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme).
+`src/styles/weaver.css` for Weaver (the `weaver` theme),
+`src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme), and
+`src/styles/netsuke.css` for Netsuke (the `netsuke` theme).
 
 Weaver's entrypoint is the one to read first when adding a sub-site stylesheet,
 and Episodic's follows the same shape. It declares the theme, then imports
@@ -154,13 +157,17 @@ specificity, so a sub-site stylesheet left unlayered silently outranks the
 utilities in the markup. In the components layer a utility still wins, which is
 what anyone writing `class="mt-8"` expects.
 
-Netsuke still carries hand-crafted stylesheets and does not use daisyUI: it
-loads the **Tailwind Play CDN** at runtime and extends the default theme through
-`/netsuke/assets/js/tailwind-config.js`. The Play CDN is not the compiled
-build: it injects its utilities into a `<style>` tag after the stylesheet link,
-which is why handwritten rules on Netsuke sometimes need the doubled selector
-described below. Its colour tokens live in its own stylesheets, and the
-accessibility rules below apply to it just the same.
+Netsuke was the last sub-site on the **Tailwind Play CDN** and now compiles
+like the rest: `src/styles/netsuke.css` declares the `netsuke` theme and
+imports the hand-written partial `src/styles/netsuke/himotoshi.css` into the
+components layer, with element defaults in `src/styles/netsuke/site-base.css`
+beside the preflight. The partial's `--netsuke-*` variables read from the
+theme rather than restating a colour. Under the CDN its rules used to double a
+selector (`.hm-hero.hm-hero`) to out-specify a utility injected after the
+stylesheet; that idiom is history, and a test refuses it. The one place the
+partial still beats a utility is the phone-width full-bleed block, whose
+`!important` declarations are load-bearing, as Weaver's are. See
+`docs/execplans/netsuke-daisy-migration.md` for what the migration turned up.
 
 Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
 build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which
@@ -180,11 +187,12 @@ rather than run through Pygments, and their `.token-*` colours live in
 `src/styles/weaver/code.css`.
 
 Stilyagi's palette is split by role rather than by hue: `--color-press-red`
-paints fills, borders, and stamps, while red *type* uses `--color-accent-text`,
-which each dark panel re-points from the paper-surface red to the ink-ground
-one (the re-pointing block lives in `src/styles/stilyagi/site-base.css`).
-Because custom properties inherit, setting `--color-accent-text` on a container
-is enough — prefer that over adding a colour at the call site.
+paints fills, borders, and stamps, while red *type* uses
+`--color-accent-text`, which each dark panel re-points from the paper-surface
+red to the ink-ground one (the re-pointing block lives in
+`src/styles/stilyagi/site-base.css`). Because custom properties inherit,
+setting `--color-accent-text` on a container is enough — prefer that over
+adding a colour at the call site.
 
 ### Prefer semantic classes over literal colours
 
@@ -491,6 +499,10 @@ are installed for this and both work without a display:
    neutral. A non-empty diff is
    either a bug or a change that must be described in the commit message.
    Narrow the captured properties with `--props` when the page is large.
+   For a whole sub-site, `scripts/weaver_snapshot.py capture --site <site>`
+   does the same walk over every page from agent-browser, after Iconify has
+   settled, and `diff` normalizes the Tailwind v3/v4 notation differences
+   away; see the Developer's Guide, section 7.
 5. **Run the accessibility audit** over the changed pages, as the
    [Accessibility](#accessibility) section requires.
 

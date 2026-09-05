@@ -1,0 +1,28 @@
+/* Element defaults for the Netsuke sub-site, in the base layer beside
+ * Tailwind's preflight. These describe an element before any class touches
+ * it, so a utility in the markup still wins.
+ *
+ * Each rule below restores something Tailwind v3's preflight left alone and
+ * v4's changes, so the compiled stylesheet renders what the Play CDN did.
+ * They are pins, not design: retire one when the design decides otherwise.
+ */
+
+/* v4's preflight zeroes padding on every element. v3's did not, so table
+   cells kept the user agent's 1px, and the items of a native select popup
+   kept theirs. The templates' cells set their own vertical and right
+   padding and leave the left to this. */
+td,
+th {
+  padding: 1px;
+}
+
+option {
+  padding: 0 2px 1px;
+}
+
+/* v3's preflight gave buttons a pointer; v4's leaves them at the platform
+   default. The sub-site was drawn with the pointer. */
+button,
+[role="button"] {
+  cursor: pointer;
+}

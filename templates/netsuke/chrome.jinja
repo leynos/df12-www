@@ -22,9 +22,9 @@
 #}
 {% macro _traffic_lights() -%}
 <div class="flex space-x-2">
-    <div class="w-3 h-3 rounded-full bg-vermillion"></div>
-    <div class="w-3 h-3 rounded-full bg-amber"></div>
-    <div class="w-3 h-3 rounded-full bg-matcha"></div>
+    <div class="w-3 h-3 rounded-full bg-accent"></div>
+    <div class="w-3 h-3 rounded-full bg-warning"></div>
+    <div class="w-3 h-3 rounded-full bg-success"></div>
 </div>
 {%- endmacro %}
 
@@ -41,7 +41,7 @@
   body_class   replaces the default body inset and type utilities
 #}
 {% macro faux_window_open(label, variant='', outer_class='', frame=none, body_class=none) -%}
-<div class="hm-faux-window{% if variant %} hm-faux-window--{{ variant }}{% endif %} {{ frame if frame is not none else 'bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden' }}{% if outer_class %} {{ outer_class }}{% endif %}">
+<div class="hm-faux-window{% if variant %} hm-faux-window--{{ variant }}{% endif %} {{ frame if frame is not none else 'bg-base-content rounded-xl border border-charcoal-mid shadow-lg overflow-hidden' }}{% if outer_class %} {{ outer_class }}{% endif %}">
     <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
         {{ _traffic_lights() | indent(8) }}
         <span class="text-xs font-mono text-stone-light">{{ label }}</span>
@@ -61,7 +61,7 @@
   `example_terminal_close()`.
 #}
 {% macro example_terminal_open(label='Terminal') -%}
-<div class="hm-example-terminal bg-charcoal rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
+<div class="hm-example-terminal bg-base-content rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
     <div class="hm-example-terminal__titlebar bg-charcoal-mid/30 px-4 py-2 flex items-center justify-between border-b border-white/10">
         {{ _traffic_lights() | indent(8) }}
         <div class="text-xs font-mono text-charcoal-light">{{ label }}</div>
@@ -90,13 +90,13 @@
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
         {%- for crumb in trail %}
         {%- if loop.last %}
-        <li aria-current="page"><div class="flex items-center">{% if not loop.first %}<span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span>{% endif %}<span class="ml-1 font-medium text-charcoal">{{ crumb.label }}</span></div></li>
+        <li aria-current="page"><div class="flex items-center">{% if not loop.first %}<span class="iconify text-base-300 text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span>{% endif %}<span class="ml-1 font-medium text-base-content">{{ crumb.label }}</span></div></li>
         {%- elif loop.first %}
-        <li class="inline-flex items-center"><a href="{{ crumb.href }}" class="inline-flex items-center hover:text-indigo">{{ crumb.label }}</a></li>
+        <li class="inline-flex items-center"><a href="{{ crumb.href }}" class="inline-flex items-center hover:text-primary">{{ crumb.label }}</a></li>
         {%- elif crumb.href %}
-        <li><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><a href="{{ crumb.href }}" class="ml-1 font-medium hover:text-indigo">{{ crumb.label }}</a></div></li>
+        <li><div class="flex items-center"><span class="iconify text-base-300 text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><a href="{{ crumb.href }}" class="ml-1 font-medium hover:text-primary">{{ crumb.label }}</a></div></li>
         {%- else %}
-        <li><div class="flex items-center"><span class="iconify text-stone text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium">{{ crumb.label }}</span></div></li>
+        <li><div class="flex items-center"><span class="iconify text-base-300 text-xs mx-2" data-icon="carbon:chevron-right" aria-hidden="true"></span><span class="ml-1 font-medium">{{ crumb.label }}</span></div></li>
         {%- endif %}
         {%- endfor %}
     </ol>
@@ -122,7 +122,7 @@
 {%- if hero %}
 <header{% if id %} id="{{ id }}"{% endif %} class="text-center max-w-3xl mx-auto mb-16">
     {{ ui.kicker(kicker, 'mb-6', accent=accent, icon=icon, icon_class=icon_class, dot=dot) }}
-    <h1 class="font-serif text-5xl lg:text-6xl font-bold text-charcoal mb-6">{{ title }}</h1>
+    <h1 class="font-serif text-5xl lg:text-6xl font-bold text-base-content mb-6">{{ title }}</h1>
     <p class="text-xl text-charcoal-mid font-light leading-relaxed">
         {{ caller() | trim }}
     </p>
@@ -130,7 +130,7 @@
 {%- else %}
 <header{% if id %} id="{{ id }}"{% endif %} class="mb-12 border-b border-stone-light pb-8">
     {{ ui.kicker(kicker, 'mb-4', accent=accent, icon=icon, icon_class=icon_class, dot=dot) }}
-    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">{{ title }}</h1>
+    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-base-content mb-6">{{ title }}</h1>
     <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
         {{ caller() | trim }}
     </p>

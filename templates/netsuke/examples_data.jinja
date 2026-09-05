@@ -236,7 +236,7 @@ defaults:
     'github': 'https://github.com/leynos/netsuke/tree/main/examples/hello-world',
     'category': 'Basics',
     'cat_icon': 'carbon:play-filled',
-    'cat_colour': 'text-amber',
+    'cat_colour': 'text-warning',
     'image': '/netsuke/assets/example-card-photo-1551288049.jpg',
     'description': 'The smallest useful Netsuke manifest in this repository. Demonstrates `vars`, inline target commands, source files, and default outputs without any reusable rule machinery.',
     'chips': ['vars', 'defaults', 'inline commands'],
@@ -256,7 +256,7 @@ defaults:
     'github': 'https://github.com/leynos/netsuke/blob/main/examples/website.yml',
     'category': 'Web',
     'cat_icon': 'carbon:application-web',
-    'cat_colour': 'text-amber',
+    'cat_colour': 'text-warning',
     'image': '/netsuke/assets/example-card-photo-1507238691740.jpg',
     'description': 'Compile Markdown pages with Pandoc, then assemble a shared index page from the same sources. Shows `foreach`, `order_only_deps`, and reusable rules in one small manifest.',
     'chips': ['pandoc', 'foreach', 'order_only_deps'],
@@ -276,7 +276,7 @@ defaults:
     'github': 'https://github.com/leynos/netsuke/blob/main/examples/photo_edit.yml',
     'category': 'Media',
     'cat_icon': 'carbon:image',
-    'cat_colour': 'text-matcha',
+    'cat_colour': 'text-success',
     'image': '/netsuke/assets/example-card-photo-1633525287515.jpg',
     'description': 'Convert RAW photos into JPEG output, then regenerate a gallery page from the converted files. Shows `foreach`, `always`, and a preview action.',
     'chips': ['darktable-cli', 'always', 'actions'],
@@ -296,7 +296,7 @@ defaults:
     'github': 'https://github.com/leynos/netsuke/blob/main/examples/visual_design.yml',
     'category': 'Design',
     'cat_icon': 'carbon:pen-fountain',
-    'cat_colour': 'text-vermillion',
+    'cat_colour': 'text-accent',
     'image': '/netsuke/assets/example-card-photo-1618005182384.jpg',
     'description': 'Rasterise listed SVG designs from `design/svg/` into PNG output with Inkscape. Shows variable-driven tooling, templated output names, and a clean action without hiding the graph in helper scripts.',
     'chips': ['inkscape', 'foreach', 'order_only_deps'],
@@ -316,7 +316,7 @@ defaults:
     'github': 'https://github.com/leynos/netsuke/blob/main/examples/basic_c.yml',
     'category': 'C / C++',
     'cat_icon': 'carbon:terminal',
-    'cat_colour': 'text-amber',
+    'cat_colour': 'text-warning',
     'image': '/netsuke/assets/example-card-photo-1518770660439.jpg',
     'description': 'A small C build expressed in plain YAML. Reuse one compile rule, link two object files, and let Netsuke translate the graph for Ninja.',
     'chips': ['gcc', 'rules', 'actions'],
@@ -353,15 +353,15 @@ defaults:
 
 {% macro card(ex) %}
             <article class="hm-card hm-card--interactive overflow-hidden flex flex-col h-full" data-example-card data-category="{{ ex.category }}">
-                <div class="h-48 bg-charcoal relative overflow-hidden group">
-                     <div class="absolute inset-0 bg-[url('{{ ex.image }}')] bg-cover bg-center opacity-95"></div>
+                <div class="h-48 bg-base-content relative overflow-hidden group">
+                     <div class="absolute inset-0 bg-cover bg-center opacity-95" style="background-image: url('{{ ex.image }}')"></div>
                     <div class="absolute top-4 right-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-mono text-white border border-white/20">
                         <span class="iconify mr-1 {{ ex.cat_colour }} inline" data-icon="{{ ex.cat_icon }}" aria-hidden="true"></span> {{ ex.category }}
                     </div>
                 </div>
-                <div class="p-6 flex flex-col flex-grow">
+                <div class="p-6 flex flex-col grow">
                     <div class="mb-4">
-                        <h3 class="font-serif text-xl font-bold text-charcoal mb-2">{{ ex.title }}</h3>
+                        <h3 class="font-serif text-xl font-bold text-base-content mb-2">{{ ex.title }}</h3>
                         <p class="text-sm text-charcoal-mid line-clamp-3">
                             {{ ex.description }}
                         </p>
@@ -374,12 +374,12 @@ defaults:
                     </div>
 
                     <div class="mt-auto pt-6 border-t border-stone-light flex justify-between items-center">
-                        <a href="{{ ex.href }}" class="text-indigo font-bold text-sm hover:text-indigo-light flex items-center">
+                        <a href="{{ ex.href }}" class="text-primary font-bold text-sm hover:text-secondary flex items-center">
                             Read Guide <span class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
                         </a>
                         <div class="flex space-x-3">
-                            <button type="button" class="text-stone hover:text-charcoal transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-text="{{ ex.snippet | forceescape }}"><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
-                            <a href="{{ ex.github }}" class="text-stone hover:text-charcoal transition-colors" title="View on GitHub"><span class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
+                            <button type="button" class="text-base-300 hover:text-base-content transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-text="{{ ex.snippet | forceescape }}"><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+                            <a href="{{ ex.github }}" class="text-base-300 hover:text-base-content transition-colors" title="View on GitHub"><span class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
                         </div>
                     </div>
                 </div>
@@ -414,12 +414,12 @@ defaults:
 {% endif %}
 {% endfor %}
 {% if ns.next %}
-                <div class="bg-indigo rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+                <div class="bg-primary rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
                     <div class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                     <h3 class="font-serif text-lg font-bold mb-2 relative z-10">Up Next</h3>
                     <p class="text-indigo-100 text-sm mb-4 relative z-10">{{ ns.next.description }}</p>
                     <a href="{{ ns.next.href }}" class="block bg-white/10 backdrop-blur border border-white/20 rounded-lg p-3 hover:bg-white/20 transition-colors relative z-10">
-                        <div class="flex justify-between items-center mb-1"><span class="text-xs font-mono text-amber">{{ ns.next.category }}</span><span class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span></div>
+                        <div class="flex justify-between items-center mb-1"><span class="text-xs font-mono text-warning">{{ ns.next.category }}</span><span class="iconify text-xs opacity-70" data-icon="carbon:arrow-right" aria-hidden="true"></span></div>
                         <div class="font-bold text-sm">{{ ns.next.title }}</div>
                     </a>
                 </div>
@@ -432,7 +432,7 @@ defaults:
 #}
 {% macro example_header(key) %}
 {%- for ex in examples if ex.key == key %}
-        <header id="example-header" class="mb-12 border-b border-stone pb-12">
+        <header id="example-header" class="mb-12 border-b border-base-300 pb-12">
             <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
                 <div class="max-w-3xl">
                     <div class="flex items-center space-x-3 mb-4">
@@ -440,7 +440,7 @@ defaults:
                         <span class="hm-chip hm-chip--muted">{{ ex.level }}</span>
                         <span class="hm-chip hm-chip--success"><span class="iconify" data-icon="carbon:checkmark" aria-hidden="true"></span> Reviewed syntax</span>
                     </div>
-                    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-charcoal mb-6">{{ ex.title }}</h1>
+                    <h1 class="font-serif text-4xl lg:text-5xl font-bold text-base-content mb-6">{{ ex.title }}</h1>
                     <p class="text-xl text-charcoal-mid font-light leading-relaxed">
                         {{ ex.lede }}
                     </p>

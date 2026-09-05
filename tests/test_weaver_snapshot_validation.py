@@ -19,6 +19,7 @@ if typ.TYPE_CHECKING:
     from pathlib import Path
 
 normalize = load("weaver_snapshot_normalize")
+document = load("weaver_snapshot_document")
 
 
 def test_a_parsed_snapshot_renders_without_touching_the_filesystem() -> None:
@@ -33,7 +34,7 @@ def test_a_parsed_snapshot_renders_without_touching_the_filesystem() -> None:
             }
         },
     }
-    rendered = normalize._rendered_tree(payload)
+    rendered = document._rendered_tree(payload)
 
     assert "--tw-ring-color" not in rendered, (
         f"the Tailwind internal survived into {rendered!r}"
@@ -61,7 +62,7 @@ def test_an_unusable_snapshot_names_the_file_it_came_from(
     snapshot.write_text(content, encoding="utf-8")
 
     with pytest.raises(SystemExit) as caught:
-        normalize._normalized_tree(snapshot)
+        document._normalized_tree(snapshot)
 
     message = str(caught.value.code)
     assert str(snapshot) in message, (
@@ -75,7 +76,7 @@ def test_a_missing_snapshot_exits_rather_than_raising_oserror(tmp_path: Path) ->
     absent = tmp_path / "gone.json"
 
     with pytest.raises(SystemExit) as caught:
-        normalize._normalized_tree(absent)
+        document._normalized_tree(absent)
 
     assert str(absent) in str(caught.value.code), (
         f"the message should name the file; got {caught.value.code!r}"
@@ -129,7 +130,7 @@ def test_a_snapshot_that_is_not_the_expected_shape_says_where(
     snapshot.write_text(json.dumps({"payload": {"tree": shape}}), encoding="utf-8")
 
     with pytest.raises(SystemExit) as caught:
-        normalize._normalized_tree(snapshot)
+        document._normalized_tree(snapshot)
 
     message = str(caught.value.code)
     assert str(snapshot) in message, (
@@ -158,8 +159,27 @@ def test_a_well_formed_snapshot_is_still_accepted(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    rendered = normalize._normalized_tree(snapshot)
+    rendered = document._normalized_tree(snapshot)
 
     assert "rgba(1, 2, 3, 1.000)" in rendered, (
         f"the tree should have normalized rather than been rejected; got {rendered!r}"
     )
+
+
+def test_a_malformed_snapshot_says_where_and_what_in_attributes() -> None:
+    """A caller can read the node, the expectation, and the finding without parsing."""
+    with pytest.raises(document.MalformedSnapshotError) as caught:
+        document._check_node(
+            {"tag": "html", "children": [{"styleDiff": 3}]}, "payload.tree"
+        )
+    error = caught.value
+    assert error.where == "payload.tree.children[0].styleDiff", (
+        "the breadcrumb names the node"
+    )
+    assert error.expected == "a mapping or absent", "what the harness assumed"
+    assert error.actual == "int", "what it found instead"
+    assert isinstance(error, document.SnapshotError), "it is a snapshot error first"
+    assert (
+        str(error)
+        == "payload.tree.children[0].styleDiff is int, not a mapping or absent"
+    ), "the message is built from the three attributes, in that order"

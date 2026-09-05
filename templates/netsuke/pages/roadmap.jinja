@@ -5,10 +5,10 @@
 {% block content %}
 {% raw %}
     <!-- Main Content Area -->
-    <main id="main-content" class="flex-grow pt-24 pb-20 site-container w-full">
+    <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Header Section -->
-        {% endraw %}{% call chrome.page_header('Current version v' ~ netsuke_version, 'Roadmap', hero=true, dot='bg-amber') %}
+        {% endraw %}{% call chrome.page_header('Current version v' ~ netsuke_version, 'Roadmap', hero=true, dot='bg-warning') %}
             v{{ netsuke_version }} is a useful preview for early adopters, not a declaration that Netsuke is finished.
             This page tracks what shipped, what is honestly still rough, and the order of the work ahead.
         {% endcall %}{% raw %}
@@ -21,56 +21,56 @@
                 <!-- Shipped -->
                 <section id="shipped">
                     <div class="flex items-center mb-8">
-                        <div class="w-10 h-10 rounded-full bg-matcha/10 text-matcha flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center mr-4">
                             <span class="iconify" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Shipped in v{% endraw %}{{ netsuke_version }}{% raw %}</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">Shipped in v{% endraw %}{{ netsuke_version }}{% raw %}</h2>
                     </div>
                     <p class="text-charcoal-mid mb-6 max-w-3xl">
                         The core build-system compiler is implemented and packaged for Linux, macOS, and Windows.
-                        The public beta releases so far cover the following; items marked <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span> are new in this release.
+                        The public beta releases so far cover the following; items marked <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span> are new in this release.
                     </p>
                     <div class="grid md:grid-cols-2 gap-4">
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
-                            <h3 class="font-bold text-charcoal text-sm mb-2">Manifest language</h3>
+                        <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs">
+                            <h3 class="font-bold text-base-content text-sm mb-2">Manifest language</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>YAML 1.2 parsing with duplicate-key and schema validation</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Jinja variables, macros, <code>foreach</code>, <code>when</code>, and globbing</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Environment helpers, executable discovery, and opt-in network helpers</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Rules, targets, actions, defaults, and explicit, implicit, and order-only dependencies</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordered <code>command</code> lists with fail-fast <code>&amp;&amp;</code> chaining, and <code>description</code> metadata on rules, targets, and actions</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency-only aggregates: an action or target with a non-empty <code>deps</code> list may omit its recipe <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordinary shell dollars: write <code>$PATH</code> as-is; Netsuke escapes it for Ninja after lowering the <code>{{ ins }}</code> and <code>{{ outs }}</code> markers <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>YAML 1.2 parsing with duplicate-key and schema validation</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Jinja variables, macros, <code>foreach</code>, <code>when</code>, and globbing</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Environment helpers, executable discovery, and opt-in network helpers</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Rules, targets, actions, defaults, and explicit, implicit, and order-only dependencies</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordered <code>command</code> lists with fail-fast <code>&amp;&amp;</code> chaining, and <code>description</code> metadata on rules, targets, and actions</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency-only aggregates: an action or target with a non-empty <code>deps</code> list may omit its recipe <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordinary shell dollars: write <code>$PATH</code> as-is; Netsuke escapes it for Ninja after lowering the <code>{{ ins }}</code> and <code>{{ outs }}</code> markers <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
                             </ul>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
-                            <h3 class="font-bold text-charcoal text-sm mb-2">Compiler &amp; execution</h3>
+                        <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs">
+                            <h3 class="font-bold text-base-content text-sm mb-2">Compiler &amp; execution</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A deterministic build graph with duplicate-output, missing-rule, and cycle checks</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ninja generation and execution, plus <code>clean</code> and standalone manifest generation</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency graphs as Graphviz DOT or self-contained, accessible HTML</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Serial dependency ordering with <code>dependency_order: serial</code>, backed by Ninja dyndep</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Windows legacy recipes run in Windows PowerShell by default, with an explicit Git Bash or MSYS2 compatibility route <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>UTF-8 build-file and working-directory paths are required, with a clear diagnostic otherwise <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A deterministic build graph with duplicate-output, missing-rule, and cycle checks</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ninja generation and execution, plus <code>clean</code> and standalone manifest generation</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency graphs as Graphviz DOT or self-contained, accessible HTML</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Serial dependency ordering with <code>dependency_order: serial</code>, backed by Ninja dyndep</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Windows legacy recipes run in Windows PowerShell by default, with an explicit Git Bash or MSYS2 compatibility route <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>UTF-8 build-file and working-directory paths are required, with a clear diagnostic otherwise <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
                             </ul>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
-                            <h3 class="font-bold text-charcoal text-sm mb-2">Operator experience</h3>
+                        <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs">
+                            <h3 class="font-bold text-base-content text-sm mb-2">Operator experience</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Layered configuration, localized output, and accessibility preferences</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Progress reporting, stage timings, and versioned JSON results or diagnostics</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A <code>netsuke help targets</code> catalogue of targets and actions, now listing conditional entries without rendering recipe bodies <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Configuration-selection diagnostics, cached configuration discovery, and bounded metrics under <code>--verbose</code></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Thirty-five locale catalogues; beta3 adds a published <a href="/netsuke/guides/translating/#style-and-terminology" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">localization style guide and glossary</a> <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Layered configuration, localized output, and accessibility preferences</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Progress reporting, stage timings, and versioned JSON results or diagnostics</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A <code>netsuke help targets</code> catalogue of targets and actions, now listing conditional entries without rendering recipe bodies <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Configuration-selection diagnostics, cached configuration discovery, and bounded metrics under <code>--verbose</code></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Thirty-five locale catalogues; beta3 adds a published <a href="/netsuke/guides/translating/#style-and-terminology" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization style guide and glossary</a> <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
                             </ul>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-stone shadow-sm">
-                            <h3 class="font-bold text-charcoal text-sm mb-2">Confidence &amp; packaging</h3>
+                        <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs">
+                            <h3 class="font-bold text-base-content text-sm mb-2">Confidence &amp; packaging</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unit, behavioural, integration, property, snapshot, and initial Kani verification coverage</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Packages for Linux (<code>.deb</code>, <code>.rpm</code>), macOS (<code>.pkg</code>), and Windows (<code>.msi</code>)</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Jinja <code>glob()</code> rejects matched filenames that cannot be inserted as one portable unquoted shell word <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A Windows CI job covering lint, compile, and test alongside the Linux and macOS matrix <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-matcha mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Unit, behavioural, integration, property, snapshot, and initial Kani verification coverage</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Packages for Linux (<code>.deb</code>, <code>.rpm</code>), macOS (<code>.pkg</code>), and Windows (<code>.msi</code>)</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Jinja <code>glob()</code> rejects matched filenames that cannot be inserted as one portable unquoted shell word <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A Windows CI job covering lint, compile, and test alongside the Linux and macOS matrix <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
                             </ul>
                         </div>
                     </div>
@@ -79,10 +79,10 @@
                 <!-- Known limitations -->
                 <section id="limitations">
                     <div class="flex items-center mb-8">
-                        <div class="w-10 h-10 rounded-full bg-amber/10 text-amber flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 rounded-full bg-warning/10 text-warning flex items-center justify-center mr-4">
                             <span class="iconify" data-icon="carbon:warning-alt" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Known limitations</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">Known limitations</h2>
                     </div>
                     <p class="text-charcoal-mid mb-6 max-w-3xl">
                         The compiler pipeline and ordinary local-build workflow are substantial; the command-line interface,
@@ -90,34 +90,34 @@
                         automation and expect some command names, flags, diagnostic schemas, and manifest details to change before 1.0.
                         The following limitations apply to v{% endraw %}{{ netsuke_version }}{% raw %}.
                     </p>
-                    <div class="bg-white rounded-xl border border-stone shadow-sm divide-y divide-stone-light">
+                    <div class="bg-white rounded-xl border border-base-300 shadow-xs hm-rows">
                         <div class="p-5 flex items-start">
-                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:terminal" aria-hidden="true"></span>
+                            <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:terminal" aria-hidden="true"></span>
                             <p class="text-sm text-charcoal-mid">Recipes remain shell strings: Unix scripts use <code>/bin/sh -e</code>, Windows legacy recipes use Windows PowerShell by default, and the Windows Bash compatibility route is an explicit opt-in. Structured executable arguments and recipe environment mappings are not implemented yet.</p>
                         </div>
                         <div class="p-5 flex items-start">
-                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:currency-dollar" aria-hidden="true"></span>
-                            <p class="text-sm text-charcoal-mid">Beta3 fixes beta2's shell-dollar limitation with Ninja-aware escaping, so ordinary shell expressions are written normally. Beta2 manifests that spelled <code>$$PATH</code> or used the <code>$in</code>/<code>$out</code> placeholders need migration to <code>$PATH</code> and <code>{{ ins }}</code>/<code>{{ outs }}</code>; see the <a href="/netsuke/docs/security/#shell-dollars" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">safety boundary</a>.</p>
+                            <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:currency-dollar" aria-hidden="true"></span>
+                            <p class="text-sm text-charcoal-mid">Beta3 fixes beta2's shell-dollar limitation with Ninja-aware escaping, so ordinary shell expressions are written normally. Beta2 manifests that spelled <code>$$PATH</code> or used the <code>$in</code>/<code>$out</code> placeholders need migration to <code>$PATH</code> and <code>{{ ins }}</code>/<code>{{ outs }}</code>; see the <a href="/netsuke/docs/security/#shell-dollars" class="text-primary underline decoration-primary/40 hover:decoration-primary">safety boundary</a>.</p>
                         </div>
                         <div class="p-5 flex items-start">
-                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:flow-connection" aria-hidden="true"></span>
+                            <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:flow-connection" aria-hidden="true"></span>
                             <p class="text-sm text-charcoal-mid">Compiler-generated dependency imports, such as GCC depfiles, are planned but not yet part of the manifest model.</p>
                         </div>
                         <div class="p-5 flex items-start">
-                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:json" aria-hidden="true"></span>
+                            <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:json" aria-hidden="true"></span>
                             <p class="text-sm text-charcoal-mid"><span><code>--json</code> emits exactly one versioned result or diagnostic document per command, but the schema may still change before 1.0.</span></p>
                         </div>
                         <div class="p-5 flex items-start">
-                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:accessibility" aria-hidden="true"></span>
+                            <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:accessibility" aria-hidden="true"></span>
                             <p class="text-sm text-charcoal-mid">Accessibility still needs assistive-technology verification, and terminal rendering needs regression coverage.</p>
                         </div>
                         <div class="p-5 flex items-start">
-                            <span class="iconify text-amber mt-1 mr-3 shrink-0" data-icon="carbon:color-palette" aria-hidden="true"></span>
+                            <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:color-palette" aria-hidden="true"></span>
                             <p class="text-sm text-charcoal-mid">Colour rendering is not implemented: <code>--color</code> affects mode selection but does not add coloured terminal text.</p>
                         </div>
                     </div>
-                    <div class="mt-4 bg-vermillion/5 border border-vermillion/20 rounded-lg p-4 flex items-start">
-                        <span class="iconify text-vermillion mt-0.5 mr-3 shrink-0" data-icon="carbon:security" aria-hidden="true"></span>
+                    <div class="mt-4 bg-accent/5 border border-accent/20 rounded-lg p-4 flex items-start">
+                        <span class="iconify text-accent mt-0.5 mr-3 shrink-0" data-icon="carbon:security" aria-hidden="true"></span>
                         <p class="text-xs text-charcoal-mid">
                             A <code>Netsukefile</code> can execute commands and use impure template helpers. Treat it with the same care
                             as a <code>Makefile</code>: review untrusted manifests before running them. Netsuke quotes supported path
@@ -129,142 +129,142 @@
                 <!-- The road ahead -->
                 <section id="road-ahead">
                     <div class="flex items-center mb-8">
-                        <div class="w-10 h-10 rounded-full bg-indigo/10 text-indigo flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-4">
                             <span class="iconify" data-icon="carbon:road" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">The road ahead</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">The road ahead</h2>
                     </div>
                     <p class="text-charcoal-mid mb-8 max-w-3xl">
                         Work after the first release is organized around three near-term priorities and a set of larger capability tracks, each validating one hypothesis.
-                        The <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">detailed roadmap</a>
+                        The <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">detailed roadmap</a>
                         tracks the task-level sequence; completed foundations live in a separate archive so the active list stays honest.
                         Two of the capability tracks have their own preview write-ups on the
-                        <a href="/netsuke/forthcoming/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">forthcoming capabilities</a> pages.
+                        <a href="/netsuke/forthcoming/" class="text-primary underline decoration-primary/40 hover:decoration-primary">forthcoming capabilities</a> pages.
                     </p>
 
                     <div class="space-y-6">
                         <!-- Phase 3 -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Stabilize the command-line contract</h3>
+                                    <h3 class="font-serif text-xl font-bold text-base-content mb-1">Stabilize the command-line contract</h3>
                                     <p class="text-sm text-charcoal-mid">Keep a pleasant, accessible local experience while making every command predictable for CI, editors, and agents.</p>
                                 </div>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-amber mr-1.5"></span> In progress</span>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-warning mr-1.5"></span> In progress</span>
                             </div>
                             <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical command and flag names replacing the pre-0.1.0 surface</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Non-interactive and mutation-safety guarantees (<code>--no-input</code>, <code>--force</code>, <code>--dry-run</code>)</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical structured <code>--json</code> output with stable exit codes and enumerable errors</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Bounded output for every large response</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Assistive-technology verification of accessible output</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Regression coverage for the configuration precedence ladder</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Regression coverage for terminal rendering and colour policy</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical command and flag names replacing the pre-0.1.0 surface</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Non-interactive and mutation-safety guarantees (<code>--no-input</code>, <code>--force</code>, <code>--dry-run</code>)</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Canonical structured <code>--json</code> output with stable exit codes and enumerable errors</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Bounded output for every large response</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Assistive-technology verification of accessible output</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Regression coverage for the configuration precedence ladder</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Regression coverage for terminal rendering and colour policy</span></li>
                             </ul>
                         </div>
 
                         <!-- Recipe model -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Make recipes safer and clearer</h3>
+                                    <h3 class="font-serif text-xl font-bold text-base-content mb-1">Make recipes safer and clearer</h3>
                                     <p class="text-sm text-charcoal-mid">Close the gap between shell-string recipes and a structured, argv-safe recipe model.</p>
                                 </div>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-amber mr-1.5"></span> In progress</span>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-warning mr-1.5"></span> In progress</span>
                             </div>
                             <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured <code>exec</code> recipes for argv-safe commands</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured recipe environment mappings</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Rule-level <code>deps_from</code> for compiler dependency imports (GCC depfiles)</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Backend dollar escaping after placeholder lowering</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency-only aggregates in place of no-op recipes</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Verbose reporting of why manifest-time <code>when</code> branches were included or skipped</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><code>env(name, default=...)</code>, <code>shell_join</code>, and <code>compact</code> helpers for deliberate shell recipes</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured <code>exec</code> recipes for argv-safe commands</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured recipe environment mappings</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Rule-level <code>deps_from</code> for compiler dependency imports (GCC depfiles)</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Backend dollar escaping after placeholder lowering</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency-only aggregates in place of no-op recipes</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Verbose reporting of why manifest-time <code>when</code> branches were included or skipped</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><code>env(name, default=...)</code>, <code>shell_join</code>, and <code>compact</code> helpers for deliberate shell recipes</span></li>
                             </ul>
                         </div>
 
                         <!-- Phase 4 -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Strengthen confidence</h3>
+                                    <h3 class="font-serif text-xl font-bold text-base-content mb-1">Strengthen confidence</h3>
                                     <p class="text-sm text-charcoal-mid">State and check the core compiler invariants strongly enough that future features cannot erode deterministic builds.</p>
                                 </div>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-amber mr-1.5"></span> Started</span>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-warning mr-1.5"></span> Started</span>
                             </div>
                             <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-matcha mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Kani tooling, CI smoke job, and harnesses for manifest-to-IR safety and cycle canonicalization</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Kani harnesses for command interpolation</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Property tests for deterministic Ninja emission, expansion invariants, and render stability</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Documented placeholder and cycle-detection contracts; evaluation of a minimal Verus proof kernel</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Kani tooling, CI smoke job, and harnesses for manifest-to-IR safety and cycle canonicalization</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Kani harnesses for command interpolation</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Property tests for deterministic Ninja emission, expansion invariants, and render stability</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Documented placeholder and cycle-detection contracts; evaluation of a minimal Verus proof kernel</span></li>
                             </ul>
                         </div>
 
                         <!-- Phase 5 -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Compounding features for humans and agents</h3>
+                                    <h3 class="font-serif text-xl font-bold text-base-content mb-1">Compounding features for humans and agents</h3>
                                     <p class="text-sm text-charcoal-mid">Make repeated human, CI, editor, and agent usage improve through introspection, memory, and delivery.</p>
                                 </div>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-stone mr-1.5"></span> Planned</span>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-base-300 mr-1.5"></span> Planned</span>
                             </div>
                             <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Machine-readable context: <code>netsuke context --json</code> and <code>skill-path</code></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A run ledger: <code>runs list</code>, <code>runs get</code>, and <code>runs prune</code></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Named profiles with redaction and secret handling</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured artefact delivery and local-first feedback</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Machine-readable context: <code>netsuke context --json</code> and <code>skill-path</code></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A run ledger: <code>runs list</code>, <code>runs get</code>, and <code>runs prune</code></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Named profiles with redaction and secret handling</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured artefact delivery and local-first feedback</span></li>
                             </ul>
                         </div>
 
                         <!-- Linter -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Netsukefile linter under <code>netsuke check</code></h3>
+                                    <h3 class="font-serif text-xl font-bold text-base-content mb-1">Netsukefile linter under <code>netsuke check</code></h3>
                                     <p class="text-sm text-charcoal-mid">Deterministic manifest linting inspired by mbake: style, correctness, and portability rules over the compiler's own stages; findings never mutate the manifest. Preview targeted at v0.2.0.</p>
                                 </div>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview: v0.2.0</span>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview: v0.2.0</span>
                             </div>
                             <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><code>netsuke check</code> as the canonical validation command, with <code>--json</code> findings</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A stable rule catalogue with per-rule enable, disable, and severity configuration</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A <code>--fail-on</code> threshold, bounded <code>--limit</code> output, and <code>--explain</code> for the rule reference</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><a href="/netsuke/forthcoming/linter/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Read the linter preview &rarr;</a></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><code>netsuke check</code> as the canonical validation command, with <code>--json</code> findings</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A stable rule catalogue with per-rule enable, disable, and severity configuration</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A <code>--fail-on</code> threshold, bounded <code>--limit</code> output, and <code>--explain</code> for the rule reference</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><a href="/netsuke/forthcoming/linter/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Read the linter preview &rarr;</a></span></li>
                             </ul>
                         </div>
 
                         <!-- Testing framework -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Netsukefile testing framework</h3>
+                                    <h3 class="font-serif text-xl font-bold text-base-content mb-1">Netsukefile testing framework</h3>
                                     <p class="text-sm text-charcoal-mid">Manifest-time tests that run through the same compiler as the build: deterministic, mock-friendly, and reported like any other Netsuke command. Preview targeted at v0.4.0.</p>
                                 </div>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-indigo mr-1.5"></span> Preview: v0.4.0</span>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview: v0.4.0</span>
                             </div>
                             <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A <code>netsuke test</code> command and a YAML test dialect beside the manifest</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Mock and fixture engines so tests never touch the real host</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Assertions over the expanded manifest, the graph, and the generated Ninja</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><a href="/netsuke/forthcoming/testing-framework/" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">Read the testing framework preview &rarr;</a></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>A <code>netsuke test</code> command and a YAML test dialect beside the manifest</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Mock and fixture engines so tests never touch the real host</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Assertions over the expanded manifest, the graph, and the generated Ninja</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span><a href="/netsuke/forthcoming/testing-framework/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Read the testing framework preview &rarr;</a></span></li>
                             </ul>
                         </div>
 
                         <!-- Standard library expansion -->
-                        <div class="bg-white rounded-xl border border-stone shadow-sm overflow-hidden">
+                        <div class="bg-white rounded-xl border border-base-300 shadow-xs overflow-hidden">
                             <div class="p-6 border-b border-stone-light flex items-start justify-between gap-4">
                                 <div>
-                                    <h3 class="font-serif text-xl font-bold text-charcoal mb-1">Template standard-library expansion</h3>
+                                    <h3 class="font-serif text-xl font-bold text-base-content mb-1">Template standard-library expansion</h3>
                                     <p class="text-sm text-charcoal-mid">Absorb common manifest operations into the standard library without weakening determinism or the capability boundary.</p>
                                 </div>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-stone mr-1.5"></span> Planned</span>
+                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-base-300 mr-1.5"></span> Planned</span>
                             </div>
                             <ul class="p-6 grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-charcoal-mid list-none">
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured data readers, configuration layering, and build matrices with stable ordering</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Text and version conditions, cross-platform path composition, and query-gated host probes</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Proportionate quality-gate selection from a deterministic Git changeset</span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-stone mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Specified in <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md" class="text-indigo underline decoration-indigo/40 hover:decoration-indigo">RFC 0006</a></span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Structured data readers, configuration layering, and build matrices with stable ordering</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Text and version conditions, cross-platform path composition, and query-gated host probes</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Proportionate quality-gate selection from a deterministic Git changeset</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-base-300 mt-1 mr-2 text-xs" data-icon="carbon:circle-dash" aria-hidden="true"></span> <span>Specified in <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">RFC 0006</a></span></li>
                             </ul>
                         </div>
                     </div>
@@ -275,29 +275,29 @@
             <aside class="lg:col-span-4">
                 <div class="sticky top-24 space-y-8">
                     <!-- Release card -->
-                    <div class="bg-white rounded-xl border border-stone shadow-sm p-6">
-                        <h3 class="font-serif text-lg font-bold text-charcoal mb-4 flex items-center">
-                            <span class="iconify text-matcha mr-2 text-sm" data-icon="carbon:tag" aria-hidden="true"></span> Current release
+                    <div class="bg-white rounded-xl border border-base-300 shadow-xs p-6">
+                        <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
+                            <span class="iconify text-success mr-2 text-sm" data-icon="carbon:tag" aria-hidden="true"></span> Current release
                         </h3>
                         <div class="space-y-3 text-sm">
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-charcoal">v{% endraw %}{{ netsuke_version }}{% raw %}</span></div>
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Release date</span><span class="font-mono text-charcoal">2 September 2026</span></div>
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Licence</span><span class="font-mono text-charcoal">ISC</span></div>
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Rust (source builds)</span><span class="font-mono text-charcoal">nightly-2026-08-23</span></div>
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Crate</span><span class="font-mono text-charcoal">netsuke-build</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-base-content">v{% endraw %}{{ netsuke_version }}{% raw %}</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Release date</span><span class="font-mono text-base-content">2 September 2026</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Licence</span><span class="font-mono text-base-content">ISC</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Rust (source builds)</span><span class="font-mono text-base-content">nightly-2026-08-23</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Crate</span><span class="font-mono text-base-content">netsuke-build</span></div>
                         </div>
                         <div class="mt-5 pt-4 border-t border-stone-light space-y-2">
-                            <a href="https://github.com/leynos/netsuke/releases" class="block w-full py-2 px-4 bg-vermillion text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">Release notes &amp; installers<br>(from 2 September 2026)</a>
-                            <a href="/netsuke/install/" class="block w-full py-2 px-4 bg-transparent border border-stone text-charcoal text-center rounded text-sm font-bold hover:bg-boxwood-pale transition-colors">Install Netsuke</a>
+                            <a href="https://github.com/leynos/netsuke/releases" class="block w-full py-2 px-4 bg-accent text-white text-center rounded text-sm font-bold hover:bg-vermillion-dim transition-colors">Release notes &amp; installers<br>(from 2 September 2026)</a>
+                            <a href="/netsuke/install/" class="block w-full py-2 px-4 bg-transparent border border-base-300 text-base-content text-center rounded text-sm font-bold hover:bg-base-100 transition-colors">Install Netsuke</a>
                         </div>
                     </div>
 
                     <!-- Command vocabulary preview -->
-                    <div class="bg-charcoal rounded-xl overflow-hidden">
+                    <div class="bg-base-content rounded-xl overflow-hidden">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Canonical vocabulary (target state)</div>
                         <div class="p-5 font-mono text-xs text-stone-light space-y-1">
-                            <div><span class="text-stone-light">Shipped:</span> <span class="text-matcha">build</span> · <span class="text-matcha">clean</span> · <span class="text-matcha">generate</span> · <span class="text-matcha">graph</span> · <span class="text-matcha">help targets</span></div>
-                            <div><span class="text-stone-light">Planned:</span> <span class="text-amber">check</span> · <span class="text-amber">test</span> · <span class="text-amber">context</span> · <span class="text-amber">skill-path</span> · <span class="text-amber">runs</span> · <span class="text-amber">profile</span> · <span class="text-amber">feedback</span></div>
+                            <div><span class="text-stone-light">Shipped:</span> <span class="text-success">build</span> · <span class="text-success">clean</span> · <span class="text-success">generate</span> · <span class="text-success">graph</span> · <span class="text-success">help targets</span></div>
+                            <div><span class="text-stone-light">Planned:</span> <span class="text-warning">check</span> · <span class="text-warning">test</span> · <span class="text-warning">context</span> · <span class="text-warning">skill-path</span> · <span class="text-warning">runs</span> · <span class="text-warning">profile</span> · <span class="text-warning">feedback</span></div>
                             <div class="pt-2 text-charcoal-light">--json · --no-input · --force · --dry-run</div>
                             <div class="text-charcoal-light">--limit · --cursor · --output · --deliver</div>
                         </div>
@@ -305,14 +305,14 @@
                     </div>
 
                     <!-- Source links -->
-                    <div class="bg-boxwood-pale rounded-xl border border-stone p-6">
-                        <h3 class="font-serif text-lg font-bold text-charcoal mb-4">Follow the work</h3>
+                    <div class="bg-base-100 rounded-xl border border-base-300 p-6">
+                        <h3 class="font-serif text-lg font-bold text-base-content mb-4">Follow the work</h3>
                         <ul class="space-y-3 text-sm">
-                            <li><a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md" class="text-charcoal-mid hover:text-vermillion transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:roadmap" aria-hidden="true"></span> Detailed roadmap (task level)</a></li>
-                            <li><a href="https://github.com/leynos/netsuke/releases" class="text-charcoal-mid hover:text-vermillion transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> Releases on GitHub</a></li>
-                            <li><a href="https://github.com/leynos/netsuke/issues" class="text-charcoal-mid hover:text-vermillion transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:debug" aria-hidden="true"></span> Issue tracker</a></li>
-                            <li><a href="/netsuke/forthcoming/" class="text-charcoal-mid hover:text-vermillion transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:idea" aria-hidden="true"></span> Forthcoming capability previews</a></li>
-                            <li><a href="/netsuke/guides/contributing/" class="text-charcoal-mid hover:text-vermillion transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:collaborate" aria-hidden="true"></span> Contributing guide</a></li>
+                            <li><a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md" class="text-charcoal-mid hover:text-accent transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:roadmap" aria-hidden="true"></span> Detailed roadmap (task level)</a></li>
+                            <li><a href="https://github.com/leynos/netsuke/releases" class="text-charcoal-mid hover:text-accent transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> Releases on GitHub</a></li>
+                            <li><a href="https://github.com/leynos/netsuke/issues" class="text-charcoal-mid hover:text-accent transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:debug" aria-hidden="true"></span> Issue tracker</a></li>
+                            <li><a href="/netsuke/forthcoming/" class="text-charcoal-mid hover:text-accent transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:idea" aria-hidden="true"></span> Forthcoming capability previews</a></li>
+                            <li><a href="/netsuke/guides/contributing/" class="text-charcoal-mid hover:text-accent transition-colors flex items-center"><span class="iconify mr-2 text-xs" data-icon="carbon:collaborate" aria-hidden="true"></span> Contributing guide</a></li>
                         </ul>
                     </div>
                 </div>

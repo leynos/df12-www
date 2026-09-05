@@ -12,7 +12,7 @@ template::
 The body is dedented, leading and trailing blank lines are stripped, and the
 result is rendered with :class:`pygments.formatters.html.HtmlFormatter`.
 The wrapper CSS class defaults to ``hm-syntax``, styled in
-``src/static/netsuke/assets/css/himotoshi.css``; a sub-site with its own
+``src/styles/netsuke/himotoshi.css``; a sub-site with its own
 syntax palette names its own class as a second argument::
 
     {% highlight 'python', 'stilyagi-syntax' %}

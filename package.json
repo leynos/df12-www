@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",
-    "@happy-dom/global-registrator": "20.11.2",
+    "@happy-dom/global-registrator": "20.11.13",
     "@iconify-json/carbon": "^1.2.25",
     "@swc/core": "^1.16.1",
     "@tailwindcss/cli": "^4.1.15",

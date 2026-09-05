@@ -1644,15 +1644,23 @@ metadata, the text clip, and the node budget; that seven representative
 components on the manifest-reference page render the paint and box edges
 pinned in `tests/__snapshots__/test_netsuke_browser.ambr` at a phone width
 and a desktop one, with the base-layer pins and the phone-width full-bleed
-asserted directly; and that `capture --site netsuke --width 360 --height 800`
-and `shots --site netsuke` run end to end through their command lines. Run it
-alone with:
+asserted directly; that `capture --site netsuke` run through its command line
+at 1280×720 and at 360×800 writes one snapshot per page, and that every page
+so captured renders as `tests/support/netsuke_baseline.json` records — a
+SHA-256 of each page's normalized computed-style tree, the same
+normalization `diff` compares with, at each width, with the build date the
+forthcoming pages stamp into a heading redacted first; and that
+`shots --site netsuke` runs end to end. A page that renders differently fails
+the baseline test by name; capture the last good commit and this one and
+`diff` them to see what moved, and once the change is meant, rerun the test
+with `NETSUKE_BASELINE_UPDATE=1` to rewrite the record in the same commit.
+Run the suite alone with:
 
 ```bash
 uv run pytest tests/test_netsuke_browser.py -v
 ```
 
-Expect it to take around ten minutes including the build: the two
+Expect it to take around fifteen minutes including the build: the three
 command-line runs each visit all 32 pages, `shots` at three widths.
 
 Together they cover every published page at two viewports for the

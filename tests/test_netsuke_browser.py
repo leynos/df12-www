@@ -12,7 +12,10 @@ iterating on something else.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
+import re
 import shutil
 import subprocess
 import typing as typ
@@ -46,6 +49,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_NETSUKE = REPO_ROOT / "public" / SITE
 
 tools = load("weaver_snapshot_tools")
+document = load("weaver_snapshot_document")
 
 # One docs page that carries each of the shapes the migration had to pin: a
 # faux window inside a section (the phone-width full-bleed block), a table
@@ -316,20 +320,40 @@ def test_the_walker_reports_what_the_capture_relies_on(
     )
 
 
-@pytest.mark.timeout(900)
-def test_the_capture_command_snapshots_the_netsuke_site_at_a_phone_width(
-    built_site: Path, tmp_path: Path
-) -> None:
-    """Run ``capture`` as an operator would, with every new option set.
+# The two viewports the committed baseline is taken at: the capture's own
+# desktop default, which the migration was proved at, and the phone width the
+# narrow media queries show at.
+BASELINE_VIEWPORTS = {
+    "desktop": (tools.CAPTURE_WIDTH, tools.CAPTURE_HEIGHT),
+    "phone": (MOBILE_WIDTH, MOBILE_HEIGHT),
+}
+BASELINE = REPO_ROOT / "tests" / "support" / "netsuke_baseline.json"
+UPDATE_BASELINE = "NETSUKE_BASELINE_UPDATE"
+
+# The one thing on a page that changes from build to build without the page
+# changing: the forthcoming pages stamp the build date into a heading.
+BUILD_DATE = re.compile(r"Status on \d{1,2} [A-Z][a-z]+ \d{4}")
+
+
+@pytest.fixture(scope="module", params=sorted(BASELINE_VIEWPORTS))
+def captured(
+    request: pytest.FixtureRequest,
+    built_site: Path,
+    tmp_path_factory: pytest.TempPathFactory,
+) -> tuple[str, Path]:
+    """Run ``capture --site netsuke`` once per viewport, as an operator would.
 
     ``--site`` selects the tree and the page list, ``--width`` and
     ``--height`` size the viewport; the settle wait and the walker run inside
     agent-browser. Everything between the command line and the JSON on disk
-    is exercised here as one, and the snapshots must say how they were taken.
+    is exercised as one, and the snapshots serve both the command's own test
+    and the baseline comparison.
     """
     del built_site  # the fixture is the build; the tree it returns is Weaver's
     uv_exe = shutil.which("uv") or pytest.skip("uv is not on PATH")
-    out_dir = tmp_path / "snapshots"
+    name = request.param
+    width, height = BASELINE_VIEWPORTS[name]
+    out_dir = tmp_path_factory.mktemp(f"capture-{name}") / "snapshots"
     completed = subprocess.run(  # noqa: S603 - fixed argv, no shell
         [
             uv_exe,
@@ -340,9 +364,9 @@ def test_the_capture_command_snapshots_the_netsuke_site_at_a_phone_width(
             "--site",
             SITE,
             "--width",
-            str(MOBILE_WIDTH),
+            str(width),
             "--height",
-            str(MOBILE_HEIGHT),
+            str(height),
             str(out_dir),
         ],
         cwd=REPO_ROOT,
@@ -354,7 +378,16 @@ def test_the_capture_command_snapshots_the_netsuke_site_at_a_phone_width(
     assert completed.returncode == 0, (
         f"capture exited {completed.returncode}: {completed.stderr[-2000:]}"
     )
+    return name, out_dir
 
+
+@pytest.mark.timeout(900)
+def test_the_capture_command_snapshots_every_netsuke_page(
+    captured: tuple[str, Path],
+) -> None:
+    """The command writes one snapshot per page that says how it was taken."""
+    name, out_dir = captured
+    width, height = BASELINE_VIEWPORTS[name]
     written = sorted(out_dir.glob("*.json"))
     assert len(written) == len(PAGES), (
         f"expected one snapshot per Netsuke page ({len(PAGES)}), got "
@@ -362,10 +395,7 @@ def test_the_capture_command_snapshots_the_netsuke_site_at_a_phone_width(
     )
     for snapshot in written:
         payload = json.loads(snapshot.read_text(encoding="utf-8"))
-        assert payload["meta"]["viewport"] == {
-            "width": MOBILE_WIDTH,
-            "height": MOBILE_HEIGHT,
-        }, (
+        assert payload["meta"]["viewport"] == {"width": width, "height": height}, (
             f"{snapshot.name} was not laid out at the viewport asked for: "
             f"{payload['meta']['viewport']}"
         )
@@ -375,9 +405,61 @@ def test_the_capture_command_snapshots_the_netsuke_site_at_a_phone_width(
         assert payload["payload"]["tree"]["children"], (
             f"{snapshot.name} carries no rendered tree"
         )
-        assert payload["payload"]["tree"]["bbox"]["width"] <= MOBILE_WIDTH, (
-            f"{snapshot.name}'s document is wider than the phone viewport"
+        assert payload["payload"]["tree"]["bbox"]["width"] <= width, (
+            f"{snapshot.name}'s document is wider than the viewport"
         )
+
+
+def _digest(snapshot: Path) -> str:
+    """Hash a snapshot's normalized tree, with the build date redacted."""
+    rendered = BUILD_DATE.sub(
+        "Status on <build date>", document._normalized_tree(snapshot)
+    )
+    return hashlib.sha256(rendered.encode("utf-8")).hexdigest()
+
+
+@pytest.mark.timeout(900)
+def test_every_page_renders_as_the_committed_baseline(
+    captured: tuple[str, Path],
+) -> None:
+    """Every Netsuke page, at both widths, renders as the committed record says.
+
+    The migration was proved by a diff against the Play CDN rendering, which
+    no longer exists in the tree. This is that proof's standing successor: a
+    digest of each page's normalized computed-style tree — the same
+    normalization ``diff`` compares with — committed in
+    ``tests/support/netsuke_baseline.json``. A page that renders differently
+    fails here by name; ``scripts/weaver_snapshot.py capture`` and ``diff``
+    then show what moved, and once the change is meant, running this test
+    with ``NETSUKE_BASELINE_UPDATE=1`` rewrites the record for the commit
+    that makes it. The build date the forthcoming pages stamp into a heading
+    is the one accepted difference, and it is redacted before hashing.
+    """
+    name, out_dir = captured
+    digests = {path.stem: _digest(path) for path in sorted(out_dir.glob("*.json"))}
+    recorded = (
+        json.loads(BASELINE.read_text(encoding="utf-8")) if BASELINE.is_file() else {}
+    )
+    if os.environ.get(UPDATE_BASELINE):
+        recorded[name] = digests
+        BASELINE.write_text(
+            json.dumps(recorded, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        pytest.skip(
+            f"{BASELINE.name} rewritten for {name}; rerun without {UPDATE_BASELINE}"
+        )
+    expected = recorded.get(name, {})
+    changed = sorted(slug for slug in digests if digests[slug] != expected.get(slug))
+    missing = sorted(set(expected) - set(digests))
+    differing = changed or missing
+    assert not differing, (
+        f"at {name} width these pages no longer render as the committed baseline "
+        f"records: {differing}. Capture with `scripts/weaver_snapshot.py "
+        f"capture --site netsuke --width {BASELINE_VIEWPORTS[name][0]} --height "
+        f"{BASELINE_VIEWPORTS[name][1]} <out-dir>` at the last good commit and at "
+        f"this one and `diff` them; if the change is meant, rerun this test with "
+        f"{UPDATE_BASELINE}=1 to record it."
+    )
 
 
 @pytest.fixture(scope="module")

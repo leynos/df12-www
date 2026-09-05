@@ -265,9 +265,15 @@ def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None
 
     def explode(argv: cabc.Sequence[str]) -> None:
         attempted.append(list(argv))
-        if argv[1] in {"set", "close"}:
+        # The viewport, the blank page the defaults are measured on, and the
+        # close on the way out all succeed; the first selected page does not.
+        if argv[1] in {"set", "close"} or argv[2] == "about:blank":
             return
         raise subprocess.CalledProcessError(1, list(argv))
+
+    def probe(argv: cabc.Sequence[str]) -> str:
+        attempted.append(list(argv))
+        return json.dumps(json.dumps({"base": {}, "deltas": {}}))
 
     with pytest.raises(subprocess.CalledProcessError):
         tools._capture_pages(
@@ -276,12 +282,17 @@ def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None
             "http://x",
             "/usr/bin/agent-browser",
             explode,
-            lambda _argv: "",
+            probe,
             walker="walk()",
             defaults="probe()",
         )
 
-    opened = [argv for argv in attempted if argv[1] == "open"]
+    assert ["eval", "probe()"] in [argv[1:3] for argv in attempted], (
+        "the defaults were measured before the first page was tried"
+    )
+    opened = [
+        argv for argv in attempted if argv[1] == "open" and argv[2] != "about:blank"
+    ]
     assert len(opened) == 1, (
         f"the run should stop at the first failure, but it opened "
         f"{len(opened)} pages: {opened}"

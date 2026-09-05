@@ -72,6 +72,7 @@ from weaver_snapshot_serving import _served
 from weaver_snapshot_tools import (
     CAPTURE_HEIGHT,
     CAPTURE_WIDTH,
+    DEFAULTS,
     SCREENSHOT_WIDTHS,
     WALKER,
     _capture_pages,
@@ -125,9 +126,13 @@ def capture(
     browser = _tool("agent-browser")
     try:
         walker = _walker_expression(_read_walker())
+    except OSError as exc:
+        message = f"the walker at {WALKER} could not be read ({exc})"
+        raise SystemExit(message) from exc
+    try:
         defaults = _read_defaults_probe()
     except OSError as exc:
-        message = f"the walker beside {WALKER} could not be read ({exc})"
+        message = f"the defaults probe at {DEFAULTS} could not be read ({exc})"
         raise SystemExit(message) from exc
     print(f"capturing {len(pages)} {site} pages at {width}x{height} into {out_dir}")
 

@@ -470,8 +470,12 @@ The migration's proof — a diff against a rendering that no longer exists —
 needed a standing successor. `tests/test_netsuke_browser.py` now pins the
 paint and box edges of seven representative components at 360px and 1280px
 as committed syrupy snapshots, asserts the base-layer pins and the
-phone-width full-bleed directly, and runs both `capture` and `shots`
-through their command lines against the built tree.
+phone-width full-bleed directly, runs both `capture` and `shots` through
+their command lines against the built tree, and holds every page to
+`tests/support/netsuke_baseline.json`: a digest of each page's normalized
+tree at 1280px and 360px, taken from the migrated rendering the diff had
+proved equal to the Play CDN's, so the proof survives the baseline it was
+made against.
 
 ## Context and orientation
 

@@ -330,9 +330,11 @@ BASELINE_VIEWPORTS = {
 BASELINE = REPO_ROOT / "tests" / "support" / "netsuke_baseline.json"
 UPDATE_BASELINE = "NETSUKE_BASELINE_UPDATE"
 
-# The one thing on a page that changes from build to build without the page
-# changing: the forthcoming pages stamp the build date into a heading.
+# What changes from build to build without the page changing: the forthcoming
+# pages stamp the build date into a heading, and every footer carries the
+# build year beside the copyright sign.
 BUILD_DATE = re.compile(r"Status on \d{1,2} [A-Z][a-z]+ \d{4}")
+COPYRIGHT_YEAR = re.compile(r"© \d{4} df12")
 
 
 @pytest.fixture(scope="module", params=sorted(BASELINE_VIEWPORTS))
@@ -411,10 +413,11 @@ def test_the_capture_command_snapshots_every_netsuke_page(
 
 
 def _digest(snapshot: Path) -> str:
-    """Hash a snapshot's normalized tree, with the build date redacted."""
+    """Hash a snapshot's normalized tree, with the build date and year redacted."""
     rendered = BUILD_DATE.sub(
         "Status on <build date>", document._normalized_tree(snapshot)
     )
+    rendered = COPYRIGHT_YEAR.sub("© <build year> df12", rendered)
     return hashlib.sha256(rendered.encode("utf-8")).hexdigest()
 
 
@@ -433,14 +436,15 @@ def test_every_page_renders_as_the_committed_baseline(
     then show what moved, and once the change is meant, running this test
     with ``NETSUKE_BASELINE_UPDATE=1`` rewrites the record for the commit
     that makes it. The build date the forthcoming pages stamp into a heading
-    is the one accepted difference, and it is redacted before hashing.
+    and the build year in every footer are the accepted differences, and
+    both are redacted before hashing.
     """
     name, out_dir = captured
     digests = {path.stem: _digest(path) for path in sorted(out_dir.glob("*.json"))}
     recorded = (
         json.loads(BASELINE.read_text(encoding="utf-8")) if BASELINE.is_file() else {}
     )
-    if os.environ.get(UPDATE_BASELINE):
+    if os.environ.get(UPDATE_BASELINE) == "1":
         recorded[name] = digests
         BASELINE.write_text(
             json.dumps(recorded, indent=2, sort_keys=True) + "\n", encoding="utf-8"

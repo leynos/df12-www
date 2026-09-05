@@ -99,10 +99,9 @@ STYLE_PROBE = """(() => {
   return JSON.stringify(out);
 })()""".replace("__SELECTORS__", json.dumps(list(COMPONENT_SELECTORS)))
 
-# Every element in the fixture, plus the iframe the walker adds to read
-# user-agent defaults from; a budget small enough to cut the walk short; and
+# Every element in the fixture; a budget small enough to cut the walk short; and
 # the laid-out width the fixture gives its paragraph.
-WALKER_FIXTURE_ELEMENTS = 11
+WALKER_FIXTURE_ELEMENTS = 10
 WALKER_BUDGET = 3
 CHILD_WIDTH = 120
 
@@ -213,6 +212,16 @@ def test_the_published_tree_holds_exactly_the_netsuke_pages_checked_here(
     )
 
 
+def _walker_with_defaults(drive: cabc.Callable[..., str], expression: str) -> str:
+    """Measure the user-agent defaults on a blank page and fill them in.
+
+    The capture does this once per run before the first page opens; the
+    fixture page is opened afterwards, so the walk appends nothing to it.
+    """
+    drive("open", "about:blank")
+    return tools._with_defaults(expression, drive("eval", tools._read_defaults_probe()))
+
+
 @pytest.mark.timeout(300)
 def test_the_walker_reports_what_the_capture_relies_on(
     drive: cabc.Callable[..., str], tmp_path: Path
@@ -229,8 +238,15 @@ def test_the_walker_reports_what_the_capture_relies_on(
     fixture = tmp_path / "walker.html"
     fixture.write_text(WALKER_FIXTURE, encoding="utf-8")
     drive("set", "viewport", "800", "600")
+    # Both walks are prepared before the fixture opens: the defaults are
+    # measured on a blank page, and the fixture is then only read.
+    source = tools._read_walker()
+    walker = _walker_with_defaults(drive, tools._walker_expression(source))
+    capped_walker = _walker_with_defaults(
+        drive, tools._walker_expression(source, max_nodes=WALKER_BUDGET)
+    )
     drive("open", fixture.as_uri())
-    result = _evaluate(drive, tools._walker_expression(tools._read_walker()))
+    result = _evaluate(drive, walker)
     document = tools._snapshot_document(fixture.as_uri(), json.dumps(result))
     tree = document["payload"]["tree"]
 
@@ -280,14 +296,12 @@ def test_the_walker_reports_what_the_capture_relies_on(
     assert field["name"] == "q", "the name attribute reaches the node"
     assert field["text"] == "typed", "an input reports its value as its text"
     assert document["payload"]["meta"]["visited"] == WALKER_FIXTURE_ELEMENTS, (
-        "html, head, meta, title, style, body, the four in the body, and the "
-        "walker's own iframe make eleven elements; the walk counted "
+        "html, head, meta, title, style, body, and the four in the body make "
+        "ten elements, and the walk appends none of its own; it counted "
         f"{document['payload']['meta']['visited']}"
     )
 
-    capped = _evaluate(
-        drive, tools._walker_expression(tools._read_walker(), max_nodes=WALKER_BUDGET)
-    )
+    capped = _evaluate(drive, capped_walker)
     capped_document = tools._snapshot_document(fixture.as_uri(), json.dumps(capped))
 
     def count(node: dict[str, typ.Any]) -> int:

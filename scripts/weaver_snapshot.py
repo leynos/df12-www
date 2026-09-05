@@ -41,6 +41,7 @@ run by path, so its own directory is on `sys.path`.
 - ``weaver_snapshot_ownership`` — proving whose server answered
 - ``weaver_snapshot_serving``   — ports, the server, and its lifecycle
 - ``weaver_snapshot_tools``     — driving agent-browser, and the walker
+- ``weaver_snapshot_defaults.js`` — the user-agent defaults, measured on a blank page
 - ``weaver_snapshot_walker.js`` — the computed-style walk, run in the page
 - ``weaver_snapshot_colour``    — one colour written one way
 - ``weaver_snapshot_normalize`` — reducing a tree to what is visible
@@ -74,6 +75,7 @@ from weaver_snapshot_tools import (
     SCREENSHOT_WIDTHS,
     WALKER,
     _capture_pages,
+    _read_defaults_probe,
     _read_tool,
     _read_walker,
     _run_tool,
@@ -123,8 +125,9 @@ def capture(
     browser = _tool("agent-browser")
     try:
         walker = _walker_expression(_read_walker())
+        defaults = _read_defaults_probe()
     except OSError as exc:
-        message = f"the walker at {WALKER} could not be read ({exc})"
+        message = f"the walker beside {WALKER} could not be read ({exc})"
         raise SystemExit(message) from exc
     print(f"capturing {len(pages)} {site} pages at {width}x{height} into {out_dir}")
 
@@ -139,6 +142,7 @@ def capture(
             site,
             (width, height),
             walker=walker,
+            defaults=defaults,
         )
 
     print(f"done: {out_dir.resolve()}")

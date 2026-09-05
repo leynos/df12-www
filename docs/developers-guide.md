@@ -1442,10 +1442,13 @@ uv run python scripts/weaver_snapshot.py diff <before> <after>
 ```
 
 `capture` serves `public/` and records every published page's computed styles
-as JSON. It drives `agent-browser`: sets the viewport, opens the page, waits
-for the network to go idle and then for Iconify to report every icon arrived
-or missing, and evaluates `scripts/weaver_snapshot_walker.js` — a copy of
-css-view's walker — in the settled page. The wait is what makes a capture
+as JSON. It drives `agent-browser`: sets the viewport, measures the user-agent
+defaults once on a blank page with `scripts/weaver_snapshot_defaults.js`, then
+for each page opens it, waits for the network to go idle and then for Iconify
+to report every icon arrived or missing, and evaluates
+`scripts/weaver_snapshot_walker.js` — a copy of css-view's walker that takes
+those defaults as a parameter and appends nothing to the page it reads — in
+the settled page. The wait is what makes a capture
 repeatable on a page that draws its icons after load; a capture taken a moment
 too early records a different layout, not a different style. `--site` names
 the sub-site (the default is Weaver, which the harness was written for) and
@@ -1626,6 +1629,31 @@ Run either file on its own:
 uv run pytest tests/test_weaver_browser.py -v
 uv run pytest tests/test_weaver_browser_interaction.py -v
 ```
+
+`tests/test_netsuke_browser.py` is Netsuke's counterpart, on the same
+`built_site`, `served`, and `drive` fixtures and the same `playwright` marker
+and skips, with its page list and layout probe in
+`tests/support/netsuke_browser.py`. It checks, for every configured Netsuke
+page, that the drawer toggle is the navigation at 360px and the link list is
+at 1280px, and that the document fits the viewport (four pages that overflowed
+before the daisyUI migration are waived by name, and the waiver fails if one
+stops overflowing); that the published tree holds exactly the configured
+pages; that the vendored walker, run over a controlled document, reports
+inherited-versus-default handling, the always-reported margins, element
+metadata, the text clip, and the node budget; that seven representative
+components on the manifest-reference page render the paint and box edges
+pinned in `tests/__snapshots__/test_netsuke_browser.ambr` at a phone width
+and a desktop one, with the base-layer pins and the phone-width full-bleed
+asserted directly; and that `capture --site netsuke --width 360 --height 800`
+and `shots --site netsuke` run end to end through their command lines. Run it
+alone with:
+
+```bash
+uv run pytest tests/test_netsuke_browser.py -v
+```
+
+Expect it to take around ten minutes including the build: the two
+command-line runs each visit all 32 pages, `shots` at three widths.
 
 Together they cover every published page at two viewports for the
 self-containment, accessibility, chrome, and layout checks, plus the smaller,

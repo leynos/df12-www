@@ -24,6 +24,9 @@ from pathlib import Path
 
 from weaver_snapshot_paths import DEFAULT_SITE, REPO_ROOT, _slug
 
+if typ.TYPE_CHECKING:
+    from weaver_snapshot_types import Json
+
 # 360 exercises the mobile drawer, 768 the tablet breakpoint, and 1440 the
 # fixed-sidebar layout the site was designed against.
 SCREENSHOT_WIDTHS = (360, 768, 1440)
@@ -83,6 +86,9 @@ ALWAYS_PROPERTIES = ("margin-top", "margin-right", "margin-bottom", "margin-left
 
 # The walker evaluator, read once per run. See the file's own header.
 WALKER = Path(__file__).with_name("weaver_snapshot_walker.js")
+# The probe that measures user-agent defaults on a blank page, evaluated once
+# per capture so the walker never has to append anything to a page it reads.
+DEFAULTS = Path(__file__).with_name("weaver_snapshot_defaults.js")
 
 # What "the page has settled" means, as an expression `agent-browser wait
 # --fn` polls until it is truthy.
@@ -263,10 +269,73 @@ def _read_walker(path: Path = WALKER) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _read_defaults_probe(path: Path = DEFAULTS) -> str:
+    """Read the defaults probe's source.
+
+    Parameters
+    ----------
+    path
+        The probe script. The default is the file beside this module.
+
+    Returns
+    -------
+    str
+        A JavaScript expression that evaluates, on a blank page, to the
+        user-agent defaults as a JSON string.
+
+    Raises
+    ------
+    OSError
+        If the file cannot be read; the command boundary names it.
+    """
+    return path.read_text(encoding="utf-8")
+
+
+def _decoded(evaluated: str) -> Json:
+    """Decode what ``agent-browser eval`` printed for a JSON-string result."""
+    result = json.loads(evaluated.strip())
+    return json.loads(result) if isinstance(result, str) else result
+
+
+def _with_defaults(expression: str, evaluated: str) -> str:
+    """Fill the walker's ``__DEFAULTS__`` parameter from the probe's output.
+
+    Parameters
+    ----------
+    expression
+        A walker expression from :func:`_walker_expression`.
+    evaluated
+        What ``agent-browser eval`` printed for the defaults probe.
+
+    Returns
+    -------
+    str
+        The walker expression with the measured defaults in place.
+
+    Raises
+    ------
+    TypeError
+        If the probe did not return a mapping with ``base`` and ``deltas``.
+    """
+    defaults = _decoded(evaluated)
+    if (
+        not isinstance(defaults, dict)
+        or not isinstance(defaults.get("base"), dict)
+        or not isinstance(defaults.get("deltas"), dict)
+    ):
+        message = (
+            f"the defaults probe did not return base and deltas: {defaults!r:.200}"
+        )
+        raise TypeError(message)
+    return expression.replace(
+        "__DEFAULTS__", json.dumps(defaults, separators=(",", ":"))
+    )
+
+
 def _walker_expression(
     source: str, max_nodes: int = MAX_NODES, text_clip: int = TEXT_CLIP
 ) -> str:
-    """Fill the walker evaluator's parameters in.
+    """Fill the walker evaluator's parameters in, all but the defaults.
 
     Parameters
     ----------
@@ -281,7 +350,7 @@ def _walker_expression(
     -------
     str
         A JavaScript expression that evaluates to the snapshot as a JSON
-        string, ready for ``agent-browser eval``.
+        string once :func:`_with_defaults` has filled ``__DEFAULTS__``.
     """
     return (
         source.replace("__INHERITED__", json.dumps(list(INHERITED_PROPERTIES)))
@@ -294,7 +363,7 @@ def _walker_expression(
 class _WalkerResult(typ.TypedDict):
     """What the walker returns: the tree and how many elements it visited."""
 
-    tree: dict[str, typ.Any]
+    tree: dict[str, Json]
     visited: int
 
 
@@ -320,17 +389,14 @@ def _walker_result(evaluated: str) -> _WalkerResult:
         If it decodes to something other than a mapping with a ``tree``
         mapping and an integer ``visited``.
     """
-    result = json.loads(evaluated.strip())
-    if isinstance(result, str):
-        result = json.loads(result)
-    if (
-        not isinstance(result, dict)
-        or not isinstance(result.get("tree"), dict)
-        or type(result.get("visited")) is not int  # a bool is an int to isinstance
-    ):
+    result = _decoded(evaluated)
+    tree = result.get("tree") if isinstance(result, dict) else None
+    visited = result.get("visited") if isinstance(result, dict) else None
+    # A bool is an int to `isinstance`, and would be written as `visited: true`.
+    if not isinstance(tree, dict) or type(visited) is not int:
         message = f"the walker did not return a tree and a visit count: {result!r:.200}"
         raise TypeError(message)
-    return {"tree": result["tree"], "visited": result["visited"]}
+    return {"tree": tree, "visited": visited}
 
 
 # Where a snapshot's timestamp comes from: a seam, so a test can pin it.
@@ -494,6 +560,7 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
     *,
     walker: str,
+    defaults: str,
     now: Stamp = _utc_now,
 ) -> None:
     """Snapshot each page in turn, reporting progress as it goes.
@@ -525,9 +592,13 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
         proved at more than one.
     walker
         The walker expression to evaluate in each page, as
-        :func:`_walker_expression` builds it. Read at the command boundary,
-        so a missing or unreadable walker is reported there, before any
-        server or browser is started.
+        :func:`_walker_expression` builds it, its ``__DEFAULTS__`` still to
+        fill. Read at the command boundary, so a missing or unreadable walker
+        is reported there, before any server or browser is started.
+    defaults
+        The defaults probe, as :func:`_read_defaults_probe` returns it. It is
+        evaluated once on a blank page before the first target page opens,
+        so measuring an element's defaults never touches a page being read.
     now
         Where each snapshot's timestamp comes from.
 
@@ -545,10 +616,12 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
 
     try:
         drive("set", "viewport", str(viewport[0]), str(viewport[1]))
+        drive("open", "about:blank")
+        walk = _with_defaults(walker, read([browser, "eval", defaults, *session]))
         for page in pages:
             url = f"{base}/{site}/{page}"
             settled = _open_settled(drive, url)
-            evaluated = read([browser, "eval", walker, *session])
+            evaluated = read([browser, "eval", walk, *session])
             try:
                 document = _snapshot_document(url, evaluated, viewport, now=now)
             except (ValueError, TypeError) as exc:

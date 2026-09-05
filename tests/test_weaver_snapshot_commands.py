@@ -195,6 +195,8 @@ def _driven(
 
     def read(argv: cabc.Sequence[str]) -> str:
         record["argv"].append(list(argv))
+        if "x-unknown" in argv[2]:  # the defaults probe, evaluated on about:blank
+            return json.dumps(json.dumps({"base": {}, "deltas": {}}))
         tree = {"tag": "html", "classes": [], "styleDiff": {}, "children": []}
         return json.dumps(json.dumps({"tree": tree, "visited": 1}))
 
@@ -298,7 +300,11 @@ def test_the_capture_command_addresses_the_site_it_was_given(
     assert sites == ["netsuke"], (
         f"the server's readiness probe should ask for the named site; got {sites}"
     )
-    urls = [argv[2] for argv in run["argv"] if argv[1] == "open"]
+    urls = [
+        argv[2]
+        for argv in run["argv"]
+        if argv[1] == "open" and argv[2] != "about:blank"
+    ]
     assert urls == [
         "http://127.0.0.1:9999/netsuke/",
         "http://127.0.0.1:9999/netsuke/docs/",

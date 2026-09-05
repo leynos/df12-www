@@ -31,10 +31,13 @@ def test_the_walker_expression_carries_its_parameters() -> None:
         tools._read_walker(), max_nodes=123, text_clip=45
     )
 
-    assert "__" not in expression.replace("__snapshotSettle", ""), (
+    filled = tools._with_defaults(
+        expression, json.dumps(json.dumps({"base": {}, "deltas": {}}))
+    )
+    assert "__" not in filled.replace("__snapshotSettle", ""), (
         "a placeholder left unfilled would be a syntax error in the page"
     )
-    assert expression.rstrip().endswith("123, 45);"), (
+    assert expression.rstrip().endswith("123, 45, __DEFAULTS__);"), (
         f"the parameters are the final call's arguments; got {expression[-60:]!r}"
     )
     assert '"line-height"' in expression, (
@@ -136,6 +139,8 @@ def _recording_browser(
 
     def read(argv: cabc.Sequence[str]) -> str:
         calls.append(list(argv))
+        if argv[2] == "probe()":
+            return json.dumps(json.dumps({"base": {}, "deltas": {}}))
         spans = [
             {"tag": "span", "classes": ["iconify"], "styleDiff": {}, "children": []}
             for _ in range(unrendered)
@@ -172,16 +177,23 @@ def test_capture_settles_each_page_before_walking_it(
         read,
         "netsuke",
         walker="walk()",
+        defaults="probe()",
     )
 
     assert calls[0][1:5] == ["set", "viewport", "1280", "720"], (
         f"the viewport should be pinned before any page loads; got {calls[0]}"
     )
-    per_page = [argv[1] for argv in calls[1:-1]]
+    assert [argv[1:3] for argv in calls[1:3]] == [
+        ["open", "about:blank"],
+        ["eval", "probe()"],
+    ], f"the defaults are measured on a blank page first; got {calls[1:3]}"
+    per_page = [argv[1] for argv in calls[3:-1]]
     assert per_page == ["open", "wait", "wait", "eval"] * len(pages), (
         f"each page should be opened, settled twice over, then walked; got {per_page}"
     )
-    opened = [argv[2] for argv in calls if argv[1] == "open"]
+    opened = [
+        argv[2] for argv in calls if argv[1] == "open" and argv[2] != "about:blank"
+    ]
     assert opened == [
         "http://127.0.0.1:8099/netsuke/",
         "http://127.0.0.1:8099/netsuke/install/",
@@ -214,9 +226,10 @@ def test_a_page_that_never_settles_is_still_captured(
         read,
         "netsuke",
         walker="walk()",
+        defaults="probe()",
     )
 
-    assert [argv[1] for argv in calls].count("eval") == 1, (
+    assert [argv[1] for argv in calls].count("eval") == 2, (  # noqa: PLR2004 - the probe, then the one walk
         "the walk should still be taken once the settle wait gives up"
     )
     assert (tmp_path / "docs.json").is_file(), "the unsettled page is still written"
@@ -265,6 +278,7 @@ def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None
             explode,
             lambda _argv: "",
             walker="walk()",
+            defaults="probe()",
         )
 
     opened = [argv for argv in attempted if argv[1] == "open"]
@@ -355,6 +369,7 @@ def test_capture_lays_pages_out_at_the_viewport_it_was_given(
         "netsuke",
         (360, 800),
         walker="walk()",
+        defaults="probe()",
     )
     assert calls[0][1:5] == ["set", "viewport", "360", "800"], (
         f"the viewport is set before any page is opened; got {calls[0]!r}"
@@ -387,6 +402,8 @@ def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
 
     def garbage(argv: cabc.Sequence[str]) -> str:
         calls.append(list(argv))
+        if argv[2] == "probe()":
+            return json.dumps(json.dumps({"base": {}, "deltas": {}}))
         return json.dumps({"visited": 1})
 
     with pytest.raises(SystemExit, match=r"http://x/netsuke/docs/.*tree") as caught:
@@ -399,6 +416,7 @@ def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
             garbage,
             "netsuke",
             walker="walk()",
+            defaults="probe()",
         )
     assert "docs/" in str(caught.value), "the page that broke is named"
     assert not list(tmp_path.glob("*.json")), "no half-snapshot is written"

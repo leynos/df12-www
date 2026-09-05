@@ -6,8 +6,12 @@
  * settled. css-view drives its own browser and captures the moment the network
  * goes idle, which on Netsuke is before Iconify has fetched its glyphs; the
  * harness needs to say when the page is ready, and agent-browser lets it.
+ * One departure from the original: css-view measured user-agent defaults in
+ * an iframe it appended to the page; this walk takes them as a parameter,
+ * measured beforehand on a blank page, and appends nothing to the page it
+ * reads.
  *
- * Read by scripts/weaver_snapshot_tools.py, which substitutes the four
+ * Read by scripts/weaver_snapshot_tools.py, which substitutes the five
  * parameters and hands the result to `agent-browser eval`. The output is the
  * same tree css-view writes under `payload.tree`: one node per element, its
  * classes, its bounding box, and the computed properties that differ from
@@ -18,32 +22,24 @@
  * otherwise go unrecorded, and the harness folds margins into the gaps
  * between siblings, which needs every margin, default or not.
  */
-((inheritedProps, alwaysProps, maxNodes, textClip) => {
+((inheritedProps, alwaysProps, maxNodes, textClip, defaults) => {
   const inherited = new Set(inheritedProps);
   const always = new Set(alwaysProps);
 
-  const iframe = document.createElement("iframe");
-  iframe.style.cssText =
-    "position:fixed;left:-9999px;top:-9999px;width:0;height:0;border:0;visibility:hidden";
-  document.documentElement.appendChild(iframe);
-
+  // The user-agent defaults were measured on a blank page beforehand (see
+  // weaver_snapshot_defaults.js), so this walk reads the page and appends
+  // nothing to it. An element name the probe did not list gets the unknown
+  // element's defaults, as `createElement` of that name would have.
   const defaultsCache = new Map();
   const readDefaults = (tagName) => {
     const upper = tagName.toUpperCase();
     const cached = defaultsCache.get(upper);
     if (cached) return cached;
-    const doc = iframe.contentDocument;
-    if (!doc?.body) return {};
-    const el = doc.createElement(upper);
-    doc.body.appendChild(el);
-    const cs = iframe.contentWindow?.getComputedStyle(el);
-    const record = {};
-    if (cs) {
-      for (const prop of cs) {
-        record[prop] = cs.getPropertyValue(prop);
-      }
+    const record = { ...defaults.base };
+    for (const [prop, value] of Object.entries(defaults.deltas[upper] || {})) {
+      if (value === null) delete record[prop];
+      else record[prop] = value;
     }
-    el.remove();
     defaultsCache.set(upper, record);
     return record;
   };
@@ -125,6 +121,5 @@
   };
 
   const tree = document.documentElement ? collect(document.documentElement, null) : null;
-  iframe.remove();
   return JSON.stringify({ tree, visited });
-})(__INHERITED__, __ALWAYS__, __MAX_NODES__, __TEXT_CLIP__);
+})(__INHERITED__, __ALWAYS__, __MAX_NODES__, __TEXT_CLIP__, __DEFAULTS__);

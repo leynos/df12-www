@@ -3,15 +3,15 @@
 {% set active_nav = 'roadmap' %}
 {% block page_title %}Roadmap - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area -->
     <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Header Section -->
-        {% endraw %}{% call chrome.page_header('Current version v' ~ netsuke_version, 'Roadmap', hero=true, dot='bg-warning') %}
+        {% call chrome.page_header('Current version v' ~ netsuke_version, 'Roadmap', hero=true, dot='bg-warning') %}
             v{{ netsuke_version }} is a useful preview for early adopters, not a declaration that Netsuke is finished.
             This page tracks what shipped, what is honestly still rough, and the order of the work ahead.
-        {% endcall %}{% raw %}
+        {% endcall %}
 
         <div class="grid lg:grid-cols-12 gap-12">
 
@@ -24,7 +24,7 @@
                         <div class="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center mr-4">
                             <span class="iconify" data-icon="carbon:checkmark-outline" aria-hidden="true"></span>
                         </div>
-                        <h2 class="font-serif text-2xl font-bold text-base-content">Shipped in v{% endraw %}{{ netsuke_version }}{% raw %}</h2>
+                        <h2 class="font-serif text-2xl font-bold text-base-content">Shipped in v{{ netsuke_version }}</h2>
                     </div>
                     <p class="text-charcoal-mid mb-6 max-w-3xl">
                         The core build-system compiler is implemented and packaged for Linux, macOS, and Windows.
@@ -40,8 +40,8 @@
                                 <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Rules, targets, actions, defaults, and explicit, implicit, and order-only dependencies</span></li>
                                 <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordered <code>command</code> lists with fail-fast <code>&amp;&amp;</code> chaining, and <code>description</code> metadata on rules, targets, and actions</span></li>
                                 <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Dependency-only aggregates: an action or target with a non-empty <code>deps</code> list may omit its recipe <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
-                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordinary shell dollars: write <code>$PATH</code> as-is; Netsuke escapes it for Ninja after lowering the <code>{{ ins }}</code> and <code>{{ outs }}</code> markers <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
-                            </ul>
+{% raw %}                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Ordinary shell dollars: write <code>$PATH</code> as-is; Netsuke escapes it for Ninja after lowering the <code>{{ ins }}</code> and <code>{{ outs }}</code> markers <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta3</span></span></li>
+{% endraw %}                            </ul>
                         </div>
                         <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs">
                             <h3 class="font-bold text-base-content text-sm mb-2">Compiler &amp; execution</h3>
@@ -88,7 +88,7 @@
                         The compiler pipeline and ordinary local-build workflow are substantial; the command-line interface,
                         configuration vocabulary, and advanced recipe model remain pre-stable. Pin the Netsuke version in
                         automation and expect some command names, flags, diagnostic schemas, and manifest details to change before 1.0.
-                        The following limitations apply to v{% endraw %}{{ netsuke_version }}{% raw %}.
+                        The following limitations apply to v{{ netsuke_version }}.
                     </p>
                     <div class="bg-white rounded-xl border border-base-300 shadow-xs hm-rows">
                         <div class="p-5 flex items-start">
@@ -97,8 +97,8 @@
                         </div>
                         <div class="p-5 flex items-start">
                             <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:currency-dollar" aria-hidden="true"></span>
-                            <p class="text-sm text-charcoal-mid">Beta3 fixes beta2's shell-dollar limitation with Ninja-aware escaping, so ordinary shell expressions are written normally. Beta2 manifests that spelled <code>$$PATH</code> or used the <code>$in</code>/<code>$out</code> placeholders need migration to <code>$PATH</code> and <code>{{ ins }}</code>/<code>{{ outs }}</code>; see the <a href="/netsuke/docs/security/#shell-dollars" class="text-primary underline decoration-primary/40 hover:decoration-primary">safety boundary</a>.</p>
-                        </div>
+{% raw %}                            <p class="text-sm text-charcoal-mid">Beta3 fixes beta2's shell-dollar limitation with Ninja-aware escaping, so ordinary shell expressions are written normally. Beta2 manifests that spelled <code>$$PATH</code> or used the <code>$in</code>/<code>$out</code> placeholders need migration to <code>$PATH</code> and <code>{{ ins }}</code>/<code>{{ outs }}</code>; see the <a href="/netsuke/docs/security/#shell-dollars" class="text-primary underline decoration-primary/40 hover:decoration-primary">safety boundary</a>.</p>
+{% endraw %}                        </div>
                         <div class="p-5 flex items-start">
                             <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:flow-connection" aria-hidden="true"></span>
                             <p class="text-sm text-charcoal-mid">Compiler-generated dependency imports, such as GCC depfiles, are planned but not yet part of the manifest model.</p>
@@ -280,7 +280,7 @@
                             <span class="iconify text-success mr-2 text-sm" data-icon="carbon:tag" aria-hidden="true"></span> Current release
                         </h3>
                         <div class="space-y-3 text-sm">
-                            <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-base-content">v{% endraw %}{{ netsuke_version }}{% raw %}</span></div>
+                            <div class="flex justify-between"><span class="text-charcoal-mid">Version</span><span class="font-mono text-base-content">v{{ netsuke_version }}</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Release date</span><span class="font-mono text-base-content">2 September 2026</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Licence</span><span class="font-mono text-base-content">ISC</span></div>
                             <div class="flex justify-between"><span class="text-charcoal-mid">Rust (source builds)</span><span class="font-mono text-base-content">nightly-2026-08-23</span></div>
@@ -319,5 +319,5 @@
             </aside>
         </div>
     </main>
-{% endraw %}
+
 {% endblock %}

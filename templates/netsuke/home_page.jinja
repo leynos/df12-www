@@ -1,16 +1,15 @@
-{% extends "doc_page.jinja" %}
+{% extends "_layout.jinja" %}
 {% import "chrome.jinja" as chrome %}
 {#
   The Netsuke homepage.
 
   Extends the shared layout so the navbar, mobile menu, and footer have one
-  owner. The homepage has no docs chrome, so it drops the scrollspy and
-  copy-button scripts, pulls in Plotly for the pipeline chart, and lets the
-  body flow rather than stretching it into the doc-page flex column.
+  owner. It is not a documentation page, so it extends `_layout.jinja` rather
+  than `doc_page.jinja` and never acquires the scrollspy and copy-button
+  scripts or the doc-page flex column in the first place. It adds Plotly for
+  the pipeline chart.
 #}
 {% block page_title %}{{ homepage.title }}{% endblock %}
-{% block body_class %}{% endblock %}
-{% block page_scripts %}{% endblock %}
 {% block extra_head %}
     <script src="https://cdn.plot.ly/plotly-3.1.1.min.js" integrity="sha384-eyWfwv4NWkH7sLjk6s+Al2SBmZhX8gcLellpr+PLrfiNaHoTlAQTG9zDi4Z0liz8" crossorigin="anonymous"></script>
 {% endblock %}
@@ -150,7 +149,7 @@
                 <!-- Code Window -->
                 <div class="relative">
                     <div class="hm-faux-window__shadow absolute -top-6 -right-6 w-full h-full bg-base-300/30 rounded-lg transform rotate-2"></div>
-                    {{ chrome.faux_window_open('Netsukefile', frame='code-window relative z-10 text-sm', body_class='p-6 overflow-x-auto text-stone-light leading-relaxed') }}
+                    {% call chrome.faux_window('Netsukefile', frame='code-window relative z-10 text-sm', body_class='p-6 overflow-x-auto text-stone-light leading-relaxed') %}
 {% highlight 'netsuke' %}{% raw %}
 # Reusable commands live in rules
 netsuke_version: "1.0.0"
@@ -171,7 +170,7 @@ targets:
     command: "pandoc {{ ins }} -o {{ outs }}"
     sources: "README.md"
 {% endraw %}{% endhighlight %}
-                    {{ chrome.faux_window_close() }}
+                    {% endcall %}
                 </div>
             </div>
         </div>
@@ -263,7 +262,7 @@ targets:
                 </p>
             </div>
 
-            {{ chrome.faux_window_open('user@devbox:~/netsuke-demo', frame='bg-charcoal-mid/30 rounded-xl border border-white/10 shadow-2xl overflow-hidden font-mono text-sm', body_class='p-6 space-y-4') }}
+            {% call chrome.faux_window('user@devbox:~/netsuke-demo', frame='bg-charcoal-mid/30 rounded-xl border border-white/10 shadow-2xl overflow-hidden font-mono text-sm', body_class='p-6 space-y-4') %}
                     <!-- Command 1 -->
                     <div>
                         <div class="flex items-center text-stone-light">
@@ -302,7 +301,7 @@ targets:
                             </div>
                         </div>
                     </div>
-            {{ chrome.faux_window_close() }}
+            {% endcall %}
         </div>
     </section>
 

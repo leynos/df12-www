@@ -15,22 +15,22 @@
     </style>
 {% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar('templating', sub_links=[{'href': '#why', 'label': 'Why Jinja inside YAML'}, {'href': '#yaml', 'label': 'YAML foundations'}, {'href': '#rendering', 'label': 'How rendering works'}, {'href': '#foreach', 'label': 'Repeating with foreach'}, {'href': '#when', 'label': 'Selecting with when'}, {'href': '#macros', 'label': 'Macros'}, {'href': '#patterns', 'label': 'Common patterns'}]) }}{% raw %}
+        {{ docsnav.sidebar('templating', sub_links=[{'href': '#why', 'label': 'Why Jinja inside YAML'}, {'href': '#yaml', 'label': 'YAML foundations'}, {'href': '#rendering', 'label': 'How rendering works'}, {'href': '#foreach', 'label': 'Repeating with foreach'}, {'href': '#when', 'label': 'Selecting with when'}, {'href': '#macros', 'label': 'Macros'}, {'href': '#patterns', 'label': 'Common patterns'}]) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
-{% endraw %}{{ docsnav.mobile_docs_bar('templating') }}{% raw %}
+{{ docsnav.mobile_docs_bar('templating') }}
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Templating'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Templating'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Core Concepts', 'Templating') %}
+            {% call chrome.page_header('Core Concepts', 'Templating') %}
                 Netsuke renders MiniJinja inside YAML values. The structure stays as data; templating fills in strings,
                 expands entries with <code>foreach</code>, and gates them with <code>when</code> &mdash; all before the build graph exists.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- Why -->
             <section id="why" class="mb-20">
@@ -75,11 +75,11 @@
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     A <code>Netsukefile</code> is a YAML mapping. Netsuke rejects duplicate keys, unknown fields, and missing
                     required fields; <code>netsuke_version</code> and <code>targets</code> are required. Quote version numbers
-                    and any value that begins with <code>{{</code> &mdash; an unquoted <code>{</code> has meaning in YAML.
-                    Use <code>|</code> for a multi-line string that preserves line breaks, or <code>&gt;-</code> to fold lines
+{% raw %}                    and any value that begins with <code>{{</code> &mdash; an unquoted <code>{</code> has meaning in YAML.
+{% endraw %}                    Use <code>|</code> for a multi-line string that preserves line breaks, or <code>&gt;-</code> to fold lines
                     into one string.
                 </p>
-                {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 
 vars:
@@ -97,7 +97,7 @@ targets:
 
 defaults:
   - greeting.txt
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+{% endraw %}{% endhighlight %}{% endcall %}
             </section>
 
             <!-- Rendering -->
@@ -106,8 +106,8 @@ defaults:
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:magic-wand" aria-hidden="true"></span> How rendering works
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    MiniJinja renders <em>string fields</em>. Put an expression inside <code>{{ ... }}</code>, read values
-                    declared under <code>vars</code> by name, pass a value through a filter with <code>|</code>, call a
+{% raw %}                    MiniJinja renders <em>string fields</em>. Put an expression inside <code>{{ ... }}</code>, read values
+{% endraw %}                    declared under <code>vars</code> by name, pass a value through a filter with <code>|</code>, call a
                     function with parentheses, and apply a test with <code>is</code>.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6">
@@ -115,9 +115,9 @@ defaults:
                         <h3 class="font-bold text-base-content mb-3 text-sm">Rules that keep manifests honest</h3>
                         <ul class="space-y-2 text-sm text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Undefined values are errors, not silent empty strings.</span></li>
-                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Only <code>{{ ins }}</code> and <code>{{ outs }}</code> are automatically quoted for the host shell; other rendered values are not.</span></li>
+{% raw %}                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Only <code>{{ ins }}</code> and <code>{{ outs }}</code> are automatically quoted for the host shell; other rendered values are not.</span></li>
                             <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Structural statements such as <code>{% for %}</code> cannot reshape the YAML document. Use <code>foreach</code>, <code>when</code>, and declared macros instead.</span></li>
-                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>vars</code> keys named <code>env</code> or <code>glob</code> are rejected at parse time &mdash; they would silently shadow the built-in helpers of the same name. The error names the offending key.</span></li>
+{% endraw %}                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>vars</code> keys named <code>env</code> or <code>glob</code> are rejected at parse time &mdash; they would silently shadow the built-in helpers of the same name. The error names the offending key.</span></li>
                         </ul>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
@@ -139,14 +139,14 @@ defaults:
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:repeat" aria-hidden="true"></span> Repeating with <code class="ml-2">foreach</code>
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    <code>foreach</code> takes a direct Jinja expression &mdash; no <code>{{ ... }}</code> braces &mdash; that
-                    evaluates to a sequence: a list declared under <code>vars</code>, or a discovery call such as
+{% raw %}                    <code>foreach</code> takes a direct Jinja expression &mdash; no <code>{{ ... }}</code> braces &mdash; that
+{% endraw %}                    evaluates to a sequence: a list declared under <code>vars</code>, or a discovery call such as
                     <code>glob('src/*.c')</code>. Netsuke clones the entry once per element, exposing <code>item</code> (the
                     element) and <code>index</code> (its position) to every string field and to <code>when</code>.
                     It works on <code>targets</code> and on top-level <code>actions</code> alike.
                 </p>
                 <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 vars:
   designs:
     - hero
@@ -162,7 +162,7 @@ targets:
     name: "site/{{ item | basename | with_suffix('.html') }}"
     rule: page
     sources: "{{ item }}"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                 </div>
                 <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
                     <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
@@ -187,7 +187,7 @@ targets:
                     <a href="/netsuke/docs/standard-library/" class="text-primary underline decoration-primary/40 hover:decoration-primary"><code>command_available(...)</code></a>.
                 </p>
                 <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}
 targets:
   - when: command_available('magick')
     name: "build/hero.png"
@@ -198,7 +198,7 @@ targets:
     name: "build/hero.png"
     rule: inkscape_convert
     sources: "design/hero.svg"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
                 <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
                     <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
@@ -218,10 +218,10 @@ targets:
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Declared macros are the manifest's unit of reuse: a <code>signature</code> naming the macro and its
                     parameters, and a <code>body</code> template rendered wherever the macro is called. Because they are
-                    declared as data rather than written as <code>{% macro %}</code> statements, the YAML document stays a
-                    document.
+{% raw %}                    declared as data rather than written as <code>{% macro %}</code> statements, the YAML document stays a
+{% endraw %}                    document.
                 </p>
-                {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
 macros:
   - signature: "obj_name(src)"
     body: |
@@ -232,7 +232,7 @@ targets:
     name: "build/{{ obj_name(item) }}"
     rule: "compile"
     sources: "{{ item }}"
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+{% endraw %}{% endhighlight %}{% endcall %}
             </section>
 
             <!-- Advanced Patterns -->
@@ -271,7 +271,7 @@ targets:
                             </p>
 
                             <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}
 targets:
   - when: target_os == 'linux'
     name: "sys/linux.o"
@@ -282,7 +282,7 @@ targets:
     name: "sys/macos.o"
     rule: "compile"
     sources: "src/macos_utils.c"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
@@ -298,7 +298,7 @@ targets:
                             </p>
 
                             <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 targets:
   - name: test-report.txt
     command: "./run-tests > {{ outs }}"
@@ -308,7 +308,7 @@ targets:
 actions:
   - name: test
     command: "./app --self-test"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
@@ -324,7 +324,7 @@ actions:
                             </p>
 
                             <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 rules:
   - name: protoc
     command: "protoc --c_out=gen {{ ins }}"
@@ -337,7 +337,7 @@ targets:
   - name: messages.o
     rule: compile
     sources: gen/messages.c
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
@@ -350,7 +350,7 @@ targets:
             </section>
 
             <!-- Help Footer -->
-{% endraw %}{{ docsnav.docs_footer('templating') }}{% raw %}
+{{ docsnav.docs_footer('templating') }}
 
         </main>
     </div>
@@ -399,5 +399,5 @@ targets:
     </script>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

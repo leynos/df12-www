@@ -12,23 +12,23 @@
     </style>
 {% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar('standard-library', sub_links=[{'href': '#stdlib-reference', 'label': 'Core reference'}, {'href': '#stdlib-extended', 'label': 'Extended library'}, {'href': '#purity', 'label': 'Pure vs host-observing'}]) }}{% raw %}
+        {{ docsnav.sidebar('standard-library', sub_links=[{'href': '#stdlib-reference', 'label': 'Core reference'}, {'href': '#stdlib-extended', 'label': 'Extended library'}, {'href': '#purity', 'label': 'Pure vs host-observing'}]) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
-{% endraw %}{{ docsnav.mobile_docs_bar('standard-library') }}{% raw %}
+{{ docsnav.mobile_docs_bar('standard-library') }}
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Standard Library'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Standard Library'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Reference', 'Standard Library') %}
+            {% call chrome.page_header('Reference', 'Standard Library') %}
                 The functions, filters, and tests available inside a <code>Netsukefile</code>: paths, file contents,
                 collections, time, command execution, executable discovery, and network access &mdash; each labelled
                 pure or host-observing.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- Standard Library Reference -->
             <section id="stdlib-reference" class="mb-16">
@@ -67,8 +67,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Replaces the file extension of a path. Accepts an optional count to replace multiple trailing extensions, and an optional separator (default <code>.</code>).</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ item | basename | with_suffix('.o') }}
-                        </div>
+{% raw %}                            {{ item | basename | with_suffix('.o') }}
+{% endraw %}                        </div>
                     </div>
 
                     <!-- Function Card 4 -->
@@ -91,8 +91,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Pure path filters: <code>basename</code> returns the final path component; <code>dirname</code> returns the parent (or <code>.</code> when there is none).</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ 'reports/daily.csv' | basename }}
-                        </div>
+{% raw %}                            {{ 'reports/daily.csv' | basename }}
+{% endraw %}                        </div>
                     </div>
 
                     <!-- Function Card 6 -->
@@ -128,8 +128,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns the current time as a timezone-aware object (defaults to UTC). Exposes <code>.iso8601</code>, <code>.unix_timestamp</code>, and <code>.offset</code>. Accepts an optional UTC offset string such as <code>'+02:00'</code> or <code>'Z'</code>.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ now().iso8601 }}
-                        </div>
+{% raw %}                            {{ now().iso8601 }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -155,8 +155,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional encoding argument; <code>'utf-8'</code> (alias <code>'utf8'</code>) is currently the only supported encoding.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ "VERSION" | contents }}
-                        </div>
+{% raw %}                            {{ "VERSION" | contents }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -165,8 +165,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns the file size in bytes. Useful for gating large downloads or asserting build artefact bounds.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | size }}
-                        </div>
+{% raw %}                            {{ path | size }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -175,8 +175,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Counts the number of lines in a text file. Does not load the entire file into memory.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ "src/main.c" | linecount }}
-                        </div>
+{% raw %}                            {{ "src/main.c" | linecount }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -185,8 +185,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns the full hex digest of a file. Supports <code>sha256</code> (default) and <code>sha512</code>; MD5 and SHA-1 need the <code>legacy-digests</code> build feature.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | hash('sha512') }}
-                        </div>
+{% raw %}                            {{ path | hash('sha512') }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -195,8 +195,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Returns a truncated hex digest of a file. Accepts a length (default: <code>8</code>) and an algorithm (default: <code>sha256</code>). Useful for short cache-busting hashes in output filenames.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | digest(12, 'sha512') }}
-                        </div>
+{% raw %}                            {{ path | digest(12, 'sha512') }}
+{% endraw %}                        </div>
                     </div>
                 </div>
 
@@ -212,8 +212,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Makes an absolute path relative to a given base. <code>'/a/b/c' | relative_to('/a/b')</code> &rarr; <code>'c'</code>.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ path | relative_to(base_dir) }}
-                        </div>
+{% raw %}                            {{ path | relative_to(base_dir) }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -222,8 +222,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Canonicalises a path, resolving all symlinks and relative components to an absolute path.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ item | realpath }}
-                        </div>
+{% raw %}                            {{ item | realpath }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -232,8 +232,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Expands a leading <code>~</code> to the current user's home directory.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ "~/.config/app" | expanduser }}
-                        </div>
+{% raw %}                            {{ "~/.config/app" | expanduser }}
+{% endraw %}                        </div>
                     </div>
                 </div>
 
@@ -290,8 +290,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Pipes the input value as stdin to a shell command string. Capture mode (the default) returns the command's stdout. Pass <code>{'mode': 'tempfile'}</code> (also spelled <code>stream</code> or <code>streaming</code>) to write bounded output to a persisted temporary file; those modes return the file's path, not its contents.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ user_list | shell('grep admin') }}
-                        </div>
+{% raw %}                            {{ user_list | shell('grep admin') }}
+{% endraw %}                        </div>
                     </div>
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
@@ -300,8 +300,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4">Runs the host <code>grep</code> executable over the input value. The <code>flags</code> argument is a sequence such as <code>['-i']</code>; availability and flag spelling are platform-dependent. Options share the same modes as <code>shell</code>.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
-                            {{ log_lines | grep('ERROR', ['-i']) }}
-                        </div>
+{% raw %}                            {{ log_lines | grep('ERROR', ['-i']) }}
+{% endraw %}                        </div>
                     </div>
                 </div>
 
@@ -317,8 +317,8 @@
                         </div>
                         <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
                             Resolves executables using the current <code>PATH</code> without marking the template impure.
-                            Available as both a filter (<code>{{ 'clang++' | which }}</code>) and a function (<code>{{ which('clang++') }}</code>).
-                            On Windows, an extensionless name is matched against the effective <code>PATHEXT</code>, so <code>which('cargo')</code> finds <code>cargo.exe</code>.
+{% raw %}                            Available as both a filter (<code>{{ 'clang++' | which }}</code>) and a function (<code>{{ which('clang++') }}</code>).
+{% endraw %}                            On Windows, an extensionless name is matched against the effective <code>PATHEXT</code>, so <code>which('cargo')</code> finds <code>cargo.exe</code>.
                             Set <code>NETSUKE_WHICH_WORKSPACE=0</code> to disable the workspace-tree fallback search used when a command is absent from <code>PATH</code>.
                         </p>
                         <div class="grid md:grid-cols-2 gap-6">
@@ -350,8 +350,8 @@
                                     <div><code class="text-accent">netsuke::jinja::which::args</code> &mdash; unknown or invalid keyword argument</div>
                                 </div>
                                 <div class="mt-4 text-xs font-mono text-stone-light bg-base-content p-3 rounded">
-                                    {{ 'clang++' | which(all=true, canonical=true) }}
-                                </div>
+{% raw %}                                    {{ 'clang++' | which(all=true, canonical=true) }}
+{% endraw %}                                </div>
                             </div>
                         </div>
                     </div>
@@ -384,12 +384,12 @@
                     </div>
                 </div>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
-                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                    {% highlight 'netsuke' %}
 targets:
   - when: 'src/main.c' is file and command_available('clang')
     name: "build/main.o"
     rule: "compile"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
             </section>
 
@@ -432,12 +432,12 @@ targets:
             </section>
 
             <!-- Help Footer -->
-{% endraw %}{{ docsnav.docs_footer('standard-library') }}{% raw %}
+{{ docsnav.docs_footer('standard-library') }}
 
         </main>
     </div>
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

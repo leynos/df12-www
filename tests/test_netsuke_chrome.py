@@ -169,12 +169,11 @@ class TestWindows:
     def test_faux_window_defaults(self) -> None:
         """The default window has the dark frame, three dots, and a label."""
         soup = _render_macro(
-            "{{ chrome.faux_window_open('Netsukefile') }}<p>body</p>"
-            "{{ chrome.faux_window_close() }}"
+            "{% call chrome.faux_window('Netsukefile') %}<p>body</p>{% endcall %}"
         )
         window = soup.select_one("div.hm-faux-window")
 
-        assert window is not None, "the opener renders the window element"
+        assert window is not None, "the call renders the window element"
         assert {"bg-base-content", "rounded-xl", "border-charcoal-mid"} <= set(
             window["class"]
         ), "the default frame is the docs dark card"
@@ -201,13 +200,13 @@ class TestWindows:
     def test_faux_window_overrides(self) -> None:
         """Variant, layout, frame, and body overrides all reach the markup."""
         soup = _render_macro(
-            "{{ chrome.faux_window_open('x', variant='card-bleed', "
-            "outer_class='mb-8', frame='code-window', body_class='p-2') }}"
-            "{{ chrome.faux_window_close() }}"
+            "{% call chrome.faux_window('x', variant='card-bleed', "
+            "outer_class='mb-8', frame='code-window', body_class='p-2') %}"
+            "{% endcall %}"
         )
         window = soup.select_one("div.hm-faux-window")
 
-        assert window is not None, "the opener renders the window element"
+        assert window is not None, "the call renders the window element"
         classes = set(window["class"])
         assert "hm-faux-window--card-bleed" in classes, "variant is a modifier"
         assert "mb-8" in classes, "outer_class is appended"
@@ -220,14 +219,13 @@ class TestWindows:
         )
 
     def test_example_terminal(self) -> None:
-        """The example terminal defaults its label and closes cleanly."""
+        """The example terminal defaults its label and wraps its body."""
         soup = _render_macro(
-            "{{ chrome.example_terminal_open() }}<p>out</p>"
-            "{{ chrome.example_terminal_close() }}"
+            "{% call chrome.example_terminal() %}<p>out</p>{% endcall %}"
         )
         terminal = soup.select_one("div.hm-example-terminal")
 
-        assert terminal is not None, "the opener renders the terminal element"
+        assert terminal is not None, "the call renders the terminal element"
         label = terminal.select_one(".hm-example-terminal__titlebar > div.text-xs")
         assert label is not None, "the titlebar carries a label"
         assert label.get_text(strip=True) == "Terminal", "the default label"
@@ -236,32 +234,26 @@ class TestWindows:
         )
 
     @pytest.mark.parametrize(
-        ("opener", "closer", "selector"),
+        ("call", "selector"),
         [
-            ("faux_window_open('x')", "faux_window_close()", "div.hm-faux-window"),
-            (
-                "example_terminal_open()",
-                "example_terminal_close()",
-                "div.hm-example-terminal",
-            ),
+            ("faux_window('x')", "div.hm-faux-window"),
+            ("example_terminal()", "div.hm-example-terminal"),
         ],
     )
-    def test_closer_closes_the_window(
-        self, opener: str, closer: str, selector: str
-    ) -> None:
-        """Content after the closer sits outside the window, not inside it."""
+    def test_the_window_bounds_its_body(self, call: str, selector: str) -> None:
+        """Content after the block sits outside the window, not inside it."""
         soup = _render_macro(
-            "{{ chrome." + opener + " }}<p id='inside'>in</p>"
-            "{{ chrome." + closer + " }}<p id='after'>after</p>"
+            "{% call chrome." + call + " %}<p id='inside'>in</p>{% endcall %}"
+            "<p id='after'>after</p>"
         )
         window = soup.select_one(selector)
 
-        assert window is not None, "the opener renders the window"
+        assert window is not None, "the call renders the window"
         assert window.select_one("#inside") is not None, (
-            "content before the closer is inside the window"
+            "the block body is inside the window"
         )
         assert window.select_one("#after") is None, (
-            "content after the closer is outside the window"
+            "content after the block is outside the window"
         )
         assert soup.select_one("#after") is not None, (
             "the trailing content still renders"

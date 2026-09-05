@@ -4,10 +4,10 @@
 {% import "docs_nav.jinja" as docsnav %}
 {% block page_title %}Netsukefile Testing Framework (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar(sections=[
+        {{ docsnav.sidebar(sections=[
             {'title': 'Forthcoming', 'links': [
                 {'href': '/netsuke/forthcoming/', 'label': 'All previews'},
                 {'href': '/netsuke/forthcoming/linter/', 'label': 'Netsukefile Linter'},
@@ -26,17 +26,17 @@
                 {'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md', 'label': 'UX and semantic design'},
                 {'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md', 'label': 'Technical design'}
             ]},
-        ], search=false, nav_label='Preview pages') }}{% raw %}
+        ], search=false, nav_label='Preview pages') }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': 'Testing Framework'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': 'Testing Framework'}]) }}
 
             <!-- Page Header -->
             <div class="mb-12 border-b border-stone-light pb-8">
                 <div class="flex items-center flex-wrap gap-3 mb-4">
-                    {% endraw %}{{ ui.kicker('Forthcoming capability', dot='bg-primary') }}{% raw %}
+                    {{ ui.kicker('Forthcoming capability', dot='bg-primary') }}
                     <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview targeted at v0.4.0</span>
                 </div>
                 <h1 class="font-serif text-4xl lg:text-5xl font-bold text-base-content mb-6">Netsukefile Testing Framework</h1>
@@ -51,10 +51,10 @@
             <section id="status" class="mb-16">
                 <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
                     <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
-                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {% endraw %}{{ generated_at.strftime('%-d %B %Y') }}{% raw %}
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.strftime('%-d %B %Y') }}
                     </h2>
                     <ul class="space-y-2 text-sm text-charcoal-mid">
-                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{% endraw %}{{ netsuke_version }}{% raw %}.</strong> Nothing described here is implemented: there is no <code>test</code> command, no <code>tests</code> manifest key, and no test dialect in the released binary.</span></li>
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> Nothing described here is implemented: there is no <code>test</code> command, no <code>tests</code> manifest key, and no test dialect in the released binary.</span></li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">RFC 0007</a> (proposed, 17 August 2026) sets the scope; the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">UX and semantic design</a> and the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">technical design</a> are drafts. Roadmap phase 7 tracks the work, with every task still open.</span></li>
                         <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span><strong>Gated on evidence.</strong> Before the dialect and mock engine are built, the seams are dogfooded through a differential fidelity suite over the repository's example manifests; if the dialect's demand assumptions fail, the design's explicit exit is overrides only, with no dialect.</span></li>
                         <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.4.0.</strong> The success criterion is concrete: an author can write the worked example below and run it to a green result on a machine with no compiler, no network, and a fixed clock. Key names, matchers, and output shapes may change before then.</span></li>
@@ -100,7 +100,7 @@
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile: discovery block and its defaults</div>
-                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                        {% highlight 'netsuke' %}
 netsuke_version: "1.2.0"
 
 tests:
@@ -111,11 +111,11 @@ tests:
   exclude:
     - "**/_*.yml"
     - "**/_*.yaml"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A test file's fixed keys plus test_* cases</div>
-                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                        {% highlight 'netsuke' %}
 netsuke_test_version: "1.0"   # required in every file
 
 imports:                       # optional support files,
@@ -129,7 +129,7 @@ fixtures: {}                   # fixture definitions
 
 test_compile_target:           # one or more cases
   steps: []
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                     </div>
                 </div>
                 <p class="text-xs text-charcoal-mid mt-4"><code>netsuke_test_version</code> is a <code>MAJOR.MINOR</code> string. The dialect denies unknown keys everywhere, so every addition is a minor-version event and an older runner rejects a newer file rather than misreading it; an unknown key is reported with the nearest known key. Case names match <code>test_[A-Za-z0-9_]+</code> and are reported as <code>&lt;file&gt;::&lt;name&gt;</code>.</p>
@@ -146,7 +146,7 @@ test_compile_target:           # one or more cases
                 </p>
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/hello.yml</div>
-                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                    {% highlight 'netsuke' %}
 netsuke_test_version: "1.0"
 
 test_hello_target_is_generated:
@@ -155,7 +155,7 @@ test_hello_target_is_generated:
       then:
         - result.ok
         - result.graph.has_target("build/hello.txt")
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
@@ -174,7 +174,7 @@ test_hello_target_is_generated:
                         <h3 class="font-bold text-base-content mb-3 text-sm"><code>then</code>: assertion forms</h3>
                         <p class="text-xs text-charcoal-mid mb-3">Scalar entries are MiniJinja boolean expressions over the result and the mock journal; object entries are structured assertions with richer diffs. Helpers available in expressions: <code>contains</code>, <code>starts_with</code>, <code>ends_with</code>, <code>matches</code>, <code>file_exists</code>, <code>file_contains</code>.</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}
 then:
   - result.ok
   - result.graph.targets | length == 3
@@ -187,7 +187,7 @@ then:
   - matches:
       value: result.error.message
       regex: "missing.*rule"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3">A false assertion is a <em>FAIL</em>; a case that could not run to a verdict is an <em>ERROR</em>. The two are distinct end to end, and expected failures can be asserted on by name.</p>
                     </div>
@@ -208,7 +208,7 @@ then:
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Shorthand doubles in given.let</div>
-                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                        {% highlight 'netsuke' %}
 given:
   env:
     set:
@@ -218,7 +218,7 @@ given:
     cc:   stub(returns="clang")
     now:  spy()
     compile_cmd: substitute("stand_in_compile")
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
                         <h3 class="font-bold text-base-content mb-3 text-sm">What can be mocked</h3>
@@ -245,7 +245,7 @@ given:
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A fixture from the UX design</div>
-                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                    {% highlight 'netsuke' %}{% raw %}
 fixtures:
   tiny_c_project:
     description: Minimal C project with one source and a Netsukefile.
@@ -267,7 +267,7 @@ fixtures:
     exports:
       root: "{{ project }}"
       manifest: "{{ project }}/Netsukefile"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                 </div>
             </section>
 
@@ -277,7 +277,7 @@ fixtures:
                 </h2>
                 <div class="bg-base-content rounded-xl overflow-hidden mb-6">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke test, as designed</div>
-                    {% endraw %}{% highlight 'text' %}{% raw %}
+                    {% highlight 'text' %}
 netsuke test [FILTER...]
 
 Arguments:
@@ -293,7 +293,7 @@ Options:
   --timeout <SECS>         Per-case wall-clock budget (default 60)
   --keep                   Preserve sandboxes of failing cases
   --allow-empty            Succeed when zero cases are selected
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
@@ -332,7 +332,7 @@ Options:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile (subject)</div>
-                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                        {% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.2.0"
 
 tests:
@@ -352,11 +352,11 @@ targets:
 
 defaults:
   - build/main.o
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/compile.yml</div>
-                        {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                        {% highlight 'netsuke' %}{% raw %}
 netsuke_test_version: "1.0"
 
 macros:
@@ -385,12 +385,12 @@ test_skips_filtered_sources:
         - contains(result.ninja, "STUB src/main.c -> build/main.o")
         - mocks.glob.call_count == 1
         - substitutes.compile_cmd.call_count == 1
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                     </div>
                 </div>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Human report, with one failing assertion rendered with its actual value</div>
-                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                    {% highlight 'netsuke-console' %}
 $ netsuke test
 
 PASS compile.yml::test_generates_object_targets
@@ -400,7 +400,7 @@ FAIL compile.yml::test_substituted_macro_receives_source
     substitutes.compile_cmd.calls[0].args[0] = "src/lib.c"
 
 2 cases: 1 passed, 1 failed
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
             </section>
 
@@ -428,9 +428,9 @@ FAIL compile.yml::test_substituted_macro_receives_source
                 </div>
             </section>
 
-{% endraw %}{{ docsnav.footer_nav({'kicker': 'Previous preview', 'label': 'Netsukefile Linter', 'href': '/netsuke/forthcoming/linter/'}, {'kicker': 'Follow', 'label': 'Roadmap', 'href': '/netsuke/roadmap/'}) }}{% raw %}
+{{ docsnav.footer_nav({'kicker': 'Previous preview', 'label': 'Netsukefile Linter', 'href': '/netsuke/forthcoming/linter/'}, {'kicker': 'Follow', 'label': 'Roadmap', 'href': '/netsuke/roadmap/'}) }}
 
         </main>
     </div>
-{% endraw %}
+
 {% endblock %}

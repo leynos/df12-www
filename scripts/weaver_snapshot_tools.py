@@ -241,11 +241,37 @@ def _session_name(site: str = DEFAULT_SITE, purpose: str = "shots") -> str:
     return f"{site}-{purpose}-{os.getpid()}"
 
 
-def _walker_expression(max_nodes: int = MAX_NODES, text_clip: int = TEXT_CLIP) -> str:
-    """Read the walker evaluator and fill in its parameters.
+def _read_walker(path: Path = WALKER) -> str:
+    """Read the walker evaluator's source.
 
     Parameters
     ----------
+    path
+        The vendored walker. The default is the file beside this module.
+
+    Returns
+    -------
+    str
+        The JavaScript source, with its parameter placeholders unfilled.
+
+    Raises
+    ------
+    OSError
+        If the file cannot be read. The command boundary turns this into a
+        message naming the file; nothing below it should have to.
+    """
+    return path.read_text(encoding="utf-8")
+
+
+def _walker_expression(
+    source: str, max_nodes: int = MAX_NODES, text_clip: int = TEXT_CLIP
+) -> str:
+    """Fill the walker evaluator's parameters in.
+
+    Parameters
+    ----------
+    source
+        The walker's source, as :func:`_read_walker` returns it.
     max_nodes
         How many elements the walk may visit before it stops.
     text_clip
@@ -258,8 +284,7 @@ def _walker_expression(max_nodes: int = MAX_NODES, text_clip: int = TEXT_CLIP) -
         string, ready for ``agent-browser eval``.
     """
     return (
-        WALKER.read_text(encoding="utf-8")
-        .replace("__INHERITED__", json.dumps(list(INHERITED_PROPERTIES)))
+        source.replace("__INHERITED__", json.dumps(list(INHERITED_PROPERTIES)))
         .replace("__ALWAYS__", json.dumps(list(ALWAYS_PROPERTIES)))
         .replace("__MAX_NODES__", str(max_nodes))
         .replace("__TEXT_CLIP__", str(text_clip))
@@ -468,7 +493,7 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     site: str = DEFAULT_SITE,
     viewport: tuple[int, int] = (CAPTURE_WIDTH, CAPTURE_HEIGHT),
     *,
-    walker: cabc.Callable[[], str] = _walker_expression,
+    walker: str,
     now: Stamp = _utc_now,
 ) -> None:
     """Snapshot each page in turn, reporting progress as it goes.
@@ -499,8 +524,10 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
         queries only show at the widths they apply to, so a migration is
         proved at more than one.
     walker
-        Where the walker's source comes from. The default reads the vendored
-        file beside this module.
+        The walker expression to evaluate in each page, as
+        :func:`_walker_expression` builds it. Read at the command boundary,
+        so a missing or unreadable walker is reported there, before any
+        server or browser is started.
     now
         Where each snapshot's timestamp comes from.
 
@@ -516,13 +543,12 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
     def drive(*args: str) -> None:
         run([browser, *args, *session])
 
-    expression = walker()
     try:
         drive("set", "viewport", str(viewport[0]), str(viewport[1]))
         for page in pages:
             url = f"{base}/{site}/{page}"
             settled = _open_settled(drive, url)
-            evaluated = read([browser, "eval", expression, *session])
+            evaluated = read([browser, "eval", walker, *session])
             try:
                 document = _snapshot_document(url, evaluated, viewport, now=now)
             except (ValueError, TypeError) as exc:

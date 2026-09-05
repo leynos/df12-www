@@ -27,7 +27,9 @@ tools = load("weaver_snapshot_tools")
 
 def test_the_walker_expression_carries_its_parameters() -> None:
     """The evaluator is a template; every placeholder has to be filled in."""
-    expression = tools._walker_expression(max_nodes=123, text_clip=45)
+    expression = tools._walker_expression(
+        tools._read_walker(), max_nodes=123, text_clip=45
+    )
 
     assert "__" not in expression.replace("__snapshotSettle", ""), (
         "a placeholder left unfilled would be a syntax error in the page"
@@ -169,6 +171,7 @@ def test_capture_settles_each_page_before_walking_it(
         run,
         read,
         "netsuke",
+        walker="walk()",
     )
 
     assert calls[0][1:5] == ["set", "viewport", "1280", "720"], (
@@ -203,7 +206,14 @@ def test_a_page_that_never_settles_is_still_captured(
     """An icon the set lacks keeps its placeholder; the page is captured and said so."""
     calls, run, read = recording_browser(settle_fails=True, unrendered=1)
     tools._capture_pages(
-        ["docs/"], tmp_path, "http://x", "/usr/bin/agent-browser", run, read, "netsuke"
+        ["docs/"],
+        tmp_path,
+        "http://x",
+        "/usr/bin/agent-browser",
+        run,
+        read,
+        "netsuke",
+        walker="walk()",
     )
 
     assert [argv[1] for argv in calls].count("eval") == 1, (
@@ -254,6 +264,7 @@ def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None
             "/usr/bin/agent-browser",
             explode,
             lambda _argv: "",
+            walker="walk()",
         )
 
     opened = [argv for argv in attempted if argv[1] == "open"]
@@ -343,6 +354,7 @@ def test_capture_lays_pages_out_at_the_viewport_it_was_given(
         read,
         "netsuke",
         (360, 800),
+        walker="walk()",
     )
     assert calls[0][1:5] == ["set", "viewport", "360", "800"], (
         f"the viewport is set before any page is opened; got {calls[0]!r}"
@@ -386,7 +398,7 @@ def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
             run,
             garbage,
             "netsuke",
-            walker=lambda: "walk()",
+            walker="walk()",
         )
     assert "docs/" in str(caught.value), "the page that broke is named"
     assert not list(tmp_path.glob("*.json")), "no half-snapshot is written"

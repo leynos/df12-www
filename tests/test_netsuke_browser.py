@@ -230,7 +230,7 @@ def test_the_walker_reports_what_the_capture_relies_on(
     fixture.write_text(WALKER_FIXTURE, encoding="utf-8")
     drive("set", "viewport", "800", "600")
     drive("open", fixture.as_uri())
-    result = _evaluate(drive, tools._walker_expression())
+    result = _evaluate(drive, tools._walker_expression(tools._read_walker()))
     document = tools._snapshot_document(fixture.as_uri(), json.dumps(result))
     tree = document["payload"]["tree"]
 
@@ -285,7 +285,9 @@ def test_the_walker_reports_what_the_capture_relies_on(
         f"{document['payload']['meta']['visited']}"
     )
 
-    capped = _evaluate(drive, tools._walker_expression(max_nodes=WALKER_BUDGET))
+    capped = _evaluate(
+        drive, tools._walker_expression(tools._read_walker(), max_nodes=WALKER_BUDGET)
+    )
     capped_document = tools._snapshot_document(fixture.as_uri(), json.dumps(capped))
 
     def count(node: dict[str, typ.Any]) -> int:

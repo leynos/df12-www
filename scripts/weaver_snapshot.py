@@ -72,11 +72,14 @@ from weaver_snapshot_tools import (
     CAPTURE_HEIGHT,
     CAPTURE_WIDTH,
     SCREENSHOT_WIDTHS,
+    WALKER,
     _capture_pages,
     _read_tool,
+    _read_walker,
     _run_tool,
     _shoot_pages,
     _tool,
+    _walker_expression,
 )
 
 app = cyclopts.App(
@@ -118,11 +121,24 @@ def capture(
     """
     pages = _page_paths(_public_root(site))
     browser = _tool("agent-browser")
+    try:
+        walker = _walker_expression(_read_walker())
+    except OSError as exc:
+        message = f"the walker at {WALKER} could not be read ({exc})"
+        raise SystemExit(message) from exc
     print(f"capturing {len(pages)} {site} pages at {width}x{height} into {out_dir}")
 
     with _staged(out_dir, ".json") as staging, _served(port, site=site) as base:
         _capture_pages(
-            pages, staging, base, browser, _run_tool, _read_tool, site, (width, height)
+            pages,
+            staging,
+            base,
+            browser,
+            _run_tool,
+            _read_tool,
+            site,
+            (width, height),
+            walker=walker,
         )
 
     print(f"done: {out_dir.resolve()}")

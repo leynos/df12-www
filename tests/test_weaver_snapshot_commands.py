@@ -345,3 +345,26 @@ def test_a_command_stops_its_server_even_when_a_page_fails(
     assert run["closed"] == [8125], (
         f"the server should be stopped however the run ends; got {run['closed']}"
     )
+
+
+def test_the_capture_command_names_a_walker_it_cannot_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The walker is read before any server or browser starts, and named if absent."""
+
+    def unreadable() -> str:
+        message = "gone"
+        raise FileNotFoundError(message)
+
+    monkeypatch.setattr(commands, "_read_walker", unreadable)
+    with (
+        _driven(monkeypatch, [""], {"agent-browser": "/usr/bin/agent-browser"}) as run,
+        pytest.raises(SystemExit) as caught,
+    ):
+        commands.capture(tmp_path / "out", port=8124)
+
+    assert "weaver_snapshot_walker.js" in str(caught.value.code), (
+        f"the message should name the walker file; got {caught.value.code!r}"
+    )
+    assert "gone" in str(caught.value.code), "and carry the reason"
+    assert run["served"] == [], f"no server should have started; got {run}"

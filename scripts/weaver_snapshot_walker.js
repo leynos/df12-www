@@ -1,5 +1,5 @@
 /**
- * weaver_snapshot_walker.js — the computed-style walker the harness evaluates.
+ * @file weaver_snapshot_walker.js — the computed-style walker the harness evaluates.
  *
  * A copy of css-view's walker evaluator (src/snapshot/walker.ts, ISC), kept
  * here so the harness can run it inside a page that agent-browser has already

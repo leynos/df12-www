@@ -376,7 +376,9 @@ def test_the_members_only_one_tailwind_transitions_are_ignored() -> None:
     ), "the two lists describe the same behaviour on this site"
 
     real = _node(**{"transition-property": "opacity"})
-    assert normalize._normalize(real)["styleDiff"]["transition-property"] == "opacity"
+    assert (
+        normalize._normalize(real)["styleDiff"]["transition-property"] == "opacity"
+    ), "a transition both Tailwinds listed is a real declaration and survives"
 
 
 @pytest.mark.parametrize(
@@ -427,7 +429,9 @@ def test_space_y_reads_the_same_whichever_sibling_carries_the_margin() -> None:
     assert _gaps(v3) == _gaps(v4), (
         "the children sit in the same places, so their gaps must read the same"
     )
-    assert _gaps(v3)[1]["gap-before-top"] == "16px"
+    assert _gaps(v3)[1]["gap-before-top"] == "16px", (
+        "the space between the first two siblings is the margin that made it"
+    )
     assert "gap-before-top" not in _gaps(v3)[0], "the first child has nothing before it"
     assert _gaps(v3)[0]["gap-after-bottom"] == "16px", "but 16px after it"
     assert "gap-after-bottom" not in _gaps(v3)[2], "and the last nothing after it"
@@ -437,7 +441,10 @@ def test_a_gap_on_the_parent_reads_the_same_as_margins_on_the_children() -> None
     """`gap-x-4` on a flex row is what v4 recommends in place of `space-x-4`."""
     spaced = _stack({}, {"margin-left": "16px"}, {"margin-left": "16px"})
     gapped = _stack({}, {}, {}, parent={"column-gap": "16px"})
-    assert _gaps(spaced) == _gaps(gapped)
+    assert _gaps(spaced) == _gaps(gapped), (
+        "a gap on the parent and margins on the children put the siblings in "
+        "the same places, so they fold to the same gaps"
+    )
     assert "column-gap" not in normalize._normalize(gapped)["styleDiff"], (
         "the parent's gap is folded into the children's and must not also count"
     )
@@ -447,7 +454,10 @@ def test_a_margin_that_really_changes_still_changes_a_gap() -> None:
     """The folding must not swallow a real move."""
     before = _stack({}, {"margin-top": "16px"})
     after = _stack({}, {"margin-top": "24px"})
-    assert _gaps(before) != _gaps(after)
+    assert _gaps(before) != _gaps(after), (
+        "a margin that really changed must still change a gap, or the fold "
+        "would hide a regression"
+    )
 
 
 def test_a_margin_that_is_not_a_length_is_left_alone() -> None:
@@ -510,7 +520,9 @@ def test_a_v4_rotation_reads_as_the_matrix_v3_wrote() -> None:
         normalize._normalize(v3)["styleDiff"]["transform"]
         == normalize._normalize(v4)["styleDiff"]["transform"]
     )
-    assert "rotate" not in normalize._normalize(v4)["styleDiff"]
+    assert "rotate" not in normalize._normalize(v4)["styleDiff"], (
+        "v4's individual rotate is folded into the composed transform"
+    )
 
 
 def test_a_v4_translation_resolves_against_the_box() -> None:
@@ -528,7 +540,9 @@ def test_a_v4_translation_resolves_against_the_box() -> None:
 def test_an_identity_transform_is_left_unsaid() -> None:
     """v3's bare `transform` utility wrote an identity matrix; v4 writes none."""
     v3 = _node(transform="matrix(1, 0, 0, 1, 0, 0)")
-    assert "transform" not in normalize._normalize(v3)["styleDiff"]
+    assert "transform" not in normalize._normalize(v3)["styleDiff"], (
+        "an identity matrix is no transform at all and is left unsaid"
+    )
 
 
 def test_a_real_transform_survives() -> None:

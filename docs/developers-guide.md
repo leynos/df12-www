@@ -1332,18 +1332,22 @@ convention test confines the flag to it.
 
 ### 7.1. Verifying a styling change against Weaver
 
-`scripts/weaver_snapshot.py` is the command surface; the work sits in ten
-siblings beside it, none over 400 lines, named for what they do: `_paths` (the
-published tree, the page list, and each page's filename stem), `_locking`
-(advisory locks and lock-file hygiene), `_output` (staging and failure-atomic
-publication), `_ownership` (proving whose server answered), `_serving` (ports,
-the server, and its lifecycle), `_tools` (driving agent-browser, and the
-walker it evaluates in the settled page), `_colour` (one colour written one
-way), `_normalize` (reducing a captured tree to what a reader could see),
-`_clock` (the passage of time, as
-something a caller can supply), and `_process` (starting, polling, and stopping
-the server child). They are plain modules rather than a package, so a script
-run by path finds them on `sys.path` and the invocation below is unchanged.
+`scripts/weaver_snapshot.py` is the command surface; the work sits in
+thirteen siblings beside it, none over 400 lines, named for what they do:
+`_paths` (the published tree, the page list, and each page's filename stem),
+`_locking` (advisory locks and lock-file hygiene), `_output` (staging and
+failure-atomic publication), `_ownership` (proving whose server answered),
+`_serving` (ports, the server, and its lifecycle), `_tools` (driving
+agent-browser, and the walker it evaluates in the settled page), `_colour`
+(one colour written one way), `_normalize` (reducing a captured tree to what
+a reader could see), `_folds` (the transition, radius, incidental-text and
+sibling-margin folds that make v4's notation read as v3's), `_transform`
+(composing v4's individual transform properties into v3's matrix),
+`_document` (reading a snapshot from disk and rendering its normalized tree),
+`_clock` (the passage of time, as something a caller can supply), and
+`_process` (starting, polling, and stopping the server child). They are plain
+modules rather than a package, so a script run by path finds them on
+`sys.path` and the invocation below is unchanged.
 
 Every outward dependency the harness has — the clock, the readiness probe, the
 process launcher, the marker fetch, the file mover, the port allocator — is a

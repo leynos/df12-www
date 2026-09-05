@@ -44,6 +44,9 @@ run by path, so its own directory is on `sys.path`.
 - ``weaver_snapshot_walker.js`` — the computed-style walk, run in the page
 - ``weaver_snapshot_colour``    — one colour written one way
 - ``weaver_snapshot_normalize`` — reducing a tree to what is visible
+- ``weaver_snapshot_folds``     — the folds that make v4's notation read as v3's
+- ``weaver_snapshot_transform`` — composing individual transforms into one matrix
+- ``weaver_snapshot_document``  — reading a snapshot and rendering its tree
 """
 
 from __future__ import annotations
@@ -59,8 +62,8 @@ import sys
 from pathlib import Path  # noqa: TC003
 
 import cyclopts
+from weaver_snapshot_document import _normalized_tree
 from weaver_snapshot_locking import _exclusive, _output_lock_path
-from weaver_snapshot_normalize import _normalized_tree
 from weaver_snapshot_output import _staged
 from weaver_snapshot_paths import DEFAULT_SITE, _page_paths, _public_root
 from weaver_snapshot_serving import _served

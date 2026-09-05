@@ -93,6 +93,8 @@ Every published file therefore has a source elsewhere in the repository:
 | `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                      |
 | `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                      |
 | `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
+| `stilyagi/assets/styles/stilyagi.css` | Tailwind compiling `src/styles/`                      |
+| `netsuke/assets/css/himotoshi.css`    | Tailwind compiling `src/styles/`                      |
 | `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
 | `*/assets/js/*.js`                    | swc compiling `src/static/**/assets/js/*.ts`          |
 | `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |

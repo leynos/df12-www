@@ -53,13 +53,13 @@ def test_the_snapshot_document_puts_the_tree_where_readers_look() -> None:
 
     document = tools._snapshot_document("http://x/netsuke/", evaluated)
 
-    assert document["payload"]["tree"] == tree
-    assert document["payload"]["meta"]["visited"] == 1
-    assert document["meta"]["url"] == "http://x/netsuke/"
+    assert document["payload"]["tree"] == tree, "the tree sits where css-view put it"
+    assert document["payload"]["meta"]["visited"] == 1, "the visit count travels too"
+    assert document["meta"]["url"] == "http://x/netsuke/", "the page is recorded"
     assert document["meta"]["viewport"] == {
         "width": tools.CAPTURE_WIDTH,
         "height": tools.CAPTURE_HEIGHT,
-    }
+    }, "an unstated viewport is the default one"
 
 
 def test_the_browser_session_is_named_for_the_site_and_the_job() -> None:
@@ -113,7 +113,6 @@ def test_concurrent_runs_do_not_share_a_browser_session() -> None:
 
 
 def _recording_browser(
-    tmp_path: Path,
     *,
     settle_fails: bool = False,
     unrendered: int = 0,
@@ -145,7 +144,7 @@ def test_capture_settles_each_page_before_walking_it(tmp_path: Path) -> None:
     where the icons will be, which moves every line below them: a layout
     change that is not a style change. The order is the whole point.
     """
-    calls, run, read = _recording_browser(tmp_path)
+    calls, run, read = _recording_browser()
     pages = ["", "install/"]
     tools._capture_pages(
         pages,
@@ -185,7 +184,7 @@ def test_a_page_that_never_settles_is_still_captured(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """An icon the set lacks keeps its placeholder; the page is captured and said so."""
-    calls, run, read = _recording_browser(tmp_path, settle_fails=True, unrendered=1)
+    calls, run, read = _recording_browser(settle_fails=True, unrendered=1)
     tools._capture_pages(
         ["docs/"], tmp_path, "http://x", "/usr/bin/agent-browser", run, read, "netsuke"
     )
@@ -193,7 +192,7 @@ def test_a_page_that_never_settles_is_still_captured(
     assert [argv[1] for argv in calls].count("eval") == 1, (
         "the walk should still be taken once the settle wait gives up"
     )
-    assert (tmp_path / "docs.json").is_file()
+    assert (tmp_path / "docs.json").is_file(), "the unsettled page is still written"
     report = capsys.readouterr().out
     assert "did not settle" in report, f"the report should say so; got {report!r}"
     assert "1 icons the set does not have" in report, (
@@ -208,7 +207,7 @@ def test_a_snapshot_that_cannot_be_read_is_an_error_not_a_count(
     with pytest.raises(FileNotFoundError):
         tools._unrendered_icons(tmp_path / "absent.json")
     (tmp_path / "broken.json").write_text("{", encoding="utf-8")
-    with pytest.raises(ValueError, match="Expecting"):
+    with pytest.raises(json.JSONDecodeError, match="Expecting"):
         tools._unrendered_icons(tmp_path / "broken.json")
     (tmp_path / "shapeless.json").write_text('{"payload": {}}', encoding="utf-8")
     with pytest.raises(KeyError):
@@ -315,7 +314,7 @@ def test_a_missing_tool_names_itself_rather_than_failing_obscurely() -> None:
 
 def test_capture_lays_pages_out_at_the_viewport_it_was_given(tmp_path: Path) -> None:
     """A phone width proves the narrow media queries; the default is the desktop."""
-    calls, run, read = _recording_browser(tmp_path)
+    calls, run, read = _recording_browser()
     tools._capture_pages(
         [""],
         tmp_path,
@@ -326,6 +325,10 @@ def test_capture_lays_pages_out_at_the_viewport_it_was_given(tmp_path: Path) -> 
         "netsuke",
         (360, 800),
     )
-    assert calls[0][1:5] == ["set", "viewport", "360", "800"], calls[0]
-    written = json.loads((tmp_path / "__home.json").read_text())
-    assert written["meta"]["viewport"] == {"width": 360, "height": 800}
+    assert calls[0][1:5] == ["set", "viewport", "360", "800"], (
+        f"the viewport is set before any page is opened; got {calls[0]!r}"
+    )
+    written = json.loads((tmp_path / "__home.json").read_text(encoding="utf-8"))
+    assert written["meta"]["viewport"] == {"width": 360, "height": 800}, (
+        "the snapshot records the viewport it was laid out at"
+    )

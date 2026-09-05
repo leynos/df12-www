@@ -19,6 +19,7 @@ if typ.TYPE_CHECKING:
     from pathlib import Path
 
 normalize = load("weaver_snapshot_normalize")
+document = load("weaver_snapshot_document")
 
 
 def test_a_parsed_snapshot_renders_without_touching_the_filesystem() -> None:
@@ -33,7 +34,7 @@ def test_a_parsed_snapshot_renders_without_touching_the_filesystem() -> None:
             }
         },
     }
-    rendered = normalize._rendered_tree(payload)
+    rendered = document._rendered_tree(payload)
 
     assert "--tw-ring-color" not in rendered, (
         f"the Tailwind internal survived into {rendered!r}"
@@ -61,7 +62,7 @@ def test_an_unusable_snapshot_names_the_file_it_came_from(
     snapshot.write_text(content, encoding="utf-8")
 
     with pytest.raises(SystemExit) as caught:
-        normalize._normalized_tree(snapshot)
+        document._normalized_tree(snapshot)
 
     message = str(caught.value.code)
     assert str(snapshot) in message, (
@@ -75,7 +76,7 @@ def test_a_missing_snapshot_exits_rather_than_raising_oserror(tmp_path: Path) ->
     absent = tmp_path / "gone.json"
 
     with pytest.raises(SystemExit) as caught:
-        normalize._normalized_tree(absent)
+        document._normalized_tree(absent)
 
     assert str(absent) in str(caught.value.code), (
         f"the message should name the file; got {caught.value.code!r}"
@@ -129,7 +130,7 @@ def test_a_snapshot_that_is_not_the_expected_shape_says_where(
     snapshot.write_text(json.dumps({"payload": {"tree": shape}}), encoding="utf-8")
 
     with pytest.raises(SystemExit) as caught:
-        normalize._normalized_tree(snapshot)
+        document._normalized_tree(snapshot)
 
     message = str(caught.value.code)
     assert str(snapshot) in message, (
@@ -158,7 +159,7 @@ def test_a_well_formed_snapshot_is_still_accepted(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    rendered = normalize._normalized_tree(snapshot)
+    rendered = document._normalized_tree(snapshot)
 
     assert "rgba(1, 2, 3, 1.000)" in rendered, (
         f"the tree should have normalized rather than been rejected; got {rendered!r}"

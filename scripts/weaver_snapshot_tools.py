@@ -180,15 +180,14 @@ def _read_tool(argv: cabc.Sequence[str]) -> str:
     subprocess.TimeoutExpired
         If it has not finished within :data:`TOOL_TIMEOUT_SECONDS`.
     """
-    completed = subprocess.run(  # noqa: S603 - fixed argv built from the published tree
+    return subprocess.run(  # noqa: S603 - fixed argv built from the published tree
         list(argv),
         cwd=REPO_ROOT,
         check=True,
         capture_output=True,
         text=True,
         timeout=TOOL_TIMEOUT_SECONDS,
-    )
-    return completed.stdout
+    ).stdout
 
 
 def _run_tool(argv: cabc.Sequence[str]) -> None:
@@ -267,6 +266,48 @@ def _walker_expression(max_nodes: int = MAX_NODES, text_clip: int = TEXT_CLIP) -
     )
 
 
+class _WalkerResult(typ.TypedDict):
+    """What the walker returns: the tree and how many elements it visited."""
+
+    tree: dict[str, typ.Any]
+    visited: int
+
+
+def _walker_result(evaluated: str) -> _WalkerResult:
+    """Decode what ``agent-browser eval`` printed into the walker's result.
+
+    Parameters
+    ----------
+    evaluated
+        The tool's stdout: the walker's JSON string, itself JSON-encoded once
+        more by the tool.
+
+    Returns
+    -------
+    _WalkerResult
+        The decoded result, checked for the two members the harness reads.
+
+    Raises
+    ------
+    ValueError
+        If the output is not JSON.
+    TypeError
+        If it decodes to something other than a mapping with a ``tree``
+        mapping and an integer ``visited``.
+    """
+    result = json.loads(evaluated.strip())
+    if isinstance(result, str):
+        result = json.loads(result)
+    if (
+        not isinstance(result, dict)
+        or not isinstance(result.get("tree"), dict)
+        or not isinstance(result.get("visited"), int)
+    ):
+        message = f"the walker did not return a tree and a visit count: {result!r:.200}"
+        raise TypeError(message)
+    return {"tree": result["tree"], "visited": result["visited"]}
+
+
 def _snapshot_document(
     url: str,
     evaluated: str,
@@ -290,9 +331,7 @@ def _snapshot_document(
         A document with ``payload.tree`` where every reader of a snapshot
         expects it, and a ``meta`` recording when and how it was taken.
     """
-    result = json.loads(evaluated.strip())
-    if isinstance(result, str):
-        result = json.loads(result)
+    result = _walker_result(evaluated)
     return {
         "meta": {
             "url": url,
@@ -398,7 +437,10 @@ def _open_settled(drive: cabc.Callable[..., None], url: str) -> bool:
     drive("wait", "--load", "networkidle")
     try:
         drive("wait", "--fn", SETTLED)
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        # agent-browser gives up on its own deadline, or the subprocess hits
+        # this module's; either way the page is walked as it stands and the
+        # capture says so.
         return False
     return True
 

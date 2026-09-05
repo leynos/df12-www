@@ -478,7 +478,11 @@ sub-shades, three font families, one spacing step, and three paper shadows.
 The snapshot harness is `scripts/weaver_snapshot.py` and its siblings. Its
 `capture` records computed styles for every page via `css-view`, `shots`
 records screenshots via `agent-browser`, and `diff` compares two captures
-after normalizing away notation differences. Run it as:
+after normalizing away notation differences. (Addendum, 2026-09-05: as the
+decision log records, `capture` no longer runs css-view. It drives
+`agent-browser`, waits for Iconify to settle, and evaluates the vendored
+walker in the page; the paragraph above describes the harness as this plan
+found it.) Run it as:
 
 ```bash
 uv run python scripts/weaver_snapshot.py capture --site netsuke .netsuke-baseline

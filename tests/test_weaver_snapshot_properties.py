@@ -38,6 +38,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # properties feed, and the tree walk that applies it.
 colour = load("weaver_snapshot_colour")
 normalize = load("weaver_snapshot_normalize")
+folds = load("weaver_snapshot_folds")
+transform = load("weaver_snapshot_transform")
 paths = load("weaver_snapshot_paths")
 
 # Deterministic and quiet: these run in the commit gate, so a flaky example or
@@ -294,7 +296,7 @@ def test_distinct_pages_never_share_a_snapshot_filename(pages: list[str]) -> Non
 # where v3 put a top one. Each fold must be total, must be a fixed point, and
 # must leave a genuine difference visible.
 
-NOISE = sorted(normalize._TRANSITION_NOISE)
+NOISE = sorted(folds._TRANSITION_NOISE)
 SIGNAL = ["color", "background-color", "border-color", "opacity", "transform"]
 transition_lists = st.lists(
     st.sampled_from([*NOISE, *SIGNAL]), min_size=1, max_size=8
@@ -305,7 +307,7 @@ transition_lists = st.lists(
 @SETTINGS
 def test_transition_noise_is_removed_and_the_rest_kept_in_order(value: str) -> None:
     """The members only one Tailwind knew go; the others keep their order."""
-    canonical = normalize._canonical_transition(value)
+    canonical = folds._canonical_transition(value)
     kept = [part for part in canonical.split(", ") if part]
     assert not set(kept) & set(NOISE), (
         f"a transition member v3 never listed survived: {canonical!r}"
@@ -313,7 +315,7 @@ def test_transition_noise_is_removed_and_the_rest_kept_in_order(value: str) -> N
     assert kept == [part for part in value.split(", ") if part not in NOISE], (
         f"the members that stay must keep their order; {value!r} became {canonical!r}"
     )
-    assert normalize._canonical_transition(canonical) == canonical, (
+    assert folds._canonical_transition(canonical) == canonical, (
         f"canonicalizing a transition twice changed it: {canonical!r}"
     )
 
@@ -330,15 +332,15 @@ def test_no_radius_past_a_semicircle_survives_and_none_below_changes(
     value: str,
 ) -> None:
     """``rounded-full`` is 9999px in v3 and infinity in v4: the same corner."""
-    capped = normalize._capped_radius(value)
+    capped = folds._capped_radius(value)
     lengths = [float(part[:-2]) for part in capped.split()]
-    assert all(length <= normalize._FULL_RADIUS for length in lengths), (
+    assert all(length <= folds._FULL_RADIUS for length in lengths), (
         f"a radius beyond the cap survived: {capped!r}"
     )
     for before, after in zip(value.split(), capped.split(), strict=True):
-        if float(before[:-2]) < normalize._FULL_RADIUS:
+        if float(before[:-2]) < folds._FULL_RADIUS:
             assert before == after, f"a radius below the cap changed: {before!r}"
-    assert normalize._capped_radius(capped) == capped, (
+    assert folds._capped_radius(capped) == capped, (
         f"capping a radius twice changed it: {capped!r}"
     )
 
@@ -357,7 +359,7 @@ def test_a_port_and_a_plotly_uid_are_incidental_whatever_they_are(
 ) -> None:
     """Both change every run without the page changing."""
     value = f"url(http://127.0.0.1:{port}/x.png) {text} url(#{prefix}{uid})"
-    stripped = normalize._incidental_text(value)
+    stripped = folds._incidental_text(value)
     assert f":{port}" not in stripped.replace(text, ""), (
         f"the loopback port survived: {stripped!r}"
     )
@@ -367,7 +369,7 @@ def test_a_port_and_a_plotly_uid_are_incidental_whatever_they_are(
     assert stripped == f"url(http://127.0.0.1/x.png) {text} url(#{prefix})", (
         f"more than the port and the uid changed: {stripped!r}"
     )
-    assert normalize._incidental_text(stripped) == stripped, (
+    assert folds._incidental_text(stripped) == stripped, (
         f"stripping a value twice changed it: {stripped!r}"
     )
 
@@ -376,7 +378,9 @@ def test_a_port_and_a_plotly_uid_are_incidental_whatever_they_are(
 @SETTINGS
 def test_text_without_a_port_or_a_uid_is_left_alone(text: str) -> None:
     """The strip must not reach anything that is not run-to-run noise."""
-    assert normalize._incidental_text(text) == text
+    assert folds._incidental_text(text) == text, (
+        f"text without a port or a uid must survive untouched; got {text!r}"
+    )
 
 
 factors = st.floats(min_value=0.1, max_value=4, allow_nan=False).map(
@@ -406,19 +410,19 @@ def test_individual_transforms_fold_to_the_matrix_v3_would_have_reported(
         "rotate": f"{angle}deg",
         "translate": f"{tx}px {ty}px",
     }
-    normalize._fold_transform(v4, bbox)
+    transform._fold_transform(v4, bbox)
     assert not {"scale", "rotate", "translate"} & v4.keys(), (
         f"an individual transform property survived the fold: {v4!r}"
     )
     expected = _expected(sx, sy, angle, tx, ty)
     rounded = ", ".join(
-        f"{round(part, normalize._MATRIX_PLACES) + 0:g}" for part in expected
+        f"{round(part, transform._MATRIX_PLACES) + 0:g}" for part in expected
     )
     v3 = {"transform": f"matrix({rounded})"}
-    normalize._fold_transform(v3, bbox)
+    transform._fold_transform(v3, bbox)
     if all(
         abs(part - identity) < IDENTITY_TOLERANCE
-        for part, identity in zip(expected, normalize._IDENTITY, strict=True)
+        for part, identity in zip(expected, transform._IDENTITY, strict=True)
     ):
         assert "transform" not in v4, f"an identity transform was reported: {v4!r}"
     else:
@@ -426,7 +430,7 @@ def test_individual_transforms_fold_to_the_matrix_v3_would_have_reported(
             f"the folded v4 properties {v4!r} disagree with v3's matrix {v3!r}"
         )
     again = dict(v4)
-    normalize._fold_transform(again, bbox)
+    transform._fold_transform(again, bbox)
     assert again == v4, f"folding a transform twice changed it: {again!r}"
 
 
@@ -437,7 +441,7 @@ def test_a_hidden_node_keeps_no_transform_at_all(
 ) -> None:
     """Chromium leaves ``rotate`` as declared on a node it does not lay out."""
     style = {"display": display, "scale": f"{sx:g}", "rotate": f"{angle}deg"}
-    normalize._fold_transform(style, {"width": 10, "height": 10})
+    transform._fold_transform(style, {"width": 10, "height": 10})
     if display == "none":
         assert style == {"display": "none"}, (
             f"a hidden node carried a transform into the comparison: {style!r}"
@@ -451,6 +455,7 @@ margins = st.integers(min_value=0, max_value=48).map(lambda n: f"{n}px")
 
 
 def _child(top: str, bottom: str) -> dict[str, typ.Any]:
+    """Build a walker node carrying only the two vertical margins."""
     return {
         "tag": "div",
         "styleDiff": {"margin-top": top, "margin-bottom": bottom},
@@ -480,8 +485,8 @@ def test_moving_a_margin_across_a_sibling_boundary_leaves_the_gaps_alone(
         v3[index]["styleDiff"]["margin-bottom"] = "0px"
         leading = int(v3[index + 1]["styleDiff"]["margin-top"][:-2])
         v3[index + 1]["styleDiff"]["margin-top"] = f"{leading + moved}px"
-    normalize._fold_sibling_margins(v4, dict(parent))
-    normalize._fold_sibling_margins(v3, dict(parent))
+    folds._fold_sibling_margins(v4, dict(parent))
+    folds._fold_sibling_margins(v3, dict(parent))
     assert [child["styleDiff"] for child in v4] == [
         child["styleDiff"] for child in v3
     ], "the same space between two siblings folded to different gaps"
@@ -498,7 +503,7 @@ def test_each_gap_is_the_two_margins_that_meet_plus_the_parent_gap(
 ) -> None:
     """What a reader sees between two siblings is exactly this sum."""
     children = [_child(top, bottom) for top, bottom in pairs]
-    normalize._fold_sibling_margins(children, {"row-gap": gap})
+    folds._fold_sibling_margins(children, {"row-gap": gap})
     for index in range(1, len(children)):
         expected = (
             int(pairs[index][0][:-2]) + int(pairs[index - 1][1][:-2]) + int(gap[:-2])
@@ -517,7 +522,7 @@ def test_a_child_with_an_auto_margin_keeps_its_margins(
     """``mx-auto`` centring is not a gap and must survive as declared."""
     children = [_child(top, bottom) for top, bottom in pairs]
     children[0]["styleDiff"]["margin-top"] = "auto"
-    normalize._fold_sibling_margins(children, {"row-gap": gap})
+    folds._fold_sibling_margins(children, {"row-gap": gap})
     assert children[0]["styleDiff"]["margin-top"] == "auto", (
         f"an auto margin was folded away: {children[0]['styleDiff']!r}"
     )

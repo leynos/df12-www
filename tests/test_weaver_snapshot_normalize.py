@@ -519,7 +519,7 @@ def test_a_v4_rotation_reads_as_the_matrix_v3_wrote() -> None:
     assert (
         normalize._normalize(v3)["styleDiff"]["transform"]
         == normalize._normalize(v4)["styleDiff"]["transform"]
-    )
+    ), "v3's composed matrix and v4's individual rotate must fold alike"
     assert "rotate" not in normalize._normalize(v4)["styleDiff"], (
         "v4's individual rotate is folded into the composed transform"
     )
@@ -534,7 +534,7 @@ def test_a_v4_translation_resolves_against_the_box() -> None:
     assert (
         normalize._normalize(v3)["styleDiff"]["transform"]
         == normalize._normalize(v4)["styleDiff"]["transform"]
-    )
+    ), "a percentage translation resolves against the box to v3's pixels"
 
 
 def test_an_identity_transform_is_left_unsaid() -> None:

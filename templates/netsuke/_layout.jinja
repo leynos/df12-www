@@ -12,9 +12,11 @@
   `doc_page.jinja` extends it directly and fills `page_scripts` and
   `body_class` with the documentation chrome; every template under
   `pages/` reaches it that way, save for the standalone
-  `pages/icon-replacements.jinja`. `home_page.jinja` extends it
-  directly rather than through `doc_page.jinja`, since the homepage is
-  not a documentation page.
+  `pages/icon-replacements.jinja`. So does `shared_content_page.jinja`,
+  which draws the legal pages: it extends `doc_page.jinja` rather than
+  the layout, and so carries the documentation chrome with it.
+  `home_page.jinja` extends the layout directly rather than through
+  `doc_page.jinja`, since the homepage is not a documentation page.
 #}
 <!DOCTYPE html>
 <html lang="en">

@@ -1,6 +1,9 @@
-MDLINT ?= $(shell which markdownlint-cli2)
-NIXIE ?= $(shell which nixie)
-MDFORMAT_ALL ?= $(shell which mdformat-all)
+# `command -v` rather than `which`: under `bun run`, node_modules/.bin leads
+# PATH, and the `which` npm package (a stylelint dependency) installs a shim
+# there that starts node on every lookup, slowing every nested make.
+MDLINT ?= $(shell command -v markdownlint-cli2)
+NIXIE ?= $(shell command -v nixie)
+MDFORMAT_ALL ?= $(shell command -v mdformat-all)
 TOOLS = $(MDFORMAT_ALL) ruff ty $(MDLINT) $(NIXIE) uv bun
 VENV_TOOLS = pytest
 UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
@@ -16,13 +19,14 @@ PYTEST_FILTER += -m 'not playwright'
 endif
 
 .PHONY: help all clean build build-release lint fmt check-fmt check-site-data \
-        docs-check markdownlint nixie site-data spelling test typecheck typecheck-js \
+        docs-check markdownlint nixie site-data spelling stylelint test typecheck \
+        typecheck-js \
         $(TOOLS) \
         $(VENV_TOOLS) dev
 
 .DEFAULT_GOAL := all
 
-all: build check-fmt lint test test-js typecheck docs-check spelling
+all: build check-fmt lint stylelint test test-js typecheck docs-check spelling
 
 .venv: pyproject.toml
 	$(UV_ENV) uv venv --clear
@@ -95,6 +99,10 @@ fmt: ruff $(NODE_MODULES_STAMP) $(MDFORMAT_ALL) ## Format sources
 	ruff format
 	ruff check --select I --fix
 	bun run lint:js:fix
+	# Safe over the generated Pygments blocks: the generators emit
+	# stylelint-disable markers around them, and fixes are not applied
+	# inside a disabled range.
+	bun run lint:css:fix
 	$(MDFORMAT_ALL)
 
 check-fmt: ruff ## Verify formatting
@@ -106,6 +114,11 @@ check-fmt: ruff ## Verify formatting
 lint: ruff $(NODE_MODULES_STAMP) ## Run linters
 	ruff check
 	bun run lint:js
+
+stylelint: $(NODE_MODULES_STAMP) ## Lint the hand-written and Tailwind CSS
+	# Lint only: Biome formats the CSS, so this is the rule set in
+	# stylelint.config.js over src/**/*.css and nothing else.
+	bun run lint:css
 
 typecheck: build ty typecheck-js ## Run typechecking
 	ty --version

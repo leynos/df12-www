@@ -191,8 +191,8 @@ triggers a recompile. See section 2 of the Developer's Guide for the full
 watcher contract.
 
 `make all` composes
-`build check-fmt lint test test-js typecheck docs-check spelling`, run
-sequentially so the build cache is used rather than contended by parallel
+`build check-fmt lint stylelint test test-js typecheck docs-check spelling`,
+run sequentially so the build cache is used rather than contended by parallel
 invocations.
 
 ## 6. Typing conventions adopted in the migration

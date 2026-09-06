@@ -19,6 +19,8 @@
     "build:pages": "uv run pages generate --all-sites",
     "serve": "bun run build && bunx http-server public -p ${DF12_PORT:-8080}",
     "lint:js": "biome check .",
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
     "docs:check": "typedoc --options typedoc.json",
     "typecheck:js": "tsc -p tsconfig.browser.json --noEmit && tsc -p tsconfig.scripts.json --noEmit",
     "lint:js:fix": "biome check --write .",
@@ -41,6 +43,8 @@
     "http-server": "^14.1.1",
     "minisearch": "7.2.0",
     "sharp": "^0.35.3",
+    "stylelint": "17.15.0",
+    "stylelint-config-standard": "40.0.0",
     "tailwindcss": "^4.1.15",
     "typedoc": "0.28.20",
     "typescript": "6"

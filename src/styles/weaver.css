@@ -23,7 +23,7 @@
  *
  * The layering is load-bearing. When this stylesheet stood alone beside the
  * Play CDN, both it and the utilities were unlayered, so ties went to the
- * utilities on source order — the CDN injected its <style> after this file's
+ * utilities on source order — the CDN injected its \3c style> after this file's
  * <link>. Compiled Tailwind puts utilities in @layer utilities, and per CSS
  * Cascade Level 5 an unlayered declaration beats every layered one regardless
  * of specificity. Left unlayered, these rules would start winning arguments
@@ -37,7 +37,6 @@
  * element, which here means `chrome` before `content`: a legal page's
  * sidebar and its prose both live under the same shell. */
 @import "./weaver/site-base.css" layer(base);
-
 @import "./weaver/chrome.css" layer(components);
 @import "./weaver/panels.css" layer(components);
 @import "./weaver/callouts.css" layer(components);
@@ -88,24 +87,22 @@
   --color-base-200: #ece7cd;
   --color-base-300: #ded8bc;
   --color-base-content: #193c6e;
-
   --color-primary: #193c6e;
   --color-primary-content: #f3efd9;
   --color-secondary: #0f2440;
   --color-secondary-content: #f3efd9;
   --color-accent: #e8502b;
-  --color-accent-content: #ffffff;
+  --color-accent-content: #fff;
   --color-neutral: #0f2440;
   --color-neutral-content: #f3efd9;
-
   --color-info: #193c6e;
   --color-info-content: #f3efd9;
   --color-success: #3a7049;
-  --color-success-content: #ffffff;
+  --color-success-content: #fff;
   --color-warning: #8a6420;
   --color-warning-content: #fff4e0;
   --color-error: #c43a3a;
-  --color-error-content: #ffffff;
+  --color-error-content: #fff;
 
   /* Weaver's surfaces are hard-edged: the markup reaches for rounded-sm and
      rounded-[2px] almost exclusively, and its elevation is drawn with offset
@@ -191,9 +188,9 @@
      solid one under the current nav item; the panel shadows are washes of the
      same indigo at three weights. */
   --shadow-block: 2px 2px 0 #193c6e;
-  --shadow-panel-sm: 4px 4px 0 rgba(25, 60, 110, 0.1);
-  --shadow-panel: 8px 8px 0 rgba(25, 60, 110, 0.1);
-  --shadow-panel-soft: 8px 8px 0 rgba(25, 60, 110, 0.08);
+  --shadow-panel-sm: 4px 4px 0 rgb(25 60 110 / 10%);
+  --shadow-panel: 8px 8px 0 rgb(25 60 110 / 10%);
+  --shadow-panel-soft: 8px 8px 0 rgb(25 60 110 / 8%);
 
   /* Dracula, which is where the hand-marked code samples took their colours.
      The `.token-*` classes in weaver/code.css are the only consumers. */
@@ -206,12 +203,13 @@
   --color-token-cmd: #50fa7b;
   --color-token-arg: #f8f8f2;
   --color-token-pass: #50fa7b;
-  --color-token-fail: #ff5555;
+  --color-token-fail: #f55;
   --color-code-surface: #282a36;
 
   /* Weaver's own signal palette. These began as Tailwind's stock shades,
      used directly in the markup; each is kept at the value the design was
      drawn against and given the name of the job it does. */
+
   /* Syntax colours inside the dark terminal and code panels. */
   --color-code-text: #d1d5db; /* was gray-300: body text in a dark code panel */
   --color-code-dim: #9ca3af; /* was gray-400: secondary text in a dark panel */

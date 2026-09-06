@@ -41,7 +41,7 @@
   max-width: 72rem;
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .masthead-frame {
     min-width: min(44rem, 100%);
   }
@@ -102,7 +102,7 @@
  * utilities on the cells, utilities sit in a later layer than this file,
  * and layer order alone cannot beat them.
  */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .command-table thead {
     position: absolute;
     overflow: hidden;

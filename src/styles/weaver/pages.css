@@ -1,6 +1,6 @@
 /* Per-page components.
  *
- * Each of these was a small `<style>` block inlined in the one template that
+ * Each of these was a small `\3c style>` block inlined in the one template that
  * used it. That is a defensible shape for a one-off, but it kept colour
  * literals in the markup and put the rules out of reach of the stylesheet's
  * own tokens. The roadmap's timeline rule was a hex code at 20% opacity and

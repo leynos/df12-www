@@ -100,7 +100,7 @@
   color: var(--color-base-content);
 }
 
-@media (min-width: 76rem) {
+@media (width >= 76rem) {
   .doc-list,
   .doc-featured {
     display: grid;
@@ -179,7 +179,7 @@
   color: var(--color-ink-2);
 }
 
-@media (min-width: 90rem) {
+@media (width >= 90rem) {
   .command-list {
     display: grid;
     column-gap: var(--space-5);

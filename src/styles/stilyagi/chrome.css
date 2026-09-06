@@ -4,6 +4,7 @@
    ================================================================= */
 
 /* ---------- Utilities ----------------------------------------------- */
+
 /* Scripts toggle `hidden` on table rows and tab panels, whose component CSS
    sets an explicit `display`; without this the attribute would be ignored. */
 [hidden] {
@@ -30,6 +31,7 @@
 }
 
 /* ---------- Skip link ----------------------------------------------- */
+
 /* Visually hidden until focused, then pinned above the sticky masthead. */
 .skip-link {
   position: absolute;
@@ -46,6 +48,7 @@
   font-weight: 700;
   text-decoration: none;
 }
+
 .skip-link:focus {
   left: calc(var(--unit) * 2);
   top: calc(var(--unit) * 2);
@@ -60,27 +63,28 @@
   border-bottom: var(--rule-weight-2) solid var(--color-ink);
   backdrop-filter: blur(10px);
 }
+
 .site-mast-inner {
   max-width: 1320px;
   margin: 0 auto;
   padding: 14px calc(var(--unit) * 4) 12px;
   display: grid;
   grid-template-columns: auto 1fr;
-  align-items: center;
-  justify-items: end;
+  place-items: center end;
   gap: calc(var(--unit) * 4);
 }
+
 .brand-lockup {
   display: grid;
   grid-template-columns: 42px auto;
   grid-template-rows: auto auto;
   align-items: center;
-  column-gap: 18px;
-  row-gap: 2px;
+  gap: 2px 18px;
   color: var(--color-ink);
   text-decoration: none;
   justify-self: start;
 }
+
 .brand-lockup .brand-stripe {
   grid-row: 1 / span 2;
   width: 42px;
@@ -88,6 +92,7 @@
   border-right: var(--rule-weight) solid var(--color-ink);
   background: repeating-linear-gradient(135deg, var(--color-ink) 0 8px, transparent 8px 14px);
 }
+
 .brand-lockup .brand-word {
   font-family: var(--font-display);
   font-weight: 900;
@@ -96,6 +101,7 @@
   line-height: 0.8;
   text-transform: lowercase;
 }
+
 .brand-lockup .brand-imprint {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -104,6 +110,7 @@
   color: var(--color-fg-muted);
   text-transform: uppercase;
 }
+
 /* On the narrowest phones the imprint wraps to two lines and pushes the
    masthead out of shape; dropping the publisher prefix keeps it on one. */
 @media (width <= 460px) {
@@ -111,9 +118,11 @@
     display: none;
   }
 }
+
 .site-mast nav {
   justify-self: end;
 }
+
 .nav-toggle {
   display: none;
   border: var(--rule-weight) solid var(--color-ink);
@@ -121,19 +130,23 @@
   padding: 10px 9px;
   cursor: pointer;
 }
+
 .nav-toggle-bars {
   display: block;
   width: 22px;
   height: 13px;
   background: repeating-linear-gradient(180deg, var(--color-ink) 0 3px, transparent 3px 8px);
 }
+
 .nav-toggle:hover .nav-toggle-bars {
   background: repeating-linear-gradient(180deg, var(--color-press-red) 0 3px, transparent 3px 8px);
 }
+
 .site-mast nav ol {
   list-style: none;
   padding: 0;
   margin: 0;
+
   /* The list carries the popover attribute for the narrow-width menu, and
      the UA styles a popover as a fixed, inset-0, bordered box even while
      closed; reset all of that so the desktop row lays out in flow. */
@@ -155,6 +168,7 @@
   text-transform: uppercase;
   font-weight: 700;
 }
+
 .site-mast nav a {
   position: relative;
   display: inline-flex;
@@ -162,10 +176,12 @@
   text-decoration: none;
   padding: 6px 0 8px;
 }
+
 .site-mast nav a span {
   position: relative;
   z-index: 1;
 }
+
 .site-mast nav a::after {
   content: "";
   position: absolute;
@@ -178,9 +194,11 @@
   transform-origin: left;
   transition: transform var(--tempo-fast) var(--ease);
 }
+
 .site-mast nav a:hover {
   color: var(--color-accent-text);
 }
+
 /* The way out of the sub-site is not one of its sections, so it sits a shade
    back from the section links and takes a rule of its own to say so. */
 .site-mast nav .nav-up {
@@ -188,12 +206,15 @@
   padding-right: 26px;
   border-right: var(--rule-weight) solid var(--color-ink-soft);
 }
+
 .site-mast nav .nav-up a {
   color: var(--color-ink-soft);
 }
+
 .site-mast nav .nav-up a:hover {
   color: var(--color-accent-text);
 }
+
 .site-mast nav a:hover::after,
 .site-mast nav a.active::after {
   transform: scaleX(1);
@@ -207,9 +228,11 @@
   .nav-toggle {
     display: grid;
   }
+
   .site-mast nav ol:not(:popover-open) {
     display: none;
   }
+
   .site-mast nav ol:popover-open {
     position: fixed;
     inset: auto;
@@ -224,10 +247,12 @@
     background: var(--color-paper);
     box-shadow: 6px 6px 0 var(--color-press-red);
   }
+
   .site-mast nav ol:popover-open a {
     display: block;
     padding: 8px 0;
   }
+
   /* Stacked in the menu, the divider belongs under the row, not beside it. */
   .site-mast nav ol:popover-open .nav-up {
     margin-right: 0;
@@ -237,6 +262,7 @@
     border-right: 0;
     border-bottom: var(--rule-weight) solid var(--color-ink-soft);
   }
+
   .site-mast nav ol::backdrop {
     background: color-mix(in srgb, var(--color-ink) 25%, transparent);
   }
@@ -259,6 +285,7 @@
       transparent
     );
 }
+
 .page-intro::before {
   content: "";
   position: absolute;
@@ -272,6 +299,7 @@
     var(--color-press-red) 10px 20px
   );
 }
+
 .page-intro .wrap {
   max-width: 1320px;
   margin: 0 auto;
@@ -282,6 +310,7 @@
   align-items: end;
   position: relative;
 }
+
 .page-intro .wrap::after {
   content: "";
   position: absolute;
@@ -313,6 +342,7 @@
     );
   opacity: 0.55;
 }
+
 .page-intro .folio {
   font-family: var(--font-sans);
   font-size: var(--t-caption);
@@ -325,6 +355,7 @@
   gap: 14px;
   font-weight: 700;
 }
+
 .page-intro .folio::after {
   content: "";
   display: block;
@@ -332,15 +363,18 @@
   background: var(--color-press-red);
   flex: 1;
 }
+
 .page-intro h1 {
   font-size: clamp(3.3rem, 5vw + 1rem, 6rem);
   line-height: 0.88;
   margin: 0;
   max-width: 10ch;
 }
+
 .page-intro h1 .accent {
   color: var(--color-accent-text);
 }
+
 .page-intro .lede {
   font-size: 1.18rem;
   line-height: 1.55;
@@ -349,23 +383,28 @@
   position: relative;
   z-index: 1;
 }
+
 .page-intro .lede::first-line {
   font-variant: small-caps;
   letter-spacing: 0.04em;
 }
+
 /* A rubber stamp filed under the lede — the docs page's version mark, the
    roadmap's GROUNDED. */
 .page-intro .intro-stamp {
   margin-top: 18px;
 }
-@media (max-width: 900px) {
+
+@media (width <= 900px) {
   .page-intro .wrap {
     grid-template-columns: 1fr;
     gap: calc(var(--unit) * 3);
   }
+
   .page-intro .wrap::after {
     display: none;
   }
+
   .page-intro h1 {
     max-width: none;
   }
@@ -377,6 +416,7 @@
   border-top: var(--rule-weight-2) solid var(--color-ink);
   margin: 0;
 }
+
 .folio-sm {
   font-family: var(--font-sans);
   font-size: var(--t-caption);
@@ -397,6 +437,7 @@
     ),
     var(--color-paper-shade);
 }
+
 .colophon-footer .wrap {
   max-width: 1320px;
   margin: 0 auto;
@@ -406,6 +447,7 @@
   gap: calc(var(--unit) * 4);
   position: relative;
 }
+
 .colophon-footer .colophon-heading {
   font-family: var(--font-sans);
   font-size: 0.78rem;
@@ -413,14 +455,17 @@
   color: var(--color-accent-text);
   margin-bottom: 14px;
 }
+
 .colophon-footer ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .colophon-footer ul li {
   margin-bottom: 6px;
 }
+
 .colophon-footer ul a {
   font-family: var(--font-editorial);
   font-size: 1rem;
@@ -428,16 +473,19 @@
   text-decoration: none;
   border-bottom: 1px dotted var(--color-ink-soft);
 }
+
 .colophon-footer ul a:hover {
   color: var(--color-accent-text);
   border-color: var(--color-press-red);
 }
+
 .colophon-footer .imprint {
   font-family: var(--font-editorial);
   font-size: 1rem;
   line-height: 1.55;
   color: var(--color-ink-soft);
 }
+
 .colophon-footer .imprint strong {
   font-family: var(--font-display);
   font-weight: 900;
@@ -449,9 +497,11 @@
   margin-bottom: 6px;
   line-height: 0.82;
 }
+
 .colophon-footer .imprint .r {
   color: var(--color-accent-text);
 }
+
 .colophon-footer .imprint .sig {
   margin-top: 14px;
   font-family: var(--font-sans);
@@ -460,6 +510,7 @@
   text-transform: uppercase;
   color: var(--color-ink);
 }
+
 .colophon-strip {
   border-top: var(--rule-weight) solid var(--color-ink);
   padding: 14px calc(var(--unit) * 4);
@@ -478,20 +529,22 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
   .colophon-footer .wrap {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
   .brand-lockup {
     grid-template-columns: 26px auto;
     column-gap: 12px;
   }
+
   .brand-lockup .brand-stripe {
     width: 26px;
   }
+
   .colophon-footer .wrap {
     grid-template-columns: 1fr;
   }
@@ -503,6 +556,7 @@
   margin: 0 auto;
   padding: calc(var(--unit) * 8) calc(var(--unit) * 4);
 }
+
 .stack-section + .stack-section {
   padding-top: 0;
 }
@@ -516,6 +570,7 @@
   padding-bottom: calc(var(--unit) * 2);
   border-bottom: var(--rule-weight) solid var(--color-ink);
 }
+
 .section-head .num {
   font-family: var(--font-display);
   font-weight: 900;
@@ -523,10 +578,12 @@
   line-height: 0.8;
   color: var(--color-accent-text);
 }
+
 .section-head h2 {
   font-size: 2.25rem;
   margin: 0;
 }
+
 .section-head .tag {
   font-family: var(--font-sans);
   font-size: var(--t-caption);
@@ -537,6 +594,7 @@
 }
 
 /* ---------- Closing section ---------------------------------------- */
+
 /* A pull-quote and a row of onward links: the last thing on why, how, and
    design.  All three spelled it out in style attributes, which is how they
    came to disagree about the measure without anyone deciding they should.
@@ -548,11 +606,13 @@
   padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 10);
   text-align: center;
 }
+
 .closing .pullquote {
   max-width: 38ch;
   margin: 0 auto;
   font-size: 2rem;
 }
+
 .closing .next {
   margin-top: calc(var(--unit) * 4);
   display: flex;
@@ -560,6 +620,7 @@
   justify-content: center;
   flex-wrap: wrap;
 }
+
 .closing .next a {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -571,6 +632,7 @@
   border-bottom: 2px solid var(--color-press-red);
   padding-bottom: 2px;
 }
+
 .closing .next a:hover {
   color: var(--color-accent-text);
 }
@@ -599,12 +661,15 @@
   padding: calc(var(--unit) * 3);
   border-left: var(--rule-weight-3) solid var(--color-press-red);
 }
+
 .ink-panel h3 {
   color: var(--color-paper);
 }
+
 .ink-panel .accent {
   color: var(--color-accent-text);
 }
+
 .ink-panel a {
   color: var(--color-paper);
 }
@@ -620,17 +685,21 @@
   padding: 2px 8px 1px;
   border: 1px solid currentcolor;
 }
+
 .verdict.red {
   color: var(--color-accent-text);
 }
+
 .verdict.ink {
   color: var(--color-ink);
 }
+
 /* The verdict is set in its colour and outlined in it, so both take the
    type-safe hue: the fills manage 4.36:1 and 4.09:1 against paper. */
 .verdict.ochre {
   color: var(--color-signal-rust-text);
 }
+
 .verdict.sage {
   color: var(--color-signal-sage-text);
 }

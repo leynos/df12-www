@@ -142,7 +142,7 @@ def test_the_breakpoint_the_guide_quotes_is_the_one_in_force(
     )
 
     css = CHROME_CSS.read_text(encoding="utf-8")
-    assert "@media (max-width: 1023px)" in css, (
+    assert "@media (width <= 1023px)" in css, (
         "the stylesheet's drawer breakpoint has moved away from 1023px, so the "
         "guide's 1024 is no longer the boundary"
     )

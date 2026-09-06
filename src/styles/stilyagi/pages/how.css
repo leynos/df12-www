@@ -1,10 +1,11 @@
-/* Stilyagi · page styles for how. Extracted from the source site's inline <style>. */
+/* Stilyagi · page styles for how. Extracted from the source site's inline \3c style>. */
 
 .arch {
   max-width: 1240px;
   margin: 0 auto;
   padding: calc(var(--unit) * 6) calc(var(--unit) * 4) calc(var(--unit) * 4);
 }
+
 .arch-diagram {
   border: var(--rule-weight-2) solid var(--color-ink);
   background: var(--color-paper);
@@ -12,6 +13,7 @@
   position: relative;
   overflow: hidden;
 }
+
 /* The label used to be a content string on ::before.  Generated text is not
    reliably exposed to assistive technology, cannot be selected or
    translated, and the repository's own spell checking cannot see it, so it
@@ -23,12 +25,14 @@
   font-family: var(--font-sans);
   font-size: 0.7rem;
   letter-spacing: 0.2em;
+
   /* The markup carries the label in sentence case, as prose; the caps are a
      presentational choice, as they are for every other label on the site. */
   text-transform: uppercase;
   color: var(--color-accent-text);
   font-weight: 700;
 }
+
 .pipeline {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -36,6 +40,7 @@
   align-items: stretch;
   margin-top: calc(var(--unit) * 2);
 }
+
 .stage {
   padding: calc(var(--unit) * 3) calc(var(--unit) * 2);
   border-right: var(--rule-weight) solid var(--color-ink);
@@ -44,9 +49,11 @@
   flex-direction: column;
   min-height: 240px;
 }
+
 .stage:last-child {
   border-right: 0;
 }
+
 .stage .sidx {
   font-family: var(--font-display);
   font-weight: 900;
@@ -55,6 +62,7 @@
   line-height: 1;
   margin-bottom: 8px;
 }
+
 .stage h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -64,12 +72,14 @@
   line-height: 1.05;
   letter-spacing: 0;
 }
+
 .stage p {
   font-family: var(--font-editorial);
   font-size: 0.95rem;
   line-height: 1.45;
   margin: 0 0 8px;
 }
+
 .stage .layer-tag {
   margin-top: auto;
   font-family: var(--font-sans);
@@ -80,14 +90,17 @@
   padding: 3px 6px 2px;
   align-self: flex-start;
 }
+
 .layer-rust {
   background: var(--color-ink);
   color: var(--color-paper);
 }
+
 .layer-py {
   background: var(--color-press-red);
   color: var(--color-paper);
 }
+
 .layer-bridge {
   background: var(--color-jazz-ochre);
   color: var(--color-ink);
@@ -102,10 +115,12 @@
   font-size: 1.8rem;
   color: var(--color-accent-text);
 }
+
 .arrow-row span {
   text-align: right;
   margin-right: -12px;
 }
+
 .arrow-row span:last-child {
   visibility: hidden;
 }
@@ -116,25 +131,31 @@
   grid-template-columns: 1fr 1fr;
   gap: calc(var(--unit) * 3);
 }
+
 .boundary .layer-card {
   border: var(--rule-weight) solid var(--color-ink);
   padding: calc(var(--unit) * 3);
   background: var(--color-paper);
 }
+
 .boundary .layer-card.rust {
   background: var(--color-ink);
   color: var(--color-paper);
 }
+
 .boundary .layer-card.rust h3 {
   color: var(--color-paper);
 }
+
 .boundary .layer-card.rust ul li {
   color: var(--color-paper);
   border-bottom-color: color-mix(in srgb, var(--color-paper) 25%, transparent);
 }
+
 .boundary .layer-card.rust ul li::before {
   color: var(--color-press-red-on-ink);
 }
+
 .boundary .layer-card h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -142,6 +163,7 @@
   font-size: 1.4rem;
   margin: 0 0 10px;
 }
+
 /* --accent-text is already the ink-ground red inside the Rust card, so this
    one rule serves both cards; the card no longer restates it, and neither
    does the template. */
@@ -154,11 +176,13 @@
   font-weight: 700;
   margin-bottom: 12px;
 }
+
 .boundary .layer-card ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .boundary .layer-card li {
   padding: 8px 0 8px 1.6em;
   border-bottom: 1px dashed color-mix(in srgb, var(--color-ink) 20%, transparent);
@@ -167,6 +191,7 @@
   font-size: 1rem;
   line-height: 1.4;
 }
+
 .boundary .layer-card li::before {
   content: "☞";
   position: absolute;
@@ -175,6 +200,7 @@
   font-family: var(--font-editorial);
   color: var(--color-accent-text);
 }
+
 .boundary .layer-card li:last-child {
   border-bottom: 0;
 }
@@ -185,12 +211,14 @@
   margin: 0 auto;
   padding: calc(var(--unit) * 6) calc(var(--unit) * 4);
 }
+
 .ex-wrap {
   display: grid;
   grid-template-columns: 57fr 43fr;
   gap: 0;
   border: var(--rule-weight-2) solid var(--color-ink);
 }
+
 .ex-wrap > .ex-col {
   padding: 0;
   background: var(--color-paper);
@@ -198,11 +226,13 @@
   flex-direction: column;
   min-width: 0;
 }
+
 .ex-wrap > .ex-col + .ex-col {
   /* The split runs across both the paper header and the ink panels below,
      where --ink would be invisible. */
   border-left: var(--rule-weight) solid var(--color-rule-on-ink);
 }
+
 .ex-header {
   padding: 14px 20px;
   border-bottom: var(--rule-weight) solid var(--color-ink);
@@ -216,10 +246,12 @@
   align-items: center;
   background: var(--color-paper-shade);
 }
+
 .ex-header .red {
   color: var(--color-accent-text);
   font-weight: 700;
 }
+
 .ex-body {
   padding: 0;
   flex: 1;
@@ -227,9 +259,11 @@
   flex-direction: column;
   min-width: 0;
 }
+
 .ex-body > * {
   flex: 1;
 }
+
 .ex-body pre {
   margin: 0;
   padding: 20px 22px;
@@ -245,39 +279,50 @@
   line-height: 1.55;
   overflow-x: auto;
 }
+
 .term .prompt {
   color: var(--color-signal-sage-on-ink);
 }
+
 .term .cmd {
   color: var(--color-paper);
 }
+
 .term .dim {
   color: color-mix(in srgb, var(--color-paper) 55%, transparent);
 }
+
 .term .err {
   color: var(--color-press-red-on-ink);
   font-weight: 700;
 }
+
 .term .warn {
   color: var(--color-jazz-ochre);
   font-weight: 700;
 }
+
 .term .path {
   color: var(--color-jazz-cyan);
 }
+
 .term .code {
   color: var(--color-press-red-on-ink);
   font-weight: 700;
 }
+
 .term .msg {
   color: var(--color-paper);
 }
+
 .term .caret {
   color: var(--color-press-red-on-ink);
 }
+
 .term .rule {
   color: var(--color-fg2-on-ink);
 }
+
 .term .final {
   color: var(--color-signal-sage-on-ink);
 }
@@ -288,20 +333,24 @@
   margin: 0 auto;
   padding: calc(var(--unit) * 6) calc(var(--unit) * 4);
 }
+
 .cli-table {
   /* Clears the artwork above it, which the section stacks the table under. */
   margin-top: calc(var(--unit) * 4);
   border: var(--rule-weight-2) solid var(--color-ink);
   background: var(--color-paper);
 }
+
 .cli-row {
   display: grid;
   grid-template-columns: 200px minmax(0, 1.1fr) minmax(0, 1.3fr);
   border-bottom: var(--rule-weight) solid var(--color-ink);
 }
+
 .cli-row:last-child {
   border-bottom: 0;
 }
+
 .cli-row .cmd {
   padding: calc(var(--unit) * 3);
   background: var(--color-paper-shade);
@@ -311,14 +360,17 @@
   font-weight: 700;
   color: var(--color-ink);
 }
+
 .cli-row .cmd .accent {
   color: var(--color-accent-text);
 }
+
 /* The program name is the constant part of all six invocations, so it is set
    back from the verb that distinguishes them. */
 .cli-row .cmd .dim {
   color: var(--color-ink-soft);
 }
+
 .cli-row .sum {
   padding: calc(var(--unit) * 3);
   font-family: var(--font-editorial);
@@ -326,6 +378,7 @@
   line-height: 1.45;
   border-right: var(--rule-weight) solid var(--color-ink);
 }
+
 .cli-row .opts {
   padding: calc(var(--unit) * 3);
   font-family: var(--font-mono);
@@ -333,6 +386,7 @@
   color: var(--color-ink-soft);
   line-height: 1.6;
 }
+
 .cli-row .opts code {
   color: var(--color-accent-text);
   font-family: var(--font-mono);
@@ -348,6 +402,7 @@
   grid-template-columns: 260px 1fr;
   gap: calc(var(--unit) * 6);
 }
+
 .flowtext .margin-note {
   font-family: var(--font-sans);
   font-size: 0.72rem;
@@ -359,12 +414,14 @@
   top: 100px;
   align-self: start;
 }
+
 .flowtext .margin-note .red {
   color: var(--color-accent-text);
   font-weight: 700;
   display: block;
   margin-bottom: 6px;
 }
+
 .flowtext .body h3 {
   font-family: var(--font-display);
   font-size: 1.8rem;
@@ -372,18 +429,22 @@
   margin: calc(var(--unit) * 4) 0 calc(var(--unit) * 2);
   line-height: 0.95;
 }
+
 .flowtext .body h3:first-child {
   margin-top: 0;
 }
+
 .flowtext .body h3 .red {
   color: var(--color-accent-text);
 }
+
 .flowtext .body p {
   font-family: var(--font-editorial);
   font-size: 1.1rem;
   line-height: 1.55;
   max-width: 64ch;
 }
+
 .flowtext .body p + p {
   text-indent: 1.8em;
 }
@@ -403,18 +464,21 @@
   gap: calc(var(--unit) * 3);
   margin-top: calc(var(--unit) * 4);
 }
+
 .layer-illo figure {
   margin: 0;
   border: var(--rule-weight) solid var(--color-ink);
   overflow: hidden;
   position: relative;
 }
+
 .layer-illo figure img {
   width: 100%;
   height: 160px;
   object-fit: cover;
   display: block;
 }
+
 .layer-illo figcaption {
   padding: 8px 12px;
   background: var(--color-paper);
@@ -432,9 +496,11 @@
   border: var(--rule-weight-2) solid var(--color-ink);
   overflow: hidden;
   position: relative;
+
   /* Lets the overlay's font-size track the rendered artwork via cqw. */
   container-type: inline-size;
 }
+
 .cli-frame-img img {
   width: 100%;
   height: auto;
@@ -450,30 +516,35 @@
   top: 31.3%;
   width: 59.3%;
   height: 57%;
+
   /* Tinted rather than solid ink so the halftone art ghosts through. */
   background: color-mix(in srgb, var(--color-ink) 88%, transparent);
   padding: 1.4em 1.6em;
   font-size: clamp(0.55rem, 1.2cqw, 0.92rem);
   overflow-y: auto;
+
   /* A single flex child laid out column-reverse anchors the initial scroll
      position to the end of the transcript without any script. */
   display: flex;
   flex-direction: column-reverse;
 }
+
 /* The overlay is a scroller inside the artwork, so its ring is drawn inside
    it: outside, it would ring a window drawn on a poster.  Over the tinted
    ink ground it takes the paper ring, at 16.65:1. */
 .frame-term:focus-visible {
   --focus-ring-color: var(--color-paper);
+
   outline-offset: -3px;
 }
+
 .frame-term .transcript {
   /* Breathing room below the resting prompt so the window is not filled
      edge to edge with text. */
   padding-bottom: 3em;
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
   .pipeline,
   .boundary,
   .ex-wrap,
@@ -481,11 +552,13 @@
   .flowtext {
     grid-template-columns: 1fr;
   }
+
   /* Stacked one-up, the sticky note travels over the prose instead of beside
      it, so it needs a surface of its own.  Same treatment as the masthead: a
      near-opaque paper wash over a blur, lifted above the body column. */
   .flowtext .margin-note {
     z-index: 1;
+
     /* The masthead runs 74–90px tall depending on how the brand imprint
        wraps.  Anchoring the box at 74px and padding the text down to 98px
        means the wash always meets the masthead — no strip of unblurred
@@ -498,22 +571,27 @@
     backdrop-filter: blur(8px);
     border-bottom: var(--rule-weight) solid var(--color-ink);
   }
+
   .stage {
     border-right: 0;
     border-bottom: var(--rule-weight) solid var(--color-ink);
     min-height: auto;
   }
+
   .arrow-row {
     display: none;
   }
+
   .cli-row .cmd,
   .cli-row .sum {
     border-right: 0;
     border-bottom: var(--rule-weight) solid var(--color-ink);
   }
+
   .layer-illo {
     grid-template-columns: 1fr;
   }
+
   /* Full bleed: cancel the section side padding so these boards span the
      viewport, and drop the side borders that would hug the screen edge. */
   .cli-frame-img,
@@ -522,6 +600,7 @@
     margin-inline: calc(var(--unit) * -4);
     border-inline: 0;
   }
+
   .frame-term {
     /* 80% of the desktop terminal size (0.88rem). */
     font-size: 0.71rem;

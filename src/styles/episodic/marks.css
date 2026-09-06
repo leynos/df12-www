@@ -159,6 +159,7 @@
 .signal-field span {
   width: 100%;
   min-width: 1px;
+
   /* A fixed pseudo-random envelope: the same shape on every load, because a
      reference that reshuffles between visits is noise.
      Every term is a property, so a variant retunes the shape rather than
@@ -325,6 +326,7 @@
 
 /* Legal, beside the colophon rather than in a column of its own. Inline and
  * wrapping, because three destinations do not need a quarter of the grid. */
+
 /* One row of links, so they sit on one baseline. Stretch would align them
  * only while all three happen to be the same height. */
 .site-footer__legal {
@@ -342,13 +344,13 @@
   font-size: 0.86rem;
 }
 
-@media (max-width: 68rem) {
+@media (width <= 68rem) {
   .site-footer__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .site-footer__grid {
     grid-template-columns: minmax(0, 1fr);
   }

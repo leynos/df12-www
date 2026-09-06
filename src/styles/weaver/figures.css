@@ -7,7 +7,7 @@
  * because utilities sit in a later layer than this file.
  */
 
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .figure-fullbleed {
     border: none !important;
     padding: 0 !important;

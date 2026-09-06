@@ -18,31 +18,25 @@
   color-scheme: light;
 
   --color-primary: #bc4626;
-  --color-primary-content: #ffffff;
-
+  --color-primary-content: #fff;
   --color-secondary: #2d3a8c;
-  --color-secondary-content: #ffffff;
-
+  --color-secondary-content: #fff;
   --color-accent: #e8a838;
   --color-accent-content: #12121f;
-
   --color-neutral: #12121f;
   --color-neutral-content: #f5e6d0;
-
   --color-base-100: #fdf8f0;
   --color-base-200: #faf3ea;
   --color-base-300: #e8d5b8;
   --color-base-content: #12121f;
-
   --color-info: #2d3a8c;
   --color-info-content: #e8eaf6;
   --color-success: #3a7049;
-  --color-success-content: #ffffff;
+  --color-success-content: #fff;
   --color-warning: #8a6420;
   --color-warning-content: #fff4e0;
   --color-error: #c43a3a;
-  --color-error-content: #ffffff;
-
+  --color-error-content: #fff;
   --radius-box: 0.5rem;
   --radius-field: 0.25rem;
   --radius-selector: 1rem;
@@ -77,18 +71,18 @@
   /* Cards sit raised above the parchment page, so this surface is lighter
      than base-100 rather than darker; the daisyUI base ramp cannot express
      that. Paired content token follows the daisyUI convention. */
-  --color-surface: #ffffff;
+  --color-surface: #fff;
   --color-surface-content: #12121f;
 
   /* Content pairs for the two accent surfaces daisyUI does not model.
      White clears AA on both: 7.0:1 and 4.7:1 respectively. */
-  --color-primary-deep-content: #ffffff;
-  --color-magenta-content: #ffffff;
+  --color-primary-deep-content: #fff;
+  --color-magenta-content: #fff;
 
   /* Elevation ramp, previously repeated as arbitrary rgba values. */
-  --shadow-panel: 0 8px 32px rgba(18, 18, 31, 0.18);
-  --shadow-panel-raised: 0 12px 32px rgba(18, 18, 31, 0.24);
-  --shadow-card-raised: 0 8px 24px rgba(18, 18, 31, 0.12);
+  --shadow-panel: 0 8px 32px rgb(18 18 31 / 18%);
+  --shadow-panel-raised: 0 12px 32px rgb(18 18 31 / 24%);
+  --shadow-card-raised: 0 8px 24px rgb(18 18 31 / 12%);
 
   /* Badge tint ramps (backgrounds/borders only — text uses the
      matching daisyUI colour). */

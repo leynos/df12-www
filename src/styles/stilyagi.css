@@ -30,7 +30,6 @@
  * layer lower, beside the preflight — they describe an element before
  * any class touches it. */
 @import "./stilyagi/site-base.css" layer(base);
-
 @import "./stilyagi/motifs.css" layer(components);
 @import "./stilyagi/chrome.css" layer(components);
 
@@ -87,7 +86,6 @@
   --color-base-200: #e4d7b9; /* --paper-shade: recessed panel */
   --color-base-300: #d8c9a4; /* --paper-deep: samizdat ground */
   --color-base-content: #0f0f0f; /* --ink: lamp-black; display + body */
-
   --color-primary: #c2272e; /* --press-red: verdicts, stamps, rules */
   --color-primary-content: #efe4ce;
   --color-secondary: #29b4c4; /* --jazz-cyan: poster splash, ink type on it */
@@ -96,7 +94,6 @@
   --color-accent-content: #efe4ce;
   --color-neutral: #0f0f0f; /* the ink ground the dark panels are set on */
   --color-neutral-content: #efe4ce;
-
   --color-info: #165e67; /* --jazz-cyan-text: cyan darkened to carry type */
   --color-info-content: #efe4ce;
   --color-success: #646940; /* --signal-sage-solid: paper type on sage */
@@ -147,11 +144,12 @@
      carries a wash of it down from the top edge, which is what stops the
      three paper greys reading as flat fills; the alpha varies by how much
      lift the box wants, so call sites mix it and this names only the hue. */
-  --color-paper-highlight: #ffffff;
+  --color-paper-highlight: #fff;
+
   /* The unprinted flecks in a rubber stamp, where the ink did not take.
      Same hue, different job: these are specks in a mark, not a wash over a
      surface, and they would not follow the wash if it were retuned. */
-  --color-stamp-fleck: #ffffff;
+  --color-stamp-fleck: #fff;
 
   /* Ink */
   --color-ink-soft: #2a2a2a; /* rules, secondary type */
@@ -173,6 +171,7 @@
      1.88:1. */
   --color-jazz-magenta: #d81e79;
   --color-jazz-ochre: #d69f2e;
+
   /* The legend's fifth hue. The IR inspector tints link regions in a blue
      that appears nowhere else in the palette. A tint and a swatch are
      non-text, and 3.70:1 on paper clears that 3:1 floor. */
@@ -192,9 +191,11 @@
   --color-jazz-magenta-text: #a3175b; /* 4.53:1 */
   --color-signal-sage-text: #545836; /* 4.53:1 */
   --color-signal-rust-text: #864322; /* 4.51:1 */
+
   /* rule-faint is the graph-paper line, and it is a rule colour: as type
      on paper it manages 2.52:1.  Muted type takes this instead. */
   --color-fg-muted-text: #5b5447; /* 4.57:1 */
+
   /* Magenta type on the ink ground.  The paper-ground magenta manages only
      4.00:1 there, so ink panels take this instead. */
   --color-jazz-magenta-on-ink: #dc3788; /* 4.51:1 */
@@ -207,7 +208,7 @@
      Ink is invisible against ink, so panel splits use this instead.
      A divider is a non-text element, so it needs 3:1 against its ground;
      this is 3.34:1 on ink. */
-  --color-rule-on-ink: #666666;
+  --color-rule-on-ink: #666;
 
   /* Semantic aliases.  The two that matter are dynamic: --color-accent-text
      is red type resolved against whatever ground it sits on, and

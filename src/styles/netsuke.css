@@ -18,7 +18,7 @@
  *
  * The layering is load-bearing. When himotoshi.css stood alone beside the
  * Play CDN, both it and the utilities were unlayered, so ties went to the
- * utilities on source order — the CDN injected its <style> after this file's
+ * utilities on source order — the CDN injected its \3c style> after this file's
  * <link>. Compiled Tailwind puts utilities in @layer utilities, and per CSS
  * Cascade Level 5 an unlayered declaration beats every layered one regardless
  * of specificity. Left unlayered, these rules would start winning arguments
@@ -42,6 +42,7 @@
  * so the class has never styled anything on this sub-site; registering the
  * plugin here would change that page. Netsuke's prose styling is `.hm-prose`
  * in the partial. */
+
 /* Four of daisyUI's parts are left out. `scrollbar` paints every element's
  * scrollbar in the theme's colours, which would replace the
  * `::-webkit-scrollbar` styling the partial carries; `rootcolor` paints the
@@ -86,24 +87,22 @@
   --color-base-200: #f5ede0;
   --color-base-300: #d1c7b8;
   --color-base-content: #2e2a25;
-
   --color-primary: #2b4162;
-  --color-primary-content: #ffffff;
+  --color-primary-content: #fff;
   --color-secondary: #3a5a7c;
-  --color-secondary-content: #ffffff;
+  --color-secondary-content: #fff;
   --color-accent: #c23b22;
-  --color-accent-content: #ffffff;
+  --color-accent-content: #fff;
   --color-neutral: #2e2a25;
   --color-neutral-content: #e5ddd0;
-
   --color-info: #3a5a7c;
-  --color-info-content: #ffffff;
+  --color-info-content: #fff;
   --color-success: #4a7c59;
-  --color-success-content: #ffffff;
+  --color-success-content: #fff;
   --color-warning: #c48b2c;
   --color-warning-content: #2e2a25;
   --color-error: #c23b22;
-  --color-error-content: #ffffff;
+  --color-error-content: #fff;
 
   /* Netsuke's surfaces are softly rounded: cards and code windows sit at
      rounded-lg and rounded-xl, pills at rounded-full, buttons and inputs at
@@ -162,8 +161,7 @@
 
   /* The paper shadows: the ambient elevation of a card, a panel, and a hero
      window, each a charcoal wash rather than a black one. */
-  --shadow-paper: 0 4px 6px -1px rgba(46, 42, 37, 0.1), 0 2px 4px -1px rgba(46, 42, 37, 0.06);
-  --shadow-paper-lg: 0 10px 15px -3px rgba(46, 42, 37, 0.1), 0 4px 6px -2px rgba(46, 42, 37, 0.05);
-  --shadow-paper-xl:
-    0 20px 25px -5px rgba(46, 42, 37, 0.1), 0 10px 10px -5px rgba(46, 42, 37, 0.04);
+  --shadow-paper: 0 4px 6px -1px rgb(46 42 37 / 10%), 0 2px 4px -1px rgb(46 42 37 / 6%);
+  --shadow-paper-lg: 0 10px 15px -3px rgb(46 42 37 / 10%), 0 4px 6px -2px rgb(46 42 37 / 5%);
+  --shadow-paper-xl: 0 20px 25px -5px rgb(46 42 37 / 10%), 0 10px 10px -5px rgb(46 42 37 / 4%);
 }

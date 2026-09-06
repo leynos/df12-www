@@ -18,6 +18,8 @@ from df12_pages.stilyagi_highlighting import StilyagiStyle
 from scripts.generate_stilyagi_pygments_css import (
     BEGIN,
     END,
+    STYLELINT_DISABLE,
+    STYLELINT_ENABLE,
     STYLESHEET,
     build_css,
 )
@@ -176,6 +178,21 @@ class TestStilyagiHighlighting:
             f"{STYLESHEET} is stale; rerun scripts/generate_stilyagi_pygments_css.py"
         )
 
+    def test_generated_block_is_fenced_from_stylelint(self) -> None:
+        """The markers switch stylelint off for the block and back on after.
+
+        See the Netsuke counterpart for why: ``make fmt`` runs
+        ``stylelint --fix``, and the disabled range is what keeps it from
+        reshaping the one-rule-per-line output this generator writes.
+        """
+        lines = build_css().splitlines()
+
+        assert lines[0] == BEGIN
+        assert lines[1] == STYLELINT_DISABLE
+        assert lines[-1] == END
+        assert lines[-2] == ""
+        assert lines[-3] == STYLELINT_ENABLE
+
     def test_layout_rules_stay_before_the_generated_marker(self) -> None:
         """The generator owns tokens, while hand-written CSS owns layout."""
         css = STYLESHEET.read_text(encoding="utf-8")
@@ -194,7 +211,7 @@ class TestStilyagiHighlighting:
             assert rule not in generated, f"{rule!r} should not be generated"
 
         built = build_css()
-        assert built.startswith(f"{BEGIN}\n\n:root {{")
+        assert built.startswith(f"{BEGIN}\n{STYLELINT_DISABLE}\n\n:root {{")
         assert built.endswith(f"\n\n{END}")
         assert "--stilyagi-syntax-" in built
         assert ".stilyagi-syntax { color:" in built

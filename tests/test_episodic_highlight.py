@@ -27,6 +27,19 @@ def test_committed_stylesheet_matches_the_generator() -> None:
     )
 
 
+def test_stylesheet_is_fenced_from_stylelint() -> None:
+    """The whole file is generated, so the header switches stylelint off.
+
+    ``make fmt`` runs ``stylelint --fix``; without the marker it would
+    reshape the one-rule-per-line output and the next generator run would
+    put it back.
+    """
+    css = build_css()
+    header_end = css.index(":root {")
+
+    assert "/* stylelint-disable" in css[:header_end]
+
+
 def test_every_token_family_has_an_explicit_colour() -> None:
     """Every Episodic token family resolves to the deliberate signal palette."""
     missing = [

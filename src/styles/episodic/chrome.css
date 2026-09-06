@@ -73,7 +73,7 @@
 /* The masthead descriptor and the overview's hero eyebrow say the same words.
  * Above the breakpoint both are on screen at once, so the eyebrow gives way;
  * below it the descriptor is hidden and the eyebrow earns its place. */
-@media (min-width: 48rem) {
+@media (width >= 48rem) {
   .hero__eyebrow {
     display: none;
   }
@@ -164,7 +164,7 @@
 
 /* Below this width the list returns to being a popover: fixed, panelled, and
  * closed until the button opens it. */
-@media (max-width: 64rem) {
+@media (width <= 64rem) {
   .brand__descriptor {
     display: none;
   }
@@ -184,6 +184,7 @@
     border-radius: var(--radius-field);
     background: var(--color-base-300);
     box-shadow: 0 1rem 3rem rgb(0 0 0 / 60%);
+
     /* Opens below the pinned header rather than across it. */
     inset: calc(var(--header-height) + var(--space-2)) 1rem auto;
   }
@@ -248,7 +249,7 @@
   text-transform: none;
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .status-rail {
     flex-wrap: wrap;
     padding-block: var(--space-2);

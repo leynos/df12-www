@@ -72,7 +72,7 @@
   font-size: 0.95em;
 }
 
-@media (max-width: 52rem) {
+@media (width <= 52rem) {
   .ledger-row {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2);
@@ -133,7 +133,7 @@
   color: var(--color-ink-2);
 }
 
-@media (max-width: 52rem) {
+@media (width <= 52rem) {
   .catalogue__detail > div,
   .stage__contract > div {
     grid-template-columns: minmax(0, 1fr);
@@ -149,7 +149,7 @@
 /* Ledger rows carry an index gutter and a rule, so they need more room than
  * a plain list before they will take a second column without feeling
  * cramped. */
-@media (min-width: 104rem) {
+@media (width >= 104rem) {
   .catalogue--compact {
     display: grid;
     column-gap: var(--space-5);
@@ -209,7 +209,7 @@
   color: var(--color-ink-2);
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .stage {
     padding-left: var(--space-4);
   }
@@ -226,7 +226,7 @@
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 }
 
-@media (min-width: 40rem) {
+@media (width >= 40rem) {
   .stage-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -309,7 +309,7 @@
   background: var(--color-base-200);
 }
 
-@media (min-width: 64rem) {
+@media (width >= 64rem) {
   .stage-summary--path {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }

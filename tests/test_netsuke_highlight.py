@@ -15,6 +15,8 @@ from scripts.generate_himotoshi_pygments_css import (
     BOLD_WEIGHT,
     CSS_CLASS,
     END,
+    STYLELINT_DISABLE,
+    STYLELINT_ENABLE,
     STYLESHEET,
     VARIABLE_PREFIX,
     build_css,
@@ -253,6 +255,24 @@ class TestHimotoshiPygmentsCss:
         assert committed == build_css(), (
             f"{STYLESHEET} is stale; rerun scripts/generate_himotoshi_pygments_css.py"
         )
+
+    def test_generated_block_is_fenced_from_stylelint(self) -> None:
+        """The markers switch stylelint off for the block and back on after.
+
+        The token rules are emitted one per line, which the lint preset
+        rejects, and ``make fmt`` runs ``stylelint --fix``. Fixes are not
+        applied inside a disabled range, so the markers are what stop the
+        formatter and this generator from undoing each other. The ``END``
+        marker must sit outside the range with a blank line before it, or
+        the preset's comment-spacing rule fires on the marker itself.
+        """
+        lines = build_css().splitlines()
+
+        assert lines[0] == BEGIN
+        assert lines[1] == STYLELINT_DISABLE
+        assert lines[-1] == END
+        assert lines[-2] == ""
+        assert lines[-3] == STYLELINT_ENABLE
 
     def test_generator_writes_to_the_tracked_stylesheet(self) -> None:
         """The target is the tracked source, not the git-ignored build output.

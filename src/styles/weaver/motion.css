@@ -1,6 +1,6 @@
 /* The three animations the illustrated panels use.
  *
- * Each was declared in a `<style>` block on the single page that used it,
+ * Each was declared in a `\3c style>` block on the single page that used it,
  * which is defensible for a one-off but put colour literals in the templates
  * and kept the keyframes out of reach of the stylesheet's own tokens.
  *

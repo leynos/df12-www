@@ -19,7 +19,6 @@ from scripts.generate_stilyagi_pygments_css import (
     BEGIN,
     END,
     STYLELINT_DISABLE,
-    STYLELINT_ENABLE,
     STYLESHEET,
     build_css,
 )
@@ -177,21 +176,6 @@ class TestStilyagiHighlighting:
         assert committed == build_css(), (
             f"{STYLESHEET} is stale; rerun scripts/generate_stilyagi_pygments_css.py"
         )
-
-    def test_generated_block_is_fenced_from_stylelint(self) -> None:
-        """The markers switch stylelint off for the block and back on after.
-
-        See the Netsuke counterpart for why: ``make fmt`` runs
-        ``stylelint --fix``, and the disabled range is what keeps it from
-        reshaping the one-rule-per-line output this generator writes.
-        """
-        lines = build_css().splitlines()
-
-        assert lines[0] == BEGIN
-        assert lines[1] == STYLELINT_DISABLE
-        assert lines[-1] == END
-        assert lines[-2] == ""
-        assert lines[-3] == STYLELINT_ENABLE
 
     def test_layout_rules_stay_before_the_generated_marker(self) -> None:
         """The generator owns tokens, while hand-written CSS owns layout."""

@@ -37,7 +37,11 @@ def test_stylesheet_is_fenced_from_stylelint() -> None:
     css = build_css()
     header_end = css.index(":root {")
 
-    assert "/* stylelint-disable" in css[:header_end]
+    assert "/* stylelint-disable" in css[:header_end], (
+        f"{STYLESHEET} should open with a stylelint-disable marker before its "
+        "first rule; without it `stylelint --fix` reshapes the generated "
+        "one-rule-per-line output"
+    )
 
 
 def test_every_token_family_has_an_explicit_colour() -> None:

@@ -297,7 +297,7 @@ make stylelint         # the gate; also part of `make all`
 with its reason. The Tailwind at-rules (`@apply`, `@plugin`, `@source`,
 `@theme`, and the rest) are allowed by name, since stylelint knows none of them
 and the entrypoints are where the theme tokens live; `@apply` is also excused
-from prelude validation, because its prelude is a list of utility classes. The
+from prelude validation because its prelude is a list of utility classes. The
 class pattern accepts BEM (`block__element--modifier`), the custom-property
 pattern accepts Tailwind's double-hyphen namespace join
 (`--text-xs--line-height`), `@import` keeps the string form Tailwind documents,
@@ -307,10 +307,12 @@ grouped by component, which the rule would scatter.
 Where a rule genuinely should not apply, disable it at the line with a stated
 reason, `/* stylelint-disable-next-line <rule> -- why */`, rather than loosening
 it in the config. The generated Pygments blocks are the one standing
-exception: each generator emits `/* stylelint-disable */` and
-`/* stylelint-enable */` markers around its block, so a finding there is a
-change to the generator rather than to the stylesheet. Section 4.4 has the
-detail.
+exception: the Himotoshi and Stilyagi generators each fence their block with a
+`/* stylelint-disable */` and a matching `/* stylelint-enable */` marker,
+while the Episodic generator writes the whole file and so emits only a
+file-level `/* stylelint-disable */` in its header. Either way, a finding
+inside a generated range is a change to the generator rather than to the
+stylesheet. Section 4.4 has the detail.
 
 `make fmt` runs `stylelint --fix` as well as Biome. That is safe over the
 generated blocks because stylelint does not apply fixes inside a disabled

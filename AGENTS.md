@@ -337,7 +337,7 @@ tests. See the unit testing guide for details on setting up and running tests.
 For changes to the site generator, its templates, or its stylesheets, run:
 
 ```bash
-make check-fmt lint typecheck
+make check-fmt lint stylelint typecheck
 make test          # Python suite
 make test-js       # JavaScript suite
 ```
@@ -375,8 +375,8 @@ generators emit themselves, so never hand-edit inside them; `make fmt` runs
 Biome and stylelint live in `node_modules`, so `lint`, `stylelint`, `fmt`,
 `test-js`, and `dev` all depend on a `node_modules` target that runs
 `bun install --frozen-lockfile`. A clean checkout therefore needs no manual
-install step, and the install is skipped unless `package.json` or `bun.lockb`
-has moved.
+install step, and the installation is skipped unless `package.json` or
+`bun.lockb` has moved.
 
 Where a Biome rule genuinely should not apply, suppress it at the line with a
 stated reason — `// biome-ignore lint/<group>/<rule>: why` — and never by

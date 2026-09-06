@@ -1,12 +1,15 @@
 {#
   Shared Netsuke page components.
 
-  Import as `ui` and call from inside a page's `{% raw %}` block by
-  stepping out of it first:
+  Import as `ui` and call it like any other macro:
 
       {% import "components.jinja" as ui %}
       ...
-      {% endraw %}{{ ui.kicker('Reference') }}{% raw %}
+      {{ ui.kicker('Reference') }}
+
+  Pages are live Jinja by default; `{% raw %}` wraps only the literal
+  examples that must reach the reader unrendered, so a call site needs no
+  escaping.
 
   The presentation lives in `.hm-kicker` and its modifiers in
   `src/styles/netsuke/himotoshi.css`, not in the class strings

@@ -1,19 +1,23 @@
 {#
   Shared Netsuke page furniture.
 
-  Import as `chrome`. Page bodies are wrapped in `{% raw %}`, so a call has
-  to step out of it first; where the wrapped content is a highlighted code
-  sample the fence already exists and the call joins it:
+  Import as `chrome` and call it like any other macro. Pages are live Jinja
+  by default; `{% raw %}` wraps only the literal examples that must reach the
+  reader unrendered, so only the sample itself sits inside a raw region:
 
       {% import "chrome.jinja" as chrome %}
       ...
-      {% endraw %}{{ chrome.faux_window_open('Netsukefile') }}{% highlight 'netsuke' %}{% raw %}
+      {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
       ...
-      {% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+      {% endraw %}{% endhighlight %}{% endcall %}
 
-  The windows are opener/closer pairs rather than `{% call %}` blocks so a
-  long body can stay inside the page's raw region instead of leaving and
-  re-entering it around the macro.
+  The windows were opener/closer pairs until the raw regions narrowed. That
+  kept a long body inside the page's raw region rather than leaving and
+  re-entering it around the macro call, which mattered while page bodies were
+  raw from top to bottom. Now that raw wraps only the sample, a `{% call %}`
+  block holds both the `{% highlight %}` tag and its fence, so the windows are
+  balanced blocks like `page_header`: an unclosed one is a template error
+  rather than broken markup, and no macro emits half an element.
 #}
 {% import "components.jinja" as ui %}
 
@@ -30,8 +34,7 @@
 
 {#
   A faux editor or terminal window: a dark frame, a titlebar with the
-  traffic-light dots and a centred label, and an open body element.
-  Close it with `faux_window_close()`.
+  traffic-light dots and a centred label, and the caller's body inside.
 
   label        the titlebar text, typically a file name or a shell prompt
   variant      a modifier on `.hm-faux-window`, e.g. `card-bleed`
@@ -40,40 +43,31 @@
                a window that sits on a dark ground rather than on paper
   body_class   replaces the default body inset and type utilities
 #}
-{% macro faux_window_open(label, variant='', outer_class='', frame=none, body_class=none) -%}
+{% macro faux_window(label, variant='', outer_class='', frame=none, body_class=none) -%}
 <div class="hm-faux-window{% if variant %} hm-faux-window--{{ variant }}{% endif %} {{ frame if frame is not none else 'bg-base-content rounded-xl border border-charcoal-mid shadow-lg overflow-hidden' }}{% if outer_class %} {{ outer_class }}{% endif %}">
     <div class="hm-faux-window__titlebar bg-charcoal-mid/20 px-4 py-3 flex items-center justify-between border-b border-white/10">
         {{ _traffic_lights() | indent(8) }}
         <span class="text-xs font-mono text-stone-light">{{ label }}</span>
         <div class="w-12"></div>
     </div>
-    <div class="hm-faux-window__body {{ body_class if body_class is not none else 'p-6 font-mono text-sm overflow-x-auto' }}">
-{%- endmacro %}
-
-{% macro faux_window_close() -%}
-    </div>
+    <div class="hm-faux-window__body {{ body_class if body_class is not none else 'p-6 font-mono text-sm overflow-x-auto' }}">{{ caller() }}</div>
 </div>
-{%- endmacro %}
+{% endmacro %}
 
 {#
   The example detail pages' terminal transcript window. Same shape as the
-  faux window with the tighter titlebar the examples use. Close it with
-  `example_terminal_close()`.
+  faux window with the tighter titlebar the examples use.
 #}
-{% macro example_terminal_open(label='Terminal') -%}
+{% macro example_terminal(label='Terminal') -%}
 <div class="hm-example-terminal bg-base-content rounded-xl border border-charcoal-mid shadow-lg overflow-hidden">
     <div class="hm-example-terminal__titlebar bg-charcoal-mid/30 px-4 py-2 flex items-center justify-between border-b border-white/10">
         {{ _traffic_lights() | indent(8) }}
         <div class="text-xs font-mono text-charcoal-light">{{ label }}</div>
         <div class="w-12"></div>
     </div>
-    <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">
-{%- endmacro %}
-
-{% macro example_terminal_close() -%}
-    </div>
+    <div class="hm-example-terminal__body p-6 font-mono text-sm overflow-x-auto">{{ caller() }}</div>
 </div>
-{%- endmacro %}
+{% endmacro %}
 
 {#
   The breadcrumb trail above a page header.

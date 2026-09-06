@@ -4,11 +4,11 @@
 {% set active_nav = 'examples' %}
 {% block page_title %}Batch Photo Processing - Netsuke Examples{% endblock %}
 {% block content %}
-{% raw %}
-<main id="main-content" class="grow pt-24 pb-20 site-container">
-        {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Media Workflows'}, {'label': 'Batch Photo Processing'}]) }}{% raw %}
 
-        {% endraw %}{{ exdata.example_header('batch-photo-processing') }}{% raw %}
+<main id="main-content" class="grow pt-24 pb-20 site-container">
+        {{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Media Workflows'}, {'label': 'Batch Photo Processing'}]) }}
+
+        {{ exdata.example_header('batch-photo-processing') }}
 
         <div class="grid lg:grid-cols-12 gap-12">
             <div class="lg:col-span-8 space-y-12 min-w-0">
@@ -36,10 +36,10 @@
                 <section id="manifest">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="font-serif text-2xl font-bold text-base-content flex items-center"><span class="iconify text-accent mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest</h2>
-                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/photo_edit.yml</span>{% endraw %}{{ exdata.copy_manifest_button('batch-photo-processing', 'text-charcoal-light hover:text-accent') }}{% raw %}</div>
+                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/photo_edit.yml</span>{{ exdata.copy_manifest_button('batch-photo-processing', 'text-charcoal-light hover:text-accent') }}</div>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_batch_photo }}{% endhighlight %}{% raw %}
+{% highlight 'netsuke' %}{{ exdata.snippet_batch_photo }}{% endhighlight %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300"><div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-base-content text-sm mb-1">One target template, many outputs</h4><p class="text-sm text-charcoal-mid">`foreach` walks the `photos` list and stamps out one JPEG target per input.</p></div></div>
@@ -50,13 +50,13 @@
 
                 <section id="terminal-preview">
                     <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center"><span class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build</h2>
-                    {% endraw %}{{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}{% raw %}
+                    {% call chrome.example_terminal() %}{% highlight 'netsuke-console' %}
 $ netsuke build processed/gallery.html
 [1/4] mkdir -p processed
 [2/4] Converting RAW photo
 [3/4] Converting RAW photo
 [4/4] make-gallery processed > processed/gallery.html
-{% endraw %}{% endhighlight %}{{ chrome.example_terminal_close() }}{% raw %}
+{% endhighlight %}{% endcall %}
                 </section>
 
                 <section id="build-flow" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">
@@ -90,13 +90,13 @@ $ netsuke build processed/gallery.html
                     </div>
                 </div>
 
-                {% endraw %}
+                
 {{ exdata.up_next('batch-photo-processing') }}
-{% raw %}
+
                 </div>
             </aside>
         </div>
     </main>
     <script defer src="/netsuke/assets/js/example-toc.js"></script>
-{% endraw %}
+
 {% endblock %}

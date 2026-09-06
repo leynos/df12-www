@@ -4,11 +4,11 @@
 {% set active_nav = 'examples' %}
 {% block page_title %}Hello World - Netsuke Examples{% endblock %}
 {% block content %}
-{% raw %}
-<main id="main-content" class="grow pt-24 pb-20 site-container w-full">
-        {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Foundations'}, {'label': 'Hello World'}]) }}{% raw %}
 
-        {% endraw %}{{ exdata.example_header('hello-world') }}{% raw %}
+<main id="main-content" class="grow pt-24 pb-20 site-container w-full">
+        {{ chrome.breadcrumb([{'href': '/netsuke/examples/', 'label': 'Examples'}, {'label': 'Foundations'}, {'label': 'Hello World'}]) }}
+
+        {{ exdata.example_header('hello-world') }}
 
         <div class="grid lg:grid-cols-12 gap-12">
             <div class="lg:col-span-8 space-y-12 min-w-0">
@@ -34,10 +34,10 @@
                 <section id="manifest">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="font-serif text-2xl font-bold text-base-content flex items-center"><span class="iconify text-accent mr-3 text-lg" data-icon="carbon:code" aria-hidden="true"></span> Annotated Manifest</h2>
-                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/hello-world/Netsukefile</span>{% endraw %}{{ exdata.copy_manifest_button('hello-world', 'text-charcoal-light hover:text-accent') }}{% raw %}</div>
+                        <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/hello-world/Netsukefile</span>{{ exdata.copy_manifest_button('hello-world', 'text-charcoal-light hover:text-accent') }}</div>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{{ exdata.snippet_hello_world }}{% endhighlight %}{% raw %}
+{% highlight 'netsuke' %}{{ exdata.snippet_hello_world }}{% endhighlight %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300"><div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-base-content text-sm mb-1">Variables are templated directly</h4><p class="text-sm text-charcoal-mid">The `greeting` variable is expanded inside the command string with standard Jinja syntax.</p></div></div>
@@ -48,13 +48,13 @@
 
                 <section id="terminal-preview">
                     <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center"><span class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build</h2>
-                    {% endraw %}{{ chrome.example_terminal_open() }}{% highlight 'netsuke-console' %}{% raw %}
+                    {% call chrome.example_terminal() %}{% highlight 'netsuke-console' %}
 $ netsuke
 [1/2] cat input.txt | tr 'a-z' 'A-Z' > output.txt
 [2/2] printf '%s\n' 'Hello from Netsuke!' > greeting.txt
 $ cat greeting.txt
 Hello from Netsuke!
-{% endraw %}{% endhighlight %}{{ chrome.example_terminal_close() }}{% raw %}
+{% endhighlight %}{% endcall %}
                 </section>
 
                 <section id="build-flow" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">
@@ -87,13 +87,13 @@ Hello from Netsuke!
                     </div>
                 </div>
 
-                {% endraw %}
+                
 {{ exdata.up_next('hello-world') }}
-{% raw %}
+
                 </div>
             </aside>
         </div>
     </main>
     <script defer src="/netsuke/assets/js/example-toc.js"></script>
-{% endraw %}
+
 {% endblock %}

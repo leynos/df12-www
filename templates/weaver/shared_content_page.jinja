@@ -12,13 +12,13 @@
   deliberate: these pages carry no paper texture and no grid background, and
   their footer is the short legal one rather than the full site footer.
 #}
-{% extends "doc_page.jinja" %}
+{% extends "_layout.jinja" %}
 
 {% block page_title %}{{ title }} — Weaver{% endblock %}
 
 {% block texture_overlay %}{% endblock %}
 
-{#- This overrides doc_page.jinja's `main_class` outright rather than extending
+{#- This overrides `_layout.jinja`'s `main_class` outright rather than extending
     it, which also drops the `main_extra_class` block nested inside it there.
     That is intentional: the legal pages want the plain ground rather than the
     ruled paper, and none of them uses `main_extra_class`. A page that needed it

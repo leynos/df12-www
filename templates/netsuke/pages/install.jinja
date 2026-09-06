@@ -27,12 +27,12 @@
     </style>
 {% endblock %}
 {% block content %}
-{% raw %}
+
 <main id="main-content" class="grow pt-24 pb-20 site-container">
 
         <!-- Hero Section -->
         <header id="install-hero" class="mb-16 text-center max-w-3xl mx-auto">
-            {% endraw %}{{ ui.kicker('Get Started · v' ~ netsuke_version, 'mb-6', icon='carbon:download', icon_class='text-primary') }}{% raw %}
+            {{ ui.kicker('Get Started · v' ~ netsuke_version, 'mb-6', icon='carbon:download', icon_class='text-primary') }}
             <h1 class="font-serif text-5xl lg:text-6xl font-bold text-base-content mb-6">Install Netsuke</h1>
             <p class="text-xl text-charcoal-mid font-light leading-relaxed mb-8">
                 Install the CLI, make sure <code>ninja</code> is available, and start with a small <code>Netsukefile</code>. Netsuke works best when the first build is boring.
@@ -67,22 +67,22 @@
                 <div class="p-8 lg:p-10" id="install-panel-cargo" data-install-panel="cargo" role="tabpanel" aria-labelledby="install-tab-cargo">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-base-content mb-2">Install with Cargo</h3>
-                        <p class="text-charcoal-mid text-sm">Netsuke <span class="font-semibold">v{% endraw %}{{ netsuke_version }}{% raw %}</span> is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Where <a href="https://github.com/cargo-bins/cargo-binstall" class="text-primary underline decoration-primary/40 hover:decoration-primary"><code>cargo binstall</code></a> is available, prefer it: it fetches a prebuilt release binary and avoids the nightly toolchain requirement below. <code>ninja</code> must be installed separately.</p>
+                        <p class="text-charcoal-mid text-sm">Netsuke <span class="font-semibold">v{{ netsuke_version }}</span> is published on crates.io as the <code>netsuke-build</code> crate; the installed binary is named <code>netsuke</code>. Where <a href="https://github.com/cargo-bins/cargo-binstall" class="text-primary underline decoration-primary/40 hover:decoration-primary"><code>cargo binstall</code></a> is available, prefer it: it fetches a prebuilt release binary and avoids the nightly toolchain requirement below. <code>ninja</code> must be installed separately.</p>
                     </div>
                     <div class="bg-base-content rounded-lg p-6 code-block-wrapper">
-                        {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
-$ cargo binstall netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}
-                        {% endraw %}{% endhighlight %}{% raw %}
+                        {% highlight 'netsuke-console' %}
+$ cargo binstall netsuke-build@{{ netsuke_version }}
+                        {% endhighlight %}
                     </div>
                     <div class="mt-6 mb-2">
                         <h4 class="font-bold text-sm text-base-content mb-2">Build from crates.io instead</h4>
                         <p class="text-charcoal-mid text-xs mb-3">Netsuke builds with the Polonius borrow checker, which recent nightlies enable by default. A registry build runs outside a repository checkout, so it must select the dated Rust nightly toolchain explicitly:</p>
                     </div>
                     <div class="bg-base-content rounded-lg p-6 code-block-wrapper">
-                        {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                        {% highlight 'netsuke-console' %}
 $ rustup toolchain install nightly-2026-08-23
-$ cargo +nightly-2026-08-23 install netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}
-                        {% endraw %}{% endhighlight %}{% raw %}
+$ cargo +nightly-2026-08-23 install netsuke-build@{{ netsuke_version }}
+                        {% endhighlight %}
                     </div>
                     <div class="mt-8 grid md:grid-cols-2 gap-6">
                         <div class="bg-base-100 p-4 rounded-lg border border-base-300">
@@ -110,46 +110,46 @@ $ cargo +nightly-2026-08-23 install netsuke-build@{% endraw %}{{ netsuke_version
                 <div class="p-8 lg:p-10 hidden" id="install-panel-linux" data-install-panel="linux" role="tabpanel" aria-labelledby="install-tab-linux">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-base-content mb-2">Linux packages</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{{ netsuke_version }}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{{ netsuke_version }} release</a> ships Debian (<code>.deb</code>) and RPM (<code>.rpm</code>) packages for x86-64 (<code>amd64</code>) and Arm64 (<code>arm64</code>). They install the binary under <code>/usr/bin</code>, add the <code>netsuke.1</code> manual page, and declare <code>ninja-build</code> as a dependency, so Ninja is pulled in automatically.</p>
                     </div>
                     <div class="bg-base-content rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
-{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+{% highlight 'netsuke-console' %}
 # Debian or Ubuntu
 $ sudo apt install ./PACKAGE.deb
 
 # Fedora, Rocky Linux, or another RPM-based distribution
 $ sudo dnf install ./PACKAGE.rpm
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                     </div>
-                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture. Standalone binaries with SHA-256 checksum sidecars are also published, and each standalone release archive stages shell completions for Bash, Elvish, Fish, PowerShell, and Zsh under <code>completions/&lt;shell&gt;/</code> &mdash; the installer packages do not install completion files. The installer packages themselves do not have checksum sidecars in v{% endraw %}{{ netsuke_version }}{% raw %}.</p>
+                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture. Standalone binaries with SHA-256 checksum sidecars are also published, and each standalone release archive stages shell completions for Bash, Elvish, Fish, PowerShell, and Zsh under <code>completions/&lt;shell&gt;/</code> &mdash; the installer packages do not install completion files. The installer packages themselves do not have checksum sidecars in v{{ netsuke_version }}.</p>
                 </div>
 
                 <!-- macOS panel -->
                 <div class="p-8 lg:p-10 hidden" id="install-panel-macos" data-install-panel="macos" role="tabpanel" aria-labelledby="install-tab-macos">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-base-content mb-2">macOS installer package</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{{ netsuke_version }}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{{ netsuke_version }} release</a> ships installer packages (<code>.pkg</code>) for Intel x86-64 and Apple silicon Arm64. They install the binary under <code>/usr/local/bin</code> along with the manual page and licence. Ninja must be installed separately.</p>
                     </div>
                     <div class="bg-base-content rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light">
-{% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+{% highlight 'netsuke-console' %}
 # Install the downloaded package
 $ sudo installer -pkg ./PACKAGE.pkg -target /
 
 # Ninja is a separate install
 $ brew install ninja
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                     </div>
-                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture (for example <code>netsuke-{% endraw %}{{ netsuke_version }}{% raw %}-macos-arm64.pkg</code>).</p>
+                    <p class="mt-6 text-xs text-charcoal-mid">Replace <code>PACKAGE</code> with the downloaded filename for your architecture (for example <code>netsuke-{{ netsuke_version }}-macos-arm64.pkg</code>).</p>
                 </div>
 
                 <!-- Windows panel -->
                 <div class="p-8 lg:p-10 hidden" id="install-panel-windows" data-install-panel="windows" role="tabpanel" aria-labelledby="install-tab-windows">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-base-content mb-2">Windows installer</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{% endraw %}{{ netsuke_version }}{% raw %}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{% endraw %}{{ netsuke_version }}{% raw %} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts. On Windows, recipes run in Windows PowerShell by default; set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2 (see the <a href="/netsuke/docs/security/#recipe-shells" class="text-primary underline decoration-primary/40 hover:decoration-primary">recipe shell contract</a>). An MSI product version cannot carry a pre-release suffix, so every beta in the 0.1.0 series shares the numeric version <code>0.1.0</code>: installing a later pre-release MSI replaces the existing installation rather than sitting alongside it.</p>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{{ netsuke_version }}" class="text-primary underline decoration-primary/40 hover:decoration-primary">v{{ netsuke_version }} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts. On Windows, recipes run in Windows PowerShell by default; set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2 (see the <a href="/netsuke/docs/security/#recipe-shells" class="text-primary underline decoration-primary/40 hover:decoration-primary">recipe shell contract</a>). An MSI product version cannot carry a pre-release suffix, so every beta in the 0.1.0 series shares the numeric version <code>0.1.0</code>: installing a later pre-release MSI replaces the existing installation rather than sitting alongside it.</p>
                     </div>
                     <div class="bg-base-content rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light overflow-x-auto">
-{% endraw %}{% highlight 'powershell' %}{% raw %}
+{% highlight 'powershell' %}
 # Install the downloaded package
 msiexec.exe /i PACKAGE.msi
 
@@ -160,7 +160,7 @@ $dir = Join-Path $env:ProgramFiles 'netsuke'
 $env:Path = "$env:Path;$dir"
 
 netsuke --version
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                     </div>
                     <p class="mt-6 text-xs text-charcoal-mid">See the <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#complete-windows-setup" class="text-primary underline decoration-primary/40 hover:decoration-primary">complete Windows setup</a> for the idempotent PATH script and the PowerShell help module install.</p>
                 </div>
@@ -186,10 +186,10 @@ netsuke --version
                         <h3 class="text-xl font-bold text-base-content mb-4">Verify Installation</h3>
                         <p class="text-charcoal-mid mb-4">Run the version command to ensure Netsuke is correctly installed and accessible in your path.</p>
                         <div class="bg-base-content rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
-                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                            {% highlight 'netsuke-console' %}
 $ netsuke --version
-netsuke {% endraw %}{{ netsuke_version }}{% raw %}
-                            {% endraw %}{% endhighlight %}{% raw %}
+netsuke {{ netsuke_version }}
+                            {% endhighlight %}
                         </div>
                     </div>
 
@@ -199,14 +199,14 @@ netsuke {% endraw %}{{ netsuke_version }}{% raw %}
                         <h3 class="text-xl font-bold text-base-content mb-4">Create a Manifest</h3>
                         <p class="text-charcoal-mid mb-4">Create a <code>Netsukefile</code> in the project root. Start with one rule, one target, and one default.</p>
                         <div class="bg-base-content rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 targets:
   - name: "hello.txt"
     command: "printf 'hello\n' > {{ outs }}"
     sources: []
 defaults: ["hello.txt"]
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                         </div>
                     </div>
 
@@ -216,10 +216,10 @@ defaults: ["hello.txt"]
                         <h3 class="text-xl font-bold text-base-content mb-4">Run Your First Build</h3>
                         <p class="text-charcoal-mid mb-4">Execute the default target defined in your manifest. Netsuke validates the manifest, expands templates, writes a Ninja plan, and hands execution over.</p>
                         <div class="bg-base-content rounded-lg p-4 font-mono text-sm text-stone-light shadow-inner border border-charcoal-mid">
-                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                            {% highlight 'netsuke-console' %}
 $ netsuke build
 [1/1] printf 'hello\n' > hello.txt
-                            {% endraw %}{% endhighlight %}{% raw %}
+                            {% endhighlight %}
                         </div>
 
                         <div class="mt-6 flex gap-4">
@@ -260,7 +260,7 @@ $ netsuke build
                          <h3 class="font-serif text-lg font-bold text-base-content mb-4">
                             Manual Download
                         </h3>
-                        <p class="text-xs text-charcoal-mid mb-4">The v{% endraw %}{{ netsuke_version }}{% raw %} release ships installers: Debian and RPM packages for Linux (x86-64 and Arm64), a macOS installer package, and a Windows MSI. Ninja must be installed separately on macOS and Windows.</p>
+                        <p class="text-xs text-charcoal-mid mb-4">The v{{ netsuke_version }} release ships installers: Debian and RPM packages for Linux (x86-64 and Arm64), a macOS installer package, and a Windows MSI. Ninja must be installed separately on macOS and Windows.</p>
 
                         <div class="mt-4 text-center">
                              <a href="https://github.com/leynos/netsuke/releases" class="hm-button hm-button--ghost inline-flex items-center px-5 py-2.5 text-sm">
@@ -295,7 +295,7 @@ $ netsuke build
                 <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                     <h3 class="font-bold text-base-content text-lg mb-2">Can I install a specific version?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +nightly-2026-08-23 install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{% endraw %}{{ netsuke_version }}{% raw %}</code>, not <code>v{% endraw %}{{ netsuke_version }}{% raw %}</code>). Pre-release versions such as <code>{% endraw %}{{ netsuke_version }}{% raw %}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="text-primary underline decoration-primary/40 hover:decoration-primary">crates.io</a> for available versions.
+                        Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +nightly-2026-08-23 install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{{ netsuke_version }}</code>, not <code>v{{ netsuke_version }}</code>). Pre-release versions such as <code>{{ netsuke_version }}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="text-primary underline decoration-primary/40 hover:decoration-primary">crates.io</a> for available versions.
                     </p>
                 </div>
 
@@ -309,14 +309,14 @@ $ netsuke build
                 <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                     <h3 class="font-bold text-base-content text-lg mb-2">Does it work with CI/CD?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Install Netsuke on your continuous integration (CI) agent via <code>cargo binstall netsuke-build@{% endraw %}{{ netsuke_version }}{% raw %}</code> (pin the version in automated workflows) and run <code>netsuke build</code> as a build step. When standard error (stderr) is not a teletype/terminal (TTY), progress falls back to plain text automatically, and <code>--json</code> emits a machine-readable result document. Dedicated CI integrations are planned but not yet available.
+                        Yes. Install Netsuke on your continuous integration (CI) agent via <code>cargo binstall netsuke-build@{{ netsuke_version }}</code> (pin the version in automated workflows) and run <code>netsuke build</code> as a build step. When standard error (stderr) is not a teletype/terminal (TTY), progress falls back to plain text automatically, and <code>--json</code> emits a machine-readable result document. Dedicated CI integrations are planned but not yet available.
                     </p>
                 </div>
             </div>
         </section>
 
     </main>
-{% endraw %}
+
 {% endblock %}
 {% block extra_body %}
     <script>

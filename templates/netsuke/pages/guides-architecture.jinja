@@ -4,23 +4,23 @@
 {% set active_nav = 'guides' %}
 {% block page_title %}How Netsuke Works - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar(sections=[
+        {{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#compiler', 'label': 'A build-system compiler'}, {'href': '#pipeline', 'label': 'The six-stage pipeline'}, {'href': '#static-graph', 'label': 'The static graph mandate'}, {'href': '#ir', 'label': 'The intermediate representation'}, {'href': '#execution', 'label': 'Handing off to Ninja'}, {'href': '#errors', 'label': 'When it breaks'}, {'href': '#crate', 'label': 'Inside the crate'}]},
             {'title': 'Helpful links', 'links': [{'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-design.md', 'label': 'Full design document'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/repository-layout.md', 'label': 'Repository layout'}, {'href': '/netsuke/docs/manifest-reference/', 'label': 'Manifest Reference'}, {'href': '/netsuke/docs/security/', 'label': 'Security Model'}]},
-        ], search=false) }}{% raw %}
+        ], search=false) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'How Netsuke Works'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'How Netsuke Works'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Architecture', 'How Netsuke Works') %}
+            {% call chrome.page_header('Architecture', 'How Netsuke Works') %}
                 Netsuke is a build-system compiler. It takes a YAML manifest with controlled Jinja expansion, resolves every dynamic decision up front, and emits a static Ninja plan for execution. This guide walks the pipeline from manifest to running build.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- A build-system compiler -->
             <section id="compiler" class="mb-16">
@@ -68,8 +68,8 @@
                         <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">3</div>
                         <div>
                             <h3 class="font-bold text-base-content mb-1">Template expansion</h3>
-                            <p class="text-sm text-charcoal-mid">Netsuke walks the parsed value, evaluating Jinja macros, variables, and the <code>foreach</code> and <code>when</code> keys on targets and actions. Control flow lives only in these explicit keys; structural <code>{% ... %}</code> blocks may not reshape mappings or sequences. Variable lookups respect the precedence <code>globals</code> &lt; <code>entry.vars</code> &lt; per-iteration locals.</p>
-                        </div>
+{% raw %}                            <p class="text-sm text-charcoal-mid">Netsuke walks the parsed value, evaluating Jinja macros, variables, and the <code>foreach</code> and <code>when</code> keys on targets and actions. Control flow lives only in these explicit keys; structural <code>{% ... %}</code> blocks may not reshape mappings or sequences. Variable lookups respect the precedence <code>globals</code> &lt; <code>entry.vars</code> &lt; per-iteration locals.</p>
+{% endraw %}                        </div>
                     </div>
                     <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs flex items-start">
                         <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm mr-4 shrink-0">4</div>
@@ -223,9 +223,9 @@
             </section>
 
             <!-- Footer Navigation -->
-{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'label': 'Manifest Reference', 'href': '/netsuke/docs/manifest-reference/'}) }}{% raw %}
+{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'label': 'Manifest Reference', 'href': '/netsuke/docs/manifest-reference/'}) }}
 
         </main>
     </div>
-{% endraw %}
+
 {% endblock %}

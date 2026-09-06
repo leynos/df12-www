@@ -4,14 +4,14 @@
 {% set active_nav = 'examples' %}
 {% block page_title %}Examples Hub - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area -->
     <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Header Section -->
-        {% endraw %}{% call chrome.page_header('Community & Official', 'Examples Hub', hero=true) %}
+        {% call chrome.page_header('Community & Official', 'Examples Hub', hero=true) %}
             Explore small, concrete Netsuke manifests. Each example shows one part of the language clearly enough to steal without regret.
-        {% endcall %}{% raw %}
+        {% endcall %}
 
         <!-- Featured Example (Hero Card) -->
         <section id="featured-example" class="mb-20">
@@ -49,7 +49,7 @@
                             <span>basic-c/</span>
                         </div>
                         <div class="code-preview p-4 text-sm border border-white/10 shadow-2xl rounded-lg">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 netsuke_version: "1.0.0"
 
 rules:
@@ -64,7 +64,7 @@ targets:
   - name: "app"
     command: "gcc {{ ins }} -o {{ outs }}"
     sources: ["main.o", "utils.o"]
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                         </div>
                     </div>
                 </div>
@@ -75,9 +75,9 @@ targets:
         <section id="filters" class="hm-filter-shell mb-10 sticky top-20 z-40 py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
             <div class="hm-filter-shell__row flex flex-col sm:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
                 <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-{% endraw %}
+
 {{ exdata.filter_buttons() }}
-{% raw %}
+
                 </div>
 
                 <div
@@ -113,11 +113,11 @@ targets:
 
         <!-- Examples Grid -->
         <section id="examples-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-{% endraw %}
+
 {% for ex in exdata.examples %}
 {{ exdata.card(ex) }}
 {% endfor %}
-{% raw %}
+
         </section>
 
         <!-- Contributing Callout -->
@@ -164,5 +164,5 @@ targets:
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
     <script defer src="/netsuke/assets/js/examples-hub.js"></script>
-{% endraw %}
+
 {% endblock %}

@@ -4,21 +4,21 @@
 {% set active_nav = 'docs' %}
 {% block page_title %}CLI Commands - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}, {'href': '#output-streams', 'label': 'Output streams'}, {'href': '#accessible-output', 'label': 'Accessible output'}, {'href': '#localization', 'label': 'Localization'}]) }}{% raw %}
+        {{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}, {'href': '#output-streams', 'label': 'Output streams'}, {'href': '#accessible-output', 'label': 'Accessible output'}, {'href': '#localization', 'label': 'Localization'}]) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
-{% endraw %}{{ docsnav.mobile_docs_bar('cli') }}{% raw %}
+{{ docsnav.mobile_docs_bar('cli') }}
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Reference', 'CLI Commands') %}
+            {% call chrome.page_header('Reference', 'CLI Commands') %}
                 Build targets, inspect the plan, and control output. Every command's status goes to stderr and its artefacts to stdout, so pipelines capture exactly what they need.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <section id="cli" class="mb-20">
                 <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
@@ -164,7 +164,7 @@
 
                     <!-- Right: Terminal Preview -->
                     <div class="space-y-6 sticky top-24 self-start">
-                        {% endraw %}{{ chrome.faux_window_open('user@dev:~/netsuke-project') }}{% highlight 'netsuke-console' %}{% raw %}
+                        {% call chrome.faux_window('user@dev:~/netsuke-project') %}{% highlight 'netsuke-console' %}
 $ netsuke --verbose build app
 Parsed Netsukefile and expanded 3 targets
 Wrote build.ninja
@@ -176,7 +176,7 @@ digraph netsuke {
   "main.o" -> "app"
   "utils.o" -> "app"
 }
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+{% endhighlight %}{% endcall %}
 
                         <!-- Tip Card -->
                         <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
@@ -229,7 +229,7 @@ digraph netsuke {
                     </div>
                 </div>
 
-                {% endraw %}{{ chrome.faux_window_open('Shell examples', outer_class='mb-6') }}{% highlight 'netsuke-console' %}{% raw %}
+                {% call chrome.faux_window('Shell examples', outer_class='mb-6') %}{% highlight 'netsuke-console' %}
 # Capture build graph without status noise
 $ netsuke graph > build.dot
 
@@ -241,7 +241,7 @@ $ netsuke --progress never build
 
 # Inspect generated Ninja file inline
 $ netsuke generate | grep 'rule '
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+{% endhighlight %}{% endcall %}
 
                 <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
                     <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
@@ -308,7 +308,7 @@ $ netsuke generate | grep 'rule '
                     In accessible mode each pipeline stage and each build task produces a labelled line on stderr.
                     No spinners, no cursor movement &mdash; just plain, ordered text a screen reader can follow.
                 </p>
-                {% endraw %}{{ chrome.faux_window_open('stderr, accessible mode', outer_class='mb-8') }}{% highlight 'netsuke-console' %}{% raw %}
+                {% call chrome.faux_window('stderr, accessible mode', outer_class='mb-8') %}{% highlight 'netsuke-console' %}
 Stage 1/6: Reading manifest file
 Stage 2/6: Parsing YAML document
 Stage 3/6: Expanding template directives
@@ -318,7 +318,7 @@ Stage 6/6: Synthesizing Ninja plan and executing Build
 Task 1/2: cc -c src/a.c
 Task 2/2: cc -c src/b.c
 Success: Build complete.
-{% endraw %}{% endhighlight %}{{ chrome.faux_window_close() }}{% raw %}
+{% endhighlight %}{% endcall %}
 
                 <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">
@@ -415,7 +415,7 @@ Success: Build complete.
                         Fluent messages handle pluralisation and variable interpolation natively.
                         A translator only needs to edit the <code>.ftl</code> file for their locale &mdash; no code changes required.
                     </p>
-                    {% endraw %}{{ chrome.faux_window_open('en-US.ftl', variant='card-bleed', body_class='p-6 font-mono text-xs overflow-x-auto [contain:inline-size]') }}{% raw %}
+                    {% call chrome.faux_window('en-US.ftl', variant='card-bleed', body_class='p-6 font-mono text-xs overflow-x-auto [contain:inline-size]') %}
                         <pre class="font-mono text-xs text-stone-light"><code>progress-target-count = Building { $count -&gt;
     [one] { $count } target...
    *[other] { $count } targets...
@@ -423,7 +423,7 @@ Success: Build complete.
 
 error-file-not-found = Error: File "{ $path }" was not found.
     .hint = Check that the path exists and is readable.</code></pre>
-                    {% endraw %}{{ chrome.faux_window_close() }}{% raw %}
+                    {% endcall %}
                     <p class="text-xs text-charcoal-mid mt-3">
                         See the <a href="/netsuke/guides/translating/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Translating Netsuke guide</a> for the workflow, and the upstream
                         <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization style guide</a> and
@@ -478,12 +478,12 @@ error-file-not-found = Error: File "{ $path }" was not found.
             </section>
 
             <!-- Help Footer -->
-{% endraw %}{{ docsnav.docs_footer('cli') }}{% raw %}
+{{ docsnav.docs_footer('cli') }}
 
         </main>
     </div>
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

@@ -7,21 +7,21 @@
     <script defer src="https://cdn.plot.ly/plotly-3.1.1.min.js" integrity="sha384-eyWfwv4NWkH7sLjk6s+Al2SBmZhX8gcLellpr+PLrfiNaHoTlAQTG9zDi4Z0liz8" crossorigin="anonymous"></script>
 {% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar('security', sub_links=[{'href': '#network-policy', 'label': 'Network policy'}, {'href': '#recipe-shells', 'label': 'Recipe shells'}, {'href': '#shell-dollars', 'label': 'Markers and shell dollars'}, {'href': '#security', 'label': 'Security model'}]) }}{% raw %}
+        {{ docsnav.sidebar('security', sub_links=[{'href': '#network-policy', 'label': 'Network policy'}, {'href': '#recipe-shells', 'label': 'Recipe shells'}, {'href': '#shell-dollars', 'label': 'Markers and shell dollars'}, {'href': '#security', 'label': 'Security model'}]) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
-{% endraw %}{{ docsnav.mobile_docs_bar('security') }}{% raw %}
+{{ docsnav.mobile_docs_bar('security') }}
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Security Model'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Security Model'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Reference', 'Security Model') %}
+            {% call chrome.page_header('Reference', 'Security Model') %}
                 Validated structure, quoted path substitutions, a documented recipe-shell contract, and an auditable network policy for the <code>fetch()</code> helper. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>: Netsuke reduces common quoting mistakes, but it is not a sandbox.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <section id="network-policy" class="mb-20">
                 <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
@@ -58,13 +58,13 @@
 
                 <div class="bg-base-content rounded-xl overflow-hidden">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Restricting fetch to a single host</div>
-                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                    {% highlight 'netsuke-console' %}
 $ netsuke \
   --fetch-default-deny \
   --fetch-allow-host releases.example.com \
   --fetch-block-host internal.example.com \
   build
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
             </section>
 
@@ -89,8 +89,8 @@ $ netsuke \
                             <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:logo-windows" aria-hidden="true"></span>
                             <h3 class="font-bold text-base-content text-sm">Windows: PowerShell by default</h3>
                         </div>
-                        <p class="text-xs text-charcoal-mid">Every legacy recipe is handed to Windows PowerShell (<code>powershell.exe</code>, not <code>pwsh</code>) as an encoded, non-interactive, no-profile command. A command list shares one process and is checked with <code>$LASTEXITCODE</code> after every entry. Use PowerShell syntax: <code>$name</code> is a variable and <code>$env:NAME</code> reads the environment. <code>{{ ins }}</code> and <code>{{ outs }}</code> render as single-quoted PowerShell arguments. Recipes over Windows' command-line limit and up to 1 MiB are routed through a self-deleting <code>.ps1</code> response file.</p>
-                    </div>
+{% raw %}                        <p class="text-xs text-charcoal-mid">Every legacy recipe is handed to Windows PowerShell (<code>powershell.exe</code>, not <code>pwsh</code>) as an encoded, non-interactive, no-profile command. A command list shares one process and is checked with <code>$LASTEXITCODE</code> after every entry. Use PowerShell syntax: <code>$name</code> is a variable and <code>$env:NAME</code> reads the environment. <code>{{ ins }}</code> and <code>{{ outs }}</code> render as single-quoted PowerShell arguments. Recipes over Windows' command-line limit and up to 1 MiB are routed through a self-deleting <code>.ps1</code> response file.</p>
+{% endraw %}                    </div>
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <div class="flex items-center mb-3">
                             <span class="iconify text-charcoal-mid mr-2" data-icon="carbon:logo-git" aria-hidden="true"></span>
@@ -101,12 +101,12 @@ $ netsuke \
                 </div>
                 <div class="bg-base-content rounded-xl overflow-hidden">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Keeping POSIX recipes on Windows</div>
-                    {% endraw %}{% highlight 'powershell' %}{% raw %}
+                    {% highlight 'powershell' %}
 choco install git --yes --no-progress
 $env:PATH = "C:\Program Files\Git\bin;$env:PATH"
 $env:NETSUKE_WINDOWS_SHELL = "bash"
 netsuke build
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
             </section>
 
@@ -115,20 +115,20 @@ netsuke build
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:currency-dollar" aria-hidden="true"></span> Markers and shell dollars
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    <code>{{ ins }}</code> and <code>{{ outs }}</code> are the only Netsuke markers for input and output paths, and the only values that are automatically shell-quoted. Everything else a template renders is ordinary command text. Since v0.1.0-beta3, shell dollar expressions are written normally: Netsuke lowers the markers first and only then escapes literal dollars as <code>$$</code> in the generated Ninja file, so the shell receives them unchanged.
-                </p>
+{% raw %}                    <code>{{ ins }}</code> and <code>{{ outs }}</code> are the only Netsuke markers for input and output paths, and the only values that are automatically shell-quoted. Everything else a template renders is ordinary command text. Since v0.1.0-beta3, shell dollar expressions are written normally: Netsuke lowers the markers first and only then escapes literal dollars as <code>$$</code> in the generated Ninja file, so the shell receives them unchanged.
+{% endraw %}                </p>
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <h3 class="font-bold text-base-content mb-3 text-sm">Write this</h3>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto">
-{% endraw %}{% highlight 'netsuke' %}{% raw %}
+{% highlight 'netsuke' %}{% raw %}
 targets:
   - name: build/app
     sources: src/main.c
     command: >-
       ${CC:-cc} $CFLAGS {{ ins }} -o {{ outs }}
       && echo "built on $HOSTNAME"
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3"><code>$CC</code>, <code>$CFLAGS</code>, and <code>$HOSTNAME</code> reach <code>/bin/sh</code> as literal shell variables. On the PowerShell route, write <code>$env:CC</code> instead; PowerShell does not perform POSIX <code>${VAR:-default}</code> expansion.</p>
                     </div>
@@ -136,8 +136,8 @@ targets:
                         <h3 class="font-bold text-base-content mb-3 text-sm">Migrating a beta2 manifest</h3>
                         <ul class="space-y-2 text-xs text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace the historical spelling <code>$$PATH</code> with <code>$PATH</code>. On POSIX and Bash routes <code>$$</code> is the shell's process identifier; in PowerShell it is the last token of the previous command, so the extra dollar now changes the result.</span></li>
-                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace any <code>$in</code> or <code>$out</code> placeholder with <code>{{ ins }}</code> or <code>{{ outs }}</code>. Literal <code>$ins</code> and <code>$outs</code> remain ordinary shell variables.</span></li>
-                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>On POSIX and Bash routes a marker may appear unquoted, single-quoted, or double-quoted, but not inside a command substitution or backticks. In PowerShell, use markers unquoted; quoted and command-substitution sites are rejected.</span></li>
+{% raw %}                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace any <code>$in</code> or <code>$out</code> placeholder with <code>{{ ins }}</code> or <code>{{ outs }}</code>. Literal <code>$ins</code> and <code>$outs</code> remain ordinary shell variables.</span></li>
+{% endraw %}                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>On POSIX and Bash routes a marker may appear unquoted, single-quoted, or double-quoted, but not inside a command substitution or backticks. In PowerShell, use markers unquoted; quoted and command-substitution sites are rejected.</span></li>
                             <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Build and default-target paths reject <code>$</code>, spaces, colons, <code>|</code>, and control characters; emitted metadata such as descriptions rejects newlines and NUL.</span></li>
                         </ul>
                     </div>
@@ -172,7 +172,7 @@ targets:
                             <span class="iconify" data-icon="carbon:fingerprint-recognition" aria-hidden="true"></span>
                         </div>
                         <h3 class="font-bold text-base-content mb-2">Quoted path markers</h3>
-                        <p class="text-sm text-charcoal-mid"><code>{{ ins }}</code> and <code>{{ outs }}</code> are quoted as path arguments for the selected recipe shell. Other rendered Jinja values are <em>not</em> automatically shell-quoted, and the <code>shell_escape</code> filter described in older drafts is not implemented in v{% endraw %}{{ netsuke_version }}{% raw %}: handwritten shell fragments remain the author's responsibility.</p>
+{% raw %}                        <p class="text-sm text-charcoal-mid"><code>{{ ins }}</code> and <code>{{ outs }}</code> are quoted as path arguments for the selected recipe shell. Other rendered Jinja values are <em>not</em> automatically shell-quoted, and the <code>shell_escape</code> filter described in older drafts is not implemented in v{% endraw %}{{ netsuke_version }}: handwritten shell fragments remain the author's responsibility.</p>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
@@ -209,7 +209,7 @@ targets:
             </section>
 
             <!-- Help Footer -->
-{% endraw %}{{ docsnav.docs_footer('security') }}{% raw %}
+{{ docsnav.docs_footer('security') }}
 
         </main>
     </div>
@@ -287,5 +287,5 @@ targets:
     </script>
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

@@ -4,25 +4,25 @@
 {% set active_nav = 'guides' %}
 {% block page_title %}Writing Examples &amp; Showcases - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar(sections=[
+        {{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#good-example', 'label': 'What makes a good example'}, {'href': '#anatomy', 'label': 'Anatomy of an example'}, {'href': '#conventions', 'label': 'Manifest conventions'}, {'href': '#repository', 'label': 'Where examples live'}, {'href': '#showcases', 'label': 'Showcase pages'}, {'href': '#submitting', 'label': 'Submitting'}]},
             {'title': 'Helpful links', 'links': [{'href': '/netsuke/examples/', 'label': 'Examples Hub'}, {'href': '/netsuke/guides/contributing/', 'label': 'Contributing Guide'}, {'href': 'https://github.com/leynos/netsuke/tree/main/examples', 'label': 'examples/ on GitHub'}, {'href': '/netsuke/docs/manifest-reference/', 'label': 'Manifest Reference'}]},
-        ], search=false) }}{% raw %}
+        ], search=false) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Writing Examples & Showcases'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Writing Examples & Showcases'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Community', 'Writing Examples & Showcases') %}
+            {% call chrome.page_header('Community', 'Writing Examples & Showcases') %}
                 An example is the fastest route from &ldquo;what is this?&rdquo; to a working build.
                 This guide covers what makes an example worth stealing, the manifest conventions the repository follows,
                 and how a good example becomes a showcase page on this site.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- What makes a good example -->
             <section id="good-example" class="mb-20">
@@ -73,7 +73,7 @@
 
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">examples/visual_design.yml</div>
-                    {% endraw %}{% highlight 'netsuke' %}{% raw %}
+                    {% highlight 'netsuke' %}{% raw %}
 # Schema version comes first, always quoted.
 netsuke_version: "1.0.0"
 
@@ -113,7 +113,7 @@ actions:
 # Defaults name the deliverable, not an abstract label.
 defaults:
   - build/raster/hero.png
-{% endraw %}{% endhighlight %}{% raw %}
+{% endraw %}{% endhighlight %}
                 </div>
             </section>
 
@@ -298,12 +298,12 @@ defaults:
             </section>
 
             <!-- Help Footer -->
-{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'label': 'Examples Hub', 'href': '/netsuke/examples/'}) }}{% raw %}
+{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Guides', 'href': '/netsuke/guides/'}, {'label': 'Examples Hub', 'href': '/netsuke/examples/'}) }}
 
         </main>
     </div>
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

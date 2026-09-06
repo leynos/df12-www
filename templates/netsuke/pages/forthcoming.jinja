@@ -2,15 +2,15 @@
 {% import "chrome.jinja" as chrome %}
 {% block page_title %}Forthcoming Capabilities - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
 <main id="main-content" class="grow pt-24 pb-20 site-container w-full">
 
         <!-- Hero Section -->
-        {% endraw %}{% call chrome.page_header('Previews · not yet in v' ~ netsuke_version, 'Forthcoming Capabilities', hero=true, id='forthcoming-hero', dot='bg-primary') %}
+        {% call chrome.page_header('Previews · not yet in v' ~ netsuke_version, 'Forthcoming Capabilities', hero=true, id='forthcoming-hero', dot='bg-primary') %}
             Design-stage write-ups of capabilities that are specified in Netsuke's design documents and RFCs but have not shipped.
             Each page says what is designed, what is implemented on a branch, and which release the preview is targeted at.
             Names, flags, and file formats here may change before they land.
-        {% endcall %}{% raw %}
+        {% endcall %}
 
         <section id="previews" class="mb-20">
             <div class="grid md:grid-cols-2 gap-8">
@@ -59,5 +59,5 @@
         </section>
 
     </main>
-{% endraw %}
+
 {% endblock %}

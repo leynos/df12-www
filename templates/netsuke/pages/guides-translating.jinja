@@ -4,24 +4,24 @@
 {% set active_nav = 'guides' %}
 {% block page_title %}Translating Netsuke - Netsuke Build System{% endblock %}
 {% block content %}
-{% raw %}
+
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {% endraw %}{{ docsnav.sidebar(sections=[
+        {{ docsnav.sidebar(sections=[
             {'title': 'On this page', 'sub': true, 'links': [{'href': '#how-it-works', 'label': 'How localization works'}, {'href': '#file-structure', 'label': 'File structure'}, {'href': '#style-and-terminology', 'label': 'Style, tone, and terminology'}, {'href': '#message-keys', 'label': 'Message keys'}, {'href': '#variables-plurals', 'label': 'Variables & plurals'}, {'href': '#new-locale', 'label': 'Adding a new locale'}, {'href': '#quality', 'label': 'Quality & validation'}]},
             {'title': 'Helpful links', 'links': [{'href': '/netsuke/guides/contributing/', 'label': 'Contributing Guide'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/translators-guide.md', 'label': 'Translator Guide (source)'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md', 'label': 'Localization Style Guide (source)'}, {'href': 'https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md', 'label': 'Localization Glossary (source)'}, {'href': 'https://projectfluent.org/fluent/guide/', 'label': 'Fluent Syntax Guide'}, {'href': 'https://cldr.unicode.org/index/cldr-spec/plural-rules', 'label': 'CLDR Plural Rules'}]},
-        ], search=false) }}{% raw %}
+        ], search=false) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {% endraw %}{{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Translating Netsuke'}]) }}{% raw %}
+            {{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Translating Netsuke'}]) }}
 
-            {% endraw %}{% call chrome.page_header('Localization', 'Translating Netsuke') %}
+            {% call chrome.page_header('Localization', 'Translating Netsuke') %}
                 Every user-facing message in Netsuke lives in a <a href="https://projectfluent.org/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Project Fluent</a> resource file, not in Rust source.
                 Translating the whole CLI means editing one file per locale — this guide covers the format, the conventions, and the checks that keep translations honest.
-            {% endcall %}{% raw %}
+            {% endcall %}
 
             <!-- How localization works -->
             <section id="how-it-works" class="mb-20">
@@ -349,7 +349,7 @@ example.files_processed = { $count -&gt;
 
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Steps 1&ndash;3: create, copy, translate</div>
-                    {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                    {% highlight 'netsuke-console' %}
 # 1. Create the locale directory
 $ mkdir -p locales/is
 
@@ -359,7 +359,7 @@ $ cp locales/en-US/messages.ftl locales/is/messages.ftl
 # 3. Translate values, keep keys, follow the glossary. For example:
 #   cli.about = Netsuke þýðir YAML + Jinja-lýsingar
 #               í Ninja-áætlanir.
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
@@ -377,10 +377,10 @@ $ cp locales/en-US/messages.ftl locales/is/messages.ftl
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <h3 class="font-bold text-base-content mb-3 text-sm">Steps 5&ndash;6: build and test</h3>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto mb-3">
-                            {% endraw %}{% highlight 'netsuke-console' %}{% raw %}
+                            {% highlight 'netsuke-console' %}
 $ cargo build
 $ cargo run -- --locale is --help
-{% endraw %}{% endhighlight %}{% raw %}
+{% endhighlight %}
                         </div>
                         <p class="text-xs text-charcoal-mid">
                             The compile-time audit verifies every key and every <code>{ $variable }</code> is present; missing or orphaned keys, variable mismatches, and metadata drift fail the build with a detailed error.
@@ -429,12 +429,12 @@ $ cargo run -- --locale is --help
             </section>
 
             <!-- Help Footer -->
-{% endraw %}{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Contributing', 'href': '/netsuke/guides/contributing/#translation'}, {'kicker': 'Ready?', 'label': 'Open a Pull Request', 'href': 'https://github.com/leynos/netsuke/pulls'}) }}{% raw %}
+{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Contributing', 'href': '/netsuke/guides/contributing/#translation'}, {'kicker': 'Ready?', 'label': 'Open a Pull Request', 'href': 'https://github.com/leynos/netsuke/pulls'}) }}
 
         </main>
     </div>
 
     <script defer src="/netsuke/assets/vendor/minisearch.js"></script>
     <script defer src="/netsuke/assets/js/doc-search.js"></script>
-{% endraw %}
+
 {% endblock %}

@@ -16,7 +16,7 @@ import pytest
 from bs4 import BeautifulSoup, Tag
 from hypothesis import given, settings
 from hypothesis import strategies as st
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, TemplateSyntaxError
 
 from df12_pages.config import ContentPageConfig, SubSiteHomepageConfig
 from df12_pages.content_page import ContentPageGenerator
@@ -258,6 +258,20 @@ class TestWindows:
         assert soup.select_one("#after") is not None, (
             "the trailing content still renders"
         )
+
+    @pytest.mark.parametrize(
+        "call",
+        ["faux_window('x')", "example_terminal()"],
+    )
+    def test_an_unclosed_window_is_a_template_error(self, call: str) -> None:
+        """A window left unclosed fails to parse rather than rendering wrong.
+
+        This is what the block form buys over the opener/closer pair it
+        replaced: a missing closer was previously markup that rendered with
+        an unbalanced ``div``, and is now caught before the page is built.
+        """
+        with pytest.raises(TemplateSyntaxError, match="endcall"):
+            _render_macro("{% call chrome." + call + " %}<p>body</p>")
 
 
 class TestPageHeader:

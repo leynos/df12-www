@@ -1,3 +1,21 @@
+{#
+  Shared page chrome for the Netsuke sub-site: the <head>, the fixed
+  #navbar with its nested mobile menu, and the #footer. Every other
+  Netsuke template reaches this furniture by extending it, directly or
+  otherwise.
+
+  It defines, in order, `page_title` (defaults to "Netsuke"),
+  `page_scripts` and `extra_head` (both empty), `body_class` (empty),
+  `navbar_action` and `mobile_action` (both default to the Install
+  call-to-action), `content` (empty), and `extra_body` (empty).
+
+  `doc_page.jinja` extends it directly and fills `page_scripts` and
+  `body_class` with the documentation chrome; every template under
+  `pages/` reaches it that way, save for the standalone
+  `pages/icon-replacements.jinja`. `home_page.jinja` extends it
+  directly rather than through `doc_page.jinja`, since the homepage is
+  not a documentation page.
+#}
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -1,9 +1,13 @@
 {#
   The documentation chrome.
 
-  `PageContentGenerator` hard-codes this filename and every template under
-  `pages/` extends it, so it stays as a named seam even though the page chrome
-  itself lives in `_layout.jinja` — the arrangement Stilyagi and Weaver use.
+  Two paths converge on this filename. `PageContentGenerator` hard-codes it
+  for the markdown-sourced documentation pages; separately, the templates
+  under `pages/` extend it by their own declaration, under a generator that
+  never names it — 27 of the 28, all but `pages/icon-replacements.jinja`,
+  which is a standalone document with its own head and scripts. So it stays a
+  named seam even though the page chrome itself lives in `_layout.jinja` —
+  the arrangement Stilyagi and Weaver use.
 
   What it adds over the layout is docs-only: the scroll-spy and copy-button
   scripts, and the column flex a docs sidebar needs to fill the viewport. Both

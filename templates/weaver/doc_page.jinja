@@ -1,6 +1,9 @@
 {#
-  Passthrough for the documentation pages. `PageContentGenerator` hard-codes
-  this filename, and the twelve templates under `pages/` extend it, so it stays
-  as a named seam even though the chrome now lives in `_layout.jinja`.
+  Passthrough for the documentation pages. Two paths converge on this
+  filename: `PageContentGenerator` hard-codes it for the markdown-sourced
+  documentation pages, and the templates under `pages/` extend it by their own
+  declaration — twelve of the thirteen, all but `pages/design-language.jinja`,
+  which builds its own shell. So it stays a named seam even though the chrome
+  now lives in `_layout.jinja`.
 #}
 {% extends "_layout.jinja" %}

@@ -51,7 +51,7 @@
             <section id="status" class="mb-16">
                 <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
                     <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
-                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.strftime('%-d %B %Y') }}
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
                     </h2>
                     <ul class="space-y-2 text-sm text-charcoal-mid">
                         <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> Nothing described here is implemented: there is no <code>test</code> command, no <code>tests</code> manifest key, and no test dialect in the released binary.</span></li>

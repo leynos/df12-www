@@ -1,3 +1,19 @@
+{#
+  Shared page chrome for the Weaver sub-site: the <head>, the sidebar
+  #sidebar navigation built from `chrome.nav_link(...)`, the main
+  wrapper, and the footer.
+
+  It defines twelve blocks, in order: `page_title`, `extra_head`,
+  `texture_overlay`, `nav_subitems_how`, `nav_subitems_commands`,
+  `nav_subitems_sempai`, `nav_subitems_jacquard`, `sidebar_footer`,
+  `main_class`, `main_extra_class`, `content`, and `page_footer`.
+
+  `home_page.jinja` and `shared_content_page.jinja` extend it
+  directly. `doc_page.jinja` also extends it directly and adds
+  nothing, existing only because `PageContentGenerator` hard-codes
+  that filename and the twelve templates under `pages/` extend it in
+  turn. `pages/design-language.jinja` builds its own shell instead.
+#}
 {% import '_chrome.jinja' as chrome %}<!DOCTYPE html>
 <html lang="en">
 <head>

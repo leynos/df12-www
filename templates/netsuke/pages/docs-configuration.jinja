@@ -35,7 +35,7 @@
                     <p class="text-xs text-charcoal-mid">
                         <strong class="text-base-content">Note:</strong> The keys below mirror <code>docs/sample-netsuke.toml</code> in the repository as of v{{ netsuke_version }}.
                         Netsuke is pre-1.0 &mdash; some key names and default values may still change before a stable release.
-                        Check the <a href="https://github.com/leynos/netsuke" class="text-primary underline decoration-primary/40 hover:decoration-primary">project repository</a> for the latest status.
+                        Check the <a href="https://github.com/leynos/netsuke" class="hm-link">project repository</a> for the latest status.
                     </p>
                 </div>
 
@@ -59,17 +59,17 @@
                         </h3>
                         <p class="text-xs text-charcoal-mid mb-3">Settings can be controlled via <code>NETSUKE_</code>-prefixed env vars:</p>
                         <div class="space-y-1.5 text-xs font-mono">
-                            <div><code class="text-success">NETSUKE_JOBS</code>=<code class="text-warning">8</code></div>
-                            <div><code class="text-success">NETSUKE_LOCALE</code>=<code class="text-warning">es-ES</code></div>
-                            <div><code class="text-success">NETSUKE_PROGRESS</code>=<code class="text-warning">never</code></div>
-                            <div><code class="text-success">NETSUKE_ACCESSIBILITY</code>=<code class="text-warning">on</code></div>
-                            <div><code class="text-success">NETSUKE_EMOJI</code>=<code class="text-warning">never</code></div>
-                            <div><code class="text-success">NETSUKE_JSON</code>=<code class="text-warning">1</code></div>
-                            <div><code class="text-success">NETSUKE_NO_INPUT</code>=<code class="text-warning">true</code></div>
-                            <div><code class="text-success">NETSUKE_DEFAULT_TARGETS__0</code>=<code class="text-warning">hello.txt</code></div>
-                            <div><code class="text-success">NETSUKE_NINJA</code>=<code class="text-warning">/opt/ninja/bin/ninja</code></div>
-                            <div><code class="text-success">NETSUKE_WINDOWS_SHELL</code>=<code class="text-warning">bash</code></div>
-                            <div><code class="text-success">NETSUKE_WHICH_WORKSPACE</code>=<code class="text-warning">0</code></div>
+                            <div><code class="text-success-text">NETSUKE_JOBS</code>=<code class="text-warning-text">8</code></div>
+                            <div><code class="text-success-text">NETSUKE_LOCALE</code>=<code class="text-warning-text">es-ES</code></div>
+                            <div><code class="text-success-text">NETSUKE_PROGRESS</code>=<code class="text-warning-text">never</code></div>
+                            <div><code class="text-success-text">NETSUKE_ACCESSIBILITY</code>=<code class="text-warning-text">on</code></div>
+                            <div><code class="text-success-text">NETSUKE_EMOJI</code>=<code class="text-warning-text">never</code></div>
+                            <div><code class="text-success-text">NETSUKE_JSON</code>=<code class="text-warning-text">1</code></div>
+                            <div><code class="text-success-text">NETSUKE_NO_INPUT</code>=<code class="text-warning-text">true</code></div>
+                            <div><code class="text-success-text">NETSUKE_DEFAULT_TARGETS__0</code>=<code class="text-warning-text">hello.txt</code></div>
+                            <div><code class="text-success-text">NETSUKE_NINJA</code>=<code class="text-warning-text">/opt/ninja/bin/ninja</code></div>
+                            <div><code class="text-success-text">NETSUKE_WINDOWS_SHELL</code>=<code class="text-warning-text">bash</code></div>
+                            <div><code class="text-success-text">NETSUKE_WHICH_WORKSPACE</code>=<code class="text-warning-text">0</code></div>
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3">Policy values are matched case-insensitively. <code>NETSUKE_JSON</code> accepts <code>true</code>/<code>1</code> and <code>false</code>/<code>0</code>; anything else is a validation error rather than a silent fallback. <code>NETSUKE_NINJA</code> overrides the Ninja executable used by <code>build</code> and <code>clean</code>; empty or non-UTF-8 values fall back to <code>ninja</code> on <code>PATH</code>.</p>
                     </div>
@@ -97,7 +97,7 @@
                             </div>
                         </div>
                         <div class="hm-config-keys__panels" data-config-keys-panels>
-                            <div class="hm-config-keys__panel" id="config-keys-panel-build" data-config-keys-panel="build" role="group" aria-labelledby="config-keys-label-build" tabindex="0">
+                            <div class="hm-config-keys__panel" id="config-keys-panel-build" data-config-keys-panel="build" role="group" aria-labelledby="config-keys-label-build">
 {% highlight 'toml' %}
 # Keys are flat; this mirrors docs/sample-netsuke.toml
 # Manifest path override
@@ -110,7 +110,7 @@ default_targets = ["fmt", "lint", "test"]
 no_input = true
 {% endhighlight %}
                             </div>
-                            <div class="hm-config-keys__panel" id="config-keys-panel-output" data-config-keys-panel="output" role="group" aria-labelledby="config-keys-label-output" tabindex="0">
+                            <div class="hm-config-keys__panel" id="config-keys-panel-output" data-config-keys-panel="output" role="group" aria-labelledby="config-keys-label-output">
 {% highlight 'toml' %}
 # Output policies
 progress = "auto"       # auto | always | never
@@ -124,7 +124,7 @@ json = false
 verbose = false
 {% endhighlight %}
                             </div>
-                            <div class="hm-config-keys__panel" id="config-keys-panel-network" data-config-keys-panel="network" role="group" aria-labelledby="config-keys-label-network" tabindex="0">
+                            <div class="hm-config-keys__panel" id="config-keys-panel-network" data-config-keys-panel="network" role="group" aria-labelledby="config-keys-label-network">
 {% highlight 'toml' %}
 # Network policy for the fetch() helper
 fetch_default_deny = false

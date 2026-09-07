@@ -25,6 +25,7 @@ import pytest
 
 from tests.support.netsuke_browser import (
     BASE_PATH,
+    CASES,
     DESKTOP_HEIGHT,
     DESKTOP_WIDTH,
     KNOWN_OVERFLOW,
@@ -38,6 +39,7 @@ from tests.support.netsuke_browser import (
     _open,
 )
 from tests.support.stilyagi_browser import normalize_style
+from tests.support.weaver_browser import _violations
 from tests.support.weaver_harness import load
 
 if typ.TYPE_CHECKING:
@@ -132,6 +134,41 @@ WALKER_FIXTURE = """<!DOCTYPE html>
 """.replace("__WIDTH__", str(CHILD_WIDTH)).replace("__TEXT__", "x" * 200)
 
 pytestmark = pytest.mark.playwright
+
+
+@pytest.mark.timeout(900)
+@pytest.mark.parametrize(("page", "width", "height"), CASES)
+def test_a_netsuke_page_meets_wcag_aa(
+    drive: cabc.Callable[..., str], served: str, page: str, width: int, height: int
+) -> None:
+    """Every page passes axe over WCAG 2.0 A and AA, at both widths.
+
+    Contrast is a property of the rendered page rather than of the class
+    names: what ``text-warning`` composites to depends on the ground beneath
+    it, and the sub-site used one amber for a chip's fill and for 12px type on
+    white, where it measured 2.96:1. Only a browser can say. This check is
+    what confirmed the 250 contrast failures behind issues #105 to #107 were
+    gone, and it is what stops the next call site putting them back.
+
+    Both widths are checked because a region only reports as an unreachable
+    scroller once it actually scrolls, which several tables and code panels do
+    at 360px and not at 1440px.
+
+    Netsuke carries no waivers. Weaver's list is a decision recorded against
+    that sub-site's palette; there is no equivalent here, so any failure is a
+    failure.
+    """
+    _open(drive, served, page, width, height)
+
+    unexpected = [
+        f"{violation['id']} on {node['target']}: "
+        f"{node['failureSummary'].splitlines()[-1].strip()}"
+        for violation in _violations(drive)
+        for node in violation["nodes"]
+    ]
+    assert not unexpected, (
+        f"{BASE_PATH}{page} at {width}px fails accessibility checks: {unexpected}"
+    )
 
 
 @pytest.mark.timeout(900)

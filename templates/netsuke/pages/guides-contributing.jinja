@@ -60,7 +60,7 @@
                         <h4 class="font-bold text-primary text-sm mb-1">Before you start</h4>
                         <p class="text-xs text-charcoal-mid">
                             For significant changes, open a GitHub issue first to discuss the approach. This prevents duplicate effort and ensures your work fits the project's direction.
-                            All contributors must follow the <a href="/netsuke/code-of-conduct/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Code of Conduct</a>.
+                            All contributors must follow the <a href="/netsuke/code-of-conduct/" class="hm-link">Code of Conduct</a>.
                         </p>
                     </div>
                 </div>
@@ -194,11 +194,11 @@ $ make check-fmt lint test
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:translate" aria-hidden="true"></span> Translating Netsuke
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Netsuke uses <a href="https://projectfluent.org/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Project Fluent</a> for all user-facing text.
+                    Netsuke uses <a href="https://projectfluent.org/" class="hm-link">Project Fluent</a> for all user-facing text.
                     Every message is defined in a <code>.ftl</code> file — one per locale — rather than as hard-coded strings.
                     Thirty-five locale catalogues ship; English (<code>en-US</code>) is the source locale and the fallback for anything a translation has not yet covered.
-                    Before translating, read the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization style guide</a> for voice, tone, and register, and keep the
-                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization glossary</a> open for the preferred, allowed, and forbidden form of every term in your locale.
+                    Before translating, read the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="hm-link">localization style guide</a> for voice, tone, and register, and keep the
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="hm-link">localization glossary</a> open for the preferred, allowed, and forbidden form of every term in your locale.
                 </p>
 
                 <div class="grid md:grid-cols-2 gap-8 mb-8">
@@ -207,9 +207,9 @@ $ make check-fmt lint test
                         <div class="bg-white p-5 rounded-xl border border-base-300 text-xs font-mono space-y-1 text-charcoal-mid">
                             <div>locales/</div>
                             <div class="pl-4 text-primary">en-US/messages.ftl  <span class="text-charcoal-light font-sans">(source locale)</span></div>
-                            <div class="pl-4 text-success">es-ES/messages.ftl</div>
-                            <div class="pl-4 text-success">…  <span class="text-charcoal-light font-sans">(35 shipped tags)</span></div>
-                            <div class="pl-4 text-warning">is/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
+                            <div class="pl-4 text-success-text">es-ES/messages.ftl</div>
+                            <div class="pl-4 text-success-text">…  <span class="text-charcoal-light font-sans">(35 shipped tags)</span></div>
+                            <div class="pl-4 text-warning-text">is/messages.ftl  <span class="text-charcoal-light font-sans">(your new locale)</span></div>
                         </div>
                     </div>
                     <div>
@@ -241,7 +241,7 @@ $ make check-fmt lint test
                 </p>
                 <div class="bg-base-content rounded-xl overflow-hidden mb-6">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">en-US/messages.ftl (excerpt)</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Simple message</span>
+                    <pre tabindex="0" class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Simple message</span>
 cli-help-description = A modern build system for intuitive, fast builds.
 
 <span class="text-charcoal-light"># Message with a variable</span>
@@ -307,15 +307,15 @@ progress-target-count = Building { $count -&gt;
 
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Good commit message examples</div>
-                    <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-success">fix</span>: handle empty PATH in which() resolver
+                    <pre tabindex="0" class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-success-text">fix</span>: handle empty PATH in which() resolver
 
-<span class="text-success">feat</span>: add --fetch-default-deny network policy flag
+<span class="text-success-text">feat</span>: add --fetch-default-deny network policy flag
 
-<span class="text-success">docs</span>: document accessible output mode on CLI page
+<span class="text-success-text">docs</span>: document accessible output mode on CLI page
 
-<span class="text-success">test</span>: add integration test for locale fallback to en-US
+<span class="text-success-text">test</span>: add integration test for locale fallback to en-US
 
-<span class="text-success">chore</span>: update es-ES translation for progress messages</code></pre>
+<span class="text-success-text">chore</span>: update es-ES translation for progress messages</code></pre>
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-4">

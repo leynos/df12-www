@@ -1,11 +1,12 @@
-/* Tests that the stylelint gate actually gates.
+/**
+ * @file Tests that the stylelint gate actually gates.
  *
  * `tests/test_stylelint_gate.py` covers the wiring: it replaces `bun` with a
  * cmd-mox double and proves `make stylelint` calls `bun run lint:css` and
  * propagates a non-zero exit. That says nothing about the linter itself. With
- * the double in place the rules never run, so a `stylelint.config.js` that had
- * been loosened into silence — every rule off, or a `files` glob matching
- * nothing — would satisfy every assertion there.
+ * the double in place the rules never run, so a `stylelint.config.js` that
+ * had been loosened into silence — every rule off, or a `files` glob
+ * matching nothing — would satisfy every assertion there.
  *
  * These tests close that half by running the real thing. A violation is
  * written into the tree stylelint is configured to scan, and the gate is

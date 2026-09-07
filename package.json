@@ -47,6 +47,6 @@
     "stylelint-config-standard": "40.0.0",
     "tailwindcss": "^4.1.15",
     "typedoc": "0.28.20",
-    "typescript": "6"
+    "typescript": "7"
   }
 }

@@ -1,4 +1,4 @@
-/* Stilyagi · page styles for home. Extracted from the source site's inline <style>. */
+/* Stilyagi · page styles for home. Extracted from the source site's inline \3c style>. */
 
 .home-shell {
   max-width: 1320px;
@@ -37,6 +37,7 @@
   top: -2px;
   right: 34px;
 }
+
 .poster-board::after {
   bottom: -2px;
   left: 34px;
@@ -62,6 +63,7 @@
 .poster-art-frame {
   position: relative;
   isolation: isolate;
+
   /* Lets the annotation size itself against the rendered artwork, so the
      typed line keeps its proportions on the drawn sheet at any width. */
   container-type: inline-size;
@@ -109,6 +111,7 @@
   z-index: 2;
   margin: 0;
   font-family: var(--font-display);
+
   /* The floor drops well below the ceiling so the title keeps shrinking
      through tablet widths instead of colliding with the illustration. */
   font-size: clamp(2rem, 8vw, 7rem);
@@ -123,6 +126,7 @@
 
 .poster-annotation {
   position: absolute;
+
   /* Percentages of the art frame, so the line stays on the drawn paper
      sheet however large the 1672/941 crop renders. */
   top: 22%;
@@ -132,6 +136,7 @@
   text-align: center;
   transform: rotate(3deg);
   font-family: var(--font-mono);
+
   /* One curve instead of tablet breakpoints: the frame caps at 1164px, so
      1.03cqw resolves to the 12px desktop size and shrinks with the
      artwork below it.  The 8px floor holds legibility from roughly 880px
@@ -166,12 +171,15 @@
 .poster-tile.red {
   background: color-mix(in srgb, var(--color-press-red) 14%, transparent);
 }
+
 .poster-tile.cyan {
   background: color-mix(in srgb, var(--color-jazz-cyan) 16%, transparent);
 }
+
 .poster-tile.ochre {
   background: color-mix(in srgb, var(--color-jazz-ochre) 18%, transparent);
 }
+
 .poster-tile.magenta {
   background: color-mix(in srgb, var(--color-jazz-magenta) 16%, transparent);
 }
@@ -234,22 +242,27 @@
   --accent-color: var(--color-press-red);
   --accent-color-text: var(--color-press-red-text);
 }
+
 .tool-card.sage {
   --accent-color: var(--color-signal-sage);
   --accent-color-text: var(--color-signal-sage-text);
 }
+
 .tool-card.cyan {
   --accent-color: var(--color-jazz-cyan);
   --accent-color-text: var(--color-jazz-cyan-text);
 }
+
 .tool-card.ochre {
   --accent-color: var(--color-jazz-ochre);
   --accent-color-text: var(--color-jazz-ochre-text);
 }
+
 .tool-card.magenta {
   --accent-color: var(--color-jazz-magenta);
   --accent-color-text: var(--color-jazz-magenta-text);
 }
+
 /* Ink is already the darkest thing on the page; it needs no counterpart. */
 .tool-card.ink {
   --accent-color: var(--color-ink);
@@ -593,6 +606,7 @@
     0% {
       filter: saturate(0);
     }
+
     45% {
       filter: saturate(2.4);
     }
@@ -613,6 +627,7 @@
       opacity: 0;
       font-weight: 600;
     }
+
     55% {
       opacity: 1;
       font-weight: 600;
@@ -620,14 +635,14 @@
   }
 }
 
-@media (max-width: 1180px) {
+@media (width <= 1180px) {
   .explore-grid,
   .reading-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 980px) {
+@media (width <= 980px) {
   .command-rail {
     grid-template-columns: 1fr;
   }
@@ -647,7 +662,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
   .home-shell {
     padding-inline: calc(var(--unit) * 2);
   }
@@ -683,6 +698,7 @@
     top: 48px;
     max-width: 3.8ch;
     font-size: clamp(3rem, 14vw, 4.8rem);
+
     /* A paper-coloured halo lifts the title off the busy artwork the
        tighter mobile crop puts behind it. */
     text-shadow:

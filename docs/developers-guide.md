@@ -105,13 +105,13 @@ served output until `bun run build` (or `uv run pages generate`) is rerun by
 hand. This is the usual reason a change appears not to have taken effect.
 
 Run the commit gates with `make all`, which composes
-`build check-fmt lint test test-js typecheck docs-check spelling` and runs them
-sequentially rather than in parallel, since the build cache rewards sequential
-runs. For a narrower check while iterating on the generator, templates, or
-stylesheets:
+`build check-fmt lint stylelint test test-js typecheck docs-check spelling`
+and runs them sequentially rather than in parallel, since the build cache
+rewards sequential runs. For a narrower check while iterating on the
+generator, templates, or stylesheets:
 
 ```bash
-make check-fmt lint typecheck
+make check-fmt lint stylelint typecheck
 make test          # Python suite
 make test-js       # JavaScript suite
 ```
@@ -153,8 +153,8 @@ bun run lint:js:fix   # biome check --write .  — apply what Biome can fix alon
 ```
 
 `make lint` runs `ruff check` and then `bun run lint:js`. `make fmt` runs
-`ruff format`, `ruff check --select I --fix`, `bun run lint:js:fix`, and
-`mdformat-all`.
+`ruff format`, `ruff check --select I --fix`, `bun run lint:js:fix`,
+`bun run lint:css:fix`, and `mdformat-all`.
 
 `biome check` is formatter, linter, and assists in a single pass, which has one
 consequence worth remembering: **a misformatted script fails `make lint`, not
@@ -266,7 +266,7 @@ carries its reasoning in the file:
 | `src/static/stilyagi/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/episodic/assets/search/episodic-search.json` | Episodic's MiniSearch builder owns the serialized index. Reformatting it would make the committed projection differ from its generator.                                                                                                     |
 | `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
-| `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules are not, pending the stylelint decision.                                                                                                                                                         |
+| `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules belong to stylelint, see section 2.5.                                                                                                                                                            |
 
 _Table 2: The trees `biome.jsonc` holds out of scope, and why each is written
 by something other than a person._
@@ -279,6 +279,45 @@ unparsed and silently skipped by the formatter. And `vcs.useIgnoreFile` is on,
 so `.gitignore` is honoured; that is why `reference/` needs an explicit
 exclusion despite being ignored, as the file kept inside it is negated back
 into tracking.
+
+### 2.5. Stylelint
+
+Stylelint lints the CSS: the Tailwind entrypoints and their partials under
+`src/styles/`, and the hand-crafted stylesheets under `src/static/`. It is a
+lint-only pass, since Biome already formats the CSS, and it is pinned to an
+exact version alongside `stylelint-config-standard`, the preset it extends.
+
+```bash
+bun run lint:css       # stylelint "src/**/*.css"
+bun run lint:css:fix   # the same, applying what stylelint can fix alone
+make stylelint         # the gate; also part of `make all`
+```
+
+`stylelint.config.js` records every departure from the preset beside the rule,
+with its reason. The Tailwind at-rules (`@apply`, `@plugin`, `@source`,
+`@theme`, and the rest) are allowed by name, since stylelint knows none of them
+and the entrypoints are where the theme tokens live; `@apply` is also excused
+from prelude validation because its prelude is a list of utility classes. The
+class pattern accepts BEM (`block__element--modifier`), the custom-property
+pattern accepts Tailwind's double-hyphen namespace join
+(`--text-xs--line-height`), `@import` keeps the string form Tailwind documents,
+and `no-descending-specificity` is off because the sub-site stylesheets are
+grouped by component, which the rule would scatter.
+
+Where a rule genuinely should not apply, disable it at the line with a stated
+reason, `/* stylelint-disable-next-line <rule> -- why */`, rather than loosening
+it in the config. The generated Pygments blocks are the one standing
+exception: the Himotoshi and Stilyagi generators each fence their block with a
+`/* stylelint-disable */` and a matching `/* stylelint-enable */` marker,
+while the Episodic generator writes the whole file and so emits only a
+file-level `/* stylelint-disable */` in its header. Either way, a finding
+inside a generated range is a change to the generator rather than to the
+stylesheet. Section 4.4 has the detail.
+
+`make fmt` runs `stylelint --fix` as well as Biome. That is safe over the
+generated blocks because stylelint does not apply fixes inside a disabled
+range, which is what keeps the formatter and the generators from undoing each
+other; rerunning the generators after `make fmt` reports `unchanged`.
 
 ## 3. Generated versus hand-crafted files
 
@@ -460,6 +499,15 @@ long as the style declares parents before children.
   Formatting is the generator's output shape, so if it needs to change, change
   `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to tidy
   a diff.
+- Stylelint is handled by the generators themselves rather than by the config.
+  `generate_himotoshi_pygments_css.py` and `generate_stilyagi_pygments_css.py`
+  emit a `/* stylelint-disable */` marker after `BEGIN` and a
+  `/* stylelint-enable */` marker before `END`; the Episodic generator, which
+  writes the whole file, emits a `/* stylelint-disable */` in its header. The
+  rest of each file is still linted. `stylelint --fix` leaves a disabled range
+  alone, so `make fmt` and the generators do not fight; a lint finding inside
+  the markers means the generator's output has changed shape and the
+  generator, not the stylesheet, is what to change.
 
 ### 4.5. Regenerating and verifying
 

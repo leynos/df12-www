@@ -23,7 +23,6 @@
 
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
-
 @import "./episodic/site-base.css" layer(base);
 @import "./episodic/motifs.css" layer(base);
 @import "./episodic/chrome.css" layer(base);
@@ -41,6 +40,7 @@
 
 @plugin "daisyui" {
   themes: episodic --default;
+
   /* The subsite's semantic vocabulary predates daisyUI and owns these
      names: its breadcrumbs, hero, status gauge, and roadmap steps are not
      the daisyUI components of the same name, and the daisyUI versions
@@ -64,7 +64,6 @@
   --color-base-200: #111416; /* surface-1 — panels                   */
   --color-base-300: #171a1d; /* surface-2 — raised panels, wells     */
   --color-base-content: #e6e7e9; /* ink-1                            */
-
   --color-primary: #ff5148; /* signal red                             */
   --color-primary-content: #0b0d0e;
   --color-secondary: #a4a7ad; /* aluminium                            */
@@ -73,7 +72,6 @@
   --color-accent-content: #0b0d0e;
   --color-neutral: #2a2e33; /* warm grey                              */
   --color-neutral-content: #e6e7e9;
-
   --color-info: #3bc8ef;
   --color-info-content: #0b0d0e;
   --color-success: #3ad07a;
@@ -82,14 +80,11 @@
   --color-warning-content: #0b0d0e;
   --color-error: #ff5148;
   --color-error-content: #0b0d0e;
-
   --radius-selector: 0.25rem;
   --radius-field: 0.2rem;
   --radius-box: 0.35rem;
-
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
-
   --border: 1px;
   --depth: 0;
   --noise: 0;
@@ -100,6 +95,7 @@
   /* Economica carries the logotype: condensed, flat-terminalled, and built
      to be set tight and large. */
   --font-display: "Economica", "Arial Narrow", sans-serif;
+
   /* Anek Latin carries the editorial voice — headings, prose, UI labels. */
   --font-sans: "Anek Latin", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
@@ -117,9 +113,9 @@
 
   /* Borders, weakest to strongest. A border should define an edge without
      being the first thing noticed. */
-  --color-edge-soft: rgba(255, 255, 255, 0.055);
-  --color-edge: rgba(255, 255, 255, 0.1);
-  --color-edge-strong: rgba(255, 255, 255, 0.2);
+  --color-edge-soft: rgb(255 255 255 / 5.5%);
+  --color-edge: rgb(255 255 255 / 10%);
+  --color-edge-strong: rgb(255 255 255 / 20%);
 
   /* Signals carry meaning and nothing else. Amber is attention, green is
      success, red is failure, cyan is information and focus. */

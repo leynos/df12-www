@@ -7,7 +7,7 @@
  * mean re-deriving a layout nobody wrote in the first place.
  *
  * What has changed is that its colours now come from the theme, and it lives
- * in the components layer with everything else instead of in a `<style>` tag
+ * in the components layer with everything else instead of in a `\3c style>` tag
  * where a utility could not reach it.
  */
 
@@ -38,9 +38,11 @@
   --tw-shadow-colored: 0 0 transparent;
 
   margin-top: 32px;
+
   --tw-text-opacity: 1;
 
   color: var(--color-primary);
+
   --tw-space-y-reverse: 0;
 }
 

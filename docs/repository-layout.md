@@ -185,6 +185,7 @@ Test suite for the Python package:
 | `uv.lock`                  | Locked Python dependency graph                                 |
 | `bun.lockb`                | Locked Node dependency graph                                   |
 | `biome.jsonc`              | Biome linter and formatter configuration                       |
+| `stylelint.config.js`      | Stylelint rules for the CSS, with each preset departure's why  |
 | `tsconfig.json`            | TypeScript solution file referencing the two projects below    |
 | `tsconfig.base.json`       | Strict compiler options shared by both projects                |
 | `tsconfig.browser.json`    | Typechecks the browser scripts under `src/static/`             |

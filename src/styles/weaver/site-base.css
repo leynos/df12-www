@@ -82,7 +82,7 @@ pre code {
  * Both are scoped below the tablet breakpoint, so the wide layout — where
  * nothing overflows and a mid-token break would be gratuitous — is untouched.
  */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   pre,
   code,
   th,

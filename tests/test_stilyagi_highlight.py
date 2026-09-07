@@ -18,6 +18,7 @@ from df12_pages.stilyagi_highlighting import StilyagiStyle
 from scripts.generate_stilyagi_pygments_css import (
     BEGIN,
     END,
+    STYLELINT_DISABLE,
     STYLESHEET,
     build_css,
 )
@@ -194,7 +195,7 @@ class TestStilyagiHighlighting:
             assert rule not in generated, f"{rule!r} should not be generated"
 
         built = build_css()
-        assert built.startswith(f"{BEGIN}\n\n:root {{")
+        assert built.startswith(f"{BEGIN}\n{STYLELINT_DISABLE}\n\n:root {{")
         assert built.endswith(f"\n\n{END}")
         assert "--stilyagi-syntax-" in built
         assert ".stilyagi-syntax { color:" in built

@@ -1,7 +1,7 @@
 /* Syntax colouring for the hand-marked code samples.
  *
  * These rules were four near-identical copies of each other, inlined in
- * `<style>` blocks on commands/act, commands/observe, commands/verify, and
+ * `\3c style>` blocks on commands/act, commands/observe, commands/verify, and
  * safety. Each copy carried the same seven or eight colour literals, and they
  * had already begun to disagree about which tokens existed.
  *

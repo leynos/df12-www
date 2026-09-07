@@ -22,12 +22,12 @@
   --netsuke-amber: var(--color-warning);
   --netsuke-surface-rgb: 255 255 255;
   --netsuke-warm-surface-rgb: 245 237 224;
-  --netsuke-paper-shadow: 0 4px 6px -1px rgba(46, 42, 37, 0.1),
-    0 2px 4px -1px rgba(46, 42, 37, 0.06);
-  --netsuke-paper-shadow-lg: 0 10px 15px -3px rgba(46, 42, 37, 0.1),
-    0 4px 6px -2px rgba(46, 42, 37, 0.05);
-  --netsuke-paper-shadow-xl: 0 20px 25px -5px rgba(46, 42, 37, 0.1),
-    0 10px 10px -5px rgba(46, 42, 37, 0.04);
+  --netsuke-paper-shadow: 0 4px 6px -1px rgb(46 42 37 / 10%),
+    0 2px 4px -1px rgb(46 42 37 / 6%);
+  --netsuke-paper-shadow-lg: 0 10px 15px -3px rgb(46 42 37 / 10%),
+    0 4px 6px -2px rgb(46 42 37 / 5%);
+  --netsuke-paper-shadow-xl: 0 20px 25px -5px rgb(46 42 37 / 10%),
+    0 10px 10px -5px rgb(46 42 37 / 4%);
   --netsuke-paper-texture: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
@@ -94,6 +94,7 @@ body {
   margin-inline: auto;
   max-width: 80rem;
   padding-inline: 1rem;
+
   /* Pin to the viewport rather than growing to content min-content:
      as a flex item of the body column layout, an auto-width container
      would otherwise inherit the widest descendant's intrinsic width
@@ -136,20 +137,20 @@ a.sidebar-link--sub.active {
   outline: none;
 }
 
-@media (min-width: 640px) {
+@media (width >= 640px) {
   .site-container {
     padding-inline: 1.5rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .site-container {
     padding-inline: 2rem;
   }
 }
 
 .hm-card {
-  background: rgb(var(--netsuke-surface-rgb) / 0.9);
+  background: rgb(var(--netsuke-surface-rgb) / 90%);
   border: 1px solid var(--netsuke-stone);
   border-radius: 1rem;
   box-shadow: var(--netsuke-paper-shadow);
@@ -169,7 +170,7 @@ a.sidebar-link--sub.active {
 }
 
 .hm-card--accent {
-  background: rgb(var(--netsuke-warm-surface-rgb) / 0.88);
+  background: rgb(var(--netsuke-warm-surface-rgb) / 88%);
 }
 
 .hm-guide-card {
@@ -195,7 +196,7 @@ a.sidebar-link--sub.active {
   padding-block: 4rem;
 }
 
-@media (max-width: 499.98px) {
+@media (width <= 499.98px) {
   .hm-hero {
     /* 92.25px, not 92.2px: Blink snaps layout to 1/64px, and 92.2px lands on
        92.1875px — a hair under the floor. */
@@ -208,13 +209,13 @@ a.sidebar-link--sub.active {
    redrew its drop-shadow scale as single tighter layers and its theme
    tokens hold one layer, so the pair is stated here. */
 .hm-hero-panel > h1 {
-  filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04))
-    drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+  filter: drop-shadow(0 10px 8px rgb(0 0 0 / 4%))
+    drop-shadow(0 4px 3px rgb(0 0 0 / 10%));
 }
 
 .hm-hero-panel > p {
-  filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07))
-    drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+  filter: drop-shadow(0 4px 3px rgb(0 0 0 / 7%))
+    drop-shadow(0 2px 2px rgb(0 0 0 / 6%));
 }
 
 .hm-hero-panel {
@@ -224,20 +225,20 @@ a.sidebar-link--sub.active {
     color-mix(in srgb, var(--netsuke-charcoal) 46%, transparent) 58%,
     color-mix(in srgb, var(--netsuke-vermillion) 18%, transparent)
   );
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 1.75rem;
   box-shadow: var(--netsuke-paper-shadow-xl);
   padding: 2rem;
   backdrop-filter: blur(10px);
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .hm-hero-panel {
     padding: 2.75rem;
   }
 }
 
-@media (max-width: 1023.98px) {
+@media (width <= 1023.98px) {
   .hm-hero-panel {
     background: none;
     border: 0;
@@ -260,7 +261,7 @@ a.sidebar-link--sub.active {
   width: 100%;
 }
 
-@media (max-width: 639.98px) {
+@media (width <= 639.98px) {
   /* Pin image pixel 960 of the 1376px-wide hero to the viewport's right
      edge so narrowing the viewport crops the left-hand side. The image
      fills the hero height; translateX shifts it right by the 416px of
@@ -280,9 +281,9 @@ a.sidebar-link--sub.active {
    carries the type treatment rather than the base, because the section
    pill below sets the page in the body face instead. */
 .hm-kicker--hero {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 8%);
+  border-color: rgb(255 255 255 / 20%);
+  color: rgb(255 255 255 / 90%);
   font-family: "JetBrains Mono", monospace;
   letter-spacing: 0.12em;
   padding: 0.375rem 0.875rem;
@@ -317,10 +318,10 @@ a.sidebar-link--sub.active {
 
 .hm-proof-pill {
   align-items: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 999px;
-  color: rgba(229, 221, 208, 0.96);
+  color: rgb(229 221 208 / 96%);
   display: inline-flex;
   font-family: "JetBrains Mono", monospace;
   font-size: 0.75rem;
@@ -329,8 +330,8 @@ a.sidebar-link--sub.active {
 }
 
 .hm-feature-card {
-  background: rgba(245, 237, 224, 0.9);
-  border: 1px solid rgba(209, 199, 184, 0.9);
+  background: rgb(245 237 224 / 90%);
+  border: 1px solid rgb(209 199 184 / 90%);
   border-radius: 1.25rem;
   box-shadow: var(--netsuke-paper-shadow);
   transition:
@@ -431,6 +432,7 @@ button.hm-config-keys__label {
 .hm-config-keys__panels {
   display: grid;
   gap: var(--hm-config-keys-row-gap);
+
   /* Long TOML lines must not widen the page on narrow viewports. */
   min-width: 0;
 }
@@ -440,6 +442,7 @@ button.hm-config-keys__label {
   border: 1px solid transparent;
   border-radius: 0.5rem;
   min-width: 0;
+
   /* The panel, not the pre inside it, is the horizontal scroller: it is
      the element carrying tabindex and a name, and a scrollable region
      must be keyboard reachable. `contain: inline-size` on .hm-syntax
@@ -461,6 +464,7 @@ button.hm-config-keys__label {
   background: transparent;
   border-radius: 0;
   contain: none;
+
   /* Paint nothing of its own and stretch to the widest line, so the
      panel's ground covers the full scroll extent. */
   min-width: 100%;
@@ -473,7 +477,7 @@ button.hm-config-keys__label {
   padding: 0;
 }
 
-@media (max-width: 767.98px) {
+@media (width <= 767.98px) {
   /* No script: the key groups stack, so each caption reads with its own
      paragraph beneath it. */
   .hm-config-keys__labels {
@@ -522,7 +526,7 @@ button.hm-config-keys__label {
 
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   /* Two columns, one row per key group. Both columns are subgrids of the
      same rows, so a label always sits level with the top of its own
      extract however tall the neighbouring ones grow. */
@@ -532,9 +536,11 @@ button.hm-config-keys__label {
     --hm-config-keys-row-gap: 0;
 
     column-gap: 1.5rem;
+
     /* Column one carries a paragraph, not just a name, so it needs a
        readable measure rather than the width of the longest label. */
     grid-template-columns: minmax(11rem, 2fr) 5fr;
+
     /* The count must match the number of .hm-config-keys__key groups in
        templates/netsuke/pages/docs-configuration.jinja: both columns are
        subgrids of these rows. */
@@ -563,6 +569,7 @@ button.hm-config-keys__label {
     align-self: start;
     border-left: 2px solid transparent;
     border-radius: 0 0.375rem 0.375rem 0;
+
     /* Stands in for the row gap the extracts gave up. */
     padding-bottom: 1.5rem;
     transition:
@@ -613,8 +620,8 @@ button.hm-config-keys__label {
 }
 
 .hm-filter-shell {
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(209, 199, 184, 0.85);
+  background: rgb(255 255 255 / 78%);
+  border: 1px solid rgb(209 199 184 / 85%);
   border-radius: 1rem;
   box-shadow: var(--netsuke-paper-shadow);
 }
@@ -624,8 +631,8 @@ button.hm-config-keys__label {
 }
 
 .hm-sidebar-card {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(209, 199, 184, 0.85);
+  background: rgb(255 255 255 / 92%);
+  border: 1px solid rgb(209 199 184 / 85%);
   border-radius: 1rem;
   box-shadow: var(--netsuke-paper-shadow);
 }
@@ -646,7 +653,7 @@ button.hm-config-keys__label {
 
 /* Below 460px the hero kicker wraps onto a second line; drop the lede and
    keep just the version. */
-@media (max-width: 459.98px) {
+@media (width <= 459.98px) {
   .hm-kicker__lede {
     display: none;
   }
@@ -761,7 +768,7 @@ button.hm-config-keys__label {
   border-top: 1px solid var(--netsuke-stone);
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .hm-cells > :not([hidden]) ~ :not([hidden]) {
     border-left: 1px solid var(--netsuke-stone);
     border-top-width: 0;
@@ -769,9 +776,9 @@ button.hm-config-keys__label {
 }
 
 .hm-chip--inverse {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.88);
+  background: rgb(255 255 255 / 8%);
+  border-color: rgb(255 255 255 / 16%);
+  color: rgb(255 255 255 / 88%);
 }
 
 .hm-chip--warning {
@@ -874,8 +881,8 @@ button.hm-config-keys__label {
 }
 
 .hm-button--ghost {
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(46, 42, 37, 0.14);
+  background: rgb(255 255 255 / 78%);
+  border: 1px solid rgb(46 42 37 / 14%);
   color: var(--netsuke-charcoal);
 }
 
@@ -885,13 +892,13 @@ button.hm-config-keys__label {
 }
 
 .hm-button--hero-ghost {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 28%);
   color: var(--netsuke-white);
 }
 
 .hm-button--hero-ghost:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgb(255 255 255 / 18%);
 }
 
 .hm-footer-icon {
@@ -1073,7 +1080,7 @@ button.hm-config-keys__label {
   font-weight: 600;
 }
 
-@media (max-width: 1023.98px) {
+@media (width <= 1023.98px) {
   .pipeline-connector {
     display: none;
   }
@@ -1081,7 +1088,7 @@ button.hm-config-keys__label {
 
 /* ── Responsive navbar: icon-only action buttons (md–lg) ─────────── */
 
-@media (min-width: 768px) and (max-width: 1023.98px) {
+@media (width >= 768px) and (width <= 1023.98px) {
   #navbar .hm-navbar-action {
     height: 2.25rem;
     justify-content: center;
@@ -1117,7 +1124,6 @@ button.hm-config-keys__label {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  overflow-y: hidden;
   transition:
     max-height 300ms ease,
     opacity 200ms ease;
@@ -1169,8 +1175,8 @@ button.hm-config-keys__label {
 }
 
 #navbar-mobile-menu .hm-mobile-menu__link--secondary {
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(46, 42, 37, 0.14);
+  background: rgb(255 255 255 / 78%);
+  border: 1px solid rgb(46 42 37 / 14%);
   border-left-width: 1px;
   border-radius: 0.375rem;
   color: var(--netsuke-charcoal);
@@ -1211,10 +1217,12 @@ button.hm-config-keys__label {
 }
 
 /* ── Responsive navbar: visibility overrides ──────────────────────── */
+
 /* Our #navbar rules beat Tailwind CDN utilities on specificity, so   */
+
 /* responsive show/hide must live here rather than in class attrs.    */
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   #navbar .hm-hamburger {
     display: none;
   }
@@ -1224,7 +1232,7 @@ button.hm-config-keys__label {
   }
 }
 
-@media (max-width: 767.98px) {
+@media (width <= 767.98px) {
   #navbar .hm-navbar-action {
     display: none;
   }
@@ -1232,7 +1240,7 @@ button.hm-config-keys__label {
 
 /* ── Design system page: icon-only collapse (sm–md) ──────────────── */
 
-@media (min-width: 640px) and (max-width: 767.98px) {
+@media (width >= 640px) and (width <= 767.98px) {
   #navbar .hm-navbar-action--design {
     height: 2.25rem;
     justify-content: center;
@@ -1254,7 +1262,7 @@ button.hm-config-keys__label {
   }
 }
 
-@media (max-width: 639.98px) {
+@media (width <= 639.98px) {
   #navbar .hm-navbar-action--design {
     display: none;
   }
@@ -1268,7 +1276,7 @@ button.hm-config-keys__label {
  * when the panel runs to both edges — and layer order alone cannot do that,
  * because utilities sit in a later layer than this file. Under the Play CDN
  * the block won on specificity instead; the flag keeps what it won. */
-@media (max-width: 459.98px) {
+@media (width <= 459.98px) {
   main.hm-docs-content {
     overflow-wrap: break-word !important;
   }
@@ -1373,7 +1381,7 @@ button.hm-config-keys__label {
 }
 
 .hm-prose .content-card {
-  background: rgb(var(--netsuke-warm-surface-rgb) / 0.88);
+  background: rgb(var(--netsuke-warm-surface-rgb) / 88%);
   border: 1px solid var(--netsuke-stone);
   border-radius: 1rem;
   box-shadow: var(--netsuke-paper-shadow);
@@ -1385,7 +1393,7 @@ button.hm-config-keys__label {
 
 .hm-prose .content-card__badge {
   align-items: center;
-  background: rgb(43 65 98 / 0.1);
+  background: rgb(43 65 98 / 10%);
   border-radius: 9999px;
   color: var(--netsuke-indigo);
   display: flex;
@@ -1402,7 +1410,7 @@ button.hm-config-keys__label {
 }
 
 .hm-prose .content-card--accent .content-card__badge {
-  background: rgb(194 59 34 / 0.1);
+  background: rgb(194 59 34 / 10%);
   color: var(--netsuke-vermillion);
 }
 
@@ -1481,6 +1489,7 @@ button.hm-config-keys__label {
 }
 
 /* BEGIN generated himotoshi-pygments (scripts/generate_himotoshi_pygments_css.py) */
+/* stylelint-disable -- Generated by scripts/generate_himotoshi_pygments_css.py; change the generator, not this block. */
 
 :root {
   --netsuke-syntax-text: #e5ddd0;
@@ -1631,5 +1640,6 @@ button.hm-config-keys__label {
 .hm-syntax .go { color: var(--netsuke-syntax-generic-output); }
 .hm-syntax .gr { color: var(--netsuke-syntax-generic-error); }
 .hm-syntax .err { color: var(--netsuke-syntax-error); }
+/* stylelint-enable */
 
 /* END generated himotoshi-pygments */

@@ -1,4 +1,4 @@
-/* Stilyagi · page styles for why. Extracted from the source site's inline <style>. */
+/* Stilyagi · page styles for why. Extracted from the source site's inline \3c style>. */
 
 .camps {
   display: grid;
@@ -8,14 +8,17 @@
   background: var(--color-paper);
   margin: calc(var(--unit) * 2) 0 calc(var(--unit) * 6);
 }
+
 .camps .camp {
   padding: calc(var(--unit) * 4) calc(var(--unit) * 3);
   border-right: var(--rule-weight) solid var(--color-ink);
   position: relative;
 }
+
 .camps .camp:last-child {
   border-right: 0;
 }
+
 .camps .camp .numeral {
   font-family: var(--font-display);
   font-weight: 900;
@@ -24,6 +27,7 @@
   color: var(--color-accent-text);
   margin-bottom: 8px;
 }
+
 .camps .camp h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -34,12 +38,14 @@
   color: var(--color-ink);
   line-height: 1;
 }
+
 .camps .camp p {
   font-family: var(--font-editorial);
   font-size: 1.02rem;
   line-height: 1.5;
   margin: 0 0 10px;
 }
+
 .camps .camp .verdict-tag {
   display: inline-block;
   margin-top: 12px;
@@ -52,6 +58,7 @@
   background: var(--color-ink);
   padding: 3px 8px 2px;
 }
+
 .camps .camp .verdict-tag.red {
   background: var(--color-press-red);
 }
@@ -64,6 +71,7 @@
   grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
   gap: calc(var(--unit) * 8);
 }
+
 .argument .margin-note {
   position: sticky;
   top: 100px;
@@ -75,12 +83,14 @@
   color: var(--color-ink-soft);
   line-height: 1.8;
 }
+
 .argument .margin-note .red {
   color: var(--color-accent-text);
   font-weight: 700;
   display: block;
   margin-bottom: 8px;
 }
+
 .argument .body h3 {
   font-family: var(--font-display);
   font-size: 2rem;
@@ -90,18 +100,22 @@
   margin: calc(var(--unit) * 4) 0 calc(var(--unit) * 2);
   color: var(--color-ink);
 }
+
 .argument .body h3:first-child {
   margin-top: 0;
 }
+
 .argument .body h3 .red {
   color: var(--color-accent-text);
 }
+
 .argument .body p {
   font-family: var(--font-editorial);
   font-size: 1.12rem;
   line-height: 1.55;
   max-width: 64ch;
 }
+
 .argument .body p + p {
   text-indent: 1.8em;
 }
@@ -113,20 +127,24 @@
   border-top: var(--rule-weight-3) solid var(--color-press-red);
   border-bottom: var(--rule-weight-3) solid var(--color-press-red);
 }
+
 .personas .wrap {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 calc(var(--unit) * 4);
 }
+
 .personas h2 {
   color: var(--color-paper);
   font-size: 3rem;
   line-height: 0.95;
   margin: 0 0 calc(var(--unit) * 2);
 }
+
 .personas h2 .red {
   color: var(--color-accent-text);
 }
+
 .personas .intro {
   font-family: var(--font-editorial);
   font-size: 1.15rem;
@@ -134,12 +152,14 @@
   max-width: 60ch;
   margin-bottom: calc(var(--unit) * 5);
 }
+
 .personas table {
   width: 100%;
   border-collapse: collapse;
   color: var(--color-paper);
   font-family: var(--font-editorial);
 }
+
 .personas table th,
 .personas table td {
   padding: 14px 12px;
@@ -148,6 +168,7 @@
   font-size: 1.02rem;
   line-height: 1.5;
 }
+
 .personas table thead th {
   font-family: var(--font-sans);
   font-weight: 700;
@@ -158,6 +179,7 @@
   border-top: 2px solid var(--color-press-red);
   border-bottom: 2px solid var(--color-press-red);
 }
+
 .personas table tbody th {
   font-family: var(--font-display);
   font-weight: 900;
@@ -167,12 +189,14 @@
   color: var(--color-paper);
   width: 22%;
 }
+
 /* The section folio sits on the ink ground, where --accent-text is already
    the on-ink red, so it needs only its spacing. */
 .personas .personas-folio {
   margin-bottom: 18px;
   color: var(--color-accent-text);
 }
+
 .personas table td.ignore {
   color: color-mix(in srgb, var(--color-paper) 55%, transparent);
   font-style: italic;
@@ -184,12 +208,14 @@
   margin: 0 auto;
   padding: calc(var(--unit) * 8) calc(var(--unit) * 4);
 }
+
 .valueset {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: calc(var(--unit) * 2);
   margin-top: calc(var(--unit) * 3);
 }
+
 .valueset .tenet-card {
   border: var(--rule-weight) solid var(--color-ink);
   padding: calc(var(--unit) * 3);
@@ -197,6 +223,7 @@
   position: relative;
   min-height: 180px;
 }
+
 .valueset .tenet-card .vs-num {
   font-family: var(--font-sans);
   font-size: 0.7rem;
@@ -204,6 +231,7 @@
   color: var(--color-accent-text);
   font-weight: 700;
 }
+
 .valueset .tenet-card h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -213,6 +241,7 @@
   letter-spacing: 0;
   line-height: 1.05;
 }
+
 .valueset .tenet-card p {
   font-family: var(--font-editorial);
   font-size: 0.96rem;
@@ -229,24 +258,29 @@
   gap: calc(var(--unit) * 4);
   align-items: start;
 }
+
 /* The left column of the rejected-alternatives band: a folio, a heading set
    smaller than the page's h2 default, a lede, and the chip row naming what
    was turned down. */
 .rejected-folio {
   margin-bottom: 14px;
 }
+
 .rejected-head {
   font-size: 2.4rem;
   margin: 0;
   line-height: 0.95;
 }
+
 .rejected-head .red {
   color: var(--color-accent-text);
 }
+
 .rejected-lede {
   margin-top: 18px;
   font-size: 1.1rem;
 }
+
 .rejected-chips {
   margin-top: 24px;
   display: flex;
@@ -259,6 +293,7 @@
   background: var(--color-paper-shade);
   padding: calc(var(--unit) * 4);
 }
+
 .weakness-panel h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -267,12 +302,14 @@
   font-size: 1.7rem;
   margin: 0 0 calc(var(--unit) * 2);
 }
+
 .weakness-panel ol {
   font-family: var(--font-editorial);
   font-size: 1.05rem;
   line-height: 1.5;
   padding-left: 1.2em;
 }
+
 .weakness-panel ol li {
   margin-bottom: 10px;
 }
@@ -286,6 +323,7 @@
 .why-page .closing {
   padding-top: calc(var(--unit) * 4);
 }
+
 .why-page .closing .pullquote {
   max-width: 34ch;
   font-size: 2.2rem;
@@ -297,6 +335,7 @@
   margin: 0 auto;
   padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 4);
 }
+
 .style-hunter-panel .inner {
   border: var(--rule-weight-2) solid var(--color-ink);
   background: var(--color-paper);
@@ -304,6 +343,7 @@
   grid-template-columns: auto 1fr;
   overflow: hidden;
 }
+
 .style-hunter-panel .inner img {
   width: 320px;
   height: 100%;
@@ -312,12 +352,14 @@
   border-right: var(--rule-weight-2) solid var(--color-ink);
   mix-blend-mode: multiply;
 }
+
 .style-hunter-panel .inner .text {
   padding: calc(var(--unit) * 4);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
+
 .style-hunter-panel .inner .text h3 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -326,9 +368,11 @@
   margin: 0 0 calc(var(--unit) * 2);
   line-height: 0.95;
 }
+
 .style-hunter-panel .inner .text h3 .red {
   color: var(--color-accent-text);
 }
+
 .style-hunter-panel .inner .text p {
   font-family: var(--font-editorial);
   font-size: 1.1rem;
@@ -339,32 +383,36 @@
 /* Four columns is too many below about 1180px — the camp headings start
    breaking mid-word — but one is too few while there is still room for two.
    This step catches the gap the 900px rule below used to leave. */
-@media (max-width: 1180px) {
+@media (width <= 1180px) {
   .camps,
   .valueset {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
   /* Stacked two-up, the third and fourth camps need the rule between rows
      that the single-row layout got from the side borders alone. */
   .camps .camp:nth-child(-n + 2) {
     border-bottom: var(--rule-weight) solid var(--color-ink);
   }
+
   .camps .camp:nth-child(2n) {
     border-right: 0;
   }
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
   .camps,
   .valueset,
   .weaknesses,
   .argument {
     grid-template-columns: 1fr;
   }
+
   .camps .camp {
     border-right: 0;
     border-bottom: var(--rule-weight) solid var(--color-ink);
   }
+
   /* Stacked one-up, the sticky note travels over the prose instead of beside
      it, so it needs a surface of its own.  Same treatment as the masthead: a
      near-opaque paper wash over a blur, lifted above the body column.  The
@@ -380,9 +428,11 @@
     backdrop-filter: blur(8px);
     border-bottom: var(--rule-weight) solid var(--color-ink);
   }
+
   .style-hunter-panel .inner {
     grid-template-columns: 1fr;
   }
+
   .style-hunter-panel .inner img {
     width: 100%;
     height: 200px;

@@ -205,7 +205,7 @@
 
 /* Short records run two-up once the body column is wide enough to hold two
  * without either dropping under a comfortable measure. */
-@media (min-width: 76rem) {
+@media (width >= 76rem) {
   .claim-list,
   .failure-list {
     display: grid;

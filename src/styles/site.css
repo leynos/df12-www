@@ -17,18 +17,19 @@
 
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", "Menlo", monospace;
   --container-7xl: 96rem;
 }
 
 @layer base {
   :root {
-    --focus-ring-color: #ff00ff;
+    --focus-ring-color: #f0f;
   }
 
   body {
     background-color: #f3f4f6;
     background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+
     @apply font-sans tracking-tight text-base-content;
   }
 
@@ -43,12 +44,14 @@
 @layer components {
   .doc-page {
     @apply text-base-content antialiased;
+
     background-color: #fff;
     background-image: none;
   }
 
   .layout-shell--docs {
     @apply mx-auto w-full;
+
     max-width: var(--container-7xl, 96rem);
   }
 
@@ -58,6 +61,7 @@
 
   .doc-sidebar {
     @apply hidden self-start lg:block;
+
     width: 16rem;
   }
 
@@ -95,6 +99,7 @@
 
   .doc-nav__link {
     @apply flex flex-col gap-1 border-l-2 border-transparent text-sm text-base-content/70 transition hover:border-base-200 hover:text-base-content;
+
     padding-inline-start: 0.75rem;
     font-weight: var(--font-weight-medium, 500);
   }
@@ -248,7 +253,7 @@
     left: -999px;
     top: 1rem;
     padding: 0.75rem 1.5rem;
-    background: #111111;
+    background: #111;
     color: #f3f4f6;
     border-radius: 0.75rem;
     font-family: var(--font-sans);
@@ -396,6 +401,7 @@
 
   .site-header__logo-mark {
     @apply flex h-9 w-9 items-center justify-center transition-transform duration-300;
+
     transform: rotate(0deg);
   }
 
@@ -434,18 +440,18 @@
 
   .group:hover .product-logo--limela,
   .group:focus-visible .product-logo--limela {
-    animation: limelaOrbit 3.2s ease-in-out infinite;
+    animation: limela-orbit 3.2s ease-in-out infinite;
   }
 
   .group:hover .product-logo--netsuke .product-logo__netsuke-bead,
   .group:focus-visible .product-logo--netsuke .product-logo__netsuke-bead {
-    animation: netsukeSlide 1.6s ease-in-out infinite;
+    animation: netsuke-slide 1.6s ease-in-out infinite;
   }
 
   .group:hover .product-logo--mxd .product-logo__mxd-center,
   .group:focus-visible .product-logo--mxd .product-logo__mxd-center {
     transform-origin: 50% 50%;
-    animation: mxdPulse 1.8s ease-in-out infinite;
+    animation: mxd-pulse 1.8s ease-in-out infinite;
   }
 
   .product-logo--episodic .product-logo__episodic-track {
@@ -461,17 +467,17 @@
      Both halves share one duration so the line and the mark breathe together. */
   .group:hover .product-logo--stilyagi .product-logo__stilyagi-rule,
   .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-rule {
-    animation: stilyagiMakeWay 2.6s ease-in-out infinite;
+    animation: stilyagi-make-way 2.6s ease-in-out infinite;
   }
 
   .group:hover .product-logo--stilyagi .product-logo__stilyagi-caret,
   .group:focus-visible .product-logo--stilyagi .product-logo__stilyagi-caret {
-    animation: stilyagiInsert 2.6s ease-in-out infinite;
+    animation: stilyagi-insert 2.6s ease-in-out infinite;
   }
 
   .group:hover .product-logo--episodic .product-logo__episodic-track,
   .group:focus-visible .product-logo--episodic .product-logo__episodic-track {
-    animation: episodicShimmer 1.4s ease-in-out infinite;
+    animation: episodic-shimmer 1.4s ease-in-out infinite;
   }
 
   .group:hover .product-logo--episodic .product-logo__episodic-track--2,
@@ -512,6 +518,7 @@
 
   .world-card {
     @apply grid gap-10 rounded-2xl border border-accent/40 bg-neutral/60 px-8 py-11;
+
     container-type: inline-size;
     container-name: world-card;
   }
@@ -597,8 +604,8 @@
 
 @layer utilities {
   .neon-pulse {
-    animation: neonPulse 3s ease-in-out infinite;
-    text-shadow: 0 0 0 rgba(255, 0, 255, 0.35);
+    animation: neon-pulse 3s ease-in-out infinite;
+    text-shadow: 0 0 0 rgb(255 0 255 / 35%);
   }
 
   .glyph {
@@ -622,12 +629,12 @@
 
   .group:hover .glyph--system rect,
   .group:focus-visible .glyph--system rect {
-    fill: rgba(8, 145, 178, 0.25);
+    fill: rgb(8 145 178 / 25%);
   }
 
   .group:hover .glyph--creative rect,
   .group:focus-visible .glyph--creative rect {
-    fill: rgba(255, 0, 255, 0.25);
+    fill: rgb(255 0 255 / 25%);
   }
 
   .pressable {
@@ -701,26 +708,20 @@
 
   --color-primary: #005c73;
   --color-primary-content: #f4fdff;
-
   --color-secondary: #0f172a;
   --color-secondary-content: #f8fafc;
-
-  --color-accent: #ff66ff;
+  --color-accent: #f6f;
   --color-accent-content: #2e1337;
-
-  --color-neutral: #111111;
+  --color-neutral: #111;
   --color-neutral-content: #f5f5f5;
-
   --color-base-100: #f3f4f6;
   --color-base-200: #e5e7eb;
   --color-base-300: #d1d5db;
-  --color-base-content: #111111;
-
+  --color-base-content: #111;
   --color-info: #2563eb;
   --color-success: #16a34a;
   --color-warning: #d97706;
   --color-error: #dc2626;
-
   --radius-box: 1.5rem;
   --radius-field: 0.9rem;
   --radius-selector: 1rem;
@@ -759,18 +760,18 @@
   }
 }
 
-@keyframes neonPulse {
+@keyframes neon-pulse {
   0%,
   100% {
-    text-shadow: 0 0 0 rgba(255, 0, 255, 0.35);
+    text-shadow: 0 0 0 rgb(255 0 255 / 35%);
   }
 
   50% {
-    text-shadow: 0 0 12px rgba(255, 0, 255, 0.55);
+    text-shadow: 0 0 12px rgb(255 0 255 / 55%);
   }
 }
 
-@keyframes limelaOrbit {
+@keyframes limela-orbit {
   0%,
   100% {
     transform: rotate(0deg);
@@ -781,7 +782,7 @@
   }
 }
 
-@keyframes netsukeSlide {
+@keyframes netsuke-slide {
   0%,
   100% {
     transform: translateX(0);
@@ -792,7 +793,7 @@
   }
 }
 
-@keyframes mxdPulse {
+@keyframes mxd-pulse {
   0%,
   100% {
     transform: scale(1);
@@ -803,7 +804,7 @@
   }
 }
 
-@keyframes episodicShimmer {
+@keyframes episodic-shimmer {
   0%,
   100% {
     opacity: 0.6;
@@ -815,7 +816,7 @@
 }
 
 /* The rule lifts its right end as the caret rises into the space. */
-@keyframes stilyagiMakeWay {
+@keyframes stilyagi-make-way {
   0%,
   100% {
     transform: rotate(0deg);
@@ -826,7 +827,7 @@
   }
 }
 
-@keyframes stilyagiInsert {
+@keyframes stilyagi-insert {
   0%,
   100% {
     transform: translateY(0);
@@ -898,7 +899,7 @@
 
 .content-card__badge {
   align-items: center;
-  background: rgb(37 99 235 / 0.1);
+  background: rgb(37 99 235 / 10%);
   border-radius: 9999px;
   color: #2563eb;
   display: flex;
@@ -913,7 +914,7 @@
 }
 
 .content-card--accent .content-card__badge {
-  background: rgb(220 38 38 / 0.1);
+  background: rgb(220 38 38 / 10%);
   color: #dc2626;
 }
 

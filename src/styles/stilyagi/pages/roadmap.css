@@ -1,21 +1,25 @@
-/* Stilyagi · page styles for roadmap. Extracted from the source site's inline <style>. */
+/* Stilyagi · page styles for roadmap. Extracted from the source site's inline \3c style>. */
 
 .roadmap-wrap {
   max-width: 1240px;
   margin: 0 auto;
   padding: calc(var(--unit) * 4) calc(var(--unit) * 4) calc(var(--unit) * 6);
 }
+
 .slice-timeline {
   border-top: var(--rule-weight-2) solid var(--color-ink);
   margin-top: calc(var(--unit) * 3);
 }
+
 .phase {
   border-bottom: var(--rule-weight) solid var(--color-ink);
   background: var(--color-paper);
 }
+
 .phase:hover:not(.open) {
   background: var(--color-paper-shade);
 }
+
 /* A phase head is a button that fills its row, and until now the keyboard
    got only whatever ring the browser drew by default.  It takes the same
    recessed ground the pointer gets, so the row that would open reads the
@@ -28,9 +32,11 @@
 .phase:not(.open):has(.ph-head:focus-visible) {
   background: var(--color-paper-shade);
 }
+
 .phase .ph-head:focus-visible {
   outline-offset: -4px;
 }
+
 .phase .ph-head {
   display: grid;
   grid-template-columns: 120px 1fr 200px 60px;
@@ -40,25 +46,31 @@
   gap: calc(var(--unit) * 3);
   user-select: none;
 }
+
 .ph-num {
   font-family: var(--font-display);
   font-weight: 900;
   font-size: 3.4rem;
   line-height: 1;
 }
+
 .phase.done .ph-num {
   color: var(--color-signal-sage);
 }
+
 .phase.current .ph-num {
   color: var(--color-accent-text);
 }
+
 .phase.later .ph-num {
   color: var(--color-ink-soft);
 }
+
 .ph-title {
   font-family: var(--font-display);
   font-weight: 900;
   text-transform: uppercase;
+
   /* Pinned so the promotion from h3 to h2 (for heading order) does not
      inherit the display heading's tighter tracking. */
   letter-spacing: 0.04em;
@@ -67,6 +79,7 @@
   margin: 0;
   color: var(--color-ink);
 }
+
 .ph-tag {
   font-family: var(--font-sans);
   font-size: 0.72rem;
@@ -77,6 +90,7 @@
   font-weight: 700;
   text-transform: uppercase;
 }
+
 .ph-meta {
   text-align: right;
   font-family: var(--font-sans);
@@ -86,6 +100,7 @@
   color: var(--color-ink-soft);
   line-height: 1.6;
 }
+
 .ph-status {
   display: inline-block;
   padding: 3px 8px 2px;
@@ -93,19 +108,23 @@
   letter-spacing: 0.14em;
   margin-bottom: 6px;
 }
+
 .phase.done .ph-status {
   background: var(--color-signal-sage-solid);
   color: var(--color-paper);
 }
+
 .phase.current .ph-status {
   background: var(--color-press-red);
   color: var(--color-paper);
 }
+
 .phase.later .ph-status {
   background: var(--color-paper-shade);
   color: var(--color-ink);
   border: 1px solid var(--color-ink);
 }
+
 .ph-toggle {
   font-family: var(--font-display);
   font-size: 2.4rem;
@@ -114,26 +133,31 @@
   text-align: center;
   transition: transform 180ms;
 }
+
 .phase.open .ph-toggle {
   transform: rotate(45deg);
   color: var(--color-ink);
 }
+
 .ph-body {
   overflow: hidden;
   max-height: 0;
   transition: max-height 280ms ease-out;
   background: var(--color-paper-shade);
 }
+
 .phase.open .ph-body {
   max-height: 2200px;
   border-top: var(--rule-weight) solid var(--color-ink);
 }
+
 .ph-body-inner {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: calc(var(--unit) * 5);
   padding: calc(var(--unit) * 5) calc(var(--unit) * 4);
 }
+
 .goal h3,
 .deliverables h3 {
   font-family: var(--font-display);
@@ -142,15 +166,18 @@
   font-size: 1.15rem;
   margin: 0 0 10px;
 }
+
 .goal h3 .red {
   color: var(--color-accent-text);
 }
+
 .goal p {
   font-family: var(--font-editorial);
   font-size: 1.08rem;
   line-height: 1.55;
   margin-bottom: 14px;
 }
+
 .ship-strip {
   margin-top: 18px;
   padding: 14px 16px;
@@ -162,14 +189,17 @@
   letter-spacing: 0.08em;
   color: var(--color-ink);
 }
+
 .ship-strip b {
   color: var(--color-accent-text);
 }
+
 .deliverables ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
+
 .deliverables li {
   padding: 8px 0 8px 1.8em;
   position: relative;
@@ -178,9 +208,11 @@
   font-size: 1rem;
   line-height: 1.45;
 }
+
 .deliverables li:last-child {
   border-bottom: 0;
 }
+
 .deliverables li::before {
   content: "§";
   position: absolute;
@@ -190,6 +222,7 @@
   font-weight: 900;
   color: var(--color-accent-text);
 }
+
 .legend-bar {
   display: flex;
   gap: 22px;
@@ -201,6 +234,7 @@
   text-transform: uppercase;
   color: var(--color-ink-soft);
 }
+
 .legend-bar .dot {
   display: inline-block;
   width: 12px;
@@ -208,16 +242,20 @@
   vertical-align: middle;
   margin-right: 6px;
 }
+
 .dot-done {
   background: var(--color-signal-sage);
 }
+
 .dot-cur {
   background: var(--color-press-red);
 }
+
 .dot-later {
   background: var(--color-paper-shade);
   border: 1px solid var(--color-ink);
 }
+
 /* Three keys no longer share a line at phone widths — wrapping leaves one
    stranded — so they stack into a short list instead. */
 @media (width <= 560px) {
@@ -226,6 +264,7 @@
     gap: 8px;
   }
 }
+
 .risks {
   max-width: 1240px;
   margin: 0 auto;
@@ -234,6 +273,7 @@
   grid-template-columns: 260px 1fr;
   gap: calc(var(--unit) * 6);
 }
+
 /* Scoped to the page's <main> class: the manifesto and mechanics pages
    have margin notes of their own, styled by their own partials, and these
    rules must not reach them now every partial ships in one sheet. */
@@ -248,17 +288,20 @@
   top: 100px;
   align-self: start;
 }
+
 .roadmap-page .margin-note .red {
   color: var(--color-accent-text);
   font-weight: 700;
   display: block;
   margin-bottom: 6px;
 }
+
 /* The note carries two headings; the second opens a fresh remark and needs
    air above it that the first, sitting at the top of the aside, does not. */
 .roadmap-page .margin-note .red:not(:first-child) {
   margin-top: 12px;
 }
+
 .risks .body h3 {
   font-family: var(--font-display);
   font-size: 2rem;
@@ -266,26 +309,31 @@
   margin: 0 0 calc(var(--unit) * 2);
   line-height: 0.95;
 }
+
 .risks .body p {
   font-family: var(--font-editorial);
   font-size: 1.08rem;
   line-height: 1.55;
   max-width: 64ch;
 }
+
 .risks .body p + p {
   text-indent: 1.8em;
   margin-top: 10px;
 }
+
 .roadmap-illo {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 calc(var(--unit) * 4) calc(var(--unit) * 4);
 }
+
 .roadmap-illo .illo-frame {
   position: relative;
   border: var(--rule-weight-2) solid var(--color-ink);
   margin: calc(var(--unit) * 3) 0 0;
 }
+
 /* The plate boxes the artwork alone, so the call-out percentages below
    measure the image and not the figure. Once the caption is filed beneath
    the artwork on phones the two boxes differ by the height of the caption,
@@ -293,12 +341,14 @@
 .illo-plate {
   position: relative;
 }
+
 /* Set in the artwork's empty top-left corner rather than under the frame,
    in the same sans caps as the pipeline caption on the home page. */
 .illo-caption {
   position: absolute;
   left: calc(var(--unit) * 2);
   top: calc(var(--unit) * 2);
+
   /* The caption runs to the frame's right edge; the pad keeps it off the
      rule and matches the inset on its left. */
   padding-right: calc(var(--unit) * 2);
@@ -309,12 +359,14 @@
   line-height: 1.5;
   color: var(--color-ink-soft);
 }
+
 .roadmap-illo img {
   width: 100%;
   height: auto;
   display: block;
   mix-blend-mode: multiply;
 }
+
 /* Each label names the slice a call-out line in the artwork points at.
    Coordinates are percentages of the frame, set inline per label, so the
    labels track their lines as the image scales. */
@@ -334,6 +386,7 @@
   padding: 2px 7px 1px;
   white-space: nowrap;
 }
+
 /* The call-outs wear the same status palette as the timeline below: paper on
    sage for shipped (4.58:1), paper on press-red for in flight (4.60:1), and
    the ink-on-paper default above for planned (15.21:1).  Each fill is paired
@@ -344,45 +397,53 @@
   background: var(--color-signal-sage-solid);
   color: var(--color-paper);
 }
+
 .illo-label.is-current {
   background: var(--color-press-red);
   color: var(--color-paper);
 }
+
 .illo-mark {
   font-weight: 900;
+
   /* The marks are geometric shapes centred on the em box rather than seated
      on the baseline; a small nudge lines them up with the label's capitals. */
   vertical-align: -0.05em;
 }
+
 .illo-label--below {
   transform: translate(-50%, 0);
 }
+
 /* At phone widths the image goes full-bleed — the section's inline
    padding and the frame's side borders drop so the artwork runs edge to
    edge — which buys enough room to keep the labels; they tighten their
    tracking and padding to fit the smaller frame. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
   .roadmap-illo {
     padding-inline: 0;
   }
+
+  /* The frame also sheds its bottom rule: see the caption note below. */
   .roadmap-illo .illo-frame {
     border-inline: 0;
+    border-block-end: 0;
   }
+
   .illo-label {
     letter-spacing: 0.06em;
     padding: 1px 4px;
   }
+
   /* There is no room to set the caption in the plate at this width — it
      wraps across the 03 call-out — so it is filed beneath the artwork
      instead, presented as Figure 01 is on the overview page. The frame's
      bottom rule moves to the image so the caption falls below the rule
      rather than inside it. */
-  .roadmap-illo .illo-frame {
-    border-block-end: 0;
-  }
   .roadmap-illo img {
     border-block-end: var(--rule-weight-2) solid var(--color-ink);
   }
+
   .illo-caption {
     position: static;
     margin-top: 10px;
@@ -390,14 +451,17 @@
     font-size: 0.72rem;
     line-height: normal;
   }
+
   /* At this scale two labels sit a shade off their lines: 00 drifts over
      01's leader and 03 crowds its dot. Counting spans, 1 is 00 and 4 is 03. */
   .illo-label:nth-of-type(1) {
     transform: translate(calc(-50% - 10px), -100%);
   }
+
   .illo-label:nth-of-type(4) {
     transform: translate(-50%, calc(-100% - 8px));
   }
+
   /* The last call-out sits at 88.5% of the frame and is centred on that
      point, so half its width hangs past the right edge and widens the whole
      page.  Pinning it just inside the frame costs a little alignment with
@@ -409,6 +473,7 @@
     transform: none;
   }
 }
+
 /* A band of four policy cards spanning the content column, above the
    "what we will not do" section. It carries the top padding; the section
    below supplies the gap beneath. */
@@ -420,11 +485,13 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
+
 .pacing .pacing-card {
   border: 1px solid var(--color-ink);
   padding: 14px 16px;
   background: var(--color-paper);
 }
+
 .pacing .pacing-card .tt {
   font-family: var(--font-sans);
   font-size: 0.7rem;
@@ -434,30 +501,36 @@
   text-transform: uppercase;
   margin-bottom: 6px;
 }
+
 .pacing .pacing-card .body-t {
   font-family: var(--font-editorial);
   font-size: 0.98rem;
   line-height: 1.45;
 }
-@media (max-width: 900px) {
+
+@media (width <= 900px) {
   .phase .ph-head {
     /* A bare 1fr takes its minimum from the title, so the longer phase names
        widen the track and shove the toggle past the panel's right edge.
        Capping the track lets the title wrap instead. */
     grid-template-columns: 60px minmax(0, 1fr) 50px;
   }
+
   .ph-meta {
     display: none;
   }
+
   .ph-body-inner,
   .risks {
     grid-template-columns: 1fr;
   }
+
   /* Stacked one-up, the sticky note travels over the prose instead of beside
      it, so it needs a surface of its own.  Same treatment as the masthead: a
      near-opaque paper wash over a blur, lifted above the body column. */
   .roadmap-page .margin-note {
     z-index: 1;
+
     /* The masthead runs 74–90px tall depending on how the brand imprint
        wraps.  Anchoring the box at 74px and padding the text down to 98px
        means the wash always meets the masthead — no strip of unblurred
@@ -470,14 +543,17 @@
     backdrop-filter: blur(8px);
     border-bottom: var(--rule-weight) solid var(--color-ink);
   }
+
   .pacing {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
   .pacing {
     grid-template-columns: 1fr;
   }
+
   /* The timeline runs edge to edge here, as the illustration above it does:
      the wrap gives up its inline padding and the legend takes its own back,
      so only the phase rows reach the screen edges. The rows carry padding
@@ -485,6 +561,7 @@
   .roadmap-wrap {
     padding-inline: 0;
   }
+
   .legend-bar {
     padding-inline: calc(var(--unit) * 4);
   }

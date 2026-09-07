@@ -104,7 +104,6 @@
      median of 64 and a maximum of 72. Retune by measuring, not by arithmetic. */
   --measure: 46ch;
   --max-width: 84rem;
-
   --space-1: 0.35rem;
   --space-2: 0.65rem;
   --space-3: 1rem;
@@ -123,11 +122,12 @@
 html {
   background: var(--color-base-100);
   scroll-behavior: smooth;
+
   /* Anchors must land below the pinned header, not behind it. */
   scroll-padding-top: calc(var(--header-height) + var(--space-3));
 }
 
-@media (min-width: 48rem) {
+@media (width >= 48rem) {
   :root {
     /* The status rail stops wrapping, so the header loses a line. */
     --header-height: 6.5rem;
@@ -136,7 +136,7 @@ html {
 
 /* Wide viewports get a reading column that stops growing, so line length stays
  * in the 45-75 character band the site map asks for. */
-@media (min-width: 100rem) {
+@media (width >= 100rem) {
   :root {
     --max-width: 92rem;
   }
@@ -145,11 +145,12 @@ html {
 body {
   min-width: 20rem;
   margin: 0;
+
   /* A fine grid, at the threshold of visibility: the ruled paper the
      original specification sheet was drawn on. */
   background:
-    linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px), var(--color-base-100);
+    linear-gradient(rgb(255 255 255 / 1.4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 1.4%) 1px, transparent 1px), var(--color-base-100);
   background-size: 3rem 3rem;
   color: var(--color-base-content);
   font-family: var(--font-sans);
@@ -248,10 +249,13 @@ button {
   *::after {
     /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
     animation-duration: 0.01ms !important;
+
     /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
     animation-iteration-count: 1 !important;
+
     /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
     transition-duration: 0.01ms !important;
+
     /* biome-ignore lint/complexity/noImportantStyles: User motion preferences must override component motion. */
     scroll-behavior: auto !important;
   }

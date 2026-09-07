@@ -337,7 +337,7 @@ tests. See the unit testing guide for details on setting up and running tests.
 For changes to the site generator, its templates, or its stylesheets, run:
 
 ```bash
-make check-fmt lint typecheck
+make check-fmt lint stylelint typecheck
 make test          # Python suite
 make test-js       # JavaScript suite
 ```
@@ -363,10 +363,20 @@ Run `make fmt` to apply what Biome can fix on its own, then review the findings
 it leaves behind: Biome declines to make those changes unattended because they
 alter what the code says rather than how it is laid out.
 
-Biome lives in `node_modules`, so `lint`, `fmt`, `test-js`, and `dev` all
-depend on a `node_modules` target that runs `bun install --frozen-lockfile`. A
-clean checkout therefore needs no manual install step, and the install is
-skipped unless `package.json` or `bun.lockb` has moved.
+`make stylelint` runs stylelint over `src/**/*.css`, the Tailwind entrypoints
+and the hand-crafted stylesheets alike. It lints only, since Biome formats the
+CSS. `stylelint.config.js` extends `stylelint-config-standard` and records each
+departure from the preset with its reason; suppress a rule at the line with
+`/* stylelint-disable-next-line <rule> -- why */` rather than loosening it
+there. The generated Pygments blocks carry `stylelint-disable` markers that the
+generators emit themselves, so never hand-edit inside them; `make fmt` runs
+`stylelint --fix` as well, which leaves those ranges alone.
+
+Biome and stylelint live in `node_modules`, so `lint`, `stylelint`, `fmt`,
+`test-js`, and `dev` all depend on a `node_modules` target that runs
+`bun install --frozen-lockfile`. A clean checkout therefore needs no manual
+install step, and the installation is skipped unless `package.json` or
+`bun.lockb` has moved.
 
 Where a Biome rule genuinely should not apply, suppress it at the line with a
 stated reason — `// biome-ignore lint/<group>/<rule>: why` — and never by

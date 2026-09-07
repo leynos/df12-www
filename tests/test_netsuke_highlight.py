@@ -1,8 +1,14 @@
-"""Tests for the Himotoshi Pygments style and its generated ``.hm-syntax`` CSS."""
+"""Tests for the Himotoshi Pygments style and its generated ``.hm-syntax`` CSS.
+
+The stylelint-fence contract at the foot of this module is shared with the
+Stilyagi generator, which writes its block the same way, so it is asserted
+once here for both rather than restated per sub-site.
+"""
 
 from __future__ import annotations
 
 import re
+import typing as typ
 
 import pytest
 from pygments import highlight
@@ -10,6 +16,8 @@ from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 
 from df12_pages.highlighting import HimotoshiStyle
+from scripts import generate_himotoshi_pygments_css as himotoshi_generator
+from scripts import generate_stilyagi_pygments_css as stilyagi_generator
 from scripts.generate_himotoshi_pygments_css import (
     BEGIN,
     BOLD_WEIGHT,
@@ -20,6 +28,9 @@ from scripts.generate_himotoshi_pygments_css import (
     build_css,
 )
 from scripts.pygments_css import token_rules
+
+if typ.TYPE_CHECKING:
+    from types import ModuleType
 
 #: A Netsukefile exercising comments, YAML keys, Jinja expressions, quoted
 #: and plain scalars, and the block scalars the examples use for commands.
@@ -268,3 +279,35 @@ class TestHimotoshiPygmentsCss:
             "netsuke",
             "himotoshi.css",
         ), f"unexpected stylesheet target: {STYLESHEET}"
+
+
+@pytest.mark.parametrize(
+    "generator",
+    [
+        pytest.param(himotoshi_generator, id="himotoshi"),
+        pytest.param(stilyagi_generator, id="stilyagi"),
+    ],
+)
+def test_generated_block_is_fenced_from_stylelint(generator: ModuleType) -> None:
+    """The markers switch stylelint off for the block and back on after.
+
+    Both generators write a block into a larger hand-written stylesheet, so
+    both fence it the same way, and the contract is asserted once here rather
+    than restated in each sub-site's module. The Episodic generator owns its
+    whole file and needs only the opening marker, so it is checked in
+    ``test_episodic_highlight.py`` instead.
+
+    The token rules are emitted one per line, which the lint preset rejects,
+    and ``make fmt`` runs ``stylelint --fix``. Fixes are not applied inside a
+    disabled range, so the markers are what stop the formatter and the
+    generators from undoing each other. The ``END`` marker must sit outside
+    the range with a blank line before it, or the preset's comment-spacing
+    rule fires on the marker itself.
+    """
+    lines = generator.build_css().splitlines()
+
+    assert lines[0] == generator.BEGIN
+    assert lines[1] == generator.STYLELINT_DISABLE
+    assert lines[-1] == generator.END
+    assert lines[-2] == ""
+    assert lines[-3] == generator.STYLELINT_ENABLE

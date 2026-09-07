@@ -61,6 +61,7 @@
 
 /* The proposition leads. No wordmark, no atmospheric image, no gradient
  * headline: the first thing on the page is the sentence that explains it. */
+
 /* One column until there is room for two. The signal field takes close to
  * half the hero, which only works once the sentence still sets in two lines
  * beside it: below 80rem the text column drops under about 640px, the
@@ -120,7 +121,7 @@
   display: none;
 }
 
-@media (min-width: 80rem) {
+@media (width >= 80rem) {
   .hero {
     grid-template-columns: minmax(0, 8fr) minmax(0, 7fr);
   }
@@ -132,7 +133,7 @@
   }
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .hero__actions .button {
     flex: 1 1 100%;
   }
@@ -239,7 +240,7 @@
   font-size: 1.06rem;
 }
 
-@media (min-width: 76rem) {
+@media (width >= 76rem) {
   .section {
     padding-block: var(--space-6);
     grid-template-columns: minmax(0, 19rem) minmax(0, 1fr);
@@ -247,9 +248,11 @@
 
   .section__aside {
     position: sticky;
+
     /* Clears the pinned header, which would otherwise cover the rail. */
     top: calc(var(--header-height) + var(--space-3));
     align-self: start;
+
     /* Never taller than the space below the header, or a long lede would pin
        the rail and stop it sticking at all. */
     max-height: calc(100vh - var(--header-height) - var(--space-5));
@@ -263,7 +266,7 @@
 
 /* Sticky positioning fights a reader who has asked for less movement, and it
  * fights a short viewport, so it is opt-in on both counts. */
-@media (prefers-reduced-motion: reduce), (max-height: 34rem) {
+@media (prefers-reduced-motion: reduce), (height <= 34rem) {
   .section__aside {
     position: static;
     overflow: visible;
@@ -329,14 +332,13 @@
   gap: var(--space-4);
 }
 
-@media (min-width: 62rem) {
+@media (width >= 62rem) {
   .section--paired {
     column-gap: var(--space-5);
-    grid-template-areas:
-      "head room"
-      "body room";
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    grid-template-rows: auto 1fr;
+    grid-template:
+      "head room" auto
+      "body room" 1fr
+      / minmax(0, 7fr) minmax(0, 5fr);
   }
 
   .section--paired .section__aside {

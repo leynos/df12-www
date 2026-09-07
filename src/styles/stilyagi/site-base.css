@@ -11,6 +11,7 @@
    ================================================================= */
 :root {
   /* ---------- FOCUS ------------------------------------------------ */
+
   /* One ring for every control the keyboard can reach, so a walkthrough
      reads the same from the masthead to the roadmap.
 
@@ -70,6 +71,7 @@
 html {
   scroll-behavior: smooth;
 }
+
 /* Anchor links are the one place the site moves the whole viewport, which is
    exactly the motion the preference is about. */
 @media (prefers-reduced-motion: reduce) {
@@ -77,6 +79,7 @@ html {
     scroll-behavior: auto;
   }
 }
+
 body {
   margin: 0;
   color: var(--color-ink);
@@ -101,21 +104,26 @@ body {
     );
   background-size: var(--grid-pitch) var(--grid-pitch);
 }
+
 ::selection {
   background: var(--color-press-red);
   color: var(--color-paper);
 }
+
 a {
   color: var(--color-fg-link);
+
   /* Preflight strips the UA underline; the hand-written sheets relied on
      it, so it is restored here.  Chrome and components that want a bare
      link already say text-decoration: none themselves. */
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
 a:hover {
   color: var(--color-fg-link-hover);
 }
+
 img,
 svg {
   max-width: 100%;
@@ -149,6 +157,7 @@ ul {
   margin-block: 1em;
   padding-inline-start: 40px;
 }
+
 ol {
   list-style: decimal;
   margin-block: 1em;
@@ -169,10 +178,12 @@ h2 {
   text-transform: uppercase;
   color: var(--color-ink);
 }
+
 h1 {
   font-size: var(--t-h1);
   margin: 0 0 0.3em;
 }
+
 h2 {
   font-size: var(--t-h2);
   margin: 0 0 0.4em;
@@ -188,9 +199,11 @@ h4 {
   margin: 0 0 0.5em;
   color: var(--color-ink);
 }
+
 h3 {
   font-size: var(--t-h3);
 }
+
 h4 {
   font-size: var(--t-h4);
 }
@@ -198,9 +211,11 @@ h4 {
 .editorial {
   font-family: var(--font-editorial);
 }
+
 .sans {
   font-family: var(--font-sans);
 }
+
 .mono,
 code,
 kbd,
@@ -212,6 +227,7 @@ pre {
 p {
   margin: 0 0 1em;
 }
+
 p + p {
   text-indent: 1.8em;
 } /* trade-book continuation */
@@ -219,6 +235,7 @@ p.lede {
   font-size: var(--t-lede);
   text-indent: 0;
 }
+
 p.lede::first-line {
   font-variant: small-caps;
   letter-spacing: 0.04em;
@@ -239,6 +256,7 @@ blockquote {
   font-style: italic;
   font-size: var(--t-lede);
 }
+
 blockquote footer {
   margin-top: 0.5em;
   font-style: normal;

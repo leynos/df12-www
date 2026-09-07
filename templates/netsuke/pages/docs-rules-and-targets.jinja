@@ -142,7 +142,7 @@ targets:
                     Netsuke target references are plain names and paths. The important distinction is between normal dependencies, order-only dependencies, and phony or always-run targets.
                 </p>
 
-                <div class="overflow-x-auto [contain:inline-size] shadow ring-1 ring-black/5 rounded-lg border border-stone-light mb-8">
+                <div tabindex="0" class="overflow-x-auto [contain:inline-size] shadow ring-1 ring-black/5 rounded-lg border border-stone-light mb-8">
                     <table class="min-w-full hm-rows prop-table">
                         <thead class="bg-base-100">
                             <tr>
@@ -215,7 +215,7 @@ targets:
             <section id="serial-ordering" class="mb-16">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="font-serif text-2xl font-bold text-base-content">Serial dependency ordering</h2>
-                    <span class="text-xs font-mono text-success bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta2</span>
+                    <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta2</span>
                 </div>
 
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
@@ -244,7 +244,7 @@ actions:
 
                 <div class="mb-8 bg-base-100 border-l-4 border-success p-5 rounded-r-lg">
                     <div class="flex items-start">
-                        <span class="text-xs font-mono text-success bg-success/10 px-2 py-1 rounded mr-4 shrink-0">New in v0.1.0-beta3</span>
+                        <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded mr-4 shrink-0">New in v0.1.0-beta3</span>
                         <p class="text-sm text-charcoal-mid">The <code>all</code> action above has no recipe: its dependencies are the whole workflow, so Netsuke lowers it to a native Ninja <code>phony</code> node with no shell no-op of its own. Any action or target with a non-empty <code>deps</code> list may omit <code>rule</code>, <code>command</code>, and <code>script</code> this way. Prefer it to the old <code>command: ":"</code> idiom.</p>
                     </div>
                 </div>

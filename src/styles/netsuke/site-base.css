@@ -26,3 +26,33 @@ button,
 [role="button"] {
   cursor: pointer;
 }
+
+/* The charcoal grounds re-point the type roles to the palette's light cuts.
+ *
+ * These are the tints the Himotoshi Pygments style already sets code in, so a
+ * label and the code beside it are drawn in the same colour, and each is
+ * checked against both charcoal grounds: the flat #2e2a25 of a panel, and the
+ * #3c3731 a titlebar's `bg-charcoal-mid/30` wash composites to.
+ *
+ * The grounds are named by the utility that paints them, because on this
+ * sub-site `bg-base-content` *is* "this element is the charcoal". The
+ * footer's inner container is named rather than the footer, so that the
+ * hairline the footer draws in `border-charcoal-light` keeps the paper-side
+ * value it was drawn with.
+ *
+ * These are custom-property declarations rather than colours, so the layer
+ * they sit in decides nothing; they are here beside the other element
+ * defaults because that is where a reader looks for what a ground implies. */
+.bg-base-content,
+.bg-neutral,
+.hm-faux-window,
+.hm-example-terminal,
+.hm-example-code-block,
+.hm-syntax,
+#footer > .site-container {
+  --color-charcoal-light: #ada396; /* 5.74:1 on charcoal, 4.74:1 on a titlebar */
+  --color-primary-text: #a8c3e0; /* 7.83:1 / 6.48:1 */
+  --color-success-text: #8fbf9f; /* 6.87:1 / 5.68:1 */
+  --color-warning-text: #e0b45c; /* 7.36:1 / 6.09:1 */
+  --color-accent-text: #dba396; /* 6.57:1 / 5.44:1 */
+}

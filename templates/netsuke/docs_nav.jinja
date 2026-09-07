@@ -47,10 +47,15 @@
              anchors under the current preview. The guides pass an "On
              this page" list and a "Helpful links" list
   search     whether to draw the docs search widget
-  nav_label  an `aria-label` for the sidebar's `nav`, where the section
-             list is not the documentation
+  nav_label  the sidebar `nav`'s accessible name. It defaults to the
+             documentation list every docs page shows; the preview pages
+             pass their own, because their sections are not the docs. A
+             name is not optional: the page already carries a `nav` called
+             "Primary navigation", and two navigation landmarks that a
+             screen reader cannot tell apart are two landmarks a reader
+             has to open to find out which is which
 #}
-{% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label='') %}
+{% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label='Documentation pages') %}
         <aside id="sidebar" class="hidden lg:block w-64 shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
             {%- if search %}
             <!-- Search -->
@@ -70,7 +75,7 @@
                     aria-autocomplete="list"
                     aria-expanded="false"
                 >
-                <div class="absolute right-3 top-2.5 text-xs text-base-300 font-mono">⌘K</div>
+                <div class="absolute right-3 top-2.5 text-xs text-charcoal-light font-mono">⌘K</div>
                 <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
                     <div class="overflow-hidden rounded-xl border border-base-300 bg-white shadow-paper-lg">
                         <ul class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>

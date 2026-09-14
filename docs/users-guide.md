@@ -182,6 +182,34 @@ the examples hub, and the second points at the most relevant documentation
 page. Below the manifest, the transcript of the build runs in a
 terminal-styled panel.
 
+### 5.4. Keyboard and reading access
+
+Code samples, wide reference tables, and the example panels are often wider
+than a narrow screen and scroll sideways to show the rest of their content.
+Each such region is a stop in the tab order: `Tab` moves focus to it, and
+once it holds focus the left and right arrow keys scroll it. This is how a
+reader using only a keyboard reaches the part of a command or table that has
+scrolled out of view. Whether a given region scrolls, and so whether it is a
+tab stop, depends on the window width; a narrow screen turns more regions
+into tab stops than a wide one does.
+
+A region that holds focus draws a pale ring just inside its own edge,
+visible against the dark ground of a code block, so it is clear which
+region the arrow keys will scroll.
+
+A link inside a paragraph is underlined as well as coloured, so recognizing
+it does not depend on colour alone. Links in the sidebar, in cards, and in
+the footer columns sit outside running text and are not underlined; their
+position identifies them instead.
+
+The two navigation landmarks carry distinct names for assistive technology.
+A screen reader's landmark list gives the site-wide bar as "Primary
+navigation", so it is never confused with the sidebar beside it. The sidebar
+is named for what it lists rather than for the page showing it: a
+documentation page's sidebar is "Documentation pages", a guide's is "Page
+sections", and a preview page's is "Preview pages". Section 5.1 describes
+what each one contains.
+
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the
 [df12 Pages App Design](df12-pages-app-design.md).

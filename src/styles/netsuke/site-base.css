@@ -35,15 +35,17 @@ button,
  * #3c3731 a titlebar's `bg-charcoal-mid/30` wash composites to.
  *
  * The grounds are named by the utility that paints them, because on this
- * sub-site `bg-base-content` *is* "this element is the charcoal". The
- * footer's inner container is named rather than the footer, so that the
- * hairline the footer draws in `border-charcoal-light` keeps the paper-side
- * value it was drawn with.
+ * sub-site `bg-base-content` *is* "this element is the charcoal".
  *
- * These are custom-property declarations rather than colours, so the layer
- * they sit in decides nothing; they are here beside the other element
- * defaults because that is where a reader looks for what a ground implies. */
-.bg-base-content,
+ * The footer is the one ground that has to be excluded and then re-entered a
+ * level down. It carries `bg-base-content` itself, so a rule matching that
+ * class lands on the footer element — and the footer draws the hairline
+ * between the paper page and its own charcoal in `border-charcoal-light`,
+ * which would then resolve to the light cut: #ada396 reads 2.31:1 against the
+ * #faf6f0 above it, where the paper value reads 5.10:1. Excluding `#footer`
+ * keeps the boundary and naming its inner container still gives the blurb,
+ * the copyright, and the legal links the light cut they need. */
+.bg-base-content:not(#footer),
 .bg-neutral,
 .hm-faux-window,
 .hm-example-terminal,

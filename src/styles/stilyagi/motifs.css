@@ -446,7 +446,7 @@ pre.code .tok-nm {
   color: var(--color-jazz-magenta);
 }
 
-/* .code-scroll itself is hand-written, apart from the generated Pygments
+/* .code-scroll itself is handwritten, apart from the generated Pygments
    block in syntax.css; the wrapper is a scroller, so it is in the tab order and needs
    a ring. The ring is drawn inside, over the block's own ink ground, so it is
    paper: 15.21:1 there. */

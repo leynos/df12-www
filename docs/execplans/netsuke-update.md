@@ -8,7 +8,7 @@ Status: COMPLETE
 
 ## Purpose / big picture
 
-The Netsuke sub-site renders code in three inconsistent ways: hand-written
+The Netsuke sub-site renders code in three inconsistent ways: handwritten
 `<span class="text-indigo-light">` markup with per-page colour conventions, bare
 `<pre><code class="language-yaml">` blocks with no highlighting at all, and
 bespoke terminal transcripts assembled from utility-classed `<div>`s. The same
@@ -28,7 +28,7 @@ Both syntaxes use a single Himotoshi Pygments style so every block on the
 sub-site shares one palette, and the palette lives in exactly one place.
 
 Observable success: `templates/netsuke/pages/docs-getting-started.jinja`
-contains no hand-written token spans; viewing
+contains no handwritten token spans; viewing
 `http://127.0.0.1:8080/netsuke/docs/getting-started/` shows the manifest and
 terminal blocks highlighted with identical colours to the manifest blocks on
 `/netsuke/docs/manifest-reference/`; and the unit test

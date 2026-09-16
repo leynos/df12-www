@@ -7,7 +7,7 @@
  * src/static/netsuke/assets/js/tailwind-config.js that the CDN read.
  *
  * The palette is declared once — as the daisyUI "netsuke" theme plus the
- * brand tokens under @theme — and the templates and the hand-written partial
+ * brand tokens under @theme — and the templates and the handwritten partial
  * consume those rather than restating a colour literal. See
  * docs/execplans/netsuke-daisy-migration.md.
  */

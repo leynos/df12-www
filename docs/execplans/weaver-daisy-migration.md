@@ -16,7 +16,7 @@ from an inline JavaScript configuration block repeated in four templates
 `pages/design-language.jinja`) whose copies are not identical. Every colour in
 the markup is spelled as a bespoke utility (`text-weaver-indigo`,
 `bg-weaver-cream`) or an arbitrary value
-(`shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]`), and a 370-line hand-written
+(`shadow-[2px_2px_0px_0px_rgba(25,60,110,1)]`), and a 370-line handwritten
 stylesheet sits outside Tailwind's cascade layers entirely.
 
 After this change:
@@ -139,7 +139,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   `tailwindcss/utilities.css` separately and carry element defaults in a
   `layer(base)` partial. Prefer keeping preflight and fixing the partials;
   record the decision either way.
-- **Risk:** the hand-written CSS couples to utility classes —
+- **Risk:** the handwritten CSS couples to utility classes —
   `#sidebar nav a.bg-weaver-indigo.text-weaver-cream` and
   `a[href$="/install/"]` selectors. Replacing the utilities with semantic
   classes silently kills these rules. Severity: medium. Likelihood: high (it
@@ -172,7 +172,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 - [x] (2026-08-17 17:00Z) Milestone 1 — Theme, entrypoint, and build wiring
       (red tests first).
 - [x] (2026-08-17 18:40Z) Milestone 2 — Cut over to the compiled stylesheet;
-      retire the Play CDN. The hand-written sheet moved to
+      retire the Play CDN. The handwritten sheet moved to
       `src/styles/weaver/legacy.css` and is imported into the components
       layer, so the sub-site now has exactly one stylesheet link. Fourteen of
       seventeen pages are byte-identical by bounding box; three shift by
@@ -490,7 +490,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
   in both directions, since one that hides a real change is worse than none.
 - **Observation:** every regression the cutover produced came from the same
   root cause, and it was the one the plan predicted. Evidence: the install link
-  turned vermilion because moving the hand-written sheet into the components
+  turned vermilion because moving the handwritten sheet into the components
   layer let `text-weaver-vermilion` beat the href-keyed rule that had been
   forcing it dark; the other four came from Tailwind v4 wrapping `space-y-*` in
   `:where()` and routing `text-*` line-height through `--tw-leading`, both of
@@ -673,7 +673,7 @@ Stop and escalate when any of these is reached. Do not improvise past them.
 
 - **Decision:** adopt the Episodic stylesheet shape (layered partials, one
   compiled artefact) rather than the mxd shape (compiled sheet plus a
-  hand-written companion sheet). Rationale: the user chose it when presented
+  handwritten companion sheet). Rationale: the user chose it when presented
   with both. It removes the unlayered-CSS cascade hazard permanently — the
   failure mode recorded in commit `b162aa45`, where an unlayered
   `* { padding: 0 }` reset silently zeroed every Tailwind spacing utility,
@@ -1301,7 +1301,7 @@ Styling comes from three places:
    three font families (Playfair Display, IBM Plex Sans, IBM Plex Mono), and a
    grid background image. This block is duplicated in four templates and the
    copies are not identical.
-2. `src/static/weaver/assets/styles/weaver-site.css` (370 lines) — hand-written
+2. `src/static/weaver/assets/styles/weaver-site.css` (370 lines) — handwritten
    and **unlayered**. It defines `:root` custom properties, the paper texture
    overlay, the offset-shadow "paper panel" look, callouts, status pills,
    full-bleed figure behaviour, the sidebar rules, the mobile drawer, and the
@@ -1490,7 +1490,7 @@ relative path where the others use root-relative; normalize it to root-relative
 and record that as the first documented chrome inconsistency.
 
 `weaver-site.css` stays in place and keeps working for now — the compiled sheet
-and the hand-written sheet coexist through Milestones 3 to 6. Only Milestone 7
+and the handwritten sheet coexist through Milestones 3 to 6. Only Milestone 7
 retires it.
 
 This is the milestone where Tailwind v3→v4 differences surface. Before running

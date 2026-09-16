@@ -178,7 +178,7 @@ class TestStilyagiHighlighting:
         )
 
     def test_layout_rules_stay_before_the_generated_marker(self) -> None:
-        """The generator owns tokens, while hand-written CSS owns layout."""
+        """The generator owns tokens, while handwritten CSS owns layout."""
         css = STYLESHEET.read_text(encoding="utf-8")
         marker = css.index(BEGIN)
         generated = css[marker : css.index(END) + len(END)]

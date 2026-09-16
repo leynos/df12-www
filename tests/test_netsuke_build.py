@@ -38,7 +38,7 @@ PLAY_CDN = re.compile(r"cdn\.tailwindcss\.com")
 def test_netsuke_stylesheet_is_compiled(built_site: Path) -> None:
     """The build should emit a Netsuke stylesheet carrying the daisyUI theme.
 
-    The hand-written stylesheet is copied into place today, so the file exists
+    The handwritten stylesheet is copied into place today, so the file exists
     either way; what distinguishes the compiled one is the theme it carries.
     """
     del built_site  # the fixture is the build; the tree it returns is Weaver's

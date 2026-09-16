@@ -1,5 +1,5 @@
 /**
- * @file Stylelint configuration for the hand-written and Tailwind CSS.
+ * @file Stylelint configuration for the handwritten and Tailwind CSS.
  *
  * Formatting is Biome's job (`biome check` covers `.css`), so this is a
  * lint-only pass over `src/**` built on `stylelint-config-standard`. Every

@@ -7,7 +7,7 @@
  * guide documents this harness and records both `mobile-nav.js` modules as
  * covered by it. The decision each one gets wrong is not a calculation but an
  * interaction — which element holds focus after a keypress — so a fake DOM
- * with hand-written focus bookkeeping would largely be testing itself.
+ * with handwritten focus bookkeeping would largely be testing itself.
  *
  * happy-dom supplies the real thing: genuine event dispatch and bubbling,
  * a real `activeElement`, and `closest`/`contains`/`getComputedStyle`. The

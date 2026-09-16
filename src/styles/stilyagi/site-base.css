@@ -113,7 +113,7 @@ body {
 a {
   color: var(--color-fg-link);
 
-  /* Preflight strips the UA underline; the hand-written sheets relied on
+  /* Preflight strips the UA underline; the handwritten sheets relied on
      it, so it is restored here.  Chrome and components that want a bare
      link already say text-decoration: none themselves. */
   text-decoration: underline;
@@ -130,14 +130,14 @@ svg {
   display: block;
 }
 
-/* Preflight zeroes the UA's block margin on pre, which the hand-written
+/* Preflight zeroes the UA's block margin on pre, which the handwritten
    sheets relied on for the rhythm around every code block. */
 pre {
   margin-block: 1em;
 }
 
 /* Preflight gives form controls `font: inherit`, which drags the body's
-   1.55 line-height into them; the hand-written sheets sized every field
+   1.55 line-height into them; the handwritten sheets sized every field
    against the UA's `normal`.  The components that want a different
    line-height say so themselves. */
 button,

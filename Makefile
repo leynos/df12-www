@@ -16,8 +16,10 @@ VENV_TOOLS = pytest
 UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
 SKIP_PLAYWRIGHT ?= 0
 PYTEST_FILTER ?=
-TYPOS_VERSION ?= 1.48.0
-TYPOS := uv tool run typos@$(TYPOS_VERSION)
+TYPOS_CONFIG_BUILDER_VERSION ?= v0.1.1
+TYPOS_CONFIG_BUILDER = uv tool run --from \
+	"git+https://github.com/leynos/typos-config-builder.git@$(TYPOS_CONFIG_BUILDER_VERSION)" \
+	typos-config-builder
 NODE_MODULES_STAMP := node_modules/.install-stamp
 EPISODIC_SOURCE ?= ../episodic
 
@@ -123,7 +125,7 @@ lint: ruff $(NODE_MODULES_STAMP) ## Run linters
 	ruff check
 	bun run lint:js
 
-stylelint: $(NODE_MODULES_STAMP) ## Lint the hand-written and Tailwind CSS
+stylelint: $(NODE_MODULES_STAMP) ## Lint the handwritten and Tailwind CSS
 	# Lint only: Biome formats the CSS, so this is the rule set in
 	# stylelint.config.js over src/**/*.css and nothing else.
 	bun run lint:css
@@ -140,9 +142,7 @@ markdownlint: $(MDLINT) ## Lint Markdown files
 	+$(MAKE) spelling
 
 spelling: ## Enforce en-GB-oxendict spelling in Markdown prose
-	@uv run scripts/generate_typos_config.py
-	@find . -type f -name '*.md' -not -path './node_modules/*' -print0 | \
-		xargs -0 -r $(TYPOS) --config typos.toml --force-exclude
+	$(TYPOS_CONFIG_BUILDER) gate --repository .
 
 nixie: $(NIXIE) ## Validate Mermaid diagrams
 	$(NIXIE) --no-sandbox

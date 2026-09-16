@@ -2,7 +2,7 @@
  *
  * Compiled by the shared df12 build into
  * public/stilyagi/assets/styles/stilyagi.css, alongside the main, mxd,
- * Episodic, and Weaver entrypoints. It replaces the three hand-written
+ * Episodic, and Weaver entrypoints. It replaces the three handwritten
  * shared stylesheets and the seven per-page ones that used to live under
  * src/static/stilyagi/assets/styles/.
  *
@@ -24,7 +24,7 @@
  * The layering is load-bearing: compiled Tailwind puts utilities in
  * @layer utilities, and per CSS Cascade Level 5 an unlayered declaration
  * beats every layered one regardless of specificity.  Left unlayered,
- * these rules would win arguments the hand-written sheets used to lose.
+ * these rules would win arguments the handwritten sheets used to lose.
  * In the components layer a utility in the markup still wins, which is
  * what anyone writing `class="mt-8"` expects.  Element defaults go a
  * layer lower, beside the preflight — they describe an element before

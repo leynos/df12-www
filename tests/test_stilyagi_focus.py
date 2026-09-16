@@ -88,7 +88,7 @@ _OUTLINE_OFFSET_RE = re.compile(r"outline-offset\s*:\s*(?P<value>-?[\d.]+)px")
 
 
 def _stylesheets() -> cabc.Iterator[Path]:
-    """Yield every hand-written Stilyagi stylesheet.
+    """Yield every handwritten Stilyagi stylesheet.
 
     ``syntax.css`` is generated from a Pygments style and carries no focus
     rules, so it is excluded rather than parsed.

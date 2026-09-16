@@ -2,7 +2,7 @@
 
 Two utilities of the same kind on one element make the winner a source-order
 accident, and a doubled selector in the partial is a fossil of the Play CDN
-era, when a hand-written rule had to out-specify a utility to beat it. Both
+era, when a handwritten rule had to out-specify a utility to beat it. Both
 are silent everywhere else.
 """
 
@@ -75,7 +75,7 @@ def test_the_partial_carries_no_doubled_selectors() -> None:
 
 
 def test_the_partial_is_imported_into_the_components_layer() -> None:
-    """The hand-written rules sit below the utilities, where a utility wins."""
+    """The handwritten rules sit below the utilities, where a utility wins."""
     entrypoint = ENTRYPOINT.read_text(encoding="utf-8")
     assert '@import "./netsuke/himotoshi.css" layer(components);' in entrypoint, (
         "himotoshi.css must be imported with layer(components); unlayered, it "

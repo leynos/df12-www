@@ -8,7 +8,7 @@ remain in section 6 of the [Developer's Guide](developers-guide.md).
 ## 1. Context
 
 Before this work, the sixteen classic browser scripts across the sub-sites were
-hand-written JavaScript, copied to `public/` verbatim by
+handwritten JavaScript, copied to `public/` verbatim by
 `scripts/copy-static.ts`. Nothing typechecked them. The two build scripts,
 `scripts/copy-static.ts` and `scripts/generate-image-variants.ts`, were
 TypeScript that Bun ran with their types stripped and never checked, and the
@@ -30,7 +30,7 @@ The migration had to fit the site's existing shape rather than change it:
   disguised as a types-only migration.
 - **Template and path contracts are unchanged.** Every `<script src="...">`
   path in `templates/<site>/` continues to resolve to the same published file;
-  only the source of that file moves from hand-written JavaScript to compiled
+  only the source of that file moves from handwritten JavaScript to compiled
   TypeScript.
 - **The `module.exports` test hook stays.** Several scripts end with a
   guarded `if (typeof module !== "undefined" && module.exports) { ... }` block
@@ -247,7 +247,7 @@ Developer's Guide):
 - `tests/js/compile-browser-scripts.test.mjs` unit-tests
   `isBrowserScript`, `targetFor`, and `compileClassicScript` directly,
   including a fast-check property test that checks `isBrowserScript` against a
-  hand-written specification over generated file trees — vendored paths,
+  handwritten specification over generated file trees — vendored paths,
   declaration files, and `.ts` files outside `assets/js` — rather than a fixed
   list of examples. It then runs `compile-browser-scripts.ts` and
   `copy-static.ts` as subprocesses against an isolated fixture tree, proving

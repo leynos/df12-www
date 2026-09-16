@@ -159,7 +159,7 @@ what anyone writing `class="mt-8"` expects.
 
 Netsuke was the last sub-site on the **Tailwind Play CDN** and now compiles
 like the rest: `src/styles/netsuke.css` declares the `netsuke` theme and
-imports the hand-written partial `src/styles/netsuke/himotoshi.css` into the
+imports the handwritten partial `src/styles/netsuke/himotoshi.css` into the
 components layer, with element defaults in `src/styles/netsuke/site-base.css`
 beside the preflight. The partial's `--netsuke-*` variables read from the theme
 rather than restating a colour. Under the CDN its rules used to double a
@@ -384,10 +384,11 @@ a silent blanket. `style/useForOf` is raised to an error above the recommended
 preset and is deliberate policy, not an inherited default.
 
 For Markdown changes, run `make markdownlint` and `make nixie`. The Markdown
-gate refreshes the shared en-GB-oxendict base, regenerates `typos.toml`, and
-checks maintained prose with the pinned `typos` release. Put narrow
-repository-only exceptions in `typos.local.toml`; never edit the generated
-configuration by hand.
+gate runs `make spelling`, the shared en-GB-oxendict gate. It regenerates
+`typos.toml` from the live shared dictionary and the `typos.local.toml` overlay
+on every run, so `typos.toml` is never drift checked in continuous integration.
+Put narrow repository-only exceptions in `typos.local.toml`; never edit the
+generated configuration by hand.
 
 ### Variable Declarations
 

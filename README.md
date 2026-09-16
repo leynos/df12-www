@@ -67,6 +67,8 @@ This project is released under the
 
 ## Spelling policy
 
-Run `make spelling` to refresh the shared en-GB-oxendict dictionary when newer,
-regenerate `typos.toml`, and check maintained Markdown with a pinned `typos`
-release. A valid committed config remains usable without network access.
+Run `make spelling` to check maintained Markdown. It regenerates `typos.toml`
+from the live shared en-GB-oxendict dictionary and the `typos.local.toml`
+overlay on every run, so `typos.toml` is generated output and is never drift
+checked in continuous integration. Put narrow repository-only exceptions in
+`typos.local.toml`; never edit the generated configuration by hand.

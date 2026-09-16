@@ -1,6 +1,6 @@
 """Invariants the Stilyagi sub-site must hold after its daisyUI migration.
 
-Stilyagi moved from eleven hand-written stylesheets onto the repository's
+Stilyagi moved from eleven handwritten stylesheets onto the repository's
 compiled Tailwind v4 and daisyUI v5 pipeline (issue #67). Three properties
 define "done", and each is asserted here so a later change cannot quietly
 undo one:
@@ -10,7 +10,7 @@ undo one:
    generated Pygments rules that now compile in rather than link
    separately.
 2. Every published Stilyagi page links the compiled stylesheet, and none
-   still links a removed hand-written sheet or the Pygments source file.
+   still links a removed handwritten sheet or the Pygments source file.
 3. The published markup keeps the class names the migration renamed to
    dodge daisyUI's component selectors, and none of the colliding bare
    names creeps back in.

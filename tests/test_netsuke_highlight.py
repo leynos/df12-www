@@ -291,7 +291,7 @@ class TestHimotoshiPygmentsCss:
 def test_generated_block_is_fenced_from_stylelint(generator: ModuleType) -> None:
     """The markers switch stylelint off for the block and back on after.
 
-    Both generators write a block into a larger hand-written stylesheet, so
+    Both generators write a block into a larger handwritten stylesheet, so
     both fence it the same way, and the contract is asserted once here rather
     than restated in each sub-site's module. The Episodic generator owns its
     whole file and needs only the opening marker, so it is checked in

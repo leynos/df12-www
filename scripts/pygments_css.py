@@ -16,7 +16,7 @@ resolved style under the nearest ancestor the style declares, and
 emitting that ancestor's colour for the whole group. What differs between
 the two sub-sites is only naming and weight, so those are parameters; the
 surrounding chrome — backgrounds, padding, media queries — stays in each
-site's hand-written CSS or generator, where the sites genuinely diverge.
+site's handwritten CSS or generator, where the sites genuinely diverge.
 """
 
 from __future__ import annotations

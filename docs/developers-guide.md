@@ -521,7 +521,7 @@ bunx biome check src/static/episodic/assets/styles src/styles/netsuke src/static
 
 Each script is idempotent: rerunning it without changing the corresponding
 style leaves the stylesheet untouched, and it reports whether it wrote a
-change. The Biome check confirms the hand-written stylesheets beside each
+change. The Biome check confirms the handwritten stylesheets beside each
 generated one are still formatted, and that the exclusion is holding: it should
 report the generated files as unchanged rather than reformatting them.
 
@@ -584,11 +584,11 @@ a successful rename. Failure raises `OSError`; a caller wanting a friendlier
 message wraps it, as the icon generator above does, converting it to a
 `SystemExit` naming the file.
 
-`scripts/generate_weaver_icons.py`, `scripts/build_episodic_roadmap_data.py`,
-and `scripts/typos_rollout_cache.py` all publish through it. The Weaver
-snapshot harness's directory-level publication (`_output`, section 7.1) is a
-different problem — staging and swapping a whole tree rather than replacing one
-file — and is deliberately not built on this helper.
+`scripts/generate_weaver_icons.py` and `scripts/build_episodic_roadmap_data.py`
+both publish through it. The Weaver snapshot harness's directory-level
+publication (`_output`, section 7.1) is a different problem — staging and
+swapping a whole tree rather than replacing one file — and is deliberately not
+built on this helper.
 
 ### 4.8. Weaver's chrome macros
 
@@ -1010,7 +1010,7 @@ injects the markup the templates render, and evaluates the shipped script into
 it, so the tests drive genuine event dispatch and a genuine `activeElement`.
 Both `mobile-nav.js` modules are covered this way. The choice is deliberate:
 what those modules can get wrong is which element holds focus after a keypress,
-and a fake DOM with hand-written focus bookkeeping would largely be testing
+and a fake DOM with handwritten focus bookkeeping would largely be testing
 itself. Prefer the fake DOM used by `config-keys.test.mjs` when the behaviour
 under test is a decision; reach for the harness when it is an interaction.
 
@@ -1364,7 +1364,7 @@ to move: until the migration recorded in
 [Tailwind Play CDN](https://tailwindcss.com) script at runtime and extended the
 default theme through a `tailwind-config.js`. It now has an entrypoint,
 `src/styles/netsuke.css`, that declares the `netsuke` daisyUI theme and imports
-the hand-written partial `src/styles/netsuke/himotoshi.css` into
+the handwritten partial `src/styles/netsuke/himotoshi.css` into
 `@layer components`, with element defaults in
 `src/styles/netsuke/site-base.css` beside the preflight. Stilyagi's only
 remaining hand-crafted stylesheet is the generated Pygments block at

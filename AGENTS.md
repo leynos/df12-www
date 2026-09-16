@@ -161,8 +161,8 @@ Netsuke was the last sub-site on the **Tailwind Play CDN** and now compiles
 like the rest: `src/styles/netsuke.css` declares the `netsuke` theme and
 imports the hand-written partial `src/styles/netsuke/himotoshi.css` into the
 components layer, with element defaults in `src/styles/netsuke/site-base.css`
-beside the preflight. The partial's `--netsuke-*` variables read from the
-theme rather than restating a colour. Under the CDN its rules used to double a
+beside the preflight. The partial's `--netsuke-*` variables read from the theme
+rather than restating a colour. Under the CDN its rules used to double a
 selector (`.hm-hero.hm-hero`) to out-specify a utility injected after the
 stylesheet; that idiom is history, and a test refuses it. The one place the
 partial still beats a utility is the phone-width full-bleed block, whose
@@ -187,12 +187,11 @@ rather than run through Pygments, and their `.token-*` colours live in
 `src/styles/weaver/code.css`.
 
 Stilyagi's palette is split by role rather than by hue: `--color-press-red`
-paints fills, borders, and stamps, while red *type* uses
-`--color-accent-text`, which each dark panel re-points from the paper-surface
-red to the ink-ground one (the re-pointing block lives in
-`src/styles/stilyagi/site-base.css`). Because custom properties inherit,
-setting `--color-accent-text` on a container is enough — prefer that over
-adding a colour at the call site.
+paints fills, borders, and stamps, while red *type* uses `--color-accent-text`,
+which each dark panel re-points from the paper-surface red to the ink-ground
+one (the re-pointing block lives in `src/styles/stilyagi/site-base.css`).
+Because custom properties inherit, setting `--color-accent-text` on a container
+is enough — prefer that over adding a colour at the call site.
 
 ### Prefer semantic classes over literal colours
 
@@ -345,9 +344,9 @@ make test-js       # JavaScript suite
 Rebuild and inspect the rendered result as well. The Python tests render real
 Netsuke templates through `ContentPageGenerator` and `SubSiteHomePageBuilder`,
 but they do not build and inspect the complete published site in a real
-browser, so a template change that passes every gate can still produce a
-broken page. See [Validating rendered pages](#validating-rendered-pages) for
-the required browser checks.
+browser, so a template change that passes every gate can still produce a broken
+page. See [Validating rendered pages](#validating-rendered-pages) for the
+required browser checks.
 
 `make typecheck` runs `ty` over the Python and `tsc` over the TypeScript: the
 browser scripts under `src/static/` against `tsconfig.browser.json`, and the
@@ -434,11 +433,11 @@ check the rendered page in a browser.
 ### The dev server
 
 `bun run dev` watches `src/`, `df12_pages/`, `config/`, `scripts/`, and
-`pyproject.toml`, rebuilds on change, and serves `public/` with
-`http-server`. `bun run serve` does one build and then serves. Both read
-`DF12_PORT`, so pick a port per worktree when several are served at once. For
-an agent session, start the server in the background, confirm it answers, and
-stop it when the checks are done:
+`pyproject.toml`, rebuilds on change, and serves `public/` with `http-server`.
+`bun run serve` does one build and then serves. Both read `DF12_PORT`, so pick
+a port per worktree when several are served at once. For an agent session,
+start the server in the background, confirm it answers, and stop it when the
+checks are done:
 
 ```bash
 PORT="${DF12_PORT:-8080}"
@@ -446,8 +445,8 @@ DF12_PORT="$PORT" bun run serve &
 curl -s -o /dev/null -w "%{http_code}" "http://localhost:$PORT/"
 ```
 
-The build emits a Mermaid warning for one upstream document; it is
-pre-existing and not a failure.
+The build emits a Mermaid warning for one upstream document; it is pre-existing
+and not a failure.
 
 ### Validating rendered pages
 
@@ -455,15 +454,15 @@ The commit gates render real Netsuke templates through `ContentPageGenerator`
 and `SubSiteHomePageBuilder`, but they do not build and inspect the complete
 published site in a real browser, so every change to a template, stylesheet, or
 page config is validated in a real browser before it is committed. Two tools
-are installed for this and both work without a display:
-`agent-browser` (navigation, accessibility-tree snapshots, screenshots, and
-`eval`) and `css-view` (computed-style snapshots as JSON for `jq`). Load the
+are installed for this and both work without a display: `agent-browser`
+(navigation, accessibility-tree snapshots, screenshots, and `eval`) and
+`css-view` (computed-style snapshots as JSON for `jq`). Load the
 `agent-browser` and `css-view` skills before using them.
 
 1. **Look at the page.** Open each changed page with `agent-browser open`,
    wait for `networkidle`, and take a full-page screenshot
-   (`agent-browser screenshot --full page.png`). Read the screenshot. Check
-   any added links with `agent-browser snapshot -i -u`.
+   (`agent-browser screenshot --full page.png`). Read the screenshot. Check any
+   added links with `agent-browser snapshot -i -u`.
 2. **Audit every supported viewport.** The site supports widths from 320px
    to desktop, and Tailwind breakpoints change the layout at 640, 768, 1024,
    and 1280px, so a page that is right at one width can be broken at another.
@@ -476,27 +475,27 @@ are installed for this and both work without a display:
    ```
 
    `scrollWidth` greater than `clientWidth` is a failure; `clientWidth`
-   excludes a vertical scrollbar, which `window.innerWidth` does not. Find the offender
-   with an `eval` that lists elements whose `getBoundingClientRect().right`
-   exceeds the viewport, then fix the cause rather than clipping it: wide
-   content scrolls inside its own `overflow-x-auto` container, and a grid or
-   flex child that holds it needs `min-w-0` so the column cannot grow to the
-   content's minimum width. Screenshot the narrowest and widest viewports as
-   well as the designed viewport. This audit is mandatory for every changed
-   page, not a spot check.
-3. **Inspect computed styles when the screenshot is not enough.** `css-view
-   <url>` captures every element's computed styles; the default mode on this
-   host is CDP, so query `.payload.nodes[]` with `.attributes.class`,
+   excludes a vertical scrollbar, which `window.innerWidth` does not. Find the
+   offender with an `eval` that lists elements whose
+   `getBoundingClientRect().right` exceeds the viewport, then fix the cause
+   rather than clipping it: wide content scrolls inside its own
+   `overflow-x-auto` container, and a grid or flex child that holds it needs
+   `min-w-0` so the column cannot grow to the content's minimum width.
+   Screenshot the narrowest and widest viewports as well as the designed
+   viewport. This audit is mandatory for every changed page, not a spot check.
+3. **Inspect computed styles when the screenshot is not enough.**
+   `css-view <url>` captures every element's computed styles; the default mode
+   on this host is CDP, so query `.payload.nodes[]` with `.attributes.class`,
    `.computedStyles`, and `.boundingBox`. Use it to confirm that a utility
-   resolved to the intended value, that a theme token propagated, or that
-   an element expected to be hidden has a zero-height box. The `css-view`
-   skill has the `jq` idioms.
+   resolved to the intended value, that a theme token propagated, or that an
+   element expected to be hidden has a zero-height box. The `css-view` skill
+   has the `jq` idioms.
 4. **Prove output-neutral changes are neutral.** A refactor that is meant to
-   change nothing visible — moving utilities into a component class,
-   extracting a macro, reorganizing a stylesheet, upgrading a dependency —
-   is verified by snapshot diffing, not by eye. Capture `css-view <url> -o
-   before.json` for each affected page before the change and `after.json`
-   after it, at the same viewport, and diff the computed styles:
+   change nothing visible — moving utilities into a component class, extracting
+   a macro, reorganizing a stylesheet, upgrading a dependency — is verified by
+   snapshot diffing, not by eye. Capture `css-view <url> -o before.json` for
+   each affected page before the change and `after.json` after it, at the same
+   viewport, and diff the computed styles:
 
    ```bash
    diff <(jq -S '[.payload.nodes[] | {t: .tagName, s: .computedStyles, b: .boundingBox}]' before.json) \
@@ -504,15 +503,15 @@ are installed for this and both work without a display:
    ```
 
    The projection deliberately omits class attributes: renaming or
-   consolidating classes is the usual reason for such a refactor, and only
-   the computed result matters. An empty diff is the evidence the change was
-   neutral. A non-empty diff is
-   either a bug or a change that must be described in the commit message.
-   Narrow the captured properties with `--props` when the page is large.
-   For a whole sub-site, `scripts/weaver_snapshot.py capture --site <site>`
-   does the same walk over every page from agent-browser, after Iconify has
-   settled, and `diff` normalizes the Tailwind v3/v4 notation differences
-   away; see the Developer's Guide, section 7.
+   consolidating classes is the usual reason for such a refactor, and only the
+   computed result matters. An empty diff is the evidence the change was
+   neutral. A non-empty diff is either a bug or a change that must be described
+   in the commit message. Narrow the captured properties with `--props` when
+   the page is large. For a whole sub-site,
+   `scripts/weaver_snapshot.py capture --site <site>` does the same walk over
+   every page from agent-browser, after Iconify has settled, and `diff`
+   normalizes the Tailwind v3/v4 notation differences away; see the Developer's
+   Guide, section 7.
 5. **Run the accessibility audit** over the changed pages, as the
    [Accessibility](#accessibility) section requires.
 

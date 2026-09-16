@@ -17,3 +17,19 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@c5680ec91f7b9b91406fab4ded5d45245abf7b67
       - run: make spelling
+
+  markdown-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
+      - name: Install mdtablefix
+        uses: leynos/shared-actions/.github/actions/install-mdtablefix@c5a54701c8603a0fa756a6b34c49bc2af75a6c11
+        with:
+          version: "0.6.0"
+      - run: mdtablefix --check --git --include-untracked --wrap --renumber --breaks --ellipsis --fences
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@4580e1612f6407034edd6c0e4e316d725920867b  # v24.2.0
+        with:
+          globs: '**/*.md'

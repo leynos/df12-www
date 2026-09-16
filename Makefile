@@ -2,9 +2,16 @@
 # PATH, and the `which` npm package (a stylelint dependency) installs a shim
 # there that starts node on every lookup, slowing every nested make.
 MDLINT ?= $(shell command -v markdownlint-cli2)
+# `make fmt` and `make check-fmt` call mdtablefix directly. `--git` selects the
+# Markdown files Git tracks and `--include-untracked` adds the untracked files
+# Git does not ignore, so a new document is formatted before it is staged.
+# Both modes need mdtablefix 0.6.0 or later; CI pins the version at the
+# install-mdtablefix step.
+MDTABLEFIX ?= mdtablefix
+MDTABLEFIX_SELECT = --git --include-untracked
+MDTABLEFIX_RULES = --wrap --renumber --breaks --ellipsis --fences
 NIXIE ?= $(shell command -v nixie)
-MDFORMAT_ALL ?= $(shell command -v mdformat-all)
-TOOLS = $(MDFORMAT_ALL) ruff ty $(MDLINT) $(NIXIE) uv bun
+TOOLS = ruff ty $(MDLINT) $(NIXIE) uv bun
 VENV_TOOLS = pytest
 UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
 SKIP_PLAYWRIGHT ?= 0
@@ -95,7 +102,7 @@ $(VENV_TOOLS): ## Verify required CLI tools in venv
 	$(call ensure_tool_venv,$@)
 endif
 
-fmt: ruff $(NODE_MODULES_STAMP) $(MDFORMAT_ALL) ## Format sources
+fmt: ruff $(NODE_MODULES_STAMP) ## Format sources
 	ruff format
 	ruff check --select I --fix
 	bun run lint:js:fix
@@ -103,13 +110,14 @@ fmt: ruff $(NODE_MODULES_STAMP) $(MDFORMAT_ALL) ## Format sources
 	# stylelint-disable markers around them, and fixes are not applied
 	# inside a disabled range.
 	bun run lint:css:fix
-	$(MDFORMAT_ALL)
+	$(MDTABLEFIX) --in-place $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
+	$(MDLINT) --fix "**/*.md"
 
 check-fmt: ruff ## Verify formatting
 	ruff format --check
 	# Biome's formatting is checked by the lint target, which runs
 	# `biome check` — formatter, linter, and assists in one pass.
-	# mdformat-all doesn't currently do checking
+	$(MDTABLEFIX) --check $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 
 lint: ruff $(NODE_MODULES_STAMP) ## Run linters
 	ruff check

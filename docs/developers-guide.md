@@ -105,10 +105,10 @@ served output until `bun run build` (or `uv run pages generate`) is rerun by
 hand. This is the usual reason a change appears not to have taken effect.
 
 Run the commit gates with `make all`, which composes
-`build check-fmt lint stylelint test test-js typecheck docs-check spelling`
-and runs them sequentially rather than in parallel, since the build cache
-rewards sequential runs. For a narrower check while iterating on the
-generator, templates, or stylesheets:
+`build check-fmt lint stylelint test test-js typecheck docs-check spelling` and
+runs them sequentially rather than in parallel, since the build cache rewards
+sequential runs. For a narrower check while iterating on the generator,
+templates, or stylesheets:
 
 ```bash
 make check-fmt lint stylelint typecheck
@@ -305,14 +305,14 @@ and `no-descending-specificity` is off because the sub-site stylesheets are
 grouped by component, which the rule would scatter.
 
 Where a rule genuinely should not apply, disable it at the line with a stated
-reason, `/* stylelint-disable-next-line <rule> -- why */`, rather than loosening
-it in the config. The generated Pygments blocks are the one standing
+reason, `/* stylelint-disable-next-line <rule> -- why */`, rather than
+loosening it in the config. The generated Pygments blocks are the one standing
 exception: the Himotoshi and Stilyagi generators each fence their block with a
-`/* stylelint-disable */` and a matching `/* stylelint-enable */` marker,
-while the Episodic generator writes the whole file and so emits only a
-file-level `/* stylelint-disable */` in its header. Either way, a finding
-inside a generated range is a change to the generator rather than to the
-stylesheet. Section 4.4 has the detail.
+`/* stylelint-disable */` and a matching `/* stylelint-enable */` marker, while
+the Episodic generator writes the whole file and so emits only a file-level
+`/* stylelint-disable */` in its header. Either way, a finding inside a
+generated range is a change to the generator rather than to the stylesheet.
+Section 4.4 has the detail.
 
 `make fmt` runs `stylelint --fix` as well as Biome. That is safe over the
 generated blocks because stylelint does not apply fixes inside a disabled
@@ -506,8 +506,8 @@ long as the style declares parents before children.
   writes the whole file, emits a `/* stylelint-disable */` in its header. The
   rest of each file is still linted. `stylelint --fix` leaves a disabled range
   alone, so `make fmt` and the generators do not fight; a lint finding inside
-  the markers means the generator's output has changed shape and the
-  generator, not the stylesheet, is what to change.
+  the markers means the generator's output has changed shape and the generator,
+  not the stylesheet, is what to change.
 
 ### 4.5. Regenerating and verifying
 
@@ -677,8 +677,7 @@ block's default content unless it overrides that block.
 | `content`               | empty                          |
 | `page_footer`           | full site footer               |
 
-_Table 5a: every block `_layout.jinja` defines, and what it renders by
-default._
+_Table 5a: every block `_layout.jinja` defines, and what it renders by default._
 
 `home_page.jinja` overrides only `page_title` and `content`, and inherits every
 other block — the sidebar, footer, and texture overlay on the Weaver home page
@@ -710,7 +709,11 @@ It shortens `sidebar_footer` to just the optional parent link:
 {% block sidebar_footer %}
             {% if parent_link %}
             <div class="p-6 border-t border-base-content/10 hidden lg:block">
-                <a href="{{ parent_link.href }}" class="font-mono text-xs text-base-content/82 hover:text-accent-ink transition-colors">{{ parent_link.label }}</a>
+                <a
+                    href="{{ parent_link.href }}"
+                    class="font-mono text-xs text-base-content/82
+                           hover:text-accent-ink transition-colors"
+                >{{ parent_link.label }}</a>
             </div>
             {% endif %}
 {% endblock %}
@@ -725,7 +728,8 @@ inside the `<main class="...">` attribute value, not around the `<main>`
 element itself —
 
 ```jinja
-<main class="{% block main_class %}flex-1 lg:ml-64 grid-bg min-h-screen relative{% block main_extra_class %}{% endblock %}{% endblock %}">
+<main class="{% block main_class %}flex-1 lg:ml-64 grid-bg min-h-screen relative
+{% block main_extra_class %}{% endblock %}{% endblock %}">
 ```
 
 — so overriding `main_class` replaces the whole class list rather than adding
@@ -749,11 +753,10 @@ _Table 5b: the blocks a page is most likely to override._
 ### 4.10. Which Weaver templates use the shared layout
 
 Twelve of the thirteen page templates under `templates/weaver/pages/` extend
-`doc_page.jinja`, and so reach `_layout.jinja` through it; `home_page.jinja`
-and `shared_content_page.jinja` extend the layout directly. Adding a page means
-extending one of the two — the sidebar, the mobile drawer, and the
-footer come with it, and a page that builds its own gets none of the fixes made
-to those.
+`doc_page.jinja`, and so reach `_layout.jinja` through it; `home_page.jinja` and
+`shared_content_page.jinja` extend the layout directly. Adding a page means
+extending one of the two — the sidebar, the mobile drawer, and the footer come
+with it, and a page that builds its own gets none of the fixes made to those.
 
 `pages/design-language.jinja` is the exception, and deliberately so. Its
 sidebar is not the sub-site navigation but an in-page table of contents:
@@ -829,9 +832,9 @@ Three call sites show the range:
 ```
 
 The presentation lives in `.hm-kicker` and its modifiers in
-`src/styles/netsuke/himotoshi.css`. The base carries only what every
-pill shares — `inline-flex`, centred items, the stone border, the pill radius,
-size, weight, gap, and uppercasing. The face, tracking, and inset sit on the
+`src/styles/netsuke/himotoshi.css`. The base carries only what every pill
+shares — `inline-flex`, centred items, the stone border, the pill radius, size,
+weight, gap, and uppercasing. The face, tracking, and inset sit on the
 modifiers, because the two variants differ enough that neither is a sensible
 default.
 
@@ -862,8 +865,8 @@ modifier order in that file is meaningful.
 `templates/netsuke/chrome.jinja` holds the Netsuke page furniture that
 `_layout.jinja` does not draw: the windows a code sample sits in, the page
 header, and the breadcrumb. Import it as `chrome`. Every Netsuke content page
-reaches the layout through `doc_page.jinja`, which adds the docs-only
-scrollspy and copy-button scripts and the flex column; the homepage extends
+reaches the layout through `doc_page.jinja`, which adds the docs-only scrollspy
+and copy-button scripts and the flex column; the homepage extends
 `_layout.jinja` directly and so never acquires them. The one standalone
 document is `pages/icon-replacements.jinja`, which carries its own head and
 scripts.
@@ -896,10 +899,11 @@ windows that sit on their own grounds; a docs page should not need them.
 titlebar the example pages use.
 
 `page_header(kicker, title, hero=false, id='', accent=false, icon='',
-icon_class='', dot='')` draws the kicker pill, the `h1`, and a lede paragraph
-whose text is the caller's body. The kicker options pass straight through to
-`ui.kicker`. `hero=true` selects the centred hub-page treatment with the larger
-heading; the default is the ruled-off docs treatment.
+icon_class='', dot='')`
+draws the kicker pill, the `h1`, and a lede paragraph whose text is the
+caller's body. The kicker options pass straight through to `ui.kicker`.
+`hero=true` selects the centred hub-page treatment with the larger heading; the
+default is the ruled-off docs treatment.
 
 ```jinja
 {% call chrome.page_header('Reference', 'CLI Commands') %}
@@ -907,11 +911,10 @@ heading; the default is the ruled-off docs treatment.
 {% endcall %}
 ```
 
-`breadcrumb(trail)` takes an ordered list of mappings with a `label` and,
-for every entry but the last, usually an `href`. It renders a labelled `nav`
-with an `ol` and `aria-current="page"` on the final crumb. A middle entry
-without an `href` renders as plain text; the example pages use one for the
-category.
+`breadcrumb(trail)` takes an ordered list of mappings with a `label` and, for
+every entry but the last, usually an `href`. It renders a labelled `nav` with an
+`ol` and `aria-current="page"` on the final crumb. A middle entry without an
+`href` renders as plain text; the example pages use one for the category.
 
 ```jinja
 {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'CLI Commands'}]) }}
@@ -922,10 +925,11 @@ category.
 `templates/netsuke/docs_nav.jinja` holds `docs_pages`, the ordered list every
 docs navigation renders from, alongside `mobile_docs_bar`, `footer_nav`, and
 `docs_footer`. Each entry names the `group` heading it sits under, and
-`docs_groups` fixes the heading order. `sidebar(active=none, sub_links=[],
-sections=none, search=true)` draws the desktop sidebar from that list: a docs
-page passes its slug and, where it has section anchors, a `sub_links` list of
-`href` and `label` mappings that the macro nests under the active entry.
+`docs_groups` fixes the heading order.
+`sidebar(active=none, sub_links=[], sections=none, search=true)` draws the
+desktop sidebar from that list: a docs page passes its slug and, where it has
+section anchors, a `sub_links` list of `href` and `label` mappings that the
+macro nests under the active entry.
 
 ```jinja
 {{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}]) }}
@@ -941,17 +945,17 @@ sets an `aria-label` on the `nav` where that list is not the documentation.
 what both paths call.
 
 Adding a docs page means adding one entry to `docs_pages`; the sidebar, the
-mobile dropdown, and the footer links follow. `tests/test_netsuke_navigation.py`
-pins all three to the list.
+mobile dropdown, and the footer links follow.
+`tests/test_netsuke_navigation.py` pins all three to the list.
 
 ### 5.4. The example pages: `exdata.example_header`
 
 `templates/netsuke/examples_data.jinja` holds the `examples` catalogue that the
 hub grid, the filter buttons, and the detail pages' "Up Next" boxes render
-from. Each entry also carries the detail page header: the `level`, the
-category chip's `cat_chip` variant (a modifier on `.hm-chip`), the `lede`, and
-the two header `actions`, each an `href`, an `icon`, and a `label`, the first
-drawn as the primary button. `example_header(key)` renders it:
+from. Each entry also carries the detail page header: the `level`, the category
+chip's `cat_chip` variant (a modifier on `.hm-chip`), the `lede`, and the two
+header `actions`, each an `href`, an `icon`, and a `label`, the first drawn as
+the primary button. `example_header(key)` renders it:
 
 ```jinja
 {{ exdata.example_header('hello-world') }}
@@ -964,20 +968,19 @@ that follow one shared convention: a plain immediately invoked function
 expression (IIFE) module, guarded by the same `module.exports` hook described
 below. Loading and bootstrap otherwise differ by site. Fourteen of the sixteen
 scripts (Netsuke, Stilyagi, and Episodic) are loaded with `<script defer>` and
-guard their own initialization on `document.readyState` (running immediately
-if the document has already finished loading, or waiting for
-`DOMContentLoaded` otherwise). Weaver's two scripts, `telemetry.ts` and
-`mobile-nav.ts`, are the exception: they are loaded with a plain `<script>` at
-the end of `<body>` and run immediately and unconditionally, with no
-`readyState`/`DOMContentLoaded` gate. Where a component's behaviour has a pure
-decision worth testing in isolation — no DOM, no timers — that function is
-exported via `module.exports` at the end of the IIFE, guarded by
-`typeof module !== "undefined"` so the same file still runs unmodified as a
-plain browser script. `docs-scrollspy.ts` exports
-`pickActiveIndex` (which heading is currently being read); `config-keys.ts`
-exports `nextTabIndex` (which tab an arrow/Home/End keypress should move to).
-`mobile-nav.ts` has no such function — its logic is DOM interaction throughout
-— and exports nothing.
+guard their own initialization on `document.readyState` (running immediately if
+the document has already finished loading, or waiting for `DOMContentLoaded`
+otherwise). Weaver's two scripts, `telemetry.ts` and `mobile-nav.ts`, are the
+exception: they are loaded with a plain `<script>` at the end of `<body>` and
+run immediately and unconditionally, with no `readyState`/`DOMContentLoaded`
+gate. Where a component's behaviour has a pure decision worth testing in
+isolation — no DOM, no timers — that function is exported via `module.exports`
+at the end of the IIFE, guarded by `typeof module !== "undefined"` so the same
+file still runs unmodified as a plain browser script. `docs-scrollspy.ts`
+exports `pickActiveIndex` (which heading is currently being read);
+`config-keys.ts` exports `nextTabIndex` (which tab an arrow/Home/End keypress
+should move to). `mobile-nav.ts` has no such function — its logic is DOM
+interaction throughout — and exports nothing.
 
 The `.ts` file is the source of truth. `bun run build:js`
 (`scripts/compile-browser-scripts.ts`) strips the types with swc and writes the
@@ -1231,12 +1234,12 @@ crossing is a fifth, and is the one a reader does not initiate.
 
 The Weaver drawer and its copy controls report through the same optional hook
 model as Episodic search. A production host may set
-`window.df12WeaverNavTelemetry` to a function before `telemetry.js` runs,
-which happens immediately, at the end of `<body>`, with no `defer` and no
+`window.df12WeaverNavTelemetry` to a function before `telemetry.js` runs, which
+happens immediately, at the end of `<body>`, with no `defer` and no
 `DOMContentLoaded` gate; without it, `src/static/weaver/assets/js/telemetry.ts`
 is a no-op and nothing is collected. A sink that throws is caught and ignored
-because observability must not be able to break the drawer or the button it
-was watching.
+because observability must not be able to break the drawer or the button it was
+watching.
 
 Every event has the same shape, and the whole of what may leave the page is
 declared as three frozen vocabularies at the top of that file:
@@ -1374,8 +1377,8 @@ The layering is the point. The compiled build puts utilities in
 they lose to a utility by construction rather than by source order. The
 inversion is the trap: a handwritten stylesheet that is _left_ unlayered under
 the compiled build stops losing those arguments and starts winning them,
-silently. See `src/styles/weaver.css` for the arrangement and the two
-migration ExecPlans for what the change turned up.
+silently. See `src/styles/weaver.css` for the arrangement and the two migration
+ExecPlans for what the change turned up.
 
 What the Play CDN did, for the record: it scanned the rendered document for
 utility classes and injected the utilities it found into a `<style>` element
@@ -1385,37 +1388,35 @@ the tie on source order, and the idiom used to win instead was to double the
 selector — `.hm-hero.hm-hero` — raising its specificity above a single utility
 class. Under the compiled build the doubling does nothing, since a utility wins
 whatever the specificity, and `tests/test_netsuke_conventions.py` refuses it.
-The right move is the one the migration made wherever a component rule had
-been beating a utility that way: take the utility out of the markup and state
-the value in the component, so the component's own states can override it.
+The right move is the one the migration made wherever a component rule had been
+beating a utility that way: take the utility out of the markup and state the
+value in the component, so the component's own states can override it.
 
 The one sanctioned exception is a full-bleed block below the tablet breakpoint,
-where a code panel that carries a border, a padding, and a rounded corner in the
-column has to run edge to edge on a phone. Layer order cannot express that, so
-those declarations carry `!important`, with a comment saying so; Weaver's
+where a code panel that carries a border, a padding, and a rounded corner in
+the column has to run edge to edge on a phone. Layer order cannot express that,
+so those declarations carry `!important`, with a comment saying so; Weaver's
 `figures.css` and Netsuke's `himotoshi.css` each have one such block and the
 convention test confines the flag to it.
 
 ### 7.1. Verifying a styling change against Weaver
 
-`scripts/weaver_snapshot.py` is the command surface; the work sits in
-fourteen siblings beside it, none over 400 lines, named for what they do:
-`_paths` (the published tree, the page list, and each page's filename stem),
-`_locking` (advisory locks and lock-file hygiene), `_output` (staging and
-failure-atomic publication), `_ownership` (proving whose server answered),
-`_serving` (ports, the server, and its lifecycle), `_tools` (driving
-agent-browser, and the walker it evaluates in the settled page), `_colour`
-(one colour written one way), `_normalize` (reducing a captured tree to what
-a reader could see), `_folds` (the transition, radius, incidental-text and
-sibling-margin folds that make v4's notation read as v3's), `_transform`
-(composing v4's individual transform properties into v3's matrix),
-`_document` (reading a snapshot from disk and rendering its normalized tree),
-`_types` (the JSON, style, and walker-node shapes the modules pass between
-them),
-`_clock` (the passage of time, as something a caller can supply), and
-`_process` (starting, polling, and stopping the server child). They are plain
-modules rather than a package, so a script run by path finds them on
-`sys.path` and the invocation below is unchanged.
+`scripts/weaver_snapshot.py` is the command surface; the work sits in fourteen
+siblings beside it, none over 400 lines, named for what they do: `_paths` (the
+published tree, the page list, and each page's filename stem), `_locking`
+(advisory locks and lock-file hygiene), `_output` (staging and failure-atomic
+publication), `_ownership` (proving whose server answered), `_serving` (ports,
+the server, and its lifecycle), `_tools` (driving agent-browser, and the walker
+it evaluates in the settled page), `_colour` (one colour written one way),
+`_normalize` (reducing a captured tree to what a reader could see), `_folds`
+(the transition, radius, incidental-text and sibling-margin folds that make
+v4's notation read as v3's), `_transform` (composing v4's individual transform
+properties into v3's matrix), `_document` (reading a snapshot from disk and
+rendering its normalized tree), `_types` (the JSON, style, and walker-node
+shapes the modules pass between them), `_clock` (the passage of time, as
+something a caller can supply), and `_process` (starting, polling, and stopping
+the server child). They are plain modules rather than a package, so a script
+run by path finds them on `sys.path` and the invocation below is unchanged.
 
 Every outward dependency the harness has — the clock, the readiness probe, the
 process launcher, the marker fetch, the file mover, the port allocator — is a
@@ -1511,18 +1512,17 @@ defaults once on a blank page with `scripts/weaver_snapshot_defaults.js`, then
 for each page opens it, waits for the network to go idle and then for Iconify
 to report every icon arrived or missing, and evaluates
 `scripts/weaver_snapshot_walker.js` — a copy of css-view's walker that takes
-those defaults as a parameter and appends nothing to the page it reads — in
-the settled page. The wait is what makes a capture
-repeatable on a page that draws its icons after load; a capture taken a moment
-too early records a different layout, not a different style. `--site` names
-the sub-site (the default is Weaver, which the harness was written for) and
-`--width`/`--height` the viewport, since a stylesheet's media queries only show
-at the widths they apply to. `shots` screenshots each page at 360, 768, and
-1440 CSS pixels, for the cases a style diff cannot catch on its own — a wrong
-icon glyph, a texture that failed to load. `diff` normalizes both snapshot
-trees and prints a unified diff per page, exiting non-zero when any page
-differs; that exit status is what makes it usable as a gate rather than merely
-informative.
+those defaults as a parameter and appends nothing to the page it reads — in the
+settled page. The wait is what makes a capture repeatable on a page that draws
+its icons after load; a capture taken a moment too early records a different
+layout, not a different style. `--site` names the sub-site (the default is
+Weaver, which the harness was written for) and `--width`/`--height` the
+viewport, since a stylesheet's media queries only show at the widths they apply
+to. `shots` screenshots each page at 360, 768, and 1440 CSS pixels, for the
+cases a style diff cannot catch on its own — a wrong icon glyph, a texture that
+failed to load. `diff` normalizes both snapshot trees and prints a unified diff
+per page, exiting non-zero when any page differs; that exit status is what
+makes it usable as a gate rather than merely informative.
 
 The typical loop is to capture a baseline before touching anything, make the
 change, capture again, and diff the two directories. An empty diff confirms the
@@ -1698,27 +1698,26 @@ uv run pytest tests/test_weaver_browser_interaction.py -v
 `built_site`, `served`, and `drive` fixtures and the same `playwright` marker
 and skips, with its page list and layout probe in
 `tests/support/netsuke_browser.py`. It checks, for every configured Netsuke
-page, that the drawer toggle is the navigation at 360px and the link list is
-at 1280px, and that the document fits the viewport (four pages that overflowed
+page, that the drawer toggle is the navigation at 360px and the link list is at
+1280px, and that the document fits the viewport (four pages that overflowed
 before the daisyUI migration are waived by name, and the waiver fails if one
-stops overflowing); that the published tree holds exactly the configured
-pages; that the vendored walker, run over a controlled document, reports
+stops overflowing); that the published tree holds exactly the configured pages;
+that the vendored walker, run over a controlled document, reports
 inherited-versus-default handling, the always-reported margins, element
 metadata, the text clip, and the node budget; that seven representative
-components on the manifest-reference page render the paint and box edges
-pinned in `tests/__snapshots__/test_netsuke_browser.ambr` at a phone width
-and a desktop one, with the base-layer pins and the phone-width full-bleed
-asserted directly; that `capture --site netsuke` run through its command line
-at 1280×720 and at 360×800 writes one snapshot per page, and that every page
-so captured renders as `tests/support/netsuke_baseline.json` records — a
-SHA-256 of each page's normalized computed-style tree, the same
-normalization `diff` compares with, at each width, with the build date the
-forthcoming pages stamp into a heading redacted first; and that
-`shots --site netsuke` runs end to end. A page that renders differently fails
-the baseline test by name; capture the last good commit and this one and
-`diff` them to see what moved, and once the change is meant, rerun the test
-with `NETSUKE_BASELINE_UPDATE=1` to rewrite the record in the same commit.
-Run the suite alone with:
+components on the manifest-reference page render the paint and box edges pinned
+in `tests/__snapshots__/test_netsuke_browser.ambr` at a phone width and a
+desktop one, with the base-layer pins and the phone-width full-bleed asserted
+directly; that `capture --site netsuke` run through its command line at
+1280×720 and at 360×800 writes one snapshot per page, and that every page so
+captured renders as `tests/support/netsuke_baseline.json` records — a SHA-256
+of each page's normalized computed-style tree, the same normalization `diff`
+compares with, at each width, with the build date the forthcoming pages stamp
+into a heading redacted first; and that `shots --site netsuke` runs end to end.
+A page that renders differently fails the baseline test by name; capture the
+last good commit and this one and `diff` them to see what moved, and once the
+change is meant, rerun the test with `NETSUKE_BASELINE_UPDATE=1` to rewrite the
+record in the same commit. Run the suite alone with:
 
 ```bash
 uv run pytest tests/test_netsuke_browser.py -v
@@ -1766,24 +1765,24 @@ normative procedure is
 `AGENTS.md`; this section explains the tools it relies on and why each step is
 there.
 
-Two command-line tools do the work, and neither needs a display. `agent-browser`
-drives a headless Chromium: it opens a page, waits for `networkidle`, takes a
-full-page screenshot, lists the accessibility tree with element refs, resizes
-the viewport with `agent-browser set viewport <w> <h>`, and evaluates
-JavaScript against the page. `css-view` captures every element's computed
-styles and bounding box as JSON, which `jq` can then query or `diff` can
-compare. Both have a skill under the agent's skills directory that carries the
-current command reference; load it rather than working from memory. For a
-whole sub-site the snapshot harness in section 7.1 does the capture instead:
-it drives `agent-browser`, waits for the page to settle, and evaluates a
-vendored copy of css-view's walker, so `css-view` itself is the ad hoc tool
-for one page and the origin of the walker, not the harness's capture path.
+Two command-line tools do the work, and neither needs a display.
+`agent-browser` drives a headless Chromium: it opens a page, waits for
+`networkidle`, takes a full-page screenshot, lists the accessibility tree with
+element refs, resizes the viewport with `agent-browser set viewport <w> <h>`,
+and evaluates JavaScript against the page. `css-view` captures every element's
+computed styles and bounding box as JSON, which `jq` can then query or `diff`
+can compare. Both have a skill under the agent's skills directory that carries
+the current command reference; load it rather than working from memory. For a
+whole sub-site the snapshot harness in section 7.1 does the capture instead: it
+drives `agent-browser`, waits for the page to settle, and evaluates a vendored
+copy of css-view's walker, so `css-view` itself is the ad hoc tool for one page
+and the origin of the walker, not the harness's capture path.
 
 The dev server is the target. `bun run dev` watches `src/`, `df12_pages/`,
-`config/`, `scripts/`, and `pyproject.toml` and rebuilds on change; `bun run
-serve` builds once. Both honour `DF12_PORT`, so several worktrees can be served
-at once. Confirm the server answers with `curl` before driving it, and stop it
-afterwards.
+`config/`, `scripts/`, and `pyproject.toml` and rebuilds on change;
+`bun run serve` builds once. Both honour `DF12_PORT`, so several worktrees can
+be served at once. Confirm the server answers with `curl` before driving it,
+and stop it afterwards.
 
 Four checks follow, and the second is mandatory for every changed page rather
 than a spot check:
@@ -1799,8 +1798,8 @@ than a spot check:
    `window.innerWidth` because it excludes the vertical scrollbar. The usual
    cause of a failure is a code block or table inside a grid or flex column:
    the fix is `overflow-x-auto` on the wide content and `min-w-0` on the
-   column, never a clip on the page. Section 7.4 records how the same
-   failure was found and fixed on Weaver.
+   column, never a clip on the page. Section 7.4 records how the same failure
+   was found and fixed on Weaver.
 3. **Inspect computed styles when a screenshot cannot settle the question.**
    `css-view` shows the value a utility resolved to, whether a theme token
    propagated, and whether an element that should be hidden has a zero-height
@@ -1809,13 +1808,12 @@ than a spot check:
    meant to change nothing visible — moving utilities into a component class,
    extracting a macro, reorganizing a stylesheet, upgrading a dependency — is
    proven by capturing computed-style snapshots before and after at the same
-   viewport — `css-view` for one page, `scripts/weaver_snapshot.py capture
-   --site <site> <out-dir>` for a sub-site — and diffing each node's tag, computed
-   styles, and bounding box.
-   Class attributes are left out of the projection on purpose, since
-   renaming classes is usually the point. An empty diff is the evidence; a
-   non-empty diff is either a bug or a change the commit message must
-   describe.
+   viewport — `css-view` for one page,
+   `scripts/weaver_snapshot.py capture --site <site> <out-dir>` for a sub-site
+   — and diffing each node's tag, computed styles, and bounding box. Class
+   attributes are left out of the projection on purpose, since renaming classes
+   is usually the point. An empty diff is the evidence; a non-empty diff is
+   either a bug or a change the commit message must describe.
 
 Finish with the accessibility audit in section 8.
 

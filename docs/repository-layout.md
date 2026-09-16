@@ -162,8 +162,8 @@ navigation, and `examples_data.jinja` for the examples catalogue. Netsuke,
 Weaver, and Stilyagi each centralize their chrome in a `_layout.jinja`: every
 Netsuke content page reaches it through `doc_page.jinja` and the homepage
 extends it directly; the one standalone document is
-`pages/icon-replacements.jinja`, which carries its own head and scripts.
-These are distinct from the main-site templates in `df12_pages/templates/`.
+`pages/icon-replacements.jinja`, which carries its own head and scripts. These
+are distinct from the main-site templates in `df12_pages/templates/`.
 
 ### `tests/`
 

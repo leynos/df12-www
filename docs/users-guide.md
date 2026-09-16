@@ -126,9 +126,9 @@ The planned 0.1.0 surface is `weaver <resource> <verb> [FLAGS]`, with `--json`
 as the machine switch. Selector-driven commands pass `weaver.selector.v1`
 records through `--selectors -`; the daemon is per-user and local, using Unix
 sockets by default and loopback-only TCP only for compatibility on non-Unix
-systems. Shared mutation guarantees stay the same: parser and
-language-server checks where they apply, stale-source refusal, Double-Lock
-verification, and idempotent mutations.
+systems. Shared mutation guarantees stay the same: parser and language-server
+checks where they apply, stale-source refusal, Double-Lock verification, and
+idempotent mutations.
 
 Use the current examples until the planned commands ship. `patches apply` and
 `symbols rename` remain target wording in the docs, not a promise about the
@@ -154,33 +154,31 @@ page it is replaced by a bar at the top of the content holding a drop-down of
 the documentation pages — choosing one navigates there — and the same search
 box.
 
-A guide page's sidebar instead lists that guide's sections under "On this
-page" and a short set of "Helpful links", with no search box. Below 1024
-pixels wide, a guide has no sidebar or bar; its sections follow in reading
-order, and the site-wide navigation bar is the way to other pages.
+A guide page's sidebar instead lists that guide's sections under "On this page"
+and a short set of "Helpful links", with no search box. Below 1024 pixels wide,
+a guide has no sidebar or bar; its sections follow in reading order, and the
+site-wide navigation bar is the way to other pages.
 
 The site-wide navigation bar has its own menu button below 768 pixels wide.
 Pressing it opens the menu; pressing it again, pressing `Escape`, or clicking
-outside the menu closes it. This is the same mobile menu shared across the
-site.
+outside the menu closes it. This is the same mobile menu shared across the site.
 
 ### 5.2. Breadcrumbs
 
 Every documentation, guide, and example page carries a breadcrumb trail above
 its heading, showing the route from the section hub down to that page. The
 final entry in the trail is the current page and is marked as such for
-assistive technology; earlier entries are links back up the route, except
-that an example page's category is shown as plain text.
+assistive technology; earlier entries are links back up the route, except that
+an example page's category is shown as plain text.
 
 ### 5.3. Example pages
 
-Each example page opens with three labels: the example's category (Basics,
-Web, Media, Design, C / C++, or Docs), its level (Beginner or Intermediate),
-and "Reviewed syntax", meaning the manifest has been checked against the
-shipped example. Two buttons follow the labels: the first usually returns to
-the examples hub, and the second points at the most relevant documentation
-page. Below the manifest, the transcript of the build runs in a
-terminal-styled panel.
+Each example page opens with three labels: the example's category (Basics, Web,
+Media, Design, C / C++, or Docs), its level (Beginner or Intermediate), and
+"Reviewed syntax", meaning the manifest has been checked against the shipped
+example. Two buttons follow the labels: the first usually returns to the
+examples hub, and the second points at the most relevant documentation page.
+Below the manifest, the transcript of the build runs in a terminal-styled panel.
 
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the

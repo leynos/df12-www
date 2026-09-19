@@ -1,11 +1,18 @@
-"""Tests for the Stilyagi Pygments style and the highlight tag's wrapper class."""
+"""Tests for the Stilyagi Pygments style and the highlight tag's wrapper class.
+
+The wrapper is also where the tag decides whether a block is keyboard
+reachable, so the focusability contract is asserted here beside the class it
+hangs off.
+"""
 
 from __future__ import annotations
 
 import re
 import typing as typ
 
+import pytest
 from bs4 import BeautifulSoup
+from jinja2 import TemplateRuntimeError
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
@@ -14,6 +21,7 @@ from pygments.token import Comment, Keyword, Token
 
 from df12_pages.config import ContentPageConfig
 from df12_pages.content_page import ContentPageGenerator
+from df12_pages.jinja_highlight import DEFAULT_CSS_CLASS, _make_focusable
 from df12_pages.stilyagi_highlighting import StilyagiStyle
 from scripts.generate_stilyagi_pygments_css import (
     BEGIN,
@@ -264,6 +272,11 @@ class TestStilyagiHighlighting:
         assert block.get_text().strip() == RULE_FRAGMENT.strip(), (
             "highlighted source text should round-trip unchanged"
         )
+        assert not block.has_attr("tabindex"), (
+            "a named wrapper is sized to its content inside the sub-site's own "
+            "`.code-scroll` region, which is the element that scrolls and the "
+            "element that holds the tab stop; a second stop here would go nowhere"
+        )
 
     def test_highlight_tag_still_defaults_to_the_netsuke_wrapper(
         self,
@@ -295,6 +308,22 @@ class TestStilyagiHighlighting:
         output_path = generator.run()
 
         soup = BeautifulSoup(output_path.read_text(encoding="utf-8"), "html.parser")
-        assert soup.find("div", class_="hm-syntax") is not None, (
-            "the default wrapper class should be unchanged"
+        block = soup.find("div", class_="hm-syntax")
+        assert block is not None, "the default wrapper class should be unchanged"
+        assert block.get("tabindex") == "0", (
+            "the Netsuke wrapper is itself the horizontal scroller, so it has to "
+            "be reachable from the keyboard"
         )
+
+
+def test_the_focusable_wrapper_guard_rejects_markup_it_does_not_recognise() -> None:
+    """A change in what Pygments emits fails loudly rather than silently.
+
+    The attribute is added to the rendered string because Pygments offers no
+    way to put one on the wrapper. That makes the opening tag a contract with
+    a library this repository does not control, so it is checked rather than
+    assumed: an unrecognised tag raises here instead of leaving every code
+    block on the sub-site quietly unfocusable again.
+    """
+    with pytest.raises(TemplateRuntimeError, match="expected Pygments"):
+        _make_focusable("<pre>x</pre>", DEFAULT_CSS_CLASS)

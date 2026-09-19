@@ -442,38 +442,23 @@ button.hm-config-keys__label {
   border: 1px solid transparent;
   border-radius: 0.5rem;
   min-width: 0;
-
-  /* The panel, not the pre inside it, is the horizontal scroller: it is
-     the element carrying tabindex and a name, and a scrollable region
-     must be keyboard reachable. `contain: inline-size` on .hm-syntax
-     would otherwise pin its width and push the overflow down onto the
-     unfocusable pre. */
-  overflow-x: auto;
   padding: 1rem 1.25rem;
   transition:
     border-color 150ms ease,
     box-shadow 150ms ease;
 }
 
-.hm-config-keys__panel:focus-visible {
-  outline: 2px solid var(--netsuke-indigo-light);
-  outline-offset: 2px;
-}
-
+/* The block inside the panel scrolls, as it does everywhere else, and it is
+   the block that carries the tab stop. The panel used to take both, because
+   nothing made .hm-syntax focusable; the highlight tag now emits its
+   `tabindex`, so a second stop on the panel would only be a stop that goes
+   nowhere. The panel keeps its group role and its name. */
 .hm-config-keys__panel .hm-syntax {
   background: transparent;
   border-radius: 0;
-  contain: none;
-
-  /* Paint nothing of its own and stretch to the widest line, so the
-     panel's ground covers the full scroll extent. */
-  min-width: 100%;
-  overflow-x: visible;
-  width: max-content;
 }
 
 .hm-config-keys__panel .hm-syntax pre {
-  overflow-x: visible;
   padding: 0;
 }
 
@@ -671,6 +656,19 @@ button.hm-config-keys__label {
   overflow-x: auto;
 }
 
+/* A code block is a horizontal scroller, so the highlight tag emits it with
+   `tabindex="0"`, and the hand-written ones carry the attribute in the
+   markup. Both need a ring to show for it. The ring is drawn inside the
+   border box rather than around it: a block sits flush inside the
+   faux-window and example chrome, where an outward ring would be clipped.
+   Stone-light measures 10.57:1 on the charcoal ground both are drawn over,
+   well clear of the 3:1 a focus indicator needs. */
+.hm-syntax:focus-visible,
+pre[tabindex]:focus-visible {
+  outline: 2px solid var(--netsuke-stone-light);
+  outline-offset: -3px;
+}
+
 .visually-hidden {
   border: 0;
   clip-path: inset(50%);
@@ -784,7 +782,11 @@ button.hm-config-keys__label {
 .hm-chip--warning {
   background: color-mix(in srgb, var(--netsuke-amber) 10%, transparent);
   border-color: color-mix(in srgb, var(--netsuke-amber) 20%, transparent);
-  color: var(--netsuke-amber);
+
+  /* The label takes the type role rather than the fill: amber and matcha
+     are too light to read as 12px type on their own tint, and every chip
+     then takes the light cut together on a charcoal ground. */
+  color: var(--color-warning-text);
 }
 
 .hm-chip--muted {
@@ -796,19 +798,19 @@ button.hm-config-keys__label {
 .hm-chip--success {
   background: color-mix(in srgb, var(--netsuke-matcha) 10%, transparent);
   border-color: color-mix(in srgb, var(--netsuke-matcha) 20%, transparent);
-  color: var(--netsuke-matcha);
+  color: var(--color-success-text);
 }
 
 .hm-chip--brand {
   background: color-mix(in srgb, var(--netsuke-indigo) 10%, transparent);
   border-color: color-mix(in srgb, var(--netsuke-indigo) 20%, transparent);
-  color: var(--netsuke-indigo);
+  color: var(--color-primary-text);
 }
 
 .hm-chip--accent {
   background: color-mix(in srgb, var(--netsuke-vermillion) 10%, transparent);
   border-color: color-mix(in srgb, var(--netsuke-vermillion) 20%, transparent);
-  color: var(--netsuke-vermillion);
+  color: var(--color-accent-text);
 }
 
 .hm-chip--filter {
@@ -1004,6 +1006,30 @@ button.hm-config-keys__label {
 .hm-prose li > ul,
 .hm-prose li > ol {
   margin-top: 0.5rem;
+}
+
+/* An inline link in running text.
+ *
+ * Underlined, rather than distinguished from the words around it by colour
+ * alone: indigo measures 1.4:1 against the charcoal-mid the body copy is set
+ * in, far under the 3:1 that a colour-only distinction needs, and axe reports
+ * the pattern as `link-in-text-block`. So the underline carries the meaning
+ * and the colour only reinforces it, and the hover strengthens the underline
+ * rather than adding one.
+ *
+ * Sidebar entries, cards, and the footer columns are not inside a text block,
+ * so the rule does not reach them and they keep the colour-only treatment.
+ *
+ * The colour is the type role, so a link on one of the charcoal grounds takes
+ * the light cut with everything else there. */
+.hm-link {
+  color: var(--color-primary-text);
+  text-decoration-color: color-mix(in oklab, var(--color-primary-text) 40%, transparent);
+  text-decoration-line: underline;
+}
+
+.hm-link:hover {
+  text-decoration-color: var(--color-primary-text);
 }
 
 .hm-prose a {
@@ -1540,6 +1566,13 @@ button.hm-config-keys__label {
 .hm-faux-window__body .hm-syntax pre,
 .hm-example-code-block .hm-syntax pre,
 .hm-example-terminal__body .hm-syntax pre {
+  /* `.hm-example-code-block pre` gives the hand-written blocks their
+     own horizontal scroll. A generated one must not take it: the
+     wrapper above is contained to the container's width, so a
+     scrolling pre inside it never overflows its parent, and the
+     element that ends up scrolling is the one here that cannot hold
+     a tab stop. */
+  overflow-x: visible;
   padding: 0;
 }
 

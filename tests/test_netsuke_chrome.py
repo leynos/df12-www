@@ -711,6 +711,53 @@ class TestPreviewPagesAndTokens:
             "the preview page carries the shared breadcrumb"
         )
 
+    @pytest.mark.parametrize(
+        ("template", "slug", "expected"),
+        [
+            pytest.param(
+                "pages/docs-cli.jinja",
+                "docs/cli",
+                "Documentation pages",
+                id="docs",
+            ),
+            pytest.param(
+                "pages/guides-architecture.jinja",
+                "guides/architecture",
+                "Page sections",
+                id="guide",
+            ),
+            pytest.param(
+                "pages/forthcoming-linter.jinja",
+                "forthcoming/linter",
+                "Preview pages",
+                id="preview",
+            ),
+        ],
+    )
+    def test_the_sidebar_landmark_is_named_for_what_it_lists(
+        self, tmp_path: Path, template: str, slug: str, expected: str
+    ) -> None:
+        """The sidebar's name follows its contents, not the page showing it.
+
+        Every page already carries a `nav` called "Primary navigation", so an
+        unnamed sidebar leaves a screen-reader user two navigation landmarks
+        they can only tell apart by opening. Naming it is not enough on its
+        own, though: a guide's sidebar lists that guide's sections and its
+        helpful links, so announcing it as the documentation index would be a
+        confident wrong answer rather than a missing one. The default
+        therefore keys off `sections` — the docs index when the macro renders
+        it, the caller's own list when it does not — and a caller with a
+        better name still says so.
+        """
+        soup = _render_page(tmp_path, template, slug)
+        nav = soup.select_one("#sidebar nav.space-y-8")
+
+        assert nav is not None, f"{slug} should render a sidebar nav"
+        assert nav.get("aria-label") == expected, (
+            f"{slug}'s sidebar should be announced as {expected!r}; it is "
+            f"{nav.get('aria-label')!r}"
+        )
+
     def test_docs_sidebar_default_headings(self, tmp_path: Path) -> None:
         """A docs page renders the three shared groups from docs_groups."""
         soup = _render_page(tmp_path, "pages/docs-cli.jinja", "docs/cli")

@@ -19,7 +19,7 @@
             {{ chrome.breadcrumb([{'href': '/netsuke/guides/', 'label': 'Guides'}, {'label': 'Translating Netsuke'}]) }}
 
             {% call chrome.page_header('Localization', 'Translating Netsuke') %}
-                Every user-facing message in Netsuke lives in a <a href="https://projectfluent.org/" class="text-primary underline decoration-primary/40 hover:decoration-primary">Project Fluent</a> resource file, not in Rust source.
+                Every user-facing message in Netsuke lives in a <a href="https://projectfluent.org/" class="hm-link">Project Fluent</a> resource file, not in Rust source.
                 Translating the whole CLI means editing one file per locale — this guide covers the format, the conventions, and the checks that keep translations honest.
             {% endcall %}
 
@@ -31,9 +31,9 @@
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     Fluent handles the hard parts of natural language — plurals, variables, and grammatical agreement — while keeping translation files readable.
                     Thirty-five locale catalogues ship, with English (<code>en-US</code>) as the source locale that defines the key set and renders any message a translation has not yet covered.
-                    Three documents govern a translation: this guide and the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/translators-guide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">translator guide</a> own the Fluent mechanics, locale registry, and fallback policy;
-                    the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization style guide</a> owns voice, tone, and register;
-                    and the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization glossary</a> is the source of truth for terminology in every locale.
+                    Three documents govern a translation: this guide and the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/translators-guide.md" class="hm-link">translator guide</a> own the Fluent mechanics, locale registry, and fallback policy;
+                    the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="hm-link">localization style guide</a> owns voice, tone, and register;
+                    and the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="hm-link">localization glossary</a> is the source of truth for terminology in every locale.
                 </p>
 
                 <div class="bg-white rounded-xl border border-base-300 shadow-xs p-6 mb-8">
@@ -131,11 +131,11 @@
                         <div class="pl-4 text-success">es-419/messages.ftl</div>
                         <div class="pl-4 text-success">es-ES/messages.ftl</div>
                         <div class="pl-4 text-success">…  <span class="text-charcoal-mid font-sans">(one directory per shipped tag)</span></div>
-                        <div class="pl-4 text-warning">is/messages.ftl  <span class="text-charcoal-mid font-sans">(your new locale)</span></div>
+                        <div class="pl-4 text-warning-text">is/messages.ftl  <span class="text-charcoal-mid font-sans">(your new locale)</span></div>
                     </div>
                     <div class="bg-base-content rounded-xl overflow-hidden">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">FTL format in four lines</div>
-                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Comment explaining the message context.</span>
+                        <pre tabindex="0" class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Comment explaining the message context.</span>
 message-key = The translated message text.
 
 <span class="text-charcoal-light"># Message with a variable.</span>
@@ -163,9 +163,9 @@ greeting = Hello, { $name }!</code></pre>
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
                     A catalogue that parses and passes the audit can still change the product. Two upstream documents keep every locale sounding like Netsuke:
-                    the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization style guide</a>
+                    the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="hm-link">localization style guide</a>
                     fixes the voice and explains how tone shifts by content type, and the
-                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">localization glossary</a>
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="hm-link">localization glossary</a>
                     records the preferred, allowed, and forbidden form of each term, in English and in every shipped locale. Read both before translating a single message.
                 </p>
 
@@ -217,7 +217,7 @@ greeting = Hello, { $name }!</code></pre>
                     (<code>CLI_FLAG_FILE_HELP</code> maps to <code>cli.flag.file.help</code>).
                 </p>
 
-                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto">
+                <div tabindex="0" class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto">
                     <table class="min-w-full hm-rows">
                         <thead class="bg-base-100">
                             <tr>
@@ -290,7 +290,7 @@ greeting = Hello, { $name }!</code></pre>
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-base-content rounded-xl overflow-hidden">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Variables</div>
-                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Basic variable substitution.</span>
+                        <pre tabindex="0" class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># Basic variable substitution.</span>
 error-at-path = Error at { $path }: { $details }
 
 <span class="text-charcoal-light"># Variables can appear multiple times.</span>
@@ -299,7 +299,7 @@ range-error = Value { $value } must be
                     </div>
                     <div class="bg-base-content rounded-xl overflow-hidden">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Plural forms (English vs Spanish)</div>
-                        <pre class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># en-US/messages.ftl</span>
+                        <pre tabindex="0" class="p-5 font-mono text-sm text-stone-light overflow-x-auto"><code><span class="text-charcoal-light"># en-US/messages.ftl</span>
 example.files_processed = { $count -&gt;
     [one] Processed { $count } file.
    *[other] Processed { $count } files.
@@ -366,7 +366,7 @@ $ cp locales/en-US/messages.ftl locales/is/messages.ftl
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <h3 class="font-bold text-base-content mb-3 text-sm">Step 4: register the locale</h3>
                         <p class="text-xs text-charcoal-mid mb-3"><code>src/locale_catalogues.rs</code> is the authoritative registry. Its <code>define_locales!</code> macro both declares the tag and embeds the catalogue, so a tag without a file on disk fails to compile:</p>
-                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto">
+                        <div tabindex="0" class="bg-base-content rounded-lg p-4 overflow-x-auto">
                             <pre class="font-mono text-xs text-stone-light"><code>define_locales! {
     // …
     "is" => "../locales/is/messages.ftl",
@@ -418,8 +418,8 @@ $ cargo run -- --locale is --help
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Variables match the English source (names and count)</li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Plural forms use correct CLDR categories</li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Netsuke identifiers and literal option values are untranslated</li>
-                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Terminology matches the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">glossary</a>, including the locale's own section</span></li>
-                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>One address form throughout, and the voice of the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="text-primary underline decoration-primary/40 hover:decoration-primary">style guide</a> (no humour, idiom, or invented content)</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Terminology matches the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-glossary.md" class="hm-link">glossary</a>, including the locale's own section</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>One address form throughout, and the voice of the <a href="https://github.com/leynos/netsuke/blob/main/docs/localization-styleguide.md" class="hm-link">style guide</a> (no humour, idiom, or invented content)</span></li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Right-to-left catalogues carry the direction marks</li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> Comments are translated or preserved for context</li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><code>cargo build</code> and <code>make test</code> pass</span></li>

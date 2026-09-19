@@ -25,6 +25,7 @@ import pytest
 
 from tests.support.netsuke_browser import (
     BASE_PATH,
+    CASES,
     DESKTOP_HEIGHT,
     DESKTOP_WIDTH,
     KNOWN_OVERFLOW,
@@ -37,7 +38,12 @@ from tests.support.netsuke_browser import (
     _evaluate,
     _open,
 )
-from tests.support.stilyagi_browser import normalize_style
+from tests.support.stilyagi_browser import (
+    contrast_ratio,
+    normalize_style,
+    parse_css_color,
+)
+from tests.support.weaver_browser import _violations
 from tests.support.weaver_harness import load
 
 if typ.TYPE_CHECKING:
@@ -132,6 +138,175 @@ WALKER_FIXTURE = """<!DOCTYPE html>
 """.replace("__WIDTH__", str(CHILD_WIDTH)).replace("__TEXT__", "x" * 200)
 
 pytestmark = pytest.mark.playwright
+
+
+# The two shapes a horizontally scrolling code region takes on this sub-site,
+# and a page carrying both: the translating guide shows a generated
+# `.hm-syntax` block from the highlight tag beside three hand-written `pre`
+# blocks that carry their `tabindex` in the markup. Both scroll at a phone
+# width, which is why the check runs there.
+FOCUS_RING_PAGE = "guides/translating/"
+SCROLLER_SHAPES = (
+    pytest.param(".hm-syntax", id="generated"),
+    pytest.param("pre[tabindex]", id="hand-written"),
+)
+
+# A focus indicator needs 3:1 against what it is drawn on (WCAG 2.2 SC 1.4.11)
+# and the ring is declared at 2px, so anything thinner means a rule stopped
+# applying rather than that a thinner ring was chosen.
+MINIMUM_RING_WIDTH_PX = 2.0
+MINIMUM_RING_CONTRAST = 3.0
+
+#: Put focus on the scroller, so the Tab round-trip in the test lands back on
+#: it. `%s` takes the selector, JSON-encoded.
+PARK_FOCUS = (
+    "JSON.stringify((() => {"
+    "const el = document.querySelector(%s);"
+    "if (!el) return {found: false};"
+    "el.focus();"
+    "return {found: true, focused: document.activeElement === el};"
+    "})())"
+)
+
+#: Read the ring off the element the keyboard has just reached, together with
+#: the ground it is painted over — the nearest ancestor that paints one, since
+#: a `pre` inside a charcoal card paints nothing itself.
+MEASURE_RING = (
+    "JSON.stringify((() => {"
+    "const el = document.querySelector(%s);"
+    "const style = getComputedStyle(el);"
+    "let ground = null;"
+    "for (let node = el; node; node = node.parentElement) {"
+    "const paint = getComputedStyle(node).backgroundColor;"
+    "if (paint && paint !== 'rgba(0, 0, 0, 0)' && paint !== 'transparent')"
+    "{ground = paint; break;}"
+    "}"
+    "return {reached: document.activeElement === el,"
+    "focusVisible: el.matches(':focus-visible'),"
+    "scrolls: el.scrollWidth > el.clientWidth + 1,"
+    "outlineStyle: style.outlineStyle,"
+    "outlineWidth: style.outlineWidth,"
+    "outlineColor: style.outlineColor,"
+    "outlineOffset: style.outlineOffset,"
+    "ground};"
+    "})())"
+)
+
+
+@pytest.mark.timeout(300)
+@pytest.mark.parametrize("selector", SCROLLER_SHAPES)
+def test_a_scrolling_code_region_shows_a_keyboard_focus_ring(
+    drive: cabc.Callable[..., str], served: str, selector: str
+) -> None:
+    """A reader who tabs into a code block can see where they have landed.
+
+    Putting a scrolling region into the tab order is only half the fix. axe
+    will not report the other half: it inspects the resting page, and a ring
+    exists only while something is focused, so a region that takes focus
+    invisibly passes every automated check and still strands a keyboard user
+    with no idea what will scroll.
+
+    Both shapes are checked, because the ring reaches them by different
+    routes. The generated wrapper takes its `tabindex` from the highlight tag
+    and matches `.hm-syntax:focus-visible`; the hand-written blocks carry the
+    attribute in the markup and match `pre[tabindex]:focus-visible`. Losing
+    either selector would leave one shape ringless and the other fine.
+    """
+    _open(drive, served, FOCUS_RING_PAGE, MOBILE_WIDTH, MOBILE_HEIGHT)
+    encoded = json.dumps(selector)
+
+    parked = _evaluate(drive, PARK_FOCUS % encoded)
+    assert parked["found"], (
+        f"{BASE_PATH}{FOCUS_RING_PAGE} should carry a {selector} scroller for "
+        f"this check to mean anything"
+    )
+    assert parked["focused"], f"{selector} should accept focus at all"
+
+    # Reach it as a reader does. Stepping back and forward again is two key
+    # presses rather than the forty a walk from the top of the document would
+    # take, and it proves the same two things: the region is in the tab order,
+    # and Tab lands on it rather than skipping past.
+    drive("press", "Shift+Tab")
+    drive("press", "Tab")
+
+    ring = _evaluate(drive, MEASURE_RING % encoded)
+    assert ring["reached"], (
+        f"Tab should land on {selector}; it went somewhere else, so the region "
+        f"is not in the tab order"
+    )
+    assert ring["scrolls"], (
+        f"{selector} should actually scroll at {MOBILE_WIDTH}px, or this check "
+        f"proves nothing about a scrolling region"
+    )
+    assert ring["focusVisible"], (
+        f"{selector} should match :focus-visible when reached by keyboard; the "
+        f"ring is declared on that pseudo-class and would never paint"
+    )
+    assert ring["outlineStyle"] != "none", (
+        f"{selector} should draw a focus ring; its outline-style is none"
+    )
+
+    width = float(ring["outlineWidth"].removesuffix("px"))
+    assert width >= MINIMUM_RING_WIDTH_PX, (
+        f"{selector}'s focus ring is {width}px, under the "
+        f"{MINIMUM_RING_WIDTH_PX}px it is declared at"
+    )
+
+    # The ring is drawn inside the border box, over the block's own charcoal.
+    # A positive offset would paint it on the paper around the block instead,
+    # where the stone-light it is coloured in reads 1.3:1 — the Stilyagi bug
+    # in `tests/test_stilyagi_focus.py`, and the reason the ground measured
+    # below is the block's own rather than the page's.
+    offset = float(ring["outlineOffset"].removesuffix("px"))
+    assert offset < 0, (
+        f"{selector}'s ring should be drawn inside the block at a negative "
+        f"outline-offset; it is at {offset}px"
+    )
+
+    ratio = contrast_ratio(
+        parse_css_color(ring["outlineColor"])[:3],
+        parse_css_color(ring["ground"])[:3],
+    )
+    assert ratio >= MINIMUM_RING_CONTRAST, (
+        f"{selector}'s focus ring measures {ratio:.2f}:1 against the "
+        f"{ring['ground']} it is drawn on, under the "
+        f"{MINIMUM_RING_CONTRAST}:1 a focus indicator needs"
+    )
+
+
+@pytest.mark.timeout(900)
+@pytest.mark.parametrize(("page", "width", "height"), CASES)
+def test_a_netsuke_page_meets_wcag_aa(
+    drive: cabc.Callable[..., str], served: str, page: str, width: int, height: int
+) -> None:
+    """Every page passes axe over WCAG 2.0 A and AA, at both widths.
+
+    Contrast is a property of the rendered page rather than of the class
+    names: what ``text-warning`` composites to depends on the ground beneath
+    it, and the sub-site used one amber for a chip's fill and for 12px type on
+    white, where it measured 2.96:1. Only a browser can say. This check is
+    what confirmed the 250 contrast failures behind issues #105 to #107 were
+    gone, and it is what stops the next call site putting them back.
+
+    Both widths are checked because a region only reports as an unreachable
+    scroller once it actually scrolls, which several tables and code panels do
+    at 360px and not at 1440px.
+
+    Netsuke carries no waivers. Weaver's list is a decision recorded against
+    that sub-site's palette; there is no equivalent here, so any failure is a
+    failure.
+    """
+    _open(drive, served, page, width, height)
+
+    unexpected = [
+        f"{violation['id']} on {node['target']}: "
+        f"{node['failureSummary'].splitlines()[-1].strip()}"
+        for violation in _violations(drive)
+        for node in violation["nodes"]
+    ]
+    assert not unexpected, (
+        f"{BASE_PATH}{page} at {width}px fails accessibility checks: {unexpected}"
+    )
 
 
 @pytest.mark.timeout(900)

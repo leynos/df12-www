@@ -59,7 +59,7 @@ class _RefuseRedirects(urllib.request.HTTPRedirectHandler):
     enough that the thing answering is not ``http-server`` serving this tree.
     """
 
-    def redirect_request(  # noqa: PLR0913 - the base class fixed this signature
+    def redirect_request(  # noqa: PLR0913, PLR0917 - the base class fixed this signature
         self,
         req: urllib.request.Request,
         fp: typ.IO[bytes],
@@ -203,7 +203,7 @@ def _probe_failure_category(failure: OSError | None) -> str:
             return "connection_failed"
 
 
-def _await_server(  # noqa: PLR0913 - one seam per outward dependency
+def _await_server(  # noqa: PLR0913, PLR0917 - one seam per outward dependency
     server: _Pollable,
     base: str,
     port: int,

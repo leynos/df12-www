@@ -50,7 +50,7 @@ POSITIONS = st.frozensets(st.integers(min_value=1, max_value=10), max_size=3)
     interrupt=st.booleans(),
     late=st.booleans(),
 )
-def test_publication_always_ends_in_a_recoverable_state(  # noqa: PLR0913 - each parameter is a generated dimension, not an API
+def test_publication_always_ends_in_a_recoverable_state(  # noqa: PLR0913, PLR0917 - each parameter is a generated dimension, not an API
     tmp_path: Path,
     previous: set[str],
     fresh: set[str],

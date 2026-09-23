@@ -549,7 +549,7 @@ def _open_settled(drive: cabc.Callable[..., None], url: str) -> bool:
     return True
 
 
-def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
+def _capture_pages(  # noqa: PLR0913, PLR0917 - one seam per outward dependency
     pages: cabc.Sequence[str],
     out_dir: Path,
     base: str,
@@ -642,7 +642,7 @@ def _capture_pages(  # noqa: PLR0913 - one seam per outward dependency
             drive("close")
 
 
-def _shoot_pages(  # noqa: PLR0913 - one seam per outward dependency
+def _shoot_pages(  # noqa: PLR0913, PLR0917 - one seam per outward dependency
     pages: cabc.Sequence[str],
     out_dir: Path,
     base: str,

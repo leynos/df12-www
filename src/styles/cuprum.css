@@ -46,6 +46,9 @@
 @import "./cuprum/home.css" layer(components);
 @import "./cuprum/pages.css" layer(components);
 
+/* The phone-width full bleed imports after everything it overrides. */
+@import "./cuprum/bleed.css" layer(components);
+
 @source "../../templates/cuprum/**/*.jinja";
 @source "../static/cuprum/assets/js/*.ts";
 

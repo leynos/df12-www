@@ -1024,6 +1024,14 @@ Data drives the repeated structure. A page's `sections` list feeds both the
 cannot drift; `templates/cuprum/data/` holds the worked-example cabinet, the
 Rust capability matrix, and the roadmap board.
 
+Below 480px Cuprum's content panels run full bleed, as Netsuke's code windows
+and Stilyagi's bands do: code panels, output receipts, figures, callouts, the
+capability matrix, facts lists, install slips, and illustration frames shed the
+page gutter and their side rules. The rules live in
+`src/styles/cuprum/bleed.css`, which imports last so no `!important` is needed.
+Cards and board columns keep their frames, a panel nested in another stays
+inside it, and nothing changes at 480px and above.
+
 The fictional municipal marks live in `templates/cuprum/_marks.jinja`, in the
 three registers the design language names:
 

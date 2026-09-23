@@ -47,10 +47,21 @@
              anchors under the current preview. The guides pass an "On
              this page" list and a "Helpful links" list
   search     whether to draw the docs search widget
-  nav_label  an `aria-label` for the sidebar's `nav`, where the section
-             list is not the documentation
+  nav_label  the sidebar `nav`'s accessible name, overriding the default.
+             A name is not optional: the page already carries a `nav`
+             called "Primary navigation", and two navigation landmarks a
+             screen reader cannot tell apart are two landmarks a reader
+             has to open to find out which is which. The default follows
+             what the sidebar is showing rather than which page is
+             showing it — the shared documentation index when `sections`
+             is absent, and the caller's own list when it is not, which
+             on a guide is that guide's sections and its helpful links
+             rather than anything to do with the docs. The preview pages
+             name theirs explicitly, because "Preview pages" says more
+             than either default would
 #}
-{% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label='') %}
+{% macro sidebar(active=none, sub_links=[], sections=none, search=true, nav_label=none) %}
+{%- set nav_name = nav_label or ('Documentation pages' if sections is none else 'Page sections') %}
         <aside id="sidebar" class="hidden lg:block w-64 shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto border-r border-stone-light pr-6 py-8">
             {%- if search %}
             <!-- Search -->
@@ -70,7 +81,7 @@
                     aria-autocomplete="list"
                     aria-expanded="false"
                 >
-                <div class="absolute right-3 top-2.5 text-xs text-base-300 font-mono">⌘K</div>
+                <div class="absolute right-3 top-2.5 text-xs text-charcoal-light font-mono">⌘K</div>
                 <div class="absolute left-0 right-0 top-full z-30 mt-2 hidden" data-doc-search-panel>
                     <div class="overflow-hidden rounded-xl border border-base-300 bg-white shadow-paper-lg">
                         <ul class="max-h-96 overflow-y-auto hm-rows" data-doc-search-results role="listbox"></ul>
@@ -82,7 +93,7 @@
             </div>
             {%- endif %}
 
-            <nav class="space-y-8"{% if nav_label %} aria-label="{{ nav_label }}"{% endif %}>
+            <nav class="space-y-8" aria-label="{{ nav_name }}">
                 {%- if sections is none %}
                 {%- for group in docs_groups %}
                 <div>

@@ -1,6 +1,6 @@
 # Deployment Guide — df12 Static Site
 
-_Updated: 26 October 2025_
+Last updated 26 October 2025.
 
 This guide explains how to configure, build, and deploy the df12 static site
 using the OpenTofu infrastructure stack. It consolidates all deployment

@@ -1,6 +1,6 @@
 # Scaleway Provider Parity Notes
 
-_Updated: 22 October 2025_
+Last updated 22 October 2025.
 
 This document captures the current feature parity assessment for replacing the
 AWS portions of the static site stack with Scaleway services. It is based on

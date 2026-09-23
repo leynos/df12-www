@@ -154,7 +154,15 @@ bun run lint:js:fix   # biome check --write .  — apply what Biome can fix alon
 
 `make lint` runs `ruff check` and then `bun run lint:js`. `make fmt` runs
 `ruff format`, `ruff check --select I --fix`, `bun run lint:js:fix`,
-`bun run lint:css:fix`, and `mdformat-all`.
+`bun run lint:css:fix`, `mdtablefix --in-place`, and `markdownlint-cli2 --fix`.
+
+The Markdown wiring follows the estate baseline that leynos/concordat audits
+with its `markdown-formatting-baseline` rule. `make fmt` and `make check-fmt`
+call `mdtablefix` directly over the Markdown files Git selects,
+`.markdownlint-cli2.jsonc` carries the canonical `config` and `ignores`
+verbatim with local ignores after them, and CI lints Markdown through the
+`DavidAnson/markdownlint-cli2-action` pinned to a full commit. Change a shared
+rule in concordat's canon rather than here.
 
 Neither Ruff nor ty is taken from `PATH`. Ruff is a dev dependency, so
 `uv.lock` fixes its version, and `check-fmt` and `lint` run the locked

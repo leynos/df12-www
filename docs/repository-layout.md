@@ -191,7 +191,7 @@ Test suite for the Python package:
 | `tsconfig.browser.json`    | Typechecks the browser scripts under `src/static/`             |
 | `tsconfig.scripts.json`    | Typechecks `scripts/` and the Tailwind plugin; read by TypeDoc |
 | `typedoc.json`             | TypeDoc documentation gate configuration                       |
-| `.markdownlint-cli2.jsonc` | Markdownlint rule overrides and ignores                        |
+| `.markdownlint-cli2.jsonc` | The estate markdownlint baseline, plus local ignores           |
 | `*.tofu`                   | OpenTofu infrastructure definitions                            |
 | `AGENTS.md`                | Agent and contributor workflow instructions                    |
 

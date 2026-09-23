@@ -1,7 +1,9 @@
 # `command -v` rather than `which`: under `bun run`, node_modules/.bin leads
 # PATH, and the `which` npm package (a stylelint dependency) installs a shim
 # there that starts node on every lookup, slowing every nested make.
-MDLINT ?= $(shell command -v markdownlint-cli2)
+# The fallback is Bun's global bin, where the estate installs the linter,
+# so a missing linter is reported by name rather than leaving MDLINT empty.
+MDLINT ?= $(shell command -v markdownlint-cli2 2>/dev/null || printf '%s' "$$HOME/.bun/bin/markdownlint-cli2")
 # `make fmt` and `make check-fmt` call mdtablefix directly. `--git` selects the
 # Markdown files Git tracks and `--include-untracked` adds the untracked files
 # Git does not ignore, so a new document is formatted before it is staged.
@@ -128,7 +130,7 @@ fmt: build $(NODE_MODULES_STAMP) ## Format sources
 	# inside a disabled range.
 	bun run lint:css:fix
 	$(MDTABLEFIX) --in-place $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
-	$(MDLINT) --fix "**/*.md"
+	@unset FORCE_COLOR; $(MDLINT) --fix "**/*.md"
 
 check-fmt: venv-ruff ## Verify formatting
 	$(RUFF) format --check

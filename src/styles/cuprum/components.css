@@ -1,0 +1,1158 @@
+/* Cuprum components: the work-order vocabulary shared by every page.
+ *
+ * Each block here pairs with a macro in templates/cuprum/components.jinja;
+ * the macro says what a thing is at the call site, and this file says how it
+ * is drawn. Borders are bold and square and elevation is a printed offset,
+ * while the controls stay conventional and unmistakable. */
+
+/* ---------- Layout ---------------------------------------------------- */
+
+.cu-shell {
+  max-width: var(--cu-shell);
+  margin: 0 auto;
+  padding-inline: var(--cu-gutter);
+}
+
+.cu-prose {
+  max-width: var(--cu-measure);
+}
+
+.cu-prose > * + * {
+  margin-top: 1rem;
+}
+
+.cu-prose h3 {
+  margin-top: 2.25rem;
+  font-size: 1.9rem;
+}
+
+.cu-prose h4 {
+  margin-top: 1.75rem;
+  font-size: 1.1rem;
+}
+
+/* The drafting-paper grid. It sits behind broad paper sections only, never
+   behind code, tables, or small type. */
+.cu-drafting {
+  background-color: var(--color-paper);
+  background-image:
+    linear-gradient(var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px);
+  background-size: var(--cu-grid-pitch) var(--cu-grid-pitch);
+}
+
+.cu-section {
+  padding-block: clamp(3.5rem, 7vw, 6rem);
+}
+
+.cu-section + .cu-section {
+  border-top: 2px solid var(--color-ink);
+}
+
+.cu-section--tint {
+  background-color: var(--color-paper-shade);
+}
+
+/* ---------- Labels, dockets, and stamps ------------------------------- */
+
+/* The docket tab: a numbered label-maker strip above a title. */
+.cu-docket {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.75rem;
+  border: 2px solid currentcolor;
+  color: var(--cu-accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: var(--tracking-stamp);
+  text-transform: uppercase;
+}
+
+/* The kicker: a quiet mono line above a heading. */
+.cu-kicker {
+  color: var(--cu-accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: var(--tracking-stamp);
+  text-transform: uppercase;
+}
+
+/* A stamp reinforces a status that is also stated in plain text. It is
+   decoration layered on meaning, so it never carries the meaning alone. */
+.cu-stamp {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  border: 3px double currentcolor;
+  color: var(--cu-accent-text);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+/* ---------- Status lozenges ------------------------------------------- */
+
+/* A status is words, an icon, and a fill, in that order of importance: the
+   text always names the state, so grayscale loses nothing. */
+.cu-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border: 2px solid var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cu-status svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
+}
+
+.cu-status--shipped {
+  background: var(--color-patina-text);
+  border-color: var(--color-patina-text);
+  color: var(--color-cream);
+}
+
+.cu-status--progress {
+  background: var(--color-orange);
+  color: var(--color-ink);
+}
+
+.cu-status--proposed {
+  border-style: dashed;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.cu-status--preview {
+  background: var(--color-ink);
+  color: var(--color-yellow);
+}
+
+.cu-status--verified {
+  background: var(--color-cream);
+  color: var(--color-patina-text);
+  border-color: var(--color-patina-text);
+}
+
+.cu-status--illustrative {
+  border-style: dashed;
+  background: var(--color-cream);
+  color: var(--color-copper-text);
+  border-color: var(--color-copper-text);
+}
+
+/* On a dark ground the outlined variants keep their paper fill, so they
+   read as a label pinned to the panel. */
+.cu-surface-ink .cu-status--preview,
+.cu-surface-teal .cu-status--preview {
+  border-color: var(--color-yellow);
+}
+
+/* ---------- Page header ----------------------------------------------- */
+
+/* The first viewport of every inner page: docket, title, status, one
+   sentence of thesis, and a useful first artefact beside or below it. */
+.cu-page-head {
+  border-bottom: 2px solid var(--color-ink);
+}
+
+.cu-page-head__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+@media (width >= 64rem) {
+  .cu-page-head--art .cu-page-head__grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+.cu-page-head__labels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cu-page-head__title {
+  margin-top: 1.25rem;
+  font-size: clamp(3.5rem, 9vw, 7.5rem);
+  line-height: 0.88;
+}
+
+.cu-page-head__thesis {
+  max-width: 40rem;
+  margin-top: 1.25rem;
+  font-size: clamp(1.15rem, 1.6vw, 1.35rem);
+  line-height: 1.5;
+}
+
+.cu-page-head__meta {
+  margin-top: 1.25rem;
+  color: var(--cu-muted-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.cu-page-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.75rem;
+}
+
+/* ---------- Route map (in-page section navigation) -------------------- */
+
+/* Borrowed from the mxd sub-site: a sticky strip naming the page and its
+   sections. The list is generated from the same data as the section
+   headings, so the two cannot drift. Narrow screens scroll the strip inside
+   itself rather than the page. */
+.cu-routemap {
+  position: sticky;
+  top: calc(4.25rem + 2px);
+  z-index: 30;
+  border-bottom: 2px solid var(--color-ink);
+  background: var(--color-paper-shade);
+}
+
+.cu-routemap__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cu-routemap__label {
+  flex: none;
+  color: var(--color-copper-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-stamp);
+  text-transform: uppercase;
+}
+
+.cu-routemap__scroll {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.cu-routemap__list {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.cu-routemap__list li + li {
+  margin-top: 0;
+}
+
+.cu-routemap__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.cu-routemap__link:hover {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+.cu-routemap__num {
+  color: var(--color-copper-text);
+  font-weight: 600;
+}
+
+/* Inside a scroller an outward ring would be clipped, so it is drawn in. */
+.cu-routemap__link:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---------- Section heads --------------------------------------------- */
+
+.cu-section-head {
+  max-width: 52rem;
+  margin-bottom: 2.25rem;
+}
+
+.cu-section-head__title {
+  margin-top: 0.6rem;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+}
+
+.cu-section-head__lede {
+  max-width: var(--cu-measure);
+  margin-top: 1rem;
+  font-size: 1.15rem;
+}
+
+/* ---------- Buttons --------------------------------------------------- */
+
+/* A printed button: mono caps, a 2px rule, and an offset block the hover
+   lifts off. It is its own class rather than daisyUI's `btn`, because daisyUI
+   emits `btn` into the utilities layer and fixes its height, padding, type,
+   and shadow there; printing it would mean overriding most of the component
+   at the call site. The ground each variant sits on sets its offset colour. */
+.cu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.7rem 1.15rem;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+  box-shadow: var(--shadow-block-sm);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--cu-ease),
+    box-shadow 160ms var(--cu-ease);
+}
+
+.cu-btn:hover {
+  color: var(--color-ink);
+  text-decoration: none;
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-block);
+}
+
+.cu-btn svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.cu-btn--primary,
+.cu-btn--primary:hover {
+  background: var(--color-orange);
+  color: var(--color-ink);
+}
+
+.cu-btn--dark,
+.cu-btn--dark:hover {
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+.cu-btn--outline,
+.cu-btn--outline:hover {
+  border-color: currentcolor;
+  background: transparent;
+  color: inherit;
+}
+
+.cu-surface-ink .cu-btn,
+.cu-surface-teal .cu-btn {
+  box-shadow: 4px 4px 0 var(--color-cream);
+}
+
+.cu-surface-ink .cu-btn:hover,
+.cu-surface-teal .cu-btn:hover {
+  box-shadow: 6px 6px 0 var(--color-cream);
+}
+
+.cu-surface-ink .cu-btn--outline,
+.cu-surface-teal .cu-btn--outline {
+  color: var(--color-cream);
+}
+
+.cu-btn--compact,
+.cu-btn--compact:hover,
+.cu-surface-ink .cu-btn--compact,
+.cu-surface-ink .cu-btn--compact:hover {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.72rem;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cu-btn:hover {
+    transform: none;
+  }
+}
+
+/* An inline arrow link: mono caps with a rule. */
+.cu-arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  color: var(--cu-link);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cu-arrow-link svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ---------- Cards (dockets) ------------------------------------------- */
+
+.cu-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+  box-shadow: var(--shadow-block-sm);
+}
+
+.cu-card__number {
+  color: var(--color-copper-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.cu-card__title {
+  font-family: var(--font-sans);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cu-card__title a {
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+/* The whole card is the link target; the title carries the name. */
+.cu-card__title a::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.cu-card:has(.cu-card__title a:hover) {
+  box-shadow: var(--shadow-block);
+  transform: translate(-2px, -2px);
+}
+
+.cu-card:has(.cu-card__title a:focus-visible) {
+  outline: var(--cu-focus-width) solid var(--cu-focus);
+  outline-offset: var(--cu-focus-offset);
+}
+
+.cu-card__title a:focus-visible {
+  outline: none;
+}
+
+.cu-card__body {
+  color: var(--cu-muted-text);
+}
+
+.cu-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* A card whose job sheet is not yet published: dashed, and no link. */
+.cu-card--pending {
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ---------- Tags ------------------------------------------------------ */
+
+/* Feature labels, as plain text on a small printed label. */
+.cu-tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--color-ink);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- Code panels ----------------------------------------------- */
+
+.cu-code {
+  min-width: 0;
+  border: 2px solid var(--color-ink);
+  background: var(--color-code-ground);
+  box-shadow: var(--shadow-copper);
+}
+
+.cu-code__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 2px solid var(--color-ink);
+  background: var(--color-paper-deep);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cu-code__bar-end {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cu-code__label {
+  font-weight: 500;
+}
+
+/* The scroll region is focusable, so its ring is drawn inside the panel
+   where the offset would otherwise be clipped. */
+.cu-code .code-scroll:focus-visible {
+  outline-color: var(--color-yellow);
+  outline-offset: -4px;
+}
+
+.cu-code__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  padding: 0.6rem 0.9rem;
+  border-top: 1px solid var(--color-rule-on-dark);
+  color: var(--color-night-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.05em;
+}
+
+.cu-code--flat {
+  box-shadow: var(--shadow-block-sm);
+}
+
+/* The copy control arrives with the script; without it, the code is still
+   selectable text. The confirmation changes the words, not only a colour. */
+.cu-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 2.75rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.6rem;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.cu-copy:hover {
+  background: var(--color-yellow);
+}
+
+.cu-copy svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+/* ---------- Output receipts ------------------------------------------- */
+
+/* Expected output: a printed receipt, not a fake terminal. */
+.cu-output {
+  min-width: 0;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+}
+
+.cu-output__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px dashed var(--color-ink);
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cu-output__body {
+  contain: inline-size;
+  overflow-x: auto;
+}
+
+.cu-output__body:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Output wraps rather than scrolls: it is read, not pasted, and a wrapped
+   line still begins at the left edge where its logical line began. */
+.cu-output pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* ---------- Callouts -------------------------------------------------- */
+
+.cu-callout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.25rem 1rem;
+  padding: 1.1rem 1.25rem;
+  border: 2px solid var(--color-ink);
+  border-left-width: 8px;
+  background: var(--color-cream);
+}
+
+.cu-callout__icon {
+  grid-row: span 2;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.15rem;
+}
+
+.cu-callout__title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cu-callout__body > * + * {
+  margin-top: 0.6rem;
+}
+
+.cu-callout--caveat {
+  border-left-color: var(--color-copper);
+}
+
+.cu-callout--caveat .cu-callout__icon {
+  color: var(--color-copper-text);
+}
+
+.cu-callout--note {
+  border-left-color: var(--color-patina);
+}
+
+.cu-callout--note .cu-callout__icon {
+  color: var(--color-patina-text);
+}
+
+.cu-callout--preview {
+  border-left-color: var(--color-yellow);
+  background: var(--color-paper);
+}
+
+/* ---------- Illustrations --------------------------------------------- */
+
+.cu-art {
+  margin: 0;
+}
+
+.cu-art__frame {
+  border: 2px solid var(--color-ink);
+  box-shadow: var(--shadow-block);
+  background: var(--color-ink);
+}
+
+.cu-art__frame img {
+  display: block;
+  width: 100%;
+}
+
+.cu-art__caption {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+  color: var(--cu-muted-text);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.cu-art__plate {
+  flex: none;
+  color: var(--cu-accent-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  line-height: 1.9;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---------- Facts and definition lists -------------------------------- */
+
+.cu-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+}
+
+.cu-facts__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+}
+
+.cu-facts__row + .cu-facts__row {
+  border-top: 1px dashed var(--color-ink);
+}
+
+.cu-facts dt {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  line-height: 2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cu-facts dd {
+  min-width: 0;
+  margin: 0;
+}
+
+@media (width < 30rem) {
+  .cu-facts__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.2rem;
+  }
+}
+
+/* ---------- Numbered invariants --------------------------------------- */
+
+.cu-invariants {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: invariant;
+}
+
+.cu-invariants > li {
+  position: relative;
+  padding: 1rem 0 1rem 3.5rem;
+  counter-increment: invariant;
+}
+
+.cu-invariants > li + li {
+  margin-top: 0;
+  border-top: 1px dashed var(--color-ink);
+}
+
+/* The number is generated from the list order, so the list stays the
+   single source of truth; screen readers already announce the position. */
+.cu-invariants > li::before {
+  position: absolute;
+  top: 0.9rem;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  aspect-ratio: 1;
+  border: 2px solid var(--color-ink);
+  border-radius: 50%;
+  background: var(--color-patina-text);
+  color: var(--color-cream);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  content: counter(invariant, decimal-leading-zero);
+}
+
+.cu-invariants > li:nth-child(even)::before {
+  background: var(--color-copper-text);
+}
+
+.cu-invariants strong {
+  display: block;
+}
+
+/* ---------- Capability matrix (daisyUI table) ------------------------- */
+
+.cu-matrix-wrap {
+  contain: inline-size;
+  overflow-x: auto;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+}
+
+.cu-matrix-wrap:focus-visible {
+  outline-offset: -4px;
+}
+
+.cu-matrix {
+  min-width: 44rem;
+  font-size: 0.95rem;
+}
+
+.cu-matrix caption {
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.cu-matrix thead th {
+  border-bottom: 2px solid var(--color-ink);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cu-matrix th,
+.cu-matrix td {
+  vertical-align: top;
+}
+
+.cu-matrix tbody th {
+  font-weight: 700;
+}
+
+.cu-matrix tbody tr + tr > * {
+  border-top: 1px dashed var(--color-ink);
+}
+
+/* ---------- Pager ----------------------------------------------------- */
+
+.cu-pager {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.cu-pager__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.cu-pager__link:hover {
+  background: var(--color-paper-deep);
+  color: var(--color-ink);
+}
+
+.cu-pager__link--next {
+  text-align: right;
+}
+
+.cu-pager__dir {
+  color: var(--color-copper-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cu-pager__title {
+  font-weight: 700;
+}
+
+/* ---------- Legal pages ----------------------------------------------- */
+
+.cu-legal {
+  max-width: var(--cu-measure);
+}
+
+.cu-legal h2 {
+  margin-top: 2.5rem;
+  font-size: 2rem;
+}
+
+.cu-legal h3 {
+  margin-top: 1.75rem;
+  font-size: 1.5rem;
+}
+
+.cu-legal p,
+.cu-legal ul,
+.cu-legal ol,
+.cu-legal table {
+  margin-top: 1rem;
+}
+
+.cu-legal table {
+  display: block;
+  overflow-x: auto;
+}
+
+.cu-legal th,
+.cu-legal td {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-ink);
+  text-align: left;
+}
+
+/* ---------- Install slips --------------------------------------------- */
+
+/* A command on a stamped slip. The command never wraps — a wrapped shell
+   line is a different command to anyone who retypes it — so the slip's body
+   scrolls inside itself instead. */
+.cu-slip {
+  min-width: 0;
+  max-width: 100%;
+  border: 2px solid var(--color-yellow);
+  background: color-mix(in oklab, var(--color-ink) 35%, transparent);
+  box-shadow: 5px 5px 0 var(--color-yellow);
+}
+
+.cu-slip__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-bottom: 1px solid var(--color-yellow);
+  color: var(--color-yellow);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cu-slip__body {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.8rem;
+  overflow-x: auto;
+  contain: inline-size;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.cu-slip__body:focus-visible {
+  outline-offset: -4px;
+}
+
+.cu-slip__prompt {
+  color: var(--color-yellow);
+}
+
+.cu-slip .cu-slip__command {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+  overflow-wrap: normal;
+}
+
+/* The slip on paper: ink rules, a cream ground, a copper prompt. */
+.cu-slip--paper {
+  border-color: var(--color-ink);
+  background: var(--color-cream);
+  box-shadow: var(--shadow-block-sm);
+}
+
+.cu-slip--paper .cu-slip__label {
+  border-bottom-color: var(--color-ink);
+  color: var(--color-ink);
+}
+
+.cu-slip--paper .cu-slip__prompt {
+  color: var(--color-copper-text);
+}
+
+/* ---------- Shared layouts -------------------------------------------- */
+
+/* Code beside its output or its explanation. Each column may hold wide
+   content, so both are allowed to shrink below their content's width and
+   scroll inside themselves. */
+.cu-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (width >= 64rem) {
+  .cu-pair {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 2.5rem;
+  }
+}
+
+.cu-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.cu-output + .cu-output {
+  margin-top: 1rem;
+}
+
+/* Two columns of prose, side by side on wide screens. */
+.cu-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem 3rem;
+}
+
+@media (width >= 64rem) {
+  .cu-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.cu-columns .cu-callout {
+  margin-top: 1.25rem;
+}
+
+/* A grid of docket cards; a list of them resets the list chrome. */
+.cu-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cu-card-grid > li {
+  display: flex;
+  margin: 0;
+}
+
+.cu-card-grid > li > .cu-card {
+  flex: 1;
+}
+
+/* ---------- Capability states ----------------------------------------- */
+
+/* A state is a word with a shape before it: filled for available, half for
+   integrated, hollow for inert, dashed for proposed and investigating, a
+   square for built-but-unreleased. The shape repeats the word; it never
+   replaces it. */
+.cu-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.cu-state::before {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid var(--color-ink);
+  border-radius: 50%;
+  content: "";
+}
+
+.cu-state--available::before {
+  border-color: var(--color-patina-text);
+  background: var(--color-patina-text);
+}
+
+.cu-state--integrated::before {
+  border-color: var(--color-patina-text);
+  background: linear-gradient(90deg, var(--color-patina-text) 50%, transparent 50%);
+}
+
+.cu-state--inert::before {
+  border-color: var(--color-copper-text);
+}
+
+.cu-state--proposed::before,
+.cu-state--investigating::before {
+  border-style: dashed;
+}
+
+.cu-state--unreleased::before {
+  border-color: var(--color-copper-text);
+  border-radius: 0;
+}
+
+.cu-state--python-only::before {
+  border-color: var(--color-ink-muted);
+  background: var(--color-paper-deep);
+}

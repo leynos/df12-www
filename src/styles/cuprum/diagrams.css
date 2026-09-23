@@ -1,0 +1,307 @@
+/* Cuprum's technical figures: semantic HTML, not rasterized concept art.
+ *
+ * A flow figure is an ordered list of stages. Each stage names its kind —
+ * builder, policy, process, result, observer — in words as well as in its
+ * drawing, and the edge after it names what crosses to the next stage: argv,
+ * bytes, status, event. The list is therefore its own text equivalent, and
+ * it survives images-off, grayscale, and a screen reader unchanged.
+ *
+ * Wide screens lay the stages out left to right with the edge label on the
+ * connector; below 80rem they recompose into labelled vertical steps rather
+ * than shrinking until the labels become hairlines. Decorative pipes never
+ * appear here: every line in a figure means something. */
+
+.cu-figure {
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+}
+
+.cu-figure__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cu-figure__num {
+  color: var(--color-copper-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cu-figure__title {
+  flex: 1 1 18rem;
+  font-family: var(--font-sans);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cu-figure__caption {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--color-ink);
+  color: var(--color-ink-muted);
+  font-size: 0.95rem;
+}
+
+.cu-figure__caption strong {
+  color: var(--color-ink);
+}
+
+.cu-figure__source {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- The flow -------------------------------------------------- */
+
+.cu-flow {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cu-flow > li + li {
+  margin-top: 0;
+}
+
+.cu-flow__step {
+  display: flex;
+  flex-direction: column;
+}
+
+.cu-flow__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper);
+}
+
+.cu-flow__kind {
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cu-flow__name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+.cu-flow__detail {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Kinds. Each is distinguishable by its border as well as its fill. */
+.cu-flow__stage--builder {
+  background: var(--color-cream);
+}
+
+.cu-flow__stage--policy {
+  border-width: 2px 8px;
+  border-color: var(--color-copper);
+  background: var(--color-paper);
+}
+
+.cu-flow__stage--policy .cu-flow__kind {
+  color: var(--color-copper-text);
+}
+
+.cu-flow__stage--process {
+  background: var(--color-patina-text);
+  color: var(--color-cream);
+}
+
+.cu-flow__stage--result {
+  border-style: solid solid dashed;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+.cu-flow__stage--observer {
+  border-style: dashed;
+  background: transparent;
+}
+
+.cu-flow__stage--failure {
+  background: var(--color-error);
+  color: var(--color-cream);
+}
+
+.cu-flow__stage--optional {
+  border-style: dashed;
+  background: var(--color-paper-shade);
+}
+
+/* The edge: a labelled connector naming what crosses it. */
+.cu-flow__edge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding-left: 1.25rem;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* The drawn arrow is a rule plus a head; it points down while stacked. */
+.cu-flow__edge::before {
+  align-self: stretch;
+  width: 0;
+  border-left: 2px solid var(--color-ink);
+  content: "";
+}
+
+.cu-flow__edge::after {
+  order: -1;
+  display: none;
+  content: "";
+}
+
+/* Below 80rem a five-stage flow leaves each stage too narrow to read, so
+   the horizontal layout waits for a wide desk. */
+@media (width >= 80rem) {
+  .cu-flow--horizontal {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .cu-flow--horizontal > .cu-flow__step {
+    flex: 1 1 0;
+    flex-direction: row;
+    min-width: 0;
+  }
+
+  .cu-flow--horizontal > .cu-flow__step:last-child {
+    flex-grow: 1;
+  }
+
+  .cu-flow--horizontal .cu-flow__stage {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .cu-flow--horizontal .cu-flow__edge {
+    position: relative;
+    flex: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.3rem;
+    width: 6.75rem;
+    min-height: 0;
+    padding: 0 0.35rem;
+    text-align: center;
+  }
+
+  .cu-flow--horizontal .cu-flow__edge::before {
+    order: 2;
+    align-self: stretch;
+    width: auto;
+    height: 0;
+    border-left: 0;
+    border-top: 2px solid var(--color-ink);
+  }
+
+  /* The arrowhead, drawn on the connector's right end. */
+  .cu-flow--horizontal .cu-flow__edge::after {
+    position: absolute;
+    top: 50%;
+    right: 0.2rem;
+    display: block;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-top: 2px solid var(--color-ink);
+    border-right: 2px solid var(--color-ink);
+    transform: translateY(calc(-50% + 0.6rem)) rotate(45deg);
+  }
+}
+
+/* ---------- Branches (failure and cancellation paths) ----------------- */
+
+.cu-branches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cu-branches > li + li {
+  margin-top: 0;
+}
+
+.cu-branch {
+  padding: 0.85rem 1rem;
+  border: 2px dashed var(--color-copper-text);
+  background: var(--color-paper);
+}
+
+.cu-branch__when {
+  display: block;
+  color: var(--color-copper-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cu-branch__then {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+
+/* ---------- Legend ---------------------------------------------------- */
+
+.cu-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cu-legend > li + li {
+  margin-top: 0;
+}
+
+.cu-legend__swatch {
+  display: inline-block;
+  width: 1.1rem;
+  height: 0.8rem;
+  margin-right: 0.4rem;
+  vertical-align: -0.1rem;
+  border: 2px solid var(--color-ink);
+}

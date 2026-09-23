@@ -1,0 +1,49 @@
+{#
+  The fictional municipal marks of Philadelphia Command Plumbing.
+
+  The identity is an original artwork, not the City of Philadelphia's: an
+  escutcheon of crossed pipe wrenches under a three-way tee, a seated cat,
+  and a laurel of pipe. It appears in two of the design language's three
+  registers — the engraving and the watermark — and never on a legal notice
+  or an install instruction. (The third register, the stamp, is the
+  `.cu-stamp` class.) Every mark is decorative: it repeats nothing a reader
+  needs, so it carries aria-hidden and no text alternative.
+
+  The emblem is an engraved raster used as an alpha mask, so the seal takes
+  the colour of the text around it and follows the theme tokens rather than
+  baking a colour in. The legend is live SVG text, never lettering inside the
+  image. Import as `marks`; pass a distinct `id` per use on a page, because
+  the SVG's mask and paths are addressed by id.
+#}
+{% macro seal(id, class='', legend='Philadelphia Command Plumbing', sub='Route 00-CU · Night shift') -%}
+<svg class="cu-seal{% if class %} {{ class }}{% endif %}" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="{{ id }}-top" d="M 38 120 A 82 82 0 0 1 202 120" />
+    <path id="{{ id }}-bottom" d="M 30 120 A 90 90 0 0 0 210 120" />
+    <mask id="{{ id }}-emblem" mask-type="alpha" maskUnits="userSpaceOnUse" x="62" y="62" width="116" height="116">
+      <image href="/cuprum/assets/images/seal-emblem-mask.webp" x="62" y="62" width="116" height="116" />
+    </mask>
+  </defs>
+  <circle cx="120" cy="120" r="116" fill="none" stroke="currentColor" stroke-width="3" />
+  <circle cx="120" cy="120" r="110" fill="none" stroke="currentColor" stroke-width="0.75" />
+  <circle cx="120" cy="120" r="68" fill="none" stroke="currentColor" stroke-width="1.5" />
+  <circle cx="120" cy="120" r="64" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="1.5 2.5" />
+  {#- textLength fits each legend to its arc whatever the fallback font's
+      advance widths, so a long legend spaces tighter instead of running off
+      the end of the path. -#}
+  <text class="cu-seal__legend" font-size="12" fill="currentColor">
+    <textPath href="#{{ id }}-top" startOffset="50%" text-anchor="middle" textLength="232" lengthAdjust="spacing">{{ legend | upper }}</textPath>
+  </text>
+  <text class="cu-seal__legend" font-size="10" fill="currentColor">
+    <textPath href="#{{ id }}-bottom" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" textLength="196" lengthAdjust="spacing">{{ sub | upper }}</textPath>
+  </text>
+  <circle cx="30" cy="120" r="2.5" fill="currentColor" />
+  <circle cx="210" cy="120" r="2.5" fill="currentColor" />
+  <rect x="62" y="62" width="116" height="116" fill="currentColor" mask="url(#{{ id }}-emblem)" />
+</svg>
+{%- endmacro %}
+
+{#- The engraved skyline: a strip, masked in the current colour. -#}
+{% macro skyline(class='') -%}
+<div class="cu-skyline{% if class %} {{ class }}{% endif %}" aria-hidden="true"></div>
+{%- endmacro %}

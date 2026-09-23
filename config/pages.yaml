@@ -1582,3 +1582,60 @@ sites:
         template: pages/docs.jinja
         output_slug: docs
     pages: {}
+
+  cuprum:
+    output_dir: public/cuprum
+    templates_dir: templates/cuprum
+    stylesheet: /cuprum/assets/styles/cuprum.css
+    base_path: /cuprum/
+    theme:
+      site_name: Cuprum
+      hero_eyebrow: Cuprum Documentation
+      hero_tagline: Typed, async command execution for Python
+    parent_link:
+      label: "← Back to df12 Productions"
+      href: /
+    template_vars:
+      # The development line every snippet on the sub-site is verified
+      # against. Main is ahead of the last PyPI release and its package
+      # metadata still reports the released version, so the site names the
+      # commit rather than inventing a version number. Bump the commit, its
+      # short form, and the dates together after re-running the snippets.
+      # Install commands use the full hash: pip warns on an abbreviated one.
+      cuprum_commit: "27ab2108252a37ee1115b37f46e86b5f81185fc6"
+      cuprum_ref: "27ab2108"
+      cuprum_ref_date: "2026-09-22"
+      cuprum_verified_on: "2026-09-23"
+      cuprum_released: "0.1.0"
+      cuprum_released_on: "2026-01-30"
+      python_floor: "3.12"
+      repository_url: "https://github.com/leynos/cuprum"
+    nav_links:
+      - label: Home
+        href: /cuprum/
+      - label: Examples
+        href: /cuprum/examples/
+      - label: Internals
+        href: /cuprum/internals/
+      - label: Rust extension
+        href: /cuprum/rust-extension/
+      - label: Roadmap
+        href: /cuprum/roadmap/
+      - label: Speedfit
+        href: /cuprum/speedfit/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    homepage:
+      title: "Cuprum — typed command execution for Python"
+    content_pages:
+      - { key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: getting-started }
+      - { key: examples, label: Worked examples, template: pages/examples.jinja, output_slug: examples }
+      - { key: examples-first-command, label: Run an approved command, template: pages/examples-first-command.jinja, output_slug: examples/first-command }
+      - { key: examples-pipeline-tee, label: Pipeline, tee, and stage failure, template: pages/examples-pipeline-tee.jinja, output_slug: examples/pipeline-tee }
+      - { key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals }
+      - { key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: rust-extension }
+      - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
+      - { key: speedfit, label: Speedfit, template: pages/speedfit.jinja, output_slug: speedfit }
+    pages: {}

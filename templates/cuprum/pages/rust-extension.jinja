@@ -1,0 +1,208 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% from "data/capabilities.jinja" import capabilities, state_labels %}
+{% block title %}Rust extension (technical preview) · Cuprum{% endblock %}
+{% block description %}Technical preview, optional backend: Cuprum's Rust extension accelerates the byte copy between pipeline stages. Python remains the behavioural reference, and no native wheel has been released yet.{% endblock %}
+{% block main_class %} class="cu-rust"{% endblock %}
+{% block content %}
+{% set src = repository_url ~ '/blob/main/' %}
+{% set sections = [
+  {'id': 'optional', 'label': 'What is optional', 'title': 'Optional, and narrow',
+   'lede': 'Cuprum is complete without Rust. The extension speeds up one operation, and says so when it declines.'},
+  {'id': 'matrix', 'label': 'Capabilities', 'title': 'What runs where',
+   'lede': 'Available, integrated, implemented-but-inert, and proposed are different states, and the matrix keeps them apart.'},
+  {'id': 'selection', 'label': 'Backend selection', 'title': 'Choosing a backend',
+   'lede': 'One environment variable, read once per process.'},
+  {'id': 'evidence', 'label': 'Parity and limits', 'title': 'How parity is checked, and what is not claimed'},
+] %}
+{% set valve_art = {
+  'name': 'valve-annex', 'widths': [768, 1536], 'width': 1536, 'height': 1024,
+  'alt': '', 'plate': 'Plate 05',
+  'caption': 'In the basement annex, Copper keeps a paw on the bypass valve. The copper line is optional; the teal line always runs.',
+  'eager': true,
+} %}
+{% set pathway = {
+  'id': 'fig-rust-pathway', 'num': 'Fig. 01', 'horizontal': true, 'status': 'preview',
+  'title': 'What is optional, and what falls back?',
+  'steps': [
+    {'kind': 'process', 'kind_label': 'Stage n', 'name': 'upstream stdout', 'detail': 'An OS pipe owned by asyncio.', 'edge': 'raw descriptors'},
+    {'kind': 'policy', 'kind_label': 'Selection', 'name': 'CUPRUM_STREAM_BACKEND', 'detail': 'auto uses Rust if the extension imports; python never does; rust requires it.', 'edge': 'eligible hop'},
+    {'kind': 'optional', 'kind_label': 'Optional path', 'name': 'Rust pump', 'detail': 'Copies outside the GIL in an executor; splice() on Linux.', 'edge': 'bytes'},
+    {'kind': 'process', 'kind_label': 'Stage n + 1', 'name': 'downstream stdin', 'detail': 'Receives identical bytes whichever pump ran.'},
+  ],
+  'branches': [
+    {'when': 'Hop cannot be handed over safely', 'then': 'The hop runs on the Python pump and the reason is recorded: a DEBUG record on cuprum._pipeline_streams and, if registered, a decline metric.'},
+    {'when': 'Windows', 'then': 'Every hop declines with platform_unsupported and uses the Python pump. Pipelines stay correct.'},
+    {'when': 'rust selected but not installed', 'then': 'Pipeline execution raises ImportError rather than silently falling back.'},
+  ],
+  'takeaway': 'Only the inter-stage copy has a native path. Capture, echo, line events, spawning, policy, and results are the same Python code on every backend.',
+  'source': 'Source: docs/users-guide.md#choosing-a-stream-backend and ADR-001 at main@' ~ cuprum_ref,
+} %}
+      {% call ui.page_head('Annex R · Technical preview', 'Rust extension',
+        'Python remains the behavioural reference. Rust accelerates the byte copy between pipeline stages when the extension is available — nothing else.',
+        statuses=['preview'], meta='Optional backend · not required · no native wheel released · describes main@' ~ cuprum_ref,
+        art_image=valve_art, stamp='Technical preview') %}
+        {{ ui.button('Read backend selection', '#selection', icon='arrow-down') }}
+        {{ ui.button('ADR-001', src ~ 'docs/adr-001-rust-extension.md', variant='outline', icon='external') }}
+      {% endcall %}
+      {{ ui.routemap(sections, 'Annex R') }}
+
+      {% call ui.section(sections, 'optional') %}
+      <div class="cu-rust__intro">
+        <div class="cu-prose">
+          <p>
+            Cuprum’s streams normally move through asyncio in 64 KiB reads. For
+            a few kilobytes that costs nothing worth measuring. For gigabytes
+            flowing through a multi-stage pipeline, every chunk is a trip
+            through the event loop and a fresh bytes object, and the extension
+            exists to take that copy off the loop.
+          </p>
+          <p>
+            It is a separate compiled module that Cuprum imports if it can. A
+            pure-Python install behaves identically, reports
+            <code>is_rust_available()</code> as <code>False</code>, and never
+            needs a Rust toolchain.
+          </p>
+        </div>
+        {% call ui.callout('preview', 'Technical preview · not released') %}
+        <p>
+          ADR-001, which introduces the extension, is still marked
+          <em>Proposed</em>. The PyPI release ({{ cuprum_released }}) is a
+          pure-Python wheel, and native wheels built in CI from main have not
+          been published. To try the native path today, build from a checkout
+          with Rust 1.85 or later and <code>maturin develop</code>.
+        </p>
+        {% endcall %}
+      </div>
+      <div class="mt-12">
+        {{ ui.flow(pathway) }}
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'matrix', class='cu-section--tint') %}
+      <div class="cu-matrix-wrap" tabindex="0" role="region" aria-labelledby="matrix-caption">
+        <table class="table cu-matrix">
+          <caption id="matrix-caption">Capability matrix · technical preview · main@{{ cuprum_ref }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Capability</th>
+              <th scope="col">Python path</th>
+              <th scope="col">Rust extension</th>
+              <th scope="col">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in capabilities %}
+            <tr>
+              <th scope="row">{{ row.name }}</th>
+              <td><span class="cu-state cu-state--{{ row.python }}">{{ state_labels[row.python] }}</span></td>
+              <td><span class="cu-state cu-state--{{ row.rust }}">{{ state_labels[row.rust] }}</span></td>
+              <td>{{ row.notes }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="cu-legend" aria-label="Legend">
+        {% for key in ['available', 'integrated', 'inert', 'proposed', 'investigating', 'unreleased', 'python-only'] %}
+        <li><span class="cu-state cu-state--{{ key }}">{{ state_labels[key] }}</span></li>
+        {% endfor %}
+      </ul>
+      {% endcall %}
+
+      {% call ui.section(sections, 'selection') %}
+      <div class="cu-pair">
+        <div class="cu-prose">
+          <p>
+            <code>CUPRUM_STREAM_BACKEND</code> takes three values.
+            <code>auto</code>, the default, uses Rust when the extension
+            imports and Python otherwise. <code>python</code> forces the pure
+            path, for debugging or to reproduce a pure-Python install.
+            <code>rust</code> requires the extension and fails loudly without
+            it, for benchmarking.
+          </p>
+          <p>
+            The choice is resolved on first use and cached for the life of the
+            process, so set it before Cuprum runs anything. Changing it later
+            has no effect.
+          </p>
+        </div>
+        <div class="cu-stack">
+          {% call ui.code_panel('shell', 'Force a backend', flat=true, copy='console') %}
+          {% highlight 'console', 'cuprum-syntax' %}
+$ CUPRUM_STREAM_BACKEND=python python my_script.py
+$ CUPRUM_STREAM_BACKEND=rust python my_script.py
+          {% endhighlight %}
+          {% endcall %}
+          {% call ui.code_panel('check_backend.py', 'Probe', foot=['Verified ' ~ cuprum_verified_on ~ ' · main@' ~ cuprum_ref ~ ' · pure-Python install'], flat=true) %}
+          {% highlight 'python', 'cuprum-syntax' %}
+import cuprum
+
+print(cuprum.is_rust_available())
+          {% endhighlight %}
+          {% endcall %}
+          {% call ui.output('Expected output', 'pure-Python install') %}
+False
+          {% endcall %}
+        </div>
+      </div>
+      <div class="cu-prose mt-10">
+        <h3>Watching it decline</h3>
+        <p>
+          A hop that falls back is a routing decision, not an error, so it is
+          logged at <code>DEBUG</code> on <code>cuprum._pipeline_streams</code>
+          with a <code>cuprum_reason</code>: <code>raw_fd_unavailable</code>,
+          <code>reader_unresumable</code>, <code>reader_pause_failed</code>,
+          <code>blocking_mode_unavailable</code>,
+          <code>duplicate_fds_unavailable</code>, or
+          <code>platform_unsupported</code>. To count them instead, register
+          <code>PumpMetricsHook</code> with <code>observe_pump</code>; its
+          labels are drawn from that closed set, so the series count is fixed.
+        </p>
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'evidence', class='cu-section--tint') %}
+      <div class="cu-columns">
+        <div class="cu-prose">
+          <h3>Parity</h3>
+          <p>
+            The stream tests run on both backends and assert identical output
+            for empty streams, multibyte UTF-8 split across chunk boundaries,
+            downstream stages that exit early, and backpressure under large
+            payloads. Hypothesis generates random payloads and chunk
+            boundaries and checks every byte survives either pump.
+          </p>
+          <p>
+            The unsafe Rust is confined to audited boundary crates, with Verus,
+            Kani, and Miri evidence archived, and the native pump’s lifecycle
+            is modelled with Loom.
+          </p>
+        </div>
+        <div class="cu-prose">
+          <h3>What this page does not claim</h3>
+          <p>
+            No speed-up figure is quoted here. The users’ guide describes
+            multi-fold throughput gains on large pipe-to-pipe transfers and
+            negligible differences on small outputs, but a number without its
+            workload, machine, baseline, and sample size would be decoration.
+            CI benchmarks every push to main and every pull request that
+            touches performance-relevant code, and gates on the Rust-to-Python
+            ratio; published measurements with that context are pending.
+          </p>
+          <p>
+            To measure your own workload, run <code>make benchmark-e2e</code>
+            in a checkout. It covers three payload sizes, two pipeline depths,
+            and runs with and without line callbacks, on each available
+            backend.
+          </p>
+        </div>
+      </div>
+      <div class="cu-card-grid">
+        {{ ui.card('ADR-001 · Optional Rust extension', 'Why stream operations, why optional, and the fallback strategy.', number='Decision · Proposed', href=src ~ 'docs/adr-001-rust-extension.md') }}
+        {{ ui.card('ADR-002 · Additional Rust components', 'The consume and raw-sink proposals, and the evidence each must produce.', number='Decision', href=src ~ 'docs/adr-002-additional-rust-components.md') }}
+        {{ ui.card('Send feedback', 'Tried the native path? Report what you measured, or what declined, on the issue tracker.', number='Issues', href=repository_url ~ '/issues') }}
+      </div>
+      {% endcall %}
+{% endblock %}

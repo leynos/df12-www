@@ -1,0 +1,124 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% from "data/roadmap.jinja" import roadmap, roadmap_columns, roadmap_groups %}
+{% block title %}Roadmap · Cuprum{% endblock %}
+{% block description %}Cuprum's public works board: what is shipped on main, what is in progress, and what is only proposed, each with its evidence and exit criterion.{% endblock %}
+{% block main_class %} class="cu-roadmap"{% endblock %}
+{% block content %}
+{% set src = repository_url ~ '/blob/main/' %}
+{% set checked = 'Last checked ' ~ cuprum_verified_on %}
+      {% call ui.page_head('Public works board · Roadmap', 'Roadmap',
+        'What exists now, what is being built, and what is only proposed — each with the evidence behind it and the criterion that makes it done.',
+        meta=checked ~ ' against main@' ~ cuprum_ref ~ ' and open pull requests. No delivery dates are promised.') %}
+        {{ ui.button('Read the source roadmap', src ~ 'docs/roadmap.md', icon='external') }}
+        {{ ui.button('Open pull requests', repository_url ~ '/pulls', variant='outline') }}
+      {% endcall %}
+
+      <div class="cu-roadmap__banner cu-surface-ink">
+        <img
+          src="/cuprum/assets/images/route-board-2048.webp"
+          srcset="/cuprum/assets/images/route-board-1024.webp 1024w, /cuprum/assets/images/route-board-2048.webp 2048w"
+          sizes="100vw"
+          width="2048"
+          height="768"
+          alt=""
+          fetchpriority="high"
+        />
+        <p class="cu-shell cu-roadmap__plate">
+          <span class="cu-art__plate">Plate 06</span>
+          Copper marks the end of an unfinished route. Dashed lines on the map are atmosphere; the board below is the status.
+        </p>
+      </div>
+
+      <section class="cu-section" aria-labelledby="legend-title">
+        <div class="cu-shell">
+          <div class="cu-section-head">
+            <p class="cu-kicker">Before you read the board</p>
+            <h2 id="legend-title" class="cu-section-head__title">How to read a status</h2>
+          </div>
+          <ul class="cu-roadmap__legend">
+            {% for column in roadmap_columns %}
+            <li class="cu-roadmap__legend-item">
+              {{ ui.status(column.status) }}
+              <p>{{ column.blurb }}</p>
+            </li>
+            {% endfor %}
+          </ul>
+          <p class="cu-prose mt-6">
+            A phase number is not a status: the source roadmap has finished and
+            unfinished steps side by side in several phases. Shipped cards say
+            whether the work has reached a PyPI release or is only on main.
+          </p>
+        </div>
+      </section>
+
+      <section class="cu-section cu-section--tint" aria-labelledby="board-title">
+        <div class="cu-shell">
+          <h2 id="board-title" class="sr-only">The board</h2>
+          <div class="cu-board">
+            {% for column in roadmap_columns %}
+            {% set items = roadmap | selectattr('status', 'equalto', column.status) | list %}
+            <section class="cu-board__column" aria-labelledby="col-{{ column.status }}">
+              <header class="cu-board__head cu-board__head--{{ column.status }}">
+                <h3 id="col-{{ column.status }}" class="cu-board__title">{{ column.title }}</h3>
+                <span class="cu-board__count">{{ items | length }} {{ 'item' if items | length == 1 else 'items' }}</span>
+              </header>
+              <ol class="cu-board__list">
+                {% for item in items %}
+                <li class="cu-board__card">
+                  <div class="cu-board__meta">
+                    <span class="cu-board__ref">{{ item.ref }}</span>
+                    <span class="cu-tag">{{ roadmap_groups[item.group] }}</span>
+                  </div>
+                  <h4 class="cu-board__item-title">{{ item.title }}</h4>
+                  <p class="cu-board__body">{{ item.body }}</p>
+                  <p class="cu-board__exit"><span>Done when</span> {{ item.exit }}</p>
+                  <div class="cu-board__foot">
+                    {{ ui.status(item.status) }}
+                    {% if item.status == 'shipped' %}
+                    <span>{{ 'Released in ' ~ item.released if item.released else 'On main · unreleased' }}</span>
+                    {% endif %}
+                    <span>{{ checked }}</span>
+                  </div>
+                  {% if item.pr %}
+                  <a class="cu-arrow-link" href="{{ repository_url }}/pull/{{ item.pr }}">Pull request #{{ item.pr }} {{ icons.icon('external') }}</a>
+                  {% elif item.internal %}
+                  <a class="cu-arrow-link" href="{{ item.internal }}">Read the preview {{ icons.icon('arrow-right') }}</a>
+                  {% elif item.href %}
+                  <a class="cu-arrow-link" href="{{ src ~ item.href }}">Evidence<span class="sr-only">: {{ item.title }}</span> {{ icons.icon('external') }}</a>
+                  {% endif %}
+                </li>
+                {% endfor %}
+              </ol>
+            </section>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="cu-roadmap__closing cu-surface-ink" aria-labelledby="closing-title">
+        <div class="cu-shell cu-roadmap__closing-grid">
+          {{ ui.art({
+            'name': 'guardian-repair', 'widths': [768, 1536], 'width': 1536, 'height': 1024,
+            'alt': 'In a rainy alley under a drone’s searchlight, the guardian plumber kneels at an opened utility cabinet, fitting a new copper tee into a tangle of grey conduit beside a pasted pipe-route diagram, while Copper sits on the tool bag and watches.',
+            'plate': 'Plate 07',
+            'caption': 'Later, in another Philadelphia, the guardian plumber fits a legible tee into an opaque one. Copper supervises.',
+            'sizes': '(min-width: 64rem) 55vw, 100vw',
+          }) }}
+          <div>
+            <p class="cu-kicker">Public works</p>
+            <h2 id="closing-title" class="cu-section-head__title">Follow the work, or join it.</h2>
+            <p class="mt-5">
+              Every card links to its evidence. The source roadmap has the
+              detail behind each step, and issues are the place to argue for
+              a route that is not on the map yet.
+            </p>
+            <div class="flex flex-wrap gap-4 mt-8">
+              {{ ui.button('Source roadmap', src ~ 'docs/roadmap.md', icon='external') }}
+              {{ ui.button('Issues', repository_url ~ '/issues', variant='outline', icon='external') }}
+            </div>
+          </div>
+        </div>
+      </section>
+{% endblock %}

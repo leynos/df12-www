@@ -1,0 +1,70 @@
+/* Philadelphia Command Plumbing's marks: the seal, the engraved skyline, and
+ * the page-head watermark. See templates/cuprum/_marks.jinja.
+ *
+ * Both engravings are alpha masks painted in `currentcolor`, so a mark takes
+ * the colour of the text around it: cream in the colophon, a faint ink on
+ * paper. They are decorative throughout, so none of their colours is held
+ * to a contrast floor — and so none of them may sit under anything that is:
+ * code, tables, small type, figures, or a focus ring. */
+
+.cu-seal {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cu-seal__legend {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.cu-skyline {
+  width: 100%;
+  height: clamp(4.5rem, 11vw, 9.5rem);
+  background-color: currentcolor;
+  mask-image: url("/cuprum/assets/images/skyline-engraving-mask.webp");
+  mask-position: center bottom;
+  mask-repeat: no-repeat;
+  mask-size: auto 100%;
+}
+
+/* The watermark: the seal at low contrast in the blank paper beside a page
+   head that has no illustration. It has a grid column of its own rather than
+   sitting behind the title, and it is dropped below the desktop breakpoint,
+   where there is no blank paper to put it in. */
+.cu-page-head__mark {
+  display: none;
+}
+
+@media (width >= 64rem) {
+  .cu-page-head--mark .cu-page-head__grid {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  }
+
+  .cu-page-head__mark {
+    display: block;
+    justify-self: center;
+    width: min(100%, 19rem);
+    color: color-mix(in oklab, var(--color-ink) 9%, transparent);
+  }
+}
+
+/* A stamp in the page head sits at the end of the label row. */
+.cu-page-head__stamp {
+  margin-left: auto;
+}
+
+/* ---------- In the colophon ------------------------------------------- */
+
+.cu-colophon__skyline {
+  max-width: var(--cu-shell);
+  margin: 0 auto;
+  padding: 2.5rem var(--cu-gutter) 0;
+  color: color-mix(in oklab, var(--color-cream) 30%, transparent);
+}
+
+.cu-colophon__seal {
+  width: 6.5rem;
+  margin-top: 1.5rem;
+  color: color-mix(in oklab, var(--color-cream) 55%, transparent);
+}

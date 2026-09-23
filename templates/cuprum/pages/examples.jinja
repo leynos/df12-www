@@ -1,0 +1,89 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% from "data/examples.jinja" import examples, published_examples %}
+{% block title %}Worked examples · Cuprum{% endblock %}
+{% block description %}Task-shaped Cuprum examples: complete code, the output it prints, the failure path, and the version it was tested against.{% endblock %}
+{% block main_class %} class="cu-examples"{% endblock %}
+{% block content %}
+{% set verified = 'Verified ' ~ cuprum_verified_on ~ ' · main@' ~ cuprum_ref ~ ' · Python ' ~ python_floor ~ ' · Linux' %}
+{% set trays_art = {
+  'name': 'job-sheet-trays', 'widths': [768, 1536], 'width': 1536, 'height': 1024,
+  'alt': '', 'plate': 'Plate 03',
+  'caption': 'Copper files a job sheet into the second of four trays. Each example below is one sheet.',
+  'eager': true,
+} %}
+{% set featured = published_examples[0] %}
+      {% call ui.page_head('Work order 002 · Examples', 'Worked examples',
+        'A job sheet for each job: the problem, complete code, the output it prints, and what happens when it fails.',
+        meta=published_examples | length ~ ' published · ' ~ verified, art_image=trays_art) %}
+        {{ ui.button('Open the first job', '/cuprum/examples/' ~ featured.slug ~ '/', icon='arrow-right') }}
+      {% endcall %}
+
+      <section class="cu-section" aria-labelledby="featured-title">
+        <div class="cu-shell cu-examples__featured">
+          <div>
+            <p class="cu-kicker">Featured · Job sheet {{ featured.number }}</p>
+            <h2 id="featured-title" class="cu-section-head__title">{{ featured.title }}</h2>
+            <p class="cu-section-head__lede">{{ featured.summary }}</p>
+            <div class="flex flex-wrap gap-2 mt-5">
+              {% for tag in featured.tags %}<span class="cu-tag">{{ tag }}</span>{% endfor %}
+            </div>
+            <div class="mt-8">
+              {{ ui.button('View the job sheet', '/cuprum/examples/' ~ featured.slug ~ '/', icon='arrow-right') }}
+            </div>
+          </div>
+          {% call ui.code_panel('word_count.py', 'Excerpt', foot=[verified]) %}
+          {% highlight 'python', 'cuprum-syntax' %}
+WC = Program("wc")
+CATALOGUE = ProgramCatalogue.from_programs(WC, name="word-count")
+
+count_words = sh.make(WC, catalogue=CATALOGUE)
+
+
+def word_count(text: str) -> int:
+    cmd = count_words("-w")
+    with scoped(ScopeConfig(allowlist=CATALOGUE.allowlist)):
+        result = cmd.run_sync(stdin=StdinInput(text=text))
+    if not result.ok:
+        msg = f"wc failed with exit code {result.exit_code}: {result.stderr}"
+        raise RuntimeError(msg)
+    return int((result.stdout or "").strip())
+          {% endhighlight %}
+          {% endcall %}
+        </div>
+      </section>
+
+      <section class="cu-section cu-section--tint" aria-labelledby="cabinet-title">
+        <div class="cu-shell">
+          <div class="cu-section-head">
+            <p class="cu-kicker">The cabinet</p>
+            <h2 id="cabinet-title" class="cu-section-head__title">Every job sheet</h2>
+            <p class="cu-section-head__lede">
+              A sheet is published once its code and expected output have been
+              run against the pinned commit. The dashed ones are planned and
+              not yet written; they have no page to open.
+            </p>
+          </div>
+          <h3 class="cu-examples__row-title">Published <span>{{ published_examples | length }}</span></h3>
+          <ul class="cu-card-grid" role="list">
+            {% for example in published_examples %}
+            <li>
+              {{ ui.card(example.title, example.summary, number='Job sheet ' ~ example.number,
+                href='/cuprum/examples/' ~ example.slug ~ '/', tags=example.tags, meta=['Verified ' ~ cuprum_verified_on], heading='h4') }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% set pending = examples | rejectattr('published') | list %}
+          <h3 class="cu-examples__row-title">In preparation <span>{{ pending | length }}</span></h3>
+          <ul class="cu-card-grid" role="list">
+            {% for example in pending %}
+            <li>
+              {{ ui.card(example.title, example.summary, number='Job sheet ' ~ example.number,
+                tags=example.tags, meta=['Not published'], heading='h4') }}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+{% endblock %}

@@ -1,0 +1,279 @@
+{#
+  Shared macros for the Cuprum sub-site. Import as `ui`:
+
+    {% import "components.jinja" as ui %}
+
+  Each macro pairs with a component block in src/styles/cuprum/; the macro
+  says what a thing is at the call site and the stylesheet says how it is
+  drawn. See docs/developers-guide.md, section 5.
+#}
+{% import "_icons.jinja" as icons %}
+{% import "_marks.jinja" as marks %}
+
+{#- Status vocabulary: the word, the icon, and the modifier. The word is the
+    carrier of meaning; colour and icon only reinforce it. -#}
+{% set _statuses = {
+  'shipped': ('Shipped', 'check'),
+  'progress': ('In progress', 'progress'),
+  'proposed': ('Proposed', 'bulb'),
+  'preview': ('Technical preview', 'preview'),
+  'verified': ('Verified', 'check'),
+  'illustrative': ('Illustrative API', 'braces'),
+} %}
+
+{% macro status(kind, label=none) -%}
+{% set spec = _statuses[kind] %}
+<span class="cu-status cu-status--{{ kind }}">{{ icons.icon(spec[1]) }}<span>{{ label or spec[0] }}</span></span>
+{%- endmacro %}
+
+{#- The first viewport of an inner page. `art_image` is an optional mapping
+    for the `art` macro below; without one, the blank paper beside the title
+    carries the seal as a watermark. `stamp` is a word or two already stated
+    in the statuses or meta, repeated as a rubber stamp. A call block supplies
+    the page's actions. -#}
+{% macro page_head(docket, title, thesis, statuses=[], meta=none, art_image=none, stamp=none) -%}
+<header class="cu-page-head cu-drafting{% if art_image %} cu-page-head--art{% else %} cu-page-head--mark{% endif %}">
+  <div class="cu-shell cu-page-head__grid">
+    <div>
+      <div class="cu-page-head__labels">
+        <span class="cu-docket">{{ docket }}</span>
+        {% for kind in statuses %}
+        {{ status(kind) }}
+        {% endfor %}
+        {% if stamp %}<span class="cu-stamp cu-page-head__stamp" aria-hidden="true">{{ stamp }}</span>{% endif %}
+      </div>
+      <h1 class="cu-page-head__title">{{ title }}</h1>
+      <p class="cu-page-head__thesis">{{ thesis }}</p>
+      {% if meta %}
+      <p class="cu-page-head__meta">{{ meta }}</p>
+      {% endif %}
+      {% if caller is defined %}
+      <div class="cu-page-head__actions">
+        {{ caller() }}
+      </div>
+      {% endif %}
+    </div>
+    {% if art_image %}
+    {{ art(art_image) }}
+    {% else %}
+    <div class="cu-page-head__mark">{{ marks.seal('page-seal') }}</div>
+    {% endif %}
+  </div>
+</header>
+{%- endmacro %}
+
+{#- A plate of illustration. `image` carries `name`, `widths` (ascending),
+    `width`, `height`, `alt` (empty for atmosphere), `plate`, `caption`, and
+    optionally `sizes` and `eager`. -#}
+{% macro art(image) -%}
+{% set largest = image.widths[-1] %}
+<figure class="cu-art">
+  <div class="cu-art__frame">
+    <img
+      src="/cuprum/assets/images/{{ image.name }}-{{ largest }}.webp"
+      srcset="{% for w in image.widths %}/cuprum/assets/images/{{ image.name }}-{{ w }}.webp {{ w }}w{% if not loop.last %}, {% endif %}{% endfor %}"
+      sizes="{{ image.sizes or '(min-width: 64rem) 40vw, 100vw' }}"
+      width="{{ image.width }}"
+      height="{{ image.height }}"
+      alt="{{ image.alt }}"
+      {% if image.eager %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+      decoding="async"
+    />
+  </div>
+  <figcaption class="cu-art__caption">
+    <span class="cu-art__plate">{{ image.plate }}</span>
+    <span>{{ image.caption }}</span>
+  </figcaption>
+</figure>
+{%- endmacro %}
+
+{#- The in-page route map. `sections` is the list that also drives the
+    section headings, so the two cannot drift. -#}
+{% macro routemap(sections, label='Route map') -%}
+<nav class="cu-routemap" aria-label="On this page">
+  <div class="cu-shell cu-routemap__inner">
+    <span class="cu-routemap__label" aria-hidden="true">{{ label }}</span>
+    <div class="cu-routemap__scroll">
+      <ol class="cu-routemap__list">
+        {% for section in sections %}
+        <li><a class="cu-routemap__link" href="#{{ section.id }}"><span class="cu-routemap__num" aria-hidden="true">{{ '%02d' % loop.index }}</span>{{ section.label }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+</nav>
+{%- endmacro %}
+
+{#- The head of a numbered page section. The number is the section's
+    position in the `sections` list, looked up by id rather than written by
+    hand. Templates that need a {% block %} inside a section use this with a
+    literal <section>, since a block cannot live inside a macro call. -#}
+{% macro section_head(sections, id, lede=none) -%}
+{% set ids = sections | map(attribute='id') | list %}
+{% set entry = sections[ids.index(id)] %}
+<div class="cu-section-head">
+  <p class="cu-kicker">{{ '%02d' % (ids.index(id) + 1) }} — {{ entry.label }}</p>
+  <h2 id="{{ id }}-title" class="cu-section-head__title">{{ entry.title }}</h2>
+  {% if lede or entry.lede %}
+  <p class="cu-section-head__lede">{{ lede or entry.lede }}</p>
+  {% endif %}
+</div>
+{%- endmacro %}
+
+{#- A numbered page section: the head above, then the caller's body. -#}
+{% macro section(sections, id, class='', lede=none) -%}
+<section id="{{ id }}" class="cu-section{% if class %} {{ class }}{% endif %}" aria-labelledby="{{ id }}-title">
+  <div class="cu-shell">
+    {{ section_head(sections, id, lede) }}
+    {{ caller() }}
+  </div>
+</section>
+{%- endmacro %}
+
+{#- A code panel. The caller supplies the highlighted block; the macro
+    supplies the bar, the keyboard-reachable scroll region, and the footer.
+    `data-cu-copy` marks the panel for the copy-button enhancement in
+    assets/js/copy-code.ts: `copy='console'` strips `$ ` prompts from what is
+    copied, `copy=false` leaves the panel without a button. -#}
+{% macro code_panel(title, label='', foot=[], flat=false, copy='text') -%}
+<div class="cu-code{% if flat %} cu-code--flat{% endif %}"{% if copy %} data-cu-copy="{{ copy }}" data-cu-copy-label="{{ title }}"{% endif %}>
+  <div class="cu-code__bar">
+    <span>{{ title }}</span>
+    <span class="cu-code__bar-end" data-cu-copy-slot>{% if label %}<span class="cu-code__label">{{ label }}</span>{% endif %}</span>
+  </div>
+  <div class="code-scroll" tabindex="0" role="region" aria-label="{{ title }}">
+    {{ caller() }}
+  </div>
+  {% if foot %}
+  <div class="cu-code__foot">
+    {% for line in foot %}
+    <span>{{ line }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{%- endmacro %}
+
+{#- Expected output, printed as a receipt. The caller supplies the text. -#}
+{% macro output(title, label='') -%}
+<div class="cu-output">
+  <div class="cu-output__bar"><span>{{ title }}</span>{% if label %}<span>{{ label }}</span>{% endif %}</div>
+  <div class="cu-output__body" tabindex="0" role="region" aria-label="{{ title }}">
+    <pre>{{ caller() | trim }}</pre>
+  </div>
+</div>
+{%- endmacro %}
+
+{% set _callout_icons = {'caveat': 'warning', 'note': 'info', 'preview': 'preview'} %}
+
+{% macro callout(kind, title) -%}
+<aside class="cu-callout cu-callout--{{ kind }}" aria-label="{{ title }}">
+  {{ icons.icon(_callout_icons[kind], 'cu-callout__icon') }}
+  <p class="cu-callout__title">{{ title }}</p>
+  <div class="cu-callout__body">
+    {{ caller() }}
+  </div>
+</aside>
+{%- endmacro %}
+
+{#- A flow figure, drawn from data. See src/styles/cuprum/diagrams.css for
+    the stage kinds and why the list is its own text equivalent. -#}
+{% set _kind_labels = {
+  'builder': 'Command or builder',
+  'policy': 'Authorization boundary',
+  'process': 'Process',
+  'result': 'Result',
+  'observer': 'Observer',
+  'failure': 'Failure',
+  'optional': 'Optional',
+} %}
+
+{% macro flow(figure) -%}
+<figure class="cu-figure" aria-labelledby="{{ figure.id }}-title">
+  <div class="cu-figure__head">
+    <span class="cu-figure__num">{{ figure.num }}</span>
+    <h3 id="{{ figure.id }}-title" class="cu-figure__title">{{ figure.title }}</h3>
+    {% if figure.status %}{{ status(figure.status) }}{% endif %}
+  </div>
+  <ol class="cu-flow{% if figure.horizontal %} cu-flow--horizontal{% endif %}">
+    {% for step in figure.steps %}
+    <li class="cu-flow__step">
+      <div class="cu-flow__stage cu-flow__stage--{{ step.kind }}">
+        <span class="cu-flow__kind">{{ step.kind_label or _kind_labels[step.kind] }}</span>
+        <span class="cu-flow__name">{{ step.name }}</span>
+        {% if step.detail %}<span class="cu-flow__detail">{{ step.detail }}</span>{% endif %}
+      </div>
+      {% if step.edge and not loop.last %}
+      <div class="cu-flow__edge"><span><span class="sr-only">passes </span>{{ step.edge }}<span class="sr-only"> to the next stage</span></span></div>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% if figure.branches %}
+  <ul class="cu-branches" aria-label="Other paths">
+    {% for branch in figure.branches %}
+    <li class="cu-branch">
+      <span class="cu-branch__when">{{ branch.when }}</span>
+      <span class="cu-branch__then">{{ branch.then }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <figcaption class="cu-figure__caption">
+    <strong>{{ figure.takeaway }}</strong>
+    {% if figure.source %}<span class="cu-figure__source">{{ figure.source }}</span>{% endif %}
+  </figcaption>
+</figure>
+{%- endmacro %}
+
+{#- A docket card. Without `href` it is drawn as pending: dashed, unlinked. -#}
+{% macro card(title, body, number=none, href=none, tags=[], meta=[], heading='h3') -%}
+<article class="cu-card{% if not href %} cu-card--pending{% endif %}">
+  {% if number %}<span class="cu-card__number">{{ number }}</span>{% endif %}
+  <{{ heading }} class="cu-card__title">{% if href %}<a href="{{ href }}">{{ title }}</a>{% else %}{{ title }}{% endif %}</{{ heading }}>
+  <p class="cu-card__body">{{ body }}</p>
+  {% if tags or meta %}
+  <div class="cu-card__meta">
+    {% for tag in tags %}<span class="cu-tag">{{ tag }}</span>{% endfor %}
+    {% for item in meta %}<span>{{ item }}</span>{% endfor %}
+  </div>
+  {% endif %}
+</article>
+{%- endmacro %}
+
+{#- A facts table as a definition list: `rows` is a list of (term, value)
+    pairs; values are plain text. -#}
+{% macro facts(rows, label) -%}
+<dl class="cu-facts" aria-label="{{ label }}">
+  {% for term, value in rows %}
+  <div class="cu-facts__row"><dt>{{ term }}</dt><dd>{{ value }}</dd></div>
+  {% endfor %}
+</dl>
+{%- endmacro %}
+
+{% macro pager(prev=none, next=none) -%}
+<nav class="cu-pager" aria-label="Previous and next">
+  {% if prev %}
+  <a class="cu-pager__link" href="{{ prev.href }}"><span class="cu-pager__dir">Previous</span><span class="cu-pager__title">{{ prev.title }}</span></a>
+  {% endif %}
+  {% if next %}
+  <a class="cu-pager__link cu-pager__link--next" href="{{ next.href }}"><span class="cu-pager__dir">Next</span><span class="cu-pager__title">{{ next.title }}</span></a>
+  {% endif %}
+</nav>
+{%- endmacro %}
+
+{% macro button(label, href, variant='primary', icon=none, external=false) -%}
+<a class="cu-btn cu-btn--{{ variant }}" href="{{ href }}">{{ label }}{% if icon %}{{ icons.icon(icon) }}{% endif %}</a>
+{%- endmacro %}
+
+{#- An install command on a stamped slip: a prompt, the command as code in
+    its own scroll region, and the copy enhancement. -#}
+{% macro install_slip(command, label) -%}
+<div class="cu-slip" data-cu-copy="text" data-cu-copy-label="{{ label }} command">
+  <span class="cu-slip__label" data-cu-copy-slot>{{ label }}</span>
+  <div class="cu-slip__body" tabindex="0" role="region" aria-label="{{ label }}">
+    <span class="cu-slip__prompt" aria-hidden="true">$</span>
+    <code class="cu-slip__command">{{ command }}</code>
+  </div>
+</div>
+{%- endmacro %}

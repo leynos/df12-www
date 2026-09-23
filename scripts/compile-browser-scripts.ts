@@ -14,7 +14,7 @@
  * module, and no module or syntax transform is applied beyond the target.
  *
  * How a page loads the output is the template's business, not this step's,
- * and it differs by site: fourteen of the sixteen scripts are loaded with
+ * and it differs by site: fifteen of the seventeen scripts are loaded with
  * `<script defer>`, while Weaver's `telemetry.ts` and `mobile-nav.ts` are
  * plain `<script>` tags at the end of `<body>` that run immediately. Both
  * arrangements need the same classic-script output, which is why the shape

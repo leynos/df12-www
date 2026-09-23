@@ -84,7 +84,8 @@
       "includes": [
         "src/static/stilyagi/assets/styles/syntax.css",
         "src/styles/netsuke/himotoshi.css",
-        "src/static/episodic/assets/styles/syntax.css"
+        "src/static/episodic/assets/styles/syntax.css",
+        "src/static/cuprum/assets/styles/syntax.css"
       ],
       "formatter": { "enabled": false }
     },

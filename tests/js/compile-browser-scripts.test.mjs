@@ -248,7 +248,7 @@ describe("the compile step's header", () => {
 
   test("names the two loading modes and where each is used", () => {
     const header = compilerHeader();
-    expect(header).toContain("fourteen of the sixteen scripts are loaded with `<script defer>`");
+    expect(header).toContain("fifteen of the seventeen scripts are loaded with `<script defer>`");
     expect(header).toContain("Weaver's `telemetry.ts` and `mobile-nav.ts`");
     expect(header).toContain("end of `<body>`");
   });

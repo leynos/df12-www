@@ -1,0 +1,219 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% block title %}Internals · Cuprum{% endblock %}
+{% block description %}How Cuprum keeps process boundaries legible: catalogue and builders construct, policy authorizes, the runtime executes, and observers report. The lifecycle, pipelines, and invariants.{% endblock %}
+{% block main_class %} class="cu-internals"{% endblock %}
+{% block content %}
+{% set src = repository_url ~ '/blob/main/' %}
+{% set sections = [
+  {'id': 'division', 'label': 'Division of labour', 'title': 'Four jobs, four owners',
+   'lede': 'Catalogue and builders construct. Policy authorizes. The runtime executes. Observers report. No component does another’s job.'},
+  {'id': 'lifecycle', 'label': 'Execution lifecycle', 'title': 'One command, start to finish',
+   'lede': 'What happens, in order, between calling a builder and holding a CommandResult — and what happens when the run is cut short.'},
+  {'id': 'pipelines', 'label': 'Pipelines and streams', 'title': 'Pipes, pumps, and fail-fast',
+   'lede': 'How stages are joined, where bytes are copied, how backpressure works, and which stage is blamed when one fails.'},
+  {'id': 'policy', 'label': 'Policy and observation', 'title': 'Scopes, hooks, and sinks',
+   'lede': 'Where the allowlist lives, how it narrows, and the channels that report on a run without changing what it does.'},
+  {'id': 'sources', 'label': 'Sources', 'title': 'Read the plans'},
+] %}
+{% set drafting_art = {
+  'name': 'drafting-room', 'widths': [768, 1536], 'width': 1536, 'height': 1024,
+  'alt': '', 'plate': 'Plate 04',
+  'caption': 'In the drafting room, Copper checks a tee on the plan. The figures below are the plan; the drawing is only a drawing.',
+  'eager': true,
+} %}
+{% set architecture = {
+  'id': 'fig-architecture', 'num': 'Fig. 01', 'horizontal': true,
+  'title': 'Who constructs, who authorizes, who runs, and who reports?',
+  'steps': [
+    {'kind': 'builder', 'kind_label': 'Catalogue', 'name': 'ProgramCatalogue', 'detail': 'Which programs exist, grouped by project, with noise rules and documentation links.', 'edge': 'Program'},
+    {'kind': 'builder', 'name': 'sh.make → SafeCmd', 'detail': 'An immutable command: program, argv tuple, project metadata.', 'edge': 'SafeCmd'},
+    {'kind': 'policy', 'name': 'CuprumContext scope', 'detail': 'The allowlist in force for this thread or task, plus hooks and defaults.', 'edge': 'authorized SafeCmd'},
+    {'kind': 'process', 'kind_label': 'Runtime', 'name': 'run() / run_sync()', 'detail': 'Spawns without a shell, pumps streams, enforces timeouts, tears down.', 'edge': 'status, bytes'},
+    {'kind': 'result', 'name': 'CommandResult', 'detail': 'ok, exit code, captured output, pid, timing, resource use.'},
+  ],
+  'branches': [
+    {'when': 'Observers, throughout', 'then': 'Before and after hooks, sh.observe event hooks, telemetry adapters, and presentation sinks receive events from the runtime. They report; they do not route.'},
+  ],
+  'takeaway': 'Construction and authorization are separate: the catalogue decides what can be built, and the scope in force decides what may run here.',
+  'source': 'Source: docs/cuprum-design.md §§4–6 at main@' ~ cuprum_ref,
+} %}
+{% set lifecycle = {
+  'id': 'fig-lifecycle', 'num': 'Fig. 02', 'horizontal': false,
+  'title': 'What happens between a builder call and a result?',
+  'steps': [
+    {'kind': 'builder', 'kind_label': '1 · Construction', 'name': 'sh.make(PROGRAM)(*args, **flags)', 'detail': 'UnknownProgramError if the program is not catalogued. Positional arguments are stringified; keywords become --flag=value; None is rejected.', 'edge': 'SafeCmd'},
+    {'kind': 'policy', 'kind_label': '2 · Authorization', 'name': 'scope check', 'detail': 'ForbiddenProgramError if the allowlist in force excludes the program. Nothing has been spawned and no hook has run.', 'edge': 'authorized'},
+    {'kind': 'observer', 'kind_label': '3 · Plan', 'name': 'plan event, then before hooks', 'detail': 'Observers see the resolved argv, cwd, and environment; before hooks then run in registration order. Overlays apply over the live os.environ, and an explicit timeout beats ExecutionContext, which beats the scope default.', 'edge': 'argv, env, cwd'},
+    {'kind': 'process', 'kind_label': '4 · Spawn', 'name': 'exec, no shell', 'detail': 'The argv tuple goes straight to the operating system. On Linux and macOS Cuprum owns the child’s reap so it can report its CPU time and peak memory.', 'edge': 'start event, pid'},
+    {'kind': 'process', 'kind_label': '5 · Streams', 'name': 'capture, echo, line events', 'detail': 'stdout and stderr are drained by independent tasks. Echo mirrors bytes to sinks; capture keeps everything; line events are decoded once.', 'edge': 'stdout / stderr events'},
+    {'kind': 'result', 'kind_label': '6 · Completion', 'name': 'exit event, after hooks, result', 'detail': 'After hooks run in reverse registration order, so the innermost cleans up first.'},
+  ],
+  'branches': [
+    {'when': 'Task cancelled', 'then': 'SIGTERM, a grace period (cancel_grace, 0.5 s by default), then SIGKILL and reap. Repeated cancellation does not interrupt teardown; the first cancellation is re-raised afterwards.'},
+    {'when': 'Timeout expires', 'then': 'The same teardown, then TimeoutExpired carrying whatever output was captured, a timeout event, and a WARNING on the cuprum.timeout logger.'},
+    {'when': 'An observe hook raises', 'then': 'The run fails with the hook’s own exception type. A hook that must never affect a run catches its own errors.'},
+  ],
+  'takeaway': 'A command that was never authorized is never spawned, and a spawned command is always reaped, however the run ends.',
+  'source': 'Source: cuprum/sh.py, cuprum/_command_internals.py, and docs/users-guide.md#execution-runtime at main@' ~ cuprum_ref,
+} %}
+{% set pipeline = {
+  'id': 'fig-pipeline', 'num': 'Fig. 03', 'horizontal': true,
+  'title': 'Which bytes go where in a three-stage pipeline?',
+  'steps': [
+    {'kind': 'process', 'kind_label': 'Stage 0', 'name': 'producer', 'detail': 'stdout → OS pipe. stderr → caller (echo, capture).', 'edge': 'bytes, with backpressure'},
+    {'kind': 'process', 'kind_label': 'Stage 1', 'name': 'filter', 'detail': 'Reads stage 0, writes stage 2. Its stdout result is None.', 'edge': 'bytes, with backpressure'},
+    {'kind': 'process', 'kind_label': 'Stage 2 (final)', 'name': 'consumer', 'detail': 'Its stdout is the pipeline’s output.', 'edge': 'final stdout'},
+    {'kind': 'result', 'name': 'PipelineResult', 'detail': 'stdout, stages[], failure, failure_index.'},
+  ],
+  'branches': [
+    {'when': 'First non-final stage exits non-zero', 'then': 'Every other still-running stage is terminated, upstream and downstream. The failing stage owns its own exit and is reported as failure_index.'},
+    {'when': 'A downstream stage stops reading', 'then': 'The pump drains the upstream reader to EOF or a short timeout, so the producer is not left blocked on a full pipe.'},
+    {'when': 'Deadline reached', 'then': 'One deadline covers the whole pipeline; each stage still gets its own timeout event and log record.'},
+  ],
+  'takeaway': 'Only the final stage’s stdout reaches the caller; every stage’s stderr does. Blame goes to the first stage to fail, not the last.',
+  'source': 'Source: cuprum/_pipeline_internals.py, cuprum/_pipeline_wait.py, and docs/users-guide.md#pipeline-execution at main@' ~ cuprum_ref,
+} %}
+      {% call ui.page_head('Engineering plans · Internals', 'Internals',
+        'Catalogue and builders construct; policy authorizes; the runtime executes; observers report. This is how Cuprum keeps each of those boundaries legible.',
+        meta='Describes main@' ~ cuprum_ref ~ ' (' ~ cuprum_ref_date ~ '). Internal module names can change without notice; the public API is in the users’ guide.',
+        art_image=drafting_art) %}
+        {{ ui.button('Inspect the lifecycle', '#lifecycle', icon='arrow-down') }}
+        {{ ui.button('Show me the failure path', '/cuprum/examples/pipeline-tee/#failure', variant='outline') }}
+      {% endcall %}
+      {{ ui.routemap(sections, 'Drafting room') }}
+
+      {% call ui.section(sections, 'division') %}
+      {{ ui.flow(architecture) }}
+      <div class="cu-internals__invariants mt-14">
+        <div>
+          <p class="cu-kicker">Stated invariants</p>
+          <h3 class="cu-internals__subhead">What holds, every time</h3>
+          <p class="mt-3">
+            Each line names where it is enforced. If the code and this list ever
+            disagree, the code is right and this page is out of date.
+          </p>
+        </div>
+        <ol class="cu-invariants">
+          <li><strong>Nothing reaches a shell.</strong> Every spawn passes an argv tuple with <code>shell=False</code>. <span class="cu-invariants__src">cuprum/_wait4_process.py, cuprum/_pipeline_spawn.py</span></li>
+          <li><strong>A command exists only for a catalogued program.</strong> <code>sh.make</code> raises <code>UnknownProgramError</code> otherwise. <span class="cu-invariants__src">cuprum/sh.py, cuprum/catalogue.py</span></li>
+          <li><strong>Authorization happens at run time, before any spawn.</strong> The scope in force is checked for a command, and for every stage of a pipeline before the first stage starts. <span class="cu-invariants__src">cuprum/context/, cuprum/_pipeline_internals.py</span></li>
+          <li><strong>Scopes only narrow.</strong> A nested <code>scoped()</code> intersects its allowlist with its parent’s. Widening is a separate, explicit call to <code>allow()</code>. <span class="cu-invariants__src">cuprum/context/</span></li>
+          <li><strong>Every spawned child is reaped.</strong> Cancellation and timeouts escalate from <code>SIGTERM</code> to <code>SIGKILL</code> and wait for the exit, even under repeated cancellation. <span class="cu-invariants__src">cuprum/_process_lifecycle.py</span></li>
+          <li><strong>Capture is complete.</strong> Truncating an echoed line, or disabling echo for a sink that cannot encode the text, never removes bytes from the result. <span class="cu-invariants__src">cuprum/_stream_echo.py</span></li>
+          <li><strong>Python is the behavioural reference.</strong> The optional Rust pump must produce identical bytes, and a hop it cannot take runs on the Python pump instead. <span class="cu-invariants__src">cuprum/_pipeline_streams.py</span></li>
+        </ol>
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'lifecycle', class='cu-section--tint') %}
+      {{ ui.flow(lifecycle) }}
+      {% endcall %}
+
+      {% call ui.section(sections, 'pipelines') %}
+      {{ ui.flow(pipeline) }}
+      <div class="cu-columns mt-12">
+        <div class="cu-prose">
+          <h3>Backpressure</h3>
+          <p>
+            Stages are joined by operating-system pipes. Between two stages a
+            pump reads from one and writes to the next, awaiting
+            <code>drain()</code> on each write, so a slow consumer slows its
+            producer instead of filling memory.
+          </p>
+          <h3>Where Rust fits</h3>
+          <p>
+            That inter-stage pump is the one place the optional
+            <a href="/cuprum/rust-extension/">Rust extension</a> is used: when
+            it is installed and selected, the copy runs outside the GIL, using
+            <code>splice()</code> on Linux. Capturing the final output always
+            uses the Python path.
+          </p>
+        </div>
+        <div class="cu-prose">
+          <h3>Diagnosing a fail-fast</h3>
+          <p>
+            When the first non-final failure still has stages to stop, observe
+            hooks receive one <code>pipeline_fail_fast</code> event before
+            termination begins, carrying the stage index, pipeline width, exit
+            code, and duration. It omits argv and tags, so command-line secrets
+            do not reach the warning it produces.
+          </p>
+          <p>
+            A final-stage failure, or one whose siblings have already exited,
+            emits no such event: there was nothing left to terminate. It is
+            still reported as <code>failure_index</code>.
+          </p>
+        </div>
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'policy', class='cu-section--tint') %}
+      <div class="cu-columns">
+        <div class="cu-prose">
+          <h3>Where the policy lives</h3>
+          <p>
+            <code>CuprumContext</code> is an immutable value held in a
+            <code>ContextVar</code>. Each thread gets its own; each async task
+            inherits its creator’s and may change it independently. Entering
+            <code>scoped()</code> replaces the value, and leaving the block
+            restores the previous one, even on an exception.
+          </p>
+          <p>
+            At the root, with no scope established, every catalogued program
+            may run. That permissive default eases adoption; narrowing it is
+            how code states its policy. An explicitly empty allowlist inside a
+            restricted scope permits nothing.
+          </p>
+          <h3>Hooks</h3>
+          <p>
+            Before hooks run in registration order, parent first. After hooks
+            run in reverse, child first, so cleanup nests like context
+            managers. <code>logging_hook()</code> pairs the two to log start
+            and exit.
+          </p>
+        </div>
+        <div class="cu-prose">
+          <h3>Observation</h3>
+          <p>
+            <code>sh.observe()</code> delivers structured <code>ExecEvent</code>
+            values — plan, start, stdout, stderr, exit, and the ancillary
+            timeout and teardown events — each correlated by an
+            <code>exec_id</code> rather than a pid the system may recycle.
+          </p>
+          <p>
+            The adapters in <code>cuprum.adapters</code> turn those events into
+            structured logs, Prometheus-style metrics, and OpenTelemetry-style
+            spans. They define protocols rather than importing a telemetry
+            library, so Cuprum keeps its zero-dependency install.
+          </p>
+          {% call ui.callout('caveat', 'Arguments are logged verbatim') %}
+          <p>
+            The structured logging adapter and <code>logging_hook()</code>
+            record argv as supplied. Pass secrets through the environment or a
+            file, not on the command line.
+          </p>
+          {% endcall %}
+          <h3>Presentation sinks</h3>
+          <p>
+            An opt-in sink reframes a run’s echoed output without changing
+            capture or the result. <code>GitHubActionsSink</code> wraps a run in
+            a collapsible log group and turns a failure into one annotation; it
+            activates only when <code>GITHUB_ACTIONS</code> is
+            <code>true</code>, unless forced.
+          </p>
+        </div>
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'sources') %}
+      <div class="cu-card-grid">
+        {{ ui.card('Cuprum design', 'The design document: principles, conceptual model, async execution, pipelines, error model, and the Rust extension.', number='Plan', href=src ~ 'docs/cuprum-design.md') }}
+        {{ ui.card("Users' guide", 'The public API, with every option and its failure behaviour.', number='Manual', href=src ~ 'docs/users-guide.md') }}
+        {{ ui.card('ADR-006 · Context package split', 'Why the scope, hooks, and registrations live where they do.', number='Decision', href=src ~ 'docs/adr-006-context-package-split.md') }}
+        {{ ui.card('ADR-007 · Execution module boundaries', 'How single-command execution is divided between modules.', number='Decision', href=src ~ 'docs/adr-007-subprocess-execution-module-boundaries.md') }}
+        {{ ui.card('ADR-013 · GitHub Actions sink', 'Why presentation is an opt-in sink rather than a change to echo.', number='Decision', href=src ~ 'docs/adr-013-opt-in-github-actions-presentation-sink.md') }}
+      </div>
+      {% endcall %}
+{% endblock %}

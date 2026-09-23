@@ -17,7 +17,7 @@
  *   optional throughout because every reader tolerates their absence: the
  *   telemetry sinks are no-ops when nothing installed them.
  *
- * `module` is the CommonJS hook the Bun tests use. Seven scripts end with
+ * `module` is the CommonJS hook the Bun tests use. Ten scripts end with
  * `if (typeof module !== "undefined" && module.exports) { module.exports =
  * {...}; }`, which the browser skips and `require` honours. It is declared as
  * a plain global rather than through `@types/node` so the browser project

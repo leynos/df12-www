@@ -5,7 +5,7 @@
   ('Needs', 'Python ' ~ python_floor ~ ' or later, and wc on PATH (any POSIX system)'),
   ('Install', 'Cuprum from main@' ~ cuprum_ref ~ '; see Getting started'),
   ('Tested', cuprum_verified_on ~ ' against main@' ~ cuprum_ref ~ ' on Linux, Python ' ~ python_floor),
-  ('Uses', 'ProgramCatalogue.from_programs, sh.make, StdinInput, ScopeConfig'),
+  ('Uses', 'ProgramCatalogue.from_programs, sh.make, StdinInput, scoped(catalogue=…)'),
 ] %}
 
 {% block problem %}
@@ -28,7 +28,6 @@
 from cuprum import (
     Program,
     ProgramCatalogue,
-    ScopeConfig,
     StdinInput,
     scoped,
     sh,
@@ -42,7 +41,7 @@ count_words = sh.make(WC, catalogue=CATALOGUE)
 
 def word_count(text: str) -> int:
     cmd = count_words("-w")
-    with scoped(ScopeConfig(allowlist=CATALOGUE.allowlist)):
+    with scoped(catalogue=CATALOGUE):
         result = cmd.run_sync(stdin=StdinInput(text=text))
     if not result.ok:
         msg = f"wc failed with exit code {result.exit_code}: {result.stderr}"
@@ -116,7 +115,6 @@ from cuprum import (
     ForbiddenProgramError,
     Program,
     ProgramCatalogue,
-    ScopeConfig,
     UnknownProgramError,
     scoped,
     sh,
@@ -132,7 +130,7 @@ except UnknownProgramError as exc:
     print(f"UnknownProgramError: {exc}")
 
 # In a catalogue, but outside the active scope: refused when it runs.
-with scoped(ScopeConfig(allowlist=CATALOGUE.allowlist)):
+with scoped(catalogue=CATALOGUE):
     try:
         sh.make(ECHO)("hello").run_sync()
     except ForbiddenProgramError as exc:
@@ -169,9 +167,9 @@ Program echo denied by context allowlist restricted_state=True
 {% block policy %}
 <p>
   Two independent checks let this run. The builder was made from a catalogue
-  that lists <code>wc</code>, and the <code>scoped()</code> block's allowlist
-  is that catalogue's allowlist, so <code>wc</code> is the one program the
-  block may run.
+  that lists <code>wc</code>, and the <code>scoped()</code> block takes its
+  allowlist from that same catalogue, so <code>wc</code> is the one program
+  the block may run.
 </p>
 <p>
   The scope is what a reviewer reads. Remove the <code>with</code> block and

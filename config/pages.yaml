@@ -1616,9 +1616,9 @@ sites:
       # commit rather than inventing a version number. Bump the commit, its
       # short form, and the dates together after re-running the snippets.
       # Install commands use the full hash: pip warns on an abbreviated one.
-      cuprum_commit: "27ab2108252a37ee1115b37f46e86b5f81185fc6"
-      cuprum_ref: "27ab2108"
-      cuprum_ref_date: "2026-09-22"
+      cuprum_commit: "e82cf9f648fc7143bdb11a4b0a9cf0cde7f2f62c"
+      cuprum_ref: "e82cf9f6"
+      cuprum_ref_date: "2026-09-23"
       cuprum_verified_on: "2026-09-23"
       cuprum_released: "0.1.0"
       cuprum_released_on: "2026-01-30"

@@ -43,7 +43,7 @@ count_words = sh.make(WC, catalogue=CATALOGUE)
 
 def word_count(text: str) -> int:
     cmd = count_words("-w")
-    with scoped(ScopeConfig(allowlist=CATALOGUE.allowlist)):
+    with scoped(catalogue=CATALOGUE):
         result = cmd.run_sync(stdin=StdinInput(text=text))
     if not result.ok:
         msg = f"wc failed with exit code {result.exit_code}: {result.stderr}"

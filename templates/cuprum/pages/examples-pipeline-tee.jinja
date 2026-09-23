@@ -51,7 +51,6 @@ from cuprum import (
     Program,
     ProgramCatalogue,
     RunOutputOptions,
-    ScopeConfig,
     scoped,
     sh,
 )
@@ -66,7 +65,7 @@ UPPER = "import sys; sys.stdout.write(sys.stdin.read().upper())"
 
 pipeline = echo("-n", "routed through two stages") | python("-c", UPPER)
 
-with scoped(ScopeConfig(allowlist=CATALOGUE.allowlist)):
+with scoped(catalogue=CATALOGUE):
     # echo=True tees the final stdout and every stage's stderr to the
     # terminal while the final stdout is still captured.
     result = pipeline.run_sync(output=RunOutputOptions(echo=True))
@@ -125,7 +124,6 @@ from cuprum import (
     ECHO,
     Program,
     ProgramCatalogue,
-    ScopeConfig,
     scoped,
     sh,
 )
@@ -142,7 +140,7 @@ CONSUME = "import sys; sys.stdout.write(sys.stdin.read())"
 
 pipeline = python("-c", PRODUCE) | python("-c", REJECT) | python("-c", CONSUME)
 
-with scoped(ScopeConfig(allowlist=CATALOGUE.allowlist)):
+with scoped(catalogue=CATALOGUE):
     result = pipeline.run_sync()
 
 print(f"ok={result.ok}")

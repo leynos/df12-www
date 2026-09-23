@@ -48,7 +48,9 @@ class StilyagiStyle(Style):
 
     # Pygments token types are not publicly typed, so the key is Any; the same
     # rationale applies in scripts/generate_stilyagi_pygments_css.py.
-    styles: typ.ClassVar[dict[typ.Any, str]] = {
+    # The base class declares this attribute without `ClassVar`, which ty
+    # reads as an instance variable; RUF012 still wants the annotation here.
+    styles: typ.ClassVar[dict[typ.Any, str]] = {  # ty: ignore[invalid-attribute-override]
         Token: "#efe4ce",  # paper: default text
         Comment: "italic #827b6a",  # lightened rule-faint; 4.6:1
         Comment.Preproc: "#d69f2e",  # jazz ochre

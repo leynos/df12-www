@@ -93,7 +93,12 @@ class SharedContentGenerator:
             lstrip_blocks=True,
         )
         if page_chrome and page_chrome.template_vars:
-            self.env.globals.update(page_chrome.template_vars)
+            # Jinja types `globals` as the literal of its default namespace,
+            # so a checker rejects any other value; the namespace is open by
+            # design, and the cast says so once.
+            typ.cast("dict[str, object]", self.env.globals).update(
+                page_chrome.template_vars
+            )
         self.template = self.env.get_template(self.template_name)
         self._markdown_extensions = [
             "sane_lists",

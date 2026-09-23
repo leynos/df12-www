@@ -67,7 +67,7 @@ def _footer_links(soup: BeautifulSoup) -> list[tuple[str, str, str]]:
                 (
                     kicker.get_text(strip=True),
                     label.get_text(strip=True),
-                    anchor["href"],
+                    str(anchor["href"]),
                 )
             )
     return links

@@ -85,7 +85,9 @@ def _render_macro(source: str, **context: object) -> BeautifulSoup:
         lstrip_blocks=True,
         extensions=[HighlightExtension],
     )
-    env.globals.update(TEMPLATE_VARS)
+    # Jinja types `globals` as the literal of its default namespace; it is
+    # open by design.
+    typ.cast("dict[str, object]", env.globals).update(TEMPLATE_VARS)
     preamble = (
         '{% import "chrome.jinja" as chrome %}'
         '{% import "docs_nav.jinja" as docsnav %}'

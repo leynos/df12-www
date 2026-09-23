@@ -77,12 +77,33 @@ class SystemCardConfig:
 
 
 @dc.dataclass(slots=True)
+class LibraryLinkConfig:
+    """A compact link to a library, listed beneath the systems grid."""
+
+    label: str
+    description: str
+    href: str
+    meta_label: str
+    external: bool = True
+
+
+@dc.dataclass(slots=True)
+class LibrariesConfig:
+    """The libraries group within the systems section."""
+
+    heading: str
+    kicker: str
+    links: list[LibraryLinkConfig]
+
+
+@dc.dataclass(slots=True)
 class SystemsSectionConfig:
     """Systems grid configuration for the homepage."""
 
     heading: str
     kicker: str
     cards: list[SystemCardConfig]
+    libraries: LibrariesConfig | None = None
 
 
 @dc.dataclass(slots=True)
@@ -382,6 +403,8 @@ __all__ = [
     "FooterLinkConfig",
     "HeroConfig",
     "HomepageConfig",
+    "LibrariesConfig",
+    "LibraryLinkConfig",
     "NavLinkConfig",
     "PageConfig",
     "PrincipleConfig",

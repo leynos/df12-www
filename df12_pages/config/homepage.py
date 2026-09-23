@@ -12,6 +12,8 @@ from .models import (
     FooterLinkConfig,
     HeroConfig,
     HomepageConfig,
+    LibrariesConfig,
+    LibraryLinkConfig,
     NavLinkConfig,
     SiteConfigError,
     SystemCardConfig,
@@ -176,7 +178,70 @@ def _build_systems_config(
         heading=str(heading),
         kicker=str(kicker),
         cards=cards,
+        libraries=_build_libraries_config(rest.get("libraries")),
     )
+
+
+def _build_libraries_config(
+    payload: object,
+) -> LibrariesConfig | None:
+    """Build the optional libraries group listed beneath the systems grid."""
+    match payload:
+        case None:
+            return None
+        case {"heading": heading, "kicker": kicker, **rest}:
+            links = _build_library_links(rest.get("links"))
+        case _:
+            msg = "Systems libraries require 'heading', 'kicker', and links."
+            raise SiteConfigError(msg)
+    if not (heading and kicker and links):
+        msg = "Systems libraries require 'heading', 'kicker', and links."
+        raise SiteConfigError(msg)
+    return LibrariesConfig(heading=str(heading), kicker=str(kicker), links=links)
+
+
+def _build_library_links(
+    entries: object,
+) -> list[LibraryLinkConfig]:
+    """Build the library links for the libraries group."""
+    links: list[LibraryLinkConfig] = []
+    match entries:
+        case list() as items:
+            iterable = items
+        case _:
+            return links
+    for entry in iterable:
+        match entry:
+            case {
+                "label": label,
+                "description": description,
+                "href": href,
+                "meta_label": meta_label,
+                **rest,
+            }:
+                pass
+            case _:
+                msg = (
+                    "Library links require 'label', 'description', 'href', "
+                    "and 'meta_label'."
+                )
+                raise SiteConfigError(msg)
+        if not (label and description and href and meta_label):
+            msg = (
+                "Library links require 'label', 'description', 'href', "
+                "and 'meta_label'."
+            )
+            raise SiteConfigError(msg)
+        links.append(
+            LibraryLinkConfig(
+                label=str(label),
+                description=str(description),
+                href=str(href),
+                meta_label=str(meta_label),
+                external=bool(rest.get("external", True)),
+            )
+        )
+    return links
 
 
 def _build_system_cards(
@@ -406,6 +471,8 @@ __all__ = [
     "_build_footer_links",
     "_build_hero_config",
     "_build_homepage_config",
+    "_build_libraries_config",
+    "_build_library_links",
     "_build_nav_links",
     "_build_system_cards",
     "_build_systems_config",

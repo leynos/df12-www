@@ -105,6 +105,20 @@ homepage:
         icon: stilyagi
         meta_label: Learn more
         external: false
+    libraries:
+      heading: Libraries
+      kicker: Smaller parts, built to be built with.
+      links:
+        - label: Cuprum
+          description: Typed, async command execution for Python. Approved programs, exact argv, structured results.
+          href: "cuprum/"
+          meta_label: Learn more
+          external: false
+        - label: rstest-bdd
+          description: Behaviour-driven testing macros layered on rstest. Narrative clarity without the ceremony.
+          href: "https://github.com/leynos/rstest-bdd"
+          meta_label: View on GitHub
+          external: true
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.

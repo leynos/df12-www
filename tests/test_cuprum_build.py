@@ -114,11 +114,11 @@ def test_code_regions_are_keyboard_reachable_and_labelled(built_site: Path) -> N
 
 @pytest.mark.timeout(300)
 def test_install_commands_pin_the_verified_commit(built_site: Path) -> None:
-    """Install commands pin the full commit, and nothing installs Speedfit.
+    """Install commands pin the full commit, and nothing installs Setwork.
 
     The documented API is on main, ahead of the PyPI release, so an unpinned
     `pip install cuprum` would install something the pages do not describe.
-    Speedfit has no package at all; a placeholder install would be a promise.
+    Setwork has no package at all; a placeholder install would be a promise.
     """
     assert built_site.is_dir()
     commit = str(_site_vars()["cuprum_commit"])
@@ -133,7 +133,7 @@ def test_install_commands_pin_the_verified_commit(built_site: Path) -> None:
         assert command.endswith(f'@{commit}"'), f"unpinned install: {command}"
     for page in _pages():
         text = page.read_text(encoding="utf-8")
-        assert "install speedfit" not in text, f"{page} offers to install Speedfit"
+        assert "install setwork" not in text, f"{page} offers to install Setwork"
 
 
 @pytest.mark.timeout(300)
@@ -208,7 +208,7 @@ def test_previews_say_so_in_their_heading(built_site: Path) -> None:
     assert built_site.is_dir()
     expectations = {
         "rust-extension": "Technical preview",
-        "speedfit": "Proposed",
+        "setwork": "Proposed",
     }
     for slug, word in expectations.items():
         head = _soup(PUBLIC_CUPRUM / slug / "index.html").select_one(".cu-page-head")

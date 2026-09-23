@@ -307,15 +307,15 @@
   box-shadow: 8px 8px 0 var(--color-orange);
 }
 
-/* ---------- Speedfit -------------------------------------------------- */
+/* ---------- Setwork -------------------------------------------------- */
 
-.cu-speedfit .cu-speedfit__exclusions {
+.cu-setwork .cu-setwork__exclusions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: 1.25rem;
 }
 
-.cu-speedfit .cu-speedfit__follow {
+.cu-setwork .cu-setwork__follow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;

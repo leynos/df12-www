@@ -1635,8 +1635,8 @@ sites:
         href: /cuprum/rust-extension/
       - label: Roadmap
         href: /cuprum/roadmap/
-      - label: Speedfit
-        href: /cuprum/speedfit/
+      - label: Setwork
+        href: /cuprum/setwork/
     shared_content:
       - terms-of-use
       - privacy-policy
@@ -1651,5 +1651,5 @@ sites:
       - { key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals }
       - { key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: rust-extension }
       - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
-      - { key: speedfit, label: Speedfit, template: pages/speedfit.jinja, output_slug: speedfit }
+      - { key: setwork, label: Setwork, template: pages/setwork.jinja, output_slug: setwork }
     pages: {}

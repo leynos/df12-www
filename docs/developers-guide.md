@@ -156,6 +156,13 @@ bun run lint:js:fix   # biome check --write .  — apply what Biome can fix alon
 `ruff format`, `ruff check --select I --fix`, `bun run lint:js:fix`,
 `bun run lint:css:fix`, and `mdformat-all`.
 
+Neither Ruff nor ty is taken from `PATH`. Ruff is a dev dependency, so
+`uv.lock` fixes its version and the targets run it with `uv run ruff`; ty is
+run with `uv tool run ty==$(TY_VERSION)`, pinned in the `Makefile`. A new
+release of either therefore cannot fail the gates on code nobody has changed.
+Moving to one is a deliberate change: `uv lock --upgrade-package ruff` or a new
+`TY_VERSION`, committed with whatever fixes the new release demands.
+
 `biome check` is formatter, linter, and assists in a single pass, which has one
 consequence worth remembering: **a misformatted script fails `make lint`, not
 `make check-fmt`.** The target names do not imply that, so `check-fmt` carries

@@ -11,9 +11,15 @@ MDTABLEFIX ?= mdtablefix
 MDTABLEFIX_SELECT = --git --include-untracked
 MDTABLEFIX_RULES = --wrap --renumber --breaks --ellipsis --fences
 NIXIE ?= $(shell command -v nixie)
-TOOLS = ruff ty $(MDLINT) $(NIXIE) uv bun
+TOOLS = $(MDLINT) $(NIXIE) uv bun
 VENV_TOOLS = pytest
 UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
+# Ruff comes from the dev group, so uv.lock fixes its version; ty is pinned
+# here. A new release of either therefore cannot fail the gates on code
+# nobody has changed: moving to it is a deliberate bump and its fixes.
+RUFF = $(UV_ENV) uv run ruff
+TY_VERSION ?= 0.0.82
+TY = $(UV_ENV) uv tool run ty==$(TY_VERSION)
 SKIP_PLAYWRIGHT ?= 0
 PYTEST_FILTER ?=
 TYPOS_CONFIG_BUILDER_VERSION ?= v0.1.1
@@ -104,9 +110,9 @@ $(VENV_TOOLS): ## Verify required CLI tools in venv
 	$(call ensure_tool_venv,$@)
 endif
 
-fmt: ruff $(NODE_MODULES_STAMP) ## Format sources
-	ruff format
-	ruff check --select I --fix
+fmt: build $(NODE_MODULES_STAMP) ## Format sources
+	$(RUFF) format
+	$(RUFF) check --select I --fix
 	bun run lint:js:fix
 	# Safe over the generated Pygments blocks: the generators emit
 	# stylelint-disable markers around them, and fixes are not applied
@@ -115,14 +121,14 @@ fmt: ruff $(NODE_MODULES_STAMP) ## Format sources
 	$(MDTABLEFIX) --in-place $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 	$(MDLINT) --fix "**/*.md"
 
-check-fmt: ruff ## Verify formatting
-	ruff format --check
+check-fmt: build ## Verify formatting
+	$(RUFF) format --check
 	# Biome's formatting is checked by the lint target, which runs
 	# `biome check` — formatter, linter, and assists in one pass.
 	$(MDTABLEFIX) --check $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 
-lint: ruff $(NODE_MODULES_STAMP) ## Run linters
-	ruff check
+lint: build $(NODE_MODULES_STAMP) ## Run linters
+	$(RUFF) check
 	bun run lint:js
 
 stylelint: $(NODE_MODULES_STAMP) ## Lint the handwritten and Tailwind CSS
@@ -130,9 +136,9 @@ stylelint: $(NODE_MODULES_STAMP) ## Lint the handwritten and Tailwind CSS
 	# stylelint.config.js over src/**/*.css and nothing else.
 	bun run lint:css
 
-typecheck: build ty typecheck-js ## Run typechecking
-	ty --version
-	ty check
+typecheck: build typecheck-js ## Run typechecking
+	$(TY) --version
+	$(TY) check
 
 typecheck-js: $(NODE_MODULES_STAMP) ## Typecheck the browser scripts and build scripts
 	bun run typecheck:js

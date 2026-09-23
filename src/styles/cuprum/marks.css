@@ -28,6 +28,18 @@
   mask-size: auto 100%;
 }
 
+/* Germantown Town Hall (1923), a portrait plate of its rotunda and tower.
+   Its box keeps the mask's own proportions, so the plate is never cropped
+   or stretched. */
+.cu-town-hall {
+  aspect-ratio: 560 / 835;
+  background-color: currentcolor;
+  mask-image: url("/cuprum/assets/images/town-hall-engraving-mask.webp");
+  mask-position: center bottom;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
 /* The watermark: the seal at low contrast in the blank paper beside a page
    head that has no illustration. It has a grid column of its own rather than
    sitting behind the title, and it is dropped below the desktop breakpoint,

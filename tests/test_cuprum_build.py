@@ -209,3 +209,18 @@ def test_previews_say_so_in_their_heading(built_site: Path) -> None:
         assert head is not None
         statuses = [s.get_text(strip=True) for s in head.select(".cu-status")]
         assert word in statuses, f"/cuprum/{slug}/ header statuses: {statuses}"
+
+
+@pytest.mark.timeout(300)
+def test_engraving_masks_are_published(built_site: Path) -> None:
+    """Every mask the compiled sheet names is a published file.
+
+    The skyline and the town hall are CSS masks, not images, so a missing
+    file leaves an invisible box rather than a broken-image icon.
+    """
+    assert built_site.is_dir()
+    css = COMPILED_STYLESHEET.read_text(encoding="utf-8")
+    masks = set(re.findall(r'mask-image:url\("?(/cuprum/[^")]+)"?\)', css))
+    assert any("town-hall" in mask for mask in masks), sorted(masks)
+    for mask in masks:
+        assert (REPO_ROOT / "public" / mask.lstrip("/")).is_file(), mask

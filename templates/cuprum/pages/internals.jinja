@@ -1,6 +1,7 @@
 {% extends "_layout.jinja" %}
 {% import "components.jinja" as ui %}
 {% import "_icons.jinja" as icons %}
+{% import "_marks.jinja" as marks %}
 {% block title %}Internals · Cuprum{% endblock %}
 {% block description %}How Cuprum keeps process boundaries legible: catalogue and builders construct, policy authorizes, the runtime executes, and observers report. The lifecycle, pipelines, and invariants.{% endblock %}
 {% block main_class %} class="cu-internals"{% endblock %}
@@ -94,6 +95,7 @@
             Each line names where it is enforced. If the code and this list ever
             disagree, the code is right and this page is out of date.
           </p>
+          {{ marks.town_hall('cu-internals__town-hall') }}
         </div>
         <ol class="cu-invariants">
           <li><strong>Nothing reaches a shell.</strong> Every spawn passes an argv tuple with <code>shell=False</code>. <span class="cu-invariants__src">cuprum/_wait4_process.py, cuprum/_pipeline_spawn.py</span></li>

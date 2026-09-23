@@ -67,9 +67,23 @@
   gap: 1.5rem 3rem;
 }
 
+/* The town hall engraving fills the blank paper under the introduction,
+   beside the list. Below the desktop breakpoint the columns stack and it
+   would only push the list down, so it is dropped, as the watermark is. */
+.cu-internals .cu-internals__town-hall {
+  display: none;
+}
+
 @media (width >= 64rem) {
   .cu-internals .cu-internals__invariants {
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+  }
+
+  .cu-internals .cu-internals__town-hall {
+    display: block;
+    width: min(100%, 17rem);
+    margin: 2.5rem auto 0;
+    color: color-mix(in oklab, var(--color-ink) 78%, transparent);
   }
 }
 

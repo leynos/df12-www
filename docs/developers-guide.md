@@ -1028,9 +1028,13 @@ The fictional municipal marks live in `templates/cuprum/_marks.jinja`, in the
 three registers the design language names:
 
 - **Engraving.** The Philadelphia Command Plumbing seal in the colophon and the
-  engraved skyline above it. The emblem and the skyline are alpha masks under
+  engraved skyline above it, and a plate of Germantown Town Hall beside the
+  stated invariants on the Internals page, shown only at desktop width. The
+  emblem, the skyline, and the town hall are alpha masks under
   `src/static/cuprum/assets/images/`, painted in `currentcolor`, so they follow
-  the theme tokens; the seal's legend is live SVG text.
+  the theme tokens; the seal's legend is live SVG text. The town hall was drawn
+  from a photograph of the real building, so it is a likeness, not an invention
+  like the seal.
 - **Watermark.** The seal at low contrast in the blank paper beside a page head
   that has no illustration. It has a grid column of its own, so it never sits
   under text, and it is dropped below the desktop breakpoint.

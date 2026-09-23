@@ -142,13 +142,13 @@ pytestmark = pytest.mark.playwright
 
 # The two shapes a horizontally scrolling code region takes on this sub-site,
 # and a page carrying both: the translating guide shows a generated
-# `.hm-syntax` block from the highlight tag beside three hand-written `pre`
+# `.hm-syntax` block from the highlight tag beside three handwritten `pre`
 # blocks that carry their `tabindex` in the markup. Both scroll at a phone
 # width, which is why the check runs there.
 FOCUS_RING_PAGE = "guides/translating/"
 SCROLLER_SHAPES = (
     pytest.param(".hm-syntax", id="generated"),
-    pytest.param("pre[tabindex]", id="hand-written"),
+    pytest.param("pre[tabindex]", id="handwritten"),
 )
 
 # A focus indicator needs 3:1 against what it is drawn on (WCAG 2.2 SC 1.4.11)
@@ -208,7 +208,7 @@ def test_a_scrolling_code_region_shows_a_keyboard_focus_ring(
 
     Both shapes are checked, because the ring reaches them by different
     routes. The generated wrapper takes its `tabindex` from the highlight tag
-    and matches `.hm-syntax:focus-visible`; the hand-written blocks carry the
+    and matches `.hm-syntax:focus-visible`; the handwritten blocks carry the
     attribute in the markup and match `pre[tabindex]:focus-visible`. Losing
     either selector would leave one shape ringless and the other fine.
     """

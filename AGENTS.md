@@ -323,18 +323,18 @@ to a light cut on the charcoal grounds. Write `text-warning` on an icon and
 [Developer's Guide](docs/developers-guide.md) has the whole set.
 
 An element that scrolls horizontally needs a tab stop, or a keyboard cannot
-reach what has scrolled out of view. The `{% highlight %}` tag emits one on
-the wrapper where the wrapper is the scroller; a hand-written
-`overflow-x-auto` container carries `tabindex="0"` in the markup. Whether a
-container scrolls depends on the viewport, so check the narrow end too.
+reach what has scrolled out of view. The `{% highlight %}` tag emits one on the
+wrapper where the wrapper is the scroller; a handwritten `overflow-x-auto`
+container carries `tabindex="0"` in the markup. Whether a container scrolls
+depends on the viewport, so check the narrow end too.
 
 Run an audit over the affected pages after any change to colour or markup
 structure. The enforced bar is zero axe violations against WCAG 2.0 A and AA,
 the tag set the browser suites actually check; axe's best-practice rules sit
 outside that bar, and a finding there is worth reading and fixing but is a
 judgement call rather than a build failure. The Weaver and Netsuke browser
-suites run the audit over every page of their sub-site at both viewports, so
-a regression fails `make test` rather than waiting for someone to look.
+suites run the audit over every page of their sub-site at both viewports, so a
+regression fails `make test` rather than waiting for someone to look.
 
 ## Formatting and Validation
 

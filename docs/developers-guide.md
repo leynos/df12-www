@@ -1859,42 +1859,42 @@ of recorded waivers; Netsuke carries none, so any finding there is a failure.
 A hue that fills something and a hue that sets type in it cannot be the same
 value. Amber at `#c48b2c` fills a chip and draws an icon perfectly well, and
 measures 2.96:1 as 12px type on white. So the Netsuke entrypoint splits the
-two: the daisyUI slot stays the fill, and type in that hue reads from a
-matching `--color-*-text` role — `--color-primary-text`,
-`--color-success-text`, `--color-warning-text`, `--color-accent-text` — with
-`--color-charcoal-light` serving the muted role beside them.
+two: the daisyUI slot stays the fill, and type in that hue reads from a matching
+`--color-*-text` role — `--color-primary-text`, `--color-success-text`,
+`--color-warning-text`, `--color-accent-text` — with `--color-charcoal-light`
+serving the muted role beside them.
 
 Each role is re-pointed to a light cut on the charcoal grounds by a block in
 `src/styles/netsuke/site-base.css`, because no single value clears 4.5:1 on
-both paper and charcoal. Custom properties inherit, so setting the token on
-the ground is enough and a call site needs no dark-surface variant of its
-own; Stilyagi splits `--color-press-red` from `--color-accent-text` for the
-same reason. The light cuts are the tints the Himotoshi Pygments style
-already sets code in, so a label and the code beside it agree.
+both paper and charcoal. Custom properties inherit, so setting the token on the
+ground is enough and a call site needs no dark-surface variant of its own;
+Stilyagi splits `--color-press-red` from `--color-accent-text` for the same
+reason. The light cuts are the tints the Himotoshi Pygments style already sets
+code in, so a label and the code beside it agree.
 
 The practical rule when writing markup: `text-warning` on an icon,
-`text-warning-text` on words. Reach for the plain slot only where the colour
-is a fill, a border, or a glyph.
+`text-warning-text` on words. Reach for the plain slot only where the colour is
+a fill, a border, or a glyph.
 
 ### 8.2. Scrolling regions need a tab stop
 
 A region that scrolls horizontally has to be reachable from the keyboard, or
 its content is unreadable without a pointer; axe reports it as
-`scrollable-region-focusable`. Which element scrolls is a stylesheet
-decision, so the answer differs by sub-site:
+`scrollable-region-focusable`. Which element scrolls is a stylesheet decision,
+so the answer differs by sub-site:
 
 - Episodic and Stilyagi wrap each code block in a `.code-scroll` region that
   carries the scroll, the `tabindex`, and an accessible name. Their inner
   syntax wrapper is sized to its content and never scrolls.
 - Netsuke has no such wrapper: `.hm-syntax` scrolls itself, so
   `df12_pages/jinja_highlight.py` emits it with `tabindex="0"`. The wrapper
-  classes that take the attribute are listed in `SCROLLING_CSS_CLASSES`
-  there, and `.hm-syntax:focus-visible` in `himotoshi.css` draws the ring.
+  classes that take the attribute are listed in `SCROLLING_CSS_CLASSES` there,
+  and `.hm-syntax:focus-visible` in `himotoshi.css` draws the ring.
 
-A hand-written `overflow-x-auto` wrapper — a wide table, a `pre` that is not
-run through the highlight tag — carries `tabindex="0"` in the markup. Whether
-one scrolls depends on the viewport, so check at 360px as well as at desktop
-width; several Netsuke tables scroll only at the narrow end.
+A handwritten `overflow-x-auto` wrapper — a wide table, a `pre` that is not run
+through the highlight tag — carries `tabindex="0"` in the markup. Whether one
+scrolls depends on the viewport, so check at 360px as well as at desktop width;
+several Netsuke tables scroll only at the narrow end.
 
 ### 8.3. Inline links carry an underline
 
@@ -1910,8 +1910,8 @@ adding it.
 repeats is the class list on an ordinary `<a>`, not a shape, so there is
 nothing for a macro to hold. §5 sets out when the pair is warranted.
 
-The rule only reaches links inside a text block, so sidebar entries, cards,
-and the footer columns keep the colour-only treatment.
+The rule only reaches links inside a text block, so sidebar entries, cards, and
+the footer columns keep the colour-only treatment.
 
 ### 8.4. Focus indicators
 

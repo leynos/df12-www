@@ -657,7 +657,7 @@ button.hm-config-keys__label {
 }
 
 /* A code block is a horizontal scroller, so the highlight tag emits it with
-   `tabindex="0"`, and the hand-written ones carry the attribute in the
+   `tabindex="0"`, and the handwritten ones carry the attribute in the
    markup. Both need a ring to show for it. The ring is drawn inside the
    border box rather than around it: a block sits flush inside the
    faux-window and example chrome, where an outward ring would be clipped.
@@ -1566,7 +1566,7 @@ pre[tabindex]:focus-visible {
 .hm-faux-window__body .hm-syntax pre,
 .hm-example-code-block .hm-syntax pre,
 .hm-example-terminal__body .hm-syntax pre {
-  /* `.hm-example-code-block pre` gives the hand-written blocks their
+  /* `.hm-example-code-block pre` gives the handwritten blocks their
      own horizontal scroll. A generated one must not take it: the
      wrapper above is contained to the container's width, so a
      scrolling pre inside it never overflows its parent, and the

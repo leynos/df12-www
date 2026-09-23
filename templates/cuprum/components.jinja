@@ -88,18 +88,38 @@
 {%- endmacro %}
 
 {#- The in-page route map. `sections` is the list that also drives the
-    section headings, so the two cannot drift. -#}
+    section headings, so the two cannot drift.
+
+    The links render twice from that one list: as a strip from 80rem up,
+    and as a <details> drop-down below it, where the strip would otherwise
+    scroll sideways. CSS shows exactly one, so a screen reader meets the
+    links once. The drop-down works without script; routemap.ts adds the
+    scroll-spy, names the current section in the summary, and closes the
+    menu after a choice. -#}
+{% macro _routemap_links(sections) -%}
+{% for section in sections %}
+<li><a class="cu-routemap__link" href="#{{ section.id }}" data-cu-routemap-link><span class="cu-routemap__num" aria-hidden="true">{{ '%02d' % loop.index }}</span>{{ section.label }}</a></li>
+{% endfor %}
+{%- endmacro %}
+
 {% macro routemap(sections, label='Route map') -%}
-<nav class="cu-routemap" aria-label="On this page">
+<nav class="cu-routemap" aria-label="On this page" data-cu-routemap>
   <div class="cu-shell cu-routemap__inner">
     <span class="cu-routemap__label" aria-hidden="true">{{ label }}</span>
     <div class="cu-routemap__scroll">
       <ol class="cu-routemap__list">
-        {% for section in sections %}
-        <li><a class="cu-routemap__link" href="#{{ section.id }}"><span class="cu-routemap__num" aria-hidden="true">{{ '%02d' % loop.index }}</span>{{ section.label }}</a></li>
-        {% endfor %}
+        {{ _routemap_links(sections) }}
       </ol>
     </div>
+    <details class="cu-routemap__menu">
+      <summary class="cu-routemap__summary">
+        <span class="cu-routemap__current" data-cu-routemap-current>Jump to a section</span>
+        {{ icons.icon('chevron-solid', 'cu-routemap__chevron') }}
+      </summary>
+      <ol class="cu-routemap__menu-list">
+        {{ _routemap_links(sections) }}
+      </ol>
+    </details>
   </div>
 </nav>
 {%- endmacro %}

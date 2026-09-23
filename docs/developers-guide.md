@@ -1032,6 +1032,15 @@ page gutter and their side rules. The rules live in
 Cards and board columns keep their frames, a panel nested in another stays
 inside it, and nothing changes at 480px and above.
 
+Each long page carries a sticky route map, rendered by the `routemap` macro
+from the same `sections` list as its headings. From 80rem up it is a strip of
+links; below that, where the strip would scroll sideways, the same links sit in
+a `<details>` drop-down with a solid chevron. `routemap.ts` adds the
+scroll-spy: it marks the section being read with `aria-current="location"` in
+both lists, names it in the drop-down's summary, and closes the drop-down after
+a choice, on Escape, or on a click outside. Without the script both forms still
+work as plain fragment links.
+
 The fictional municipal marks live in `templates/cuprum/_marks.jinja`, in the
 three registers the design language names:
 
@@ -1066,7 +1075,7 @@ test fails if one is unpinned.
 Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files
 that follow one shared convention: a plain immediately invoked function
 expression (IIFE) module, guarded by the same `module.exports` hook described
-below. Loading and bootstrap otherwise differ by site. Fifteen of the seventeen
+below. Loading and bootstrap otherwise differ by site. Sixteen of the eighteen
 scripts (Netsuke, Stilyagi, Episodic, and Cuprum) are loaded with
 `<script defer>` and guard their own initialization on `document.readyState`
 (running immediately if the document has already finished loading, or waiting

@@ -138,11 +138,17 @@ def test_install_commands_pin_the_verified_commit(built_site: Path) -> None:
 
 @pytest.mark.timeout(300)
 def test_route_maps_point_at_sections_on_the_page(built_site: Path) -> None:
-    """Every route-map link targets a section that exists, in order."""
+    """Every route-map link targets a section that exists, in order.
+
+    The strip and the phone drop-down render from one list, so they must
+    name the same sections in the same order.
+    """
     assert built_site.is_dir()
     for page in _pages():
         soup = _soup(page)
-        targets = [_attr(a, "href") for a in soup.select(".cu-routemap__link")]
+        targets = [_attr(a, "href") for a in soup.select(".cu-routemap__list a")]
+        menu = [_attr(a, "href") for a in soup.select(".cu-routemap__menu-list a")]
+        assert menu == targets, f"{page}: the drop-down and the strip disagree"
         for number, target in enumerate(targets, start=1):
             section = soup.select_one(target)
             assert section is not None, f"{page}: {target} has no section"

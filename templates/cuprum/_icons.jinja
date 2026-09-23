@@ -4,7 +4,9 @@
   Every icon is decorative: it sits beside a word that already says the same
   thing, so each carries aria-hidden and no title. The paths are drawn on a
   24-unit grid in the prototype's hand, at a 1.8 stroke, and take the colour
-  of the text around them. Import as `icons` and call `icons.icon('check')`.
+  of the text around them. The one exception is `chevron-solid`, a filled
+  triangle that marks a drop-down. Import as `icons` and call
+  `icons.icon('check')`.
 #}
 {% set _paths = {
   'arrow-right': '<path d="M4 12h15M13 6l6 6-6 6"/>',
@@ -26,6 +28,7 @@
   'menu': '<path d="M3 6h18M3 12h18M3 18h18"/>',
   'package': '<path d="m3 7 9-4 9 4v10l-9 4-9-4Z"/><path d="m3 7 9 4 9-4M12 11v10"/>',
   'tee': '<path d="M3 9h18v6H3zM10 15v6h4v-6"/>',
+  'chevron-solid': '<path d="M3 8h18l-9 10Z" fill="currentColor" stroke="none"/>',
 } %}
 
 {% macro icon(name, class='') -%}

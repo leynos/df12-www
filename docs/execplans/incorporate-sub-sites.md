@@ -67,35 +67,40 @@ Add three new dataclasses:
 @dc.dataclass(slots=True)
 class SharedContentConfig:
     """Shared-copy page rendered into each sub-site."""
-    key: str           # "terms-of-use", "privacy-policy"
-    label: str         # "Terms of Use"
-    source: str        # local path or URL to markdown
-    output_slug: str   # "terms-of-use" → terms-of-use/index.html
+
+    key: str  # "terms-of-use", "privacy-policy"
+    label: str  # "Terms of Use"
+    source: str  # local path or URL to markdown
+    output_slug: str  # "terms-of-use" → terms-of-use/index.html
+
 
 @dc.dataclass(slots=True)
 class SubSiteHomepageConfig:
     """Homepage config with freeform template context."""
+
     output: Path
     title: str
     context: dict[str, typ.Any]  # raw YAML for template
 
+
 @dc.dataclass(slots=True)
 class SubSiteConfig:
     """Self-contained sub-site with own templates and CSS."""
-    key: str                            # "weaver"
-    output_dir: Path                    # Path("public/weaver")
-    templates_dir: Path                 # Path("templates/weaver")
-    stylesheet: str                     # "assets/weaver.css"
-    base_path: str                      # "/weaver/"
+
+    key: str  # "weaver"
+    output_dir: Path  # Path("public/weaver")
+    templates_dir: Path  # Path("templates/weaver")
+    stylesheet: str  # "assets/weaver.css"
+    base_path: str  # "/weaver/"
     theme: ThemeConfig
     pages: dict[str, PageConfig]
     homepage: SubSiteHomepageConfig | None
     about: AboutPageConfig | None
     docs_index_output: Path | None
-    shared_content_refs: list[str]      # keys into shared
-    nav_links: list[NavLinkConfig]      # sub-site nav
-    parent_link: NavLinkConfig | None   # "About df12"
-    static_assets_dir: Path | None      # copied to output
+    shared_content_refs: list[str]  # keys into shared
+    nav_links: list[NavLinkConfig]  # sub-site nav
+    parent_link: NavLinkConfig | None  # "About df12"
+    static_assets_dir: Path | None  # copied to output
 ```
 
 Extend `SiteConfig`:

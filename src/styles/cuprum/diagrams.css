@@ -191,35 +191,49 @@
     align-items: stretch;
   }
 
+  /* Every step but the last carries a fixed-width edge, so it starts from
+     that width and the last from nothing: the free space then divides
+     evenly between the stages themselves, rather than handing the last
+     one an edge's worth more. No stage or step may shrink below its
+     longest word (the flex default), so a name is never split mid-word
+     and a kind label never spills out of its box. */
   .cu-flow--horizontal > .cu-flow__step {
-    flex: 1 1 0;
+    --cu-flow-edge: 6.5rem;
+
+    flex: 1 1 var(--cu-flow-edge);
     flex-direction: row;
-    min-width: 0;
   }
 
   .cu-flow--horizontal > .cu-flow__step:last-child {
-    flex-grow: 1;
+    flex-basis: 0;
   }
 
   .cu-flow--horizontal .cu-flow__stage {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1 1 0;
   }
 
+  /* Three rows: the label sits above the middle, the connector on it, and
+     an empty row below balances the label, so the connector is always at
+     the step's centre however many lines the label takes. */
   .cu-flow--horizontal .cu-flow__edge {
     position: relative;
+    display: grid;
     flex: none;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.3rem;
-    width: 6.75rem;
+    grid-template-rows: 1fr auto 1fr;
+    row-gap: 0.3rem;
+    width: var(--cu-flow-edge);
     min-height: 0;
     padding: 0 0.35rem;
     text-align: center;
   }
 
+  .cu-flow--horizontal .cu-flow__edge > span {
+    grid-row: 1;
+    align-self: end;
+  }
+
   .cu-flow--horizontal .cu-flow__edge::before {
-    order: 2;
+    grid-row: 2;
     align-self: stretch;
     width: auto;
     height: 0;
@@ -237,7 +251,7 @@
     height: 0.55rem;
     border-top: 2px solid var(--color-ink);
     border-right: 2px solid var(--color-ink);
-    transform: translateY(calc(-50% + 0.6rem)) rotate(45deg);
+    transform: translateY(-50%) rotate(45deg);
   }
 }
 

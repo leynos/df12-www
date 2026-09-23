@@ -8,9 +8,10 @@
  * top and bottom rules stay, so stacked panels still read as separate
  * sheets.
  *
- * Only the panels bleed. Cards and board columns are items in a grid and
- * keep their frames, and a panel nested in another panel stays inside its
- * parent, since the parent has already reached the edge.
+ * Only the panels bleed. Cards, board columns, and the matrix tables, whose
+ * rows are already drawn as cards at this width, keep their frames, and a
+ * panel nested in another panel stays inside its parent, since the parent
+ * has already reached the edge.
  *
  * No `!important` is needed, unlike Netsuke and Weaver: the Cuprum markup
  * puts no utilities on these frames, and this partial imports last, so it
@@ -18,16 +19,9 @@
  * nothing here applies, and the desktop presentation is unchanged. */
 
 @media (width < 30rem) {
-  :is(
-    .cu-code,
-    .cu-output,
-    .cu-figure,
-    .cu-matrix-wrap,
-    .cu-facts,
-    .cu-art__frame,
-    .cu-slip,
-    .cu-callout
-  ):not(:is(.cu-code, .cu-output, .cu-figure, .cu-callout, .cu-card) *) {
+  :is(.cu-code, .cu-output, .cu-figure, .cu-facts, .cu-art__frame, .cu-slip, .cu-callout):not(
+    :is(.cu-code, .cu-output, .cu-figure, .cu-callout, .cu-card) *
+  ) {
     max-width: none;
     margin-inline: calc(-1 * var(--cu-gutter));
     border-inline-width: 0;

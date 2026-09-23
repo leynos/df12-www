@@ -81,29 +81,17 @@
       {% endcall %}
 
       {% call ui.section(sections, 'matrix', class='cu-section--tint') %}
-      <div class="cu-matrix-wrap" tabindex="0" role="region" aria-labelledby="matrix-caption">
-        <table class="table cu-matrix">
-          <caption id="matrix-caption">Capability matrix · technical preview · main@{{ cuprum_ref }}</caption>
-          <thead>
-            <tr>
-              <th scope="col">Capability</th>
-              <th scope="col">Python path</th>
-              <th scope="col">Rust extension</th>
-              <th scope="col">Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for row in capabilities %}
-            <tr>
-              <th scope="row">{{ row.name }}</th>
-              <td><span class="cu-state cu-state--{{ row.python }}">{{ state_labels[row.python] }}</span></td>
-              <td><span class="cu-state cu-state--{{ row.rust }}">{{ state_labels[row.rust] }}</span></td>
-              <td>{{ row.notes }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+      {% call ui.matrix('matrix-caption', 'Capability matrix · technical preview · main@' ~ cuprum_ref,
+        ['Capability', 'Python path', 'Rust extension', 'Notes']) %}
+      {% for row in capabilities %}
+      <tr role="row">
+        <th scope="row" role="rowheader">{{ row.name }}</th>
+        {% call ui.matrix_cell('Python path') %}<span class="cu-state cu-state--{{ row.python }}">{{ state_labels[row.python] }}</span>{% endcall %}
+        {% call ui.matrix_cell('Rust extension') %}<span class="cu-state cu-state--{{ row.rust }}">{{ state_labels[row.rust] }}</span>{% endcall %}
+        {% call ui.matrix_cell('Notes') %}{{ row.notes }}{% endcall %}
+      </tr>
+      {% endfor %}
+      {% endcall %}
       <ul class="cu-legend" aria-label="Legend">
         {% for key in ['available', 'integrated', 'inert', 'proposed', 'investigating', 'unreleased', 'python-only'] %}
         <li><span class="cu-state cu-state--{{ key }}">{{ state_labels[key] }}</span></li>

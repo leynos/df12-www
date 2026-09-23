@@ -1025,12 +1025,18 @@ cannot drift; `templates/cuprum/data/` holds the worked-example cabinet, the
 Rust capability matrix, and the roadmap board.
 
 Below 480px Cuprum's content panels run full bleed, as Netsuke's code windows
-and Stilyagi's bands do: code panels, output receipts, figures, callouts, the
-capability matrix, facts lists, install slips, and illustration frames shed the
-page gutter and their side rules. The rules live in
+and Stilyagi's bands do: code panels, output receipts, figures, callouts, facts
+lists, install slips, and illustration frames shed the page gutter and their
+side rules, and the faux terminals drop to 0.7rem type. The rules live in
 `src/styles/cuprum/bleed.css`, which imports last so no `!important` is needed.
 Cards and board columns keep their frames, a panel nested in another stays
 inside it, and nothing changes at 480px and above.
+
+Comparison tables use the `matrix` and `matrix_cell` macros. Below 48rem, where
+a table would scroll sideways, each row becomes a card titled by its row
+header, with each cell labelled by its column; the macros state the table's
+ARIA roles, which the block display would otherwise cost it. The desktop table
+is unchanged.
 
 Each long page carries a sticky route map, rendered by the `routemap` macro
 from the same `sections` list as its headings. From 80rem up it is a strip of

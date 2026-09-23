@@ -181,22 +181,39 @@ ValueError: ambiguous first echo operand '-n'; the selected profile has no verif
       {% endcall %}
 
       {% call ui.section(sections, 'grammar') %}
-      <div class="cu-matrix-wrap" tabindex="0" role="region" aria-labelledby="grammar-caption">
-        <table class="table cu-matrix">
-          <caption id="grammar-caption">Command grammar classes · from the Speedfit terms of reference</caption>
-          <thead>
-            <tr><th scope="col">Grammar class</th><th scope="col">Examples</th><th scope="col">Consequence for Speedfit</th></tr>
-          </thead>
-          <tbody>
-            <tr><th scope="row">Flat option algebra</th><td><code>echo</code>, many core utilities</td><td>A generated function can usually model the full command.</td></tr>
-            <tr><th scope="row">Assignment operands</th><td><code>dd</code></td><td>Named values serialize as tokens such as <code>bs=4M</code>, not POSIX flags.</td></tr>
-            <tr><th scope="row">Command family</th><td><code>git</code>, <code>docker</code></td><td>Runnable leaves map to functions in a module.</td></tr>
-            <tr><th scope="row">Mode-sensitive command</th><td><code>tar</code>, <code>openssl</code></td><td>Incompatible modes become separate functions.</td></tr>
-            <tr><th scope="row">Embedded language</th><td><code>find</code>, <code>sed</code></td><td>A command-specific syntax tree is required.</td></tr>
-            <tr><th scope="row">Delegated execution</th><td><code>find -exec</code>, <code>sh -c</code></td><td>Authorization must cover programs nested inside arguments. Excluded for now.</td></tr>
-          </tbody>
-        </table>
-      </div>
+      {% call ui.matrix('grammar-caption', 'Command grammar classes · from the Speedfit terms of reference',
+        ['Grammar class', 'Examples', 'Consequence for Speedfit']) %}
+      <tr role="row">
+        <th scope="row" role="rowheader">Flat option algebra</th>
+        {% call ui.matrix_cell('Examples') %}<code>echo</code>, many core utilities{% endcall %}
+        {% call ui.matrix_cell('Consequence for Speedfit') %}A generated function can usually model the full command.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Assignment operands</th>
+        {% call ui.matrix_cell('Examples') %}<code>dd</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Speedfit') %}Named values serialize as tokens such as <code>bs=4M</code>, not POSIX flags.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Command family</th>
+        {% call ui.matrix_cell('Examples') %}<code>git</code>, <code>docker</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Speedfit') %}Runnable leaves map to functions in a module.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Mode-sensitive command</th>
+        {% call ui.matrix_cell('Examples') %}<code>tar</code>, <code>openssl</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Speedfit') %}Incompatible modes become separate functions.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Embedded language</th>
+        {% call ui.matrix_cell('Examples') %}<code>find</code>, <code>sed</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Speedfit') %}A command-specific syntax tree is required.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Delegated execution</th>
+        {% call ui.matrix_cell('Examples') %}<code>find -exec</code>, <code>sh -c</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Speedfit') %}Authorization must cover programs nested inside arguments. Excluded for now.{% endcall %}
+      </tr>
+      {% endcall %}
       <p class="cu-prose mt-6">
         Dialect is part of the contract. GNU, BSD, BusyBox, and vendor variants
         are separate target profiles, never folded into a fictional universal

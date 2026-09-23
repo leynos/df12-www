@@ -261,6 +261,39 @@
 </article>
 {%- endmacro %}
 
+{#- A comparison table. The caller supplies the body rows; each row is a
+    `<tr role="row">` holding a `<th scope="row" role="rowheader">` and one
+    `matrix_cell` per remaining column.
+
+    Below 48rem, where the table would scroll sideways, each row is drawn
+    as a card. That display change can cost a table its implicit roles, so
+    they are stated here explicitly, and each cell carries its column's
+    name for the card to show; see src/styles/cuprum/components.css. -#}
+{% macro matrix(id, caption, columns) -%}
+<div class="cu-matrix-wrap" tabindex="0" role="region" aria-labelledby="{{ id }}">
+  <table class="table cu-matrix" role="table">
+    <caption id="{{ id }}">{{ caption }}</caption>
+    <thead role="rowgroup">
+      <tr role="row">
+        {% for column in columns %}
+        <th scope="col" role="columnheader">{{ column }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody role="rowgroup">
+      {{ caller() }}
+    </tbody>
+  </table>
+</div>
+{%- endmacro %}
+
+{#- One cell of a `matrix`, labelled with its column's name. The label is
+    shown only on the phone cards, and hidden from assistive technology,
+    which already names the cell by its column header. -#}
+{% macro matrix_cell(column) -%}
+<td role="cell"><span class="cu-matrix__label" aria-hidden="true">{{ column }}</span>{{ caller() }}</td>
+{%- endmacro %}
+
 {#- A facts table as a definition list: `rows` is a list of (term, value)
     pairs; values are plain text. -#}
 {% macro facts(rows, label) -%}

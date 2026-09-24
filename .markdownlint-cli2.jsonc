@@ -1,37 +1,33 @@
 {
-  // Ignore MD013 (line length) inside tables since reflowing
-  // Markdown tables often breaks formatting and readability.
+  // The estate baseline, copied verbatim from leynos/concordat's
+  // platform-standards/canon/lint/markdown/.markdownlint-cli2.jsonc and
+  // audited by its markdown-formatting-baseline rule (PD-005). Change the
+  // canon there rather than these entries here.
   "config": {
-    "MD004": {
-      "style": "dash"
-    },
-    "MD010": {
-      "code_blocks": false
-    },
+    "MD004": { "style": "dash" },
+    "MD010": { "code_blocks": false },
     "MD013": {
       "line_length": 80,
       "code_block_line_length": 120,
       "tables": false,
       "headings": false
     },
-    "MD029": {
-      "style": "ordered"
-    },
-    "MD036": false
+    "MD029": { "style": "ordered" }
   },
   "ignores": [
     "**/.venv/**",
-    "**/node_modules/**",
-    "**/.terraform/**",
-    "**/.terraform.lock.hcl",
-    "./target/**",
-    ".bun_tmp/**",
-    "**/.uv-cache/**",
-    "**/.uv-tools/**",
     ".vtcode/**",
+    "**/node_modules/**",
     "**/target/**",
     ".terraform/**",
+    ".uv-cache/**",
     "memories/**",
-    "CRUSH.md"
+    "CRUSH.md",
+    // Local additions, which the baseline permits alongside its own: the
+    // module tests' provider caches, Bun's scratch directory, and uv's tool
+    // environments all hold third-party Markdown.
+    "**/.terraform/**",
+    ".bun_tmp/**",
+    "**/.uv-tools/**"
   ]
 }

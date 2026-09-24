@@ -33,8 +33,12 @@ SECTION_NAMES = (
 _FIELD_SECTIONS = frozenset(
     {"Parameters", "Attributes", "Returns", "Yields", "Raises", "Warns"}
 )
+#: Headings some docstrings spell differently, mapped to the canonical name.
+_SECTION_ALIASES = {"Example": "Examples"}
 _UNDERLINE = re.compile(r"^-{3,}\s*$")
-_FIELD_LINE = re.compile(r"^(?P<name>[^\s:][^:]*?)(?:\s*:\s*(?P<type>.+))?$")
+_FIELD_LINE = re.compile(r"^(?P<name>[^\s:][^:]*?)\s*(?::\s*(?P<type>.*))?$")
+#: A field header names one or more identifiers, perhaps starred.
+_FIELD_NAME = re.compile(r"^\*{0,2}[A-Za-z_][\w.]*(?:\s*,\s*\*{0,2}[A-Za-z_][\w.]*)*$")
 
 
 class ApiSourceError(Exception):
@@ -117,7 +121,8 @@ def parse_docstring(text: str | None) -> Docstring:
     heads = [
         i
         for i in range(len(lines) - 1)
-        if lines[i].strip() in SECTION_NAMES and _UNDERLINE.match(lines[i + 1].strip())
+        if _section(lines[i]) in SECTION_NAMES
+        and _UNDERLINE.match(lines[i + 1].strip())
     ]
     intro = lines[: heads[0]] if heads else lines
     paragraphs = _paragraphs(intro)
@@ -125,17 +130,27 @@ def parse_docstring(text: str | None) -> Docstring:
     texts: dict[str, tuple[str, ...]] = {}
     examples = ""
     for index, start in enumerate(heads):
-        name = lines[start].strip()
+        name = _section(lines[start])
         end = heads[index + 1] if index + 1 < len(heads) else len(lines)
         content = lines[start + 2 : end]
         if name in _FIELD_SECTIONS:
-            fields[name] = _fields(content, returns=name in {"Returns", "Yields"})
+            fields[name], prose = _fields(
+                content, returns=name in {"Returns", "Yields"}
+            )
+            if prose:
+                texts[name] = prose
         elif name == "Examples":
             examples = _literal(content)
         else:
             texts[name] = _paragraphs(content)
     summary = paragraphs[0] if paragraphs else ""
     return Docstring(summary, paragraphs[1:], fields, texts, examples)
+
+
+def _section(line: str) -> str:
+    """Return the canonical section name a heading line spells."""
+    heading = line.strip()
+    return _SECTION_ALIASES.get(heading, heading)
 
 
 def _paragraphs(lines: list[str]) -> tuple[str, ...]:
@@ -156,31 +171,47 @@ def _literal(lines: list[str]) -> str:
     return "\n".join(lines).strip("\n")
 
 
-def _fields(lines: list[str], *, returns: bool) -> tuple[Field, ...]:
+def _fields(
+    lines: list[str], *, returns: bool
+) -> tuple[tuple[Field, ...], tuple[str, ...]]:
     """Parse ``name : type`` headed entries with indented descriptions.
 
-    A Returns entry may be a bare type (``int``) rather than
-    ``name : type``, so there a line without a colon is read as the type.
+    A header may also be ``name:`` with no type. A Returns entry may be a bare
+    type (``int``) rather than ``name : type``, so there a line without a
+    colon is read as the type. Any other unindented line is prose about the
+    section rather than a field, and is returned separately as paragraphs.
     """
     entries: list[tuple[str, str, list[str]]] = []
+    prose: list[str] = []
+    in_prose = False
     for line in lines:
         if not line.strip():
-            if entries:
+            if in_prose:
+                prose.append("")
+            elif entries:
                 entries[-1][2].append("")
             continue
         if not line.startswith((" ", "\t")):
             match = _FIELD_LINE.match(line.strip())
-            if match is None:
-                continue
-            name, kind = match["name"].strip(), (match["type"] or "").strip()
-            if returns and not kind:
-                name, kind = "", name
-            entries.append((name, kind, []))
+            name = match["name"].strip() if match else ""
+            kind = (match["type"] or "").strip() if match else ""
+            if returns and match and not kind and match["type"] is None:
+                entries.append(("", name, []))
+                in_prose = False
+            elif match and _FIELD_NAME.match(name):
+                entries.append((name, kind, []))
+                in_prose = False
+            else:
+                prose.append(line)
+                in_prose = True
+        elif in_prose:
+            prose.append(line)
         elif entries:
             entries[-1][2].append(line)
-    return tuple(
+    fields = tuple(
         Field(name, kind, " ".join(_paragraphs(body))) for name, kind, body in entries
     )
+    return fields, _paragraphs(prose)
 
 
 def public_names(package_init: Path) -> list[str]:

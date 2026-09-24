@@ -361,3 +361,30 @@ def test_an_extra_module_lists_what_the_package_does_not_export(
     assert (module.name, module.kind) == ("pkg.sh", "module")
     assert [member.name for member in module.members] == ["make"]
     assert builder.display_line("module", "pkg.sh", "") == "from pkg import sh"
+
+
+def test_a_bare_field_header_and_section_prose_are_told_apart() -> None:
+    """``name:`` is a field; an unindented sentence is prose about the section."""
+    text = "\n".join(
+        [
+            "Summary.",
+            "",
+            "Attributes",
+            "----------",
+            "phase:",
+            "    The phase.",
+            "",
+            "New fields are appended at the end.",
+            "",
+            "Example",
+            "-------",
+            ">>> 1",
+            "1",
+        ]
+    )
+    doc = parse_docstring(text)
+    assert [(f.name, f.description) for f in doc.fields["Attributes"]] == [
+        ("phase", "The phase.")
+    ]
+    assert doc.texts["Attributes"] == ("New fields are appended at the end.",)
+    assert doc.examples == ">>> 1\n1"

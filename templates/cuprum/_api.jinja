@@ -24,9 +24,8 @@
     </div>
     {% endfor %}
   </dl>
-  {% else %}
-  {% for paragraph in section.paragraphs %}<p>{{ paragraph | safe }}</p>{% endfor %}
   {% endif %}
+  {% for paragraph in section.paragraphs or [] %}<p>{{ paragraph | safe }}</p>{% endfor %}
 </div>
 {% endfor %}
 {% if d.examples %}

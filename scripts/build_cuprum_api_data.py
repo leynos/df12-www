@@ -387,27 +387,20 @@ def _doc_payload(doc: Docstring, known: frozenset[str]) -> dict[str, typ.Any]:
         payload["body"] = [inline_html(p, known) for p in doc.body]
     sections = []
     for name in SECTION_NAMES:
+        section: dict[str, typ.Any] = {"title": name}
         if doc.fields.get(name):
-            sections.append(
+            section["fields"] = [
                 {
-                    "title": name,
-                    "fields": [
-                        {
-                            "name": field.name,
-                            "type": html.escape(field.type),
-                            "description": inline_html(field.description, known),
-                        }
-                        for field in doc.fields[name]
-                    ],
+                    "name": field.name,
+                    "type": html.escape(field.type),
+                    "description": inline_html(field.description, known),
                 }
-            )
-        elif doc.texts.get(name):
-            sections.append(
-                {
-                    "title": name,
-                    "paragraphs": [inline_html(p, known) for p in doc.texts[name]],
-                }
-            )
+                for field in doc.fields[name]
+            ]
+        if doc.texts.get(name):
+            section["paragraphs"] = [inline_html(p, known) for p in doc.texts[name]]
+        if len(section) > 1:
+            sections.append(section)
     if sections:
         payload["sections"] = sections
     if doc.examples:

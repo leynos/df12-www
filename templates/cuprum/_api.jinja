@@ -1,0 +1,76 @@
+{#
+  Rendering for the generated API reference. Each macro takes the data
+  scripts/build_cuprum_api_data.py wrote to data/api.jinja: the prose fields
+  are HTML the generator escaped and marked up, so they are output as safe;
+  declarations and examples are plain text, highlighted here.
+#}
+{% import "_icons.jinja" as icons %}
+{% from "data/api.jinja" import api_source %}
+
+{#- A parsed docstring: summary, paragraphs, field and prose sections, and
+    any doctest examples. -#}
+{% macro doc(d, heading='h4', label='') -%}
+{% if d.summary %}<p class="cu-api__summary">{{ d.summary | safe }}</p>{% endif %}
+{% for paragraph in d.body or [] %}<p>{{ paragraph | safe }}</p>{% endfor %}
+{% for section in d.sections or [] %}
+<div class="cu-api__section">
+  <{{ heading }} class="cu-api__section-title">{{ section.title }}</{{ heading }}>
+  {% if section.fields %}
+  <dl class="cu-api__fields">
+    {% for field in section.fields %}
+    <div class="cu-api__field">
+      <dt>{% if field.name %}<code class="cu-api__field-name">{{ field.name }}</code>{% endif %}{% if field.type %} <span class="cu-api__field-type">{{ field.type | safe }}</span>{% endif %}</dt>
+      <dd>{{ field.description | safe }}</dd>
+    </div>
+    {% endfor %}
+  </dl>
+  {% else %}
+  {% for paragraph in section.paragraphs %}<p>{{ paragraph | safe }}</p>{% endfor %}
+  {% endif %}
+</div>
+{% endfor %}
+{% if d.examples %}
+<div class="cu-api__section">
+  <{{ heading }} class="cu-api__section-title">Examples</{{ heading }}>
+  <div class="code-scroll cu-api__example" tabindex="0" role="region" aria-label="Examples{{ ' for ' ~ label if label }}">
+  {% highlight 'pycon', 'cuprum-syntax' %}{{ d.examples | safe }}{% endhighlight %}
+  </div>
+</div>
+{% endif %}
+{%- endmacro %}
+
+{#- A declaration, highlighted as Python. It wraps rather than scrolls, so
+    no declaration needs a keyboard stop of its own; the generator has
+    already set long parameter lists one to a line. -#}
+{% macro declaration(text) -%}
+<div class="cu-api__decl">
+{% highlight 'python', 'cuprum-syntax' %}{{ text | safe }}{% endhighlight %}
+</div>
+{%- endmacro %}
+
+{#- One exported name, with its source link and, for a class or module, its
+    members in a disclosure. -#}
+{% macro entry(e) -%}
+<article id="{{ e.name }}" class="cu-api__entry" aria-labelledby="{{ e.name }}-title">
+  <header class="cu-api__head">
+    <span class="cu-api__kind">{{ e.kind }}</span>
+    <h3 id="{{ e.name }}-title" class="cu-api__name"><code>{{ e.name }}</code></h3>
+    <a class="cu-api__source" href="{{ repository_url }}/blob/{{ api_source.commit }}/{{ e.path }}#L{{ e.line }}">{{ e.path }}<span class="sr-only">, the source of {{ e.name }}</span> {{ icons.icon('external') }}</a>
+  </header>
+  {{ declaration(e.display) }}
+  {% if e.bases %}<p class="cu-api__bases">Bases: {% for base in e.bases %}<code>{{ base }}</code>{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+  {{ doc(e.doc, label=e.name) }}
+  {% if e.members %}
+  <details class="cu-api__members">
+    <summary>{{ e.members | length }} {{ 'export' if e.kind == 'module' else 'member' }}{{ '' if e.members | length == 1 else 's' }}</summary>
+    {% for m in e.members %}
+    <div class="cu-api__member" id="{{ e.name }}.{{ m.name }}">
+      <p class="cu-api__member-head"><span class="cu-api__kind">{{ m.kind }}</span> <code>{{ e.name }}.{{ m.name }}</code></p>
+      {{ declaration(m.display) }}
+      {{ doc(m.doc, heading='h5', label=e.name ~ '.' ~ m.name) }}
+    </div>
+    {% endfor %}
+  </details>
+  {% endif %}
+</article>
+{%- endmacro %}

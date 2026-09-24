@@ -1,0 +1,17 @@
+{#
+  The documentation section's contents. One list drives the docs sidebar, the
+  phone drop-down, the landing page, and each page's previous and next links,
+  so they cannot disagree.
+
+  Guides are written for the site, in the order a newcomer reads them. The
+  API pages come from data/api.jinja, which scripts/build_cuprum_api_data.py
+  generates from Cuprum's source.
+#}
+{% from "data/api.jinja" import api_groups, api_source %}
+{% set docs_source = api_source %}
+{% set docs_guides = [] %}
+{% set docs_api = [] %}
+{% for group in api_groups %}
+{% set _ = docs_api.append({'slug': group.slug, 'title': group.title, 'lede': group.lede,
+  'href': '/cuprum/docs/api/' ~ group.slug ~ '/', 'names': group.entries | map(attribute='name') | list}) %}
+{% endfor %}

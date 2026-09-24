@@ -124,6 +124,10 @@ Build-time scripts outside the Python package:
 - `generate_*_pygments_css.py` — Regenerate the marked Pygments block in each
   sub-site's syntax stylesheet from its Pygments `Style`; Cuprum's is
   `generate_cuprum_pygments_css.py`.
+- `cuprum_api_parser.py` and `build_cuprum_api_data.py` — Read Cuprum's public
+  API from a Cuprum checkout, with `ast` alone, and write the generated
+  `templates/cuprum/data/api.jinja` the API reference renders; run through
+  `make cuprum-api-data` and checked by `make check-cuprum-api-data`.
 
 ### `src/`
 

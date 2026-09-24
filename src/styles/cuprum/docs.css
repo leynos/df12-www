@@ -1,0 +1,430 @@
+/* The documentation section: its layout, its navigation, and the generated
+ * API reference. See templates/cuprum/pages/_docs.jinja and _api.jinja.
+ *
+ * From 64rem the contents sit in a sticky rail beside the page; below it
+ * they fold into a disclosure above the page, as the route map does, and
+ * CSS displays exactly one of the two, so a screen reader meets the links
+ * once. */
+
+.cu-docs__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  padding-block: 2rem clamp(3.5rem, 7vw, 6rem);
+}
+
+@media (width >= 64rem) {
+  .cu-docs__grid {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 3.5rem;
+    padding-top: 3rem;
+  }
+}
+
+.cu-docs__body {
+  min-width: 0;
+}
+
+/* ---------- Navigation ------------------------------------------------ */
+
+.cu-docs-nav__rail {
+  display: none;
+}
+
+@media (width >= 64rem) {
+  .cu-docs-nav__menu {
+    display: none;
+  }
+
+  .cu-docs-nav__rail {
+    position: sticky;
+    top: calc(4.25rem + 2px + 1.5rem);
+    display: block;
+    max-height: calc(100dvh - 4.25rem - 3rem);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+}
+
+.cu-docs-nav__menu {
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper-shade);
+}
+
+.cu-docs-nav__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  list-style: none;
+  cursor: pointer;
+}
+
+.cu-docs-nav__summary::-webkit-details-marker {
+  display: none;
+}
+
+/* A solid chevron, as on the route map, turned over while open. */
+.cu-docs-nav__summary::after {
+  flex: none;
+  width: 0.75rem;
+  height: 0.5rem;
+  background: currentcolor;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  content: "";
+  transition: transform 0.15s ease;
+}
+
+.cu-docs-nav__menu[open] .cu-docs-nav__summary::after {
+  transform: rotate(180deg);
+}
+
+.cu-docs-nav__summary:focus-visible {
+  outline-offset: -3px;
+}
+
+.cu-docs-nav__panel {
+  padding: 0.25rem 1rem 1rem;
+  border-top: 1px dashed var(--color-ink);
+}
+
+.cu-docs-nav__home {
+  display: block;
+  padding-block: 0.4rem;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1.1;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.cu-docs-nav__heading {
+  margin-top: 1.25rem;
+  color: var(--color-copper-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-stamp);
+  text-transform: uppercase;
+}
+
+.cu-docs-nav__heading a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cu-docs-nav__list,
+.cu-docs-nav__entries {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cu-docs-nav__list > li + li,
+.cu-docs-nav__entries > li + li {
+  margin-top: 0;
+}
+
+.cu-docs-nav__link {
+  display: block;
+  padding: 0.35rem 0 0.35rem 0.75rem;
+  color: var(--color-ink);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.cu-docs-nav__link:hover,
+.cu-docs-nav__heading a:hover,
+.cu-docs-nav__home:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* The page being read: a copper bar down its left edge, as the route map's
+   drop-down marks a section, drawn inset so nothing reflows. */
+.cu-docs-nav__link[aria-current],
+.cu-docs-nav__home[aria-current] {
+  box-shadow: inset 3px 0 0 var(--color-copper);
+  font-weight: 700;
+}
+
+.cu-docs-nav__home[aria-current] {
+  padding-left: 0.75rem;
+}
+
+.cu-docs-nav__entries {
+  margin: 0 0 0.5rem 0.75rem;
+  padding-left: 0.75rem;
+  border-left: 1px dashed var(--color-ink);
+}
+
+/* Padded to a 24px target, the WCAG 2.2 minimum, despite the small type. */
+.cu-docs-nav__entries a {
+  display: block;
+  padding-block: 0.3rem;
+  color: var(--color-ink-muted);
+  font-size: 0.8rem;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.cu-docs-nav__entries a:hover {
+  color: var(--color-ink);
+  text-decoration: underline;
+}
+
+.cu-docs-nav__entries code {
+  padding: 0;
+  background: none;
+}
+
+/* ---------- Page heads and parts --------------------------------------- */
+
+.cu-docs__head {
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--color-ink);
+}
+
+.cu-docs__title {
+  margin-top: 0.75rem;
+  font-size: clamp(3rem, 7vw, 5rem);
+  line-height: 0.92;
+}
+
+.cu-docs__lede {
+  max-width: var(--cu-measure);
+  margin-top: 1rem;
+  font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+  line-height: 1.55;
+}
+
+.cu-docs__meta {
+  margin-top: 1rem;
+  color: var(--cu-muted-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.cu-docs__part {
+  margin-top: 3rem;
+}
+
+.cu-docs__part-title {
+  margin-bottom: 1rem;
+  font-size: 2.2rem;
+}
+
+.cu-docs__part-title a {
+  color: inherit;
+  text-decoration-thickness: 2px;
+}
+
+.cu-docs__part-lede {
+  max-width: var(--cu-measure);
+  margin-bottom: 1rem;
+}
+
+.cu-docs__names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cu-docs__names > li + li {
+  margin-top: 0;
+}
+
+.cu-docs__names a {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-ink);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.cu-docs__names a:hover {
+  background: var(--color-yellow);
+}
+
+.cu-docs__names code {
+  padding: 0;
+  background: none;
+}
+
+/* ---------- API entries ----------------------------------------------- */
+
+.cu-api__entry {
+  padding-block: 2.25rem;
+  border-bottom: 1px dashed var(--color-ink);
+  scroll-margin-top: calc(4.25rem + 2rem);
+}
+
+.cu-api__entry > * + * {
+  margin-top: 0.9rem;
+}
+
+.cu-api__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+}
+
+.cu-api__kind {
+  color: var(--color-copper-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cu-api__name {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+.cu-api__name code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+.cu-api__source {
+  margin-left: auto;
+  color: var(--cu-muted-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  overflow-wrap: anywhere;
+}
+
+.cu-api__source svg {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  vertical-align: -0.1em;
+}
+
+/* Declarations wrap rather than scroll, so none needs a keyboard stop; the
+   generator has already set long parameter lists one to a line. */
+.cu-api__decl .cuprum-syntax {
+  width: auto;
+}
+
+.cu-api__decl .cuprum-syntax pre {
+  padding: 0.9rem 1.1rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cu-api__summary {
+  font-size: 1.05rem;
+}
+
+.cu-api__bases {
+  color: var(--cu-muted-text);
+  font-size: 0.9rem;
+}
+
+.cu-api__section-title {
+  margin-top: 1.25rem;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cu-api__fields {
+  margin: 0.5rem 0 0;
+  border-top: 1px solid var(--color-ink);
+}
+
+.cu-api__field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.2rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed var(--color-ink);
+}
+
+@media (width >= 48rem) {
+  .cu-api__field {
+    grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.cu-api__field dt {
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.cu-api__field-name {
+  font-weight: 600;
+}
+
+.cu-api__field-type {
+  color: var(--color-patina-text);
+}
+
+.cu-api__field dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.cu-api__members {
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+}
+
+.cu-api__members > summary {
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cu-api__members > summary:focus-visible {
+  outline-offset: -3px;
+}
+
+.cu-api__member {
+  padding: 1rem;
+  border-top: 1px dashed var(--color-ink);
+  scroll-margin-top: calc(4.25rem + 2rem);
+}
+
+.cu-api__member > * + * {
+  margin-top: 0.7rem;
+}
+
+.cu-api__member-head code {
+  font-weight: 600;
+}

@@ -1038,6 +1038,22 @@ header, with each cell labelled by its column; the macros state the table's
 ARIA roles, which the block display would otherwise cost it. The desktop table
 is unchanged.
 
+The documentation section lives under `/cuprum/docs/`. Every page in it extends
+`pages/_docs.jinja`, whose navigation renders from `data/docs.jinja` as a
+sticky rail from 64rem and a `<details>` drop-down below it. The API reference
+is generated from Cuprum's source: `scripts/cuprum_api_parser.py` resolves each
+name in `cuprum.__all__` to the statement that defines it, with `ast` alone,
+following re-exports through the package, and parses its signature and NumPy
+docstring. `scripts/build_cuprum_api_data.py` then sorts the names into the
+reference pages in its `GROUPS`, renders the reStructuredText inline markup as
+escaped HTML, and writes `templates/cuprum/data/api.jinja`. Run
+`make cuprum-api-data CUPRUM_SOURCE=<checkout>` against a checkout of the
+documented release, and `make check-cuprum-api-data` to confirm the committed
+file still matches. A name exported but placed in no group, placed twice, or
+placed but no longer exported stops the build, so the reference cannot fall
+silently behind the package. Each reference page is a two-line template that
+sets `api_slug` and extends `pages/_docs_api_group.jinja`.
+
 Each long page carries a sticky route map, rendered by the `routemap` macro
 from the same `sections` list as its headings. From 80rem up it is a strip of
 links; below that, where the strip would scroll sideways, the same links sit in

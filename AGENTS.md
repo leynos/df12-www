@@ -206,7 +206,14 @@ sub-site's components layer whatever the specificity. Its code is real — every
 snippet was run against the commit named by `cuprum_commit` in the site's
 `template_vars`, and the install commands pin that commit. The fictional
 Philadelphia Command Plumbing seal is decorative and never appears on a legal
-page. See section 5.5 of the [Developer's Guide](docs/developers-guide.md).
+page. Its API reference, under `/cuprum/docs/api/`, is generated rather than
+written: `make cuprum-api-data` reads every name Cuprum exports from a Cuprum
+checkout (`CUPRUM_SOURCE`, default `../cuprum`) into
+`templates/cuprum/data/api.jinja`, and `make check-cuprum-api-data` fails when
+that file has drifted. Never edit the generated file; when Cuprum exports a new
+name, place it in a group in `scripts/build_cuprum_api_data.py` or the build
+refuses to run. See section 5.5 of the
+[Developer's Guide](docs/developers-guide.md).
 
 ### Prefer semantic classes over literal colours
 

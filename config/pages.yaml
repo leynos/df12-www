@@ -1627,6 +1627,8 @@ sites:
     nav_links:
       - label: Home
         href: /cuprum/
+      - label: Docs
+        href: /cuprum/docs/
       - label: Examples
         href: /cuprum/examples/
       - label: Internals
@@ -1648,6 +1650,15 @@ sites:
       - { key: examples-pipeline-tee, label: Pipeline, tee, and stage failure, template: pages/examples-pipeline-tee.jinja, output_slug: examples/pipeline-tee }
       - { key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals }
       - { key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: internals/rust-extension }
+      - { key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs }
+      - { key: docs-api, label: API reference, template: pages/docs-api.jinja, output_slug: docs/api }
+      - { key: docs-api-commands, label: "Commands and results", template: pages/docs-api-commands.jinja, output_slug: docs/api/commands }
+      - { key: docs-api-catalogues, label: "Programs and catalogues", template: pages/docs-api-catalogues.jinja, output_slug: docs/api/catalogues }
+      - { key: docs-api-pipelines, label: "Pipelines and concurrency", template: pages/docs-api-pipelines.jinja, output_slug: docs/api/pipelines }
+      - { key: docs-api-policy, label: "Scopes, policy, and hooks", template: pages/docs-api-policy.jinja, output_slug: docs/api/policy }
+      - { key: docs-api-observation, label: "Events and observation", template: pages/docs-api-observation.jinja, output_slug: docs/api/observation }
+      - { key: docs-api-rust, label: "Rust pump and backends", template: pages/docs-api-rust.jinja, output_slug: docs/api/rust }
+      - { key: docs-api-errors, label: "Errors", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors }
       - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
       - { key: setwork, label: Setwork, template: pages/setwork.jinja, output_slug: setwork }
     pages: {}

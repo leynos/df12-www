@@ -1,0 +1,36 @@
+{% extends "pages/_docs.jinja" %}
+{% import "components.jinja" as ui %}
+{% from "data/docs.jinja" import docs_guides, docs_api, docs_source as api_source %}
+{% set docs_current = '/cuprum/docs/' %}
+{% block title %}Documentation · Cuprum{% endblock %}
+{% block description %}Cuprum's documentation: task guides for running, piping, scoping, and observing commands, and a reference for every public name, read from the source.{% endblock %}
+{% block docs_body %}
+          <header class="cu-docs__head">
+            <p class="cu-kicker">Work order 004 · Documentation</p>
+            <h1 class="cu-docs__title">Documentation</h1>
+            <p class="cu-docs__lede">
+              Guides walk through a task end to end. The API reference lists
+              every name Cuprum exports, read from the source of
+              {{ api_source.version }}, with each signature, parameter, and
+              failure.
+            </p>
+          </header>
+          {% if docs_guides %}
+          <section class="cu-docs__part" aria-labelledby="guides-title">
+            <h2 id="guides-title" class="cu-docs__part-title">Guides</h2>
+            <ul class="cu-card-grid" role="list">
+              {% for guide in docs_guides %}
+              <li>{{ ui.card(guide.title, guide.summary, number='Guide ' ~ '%02d' % loop.index, href=guide.href, heading='h3') }}</li>
+              {% endfor %}
+            </ul>
+          </section>
+          {% endif %}
+          <section class="cu-docs__part" aria-labelledby="api-title">
+            <h2 id="api-title" class="cu-docs__part-title">API reference</h2>
+            <ul class="cu-card-grid" role="list">
+              {% for page in docs_api %}
+              <li>{{ ui.card(page.title, page.lede, number=page.names | length ~ ' names', href=page.href, heading='h3') }}</li>
+              {% endfor %}
+            </ul>
+          </section>
+{% endblock %}

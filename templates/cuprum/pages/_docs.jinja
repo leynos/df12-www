@@ -1,0 +1,50 @@
+{#
+  The layout every documentation page extends.
+
+  A child sets `docs_current` (the href of the page) and, on an API page,
+  `docs_group` (its group from data/api.jinja), then fills `docs_body`.
+  The sidebar and the phone drop-down both render from data/docs.jinja, and
+  the current page's API entries are listed under it as anchors.
+#}
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% from "data/docs.jinja" import docs_guides, docs_api %}
+{% set docs_group = docs_group | default(none) %}
+{% block main_class %} class="cu-docs"{% endblock %}
+{% macro _nav_list(items) -%}
+<ul class="cu-docs-nav__list" role="list">
+  {% for item in items %}
+  <li>
+    <a class="cu-docs-nav__link" href="{{ item.href }}"{% if item.href == docs_current %} aria-current="page"{% endif %}>{{ item.title }}</a>
+    {% if item.href == docs_current and item.names %}
+    <ul class="cu-docs-nav__entries" role="list">
+      {% for name in item.names %}<li><a href="#{{ name }}"><code>{{ name }}</code></a></li>{% endfor %}
+    </ul>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{%- endmacro %}
+{% macro _nav() -%}
+<a class="cu-docs-nav__home" href="/cuprum/docs/"{% if docs_current == '/cuprum/docs/' %} aria-current="page"{% endif %}>Documentation</a>
+{% if docs_guides %}
+<p class="cu-docs-nav__heading">Guides</p>
+{{ _nav_list(docs_guides) }}
+{% endif %}
+<p class="cu-docs-nav__heading"><a href="/cuprum/docs/api/"{% if docs_current == '/cuprum/docs/api/' %} aria-current="page"{% endif %}>API reference</a></p>
+{{ _nav_list(docs_api) }}
+{%- endmacro %}
+{% block content %}
+      <div class="cu-shell cu-docs__grid">
+        <nav class="cu-docs-nav" aria-label="Documentation">
+          <details class="cu-docs-nav__menu">
+            <summary class="cu-docs-nav__summary">Documentation contents</summary>
+            <div class="cu-docs-nav__panel">{{ _nav() }}</div>
+          </details>
+          <div class="cu-docs-nav__rail">{{ _nav() }}</div>
+        </nav>
+        <div class="cu-docs__body">
+          {% block docs_body %}{% endblock %}
+        </div>
+      </div>
+{% endblock %}

@@ -45,6 +45,7 @@
  * class, because every page's rules share this one sheet. */
 @import "./cuprum/home.css" layer(components);
 @import "./cuprum/pages.css" layer(components);
+@import "./cuprum/docs.css" layer(components);
 
 /* The phone-width full bleed imports after everything it overrides. */
 @import "./cuprum/bleed.css" layer(components);

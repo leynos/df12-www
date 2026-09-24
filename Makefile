@@ -33,12 +33,14 @@ TYPOS_CONFIG_BUILDER = uv tool run --from \
 	typos-config-builder
 NODE_MODULES_STAMP := node_modules/.install-stamp
 EPISODIC_SOURCE ?= ../episodic
+CUPRUM_SOURCE ?= ../cuprum
 
 ifeq ($(strip $(SKIP_PLAYWRIGHT)),1)
 PYTEST_FILTER += -m 'not playwright'
 endif
 
 .PHONY: help all clean build build-release lint fmt check-fmt check-site-data \
+        cuprum-api-data check-cuprum-api-data \
         docs-check markdownlint nixie site-data spelling stylelint test typecheck \
         typecheck-js venv-ruff \
         $(TOOLS) \
@@ -59,6 +61,12 @@ site-data: ## Regenerate committed Episodic data from its authoritative roadmap
 
 check-site-data: ## Check the committed Episodic roadmap projection for drift
 	uv run scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)" --check
+
+cuprum-api-data: ## Regenerate the Cuprum API reference from a Cuprum checkout at the documented release
+	uv run scripts/build_cuprum_api_data.py --cuprum-root "$(CUPRUM_SOURCE)"
+
+check-cuprum-api-data: ## Check the committed Cuprum API reference against its source
+	uv run scripts/build_cuprum_api_data.py --cuprum-root "$(CUPRUM_SOURCE)" --check
 
 # Biome, Tailwind, and the test runner all live in node_modules, so every
 # target that shells out to bun has to depend on this. `bun` is order-only:

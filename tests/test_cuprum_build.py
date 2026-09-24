@@ -13,7 +13,9 @@ skipping it.
 
 from __future__ import annotations
 
+import json
 import re
+import typing as typ
 from pathlib import Path
 
 import pytest
@@ -230,3 +232,40 @@ def test_engraving_masks_are_published(built_site: Path) -> None:
     assert any("town-hall" in mask for mask in masks), sorted(masks)
     for mask in masks:
         assert (REPO_ROOT / "public" / mask.lstrip("/")).is_file(), mask
+
+
+def _api_groups() -> list[dict[str, object]]:
+    """Return the generated API reference data the docs pages render."""
+    text = (REPO_ROOT / "templates" / "cuprum" / "data" / "api.jinja").read_text(
+        encoding="utf-8"
+    )
+    start = text.index("{% set api_groups = ") + len("{% set api_groups = ")
+    end = text.index(" %}\n{% set api_source")
+    return typ.cast("list[dict[str, object]]", json.loads(text[start:end]))
+
+
+@pytest.mark.timeout(300)
+def test_api_reference_publishes_every_exported_name(built_site: Path) -> None:
+    """Each generated entry has one anchor, on its own group's page."""
+    assert built_site.is_dir()
+    for group in _api_groups():
+        page = PUBLIC_CUPRUM / "docs" / "api" / str(group["slug"]) / "index.html"
+        soup = _soup(page)
+        ids = [_attr(article, "id") for article in soup.select("article.cu-api__entry")]
+        entries = typ.cast("list[dict[str, object]]", group["entries"])
+        assert ids == [entry["name"] for entry in entries], f"{page}: entries differ"
+        assert len(soup.select("h1")) == 1, f"{page}: expected one h1"
+
+
+@pytest.mark.timeout(300)
+def test_docs_rail_and_drop_down_list_the_same_pages(built_site: Path) -> None:
+    """The desktop rail and the phone drop-down render from one list."""
+    assert built_site.is_dir()
+    for page in sorted((PUBLIC_CUPRUM / "docs").rglob("index.html")):
+        soup = _soup(page)
+        rail = [_attr(a, "href") for a in soup.select(".cu-docs-nav__rail a")]
+        menu = [_attr(a, "href") for a in soup.select(".cu-docs-nav__panel a")]
+        assert rail, f"{page}: the docs navigation is empty"
+        assert rail == menu, f"{page}: the rail and the drop-down disagree"
+        current = soup.select(".cu-docs-nav__rail [aria-current='page']")
+        assert len(current) == 1, f"{page}: expected one current page in the rail"

@@ -1,0 +1,4753 @@
+{#
+  GENERATED FILE - do not edit by hand.
+
+  The Cuprum API reference, read from Cuprum's source by
+  scripts/build_cuprum_api_data.py. Regenerate with `make cuprum-api-data`
+  after the documented release moves; `make check-cuprum-api-data` fails when
+  this file no longer matches the source.
+
+  Source: leynos/cuprum 0.2.0-beta1 at 230c4b9b31c74e538bd75d21224ebb4f70dc7f9d
+#}
+{% set api_groups = [
+  {
+    "slug": "commands",
+    "title": "Commands and results",
+    "lede": "Building a typed command from a catalogued program, running it, and reading what it returns.",
+    "entries": [
+      {
+        "name": "sh",
+        "kind": "module",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 1,
+        "display": "from cuprum import sh",
+        "doc": {
+          "summary": "Safe command construction and execution facade for curated programs.",
+          "body": [
+            "This module focuses on the typed core: building <code>SafeCmd</code> instances from curated <code>Program</code> values and providing a minimal async runtime for executing them with predictable semantics."
+          ]
+        },
+        "members": [
+          {
+            "name": "build_argv",
+            "kind": "function",
+            "display": "def build_argv(*args: _ArgValue, **kwargs: _ArgValue) -> tuple[str, ...]",
+            "doc": {
+              "summary": "Build an argv tuple using the same rules as <code>sh.make</code> builders.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "*args",
+                      "type": "",
+                      "description": "Positional argument values. Values are stringified with <code>str()</code> in the order supplied and appear before generated keyword flags."
+                    },
+                    {
+                      "name": "**kwargs",
+                      "type": "",
+                      "description": "Keyword flag values. Each key is normalized by replacing underscores with hyphens, then serialized as <code>--flag=value</code> in insertion order. <code>None</code> is rejected in positional and keyword positions."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "tuple[str, ...]",
+                      "description": "The constructed argv tuple, excluding the program name."
+                    }
+                  ]
+                }
+              ],
+              "examples": ">>> build_argv(\"status\", porcelain=True, branch=\"main\")\n('status', '--porcelain=True', '--branch=main')"
+            }
+          },
+          {
+            "name": "make",
+            "kind": "function",
+            "display": "def make(\n    program: Program,\n    *,\n    catalogue: ProgramCatalogue = DEFAULT_CATALOGUE,\n) -> SafeCmdBuilder",
+            "doc": {
+              "summary": "Build a callable that produces <code>SafeCmd</code> instances for <code>program</code>.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program",
+                      "description": "The program the built <code>SafeCmd</code> instances invoke; it must exist in <code>catalogue</code>."
+                    },
+                    {
+                      "name": "catalogue",
+                      "type": "ProgramCatalogue",
+                      "description": "The catalogue used to validate <code>program</code> and resolve its entry."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafeCmdBuilder",
+                      "description": "A callable that builds <code>SafeCmd</code> instances for <code>program</code>."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "UnknownProgramError",
+                      "type": "",
+                      "description": "If <code>program</code> does not exist in <code>catalogue</code>."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "SafeCmd",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 586,
+        "display": "class SafeCmd(\n    program: Program,\n    argv: tuple[str, ...],\n    project: ProjectSettings,\n    __weakref__: object = dc.field(init=False, repr=False, hash=False, compare=False),\n)",
+        "doc": {
+          "summary": "Typed representation of a curated command ready for execution."
+        },
+        "members": [
+          {
+            "name": "program",
+            "kind": "field",
+            "display": "program: Program",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "argv",
+            "kind": "field",
+            "display": "argv: tuple[str, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "project",
+            "kind": "field",
+            "display": "project: ProjectSettings",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "argv_with_program",
+            "kind": "property",
+            "display": "argv_with_program: tuple[str, ...]",
+            "doc": {
+              "summary": "The program name followed by this command's arguments.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "tuple[str, ...]",
+                      "description": "An argument vector whose first item is <code>str(program)</code>."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "run",
+            "kind": "method",
+            "display": "async def run(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> CommandResult",
+            "doc": {
+              "summary": "Execute the command asynchronously with predictable cancellation.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "output",
+                      "type": "RunOutputOptions | None, default=None",
+                      "description": "Capture and echo settings. Its 64 KiB default bounds each mirrored line without affecting capture; set <code>max_echo_line_bytes=None</code> for unbounded mirroring."
+                    },
+                    {
+                      "name": "timeout",
+                      "type": "float | None, default=None",
+                      "description": "Maximum execution time in seconds. An explicit value overrides the timeout in <code>context</code>."
+                    },
+                    {
+                      "name": "context",
+                      "type": "ExecutionContext | None, default=None",
+                      "description": "Execution settings, including echo sinks and text encoding."
+                    },
+                    {
+                      "name": "stdin",
+                      "type": "StdinInput | None, default=None",
+                      "description": "Optional bytes or text supplied to the child process's stdin."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CommandResult",
+                      "description": "The command outcome, including complete captured streams when <code>output.capture</code> is true."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "PermissionError",
+                      "type": "",
+                      "description": "If the command is not allowed by the active scope."
+                    },
+                    {
+                      "name": "TimeoutError",
+                      "type": "",
+                      "description": "If execution exceeds the effective timeout."
+                    },
+                    {
+                      "name": "UnicodeEncodeError",
+                      "type": "",
+                      "description": "If text stdin cannot be encoded by the execution context."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "lines",
+            "kind": "method",
+            "display": "def lines(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> LineStream",
+            "doc": {
+              "summary": "Iterate the command's output lines as they arrive.",
+              "body": [
+                "Line events are delivered in arrival order per stream, stamped with monotonic seconds since the command started. Capture and echo stay governed by *output* independently: iterating lines does not disable either unless the caller asks."
+              ],
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "LineStream",
+                      "description": "An async iterator of <code>LineEvent</code> whose <code>result</code> attribute holds the final <code>CommandResult</code> once iteration completes."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ForbiddenProgramError",
+                      "type": "",
+                      "description": "If the program is not permitted by the active context allowlist."
+                    },
+                    {
+                      "name": "TimeoutExpired",
+                      "type": "",
+                      "description": "If *timeout* elapses before the command completes."
+                    },
+                    {
+                      "name": "UnicodeEncodeError",
+                      "type": "",
+                      "description": "If <code>stdin</code> text cannot be encoded with the context's encoding."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "run_sync",
+            "kind": "method",
+            "display": "def run_sync(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> CommandResult",
+            "doc": {
+              "summary": "Execute the command synchronously.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "output",
+                      "type": "RunOutputOptions | None, default=None",
+                      "description": "Capture and echo settings. The default limits each mirrored line to 64 KiB; <code>max_echo_line_bytes=None</code> restores unbounded echoing while preserving the same capture contract."
+                    },
+                    {
+                      "name": "timeout",
+                      "type": "float | None, default=None",
+                      "description": "Maximum execution time in seconds."
+                    },
+                    {
+                      "name": "context",
+                      "type": "ExecutionContext | None, default=None",
+                      "description": "Execution settings, including echo sinks and text encoding."
+                    },
+                    {
+                      "name": "stdin",
+                      "type": "StdinInput | None, default=None",
+                      "description": "Optional bytes or text supplied to the child process's stdin."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CommandResult",
+                      "description": "The command outcome, including complete captured streams when enabled."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "PermissionError",
+                      "type": "",
+                      "description": "If the command is not allowed by the active scope."
+                    },
+                    {
+                      "name": "TimeoutError",
+                      "type": "",
+                      "description": "If execution exceeds the effective timeout."
+                    },
+                    {
+                      "name": "UnicodeEncodeError",
+                      "type": "",
+                      "description": "If text stdin cannot be encoded by the execution context."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "SafeCmdBuilder",
+        "kind": "type alias",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 62,
+        "display": "SafeCmdBuilder = cabc.Callable[..., SafeCmd]",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "CommandResult",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 126,
+        "display": "class CommandResult(\n    program: Program,\n    argv: tuple[str, ...],\n    exit_code: int,\n    pid: int,\n    stdout: str | None,\n    stderr: str | None,\n    started_at: float = dc.field(default=0.0, kw_only=True),\n    duration: float = dc.field(default=0.0, kw_only=True),\n    max_rss_bytes: int | None = dc.field(default=None, kw_only=True),\n    user_cpu_seconds: float | None = dc.field(default=None, kw_only=True),\n    system_cpu_seconds: float | None = dc.field(default=None, kw_only=True),\n    relay_fallbacks: tuple[RelayFallback, ...] = (),\n)",
+        "doc": {
+          "summary": "Structured result returned by command execution."
+        },
+        "members": [
+          {
+            "name": "program",
+            "kind": "field",
+            "display": "program: Program",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "argv",
+            "kind": "field",
+            "display": "argv: tuple[str, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "exit_code",
+            "kind": "field",
+            "display": "exit_code: int",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "pid",
+            "kind": "field",
+            "display": "pid: int",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stdout",
+            "kind": "field",
+            "display": "stdout: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stderr",
+            "kind": "field",
+            "display": "stderr: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "started_at",
+            "kind": "field",
+            "display": "started_at: float",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "duration",
+            "kind": "field",
+            "display": "duration: float",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "max_rss_bytes",
+            "kind": "field",
+            "display": "max_rss_bytes: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "user_cpu_seconds",
+            "kind": "field",
+            "display": "user_cpu_seconds: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "system_cpu_seconds",
+            "kind": "field",
+            "display": "system_cpu_seconds: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "relay_fallbacks",
+            "kind": "field",
+            "display": "relay_fallbacks: tuple[RelayFallback, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "ok",
+            "kind": "property",
+            "display": "ok: bool",
+            "doc": {
+              "summary": "Whether the command exited successfully.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "bool",
+                      "description": "<code>True</code> exactly when <code>exit_code</code> is zero."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ExecutionContext",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 278,
+        "display": "class ExecutionContext(\n    env: _EnvMapping = None,\n    cwd: _CwdType = None,\n    cancel_grace: float = _DEFAULT_CANCEL_GRACE,\n    native_pump_cleanup_grace: float = _DEFAULT_NATIVE_PUMP_CLEANUP_GRACE,\n    timeout: float | None = None,\n    stdout_sink: typ.IO[str] | None = None,\n    stderr_sink: typ.IO[str] | None = None,\n    encoding: str = _DEFAULT_ENCODING,\n    errors: str = _DEFAULT_ERROR_HANDLING,\n    tags: cabc.Mapping[str, object] | None = None,\n)",
+        "doc": {
+          "summary": "Execution parameters for SafeCmd runtime control."
+        },
+        "members": [
+          {
+            "name": "env",
+            "kind": "field",
+            "display": "env: _EnvMapping",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "cwd",
+            "kind": "field",
+            "display": "cwd: _CwdType",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "cancel_grace",
+            "kind": "field",
+            "display": "cancel_grace: float",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "native_pump_cleanup_grace",
+            "kind": "field",
+            "display": "native_pump_cleanup_grace: float",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "timeout",
+            "kind": "field",
+            "display": "timeout: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stdout_sink",
+            "kind": "field",
+            "display": "stdout_sink: typ.IO[str] | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stderr_sink",
+            "kind": "field",
+            "display": "stderr_sink: typ.IO[str] | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "encoding",
+            "kind": "field",
+            "display": "encoding: str",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "errors",
+            "kind": "field",
+            "display": "errors: str",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "tags",
+            "kind": "field",
+            "display": "tags: cabc.Mapping[str, object] | None",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "RunOutputOptions",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 413,
+        "display": "class RunOutputOptions(\n    capture: bool = True,\n    echo: bool = False,\n    echo_stdout: bool | None = None,\n    echo_stderr: bool | None = None,\n    max_echo_line_bytes: int | None = DEFAULT_ECHO_MAX_LINE_BYTES,\n    on_line: LineHook | None = None,\n    idle_after: float | None = None,\n    on_idle: cabc.Callable[[float, float], None] | None = None,\n    sink: sinks.OutputSink | None = None,\n)",
+        "doc": {
+          "summary": "Configure captured and mirrored command output.",
+          "sections": [
+            {
+              "title": "Parameters",
+              "fields": [
+                {
+                  "name": "capture",
+                  "type": "bool, default=True",
+                  "description": "Store stdout and stderr on the returned result. Capture is independent of echoing, so a captured stream can remain silent and an echoed stream can be left uncaptured."
+                },
+                {
+                  "name": "echo",
+                  "type": "bool, default=False",
+                  "description": "Shorthand for enabling both <code>echo_stdout</code> and <code>echo_stderr</code> unless either stream has an explicit override."
+                },
+                {
+                  "name": "echo_stdout",
+                  "type": "bool | None, default=None",
+                  "description": "Whether stdout is mirrored to the execution context's stdout sink. <code>None</code> inherits <code>echo</code>."
+                },
+                {
+                  "name": "echo_stderr",
+                  "type": "bool | None, default=None",
+                  "description": "Whether stderr is mirrored to the execution context's stderr sink. <code>None</code> inherits <code>echo</code>."
+                },
+                {
+                  "name": "max_echo_line_bytes",
+                  "type": "int | None, default=64 * 1024",
+                  "description": "Inclusive byte bound for every echoed line, including its retained bytes, truncation marker, and terminator. <code>None</code> restores unbounded, chunk-for-chunk mirroring; captured output always remains complete."
+                },
+                {
+                  "name": "on_line",
+                  "type": "LineHook | None, default=None",
+                  "description": "Optional synchronous callback invoked once per decoded output line with a <code>LineEvent</code> carrying the stream name, the monotonic seconds since the command started, and the line text. Independent of <code>capture</code> and <code>echo</code>; lines are delivered in arrival order per stream. Lines are observed on the Python pathway, so the Rust fast-path dispatcher stays out of the way whenever this is set."
+                },
+                {
+                  "name": "idle_after",
+                  "type": "float | None, default=None",
+                  "description": "Seconds of silence, measured across both streams, before the run reports that it is still running. <code>None</code> disables idle reporting and costs nothing: no watchdog, no timer, no extra pipe. The interval must be finite and strictly positive. Reporting describes the absence of observed output — never a deadlock diagnosis — and can neither terminate the child nor extend its timeout."
+                },
+                {
+                  "name": "on_idle",
+                  "type": "cabc.Callable[[float, float], None] | None, default=None",
+                  "description": "Synchronous <code>(elapsed_total, elapsed_idle)</code> callback, in seconds, invoked once per idle interval in place of the built-in stderr keepalive. It must not block for long: it runs on the run's own event loop. Requires <code>idle_after</code>."
+                },
+                {
+                  "name": "sink",
+                  "type": "sinks.OutputSink | None, default=None",
+                  "description": "Optional presentation adapter (<code>sinks</code> protocol). When given, it may reframe the parent-facing output of this run (for example, a GitHub Actions group); the default <code>None</code> keeps the plain two-stream behaviour. An adapter is inactive for a run when it declines activation, in which case output is unchanged."
+                }
+              ]
+            }
+          ],
+          "examples": ">>> options = RunOutputOptions(capture=True, echo=True)\n>>> options.resolved_echo\n(True, True)\n>>> RunOutputOptions(capture=True, echo=True, echo_stdout=False).resolved_echo\n(False, True)\n>>> RunOutputOptions(capture=False, idle_after=30.0).capture\nFalse"
+        },
+        "members": [
+          {
+            "name": "capture",
+            "kind": "field",
+            "display": "capture: bool",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "echo",
+            "kind": "field",
+            "display": "echo: bool",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "echo_stdout",
+            "kind": "field",
+            "display": "echo_stdout: bool | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "echo_stderr",
+            "kind": "field",
+            "display": "echo_stderr: bool | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "max_echo_line_bytes",
+            "kind": "field",
+            "display": "max_echo_line_bytes: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "on_line",
+            "kind": "field",
+            "display": "on_line: LineHook | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "idle_after",
+            "kind": "field",
+            "display": "idle_after: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "on_idle",
+            "kind": "field",
+            "display": "on_idle: cabc.Callable[[float, float], None] | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "sink",
+            "kind": "field",
+            "display": "sink: sinks.OutputSink | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "resolved_echo",
+            "kind": "property",
+            "display": "resolved_echo: tuple[bool, bool]",
+            "doc": {
+              "summary": "The resolved <code>(echo_stdout, echo_stderr)</code> gates.",
+              "body": [
+                "<code>__post_init__</code> fills any <code>None</code> per-stream field from <code>echo</code>, so the returned pair is always concrete and reflects an explicit per-stream override where one was supplied."
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "IOOptions",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 529,
+        "display": "class IOOptions()",
+        "doc": {
+          "summary": "Deprecated alias for command output stream options."
+        },
+        "bases": [
+          "RunOutputOptions"
+        ]
+      },
+      {
+        "name": "StdinInput",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 371,
+        "display": "class StdinInput(text: str | None = None, data: bytes | None = None)",
+        "doc": {
+          "summary": "Caller-provided data to write to a subprocess's stdin pipe.",
+          "body": [
+            "Exactly one of *text* or *data* may be supplied."
+          ]
+        },
+        "members": [
+          {
+            "name": "text",
+            "kind": "field",
+            "display": "text: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "data",
+            "kind": "field",
+            "display": "data: bytes | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "resolve",
+            "kind": "method",
+            "display": "def resolve(ctx: ExecutionContext) -> bytes | None",
+            "doc": {
+              "summary": "Return the bytes payload, encoding *text* with *ctx* when needed.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "ctx",
+                      "type": "ExecutionContext",
+                      "description": "The execution context whose <code>encoding</code> and <code>errors</code> encode <code>text</code> when no raw <code>data</code> is set."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "bytes | None",
+                      "description": "The raw *data* payload, or *text* encoded with <code>ctx.encoding</code> and <code>ctx.errors</code>; <code>None</code> when neither field is set."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "UnicodeEncodeError",
+                      "type": "",
+                      "description": "If <code>text</code> cannot be encoded with <code>ctx.encoding</code> under <code>ctx.errors</code> (for example, <code>errors=&quot;strict&quot;</code>)."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "LineStream",
+        "kind": "class",
+        "module": "cuprum._line_iteration",
+        "path": "cuprum/_line_iteration.py",
+        "line": 37,
+        "display": "class LineStream(\n    iterator: cabc.AsyncGenerator[LineEvent | CommandResult, None],\n) -> None",
+        "doc": {
+          "summary": "Async iterator of <code>LineEvent</code> and the run's final <code>CommandResult</code>.",
+          "body": [
+            "Returned by <a href=\"#SafeCmd\"><code>SafeCmd.lines</code></a>. Iteration yields every decoded output line as it arrives; after the run completes, <code>result</code> holds the same <code>CommandResult</code> a <code>run()</code> call would have returned, including captured output when <code>capture=True</code>.",
+            "Leaving the loop early does not, on its own, stop the subprocess. <code>async for</code> never closes a custom iterator on <code>break</code>, and the driver keeps draining the child for as long as the stream is reachable. Use the stream as an async context manager, or call <code>aclose</code> explicitly, to guarantee teardown; dropping the last reference also closes it, but only when the event loop finalizes the generator, so that is not a guarantee.",
+            "Either teardown path ends the child the way a cancelled <code>run()</code> does: <code>SIGTERM</code>, the cancel grace wait, then <code>SIGKILL</code>."
+          ]
+        },
+        "members": [
+          {
+            "name": "aclose",
+            "kind": "method",
+            "display": "async def aclose() -> None",
+            "doc": {
+              "summary": "Close the underlying generator, tearing the run down."
+            }
+          }
+        ]
+      },
+      {
+        "name": "LineEvent",
+        "kind": "class",
+        "module": "cuprum.lines",
+        "path": "cuprum/lines.py",
+        "line": 34,
+        "display": "class LineEvent(stream: LineStreamName, at: float, text: str)",
+        "doc": {
+          "summary": "One decoded output line, tagged with its stream and arrival time."
+        },
+        "members": [
+          {
+            "name": "stream",
+            "kind": "field",
+            "display": "stream: LineStreamName",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "at",
+            "kind": "field",
+            "display": "at: float",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "text",
+            "kind": "field",
+            "display": "text: str",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "LineHook",
+        "kind": "type alias",
+        "module": "cuprum.lines",
+        "path": "cuprum/lines.py",
+        "line": 22,
+        "display": "LineHook = cabc.Callable[[LineEvent], None]",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "LineStreamName",
+        "kind": "type alias",
+        "module": "cuprum.lines",
+        "path": "cuprum/lines.py",
+        "line": 21,
+        "display": "LineStreamName = typ.Literal['stdout', 'stderr']",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "builders",
+        "kind": "module",
+        "module": "cuprum.builders",
+        "path": "cuprum/builders/__init__.py",
+        "line": 1,
+        "display": "from cuprum import builders",
+        "doc": {
+          "summary": "Core builders for common command-line tools."
+        },
+        "members": [
+          {
+            "name": "Compression",
+            "kind": "class",
+            "display": "Compression",
+            "doc": {
+              "summary": "Compression algorithm for <code>tar_create</code>.",
+              "body": [
+                "Modelling compression as a single enum makes the \"exactly one algorithm\" invariant unrepresentable as an invalid state: the previous design used three mutually-exclusive booleans that had to be reconciled at runtime.",
+                "Members ------- NONE No compression (the default); <code>tar_create</code> emits no flag. GZIP gzip compression (<code>-z</code>). BZIP2 bzip2 compression (<code>-j</code>). XZ xz compression (<code>-J</code>)."
+              ]
+            }
+          },
+          {
+            "name": "GitRef",
+            "kind": "new type",
+            "display": "GitRef = typ.NewType('GitRef', str)",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "RsyncOptions",
+            "kind": "class",
+            "display": "class RsyncOptions(\n    archive: bool = False,\n    delete: bool = False,\n    dry_run: bool = False,\n    verbose: bool = False,\n    compress: bool = False,\n    allow_relative: bool = False,\n)",
+            "doc": {
+              "summary": "Optional flags for the rsync builder."
+            }
+          },
+          {
+            "name": "SafePath",
+            "kind": "new type",
+            "display": "SafePath = typ.NewType('SafePath', str)",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "TarCreateOptions",
+            "kind": "class",
+            "display": "class TarCreateOptions(\n    compression: Compression = Compression.NONE,\n    allow_relative: bool = False,\n)",
+            "doc": {
+              "summary": "Optional flags for tar_create.",
+              "sections": [
+                {
+                  "title": "Attributes",
+                  "fields": [
+                    {
+                      "name": "compression",
+                      "type": "Compression",
+                      "description": "Compression algorithm for the archive. Defaults to <code>Compression.NONE</code>."
+                    },
+                    {
+                      "name": "allow_relative",
+                      "type": "bool",
+                      "description": "Allow relative archive and source paths. This applies to both archive and source paths. Defaults to <code>False</code>."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "git_checkout",
+            "kind": "function",
+            "display": "def git_checkout(\n    ref: str,\n    *,\n    create_branch: bool = False,\n    detach: bool = False,\n    force: bool = False,\n) -> SafeCmd",
+            "doc": {
+              "summary": "Build a <code>git checkout</code> command with validated refs.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "ref",
+                      "type": "str",
+                      "description": "Reference to check out."
+                    },
+                    {
+                      "name": "create_branch",
+                      "type": "bool",
+                      "description": "When True, create a new branch at the reference."
+                    },
+                    {
+                      "name": "detach",
+                      "type": "bool",
+                      "description": "When True, check out in detached HEAD state."
+                    },
+                    {
+                      "name": "force",
+                      "type": "bool",
+                      "description": "When True, force the checkout, overwriting local changes."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafeCmd",
+                      "description": "The assembled <code>git checkout</code> command."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "TypeError",
+                      "type": "",
+                      "description": "If <code>ref</code> is not a <code>str</code> (propagated from <code>git_ref</code>)."
+                    },
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If both <code>create_branch</code> and <code>detach</code> are True, or if <code>ref</code> is not a valid git reference (the latter propagated from <code>git_ref</code>)."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "git_ref",
+            "kind": "function",
+            "display": "def git_ref(value: str) -> GitRef",
+            "doc": {
+              "summary": "Validate a git ref name or object name.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "GitRef",
+                      "description": "Validated ref string."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "TypeError",
+                      "type": "",
+                      "description": "If <code>value</code> is not a <code>str</code>."
+                    },
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If <code>value</code> is not a valid git reference (propagated from <code>_validate_git_ref</code>)."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "git_rev_parse",
+            "kind": "function",
+            "display": "def git_rev_parse(ref: str) -> SafeCmd",
+            "doc": {
+              "summary": "Build a <code>git rev-parse</code> command with validated refs.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "ref",
+                      "type": "str",
+                      "description": "Reference to resolve."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafeCmd",
+                      "description": "The assembled <code>git rev-parse</code> command."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "TypeError",
+                      "type": "",
+                      "description": "If <code>ref</code> is not a string."
+                    },
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If <code>ref</code> is not a valid git reference."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "git_status",
+            "kind": "function",
+            "display": "def git_status(*, short: bool = False, branch: bool = False) -> SafeCmd",
+            "doc": {
+              "summary": "Build a <code>git status</code> command.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "short",
+                      "type": "bool",
+                      "description": "When True, request short-format output."
+                    },
+                    {
+                      "name": "branch",
+                      "type": "bool",
+                      "description": "When True, include branch information."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafeCmd",
+                      "description": "The assembled <code>git status</code> command."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "rsync_sync",
+            "kind": "function",
+            "display": "def rsync_sync(\n    source: str | Path,\n    destination: str | Path,\n    *,\n    options: RsyncOptions | None = None,\n) -> SafeCmd",
+            "doc": {
+              "summary": "Build an <code>rsync</code> synchronization command.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "source",
+                      "type": "",
+                      "description": "Source path to synchronize from."
+                    },
+                    {
+                      "name": "destination",
+                      "type": "",
+                      "description": "Destination path to synchronize to."
+                    },
+                    {
+                      "name": "options",
+                      "type": "",
+                      "description": "Optional rsync settings. When omitted, the command uses <code>RsyncOptions()</code>."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafeCmd",
+                      "description": "Safe command wrapper for the curated <code>rsync</code> program and generated argv."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "safe_path",
+            "kind": "function",
+            "display": "def safe_path(\n    value: str | Path,\n    *,\n    allow_relative: bool = False,\n) -> SafePath",
+            "doc": {
+              "summary": "Validate and normalize a filesystem path.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafePath",
+                      "description": "Normalized path string."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "tar_create",
+            "kind": "function",
+            "display": "def tar_create(\n    archive: str | Path,\n    sources: cabc.Sequence[str | Path],\n    *,\n    options: TarCreateOptions | None = None,\n) -> SafeCmd",
+            "doc": {
+              "summary": "Build a <code>tar</code> create command.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "archive",
+                      "type": "",
+                      "description": "Archive path passed after <code>-f</code>."
+                    },
+                    {
+                      "name": "sources",
+                      "type": "",
+                      "description": "Source paths added to the archive, in order."
+                    },
+                    {
+                      "name": "options",
+                      "type": "",
+                      "description": "Optional create settings. When omitted, the command uses <code>TarCreateOptions()</code>."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafeCmd",
+                      "description": "Safe command wrapper for the curated <code>tar</code> program and generated argv."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "tar_extract",
+            "kind": "function",
+            "display": "def tar_extract(\n    archive: str | Path,\n    *,\n    destination: str | Path | None = None,\n    allow_relative: bool = False,\n) -> SafeCmd",
+            "doc": {
+              "summary": "Build a <code>tar</code> extract command.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "archive",
+                      "type": "",
+                      "description": "Archive path passed after <code>-f</code>."
+                    },
+                    {
+                      "name": "destination",
+                      "type": "",
+                      "description": "Optional extraction directory passed after <code>-C</code>."
+                    },
+                    {
+                      "name": "allow_relative",
+                      "type": "",
+                      "description": "Allow <code>archive</code> and <code>destination</code> to be relative paths."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "SafeCmd",
+                      "description": "Safe command wrapper for the curated <code>tar</code> program and generated argv."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "catalogues",
+    "title": "Programs and catalogues",
+    "lede": "The programs Cuprum may build commands for, the projects that group them, and the defaults it ships.",
+    "entries": [
+      {
+        "name": "Program",
+        "kind": "new type",
+        "module": "cuprum.program",
+        "path": "cuprum/program.py",
+        "line": 16,
+        "display": "Program = typ.NewType('Program', str)",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "ProgramCatalogue",
+        "kind": "class",
+        "module": "cuprum.catalogue",
+        "path": "cuprum/catalogue.py",
+        "line": 168,
+        "display": "class ProgramCatalogue(\n    *,\n    projects: cabc.Iterable[ProjectSettings],\n) -> None",
+        "doc": {
+          "summary": "Catalogue of curated programs with a default allowlist."
+        },
+        "members": [
+          {
+            "name": "from_programs",
+            "kind": "classmethod",
+            "display": "def from_programs(\n    *programs: Program | str,\n    name: str | None = None,\n    documentation_locations: tuple[str, ...] = (),\n    noise_rules: tuple[str, ...] = (),\n) -> ProgramCatalogue",
+            "doc": {
+              "summary": "Build a single-project catalogue from the given programs.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "*programs",
+                      "type": "Program | str",
+                      "description": "Programs to allowlist; bare names and absolute paths are accepted."
+                    },
+                    {
+                      "name": "name",
+                      "type": "str | None, optional",
+                      "description": "Project name, derived from the programs' base names when omitted."
+                    },
+                    {
+                      "name": "documentation_locations",
+                      "type": "tuple[str, ...], optional",
+                      "description": "Documentation references for the project."
+                    },
+                    {
+                      "name": "noise_rules",
+                      "type": "tuple[str, ...], optional",
+                      "description": "Regular expressions for output lines a logger may drop."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ProgramCatalogue",
+                      "description": "A catalogue whose sole project owns the supplied programs."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If no programs are supplied."
+                    },
+                    {
+                      "name": "DuplicateProgramError",
+                      "type": "",
+                      "description": "If a program is supplied more than once."
+                    }
+                  ]
+                }
+              ],
+              "examples": ">>> from cuprum import ProgramCatalogue\n>>> catalogue = ProgramCatalogue.from_programs(\"git\", \"cargo\")\n>>> sorted(catalogue.allowlist)\n['cargo', 'git']\n>>> catalogue.lookup(\"git\").project_name\n'git-cargo'"
+            }
+          },
+          {
+            "name": "from_project",
+            "kind": "classmethod",
+            "display": "def from_project(settings: ProjectSettings) -> ProgramCatalogue",
+            "doc": {
+              "summary": "Build a catalogue containing a supplied project.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "settings",
+                      "type": "ProjectSettings",
+                      "description": "The sole project to register."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ProgramCatalogue",
+                      "description": "A catalogue exposing the supplied project's allowlist and metadata."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "DuplicateProgramError",
+                      "type": "",
+                      "description": "If <code>settings</code> declares a program more than once."
+                    }
+                  ]
+                }
+              ],
+              "examples": ">>> from cuprum import Program, ProgramCatalogue, ProjectSettings\n>>> settings = ProjectSettings(name=\"tools\", programs=(Program(\"git\"),))\n>>> ProgramCatalogue.from_project(settings).is_allowed(\"git\")\nTrue"
+            }
+          },
+          {
+            "name": "allowlist",
+            "kind": "property",
+            "display": "allowlist: frozenset[Program]",
+            "doc": {
+              "summary": "The curated allowlist of programs.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "frozenset[Program]",
+                      "description": "Every program registered in the catalogue. The returned set cannot be modified."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "is_allowed",
+            "kind": "method",
+            "display": "def is_allowed(program: Program | str) -> bool",
+            "doc": {
+              "summary": "Return True when the program is part of the default allowlist.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program | str",
+                      "description": "The program to test against the curated default allowlist."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "bool",
+                      "description": "True if the program is present in the curated allowlist."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "lookup",
+            "kind": "method",
+            "display": "def lookup(program: Program | str) -> ProgramEntry",
+            "doc": {
+              "summary": "Resolve a program into its entry, blocking unknown executables.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program | str",
+                      "description": "The program to resolve into its catalogue entry."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ProgramEntry",
+                      "description": "The resolved entry with its owning project metadata."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "UnknownProgramError",
+                      "type": "",
+                      "description": "If the program is not present in the catalogue allowlist."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "project_for",
+            "kind": "method",
+            "display": "def project_for(program: Program | str) -> ProjectSettings",
+            "doc": {
+              "summary": "Return the owning project for the given program.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program | str",
+                      "description": "The program whose owning project is returned."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ProjectSettings",
+                      "description": "The project that owns the given program."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "UnknownProgramError",
+                      "type": "",
+                      "description": "If the program is not present in this catalogue."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "visible_settings",
+            "kind": "property",
+            "display": "visible_settings: _VisibleSettings",
+            "doc": {
+              "summary": "Cached, read-only settings indexed by project name.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "_VisibleSettings",
+                      "description": "The same immutable mapping for the catalogue lifetime. Access it as a property; calling it remains a temporary compatibility form."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ProgramEntry",
+        "kind": "class",
+        "module": "cuprum.catalogue",
+        "path": "cuprum/catalogue.py",
+        "line": 126,
+        "display": "class ProgramEntry(program: Program, project: ProjectSettings)",
+        "doc": {
+          "summary": "A resolved program with its owning project metadata."
+        },
+        "members": [
+          {
+            "name": "program",
+            "kind": "field",
+            "display": "program: Program",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "project",
+            "kind": "field",
+            "display": "project: ProjectSettings",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "project_name",
+            "kind": "property",
+            "display": "project_name: str",
+            "doc": {
+              "summary": "The owning project's name.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "str",
+                      "description": "The name of the project that registered this program."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "ProjectSettings",
+        "kind": "class",
+        "module": "cuprum.catalogue",
+        "path": "cuprum/catalogue.py",
+        "line": 84,
+        "display": "class ProjectSettings(\n    name: str,\n    programs: tuple[Program, ...],\n    documentation_locations: tuple[str, ...] = (),\n    noise_rules: tuple[str, ...] = (),\n)",
+        "doc": {
+          "summary": "Metadata shared by a project's curated programs.",
+          "body": [
+            "<code>documentation_locations</code> and <code>noise_rules</code> default to empty tuples so a small script can declare a project from its name and programs alone."
+          ],
+          "sections": [
+            {
+              "title": "Attributes",
+              "fields": [
+                {
+                  "name": "name",
+                  "type": "str",
+                  "description": "The project's descriptive name."
+                },
+                {
+                  "name": "programs",
+                  "type": "tuple[Program, ...]",
+                  "description": "Curated programs owned by the project."
+                },
+                {
+                  "name": "documentation_locations",
+                  "type": "tuple[str, ...]",
+                  "description": "Runbook/reference links visible through <code>visible_settings</code>. Empty means no documentation references are declared."
+                },
+                {
+                  "name": "noise_rules",
+                  "type": "tuple[str, ...]",
+                  "description": "Patterns a logger may drop; Cuprum stores them but does not apply them. Empty means no project output lines are marked as noise."
+                }
+              ]
+            }
+          ]
+        },
+        "members": [
+          {
+            "name": "name",
+            "kind": "field",
+            "display": "name: str",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "programs",
+            "kind": "field",
+            "display": "programs: tuple[Program, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "documentation_locations",
+            "kind": "field",
+            "display": "documentation_locations: tuple[str, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "noise_rules",
+            "kind": "field",
+            "display": "noise_rules: tuple[str, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "owns",
+            "kind": "method",
+            "display": "def owns(program: Program) -> bool",
+            "doc": {
+              "summary": "Return True when the program belongs to this project.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program",
+                      "description": "The program to test for membership in this project."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "bool",
+                      "description": "True if the program is one of this project's programs."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DEFAULT_CATALOGUE",
+        "kind": "constant",
+        "module": "cuprum.catalogue",
+        "path": "cuprum/catalogue.py",
+        "line": 381,
+        "display": "DEFAULT_CATALOGUE = ProgramCatalogue(projects=DEFAULT_PROJECTS)",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "DEFAULT_PROJECTS",
+        "kind": "constant",
+        "module": "cuprum.catalogue",
+        "path": "cuprum/catalogue.py",
+        "line": 371,
+        "display": "DEFAULT_PROJECTS = tuple((ProjectSettings(name=name, programs=programs, documentation_locations=documentation_locations, noise_rules=noise_rules) for name, programs, documentation_locations, noise_rules in DEFAULT_PROJECT_DATA))",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "CORE_OPS_PROJECT",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 16,
+        "display": "CORE_OPS_PROJECT = 'core-ops'",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "DOCUMENTATION_PROJECT",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 17,
+        "display": "DOCUMENTATION_PROJECT = 'docs'",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "ECHO",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 19,
+        "display": "ECHO = Program('echo')",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "GIT",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 20,
+        "display": "GIT = Program('git')",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "LS",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 21,
+        "display": "LS = Program('ls')",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "RSYNC",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 22,
+        "display": "RSYNC = Program('rsync')",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "TAR",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 23,
+        "display": "TAR = Program('tar')",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "DOC_TOOL",
+        "kind": "constant",
+        "module": "cuprum._catalogue_defaults",
+        "path": "cuprum/_catalogue_defaults.py",
+        "line": 24,
+        "display": "DOC_TOOL = Program('mdbook')",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "PACKAGE_NAME",
+        "kind": "constant",
+        "module": "cuprum._constants",
+        "path": "cuprum/_constants.py",
+        "line": 5,
+        "display": "PACKAGE_NAME = 'cuprum'",
+        "doc": {
+          "summary": ""
+        }
+      }
+    ]
+  },
+  {
+    "slug": "pipelines",
+    "title": "Pipelines and concurrency",
+    "lede": "Joining commands stage to stage, and running independent commands side by side.",
+    "entries": [
+      {
+        "name": "Pipeline",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 789,
+        "display": "class Pipeline(parts: tuple[SafeCmd, ...])",
+        "doc": {
+          "summary": "A sequence of SafeCmd stages connected via stdout/stdin piping."
+        },
+        "members": [
+          {
+            "name": "parts",
+            "kind": "field",
+            "display": "parts: tuple[SafeCmd, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "concat",
+            "kind": "classmethod",
+            "display": "def concat(\n    left: SafeCmd | Pipeline,\n    right: SafeCmd | Pipeline,\n) -> Pipeline",
+            "doc": {
+              "summary": "Compose a pipeline from two stage operands.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "left",
+                      "type": "SafeCmd | Pipeline",
+                      "description": "A command or pipeline whose stages come first."
+                    },
+                    {
+                      "name": "right",
+                      "type": "SafeCmd | Pipeline",
+                      "description": "A command or pipeline whose stages follow <code>left</code>'s."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "Pipeline",
+                      "description": "A pipeline whose stages are *left*'s followed by *right*'s."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "run",
+            "kind": "method",
+            "display": "async def run(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    **deprecated_flags: typ.Unpack[_DeprecatedOutputFlags],\n) -> PipelineResult",
+            "doc": {
+              "summary": "Execute the pipeline asynchronously with streaming and backpressure.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "output",
+                      "type": "RunOutputOptions | None, default=None",
+                      "description": "Capture and echo settings for every observed pipeline stream. The default bounds each echoed line to 64 KiB; <code>None</code> for <code>max_echo_line_bytes</code> restores unbounded mirroring without changing capture."
+                    },
+                    {
+                      "name": "timeout",
+                      "type": "float | None, default=None",
+                      "description": "Maximum pipeline execution time in seconds."
+                    },
+                    {
+                      "name": "context",
+                      "type": "ExecutionContext | None, default=None",
+                      "description": "Execution settings, including echo sinks and text encoding."
+                    },
+                    {
+                      "name": "**deprecated_flags",
+                      "type": "bool",
+                      "description": "Deprecated <code>capture</code> and <code>echo</code> keyword arguments. Do not combine them with <code>output</code>."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "PipelineResult",
+                      "description": "The outcome for every stage and complete captured streams when capture is enabled."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If <code>output</code> is combined with deprecated flags."
+                    },
+                    {
+                      "name": "PermissionError",
+                      "type": "",
+                      "description": "If a pipeline command is not allowed by the active scope."
+                    },
+                    {
+                      "name": "TimeoutError",
+                      "type": "",
+                      "description": "If execution exceeds the effective timeout."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "run_sync",
+            "kind": "method",
+            "display": "def run_sync(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    **deprecated_flags: typ.Unpack[_DeprecatedOutputFlags],\n) -> PipelineResult",
+            "doc": {
+              "summary": "Execute the pipeline synchronously via <code>asyncio.run</code>.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "output",
+                      "type": "RunOutputOptions | None, default=None",
+                      "description": "Capture and echo settings. The 64 KiB default bounds mirrored lines; <code>max_echo_line_bytes=None</code> restores unbounded echoing while leaving captured output complete."
+                    },
+                    {
+                      "name": "timeout",
+                      "type": "float | None, default=None",
+                      "description": "Maximum pipeline execution time in seconds."
+                    },
+                    {
+                      "name": "context",
+                      "type": "ExecutionContext | None, default=None",
+                      "description": "Execution settings, including echo sinks and text encoding."
+                    },
+                    {
+                      "name": "**deprecated_flags",
+                      "type": "bool",
+                      "description": "Deprecated <code>capture</code> and <code>echo</code> keyword arguments. Do not combine them with <code>output</code>."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "PipelineResult",
+                      "description": "The outcome for every stage and complete captured streams when capture is enabled."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If <code>output</code> is combined with deprecated flags."
+                    },
+                    {
+                      "name": "PermissionError",
+                      "type": "",
+                      "description": "If a pipeline command is not allowed by the active scope."
+                    },
+                    {
+                      "name": "TimeoutError",
+                      "type": "",
+                      "description": "If execution exceeds the effective timeout."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "PipelineResult",
+        "kind": "class",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 209,
+        "display": "class PipelineResult(\n    stages: tuple[CommandResult, ...],\n    failure_index: int | None = None,\n)",
+        "doc": {
+          "summary": "Structured result returned by pipeline execution."
+        },
+        "members": [
+          {
+            "name": "stages",
+            "kind": "field",
+            "display": "stages: tuple[CommandResult, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "failure_index",
+            "kind": "field",
+            "display": "failure_index: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "final",
+            "kind": "property",
+            "display": "final: CommandResult",
+            "doc": {
+              "summary": "The result from the final pipeline stage.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CommandResult",
+                      "description": "The last stage's result in execution order."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "failure",
+            "kind": "property",
+            "display": "failure: CommandResult | None",
+            "doc": {
+              "summary": "The stage that triggered fail-fast termination, if any.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CommandResult | None",
+                      "description": "The failing stage result, or <code>None</code> when no stage triggered fail-fast termination."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "ok",
+            "kind": "property",
+            "display": "ok: bool",
+            "doc": {
+              "summary": "Whether every pipeline stage exited successfully.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "bool",
+                      "description": "<code>True</code> when every stage result is successful; otherwise <code>False</code>."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "stdout",
+            "kind": "property",
+            "display": "stdout: str | None",
+            "doc": {
+              "summary": "Captured output from the final pipeline stage.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "str | None",
+                      "description": "The final stage's captured standard output, or <code>None</code> when capture was disabled."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "run_concurrent",
+        "kind": "function",
+        "module": "cuprum.concurrent",
+        "path": "cuprum/concurrent.py",
+        "line": 184,
+        "display": "async def run_concurrent(\n    *commands: SafeCmd,\n    config: ConcurrentConfig | None = None,\n) -> ConcurrentResult",
+        "doc": {
+          "summary": "Execute multiple SafeCmd instances concurrently.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "ConcurrentResult",
+                  "description": "Aggregated results in submission order."
+                }
+              ]
+            },
+            {
+              "title": "Raises",
+              "fields": [
+                {
+                  "name": "ValueError",
+                  "type": "",
+                  "description": "If config.concurrency &lt; 1 or no commands provided."
+                },
+                {
+                  "name": "ForbiddenProgramError",
+                  "type": "",
+                  "description": "If <code>current_context().check_allowed()</code> rejects a command before task creation."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "run_concurrent_sync",
+        "kind": "function",
+        "module": "cuprum.concurrent",
+        "path": "cuprum/concurrent.py",
+        "line": 245,
+        "display": "def run_concurrent_sync(\n    *commands: SafeCmd,\n    config: ConcurrentConfig | None = None,\n) -> ConcurrentResult",
+        "doc": {
+          "summary": "Execute multiple SafeCmd instances concurrently (synchronous wrapper).",
+          "body": [
+            "This method mirrors <code>run_concurrent()</code> by driving the event loop internally. All parameters and return semantics are identical."
+          ],
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "ConcurrentResult",
+                  "description": "Aggregated results in submission order."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "ConcurrentConfig",
+        "kind": "class",
+        "module": "cuprum._concurrent_config",
+        "path": "cuprum/_concurrent_config.py",
+        "line": 26,
+        "display": "class ConcurrentConfig(\n    concurrency: int | None = None,\n    capture: bool = True,\n    echo: bool = False,\n    echo_stdout: bool | None = dc.field(default=None, kw_only=True),\n    echo_stderr: bool | None = dc.field(default=None, kw_only=True),\n    context: ExecutionContext | None = None,\n    fail_fast: bool = False,\n)",
+        "doc": {
+          "summary": "Configuration for concurrent command execution."
+        },
+        "members": [
+          {
+            "name": "concurrency",
+            "kind": "field",
+            "display": "concurrency: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "capture",
+            "kind": "field",
+            "display": "capture: bool",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "echo",
+            "kind": "field",
+            "display": "echo: bool",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "echo_stdout",
+            "kind": "field",
+            "display": "echo_stdout: bool | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "echo_stderr",
+            "kind": "field",
+            "display": "echo_stderr: bool | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "context",
+            "kind": "field",
+            "display": "context: ExecutionContext | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "fail_fast",
+            "kind": "field",
+            "display": "fail_fast: bool",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "ConcurrentResult",
+        "kind": "class",
+        "module": "cuprum._concurrent_config",
+        "path": "cuprum/_concurrent_config.py",
+        "line": 206,
+        "display": "class ConcurrentResult(\n    results: tuple[CommandResult, ...],\n    failures: tuple[int, ...] = (),\n    submission_indices: tuple[int, ...] | None = None,\n) -> None",
+        "doc": {
+          "summary": "Aggregated result from concurrent command execution."
+        },
+        "members": [
+          {
+            "name": "results",
+            "kind": "field",
+            "display": "results: tuple[CommandResult, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "failures",
+            "kind": "field",
+            "display": "failures: tuple[int, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "submission_indices",
+            "kind": "field",
+            "display": "submission_indices: tuple[int, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "ok",
+            "kind": "property",
+            "display": "ok: bool",
+            "doc": {
+              "summary": "Whether every command completed successfully.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "bool",
+                      "description": "<code>True</code> when no result is recorded as a failure; otherwise <code>False</code>."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "first_failure",
+            "kind": "property",
+            "display": "first_failure: CommandResult | None",
+            "doc": {
+              "summary": "The earliest failed command result, if any.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CommandResult | None",
+                      "description": "The result at the first recorded failure index, or <code>None</code> when every command succeeded."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "failure_submission_indices",
+            "kind": "property",
+            "display": "failure_submission_indices: tuple[int, ...]",
+            "doc": {
+              "summary": "Original submission indices of failed commands, ascending.",
+              "body": [
+                "Unlike <code>failures</code> (positions within the compacted <code>results</code>), these are stable across both collect-all and fail-fast modes: each value is the position at which the failing command was submitted."
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "policy",
+    "title": "Scopes, policy, and hooks",
+    "lede": "Narrowing what a block of code may run, overlaying its environment, and running code around each command.",
+    "entries": [
+      {
+        "name": "scoped",
+        "kind": "function",
+        "module": "cuprum.context.scoped",
+        "path": "cuprum/context/scoped.py",
+        "line": 50,
+        "display": "def scoped(\n    config: ScopeConfig | None = None,\n    *,\n    catalogue: ProgramCatalogue | None = None,\n) -> _ScopedContext",
+        "doc": {
+          "summary": "Create a scoped context manager for narrowed execution.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "_ScopedContext",
+                  "description": "A context manager that narrows the current context."
+                },
+                {
+                  "name": "",
+                  "type": "Example",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "-------",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     assert ctx.is_allowed(ECHO)",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "&gt;&gt;&gt; catalogue = ProgramCatalogue.from_programs(ECHO)",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     assert ctx.is_allowed(ECHO)",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "title": "Raises",
+              "fields": [
+                {
+                  "name": "TypeError",
+                  "type": "",
+                  "description": "If neither, or both, <code>config</code> and <code>catalogue</code> are supplied."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "ScopeConfig",
+        "kind": "class",
+        "module": "cuprum.context.core",
+        "path": "cuprum/context/core.py",
+        "line": 63,
+        "display": "class ScopeConfig(\n    allowlist: frozenset[Program] | None = None,\n    before_hooks: tuple[BeforeHook, ...] = (),\n    after_hooks: tuple[AfterHook, ...] = (),\n    observe_hooks: tuple[ExecHook, ...] = (),\n    timeout: float | None = None,\n    env_overlay: cabc.Mapping[str, str] | None = None,\n)",
+        "doc": {
+          "summary": "Configuration object for scoped execution context updates."
+        },
+        "members": [
+          {
+            "name": "allowlist",
+            "kind": "field",
+            "display": "allowlist: frozenset[Program] | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "before_hooks",
+            "kind": "field",
+            "display": "before_hooks: tuple[BeforeHook, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "after_hooks",
+            "kind": "field",
+            "display": "after_hooks: tuple[AfterHook, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "observe_hooks",
+            "kind": "field",
+            "display": "observe_hooks: tuple[ExecHook, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "timeout",
+            "kind": "field",
+            "display": "timeout: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "env_overlay",
+            "kind": "field",
+            "display": "env_overlay: cabc.Mapping[str, str] | None",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "CuprumContext",
+        "kind": "class",
+        "module": "cuprum.context.core",
+        "path": "cuprum/context/core.py",
+        "line": 106,
+        "display": "class CuprumContext(\n    allowlist: frozenset[Program] = dc.field(default_factory=frozenset),\n    before_hooks: tuple[BeforeHook, ...] = (),\n    after_hooks: tuple[AfterHook, ...] = (),\n    observe_hooks: tuple[ExecHook, ...] = (),\n    timeout: float | None = None,\n    env_overlay: cabc.Mapping[str, str] | None = None,\n    _allowlist_is_restricted: bool = False,\n)",
+        "doc": {
+          "summary": "Immutable execution context holding allowlist and hooks."
+        },
+        "members": [
+          {
+            "name": "allowlist",
+            "kind": "field",
+            "display": "allowlist: frozenset[Program]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "before_hooks",
+            "kind": "field",
+            "display": "before_hooks: tuple[BeforeHook, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "after_hooks",
+            "kind": "field",
+            "display": "after_hooks: tuple[AfterHook, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "observe_hooks",
+            "kind": "field",
+            "display": "observe_hooks: tuple[ExecHook, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "timeout",
+            "kind": "field",
+            "display": "timeout: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "env_overlay",
+            "kind": "field",
+            "display": "env_overlay: cabc.Mapping[str, str] | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "is_allowed",
+            "kind": "method",
+            "display": "def is_allowed(program: Program) -> bool",
+            "doc": {
+              "summary": "Return True when the program is in the allowlist.",
+              "body": [
+                "This method only checks membership and returns False for empty allowlists. Use check_allowed() for enforcement; it applies the two-mode empty-allowlist policy, permitting empty unrestricted contexts and denying empty restricted contexts."
+              ],
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program",
+                      "description": "The program to check against the current allowlist."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "bool",
+                      "description": "<code>True</code> when the program is a member of the allowlist."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "check_allowed",
+            "kind": "method",
+            "display": "def check_allowed(program: Program) -> None",
+            "doc": {
+              "summary": "Raise ForbiddenProgramError if program is not allowed.",
+              "body": [
+                "When the allowlist is empty and unrestricted, all programs are permitted (permissive default). When the allowlist is empty and restricted, all programs are denied.",
+                "A warning log with operation and restricted_state fields is emitted before raising ForbiddenProgramError."
+              ],
+              "sections": [
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ForbiddenProgramError",
+                      "type": "",
+                      "description": "If the program is not permitted by the context allowlist."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "narrow",
+            "kind": "method",
+            "display": "def narrow(config: ScopeConfig) -> CuprumContext",
+            "doc": {
+              "summary": "Create a derived context with narrowed allowlist and extended hooks.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context with narrowed permissions and extended hooks."
+                    }
+                  ]
+                },
+                {
+                  "title": "Notes",
+                  "paragraphs": [
+                    "When the parent has an empty *unrestricted* allowlist, the provided allowlist is used directly to establish a base scope. When the parent is restricted and empty, narrowing keeps it empty. When the parent has programs, the new allowlist is intersected to enforce narrowing (can only remove, not add programs)."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "with_allowlist",
+            "kind": "method",
+            "display": "def with_allowlist(allowlist: frozenset[Program]) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with the given allowlist replacing the current one.",
+              "body": [
+                "Unlike narrow(), this sets the allowlist directly without intersection. Use with care; prefer narrow() for enforcing safety invariants."
+              ],
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "allowlist",
+                      "type": "frozenset[Program]",
+                      "description": "The allowlist to install in place of the current one."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context with the supplied allowlist."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "with_before_hook",
+            "kind": "method",
+            "display": "def with_before_hook(hook: BeforeHook) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with an additional before hook.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "hook",
+                      "type": "BeforeHook",
+                      "description": "The before-execution hook to append."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context with the before hook appended."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "without_before_hook",
+            "kind": "method",
+            "display": "def without_before_hook(hook: BeforeHook) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with the specified before hook removed.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "hook",
+                      "type": "BeforeHook",
+                      "description": "The before-execution hook to remove."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context without the given before hook."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "with_after_hook",
+            "kind": "method",
+            "display": "def with_after_hook(hook: AfterHook) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with an additional after hook (prepended for LIFO).",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "hook",
+                      "type": "AfterHook",
+                      "description": "The after-execution hook to prepend."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context with the after hook prepended."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "without_after_hook",
+            "kind": "method",
+            "display": "def without_after_hook(hook: AfterHook) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with the specified after hook removed.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "hook",
+                      "type": "AfterHook",
+                      "description": "The after-execution hook to remove."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context without the given after hook."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "with_observe_hook",
+            "kind": "method",
+            "display": "def with_observe_hook(hook: ExecHook) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with an additional observe hook.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "hook",
+                      "type": "ExecHook",
+                      "description": "The structured-event observe hook to append."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context with the observe hook appended."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "without_observe_hook",
+            "kind": "method",
+            "display": "def without_observe_hook(hook: ExecHook) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with the specified observe hook removed.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "hook",
+                      "type": "ExecHook",
+                      "description": "The structured-event observe hook to remove."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context without the given observe hook."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "with_program",
+            "kind": "method",
+            "display": "def with_program(program: Program) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with the program added to the allowlist.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program",
+                      "description": "The program to add to the allowlist."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context whose allowlist includes the program."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "without_program",
+            "kind": "method",
+            "display": "def without_program(program: Program) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context with the program removed from the allowlist.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program",
+                      "description": "The program to remove from the allowlist."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context whose allowlist excludes the program."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "with_env_overlay",
+            "kind": "method",
+            "display": "def with_env_overlay(\n    overlay: cabc.Mapping[str, str] | None,\n) -> CuprumContext",
+            "doc": {
+              "summary": "Return a context whose env overlay is layered with <code>overlay</code>.",
+              "body": [
+                "Values in <code>overlay</code> win over earlier overlay entries, but no value ever displaces the live <code>os.environ</code>; the live process environment is read at subprocess spawn time. Passing <code>None</code> returns an unchanged copy."
+              ],
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "overlay",
+                      "type": "collections.abc.Mapping[str, str] | None",
+                      "description": "Environment variables to layer over the current overlay. <code>None</code> leaves the current overlay unchanged."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "CuprumContext",
+                      "description": "A new context with the merged environment overlay."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "current_context",
+        "kind": "function",
+        "module": "cuprum.context.state",
+        "path": "cuprum/context/state.py",
+        "line": 27,
+        "display": "def current_context() -> CuprumContext",
+        "doc": {
+          "summary": "Return the current execution context.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "CuprumContext",
+                  "description": "The context bound to the current execution scope."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "get_context",
+        "kind": "alias",
+        "module": "cuprum.context.state",
+        "path": "cuprum/context/state.py",
+        "line": 38,
+        "display": "get_context = current_context",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "allow",
+        "kind": "function",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 110,
+        "display": "def allow(*programs: Program) -> AllowRegistration",
+        "doc": {
+          "summary": "Extend the current context's allowlist with additional programs.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "AllowRegistration",
+                  "description": "A handle that can be detached or used as a context manager."
+                },
+                {
+                  "name": "",
+                  "type": "Example",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "-------",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     assert current_context().is_allowed(LS)",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "AllowRegistration",
+        "kind": "class",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 92,
+        "display": "class AllowRegistration(*programs: Program) -> None",
+        "doc": {
+          "summary": "Registration handle for dynamic allowlist extension.",
+          "body": [
+            "Supports <code>detach()</code> and context-manager usage for scoped allowing. The token-restoration discipline is documented on <code>_TokenRegistration</code>."
+          ]
+        },
+        "bases": [
+          "_TokenRegistration"
+        ]
+      },
+      {
+        "name": "env",
+        "kind": "function",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 257,
+        "display": "def env(\n    *overlays: cabc.Mapping[str, str],\n    **kwvars: str,\n) -> EnvRegistration",
+        "doc": {
+          "summary": "Overlay environment variables on top of the live <code>os.environ</code>.",
+          "body": [
+            "Mirrors <code>dict</code> in how arguments are combined: positional mappings are merged left-to-right and any keyword arguments win over them. Values are not snapshot against <code>os.environ</code> — the live process environment is read at subprocess spawn time so that variables set after Cuprum is imported (for example by <code>monkeypatch.setenv</code>) remain visible."
+          ],
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "EnvRegistration",
+                  "description": "A handle that can be detached or used as a context manager."
+                },
+                {
+                  "name": "",
+                  "type": "Example",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "-------",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "&gt;&gt;&gt; import os",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "&gt;&gt;&gt; os.environ[&quot;GIT_AUTHOR_NAME&quot;] = &quot;Cuprum&quot;",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     # Subprocesses spawned here see PATH=/usr/bin overlaid on the",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     # *live* os.environ, including GIT_AUTHOR_NAME.",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     pass",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "title": "Notes",
+              "paragraphs": [
+                "Identical to other registration helpers, <code>env</code> is bound to the <code>contextvars.Context</code> in which it is created; detach in the same logical context (thread or task) to avoid <code>ValueError</code> from <code>contextvars.ContextVar.reset</code>."
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "EnvRegistration",
+        "kind": "class",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 228,
+        "display": "class EnvRegistration(overlay: cabc.Mapping[str, str]) -> None",
+        "doc": {
+          "summary": "Registration handle for a scoped environment overlay.",
+          "body": [
+            "The overlay is layered on top of any overlay already present in the current context; nested registrations therefore behave as a stack. The token-restoration discipline is documented on <code>_TokenRegistration</code>.",
+            "The overlay itself is overlay-only. The live <code>os.environ</code> is read at subprocess spawn time (see <a href=\"#resolve_env\"><code>resolve_env</code></a>), so any updates to the process environment after the registration is created — for example via <code>pytest</code>'s <code>monkeypatch.setenv</code> — remain visible to subprocesses spawned inside the scope. This is the behaviour the issue requires."
+          ]
+        },
+        "bases": [
+          "_TokenRegistration"
+        ],
+        "members": [
+          {
+            "name": "overlay",
+            "kind": "property",
+            "display": "overlay: cabc.Mapping[str, str] | None",
+            "doc": {
+              "summary": "The immutable overlay this registration applied."
+            }
+          }
+        ]
+      },
+      {
+        "name": "merge_env_overlays",
+        "kind": "function",
+        "module": "cuprum.context.env_overlay",
+        "path": "cuprum/context/env_overlay.py",
+        "line": 28,
+        "display": "def merge_env_overlays(\n    parent: cabc.Mapping[str, str] | None,\n    child: cabc.Mapping[str, str] | None,\n) -> cabc.Mapping[str, str] | None",
+        "doc": {
+          "summary": "Layer <code>child</code> over <code>parent</code>; <code>None</code> means *inherit unchanged*.",
+          "body": [
+            "Both layers are kept overlay-only — they never include a snapshot of <code>os.environ</code>. The live process environment is read at spawn time so that callers can monkey-patch or otherwise mutate <code>os.environ</code> after Cuprum has been imported and still have those updates visible to subprocesses spawned inside the scope.",
+            "Exposed as public API so that other cuprum modules — and downstream code that builds custom observation tags — can merge overlay layers without reaching for a private symbol."
+          ],
+          "sections": [
+            {
+              "title": "Parameters",
+              "fields": [
+                {
+                  "name": "parent",
+                  "type": "collections.abc.Mapping[str, str] | None",
+                  "description": "The base overlay layer. <code>None</code> means *inherit unchanged* — the layer contributes nothing."
+                },
+                {
+                  "name": "child",
+                  "type": "collections.abc.Mapping[str, str] | None",
+                  "description": "The overlay layered on top of <code>parent</code>; its values win on key collisions. <code>None</code> means *inherit unchanged*."
+                }
+              ]
+            },
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "collections.abc.Mapping[str, str] | None",
+                  "description": "An immutable snapshot of the merged overlay, or <code>None</code> when both layers are <code>None</code> (meaning *inherit the environment unchanged*)."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "resolve_env",
+        "kind": "function",
+        "module": "cuprum.context.env_overlay",
+        "path": "cuprum/context/env_overlay.py",
+        "line": 73,
+        "display": "def resolve_env(\n    *layers: cabc.Mapping[str, str] | None,\n) -> dict[str, str] | None",
+        "doc": {
+          "summary": "Merge <code>os.environ</code> (read live) with the supplied overlay layers.",
+          "body": [
+            "Layers are applied left-to-right; later values win. <code>None</code> *and empty* layers are skipped — an empty overlay contributes nothing, so treating it as a no-op avoids an unnecessary copy of <code>os.environ</code> and lets the subprocess inherit the parent environment directly. When every layer is skipped the function returns <code>None</code> so callers may pass it through to <code>subprocess</code> APIs to mean *inherit the parent environment unchanged*.",
+            "The call to <code>os.environ.copy</code> is deferred until at least one overlay is non-empty, so the result reflects whatever the process environment looks like at the moment of resolution — the exact behaviour the issue requires."
+          ],
+          "sections": [
+            {
+              "title": "Parameters",
+              "fields": [
+                {
+                  "name": "*layers",
+                  "type": "collections.abc.Mapping[str, str] | None",
+                  "description": "Overlay layers applied left-to-right over a live copy of <code>os.environ</code>; later values win. <code>None</code> and empty layers are skipped."
+                }
+              ]
+            },
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "dict[str, str] | None",
+                  "description": "The merged environment mapping, or <code>None</code> when every layer is <code>None</code> or empty (meaning *inherit the parent environment unchanged*)."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "before",
+        "kind": "function",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 178,
+        "display": "def before(hook: BeforeHook) -> HookRegistration",
+        "doc": {
+          "summary": "Register a before-execution hook in the current context.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "HookRegistration",
+                  "description": "A handle that can be detached or used as a context manager."
+                },
+                {
+                  "name": "",
+                  "type": "Example",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "-------",
+                  "description": ""
+                },
+                {
+                  "name": "...     print(f\"Running",
+                  "type": "{cmd.program}&quot;)",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     # Commands run here will trigger log_cmd",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     pass",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "after",
+        "kind": "function",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 203,
+        "display": "def after(hook: AfterHook) -> HookRegistration",
+        "doc": {
+          "summary": "Register an after-execution hook in the current context.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "HookRegistration",
+                  "description": "A handle that can be detached or used as a context manager."
+                },
+                {
+                  "name": "",
+                  "type": "Example",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "-------",
+                  "description": ""
+                },
+                {
+                  "name": "...     print(f\"Finished",
+                  "type": "{cmd.program} -&gt; {result.exit_code}&quot;)",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     # Commands run here will trigger log_result",
+                  "description": ""
+                },
+                {
+                  "name": "",
+                  "type": "...     pass",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "BeforeHook",
+        "kind": "type alias",
+        "module": "cuprum.context.core",
+        "path": "cuprum/context/core.py",
+        "line": 34,
+        "display": "BeforeHook = cabc.Callable[[SafeCmd], None]",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "AfterHook",
+        "kind": "type alias",
+        "module": "cuprum.context.core",
+        "path": "cuprum/context/core.py",
+        "line": 35,
+        "display": "AfterHook = cabc.Callable[[SafeCmd, CommandResult], None]",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "HookRegistration",
+        "kind": "class",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 152,
+        "display": "class HookRegistration(\n    hook: BeforeHook | AfterHook | ExecHook,\n    hook_type: typ.Literal['before', 'after', 'observe'],\n) -> None",
+        "doc": {
+          "summary": "Registration handle for hooks with detach and context-manager support.",
+          "body": [
+            "The token-restoration discipline is documented on <code>_TokenRegistration</code>.",
+            "Prefer the <a href=\"#before\"><code>before</code></a>, <a href=\"#after\"><code>after</code></a>, and <a href=\"#observe\"><code>observe</code></a> factories: each pairs one hook shape with its slot, so a mismatched hook is rejected at the call site. Constructing the handle directly pairs the hook and the tag by hand, and only the tag itself is validated — at runtime."
+          ]
+        },
+        "bases": [
+          "_TokenRegistration"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "observation",
+    "title": "Events and observation",
+    "lede": "The structured events a run emits, and the hooks that receive them.",
+    "entries": [
+      {
+        "name": "observe",
+        "kind": "function",
+        "module": "cuprum.context.registration",
+        "path": "cuprum/context/registration.py",
+        "line": 308,
+        "display": "def observe(hook: ExecHook) -> HookRegistration",
+        "doc": {
+          "summary": "Register a structured execution event hook in the current context.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "HookRegistration",
+                  "description": "A handle that can be detached or used as a context manager."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "ExecEvent",
+        "kind": "class",
+        "module": "cuprum.events",
+        "path": "cuprum/events.py",
+        "line": 106,
+        "display": "class ExecEvent(\n    phase: ExecPhase,\n    program: Program,\n    argv: tuple[str, ...],\n    cwd: Path | None,\n    env: cabc.Mapping[str, str] | None,\n    pid: int | None,\n    timestamp: float,\n    line: str | None,\n    exit_code: int | None,\n    duration_s: float | None,\n    tags: cabc.Mapping[str, object],\n    note: str | None = None,\n    byte_count: int | None = None,\n    operation: str | None = None,\n    error_type: str | None = None,\n    exec_id: ExecId | None = None,\n    project: str | None = None,\n    timeout_s: float | None = None,\n    timeout_mode: TimeoutMode | None = None,\n    stage_index: int | None = None,\n    stage_count: int | None = None,\n    eof_grace_s: float | None = None,\n    pending_readers: int | None = None,\n    max_rss_bytes: int | None = None,\n    user_cpu_seconds: float | None = None,\n    system_cpu_seconds: float | None = None,\n    resource_usage_mode: ResourceUsageMode | None = None,\n)",
+        "doc": {
+          "summary": "A structured execution event emitted by Cuprum.",
+          "sections": [
+            {
+              "title": "Attributes",
+              "fields": [
+                {
+                  "name": "New optional fields are appended after ``exec_id`` rather than inserted",
+                  "type": "",
+                  "description": ""
+                },
+                {
+                  "name": "beside the field they relate to. Inserting one ahead of ``exec_id`` would",
+                  "type": "",
+                  "description": ""
+                },
+                {
+                  "name": "silently rebind a positional argument in existing caller code, handing the",
+                  "type": "",
+                  "description": ""
+                },
+                {
+                  "name": "correlation token to the new field and leaving ``exec_id=None`` — which",
+                  "type": "",
+                  "description": ""
+                },
+                {
+                  "name": "consumers such as ``TracingHook`` treat as uncorrelatable and drop.",
+                  "type": "",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        "members": [
+          {
+            "name": "phase",
+            "kind": "field",
+            "display": "phase: ExecPhase",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "program",
+            "kind": "field",
+            "display": "program: Program",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "argv",
+            "kind": "field",
+            "display": "argv: tuple[str, ...]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "cwd",
+            "kind": "field",
+            "display": "cwd: Path | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "env",
+            "kind": "field",
+            "display": "env: cabc.Mapping[str, str] | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "pid",
+            "kind": "field",
+            "display": "pid: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "timestamp",
+            "kind": "field",
+            "display": "timestamp: float",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "line",
+            "kind": "field",
+            "display": "line: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "exit_code",
+            "kind": "field",
+            "display": "exit_code: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "duration_s",
+            "kind": "field",
+            "display": "duration_s: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "tags",
+            "kind": "field",
+            "display": "tags: cabc.Mapping[str, object]",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "note",
+            "kind": "field",
+            "display": "note: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "byte_count",
+            "kind": "field",
+            "display": "byte_count: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "operation",
+            "kind": "field",
+            "display": "operation: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "error_type",
+            "kind": "field",
+            "display": "error_type: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "exec_id",
+            "kind": "field",
+            "display": "exec_id: ExecId | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "project",
+            "kind": "field",
+            "display": "project: str | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "timeout_s",
+            "kind": "field",
+            "display": "timeout_s: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "timeout_mode",
+            "kind": "field",
+            "display": "timeout_mode: TimeoutMode | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stage_index",
+            "kind": "field",
+            "display": "stage_index: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stage_count",
+            "kind": "field",
+            "display": "stage_count: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "eof_grace_s",
+            "kind": "field",
+            "display": "eof_grace_s: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "pending_readers",
+            "kind": "field",
+            "display": "pending_readers: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "max_rss_bytes",
+            "kind": "field",
+            "display": "max_rss_bytes: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "user_cpu_seconds",
+            "kind": "field",
+            "display": "user_cpu_seconds: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "system_cpu_seconds",
+            "kind": "field",
+            "display": "system_cpu_seconds: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "resource_usage_mode",
+            "kind": "field",
+            "display": "resource_usage_mode: ResourceUsageMode | None",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "ExecHook",
+        "kind": "type alias",
+        "module": "cuprum.events",
+        "path": "cuprum/events.py",
+        "line": 281,
+        "display": "ExecHook = cabc.Callable[[ExecEvent], cabc.Awaitable[None] | None]",
+        "doc": {
+          "summary": ""
+        }
+      },
+      {
+        "name": "logging_hook",
+        "kind": "function",
+        "module": "cuprum.logging_hooks",
+        "path": "cuprum/logging_hooks.py",
+        "line": 60,
+        "display": "def logging_hook(\n    *,\n    logger: logging.Logger | None = None,\n    start_level: int = logging.INFO,\n    exit_level: int = logging.INFO,\n) -> LoggingHookRegistration",
+        "doc": {
+          "summary": "Register paired hooks that log start and exit events.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "LoggingHookRegistration",
+                  "description": "Handle for detaching the hooks manually or via context manager usage."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "LoggingHookRegistration",
+        "kind": "class",
+        "module": "cuprum.logging_hooks",
+        "path": "cuprum/logging_hooks.py",
+        "line": 21,
+        "display": "class LoggingHookRegistration(\n    start_registration: HookRegistration | None,\n    exit_registration: HookRegistration | None,\n    _detached: bool = False,\n)",
+        "doc": {
+          "summary": "Registration handle for paired logging hooks.",
+          "body": [
+            "Detaches both the start (before) and exit (after) hooks together to avoid leaking state across tests or calling code. Detach order is reversed from registration to respect ContextVar token stacking."
+          ]
+        },
+        "members": [
+          {
+            "name": "start_registration",
+            "kind": "field",
+            "display": "start_registration: HookRegistration | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "exit_registration",
+            "kind": "field",
+            "display": "exit_registration: HookRegistration | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Detach both logging hooks idempotently."
+            }
+          }
+        ]
+      },
+      {
+        "name": "observe_line_stream",
+        "kind": "function",
+        "module": "cuprum.line_stream_observation",
+        "path": "cuprum/line_stream_observation.py",
+        "line": 82,
+        "display": "def observe_line_stream(\n    hook: LineStreamHook,\n) -> LineStreamHookRegistration",
+        "doc": {
+          "summary": "Register a synchronous lifecycle observer for <code>SafeCmd.lines()</code>.",
+          "body": [
+            "Observer failures are logged and do not alter subprocess results, timeout translation, or cancellation. Prefer a <code>with</code> block so registration is restored in the same context that installed it."
+          ],
+          "sections": [
+            {
+              "title": "Parameters",
+              "fields": [
+                {
+                  "name": "hook",
+                  "type": "",
+                  "description": "A synchronous callable that receives each <a href=\"#LineStreamEvent\"><code>LineStreamEvent</code></a> in the active context."
+                }
+              ]
+            },
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "LineStreamHookRegistration",
+                  "description": "A scoped registration that detaches the hook on scope exit or explicit <a href=\"#LineStreamHookRegistration\"><code>LineStreamHookRegistration.detach</code></a>."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "LineStreamEvent",
+        "kind": "class",
+        "module": "cuprum.line_stream_events",
+        "path": "cuprum/line_stream_events.py",
+        "line": 69,
+        "display": "class LineStreamEvent(\n    phase: LineStreamPhase,\n    exec_id: ExecId,\n    pid: int | None,\n    stream: LineStreamName | None = None,\n    sink: LineStreamSink | None = None,\n    queue_size: int | None = None,\n    queue_capacity: int | None = None,\n    error_type: str | None = None,\n)",
+        "doc": {
+          "summary": "One line-stream lifecycle boundary for operational observers.",
+          "body": [
+            "<code>queue_size</code> and <code>queue_capacity</code> describe bounded backpressure only in structured event data. Metrics adapters use only the closed <code>phase</code>, <code>stream</code>, and <code>sink</code> vocabularies, never identifiers, payloads, or exception types."
+          ],
+          "sections": [
+            {
+              "title": "Attributes",
+              "fields": [
+                {
+                  "name": "phase",
+                  "type": "",
+                  "description": "One bounded lifecycle state from <a href=\"#LineStreamPhase\"><code>LineStreamPhase</code></a>."
+                },
+                {
+                  "name": "exec_id",
+                  "type": "",
+                  "description": "The execution identifier shared with the corresponding <code>ExecEvent</code> lifecycle."
+                },
+                {
+                  "name": "pid",
+                  "type": "",
+                  "description": "The child process identifier once spawning has completed."
+                },
+                {
+                  "name": "stream",
+                  "type": "",
+                  "description": "The output stream related to a queue or sink event, when applicable."
+                },
+                {
+                  "name": "sink",
+                  "type": "",
+                  "description": "The bounded callback or queue destination related to a sink failure."
+                },
+                {
+                  "name": "queue_size",
+                  "type": "",
+                  "description": "The queue depth at a saturation boundary, recorded as event data only."
+                },
+                {
+                  "name": "queue_capacity",
+                  "type": "",
+                  "description": "The finite queue capacity at a saturation boundary."
+                },
+                {
+                  "name": "error_type",
+                  "type": "",
+                  "description": "The exception class name from a sink failure, never a metric label."
+                }
+              ]
+            }
+          ]
+        },
+        "members": [
+          {
+            "name": "phase",
+            "kind": "field",
+            "display": "phase: LineStreamPhase",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "exec_id",
+            "kind": "field",
+            "display": "exec_id: ExecId",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "pid",
+            "kind": "field",
+            "display": "pid: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stream",
+            "kind": "field",
+            "display": "stream: LineStreamName | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "sink",
+            "kind": "field",
+            "display": "sink: LineStreamSink | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "queue_size",
+            "kind": "field",
+            "display": "queue_size: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "queue_capacity",
+            "kind": "field",
+            "display": "queue_capacity: int | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "error_type",
+            "kind": "field",
+            "display": "error_type: str | None",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "LineStreamHook",
+        "kind": "type alias",
+        "module": "cuprum.line_stream_events",
+        "path": "cuprum/line_stream_events.py",
+        "line": 108,
+        "display": "LineStreamHook = cabc.Callable[[LineStreamEvent], None]",
+        "doc": {
+          "summary": "A synchronous observer of <a href=\"#LineStreamEvent\"><code>LineStreamEvent</code></a> values."
+        }
+      },
+      {
+        "name": "LineStreamHookRegistration",
+        "kind": "class",
+        "module": "cuprum.line_stream_observation",
+        "path": "cuprum/line_stream_observation.py",
+        "line": 32,
+        "display": "class LineStreamHookRegistration(hook: LineStreamHook) -> None",
+        "doc": {
+          "summary": "Scoped registration handle for one line-stream lifecycle hook.",
+          "sections": [
+            {
+              "title": "Attributes",
+              "fields": [
+                {
+                  "name": "_detached",
+                  "type": "",
+                  "description": "Whether the registration has already removed its own hook."
+                }
+              ]
+            },
+            {
+              "title": "Notes",
+              "paragraphs": [
+                "Entering the registration leaves its hook active in the current context. Exiting the scope or calling <code>detach</code> removes exactly the hook this handle registered, so detaching out of last-in-first-out order cannot resurrect a stale hook that was already removed."
+              ]
+            }
+          ]
+        },
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Remove this registration's own hook without restoring stale state."
+            }
+          }
+        ]
+      },
+      {
+        "name": "LineStreamPhase",
+        "kind": "class",
+        "module": "cuprum.line_stream_events",
+        "path": "cuprum/line_stream_events.py",
+        "line": 31,
+        "display": "LineStreamPhase",
+        "doc": {
+          "summary": "The bounded lifecycle vocabulary for <a href=\"#LineStreamEvent\"><code>LineStreamEvent</code></a>.",
+          "sections": [
+            {
+              "title": "Attributes",
+              "fields": [
+                {
+                  "name": "SPAWNED",
+                  "type": "",
+                  "description": "The subprocess and its consumers are ready."
+                },
+                {
+                  "name": "QUEUE_SATURATED",
+                  "type": "",
+                  "description": "A line sink is waiting for bounded queue capacity."
+                },
+                {
+                  "name": "SINK_FAILED",
+                  "type": "",
+                  "description": "A callback or queue sink raised while receiving a line."
+                },
+                {
+                  "name": "TIMEOUT",
+                  "type": "",
+                  "description": "The command deadline expired."
+                },
+                {
+                  "name": "CANCELLED",
+                  "type": "",
+                  "description": "Iteration or line delivery was cancelled."
+                },
+                {
+                  "name": "TEARDOWN_STARTED",
+                  "type": "",
+                  "description": "Shared child-process teardown began."
+                },
+                {
+                  "name": "TEARDOWN_COMPLETED",
+                  "type": "",
+                  "description": "Shared teardown and consumer drainage completed."
+                },
+                {
+                  "name": "COMPLETED",
+                  "type": "",
+                  "description": "The command result was assembled and is ready to publish."
+                }
+              ]
+            }
+          ]
+        },
+        "bases": [
+          "enum.StrEnum"
+        ],
+        "members": [
+          {
+            "name": "SPAWNED",
+            "kind": "member",
+            "display": "SPAWNED = 'spawned'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "QUEUE_SATURATED",
+            "kind": "member",
+            "display": "QUEUE_SATURATED = 'queue_saturated'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "SINK_FAILED",
+            "kind": "member",
+            "display": "SINK_FAILED = 'sink_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "TIMEOUT",
+            "kind": "member",
+            "display": "TIMEOUT = 'timeout'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "CANCELLED",
+            "kind": "member",
+            "display": "CANCELLED = 'cancelled'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "TEARDOWN_STARTED",
+            "kind": "member",
+            "display": "TEARDOWN_STARTED = 'teardown_started'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "TEARDOWN_COMPLETED",
+            "kind": "member",
+            "display": "TEARDOWN_COMPLETED = 'teardown_completed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "COMPLETED",
+            "kind": "member",
+            "display": "COMPLETED = 'completed'",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "LineStreamSink",
+        "kind": "type alias",
+        "module": "cuprum.line_stream_events",
+        "path": "cuprum/line_stream_events.py",
+        "line": 64,
+        "display": "LineStreamSink = typ.Literal['callback', 'queue']",
+        "doc": {
+          "summary": "Which line-delivery sink reported a failure."
+        }
+      },
+      {
+        "name": "observe_echo",
+        "kind": "function",
+        "module": "cuprum.echo_observation",
+        "path": "cuprum/echo_observation.py",
+        "line": 81,
+        "display": "def observe_echo(hook: EchoHook) -> EchoHookRegistration",
+        "doc": {
+          "summary": "Register a hook for stream-echo failure events in the current context.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "EchoHookRegistration",
+                  "description": "A handle that can be detached or used as a context manager."
+                }
+              ]
+            }
+          ],
+          "examples": "Count echo failures into a metrics collector::\n\n    from cuprum.adapters.metrics_adapter import InMemoryMetrics\n    from cuprum.adapters.echo_metrics import EchoMetricsHook\n\n    metrics = InMemoryMetrics()\n    with observe_echo(EchoMetricsHook(metrics)):\n        pipeline.run_sync()"
+        }
+      },
+      {
+        "name": "EchoEvent",
+        "kind": "class",
+        "module": "cuprum.echo_events",
+        "path": "cuprum/echo_events.py",
+        "line": 62,
+        "display": "class EchoEvent(\n    stream: EchoStream,\n    error_category: EchoErrorCategory,\n    dropped_bytes: int | None = None,\n)",
+        "doc": {
+          "summary": "A stream-echo event reported to registered echo hooks.",
+          "examples": "A stdout echo that could not encode its payload::\n\n    event = EchoEvent(\n        stream=EchoStream.STDOUT,\n        error_category=EchoErrorCategory.UNICODE_ENCODE,\n    )\n    assert event.stream == \"stdout\""
+        },
+        "members": [
+          {
+            "name": "stream",
+            "kind": "field",
+            "display": "stream: EchoStream",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "error_category",
+            "kind": "field",
+            "display": "error_category: EchoErrorCategory",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "dropped_bytes",
+            "kind": "field",
+            "display": "dropped_bytes: int | None",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "EchoHook",
+        "kind": "type alias",
+        "module": "cuprum.echo_events",
+        "path": "cuprum/echo_events.py",
+        "line": 128,
+        "display": "EchoHook = cabc.Callable[[EchoEvent], None]",
+        "doc": {
+          "summary": "A synchronous consumer of <a href=\"#EchoEvent\"><code>EchoEvent</code></a> values.",
+          "body": [
+            "Echo hooks are synchronous by contract: the emission site sits inline in the echo write path, between two writes to the same sink, and there is no point at which awaiting a hook could be ordered against the chunk being echoed."
+          ]
+        }
+      },
+      {
+        "name": "EchoHookRegistration",
+        "kind": "class",
+        "module": "cuprum.echo_observation",
+        "path": "cuprum/echo_observation.py",
+        "line": 34,
+        "display": "class EchoHookRegistration(hook: EchoHook) -> None",
+        "doc": {
+          "summary": "Registration handle for a stream-echo observation hook.",
+          "body": [
+            "Supports <code>detach()</code> and context-manager use. The handle captures a <code>contextvars.Token</code> when it installs the extended hook tuple, and <code>detach</code> restores the exact tuple that was current when the handle was created — the same discipline <a href=\"#PumpHookRegistration\"><code>PumpHookRegistration</code></a> applies. Detach in the <code>contextvars.Context</code> that created the registration; resetting a <code>ContextVar</code> with a token from another context raises <code>ValueError</code>.",
+            "Prefer <code>with</code> blocks, which detach in last-in-first-out order; detaching out of order restores a tuple that discards later registrations."
+          ]
+        },
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Restore the echo hooks that preceded this registration."
+            }
+          }
+        ]
+      },
+      {
+        "name": "EchoStream",
+        "kind": "class",
+        "module": "cuprum.echo_events",
+        "path": "cuprum/echo_events.py",
+        "line": 27,
+        "display": "EchoStream",
+        "doc": {
+          "summary": "Which subprocess output stream an echo event describes.",
+          "body": [
+            "A closed set rather than free text: operators aggregate the <code>stream</code> metric label, so an unbounded sink object name would create one series per sink type and a caller-controlled value would be a disclosure risk."
+          ],
+          "examples": "The member value is the string operators see::\n\n    assert EchoStream.STDOUT == \"stdout\""
+        },
+        "bases": [
+          "enum.StrEnum"
+        ],
+        "members": [
+          {
+            "name": "STDOUT",
+            "kind": "member",
+            "display": "STDOUT = 'stdout'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "STDERR",
+            "kind": "member",
+            "display": "STDERR = 'stderr'",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "EchoErrorCategory",
+        "kind": "class",
+        "module": "cuprum.echo_events",
+        "path": "cuprum/echo_events.py",
+        "line": 46,
+        "display": "EchoErrorCategory",
+        "doc": {
+          "summary": "Why an echo event occurred, as a closed set of categories.",
+          "examples": "The member value is the string operators see::\n\n    assert EchoErrorCategory.UNICODE_ENCODE == \"unicode_encode\""
+        },
+        "bases": [
+          "enum.StrEnum"
+        ],
+        "members": [
+          {
+            "name": "UNICODE_ENCODE",
+            "kind": "member",
+            "display": "UNICODE_ENCODE = 'unicode_encode'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "TRUNCATED",
+            "kind": "member",
+            "display": "TRUNCATED = 'truncated'",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "RelayFallback",
+        "kind": "class",
+        "module": "cuprum.echo_events",
+        "path": "cuprum/echo_events.py",
+        "line": 93,
+        "display": "class RelayFallback(\n    stream: EchoStream,\n    error_category: EchoErrorCategory,\n)",
+        "doc": {
+          "summary": "One handled echo-disablement recorded on a command's result.",
+          "body": [
+            "A text-only echo sink rejected the subprocess output, so the echo for that stream's drain was disabled while the stream itself kept being consumed and, when enabled, captured. One record describes one handled disablement for one stream: later chunks and the final decoder flush never re-enter the failed write, so a drain contributes at most one record."
+          ],
+          "examples": "A stdout echo that could not encode its payload::\n\n    fallback = RelayFallback(\n        stream=EchoStream.STDOUT,\n        error_category=EchoErrorCategory.UNICODE_ENCODE,\n    )\n    assert fallback.stream == \"stdout\""
+        },
+        "members": [
+          {
+            "name": "stream",
+            "kind": "field",
+            "display": "stream: EchoStream",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "error_category",
+            "kind": "field",
+            "display": "error_category: EchoErrorCategory",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "rust",
+    "title": "Rust pump and backends",
+    "lede": "Whether the optional native pump is present, and what it reports when a pipeline hop uses it or falls back.",
+    "entries": [
+      {
+        "name": "is_rust_available",
+        "kind": "function",
+        "module": "cuprum._backend",
+        "path": "cuprum/_backend.py",
+        "line": 89,
+        "display": "def is_rust_available() -> bool",
+        "doc": {
+          "summary": "Report cached Rust availability, honouring testing overrides for dispatch."
+        }
+      },
+      {
+        "name": "observe_pump",
+        "kind": "function",
+        "module": "cuprum.pump_observation",
+        "path": "cuprum/pump_observation.py",
+        "line": 127,
+        "display": "def observe_pump(hook: PumpHook) -> PumpHookRegistration",
+        "doc": {
+          "summary": "Register a hook for Rust-pump routing events in the current context.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "PumpHookRegistration",
+                  "description": "A handle that can be detached or used as a context manager."
+                }
+              ]
+            }
+          ],
+          "examples": "Count declined hand-offs into a metrics collector::\n\n    from cuprum.adapters.metrics_adapter import InMemoryMetrics\n    from cuprum.adapters.pump_metrics import PumpMetricsHook\n\n    metrics = InMemoryMetrics()\n    with observe_pump(PumpMetricsHook(metrics)):\n        pipeline.run_sync()"
+        }
+      },
+      {
+        "name": "PumpEvent",
+        "kind": "class",
+        "module": "cuprum.pump_events",
+        "path": "cuprum/pump_events.py",
+        "line": 105,
+        "display": "class PumpEvent(\n    phase: PumpPhase,\n    reason: RustPumpDeclineReason | None = None,\n    outcome: RustPumpHandoffOutcome | None = None,\n    duration_s: float | None = None,\n    elapsed_s: float | None = None,\n    exec_id: ExecId | None = None,\n)",
+        "doc": {
+          "summary": "A Rust-pump routing decision reported to registered pump hooks.",
+          "body": [
+            "The event carries the phase, a closed-set reason or hand-off outcome, the monotonic wait duration for completed native-pump cleanup, the monotonic elapsed grace wait, and the source stage token needed to correlate cleanup tracing. Descriptor numbers, command arguments, exception types, and tracebacks are all either unbounded as metric labels or a disclosure risk, and the DEBUG log records emitted alongside these events carry the diagnostic detail — including the pump's traceback — for the cases that need it."
+          ],
+          "examples": "A decline names the seam that refused::\n\n    event = PumpEvent(\n        phase=\"declined\",\n        reason=RustPumpDeclineReason.READER_PAUSE_FAILED,\n    )\n    assert event.reason == \"reader_pause_failed\"\n\nA cancellation-masked failure carries no reason::\n\n    assert PumpEvent(phase=\"failed_after_cancel\").reason is None\n\nA completed cleanup carries its monotonic duration::\n\n    cleanup = PumpEvent(phase=\"cleanup_completed\", duration_s=0.25)\n    assert cleanup.duration_s == 0.25"
+        },
+        "members": [
+          {
+            "name": "phase",
+            "kind": "field",
+            "display": "phase: PumpPhase",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "reason",
+            "kind": "field",
+            "display": "reason: RustPumpDeclineReason | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "outcome",
+            "kind": "field",
+            "display": "outcome: RustPumpHandoffOutcome | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "duration_s",
+            "kind": "field",
+            "display": "duration_s: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "elapsed_s",
+            "kind": "field",
+            "display": "elapsed_s: float | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "exec_id",
+            "kind": "field",
+            "display": "exec_id: ExecId | None",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "PumpHook",
+        "kind": "type alias",
+        "module": "cuprum.pump_events",
+        "path": "cuprum/pump_events.py",
+        "line": 168,
+        "display": "PumpHook = cabc.Callable[[PumpEvent], None]",
+        "doc": {
+          "summary": "A synchronous consumer of <a href=\"#PumpEvent\"><code>PumpEvent</code></a> values.",
+          "body": [
+            "Pump hooks are synchronous by contract. Every emission site is synchronous — one on the Python-pump fall-back path and the others inside cancellation unwinding — so there is no task to attach an awaitable to and no point at which awaiting it could be ordered against the transfer it describes. A hook that returns an awaitable is reported and discarded rather than run."
+          ]
+        }
+      },
+      {
+        "name": "PumpHookRegistration",
+        "kind": "class",
+        "module": "cuprum.pump_observation",
+        "path": "cuprum/pump_observation.py",
+        "line": 79,
+        "display": "class PumpHookRegistration(hook: PumpHook) -> None",
+        "doc": {
+          "summary": "Registration handle for a Rust-pump observation hook.",
+          "body": [
+            "Supports <code>detach()</code> and context-manager use. The handle captures a <code>contextvars.Token</code> when it installs the extended hook tuple, and <code>detach</code> restores the exact tuple that was current when the handle was created — the same discipline <code>_TokenRegistration</code> applies to execution contexts. Detach in the <code>contextvars.Context</code> that created the registration; resetting a <code>ContextVar</code> with a token from another context raises <code>ValueError</code>.",
+            "Prefer <code>with</code> blocks, which detach in last-in-first-out order; detaching out of order restores a tuple that discards later registrations."
+          ]
+        },
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Restore the pump hooks that preceded this registration."
+            }
+          }
+        ]
+      },
+      {
+        "name": "RustPumpDeclineReason",
+        "kind": "class",
+        "module": "cuprum.pump_events",
+        "path": "cuprum/pump_events.py",
+        "line": 27,
+        "display": "RustPumpDeclineReason",
+        "doc": {
+          "summary": "Why an inter-stage hop fell back from the Rust pump to the Python one.",
+          "body": [
+            "A closed set rather than free text. Operators filter on <code>cuprum_reason</code> and aggregate the <code>reason</code> metric label, so a typo at a new call site would produce a value their filters silently miss; as an enum it is a type error instead. Members are <code>str</code>, so the logged field and the metric label stay plain strings. <code>PLATFORM_UNSUPPORTED</code> means the current operating system and asyncio transport combination cannot safely use the native Rust pump. <code>DUPLICATE_FDS_UNAVAILABLE</code> means a transport's pipe description could not be re-opened or duplicated for the native worker: the descriptors existed when extraction read them, but one was already closed by the time duplication re-opened it."
+          ],
+          "examples": "The member value is the string operators see::\n\n    assert RustPumpDeclineReason.RAW_FD_UNAVAILABLE == \"raw_fd_unavailable\""
+        },
+        "bases": [
+          "enum.StrEnum"
+        ],
+        "members": [
+          {
+            "name": "RAW_FD_UNAVAILABLE",
+            "kind": "member",
+            "display": "RAW_FD_UNAVAILABLE = 'raw_fd_unavailable'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "READER_UNRESUMABLE",
+            "kind": "member",
+            "display": "READER_UNRESUMABLE = 'reader_unresumable'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "READER_PAUSE_FAILED",
+            "kind": "member",
+            "display": "READER_PAUSE_FAILED = 'reader_pause_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "BLOCKING_MODE_UNAVAILABLE",
+            "kind": "member",
+            "display": "BLOCKING_MODE_UNAVAILABLE = 'blocking_mode_unavailable'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "DUPLICATE_FDS_UNAVAILABLE",
+            "kind": "member",
+            "display": "DUPLICATE_FDS_UNAVAILABLE = 'duplicate_fds_unavailable'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "PLATFORM_UNSUPPORTED",
+            "kind": "member",
+            "display": "PLATFORM_UNSUPPORTED = 'platform_unsupported'",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "RustPumpHandoffOutcome",
+        "kind": "class",
+        "module": "cuprum.pump_events",
+        "path": "cuprum/pump_events.py",
+        "line": 57,
+        "display": "RustPumpHandoffOutcome",
+        "doc": {
+          "summary": "A bounded result of attempting the Rust writer-resource hand-off."
+        },
+        "bases": [
+          "enum.StrEnum"
+        ],
+        "members": [
+          {
+            "name": "SUBMITTED",
+            "kind": "member",
+            "display": "SUBMITTED = 'submitted'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "DUPLICATE_WRITER_FAILED",
+            "kind": "member",
+            "display": "DUPLICATE_WRITER_FAILED = 'duplicate_writer_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "BLOCKING_SETUP_FAILED",
+            "kind": "member",
+            "display": "BLOCKING_SETUP_FAILED = 'blocking_setup_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "EXECUTOR_SUBMISSION_REJECTED",
+            "kind": "member",
+            "display": "EXECUTOR_SUBMISSION_REJECTED = 'executor_submission_rejected'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "NATIVE_LOAD_FAILED",
+            "kind": "member",
+            "display": "NATIVE_LOAD_FAILED = 'native_load_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "READER_PREPARATION_FAILED",
+            "kind": "member",
+            "display": "READER_PREPARATION_FAILED = 'reader_preparation_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "BUFFER_VALIDATION_FAILED",
+            "kind": "member",
+            "display": "BUFFER_VALIDATION_FAILED = 'buffer_validation_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "PLATFORM_WRITER_TRANSFER_FAILED",
+            "kind": "member",
+            "display": "PLATFORM_WRITER_TRANSFER_FAILED = 'platform_writer_transfer_failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "NATIVE_IO_FAILED",
+            "kind": "member",
+            "display": "NATIVE_IO_FAILED = 'native_io_failed'",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "observe_pump_span",
+        "kind": "function",
+        "module": "cuprum.pump_span_observation",
+        "path": "cuprum/pump_span_observation.py",
+        "line": 98,
+        "display": "def observe_pump_span(tracer: Tracer) -> PumpHopSpanRegistration",
+        "doc": {
+          "summary": "Register a tracer for Rust-pump executor-hop spans.",
+          "sections": [
+            {
+              "title": "Returns",
+              "fields": [
+                {
+                  "name": "",
+                  "type": "PumpHopSpanRegistration",
+                  "description": "A handle that can detach the tracer or scope it with a <code>with</code> block."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "PumpHopSpanRegistration",
+        "kind": "class",
+        "module": "cuprum.pump_span_observation",
+        "path": "cuprum/pump_span_observation.py",
+        "line": 41,
+        "display": "class PumpHopSpanRegistration(tracer: Tracer) -> None",
+        "doc": {
+          "summary": "Registration handle for one Rust-pump hop tracer.",
+          "body": [
+            "The handle restores the precise preceding registration tuple when detached. It should therefore be detached in the <code>contextvars.Context</code> that created it and in last-in-first-out order when registrations nest."
+          ]
+        },
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Restore the tracers that preceded this registration."
+            }
+          }
+        ]
+      },
+      {
+        "name": "PumpHopOutcome",
+        "kind": "class",
+        "module": "cuprum.pump_span_events",
+        "path": "cuprum/pump_span_events.py",
+        "line": 13,
+        "display": "PumpHopOutcome",
+        "doc": {
+          "summary": "The bounded terminal outcomes of one Rust-pump executor hop."
+        },
+        "bases": [
+          "enum.StrEnum"
+        ],
+        "members": [
+          {
+            "name": "SUCCEEDED",
+            "kind": "member",
+            "display": "SUCCEEDED = 'succeeded'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "FAILED",
+            "kind": "member",
+            "display": "FAILED = 'failed'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "CANCELLED",
+            "kind": "member",
+            "display": "CANCELLED = 'cancelled'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "FAILED_AFTER_CANCEL",
+            "kind": "member",
+            "display": "FAILED_AFTER_CANCEL = 'failed_after_cancel'",
+            "doc": {
+              "summary": ""
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "errors",
+    "title": "Errors",
+    "lede": "The exceptions Cuprum raises when a program is unknown, forbidden, or too slow.",
+    "entries": [
+      {
+        "name": "UnknownProgramError",
+        "kind": "exception",
+        "module": "cuprum.catalogue",
+        "path": "cuprum/catalogue.py",
+        "line": 34,
+        "display": "UnknownProgramError",
+        "doc": {
+          "summary": "Raised when a program is not present in the catalogue allowlist."
+        },
+        "bases": [
+          "LookupError"
+        ]
+      },
+      {
+        "name": "ForbiddenProgramError",
+        "kind": "exception",
+        "module": "cuprum.context.core",
+        "path": "cuprum/context/core.py",
+        "line": 42,
+        "display": "class ForbiddenProgramError(\n    program: Program,\n    *,\n    restricted_state: bool,\n) -> None",
+        "doc": {
+          "summary": "Raised when attempting to run a program not in the current allowlist.",
+          "sections": [
+            {
+              "title": "Attributes",
+              "fields": [
+                {
+                  "name": "program",
+                  "type": "Program",
+                  "description": "The program that was denied by the context allowlist."
+                },
+                {
+                  "name": "restricted_state",
+                  "type": "bool",
+                  "description": "Whether the context allowlist was in a restricted state when the program was denied."
+                }
+              ]
+            }
+          ]
+        },
+        "bases": [
+          "ContextError",
+          "PermissionError"
+        ]
+      },
+      {
+        "name": "TimeoutExpired",
+        "kind": "exception",
+        "module": "cuprum.sh",
+        "path": "cuprum/sh.py",
+        "line": 339,
+        "display": "class TimeoutExpired(\n    *,\n    cmd: cabc.Sequence[str] | object,\n    timeout: float,\n    output: str | bytes | None = None,\n    stderr: str | bytes | None = None,\n) -> None",
+        "doc": {
+          "summary": "Raised when command execution exceeds the configured timeout."
+        },
+        "bases": [
+          "TimeoutError"
+        ],
+        "members": [
+          {
+            "name": "stdout",
+            "kind": "property",
+            "display": "stdout: str | bytes | None",
+            "doc": {
+              "summary": "Captured stdout, mirroring <code>subprocess.TimeoutExpired</code>.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "str | bytes | None",
+                      "description": "Captured standard output, or <code>None</code> when no output was captured before expiry."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+] %}
+{% set api_source = {
+  "version": "0.2.0-beta1",
+  "commit": "230c4b9b31c74e538bd75d21224ebb4f70dc7f9d"
+} %}

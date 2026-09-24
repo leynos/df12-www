@@ -1,10 +1,12 @@
 {% extends "pages/_docs.jinja" %}
-{% from "data/docs.jinja" import docs_api, docs_source as api_source %}
+{% import "components.jinja" as ui %}
+{% from "data/docs.jinja" import docs_api, docs_plates, docs_source as api_source %}
 {% set docs_current = '/cuprum/docs/api/' %}
 {% block title %}API reference · Cuprum{% endblock %}
 {% block description %}Every name Cuprum exports, grouped by task, with signatures, parameters, return values, and exceptions read from the source.{% endblock %}
 {% block docs_body %}
-          <header class="cu-docs__head">
+          <header class="cu-docs__head cu-docs__head--art">
+            <div>
             <p class="cu-kicker">Documentation · API reference</p>
             <h1 class="cu-docs__title">API reference</h1>
             <p class="cu-docs__lede">
@@ -15,6 +17,8 @@
               and can change without notice.
             </p>
             <p class="cu-docs__meta">Generated from <a href="{{ repository_url }}/tree/{{ api_source.commit }}">{{ api_source.commit[:8] }}</a></p>
+            </div>
+            {{ ui.plate(docs_plates.api) }}
           </header>
           {% for page in docs_api %}
           <section class="cu-docs__part" aria-labelledby="{{ page.slug }}-title">

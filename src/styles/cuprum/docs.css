@@ -194,6 +194,88 @@
   border-bottom: 2px solid var(--color-ink);
 }
 
+/* A head with a picture: the picture follows the text on a phone and takes
+   a column of its own beside it from 48rem, where there is blank paper to
+   the right of the title. */
+.cu-docs__head--art > :is(.cu-plate, .cu-docs__manuals) {
+  margin-top: 2rem;
+}
+
+@media (width >= 48rem) {
+  .cu-docs__head--art {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .cu-docs__head--art > :is(.cu-plate, .cu-docs__manuals) {
+    margin-top: 0;
+  }
+
+  /* A percentage width in an auto-sized track is cyclic, so a plate in
+     its own column takes its width outright. */
+  .cu-docs__head--art > .cu-plate {
+    width: var(--cu-plate-width);
+  }
+}
+
+/* The strewn manuals on the landing page: a colour cut-out with a
+   transparent ground, so it has no frame. */
+.cu-docs__manuals {
+  display: block;
+  width: min(100%, 22rem);
+  height: auto;
+}
+
+@media (width >= 48rem) {
+  .cu-docs__manuals {
+    width: clamp(15rem, 26vw, 24rem);
+  }
+}
+
+/* ---------- Plates ---------------------------------------------------- */
+
+/* An engraved plate from components.jinja. The box takes the mask's ratio
+   and the mask is contained within it, so capping the height leaves the
+   drawing centred and whole rather than cropped or stretched. */
+.cu-plate {
+  --cu-plate-width: 21rem;
+  --cu-plate-height: 15rem;
+
+  width: min(100%, var(--cu-plate-width));
+  margin: 0;
+}
+
+.cu-plate--portrait {
+  --cu-plate-width: 14rem;
+}
+
+@media (width >= 48rem) {
+  .cu-plate--portrait {
+    --cu-plate-height: 19rem;
+  }
+}
+
+.cu-plate__art {
+  width: 100%;
+  max-height: var(--cu-plate-height);
+  background-color: currentcolor;
+  mask-image: var(--cu-plate-mask);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+/* A closing engraving under the last part of a page, as a book ends a
+   chapter. */
+.cu-plate--tailpiece {
+  --cu-plate-width: 17rem;
+  --cu-plate-height: 22rem;
+
+  margin: 4rem auto 0;
+}
+
 .cu-docs__title {
   margin-top: 0.75rem;
   font-size: clamp(3rem, 7vw, 5rem);

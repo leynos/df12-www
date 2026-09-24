@@ -27,3 +27,43 @@
 {% set _ = docs_api.append({'slug': group.slug, 'title': group.title, 'lede': group.lede,
   'href': '/cuprum/docs/api/' ~ group.slug ~ '/', 'names': group.entries | map(attribute='name') | list}) %}
 {% endfor %}
+
+{#- The engraved plates: `docs` closes the landing page, `api` heads the
+    API index, and each guide's heads that guide. Each is an alpha mask
+    inked in the current colour, so `mask`, `width`, and `height` describe
+    the mask, and `caption` says what the drawing shows. -#}
+{% set docs_plates = {
+  'docs': {'mask': '/cuprum/assets/images/docs/docs-manifold-mask.webp', 'width': 457, 'height': 960,
+    'orientation': 'portrait', 'plate': 'Plate 09',
+    'caption': 'A wall manifold takes one supply and gives each branch its own valve, as Cuprum routes every command through one guarded set of fittings.'},
+  'run-a-command': {'mask': '/cuprum/assets/images/docs/guide-run-a-command-mask.webp', 'width': 640, 'height': 816,
+    'orientation': 'portrait', 'plate': 'Plate 10',
+    'caption': 'A bib tap opens a single run when the spindle lifts the washer from its seat, the simplest job Cuprum does.'},
+  'output': {'mask': '/cuprum/assets/images/docs/guide-output-mask.webp', 'width': 900, 'height': 627,
+    'orientation': 'landscape', 'plate': 'Plate 11',
+    'caption': 'A tee divides one stream in two, as capture and echo share a command\'s output.'},
+  'input-and-deadlines': {'mask': '/cuprum/assets/images/docs/guide-input-and-deadlines-mask.webp', 'width': 411, 'height': 960,
+    'orientation': 'portrait', 'plate': 'Plate 12',
+    'caption': 'A relief valve holds its seat until the spring\'s set load is exceeded, as a timeout lets a run go only so far before it gives way.'},
+  'pipelines-and-concurrency': {'mask': '/cuprum/assets/images/docs/guide-pipelines-and-concurrency-mask.webp', 'width': 900, 'height': 177,
+    'orientation': 'landscape', 'plate': 'Plate 13',
+    'caption': 'Stages joined by unions, couplings, and a flange carry one stream in sequence, then split to run in parallel before rejoining.'},
+  'catalogues-and-builders': {'mask': '/cuprum/assets/images/docs/guide-catalogues-and-builders-mask.webp', 'width': 900, 'height': 552,
+    'orientation': 'landscape', 'plate': 'Plate 14',
+    'caption': 'A catalogue sheet of standard fittings, each drawn once and ready to order, as a catalogue declares the programs a builder may assemble.'},
+  'policy-and-hooks': {'mask': '/cuprum/assets/images/docs/guide-policy-and-hooks-mask.webp', 'width': 518, 'height': 764,
+    'orientation': 'portrait', 'plate': 'Plate 15',
+    'caption': 'A gate valve with its wedge half lowered decides how much passes, as a scope\'s policy and hooks decide what may run.'},
+  'observe': {'mask': '/cuprum/assets/images/docs/guide-observe-mask.webp', 'width': 900, 'height': 428,
+    'orientation': 'landscape', 'plate': 'Plate 16',
+    'caption': 'A pressure gauge and a flow meter set into the line report on each run without interrupting it, as observation hooks do in production.'},
+  'troubleshoot': {'mask': '/cuprum/assets/images/docs/guide-troubleshoot-mask.webp', 'width': 900, 'height': 515,
+    'orientation': 'landscape', 'plate': 'Plate 17',
+    'caption': 'A leaking union opened up, its split washer lifted out for inspection, as a failed run is taken apart to find the cause.'},
+  'migrate': {'mask': '/cuprum/assets/images/docs/guide-migrate-mask.webp', 'width': 900, 'height': 447,
+    'orientation': 'landscape', 'plate': 'Plate 18',
+    'caption': 'A reducing coupling joins an old run to a new one of another bore, as the migration guide carries code across to 0.2.0.'},
+  'api': {'mask': '/cuprum/assets/images/docs/docs-api-exploded-mask.webp', 'width': 370, 'height': 960,
+    'orientation': 'portrait', 'plate': 'Plate 19',
+    'caption': 'A globe valve laid out part by part, as the reference lays out each module, class, and function that makes up Cuprum.'},
+} %}

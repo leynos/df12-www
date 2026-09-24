@@ -5,7 +5,7 @@
 #}
 {% extends "pages/_docs.jinja" %}
 {% import "components.jinja" as ui %}
-{% from "data/docs.jinja" import docs_guides %}
+{% from "data/docs.jinja" import docs_guides, docs_plates %}
 {% set guide = docs_guides | selectattr('slug', 'equalto', guide_slug) | first %}
 {% set docs_current = guide.href %}
 {% set slugs = docs_guides | map(attribute='slug') | list %}
@@ -13,10 +13,13 @@
 {% block title %}{{ guide.title }} · Guides · Cuprum{% endblock %}
 {% block description %}{{ guide.summary }}{% endblock %}
 {% block docs_body %}
-          <header class="cu-docs__head">
+          <header class="cu-docs__head cu-docs__head--art">
+            <div>
             <p class="cu-kicker">Guide {{ '%02d' % (position + 1) }} of {{ slugs | length }}</p>
             <h1 class="cu-docs__title">{{ guide.title }}</h1>
             <p class="cu-docs__lede">{{ guide.summary }}</p>
+            </div>
+            {{ ui.plate(docs_plates[guide_slug]) }}
           </header>
           <div class="cu-guide">
             {% block guide_body %}{% endblock %}

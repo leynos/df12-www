@@ -1085,7 +1085,11 @@ three registers the design language names:
   `src/static/cuprum/assets/images/`, painted in `currentcolor`, so they follow
   the theme tokens; the seal's legend is live SVG text. The town hall was drawn
   from a photograph of the real building, so it is a likeness, not an invention
-  like the seal.
+  like the seal. The documentation's plates of fittings and valves use the same
+  technique through the `ui.plate` macro: `docs_plates` in
+  `templates/cuprum/data/docs.jinja` names each mask, its size, and its
+  caption, and the macro passes the mask to CSS in a `--cu-plate-mask`
+  property, so adding a plate needs no new stylesheet rule.
 - **Watermark.** The seal at low contrast in the blank paper beside a page head
   that has no illustration. It has a grid column of its own, so it never sits
   under text, and it is dropped below the desktop breakpoint.

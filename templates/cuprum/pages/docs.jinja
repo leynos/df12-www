@@ -1,11 +1,12 @@
 {% extends "pages/_docs.jinja" %}
 {% import "components.jinja" as ui %}
-{% from "data/docs.jinja" import docs_guides, docs_api, docs_source as api_source %}
+{% from "data/docs.jinja" import docs_guides, docs_api, docs_plates, docs_source as api_source %}
 {% set docs_current = '/cuprum/docs/' %}
 {% block title %}Documentation · Cuprum{% endblock %}
 {% block description %}Cuprum's documentation: task guides for running, piping, scoping, and observing commands, and a reference for every public name, read from the source.{% endblock %}
 {% block docs_body %}
-          <header class="cu-docs__head">
+          <header class="cu-docs__head cu-docs__head--art">
+            <div>
             <p class="cu-kicker">Work order 004 · Documentation</p>
             <h1 class="cu-docs__title">Documentation</h1>
             <p class="cu-docs__lede">
@@ -14,6 +15,18 @@
               {{ api_source.version }}, with each signature, parameter, and
               failure.
             </p>
+            </div>
+            <img
+              class="cu-docs__manuals"
+              src="/cuprum/assets/images/docs-manuals-1280.webp"
+              srcset="/cuprum/assets/images/docs-manuals-640.webp 640w, /cuprum/assets/images/docs-manuals-1280.webp 1280w"
+              sizes="(min-width: 48rem) 24rem, 100vw"
+              width="1280"
+              height="899"
+              alt="A heap of plumbing manuals and binders, topped by the Pennsylvania Plumbing Code of 1975 with a muddy paw print on its cover."
+              fetchpriority="high"
+              decoding="async"
+            />
           </header>
           {% if docs_guides %}
           <section class="cu-docs__part" aria-labelledby="guides-title">
@@ -33,4 +46,5 @@
               {% endfor %}
             </ul>
           </section>
+          {{ ui.plate(docs_plates.docs, 'cu-plate--tailpiece') }}
 {% endblock %}

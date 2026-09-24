@@ -87,6 +87,20 @@
 </figure>
 {%- endmacro %}
 
+{#- An engraved plate: an alpha mask inked in the current colour, so it
+    takes the colour of the surface it sits on. `p` carries `mask`, `width`,
+    `height`, `orientation`, `plate`, and `caption`. The drawing is
+    decorative and hidden from assistive technology; the caption is text. -#}
+{% macro plate(p, class='') -%}
+<figure class="cu-plate cu-plate--{{ p.orientation }}{% if class %} {{ class }}{% endif %}">
+  <div class="cu-plate__art" style="--cu-plate-mask: url('{{ p.mask }}'); aspect-ratio: {{ p.width }} / {{ p.height }}" aria-hidden="true"></div>
+  <figcaption class="cu-art__caption">
+    <span class="cu-art__plate">{{ p.plate }}</span>
+    <span>{{ p.caption }}</span>
+  </figcaption>
+</figure>
+{%- endmacro %}
+
 {#- The in-page route map. `sections` is the list that also drives the
     section headings, so the two cannot drift.
 

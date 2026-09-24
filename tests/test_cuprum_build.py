@@ -237,6 +237,41 @@ def test_engraving_masks_are_published(built_site: Path) -> None:
         assert (REPO_ROOT / "public" / mask.lstrip("/")).is_file(), mask
 
 
+#: The docs landing, the API index, and the nine guides each carry a plate.
+MIN_PLATED_PAGES = 11
+_PLATE_MASK_RE = re.compile(r"--cu-plate-mask:\s*url\('([^']+)'\)")
+
+
+@pytest.mark.timeout(300)
+def test_docs_pages_carry_captioned_plates(built_site: Path) -> None:
+    """The landing, API index, and every guide carry a plate that is published.
+
+    A plate's drawing is a CSS mask named in its own style attribute, so a
+    wrong path leaves an empty box that no image check would notice.
+    """
+    assert built_site.is_dir()
+    docs = PUBLIC_CUPRUM / "docs"
+    pages = [docs / "index.html", docs / "api" / "index.html"]
+    pages += sorted((docs / "guides").glob("*/index.html"))
+    assert len(pages) >= MIN_PLATED_PAGES, [str(page) for page in pages]
+    seen: set[str] = set()
+    for page in pages:
+        plate = _soup(page).select_one("figure.cu-plate")
+        assert plate is not None, f"{page} has no plate"
+        art = plate.select_one(".cu-plate__art")
+        assert art is not None
+        assert _attr(art, "aria-hidden") == "true", f"{page}: drawing is exposed"
+        caption = plate.select_one("figcaption")
+        assert caption is not None
+        assert caption.get_text(strip=True), f"{page}: plate has no caption"
+        match = _PLATE_MASK_RE.search(_attr(art, "style"))
+        assert match, f"{page}: plate names no mask"
+        mask = match.group(1)
+        assert (REPO_ROOT / "public" / mask.lstrip("/")).is_file(), mask
+        assert mask not in seen, f"{mask} is used twice"
+        seen.add(mask)
+
+
 def _api_groups() -> list[dict[str, object]]:
     """Return the generated API reference data the docs pages render."""
     text = (REPO_ROOT / "templates" / "cuprum" / "data" / "api.jinja").read_text(

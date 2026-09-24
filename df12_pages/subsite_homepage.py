@@ -69,7 +69,10 @@ class SubSiteHomePageBuilder:
             extensions=[HighlightExtension],
         )
         if template_vars:
-            self.env.globals.update(template_vars)
+            # Jinja types `globals` as the literal of its default namespace,
+            # so a checker rejects any other value; the namespace is open by
+            # design, and the cast says so once.
+            typ.cast("dict[str, object]", self.env.globals).update(template_vars)
         self.template = self.env.get_template("home_page.jinja")
 
     def run(self) -> Path:

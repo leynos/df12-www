@@ -21,8 +21,8 @@ to verify that the generated ``docs-*.html`` pages:
   are rendered as ``codehilite`` blocks with the correct
   ``data-language`` attribute.
 * Apply the expected DaisyUI/Tailwind capsule styling to inline code
-  tokens, which is validated via the external ``css-view`` helper and
-  a Playwright-powered computed-style snapshot.
+  tokens, which is validated via the external ``css-view`` helper
+  taking a computed-style snapshot through ``agent-browser``.
 
 The module relies on several pytest fixtures:
 
@@ -54,14 +54,15 @@ suite:
 
     pytest tests/test_doc_generation.py
 
-The css-view / Playwright test is marked with ``@pytest.mark.playwright``
-and requires additional tooling:
+The css-view test is marked with ``@pytest.mark.playwright`` (the marker for
+browser-backed tests) and requires additional tooling:
 
 * ``bun`` must be available on ``PATH`` to build CSS and run
   ``css-view``.
-* Playwright Chromium must be installed, for example via::
+* ``agent-browser`` must be on ``PATH`` with a browser installed, for
+  example via::
 
-    bun x playwright install chromium
+    agent-browser install
 
 Related test data lives entirely within the fixtures in this module;
 no external files from ``features/`` or other directories are
@@ -99,6 +100,13 @@ from df12_pages.generator import PageContentGenerator
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INLINE_CODE_LABEL = "introctl"
+#: The DOM node type of a text node, as CDP reports it.
+TEXT_NODE = 3
+#: The computed properties the inline-code assertions read.
+CODE_SPAN_PROPS = (
+    "background-color,font-family,font-size,padding-inline-start,"
+    "padding-inline-end,padding-block-start,padding-block-end"
+)
 
 if typ.TYPE_CHECKING:
     from pytest_mock import MockerFixture
@@ -485,22 +493,35 @@ def test_sidebar_shows_label_and_description(
     )
 
 
-def _extract_nodes_by_tag(
-    tree: dict[str, typ.Any], tag: str
-) -> list[dict[str, typ.Any]]:
-    matches: list[dict[str, typ.Any]] = []
-    stack: list[dict[str, typ.Any]] = [tree]
-    while stack:
-        node = stack.pop()
-        if node.get("tag") == tag:
-            matches.append(node)
-        for child in node.get("children", []) or []:
-            match child:
-                case dict():
-                    stack.append(child)
-                case _:
-                    continue
-    return matches
+class _CdpNode(typ.TypedDict):
+    """The fields of a css-view CDP snapshot node that these tests read."""
+
+    index: int
+    nodeType: int
+    tagName: typ.NotRequired[str]
+    textContent: typ.NotRequired[str | None]
+    parentIndex: typ.NotRequired[int | None]
+    computedStyles: typ.NotRequired[dict[str, str]]
+
+
+def _cdp_element_with_text(nodes: list[_CdpNode], tag: str, text: str) -> _CdpNode:
+    """Return the *tag* element in a CDP snapshot whose text node reads *text*.
+
+    CDP snapshots are a flat node list: an element's text sits on a child
+    text node that points back to it through ``parentIndex``.
+    """
+    by_index = {node["index"]: node for node in nodes}
+    for node in nodes:
+        if (
+            node.get("nodeType") != TEXT_NODE
+            or (node.get("textContent") or "").strip() != text
+        ):
+            continue
+        parent = by_index.get(node.get("parentIndex"))
+        if parent is not None and str(parent.get("tagName", "")).lower() == tag:
+            return parent
+    msg = f"no <{tag}> reading {text!r} in the snapshot"
+    raise AssertionError(msg)
 
 
 @pytest.mark.playwright
@@ -516,19 +537,14 @@ def test_doc_prose_code_spans_have_expected_computed_style(
     assets_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(css_build_artifact, assets_dir / "site.css")
 
-    browsers_base = Path(
-        os.environ.get(
-            "PLAYWRIGHT_BROWSERS_PATH", Path.home() / ".cache" / "ms-playwright"
-        )
-    )
-    has_chromium = any(browsers_base.glob("chromium-*"))
-    if not has_chromium:  # pragma: no cover - environment guard
-        pytest.skip(
-            "Playwright Chromium browser not installed; "
-            "run `bun x playwright install chromium`."
-        )
-
     bun_exe = _require_executable("bun")
+    agent_browser = shutil.which("agent-browser")
+    if agent_browser is None:  # pragma: no cover - environment guard
+        pytest.skip("agent-browser is not installed; see `agent-browser install`.")
+    # css-view drives agent-browser, whose CDP backend leaves its session
+    # open; a per-process name keeps parallel runs apart, and the session is
+    # closed afterwards.
+    session = f"df12-doc-css-{os.getpid()}"
     with _http_serve(doc_path.parent) as port:
         url = f"http://127.0.0.1:{port}/{doc_path.name}"
         try:
@@ -537,14 +553,15 @@ def test_doc_prose_code_spans_have_expected_computed_style(
                     bun_exe,
                     "x",
                     "css-view",
+                    "--backend",
+                    "agent-browser",
+                    "--agent-browser-session",
+                    session,
+                    # The agent-browser backend captures in CDP mode only.
                     "--mode",
-                    "walker",
-                    # Pinned to match the Chromium availability guard above.
-                    # css-view defaults to Firefox, so without this the guard
-                    # passes on a Chromium-only machine and the run then fails
-                    # on a missing Firefox build.
-                    "--browser",
-                    "chromium",
+                    "cdp",
+                    "--props",
+                    CODE_SPAN_PROPS,
                     url,
                 ],
                 cwd=REPO_ROOT,
@@ -554,13 +571,17 @@ def test_doc_prose_code_spans_have_expected_computed_style(
             )
         except subprocess.TimeoutExpired as exc:  # pragma: no cover - environment guard
             pytest.skip(f"css-view timed out: {exc}")
+        finally:
+            subprocess.run(  # noqa: S603 - fixed argv; the session name is ours
+                [agent_browser, "--session", session, "close"],
+                check=False,
+                capture_output=True,
+                timeout=30,
+            )
     payload = msgspec_json.decode(result.stdout)
-    tree = typ.cast("dict[str, typ.Any]", payload["payload"]["tree"])
-    code_nodes = _extract_nodes_by_tag(tree, "code")
-    inline_node = next(
-        node for node in code_nodes if node.get("text") == INLINE_CODE_LABEL
-    )
-    style = inline_node["styleDiff"]
+    nodes = typ.cast("list[_CdpNode]", payload["payload"]["nodes"])
+    inline_node = _cdp_element_with_text(nodes, "code", INLINE_CODE_LABEL)
+    style = inline_node["computedStyles"]
 
     assert style["background-color"] == "rgb(229, 231, 235)"
     assert "IBM Plex Mono" in style["font-family"]

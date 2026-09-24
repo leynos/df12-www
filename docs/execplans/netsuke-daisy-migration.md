@@ -644,6 +644,7 @@ No new dependencies. In `scripts/weaver_snapshot_paths.py`:
 ```python
 DEFAULT_SITE = "weaver"
 
+
 def _public_root(site: str = DEFAULT_SITE) -> Path: ...
 ```
 

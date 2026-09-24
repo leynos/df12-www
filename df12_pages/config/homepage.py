@@ -5,7 +5,7 @@ from __future__ import annotations
 import typing as typ
 from pathlib import Path
 
-from .helpers import _normalize_classes, _optional_str
+from .helpers import _as_int, _normalize_classes, _optional_str
 from .models import (
     CTAButtonConfig,
     FooterConfig,
@@ -131,7 +131,7 @@ def _build_hero_config(payload: typ.Mapping[str, object] | None) -> HeroConfig:
 
 
 def _build_ctas(
-    entries: list[typ.Mapping[str, object]] | None,
+    entries: object,
 ) -> list[CTAButtonConfig]:
     """Build call-to-action button configurations for the hero section."""
     buttons: list[CTAButtonConfig] = []
@@ -180,7 +180,7 @@ def _build_systems_config(
 
 
 def _build_system_cards(
-    entries: list[typ.Mapping[str, object]] | None,
+    entries: object,
 ) -> list[SystemCardConfig]:
     """Build system card configurations for the systems section."""
     cards: list[SystemCardConfig] = []
@@ -243,7 +243,7 @@ def _build_worlds_config(
 
 
 def _build_world_cards(
-    entries: list[typ.Mapping[str, object]] | None,
+    entries: object,
 ) -> list[WorldCardConfig]:
     """Build world card configurations for the worlds section."""
     cards: list[WorldCardConfig] = []
@@ -283,9 +283,7 @@ def _build_world_cards(
     return cards
 
 
-def _build_world_image(
-    payload: typ.Mapping[str, object] | None, label: str
-) -> WorldImageConfig:
+def _build_world_image(payload: object, label: str) -> WorldImageConfig:
     """Build world image configuration for a specific world card."""
     match payload:
         case {
@@ -306,8 +304,8 @@ def _build_world_image(
             msg = f"World card '{label}' image missing '{key}'."
             raise SiteConfigError(msg)
     try:
-        width = int(width_value)
-        height = int(height_value)
+        width = _as_int(width_value)
+        height = _as_int(height_value)
     except (TypeError, ValueError) as exc:
         msg = f"World card '{label}' image requires numeric 'width' and 'height'."
         raise SiteConfigError(msg) from exc
@@ -352,7 +350,7 @@ def _build_footer_config(
         msg = "Homepage footer requires OSS and contact links."
         raise SiteConfigError(msg)
     try:
-        copyright_year = int(data.get("copyright_year"))
+        copyright_year = _as_int(data.get("copyright_year"))
     except (TypeError, ValueError) as exc:
         msg = "Homepage footer 'copyright_year' must be numeric."
         raise SiteConfigError(msg) from exc
@@ -369,7 +367,7 @@ def _build_footer_config(
 
 
 def _build_footer_links(
-    entries: list[typ.Mapping[str, object]] | None, *, default_external: bool
+    entries: object, *, default_external: bool
 ) -> list[FooterLinkConfig]:
     """Build footer link configurations with an optional default external flag."""
     links: list[FooterLinkConfig] = []

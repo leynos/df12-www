@@ -323,18 +323,18 @@ to a light cut on the charcoal grounds. Write `text-warning` on an icon and
 [Developer's Guide](docs/developers-guide.md) has the whole set.
 
 An element that scrolls horizontally needs a tab stop, or a keyboard cannot
-reach what has scrolled out of view. The `{% highlight %}` tag emits one on
-the wrapper where the wrapper is the scroller; a hand-written
-`overflow-x-auto` container carries `tabindex="0"` in the markup. Whether a
-container scrolls depends on the viewport, so check the narrow end too.
+reach what has scrolled out of view. The `{% highlight %}` tag emits one on the
+wrapper where the wrapper is the scroller; a handwritten `overflow-x-auto`
+container carries `tabindex="0"` in the markup. Whether a container scrolls
+depends on the viewport, so check the narrow end too.
 
 Run an audit over the affected pages after any change to colour or markup
 structure. The enforced bar is zero axe violations against WCAG 2.0 A and AA,
 the tag set the browser suites actually check; axe's best-practice rules sit
 outside that bar, and a finding there is worth reading and fixing but is a
 judgement call rather than a build failure. The Weaver and Netsuke browser
-suites run the audit over every page of their sub-site at both viewports, so
-a regression fails `make test` rather than waiting for someone to look.
+suites run the audit over every page of their sub-site at both viewports, so a
+regression fails `make test` rather than waiting for someone to look.
 
 ## Formatting and Validation
 
@@ -372,6 +372,14 @@ browser scripts under `src/static/` against `tsconfig.browser.json`, and the
 build scripts under `scripts/` against `tsconfig.scripts.json`, both in strict
 mode. The compile step strips types without checking them, so this gate is the
 only thing that catches a wrongly typed module before review.
+
+Ruff and ty are pinned rather than taken from `PATH`: Ruff is a dev dependency
+fixed by `uv.lock`, and the gates run the locked `.venv/bin/ruff` that
+`make build` installs. `make check-fmt` and `make lint` do not provision or
+sync the environment themselves; they stop and point to `make build` when that
+Ruff is missing. ty is pinned by `TY_VERSION` in the `Makefile` and run with
+`uv tool run`. Upgrade either deliberately, in a commit that carries the fixes
+the new release asks for.
 
 `make lint` runs Ruff over the Python and Biome over everything else —
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked

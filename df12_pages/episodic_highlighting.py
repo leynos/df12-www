@@ -62,7 +62,9 @@ class EpisodicStyle(Style):
     highlight_color = "#1e2226"
 
     # Pygments token types are not publicly typed, so the key is Any.
-    styles: typ.ClassVar[dict[typ.Any, str]] = {
+    # The base class declares this attribute without `ClassVar`, which ty
+    # reads as an instance variable; RUF012 still wants the annotation here.
+    styles: typ.ClassVar[dict[typ.Any, str]] = {  # ty: ignore[invalid-attribute-override]
         Token: "#e6e7e9",  # ink-1: default code text
         Comment: "italic #8f959c",  # 6.6:1, the lowest ratio in the style
         Comment.Preproc: "#3bc8ef",

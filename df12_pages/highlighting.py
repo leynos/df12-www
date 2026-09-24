@@ -48,18 +48,22 @@ class NetsukeLexer(YamlJinjaLexer):
     """YAML with embedded Jinja, as used in a ``Netsukefile``."""
 
     name = "Netsuke"
-    aliases: typ.ClassVar[list[str]] = ["netsuke", "netsukefile"]
-    filenames: typ.ClassVar[list[str]] = ["Netsukefile", "*.netsuke.yml"]
-    mimetypes: typ.ClassVar[list[str]] = []
+    # The base class declares this attribute without `ClassVar`, which ty
+    # reads as an instance variable; RUF012 still wants the annotation here.
+    aliases: typ.ClassVar[list[str]] = ["netsuke", "netsukefile"]  # ty: ignore[invalid-attribute-override]
+    filenames: typ.ClassVar[list[str]] = ["Netsukefile", "*.netsuke.yml"]  # ty: ignore[invalid-attribute-override]
+    mimetypes: typ.ClassVar[list[str]] = []  # ty: ignore[invalid-attribute-override]
 
 
 class NetsukeConsoleLexer(BashSessionLexer):
     """Shell session: ``$``-prefixed commands, backslash continuation, output."""
 
     name = "Netsuke console"
-    aliases: typ.ClassVar[list[str]] = ["netsuke-console"]
-    filenames: typ.ClassVar[list[str]] = []
-    mimetypes: typ.ClassVar[list[str]] = []
+    # The base class declares this attribute without `ClassVar`, which ty
+    # reads as an instance variable; RUF012 still wants the annotation here.
+    aliases: typ.ClassVar[list[str]] = ["netsuke-console"]  # ty: ignore[invalid-attribute-override]
+    filenames: typ.ClassVar[list[str]] = []  # ty: ignore[invalid-attribute-override]
+    mimetypes: typ.ClassVar[list[str]] = []  # ty: ignore[invalid-attribute-override]
 
 
 class HimotoshiStyle(Style):
@@ -74,7 +78,9 @@ class HimotoshiStyle(Style):
     background_color = "#2e2a25"
     highlight_color = "#3a352e"
 
-    styles: typ.ClassVar[dict[typ.Any, str]] = {
+    # The base class declares this attribute without `ClassVar`, which ty
+    # reads as an instance variable; RUF012 still wants the annotation here.
+    styles: typ.ClassVar[dict[typ.Any, str]] = {  # ty: ignore[invalid-attribute-override]
         Token: "#e5ddd0",  # stone-light: default text
         Comment: "italic #a39a8e",  # tint of charcoal-light
         Comment.Preproc: "#e0b45c",  # Jinja {% ... %} markers; tint of amber

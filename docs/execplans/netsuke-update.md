@@ -392,29 +392,33 @@ In `df12_pages/highlighting.py`:
 ```python
 class NetsukeLexer(YamlJinjaLexer):
     """YAML with embedded Jinja, as used in a Netsukefile."""
+
     name = "Netsuke"
     aliases = ["netsuke", "netsukefile"]
     filenames = ["Netsukefile", "*.netsuke.yml"]
 
+
 class NetsukeConsoleLexer(BashSessionLexer):
     """Shell session: `$`-prefixed commands, backslash continuation, output."""
+
     name = "Netsuke console"
     aliases = ["netsuke-console"]
 
+
 class HimotoshiStyle(Style):
-    background_color = "#2e2a25"          # --netsuke-charcoal
+    background_color = "#2e2a25"  # --netsuke-charcoal
     styles = {
-        Token:                  "#e5ddd0",  # --netsuke-stone-light
-        Comment:                "italic #8a8279",  # --netsuke-charcoal-light
-        Name.Tag:               "#a8c3e0",  # syntax tint of indigo-light
-        Literal.String:         "#8fbf9f",  # syntax tint of matcha
-        Punctuation:            "#d1c7b8",  # --netsuke-stone
-        Comment.Preproc:        "#e0b45c",  # Jinja markers; tint of amber
-        Name.Variable:          "#e0b45c",
-        Generic.Prompt:         "bold #8fbf9f",
-        Generic.Output:         "#b8b0a5",
-        Name.Builtin:           "#e8d5b5",  # --netsuke-boxwood
-        Keyword:                "#c98a7d",  # tint of vermillion
+        Token: "#e5ddd0",  # --netsuke-stone-light
+        Comment: "italic #8a8279",  # --netsuke-charcoal-light
+        Name.Tag: "#a8c3e0",  # syntax tint of indigo-light
+        Literal.String: "#8fbf9f",  # syntax tint of matcha
+        Punctuation: "#d1c7b8",  # --netsuke-stone
+        Comment.Preproc: "#e0b45c",  # Jinja markers; tint of amber
+        Name.Variable: "#e0b45c",
+        Generic.Prompt: "bold #8fbf9f",
+        Generic.Output: "#b8b0a5",
+        Name.Builtin: "#e8d5b5",  # --netsuke-boxwood
+        Keyword: "#c98a7d",  # tint of vermillion
     }
 ```
 

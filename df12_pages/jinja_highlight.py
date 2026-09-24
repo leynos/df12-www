@@ -126,7 +126,9 @@ def _formatter(css_class: str) -> HtmlFormatter:
 class HighlightExtension(Extension):
     """Add ``{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}``."""
 
-    tags: typ.ClassVar[set[str]] = {"highlight"}
+    # The base class declares this attribute without `ClassVar`, which ty
+    # reads as an instance variable; RUF012 still wants the annotation here.
+    tags: typ.ClassVar[set[str]] = {"highlight"}  # ty: ignore[invalid-attribute-override]
 
     def parse(self, parser: Parser) -> nodes.Node:
         """Parse the tag and defer rendering to :meth:`_render`."""

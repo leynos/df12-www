@@ -5,7 +5,7 @@ from __future__ import annotations
 import typing as typ
 from pathlib import Path
 
-from .helpers import _optional_str
+from .helpers import _as_int, _optional_str
 from .homepage import _build_footer_config, _build_nav_links
 from .models import (
     AboutLocationConfig,
@@ -91,8 +91,8 @@ def _build_avatar(payload: typ.Mapping[str, object] | None) -> AvatarConfig | No
         case _:
             return None
     try:
-        width_int = int(width)
-        height_int = int(height)
+        width_int = _as_int(width)
+        height_int = _as_int(height)
     except (TypeError, ValueError):
         return None
     return AvatarConfig(

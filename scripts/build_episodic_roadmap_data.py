@@ -92,8 +92,8 @@ def render(phases: list[Phase], source: str) -> str:
     """
     payload = [phase_payload(phase) for phase in phases]
     totals = {
-        "done": sum(item["done_count"] for item in payload),  # type: ignore[misc]
-        "total": sum(item["total_count"] for item in payload),  # type: ignore[misc]
+        "done": sum(phase.done_count for phase in phases),
+        "total": sum(phase.total_count for phase in phases),
     }
     body = json.dumps(payload, indent=2, ensure_ascii=False)
     summary = json.dumps(totals, indent=2, ensure_ascii=False)

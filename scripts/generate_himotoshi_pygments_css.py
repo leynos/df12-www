@@ -98,7 +98,7 @@ def build_css() -> str:
         f".hm-faux-window__body .{CSS_CLASS} pre,",
         f".hm-example-code-block .{CSS_CLASS} pre,",
         f".hm-example-terminal__body .{CSS_CLASS} pre {{",
-        "  /* `.hm-example-code-block pre` gives the hand-written blocks their",
+        "  /* `.hm-example-code-block pre` gives the handwritten blocks their",
         "     own horizontal scroll. A generated one must not take it: the",
         "     wrapper above is contained to the container's width, so a",
         "     scrolling pre inside it never overflows its parent, and the",

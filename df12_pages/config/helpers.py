@@ -15,7 +15,7 @@ LANGUAGE_MANIFESTS: dict[str, str] = {
 }
 
 
-def _normalize_classes(value: str | list[object] | None) -> list[str]:
+def _normalize_classes(value: object) -> list[str]:
     """Normalize class definitions into a list of non-empty strings."""
     if isinstance(value, str):
         return [segment for segment in value.split() if segment]
@@ -35,6 +35,22 @@ def _optional_str(value: object | None) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _as_int(value: object) -> int:
+    """Coerce a YAML scalar to ``int``, raising as ``int()`` would.
+
+    Raises
+    ------
+    TypeError
+        If ``value`` is not an int, float, or string (``bool`` included).
+    ValueError
+        If a string does not parse as an integer.
+    """
+    if isinstance(value, bool) or not isinstance(value, int | float | str):
+        msg = f"expected an integer, got {type(value).__name__}"
+        raise TypeError(msg)
+    return int(value)
 
 
 def _build_repo_url(repo: str, ref: str, path: str) -> str:

@@ -82,6 +82,7 @@
         art_image=drafting_art) %}
         {{ ui.button('Inspect the lifecycle', '#lifecycle', icon='arrow-down') }}
         {{ ui.button('Show me the failure path', '/cuprum/examples/pipeline-tee/#failure', variant='outline') }}
+        {{ ui.button('The Rust extension', '/cuprum/internals/rust-extension/', variant='outline') }}
       {% endcall %}
       {{ ui.routemap(sections, 'Drafting room') }}
 
@@ -127,7 +128,7 @@
           <h3>Where Rust fits</h3>
           <p>
             That inter-stage pump is the one place the optional
-            <a href="/cuprum/rust-extension/">Rust extension</a> is used: when
+            <a href="/cuprum/internals/rust-extension/">Rust extension</a> is used: when
             it is installed and selected, the copy runs outside the GIL, using
             <code>splice()</code> on Linux. Capturing the final output always
             uses the Python path.

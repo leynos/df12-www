@@ -207,7 +207,7 @@ def test_previews_say_so_in_their_heading(built_site: Path) -> None:
     """Preview pages carry their status in words at the top, not only colour."""
     assert built_site.is_dir()
     expectations = {
-        "rust-extension": "Technical preview",
+        "internals/rust-extension": "Technical preview",
         "setwork": "Proposed",
     }
     for slug, word in expectations.items():

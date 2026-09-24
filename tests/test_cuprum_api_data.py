@@ -341,7 +341,7 @@ def test_check_mode_reports_drift(
         ),
     )
     monkeypatch.setattr(
-        builder, "load_api", lambda path, _package: load_api(path, "pkg")
+        builder, "load_api", lambda path, _package, _extra=(): load_api(path, "pkg")
     )
     output = tmp_path / "api.jinja"
     args = ["--cuprum-root", str(root), "--output", str(output)]
@@ -350,3 +350,14 @@ def test_check_mode_reports_drift(
     assert builder.main([*args, "--check"]) == 0
     output.write_text(output.read_text(encoding="utf-8") + "\n", encoding="utf-8")
     assert builder.main([*args, "--check"]) == 1
+
+
+def test_an_extra_module_lists_what_the_package_does_not_export(
+    tmp_path: PathType,
+) -> None:
+    """A public submodule outside ``__all__`` is documented by its dotted name."""
+    entries = load_api(_write_package(tmp_path), "pkg", ("pkg.sh",))
+    module = entries[-1]
+    assert (module.name, module.kind) == ("pkg.sh", "module")
+    assert [member.name for member in module.members] == ["make"]
+    assert builder.display_line("module", "pkg.sh", "") == "from pkg import sh"

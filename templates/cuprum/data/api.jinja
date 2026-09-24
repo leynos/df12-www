@@ -1840,6 +1840,92 @@
         "doc": {
           "summary": ""
         }
+      },
+      {
+        "name": "cuprum.catalogue",
+        "kind": "module",
+        "module": "cuprum.catalogue",
+        "path": "cuprum/catalogue.py",
+        "line": 1,
+        "display": "from cuprum import catalogue",
+        "doc": {
+          "summary": "Curated catalogue of allowed executables and their metadata.",
+          "body": [
+            "Example: &gt;&gt;&gt; from cuprum.catalogue import DEFAULT_CATALOGUE, ECHO &gt;&gt;&gt; entry = DEFAULT_CATALOGUE.lookup(ECHO) &gt;&gt;&gt; (entry.project_name, entry.program) ('core-ops', 'echo')"
+          ]
+        },
+        "members": [
+          {
+            "name": "DuplicateProgramError",
+            "kind": "exception",
+            "display": "class DuplicateProgramError(program: Program, owner: str) -> None",
+            "doc": {
+              "summary": "Raised when a program is claimed by more than one project.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program",
+                      "description": "The contested program."
+                    },
+                    {
+                      "name": "owner",
+                      "type": "str",
+                      "description": "The name of the project that already owns the program."
+                    }
+                  ]
+                },
+                {
+                  "title": "Attributes",
+                  "fields": [
+                    {
+                      "name": "program",
+                      "type": "Program",
+                      "description": "The contested program."
+                    },
+                    {
+                      "name": "owner",
+                      "type": "str",
+                      "description": "The existing owner's project name."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "DuplicateProjectError",
+            "kind": "exception",
+            "display": "class DuplicateProjectError(project_name: str) -> None",
+            "doc": {
+              "summary": "Raised when a project name is registered more than once.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "project_name",
+                      "type": "str",
+                      "description": "The duplicated project name."
+                    }
+                  ]
+                },
+                {
+                  "title": "Attributes",
+                  "fields": [
+                    {
+                      "name": "project_name",
+                      "type": "str",
+                      "description": "The duplicated project name."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       }
     ]
   },
@@ -4651,6 +4737,418 @@
             "display": "FAILED_AFTER_CANCEL = 'failed_after_cancel'",
             "doc": {
               "summary": ""
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "adapters",
+    "title": "Adapters and sinks",
+    "lede": "Ready-made observe hooks for logging, metrics, and tracing, and the output sink that frames a run for GitHub Actions.",
+    "entries": [
+      {
+        "name": "cuprum.adapters.logging_adapter",
+        "kind": "module",
+        "module": "cuprum.adapters.logging_adapter",
+        "path": "cuprum/adapters/logging_adapter.py",
+        "line": 1,
+        "display": "from cuprum.adapters import logging_adapter",
+        "doc": {
+          "summary": "Structured logging adapter for Cuprum execution events.",
+          "body": [
+            "This module provides an observe hook that emits structured log records for each execution event phase. Unlike the simpler <code>logging_hook()</code> which logs only start/exit with before/after hooks, this adapter leverages the full <code>ExecEvent</code> stream for fine-grained observability.",
+            "The adapter demonstrates how to transform <code>ExecEvent</code> values into structured log records suitable for log aggregation systems (ELK, Splunk, etc.).",
+            "Example::",
+            "import logging from cuprum import ScopeConfig, scoped, sh from cuprum.adapters.logging_adapter import structured_logging_hook",
+            "logging.basicConfig(level=logging.DEBUG)",
+            "with scoped( ScopeConfig(allowlist=my_allowlist) ), sh.observe(structured_logging_hook()): sh.make(ECHO)(\"hello\").run_sync()"
+          ]
+        },
+        "members": [
+          {
+            "name": "JsonLoggingFormatter",
+            "kind": "class",
+            "display": "JsonLoggingFormatter",
+            "doc": {
+              "summary": "A JSON formatter for structured log output.",
+              "body": [
+                "This formatter serializes log records as JSON objects, suitable for log aggregation systems. It includes all <code>cuprum_*</code> extra fields.",
+                "Example::",
+                "import logging from cuprum.adapters.logging_adapter import JsonLoggingFormatter",
+                "handler = logging.StreamHandler() handler.setFormatter(JsonLoggingFormatter()) logger = logging.getLogger(\"cuprum.exec\") logger.addHandler(handler)"
+              ]
+            }
+          },
+          {
+            "name": "LogLevels",
+            "kind": "class",
+            "display": "class LogLevels(\n    plan_level: int = logging.DEBUG,\n    start_level: int = logging.INFO,\n    output_level: int = logging.DEBUG,\n    exit_level: int = logging.INFO,\n    fail_fast_level: int = logging.WARNING,\n)",
+            "doc": {
+              "summary": "Configuration for logging levels per execution event phase."
+            }
+          },
+          {
+            "name": "structured_logging_hook",
+            "kind": "function",
+            "display": "def structured_logging_hook(\n    *,\n    logger: logging.Logger | None = None,\n    levels: LogLevels | None = None,\n) -> ExecHook",
+            "doc": {
+              "summary": "Create an observe hook that logs execution events with structured data.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ExecHook",
+                      "description": "A hook suitable for use with <code>sh.observe()</code>."
+                    }
+                  ]
+                },
+                {
+                  "title": "Notes",
+                  "paragraphs": [
+                    "This hook is synchronous and non-blocking. Log emission happens inline with event processing. For high-throughput scenarios, consider using an async handler or buffered logging configuration.",
+                    "The hook attaches structured <code>extra</code> data to log records including:",
+                    "- <code>cuprum_phase</code>: Event phase (plan, start, stdout, stderr, stdin, stdin_error, timeout, teardown_error, capture_eof_grace_expired, exit, pipeline_fail_fast) - <code>cuprum_program</code>: Program being executed - <code>cuprum_argv</code>: Full argument vector - <code>cuprum_pid</code>: Process ID (when available) - <code>cuprum_exit_code</code>: Exit code (for exit and pipeline_fail_fast events) - <code>cuprum_duration_s</code>: Duration in seconds (for exit and pipeline_fail_fast events) - <code>cuprum_stage_index</code> / <code>cuprum_stage_count</code>: Position of the failing stage and the pipeline width (for pipeline_fail_fast events) - <code>cuprum_eof_grace_s</code> / <code>cuprum_pending_readers</code>: Fixed grace duration and pending-reader count (for capture_eof_grace_expired events) - <code>cuprum_max_rss_bytes</code> / <code>cuprum_user_cpu_seconds</code> / <code>cuprum_system_cpu_seconds</code> / <code>cuprum_resource_usage_mode</code>: Child resource measurements and the mode naming their source. The mode is carried on every terminal exit event — <code>wait4_child</code>, <code>aggregate_cpu_delta</code>, or <code>unavailable</code> — while the three figures are present only where a source produced them",
+                    "The adapter projects selected execution fields into log extras; it does not emit the full tags mapping."
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cuprum.adapters.metrics_adapter",
+        "kind": "module",
+        "module": "cuprum.adapters.metrics_adapter",
+        "path": "cuprum/adapters/metrics_adapter.py",
+        "line": 1,
+        "display": "from cuprum.adapters import metrics_adapter",
+        "doc": {
+          "summary": "Prometheus-style metrics adapter for Cuprum execution events.",
+          "body": [
+            "This module provides an observe hook that collects metrics about command execution in a format compatible with Prometheus client libraries. The adapter demonstrates how to collect:",
+            "- **Counters**: Total executions, failures, output lines - **Byte counters**: Successful stdin bytes written - **Histograms**: Execution duration distribution",
+            "The implementation uses protocol classes to remain decoupled from specific metrics libraries. Projects can implement the protocols with their preferred backend (prometheus_client, statsd, OpenTelemetry metrics, etc.).",
+            "Example with the in-memory reference implementation::",
+            "from cuprum import ScopeConfig, scoped, sh from cuprum.adapters.metrics_adapter import MetricsHook, InMemoryMetrics",
+            "metrics = InMemoryMetrics()",
+            "with scoped( ScopeConfig(allowlist=my_allowlist) ), sh.observe(MetricsHook(metrics)): sh.make(ECHO)(\"hello\").run_sync()",
+            "print(metrics.counters)  # {'cuprum_executions_total': 1, ...} print(metrics.histograms)  # {'cuprum_duration_seconds': [...]}",
+            "Example with prometheus_client::",
+            "from prometheus_client import Counter, Histogram from cuprum.adapters.metrics_adapter import MetricsCollector, MetricsHook",
+            "class PrometheusMetrics: def __init__(self): self._exec_total = Counter( \"cuprum_executions_total\", \"Total command executions\", [\"program\", \"project\"], ) self._duration = Histogram( \"cuprum_duration_seconds\", \"Execution duration\", [\"program\", \"project\"], )",
+            "def inc_counter(self, name, value, labels): if name == \"cuprum_executions_total\": self._exec_total.labels(**labels).inc(value)",
+            "def observe_histogram(self, name, value, labels): if name == \"cuprum_duration_seconds\": self._duration.labels(**labels).observe(value)",
+            "hook = MetricsHook(PrometheusMetrics())"
+          ]
+        },
+        "members": [
+          {
+            "name": "InMemoryMetrics",
+            "kind": "class",
+            "display": "class InMemoryMetrics(\n    counters: dict[str, float] = dc.field(default_factory=dict),\n    histograms: dict[str, list[float]] = dc.field(default_factory=dict),\n)",
+            "doc": {
+              "summary": "Reference in-memory metrics collector for testing and examples.",
+              "body": [
+                "Storage and locking follow the shared <code>_LockedStore</code> contract: every mutator holds the lock, and <code>reset()</code> clears the store under it."
+              ]
+            }
+          },
+          {
+            "name": "MetricsCollector",
+            "kind": "class",
+            "display": "MetricsCollector",
+            "doc": {
+              "summary": "Protocol for metrics collection backends.",
+              "body": [
+                "Implementations must be thread-safe; hooks may be invoked from multiple threads or async tasks concurrently."
+              ]
+            }
+          },
+          {
+            "name": "MetricsHook",
+            "kind": "class",
+            "display": "class MetricsHook(collector: MetricsCollector) -> None",
+            "doc": {
+              "summary": "Observe hook that collects Prometheus-style metrics.",
+              "body": [
+                "The hook emits the following metrics:",
+                "- <code>cuprum_executions_total</code>: Counter incremented on each <code>start</code> event - <code>cuprum_failures_total</code>: Counter incremented on non-zero exit - <code>cuprum_duration_seconds</code>: Histogram of execution durations - <code>cuprum_stdout_lines_total</code>: Counter of stdout lines emitted - <code>cuprum_stderr_lines_total</code>: Counter of stderr lines emitted - <code>cuprum_stdin_bytes_total</code>: Counter of successful stdin bytes written - <code>cuprum_stdin_errors_total</code>: Counter of stdin writer failures - <code>cuprum_timeouts_total</code>: Counter of subprocess and pipeline expiries - <code>cuprum_teardown_errors_total</code>: Counter of consumer drain failures - <code>cuprum_capture_eof_grace_expired_total</code>: Counter of capture EOF grace expiries with readers still pending - <code>cuprum_pipeline_fail_fast_total</code>: Counter of pipelines terminated early after their first non-final stage failure - <code>cuprum_resource_usage_measurements_total</code>: Counter of terminal events that reported how their child's resource figures were obtained - <code>cuprum_child_max_rss_bytes</code>: Histogram of per-child maximum RSS, from the attributable <code>wait4</code> path only - <code>cuprum_child_user_cpu_seconds</code>: Histogram of child user CPU time - <code>cuprum_child_system_cpu_seconds</code>: Histogram of child system CPU time",
+                "All metrics include <code>program</code> and <code>project</code> labels. The three resource histograms and their counter additionally carry a low-cardinality <code>resource_usage_mode</code> label naming their source — <code>wait4_child</code>, <code>aggregate_cpu_delta</code>, or <code>unavailable</code> — so a run that measures nothing is distinguishable from one that measured a small value. The histograms are observed only where the figure was actually measured; the counter is emitted for every recorded mode, including <code>unavailable</code>."
+              ],
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "Example",
+                      "type": "",
+                      "description": ""
+                    },
+                    {
+                      "name": "-------",
+                      "type": "",
+                      "description": "metrics = InMemoryMetrics() hook = MetricsHook(metrics) with sh.observe(hook): cmd.run_sync() assert metrics.counters[\"cuprum_executions_total\"] == 1.0"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "metrics_hook",
+            "kind": "function",
+            "display": "def metrics_hook(collector: MetricsCollector) -> ExecHook",
+            "doc": {
+              "summary": "Create a metrics observe hook for the given collector.",
+              "body": [
+                "This is a convenience factory that returns a <code>MetricsHook</code> instance cast to the <a href=\"#ExecHook\"><code>ExecHook</code></a> type."
+              ],
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ExecHook",
+                      "description": "A hook suitable for use with <code>sh.observe()</code>."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cuprum.adapters.tracing_adapter",
+        "kind": "module",
+        "module": "cuprum.adapters.tracing_adapter",
+        "path": "cuprum/adapters/tracing_adapter.py",
+        "line": 1,
+        "display": "from cuprum.adapters import tracing_adapter",
+        "doc": {
+          "summary": "OpenTelemetry-style tracing adapter for Cuprum execution events.",
+          "body": [
+            "This module provides an observe hook that creates distributed traces for command execution. The adapter demonstrates how to:",
+            "- Create spans for command execution lifecycle - Attach structured attributes to spans - Handle parent-child span relationships for pipelines - Record span events for output lines",
+            "The implementation uses protocol classes to remain decoupled from specific tracing libraries. Projects can implement the protocols with their preferred backend (OpenTelemetry, Jaeger, Zipkin, etc.).",
+            "Example with the in-memory reference implementation::",
+            "from cuprum import ScopeConfig, scoped, sh from cuprum.adapters.tracing_adapter import TracingHook, InMemoryTracer",
+            "tracer = InMemoryTracer()",
+            "with scoped( ScopeConfig(allowlist=my_allowlist) ), sh.observe(TracingHook(tracer)): sh.make(ECHO)(\"hello\").run_sync()",
+            "print(tracer.spans)  # [Span(name='cuprum.exec echo', ...)]",
+            "Example with OpenTelemetry::",
+            "from opentelemetry import trace from cuprum.adapters.tracing_adapter import Tracer, Span, TracingHook",
+            "class OTelSpan: def __init__(self, otel_span): self._span = otel_span",
+            "def set_attribute(self, key, value): self._span.set_attribute(key, value)",
+            "def add_event(self, name, attributes=None): self._span.add_event(name, attributes=attributes or {})",
+            "def set_status(self, *, ok): from opentelemetry.trace import StatusCode code = StatusCode.OK if ok else StatusCode.ERROR self._span.set_status(code)",
+            "def end(self): self._span.end()",
+            "class OTelTracer: def __init__(self, tracer): self._tracer = tracer def start_span(self, name, attributes=None): span = self._tracer.start_span(name, attributes=attributes) return OTelSpan(span)",
+            "otel_tracer = trace.get_tracer(\"cuprum\") hook = TracingHook(OTelTracer(otel_tracer))"
+          ]
+        },
+        "members": [
+          {
+            "name": "InMemorySpan",
+            "kind": "class",
+            "display": "class InMemorySpan(\n    name: str,\n    attributes: dict[str, object] = dc.field(default_factory=dict),\n    events: list[tuple[str, dict[str, object]]] = dc.field(default_factory=list),\n    status_ok: bool | None = None,\n    ended: bool = False,\n)",
+            "doc": {
+              "summary": "Reference in-memory span for testing and examples.",
+              "body": [
+                "A mutable test double implementing the <code>Span</code> protocol from <code>tracing_adapter</code>. It records everything set on it so that tests can inspect the result. It performs no synchronization of its own; a span is expected to be mutated by a single thread at a time."
+              ],
+              "sections": [
+                {
+                  "title": "Attributes",
+                  "fields": [
+                    {
+                      "name": "name",
+                      "type": "str",
+                      "description": "Name of the span, as supplied to <code>InMemoryTracer.start_span</code>."
+                    },
+                    {
+                      "name": "attributes",
+                      "type": "dict[str, object]",
+                      "description": "Span attributes keyed by name. Seeded from the attributes passed at creation and extended in place by <code>set_attribute</code>."
+                    },
+                    {
+                      "name": "events",
+                      "type": "list[tuple[str, dict[str, object]]]",
+                      "description": "Recorded events in insertion order, each a <code>(name, attributes)</code> pair appended by <code>add_event</code>."
+                    },
+                    {
+                      "name": "status_ok",
+                      "type": "bool | None",
+                      "description": "Completion status: <code>None</code> until <code>set_status</code> is called, then <code>True</code> for success or <code>False</code> for failure."
+                    },
+                    {
+                      "name": "ended",
+                      "type": "bool",
+                      "description": "Whether <code>end</code> has been called; <code>False</code> until then."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "InMemoryTracer",
+            "kind": "class",
+            "display": "class InMemoryTracer(\n    spans: list[InMemorySpan] = dc.field(default_factory=list),\n)",
+            "doc": {
+              "summary": "Reference in-memory tracer for testing and examples.",
+              "body": [
+                "Storage and locking follow the shared <code>_LockedStore</code> contract: every mutator holds the lock, and <code>reset()</code> clears the store under it."
+              ]
+            }
+          },
+          {
+            "name": "Span",
+            "kind": "class",
+            "display": "Span",
+            "doc": {
+              "summary": "Protocol for a tracing span.",
+              "body": [
+                "Spans represent a unit of work and can be enriched with attributes and events."
+              ]
+            }
+          },
+          {
+            "name": "Tracer",
+            "kind": "class",
+            "display": "Tracer",
+            "doc": {
+              "summary": "Protocol for a tracing backend.",
+              "body": [
+                "Implementations must be thread-safe; hooks may be invoked from multiple threads or async tasks concurrently."
+              ]
+            }
+          },
+          {
+            "name": "TracingHook",
+            "kind": "class",
+            "display": "class TracingHook(tracer: Tracer, *, record_output: bool = True) -> None",
+            "doc": {
+              "summary": "Project correlated execution events onto backend spans.",
+              "body": [
+                "Events without <code>exec_id</code> are ignored rather than correlated by a PID. Attributes include <code>cuprum.program</code>, <code>cuprum.argv</code>, <code>cuprum.pid</code>, <code>cuprum.cwd</code>, <code>cuprum.exit_code</code>, <code>cuprum.duration_s</code>, <code>cuprum.project</code>, <code>cuprum.pipeline_stage_index</code>, and <code>cuprum.pipeline_stages</code>. Every terminal <code>exit</code> event also carries <code>cuprum.resource_usage_mode</code>, naming how its child's resource figures were obtained — <code>wait4_child</code>, <code>aggregate_cpu_delta</code>, or <code>unavailable</code>. A terminal <code>exit</code> event that measured its child's resource usage additionally carries <code>cuprum.max_rss_bytes</code>, <code>cuprum.user_cpu_seconds</code>, and <code>cuprum.system_cpu_seconds</code>; those three figures alone are absent rather than null when no measurement applies."
+              ]
+            }
+          },
+          {
+            "name": "tracing_hook",
+            "kind": "function",
+            "display": "def tracing_hook(\n    tracer: Tracer,\n    *,\n    record_output: bool = True,\n) -> ExecHook",
+            "doc": {
+              "summary": "Create a tracing observe hook for the given tracer.",
+              "body": [
+                "This is a convenience factory that returns a <code>TracingHook</code> instance cast to the <a href=\"#ExecHook\"><code>ExecHook</code></a> type."
+              ],
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ExecHook",
+                      "description": "A hook suitable for use with <code>sh.observe()</code>."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cuprum.sinks",
+        "kind": "module",
+        "module": "cuprum.sinks",
+        "path": "cuprum/sinks/__init__.py",
+        "line": 1,
+        "display": "from cuprum import sinks",
+        "doc": {
+          "summary": "Presentation sink adapters for parent-facing run output.",
+          "body": [
+            "A sink adapter reshapes how a run's parent-facing output appears — for example, framing it in a GitHub Actions group — without changing capture, success semantics, or the returned result. Sinks are opt-in: a caller passes one explicitly via <code>sink</code>, and runs without a sink are byte-for-byte unchanged.",
+            "The protocol lives in <code>base</code>; concrete adapters (such as <code>GitHubActionsSink</code>) live alongside it in this package."
+          ]
+        },
+        "members": [
+          {
+            "name": "GitHubActionsSession",
+            "kind": "class",
+            "display": "class GitHubActionsSession(\n    log: typ.IO[str],\n    label: str,\n    *,\n    annotation_label: str,\n) -> None",
+            "doc": {
+              "summary": "One run's framed presentation session on GitHub Actions.",
+              "body": [
+                "Framing is complete the moment the session exists: the group opening and the stop-commands lease are written before the sink returns it, so child output can never appear above the group opening. The session holds that lease for the run's entire lifetime and closes the group with an error annotation when the run's terminal outcome is a failure."
+              ]
+            }
+          },
+          {
+            "name": "GitHubActionsSink",
+            "kind": "class",
+            "display": "class GitHubActionsSink(\n    destination: typ.IO[str] | None = None,\n    *,\n    title: str | None = None,\n    force: bool = False,\n) -> None",
+            "doc": {
+              "summary": "Opt-in presentation sink for GitHub Actions CI callers.",
+              "body": [
+                "The sink holds only immutable configuration; every run gets a fresh <code>GitHubActionsSession</code> from <code>open_session</code>, so one sink instance can serve many sequential or concurrent runs."
+              ]
+            }
+          },
+          {
+            "name": "OutputSession",
+            "kind": "class",
+            "display": "OutputSession",
+            "doc": {
+              "summary": "The write side of one active adapter run.",
+              "body": [
+                "Implementations keep their framing state here and remain safe for the sequential single-writer use the execution layer guarantees: child-output writes and control writes are issued from the run's own task context, not from unrelated tasks.",
+                "An adapter emits its opening framing as the session is constructed, so it is already written when <code>OutputSink.open_session</code> returns; the execution layer offers no framing hook and never reaches into an adapter's internals. <code>log</code> is therefore a pure accessor."
+              ]
+            }
+          },
+          {
+            "name": "OutputSink",
+            "kind": "class",
+            "display": "OutputSink",
+            "doc": {
+              "summary": "A factory for per-run presentation sessions.",
+              "body": [
+                "Implementations hold only immutable configuration. All mutable state lives on the <code>OutputSession</code> returned by <code>open_session</code>, which the execution layer creates fresh for every invocation."
+              ]
+            }
+          },
+          {
+            "name": "SessionOutcome",
+            "kind": "class",
+            "display": "class SessionOutcome(\n    outcome: TerminalOutcome,\n    exit_code: int | None = None,\n    detail: str | None = None,\n)",
+            "doc": {
+              "summary": "Immutable terminal report for one run."
+            }
+          },
+          {
+            "name": "SessionStart",
+            "kind": "class",
+            "display": "class SessionStart(label: str, argv: tuple[str, ...])",
+            "doc": {
+              "summary": "Immutable inputs an adapter needs to frame one run."
+            }
+          },
+          {
+            "name": "TerminalOutcome",
+            "kind": "class",
+            "display": "TerminalOutcome",
+            "doc": {
+              "summary": "Why a run finished, as a closed set the adapter can act on.",
+              "examples": "The member value is the string adapters see::\n\n    assert TerminalOutcome.EXIT_NONZERO == \"exit_nonzero\""
             }
           }
         ]

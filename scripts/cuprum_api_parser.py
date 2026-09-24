@@ -534,7 +534,9 @@ def _entry(
     return ApiEntry(name, kind, module, path, line, signature, (), doc, ())
 
 
-def load_api(root: Path, package: str) -> list[ApiEntry]:
+def load_api(
+    root: Path, package: str, extra_modules: tuple[str, ...] = ()
+) -> list[ApiEntry]:
     """Describe every name ``package`` exports, in ``__all__`` order.
 
     Parameters
@@ -543,11 +545,16 @@ def load_api(root: Path, package: str) -> list[ApiEntry]:
         The checkout root holding the ``package`` directory.
     package : str
         The importable package name, such as ``"cuprum"``.
+    extra_modules : tuple[str, ...]
+        Dotted names of public submodules the package does not re-export,
+        such as ``"cuprum.sinks"``. Each becomes a module entry, named by
+        its dotted path, listing the names in its ``__all__`` that the
+        package does not already export.
 
     Returns
     -------
     list[ApiEntry]
-        One entry per exported name.
+        One entry per exported name, then one per extra module.
 
     Raises
     ------
@@ -561,6 +568,9 @@ def load_api(root: Path, package: str) -> list[ApiEntry]:
     for name in names:
         module, node = resolver.find(package, name)
         entries.append(_entry(name, module, node, resolver, exported))
+    for module in extra_modules:
+        stub = _module_stub(resolver.tree(module))
+        entries.append(_entry(module, module, stub, resolver, exported))
     return entries
 
 

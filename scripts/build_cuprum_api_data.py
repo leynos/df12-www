@@ -7,8 +7,9 @@ writes ``templates/cuprum/data/api.jinja`` so the site builds without a Cuprum
 checkout. Run it after the pinned release moves; ``--check`` fails when the
 committed data no longer matches the source.
 
-Every exported name must belong to exactly one page in :data:`GROUPS`, so a
-name Cuprum adds cannot slip out of the reference unnoticed.
+Every exported name, and each public submodule in :data:`EXTRA_MODULES`, must
+belong to exactly one page in :data:`GROUPS`, so a name Cuprum adds cannot slip
+out of the reference unnoticed.
 """
 
 from __future__ import annotations
@@ -79,6 +80,7 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "TAR",
             "DOC_TOOL",
             "PACKAGE_NAME",
+            "cuprum.catalogue",
         ),
     },
     {
@@ -169,6 +171,20 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         ),
     },
     {
+        "slug": "adapters",
+        "title": "Adapters and sinks",
+        "lede": (
+            "Ready-made observe hooks for logging, metrics, and tracing, and the "
+            "output sink that frames a run for GitHub Actions."
+        ),
+        "names": (
+            "cuprum.adapters.logging_adapter",
+            "cuprum.adapters.metrics_adapter",
+            "cuprum.adapters.tracing_adapter",
+            "cuprum.sinks",
+        ),
+    },
+    {
         "slug": "errors",
         "title": "Errors",
         "lede": (
@@ -177,6 +193,16 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         ),
         "names": ("UnknownProgramError", "ForbiddenProgramError", "TimeoutExpired"),
     },
+)
+
+#: Public submodules the package does not re-export, documented as module
+#: entries alongside ``__all__``: the guide's recipes import from them.
+EXTRA_MODULES = (
+    "cuprum.catalogue",
+    "cuprum.sinks",
+    "cuprum.adapters.logging_adapter",
+    "cuprum.adapters.metrics_adapter",
+    "cuprum.adapters.tracing_adapter",
 )
 
 BANNER = """{#
@@ -249,7 +275,8 @@ def display_line(kind: str, name: str, signature: str) -> str:
     'def make(program: Program) -> SafeCmdBuilder'
     """
     if kind == "module":
-        return f"from cuprum import {name}"
+        parent, _, leaf = name.rpartition(".")
+        return f"from {parent or 'cuprum'} import {leaf}"
     if not signature.startswith(("(", "async (")):
         return f"{name}{signature}"
     is_async = signature.startswith("async ")
@@ -545,7 +572,7 @@ def main(argv: list[str] | None = None) -> int:
         ``0`` on success; ``1`` when ``--check`` finds drift.
     """
     args = parse_args(argv)
-    groups = group_entries(load_api(args.cuprum_root, "cuprum"))
+    groups = group_entries(load_api(args.cuprum_root, "cuprum", EXTRA_MODULES))
     rendered = render(groups, source_identity(args.cuprum_root))
     if args.check:
         current = (

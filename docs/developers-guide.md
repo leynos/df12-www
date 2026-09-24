@@ -1044,9 +1044,12 @@ sticky rail from 64rem and a `<details>` drop-down below it. The API reference
 is generated from Cuprum's source: `scripts/cuprum_api_parser.py` resolves each
 name in `cuprum.__all__` to the statement that defines it, with `ast` alone,
 following re-exports through the package, and parses its signature and NumPy
-docstring. `scripts/build_cuprum_api_data.py` then sorts the names into the
-reference pages in its `GROUPS`, renders the reStructuredText inline markup as
-escaped HTML, and writes `templates/cuprum/data/api.jinja`. Run
+docstring. Public submodules the package does not re-export, such as
+`cuprum.sinks` and the adapters, are listed in the builder's `EXTRA_MODULES`
+and documented as module entries. `scripts/build_cuprum_api_data.py` then sorts
+the names into the reference pages in its `GROUPS`, renders the
+reStructuredText inline markup as escaped HTML, and writes
+`templates/cuprum/data/api.jinja`. Run
 `make cuprum-api-data CUPRUM_SOURCE=<checkout>` against a checkout of the
 documented release, and `make check-cuprum-api-data` to confirm the committed
 file still matches. A name exported but placed in no group, placed twice, or

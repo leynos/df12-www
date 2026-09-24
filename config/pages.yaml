@@ -1658,6 +1658,7 @@ sites:
       - { key: docs-api-policy, label: "Scopes, policy, and hooks", template: pages/docs-api-policy.jinja, output_slug: docs/api/policy }
       - { key: docs-api-observation, label: "Events and observation", template: pages/docs-api-observation.jinja, output_slug: docs/api/observation }
       - { key: docs-api-rust, label: "Rust pump and backends", template: pages/docs-api-rust.jinja, output_slug: docs/api/rust }
+      - { key: docs-api-adapters, label: "Adapters and sinks", template: pages/docs-api-adapters.jinja, output_slug: docs/api/adapters }
       - { key: docs-api-errors, label: "Errors", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors }
       - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
       - { key: setwork, label: Setwork, template: pages/setwork.jinja, output_slug: setwork }

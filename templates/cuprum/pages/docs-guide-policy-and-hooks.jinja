@@ -1,0 +1,129 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'policy-and-hooks' %}
+{% block guide_body %}
+<section aria-labelledby="policy">
+  <h2 id="policy">Apply a policy</h2>
+  <p>
+    A catalogue decides which commands can be built. A scope decides which
+    may run inside a block of code, and a nested scope can only narrow its
+    parent. {{ api.ref('scoped') }}<code>(catalogue=...)</code> takes its
+    allowlist straight from a catalogue. Registrations such as
+    {{ api.ref('env') }}, {{ api.ref('before') }}, {{ api.ref('after') }},
+    and {{ api.ref('observe') }} are local to the current context and are
+    removed when their block exits; none of them changes the process's own
+    environment.
+  </p>
+{% call ui.code_panel('scoped_policy.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, env, scoped, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="policy")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+with scoped(catalogue=catalogue), env(CUPRUM_EXAMPLE="scoped"):
+    result = python("-c", "import os; print(os.getenv('CUPRUM_EXAMPLE'))").run_sync()
+assert result.stdout == "scoped\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Use {{ api.ref('ScopeConfig') }} when a catalogue alone is not enough:
+    it takes an allowlist, hooks, a default timeout, and environment
+    settings.
+  </p>
+</section>
+
+<section aria-labelledby="restrict">
+  <h2 id="restrict">Restrict a block to specific programs</h2>
+  <p>
+    Inside a narrowed scope, running anything outside the allowlist raises
+    {{ api.ref('ForbiddenProgramError') }}, a <code>PermissionError</code>
+    subclass, before a process starts.
+    {{ api.ref('current_context') }}<code>().is_allowed()</code> checks a
+    program without running it.
+  </p>
+{% call ui.code_panel('restricted_scope.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import (
+    ForbiddenProgramError,
+    Program,
+    ProgramCatalogue,
+    ScopeConfig,
+    current_context,
+    scoped,
+    sh,
+)
+
+PYTHON = Program(sys.executable)
+OTHER = Program("some-other-tool")
+catalogue = ProgramCatalogue.from_programs(PYTHON, OTHER, name="policy")
+python = sh.make(PYTHON, catalogue=catalogue)
+
+with scoped(ScopeConfig(allowlist=frozenset([OTHER]))):
+    assert not current_context().is_allowed(PYTHON)
+    try:
+        python("-c", "pass").run_sync()
+    except ForbiddenProgramError:
+        pass
+    else:
+        raise AssertionError("the scope should forbid the interpreter")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    {{ api.ref('allow') }} is the one way to widen policy: it adds programs
+    to the current allowlist, even inside a restricted scope, until its
+    registration is detached or its block exits. Called in the default
+    unrestricted context, it restricts that context to exactly the programs
+    it names. Review every <code>allow()</code> as a policy change.
+  </p>
+</section>
+
+<section aria-labelledby="hooks">
+  <h2 id="hooks">Run code around every command</h2>
+  <p>
+    {{ api.ref('before') }} receives each command before it starts, and
+    {{ api.ref('after') }} receives the command and its result once it
+    finishes. Before hooks run in registration order and after hooks in
+    reverse, so an outer scope's setup runs first and its cleanup last.
+    {{ api.ref('logging_hook') }} pairs the two to write start and exit
+    records through the standard <code>logging</code> module.
+  </p>
+{% call ui.code_panel('hooks.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import logging
+import sys
+
+from cuprum import Program, ProgramCatalogue, after, before, logging_hook, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="hooks")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+seen = []
+
+
+def note_start(cmd):
+    seen.append(("before", cmd.argv[-1]))
+
+
+def note_finish(cmd, result):
+    seen.append(("after", result.exit_code))
+
+
+logger = logging.getLogger("myapp.commands")
+with before(note_start), after(note_finish), logging_hook(logger=logger):
+    python("-c", "pass").run_sync()
+assert seen == [("before", "pass"), ("after", 0)]
+{% endhighlight %}
+{% endcall %}
+  <p>
+    A before or after hook is application code: an exception from one
+    reaches the caller and can stop a run. Keep hooks that must never affect
+    a run defensive, and use {{ api.ref('observe') }} for lifecycle events
+    that only report.
+  </p>
+</section>
+{% endblock %}

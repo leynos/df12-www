@@ -1,0 +1,25 @@
+{% extends "pages/_docs.jinja" %}
+{% import "components.jinja" as ui %}
+{% from "data/docs.jinja" import docs_guides %}
+{% set docs_current = '/cuprum/docs/guides/' %}
+{% block title %}Guides · Cuprum{% endblock %}
+{% block description %}Task guides for Cuprum: running commands, controlling output, deadlines, pipelines, policy, observation, troubleshooting, and migrating to 0.2.0.{% endblock %}
+{% block docs_body %}
+          <header class="cu-docs__head">
+            <p class="cu-kicker">Documentation · Guides</p>
+            <h1 class="cu-docs__title">Guides</h1>
+            <p class="cu-docs__lede">
+              Each guide walks through one task end to end. Read them in order
+              the first time; every example was run against the release it
+              documents.
+            </p>
+          </header>
+          <section class="cu-docs__part" aria-labelledby="all-guides">
+            <h2 id="all-guides" class="sr-only">All guides</h2>
+            <ul class="cu-card-grid" role="list">
+              {% for guide in docs_guides %}
+              <li>{{ ui.card(guide.title, guide.summary, number='Guide ' ~ '%02d' % loop.index, href=guide.href, heading='h3') }}</li>
+              {% endfor %}
+            </ul>
+          </section>
+{% endblock %}

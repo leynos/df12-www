@@ -1,0 +1,30 @@
+{#
+  One guide. A child sets `guide_slug` to a slug from data/docs.jinja and
+  fills `guide_body`; the head, the navigation, and the previous and next
+  links all come from that one list.
+#}
+{% extends "pages/_docs.jinja" %}
+{% import "components.jinja" as ui %}
+{% from "data/docs.jinja" import docs_guides %}
+{% set guide = docs_guides | selectattr('slug', 'equalto', guide_slug) | first %}
+{% set docs_current = guide.href %}
+{% set slugs = docs_guides | map(attribute='slug') | list %}
+{% set position = slugs.index(guide_slug) %}
+{% block title %}{{ guide.title }} · Guides · Cuprum{% endblock %}
+{% block description %}{{ guide.summary }}{% endblock %}
+{% block docs_body %}
+          <header class="cu-docs__head">
+            <p class="cu-kicker">Guide {{ '%02d' % (position + 1) }} of {{ slugs | length }}</p>
+            <h1 class="cu-docs__title">{{ guide.title }}</h1>
+            <p class="cu-docs__lede">{{ guide.summary }}</p>
+          </header>
+          <div class="cu-guide">
+            {% block guide_body %}{% endblock %}
+          </div>
+          {% set prev = docs_guides[position - 1] if position > 0 else none %}
+          {% set next = docs_guides[position + 1] if position + 1 < docs_guides | length else none %}
+          {{ ui.pager(
+            {'href': prev.href, 'title': prev.title} if prev else {'href': '/cuprum/docs/', 'title': 'Documentation'},
+            {'href': next.href, 'title': next.title} if next else {'href': '/cuprum/docs/api/', 'title': 'API reference'}
+          ) }}
+{% endblock %}

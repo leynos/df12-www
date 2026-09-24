@@ -1,0 +1,122 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'output' %}
+{% block guide_body %}
+<section aria-labelledby="capture">
+  <h2 id="capture">Capture and echo</h2>
+  <p>
+    Capture is on and echo is off by default. With capture on,
+    <code>stdout</code> and <code>stderr</code> on the result are decoded
+    strings; with it off, they are <code>None</code>. Echo mirrors output to
+    the parent's sinks and can be set per stream. The two are independent:
+    a stream can be captured silently, or echoed without being kept.
+  </p>
+  <p>
+    Echo limits each mirrored line to 64 KiB by default, counting its
+    truncation marker and terminator; captured output is always complete.
+    Set <code>max_echo_line_bytes=None</code> only where unbounded mirroring
+    is safe. {{ api.ref('CommandResult') }}<code>.relay_fallbacks</code>
+    records any echo that fell back after a text sink could not encode it,
+    by stream and without the output itself.
+  </p>
+</section>
+
+<section aria-labelledby="lines">
+  <h2 id="lines">Observe each line</h2>
+  <p>
+    {{ api.ref('RunOutputOptions') }}<code>.on_line</code> receives every
+    decoded line as a {{ api.ref('LineEvent') }}, even when capture and echo
+    are both off. The callback runs synchronously and should return
+    promptly. Lines keep their order within a stream, not across streams.
+  </p>
+{% call ui.code_panel('output_lines.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="output")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+lines = []
+result = python("-c", "print('one'); print('two')").run_sync(
+    output=RunOutputOptions(capture=False, on_line=lines.append),
+)
+assert result.ok and result.stdout is None
+assert [(line.stream, line.text) for line in lines] == [
+    ("stdout", "one"),
+    ("stdout", "two"),
+]
+{% endhighlight %}
+{% endcall %}
+</section>
+
+<section aria-labelledby="stream">
+  <h2 id="stream">Stream lines as they arrive</h2>
+  <p>
+    When a caller must react before the command finishes, iterate
+    {{ api.ref('SafeCmd.lines') }}, an async iterator with backpressure. Use
+    it as an async context manager whenever the loop can stop early: leaving
+    the block closes the stream and tears the child down, as a cancelled
+    <code>run()</code> would. Merely breaking out of the loop does not.
+  </p>
+{% call ui.code_panel('first_line.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import asyncio
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="follow")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+command = python(
+    "-c", "import time\nfor n in range(100):\n print(n, flush=True); time.sleep(0.01)"
+)
+
+
+async def first_line() -> str:
+    async with command.lines() as stream:
+        async for event in stream:
+            # Leaving the block closes the stream and stops the child.
+            return event.text
+    raise AssertionError("the child should print at least one line")
+
+
+assert asyncio.run(first_line()) == "0"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    After a loop that runs to the end, <code>stream.result</code> holds the
+    same {{ api.ref('CommandResult') }} that <code>run()</code> would have
+    returned. Pipelines have no <code>lines()</code>; <code>on_line</code> on a
+    pipeline run observes the final stage's stdout and every stage's
+    stderr, since interior stdout feeds the next stage instead.
+  </p>
+</section>
+
+<section aria-labelledby="quiet">
+  <h2 id="quiet">A heartbeat for a quiet child</h2>
+  <p>
+    <code>RunOutputOptions(idle_after=30.0)</code> writes a notice to the
+    stderr sink after 30 seconds without output, then once per further
+    silent interval; the default is off. The notice is never mixed into
+    captured output. <code>on_idle(total, idle)</code> replaces it. A
+    heartbeat reports silence, not a deadlock, and changes neither the
+    deadline nor the exit status. Keep the callback and any sink it writes
+    to prompt: both run on the command's event loop.
+  </p>
+{% call ui.code_panel('heartbeat.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="idle")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('done')")
+result = command.run_sync(output=RunOutputOptions(idle_after=30.0))
+assert result.ok and result.stdout == "done\n"
+{% endhighlight %}
+{% endcall %}
+</section>
+{% endblock %}

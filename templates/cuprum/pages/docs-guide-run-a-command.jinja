@@ -1,0 +1,112 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'run-a-command' %}
+{% block guide_body %}
+<section aria-labelledby="declare">
+  <h2 id="declare">Declare, build, run</h2>
+  <p>
+    A command starts as a program in a catalogue. {{ api.ref('sh.make') }}
+    consults the catalogue and returns a builder; calling the builder makes
+    a {{ api.ref('SafeCmd') }}, an exact argument vector for that program;
+    running it returns a {{ api.ref('CommandResult') }}. The default
+    catalogue holds common tools such as <code>ECHO</code>, <code>GIT</code>,
+    and <code>TAR</code>. For an application's own executable, build a
+    catalogue that names it:
+  </p>
+{% call ui.code_panel('first_command.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="my-script")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+command = python("-c", "print('hello, cuprum!')")
+result = command.run_sync()
+assert result.ok
+assert result.stdout == "hello, cuprum!\n"
+assert result.stderr == ""
+{% endhighlight %}
+{% endcall %}
+  <p>
+    <code>run_sync()</code> suits a synchronous script; in an async
+    application, <code>await command.run()</code> inside a coroutine. Both
+    return the same result. The argument vector goes to the child without a
+    shell, so quoting, globs, and pipes inside a string are passed through
+    literally rather than interpreted.
+  </p>
+</section>
+
+<section aria-labelledby="fail">
+  <h2 id="fail">Three ways a run can fail</h2>
+  <p>
+    Each failure happens at a different moment, and each means something
+    different:
+  </p>
+  <ul>
+    <li><strong>{{ api.ref('UnknownProgramError') }} when the builder is made.</strong> The program is not in the catalogue: a configuration or policy mistake, raised before anything runs.</li>
+    <li><strong><code>FileNotFoundError</code> at launch.</strong> The program is catalogued, but the operating system cannot find it: check the path, or the child's inherited <code>PATH</code>.</li>
+    <li><strong>A result with <code>ok == False</code>.</strong> The child ran and exited non-zero. Cuprum does not raise; read <code>exit_code</code> and decide by the tool's own exit-code contract.</li>
+  </ul>
+{% call ui.code_panel('failures.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, UnknownProgramError, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="failures")
+try:
+    sh.make(Program("not-in-this-catalogue"), catalogue=catalogue)
+except UnknownProgramError:
+    pass
+else:
+    raise AssertionError("an unknown program should be rejected")
+
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+result = python("-c", "import sys; sys.exit(7)").run_sync()
+assert not result.ok
+assert result.exit_code == 7
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Read <code>stderr</code> for the tool's diagnostics, but never parse it
+    to decide whether Cuprum's catalogue accepted the program: that is what
+    the exception is for.
+  </p>
+</section>
+
+<section aria-labelledby="arguments">
+  <h2 id="arguments">Build arguments deliberately</h2>
+  <p>
+    The builder accepts strings, numbers, booleans, and paths as positional
+    arguments. Keyword arguments become <code>--name=value</code>, with
+    underscores turned into hyphens, which suits only tools that accept that
+    form: for a bare flag such as <code>--check</code>, pass it
+    positionally, since <code>check=True</code> would produce
+    <code>--check=True</code>. <code>None</code> raises
+    <code>TypeError</code> in either position, so decide before building
+    whether an optional flag is omitted or replaced. An argument containing
+    spaces stays one argument.
+  </p>
+{% call ui.code_panel('arguments.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="arguments")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+command = python("-c", "print('two words')")
+assert command.argv == ("-c", "print('two words')")
+assert command.argv_with_program == (sys.executable, *command.argv)
+{% endhighlight %}
+{% endcall %}
+  <p>
+    For Git, rsync, and tar, the typed builders in {{ api.ref('builders', 'cuprum.builders') }}
+    validate paths, refs, and options when the command is built; see
+    <a href="/cuprum/docs/guides/catalogues-and-builders/">Catalogues and builders</a>.
+  </p>
+</section>
+{% endblock %}

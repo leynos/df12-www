@@ -269,3 +269,17 @@ def test_docs_rail_and_drop_down_list_the_same_pages(built_site: Path) -> None:
         assert rail == menu, f"{page}: the rail and the drop-down disagree"
         current = soup.select(".cu-docs-nav__rail [aria-current='page']")
         assert len(current) == 1, f"{page}: expected one current page in the rail"
+
+
+@pytest.mark.timeout(300)
+def test_every_guide_is_published_and_listed(built_site: Path) -> None:
+    """Each guide page exists, carries tested code, and the index links it."""
+    assert built_site.is_dir()
+    index = _soup(PUBLIC_CUPRUM / "docs" / "guides" / "index.html")
+    listed = [_attr(a, "href") for a in index.select(".cu-card__title a")]
+    assert listed, "the guides index lists no guides"
+    for href in listed:
+        page = REPO_ROOT / "public" / href.strip("/") / "index.html"
+        assert page.is_file(), f"{href} has no page"
+        panels = _soup(page).select(".cu-code")
+        assert panels, f"{href} carries no tested example"

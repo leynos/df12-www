@@ -148,6 +148,7 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "EchoStream",
             "EchoErrorCategory",
             "RelayFallback",
+            "cuprum.stream_observation",
         ),
     },
     {
@@ -174,13 +175,18 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         "slug": "adapters",
         "title": "Adapters and sinks",
         "lede": (
-            "Ready-made observe hooks for logging, metrics, and tracing, and the "
+            "Ready-made observe hooks for logging, metrics, and tracing; metrics "
+            "for stream operations, line events, echo, and the Rust pump; and the "
             "output sink that frames a run for GitHub Actions."
         ),
         "names": (
             "cuprum.adapters.logging_adapter",
             "cuprum.adapters.metrics_adapter",
             "cuprum.adapters.tracing_adapter",
+            "cuprum.adapters.stream_metrics",
+            "cuprum.adapters.line_stream_metrics",
+            "cuprum.adapters.echo_metrics",
+            "cuprum.adapters.pump_metrics",
             "cuprum.sinks",
         ),
     },
@@ -199,10 +205,15 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
 #: entries alongside ``__all__``: the guide's recipes import from them.
 EXTRA_MODULES = (
     "cuprum.catalogue",
+    "cuprum.stream_observation",
     "cuprum.sinks",
     "cuprum.adapters.logging_adapter",
     "cuprum.adapters.metrics_adapter",
     "cuprum.adapters.tracing_adapter",
+    "cuprum.adapters.stream_metrics",
+    "cuprum.adapters.line_stream_metrics",
+    "cuprum.adapters.echo_metrics",
+    "cuprum.adapters.pump_metrics",
 )
 
 BANNER = """{#

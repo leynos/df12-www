@@ -1,0 +1,49 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'troubleshoot' %}
+{% block guide_body %}
+<section aria-labelledby="first-checks">
+  <h2 id="first-checks">First checks</h2>
+  {% call ui.matrix('troubleshoot-caption', 'First checks for common outcomes', ['Symptom', 'Check']) %}
+  {% for symptom, check in [
+    ('UnknownProgramError', 'Register the exact program in the catalogue the builder was made from.'),
+    ('ForbiddenProgramError', 'Inspect the active scope and its parent’s allowlist.'),
+    ('FileNotFoundError', 'Confirm the executable’s path, or the PATH the child inherits.'),
+    ('TimeoutExpired', 'Set a deadline that fits the work, and look for slow or blocked work in the child.'),
+    ('A non-zero exit_code', 'Read the captured stderr and the tool’s documented exit codes.'),
+    ('No visible output', 'Capture is silent by default: pass RunOutputOptions(echo=True), or read result.stdout.'),
+    ('No heartbeat', 'Supply a positive idle_after; any output resets its clock.'),
+    ('No native speed-up', 'The extension may be missing, or this operation may use the Python path.'),
+  ] %}
+  <tr role="row">
+    <th scope="row" role="rowheader"><code>{{ symptom }}</code></th>
+    {% call ui.matrix_cell('Check') %}{{ check }}{% endcall %}
+  </tr>
+  {% endfor %}
+  {% endcall %}
+</section>
+
+<section aria-labelledby="native">
+  <h2 id="native">Check the native extension</h2>
+  <p>
+    {{ api.ref('is_rust_available') }} reports whether the native backend
+    can be used. It returns <code>False</code> on a pure-Python install
+    rather than raising, while other import failures still surface, so a
+    broken installation stays visible.
+  </p>
+{% call ui.code_panel('rust_available.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import cuprum
+
+assert isinstance(cuprum.is_rust_available(), bool)
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Behaviour is the same with or without the extension. The
+    <a href="/cuprum/internals/rust-extension/">Rust extension</a> page
+    covers backend selection and why a hop falls back to Python.
+  </p>
+</section>
+{% endblock %}

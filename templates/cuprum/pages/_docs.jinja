@@ -28,7 +28,7 @@
 {% macro _nav() -%}
 <a class="cu-docs-nav__home" href="/cuprum/docs/"{% if docs_current == '/cuprum/docs/' %} aria-current="page"{% endif %}>Documentation</a>
 {% if docs_guides %}
-<p class="cu-docs-nav__heading">Guides</p>
+<p class="cu-docs-nav__heading"><a href="/cuprum/docs/guides/"{% if docs_current == '/cuprum/docs/guides/' %} aria-current="page"{% endif %}>Guides</a></p>
 {{ _nav_list(docs_guides) }}
 {% endif %}
 <p class="cu-docs-nav__heading"><a href="/cuprum/docs/api/"{% if docs_current == '/cuprum/docs/api/' %} aria-current="page"{% endif %}>API reference</a></p>

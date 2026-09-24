@@ -1,0 +1,82 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'pipelines-and-concurrency' %}
+{% block guide_body %}
+<section aria-labelledby="pipeline">
+  <h2 id="pipeline">Connect a pipeline</h2>
+  <p>
+    Join commands with <code>|</code>. The result is a
+    {{ api.ref('PipelineResult') }} with one {{ api.ref('CommandResult') }}
+    per stage. Only the final stage's stdout is captured; interior stdout
+    feeds the next stage and appears as <code>None</code> on that stage's
+    result.
+  </p>
+{% call ui.code_panel('pipeline.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="pipeline")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+producer = python("-c", "print('hello')")
+consumer = python("-c", "import sys; print(sys.stdin.read().upper(), end='')")
+result = (producer | consumer).run_sync()
+assert result.ok
+assert result.stdout == "HELLO\n"
+assert [stage.exit_code for stage in result.stages] == [0, 0]
+{% endhighlight %}
+{% endcall %}
+</section>
+
+<section aria-labelledby="which">
+  <h2 id="which">Find the stage that failed</h2>
+  <p>
+    The final stage can succeed after an earlier one has failed, so check
+    <code>ok</code> or <code>failure_index</code>, never only the last exit
+    code. When a stage fails while others are still running, Cuprum
+    terminates those peers. The first observed failure is the one recorded;
+    when two stages finish at almost the same moment, stage order breaks the
+    tie. The <a href="/cuprum/examples/pipeline-tee/">pipeline job sheet</a>
+    shows a three-stage run failing in the middle.
+  </p>
+</section>
+
+<section aria-labelledby="concurrent">
+  <h2 id="concurrent">Run commands side by side</h2>
+  <p>
+    {{ api.ref('run_concurrent') }} is async;
+    {{ api.ref('run_concurrent_sync') }} serves synchronous callers. Bound
+    the number of simultaneous children with
+    {{ api.ref('ConcurrentConfig') }}<code>.concurrency</code>. Results come
+    back in submission order.
+  </p>
+{% call ui.code_panel('concurrent.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ConcurrentConfig, ProgramCatalogue, run_concurrent_sync, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="concurrent")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+commands = [python("-c", f"print({number})") for number in (1, 2)]
+result = run_concurrent_sync(*commands, config=ConcurrentConfig(concurrency=2))
+assert result.ok
+assert [item.stdout for item in result.results] == ["1\n", "2\n"]
+assert result.submission_indices == (0, 1)
+{% endhighlight %}
+{% endcall %}
+  <p>
+    With <code>fail_fast=True</code>, the remaining commands are cancelled
+    after the first non-zero exit, so some may be missing from the results
+    and a command that had already finished can still appear.
+    <code>failures</code> indexes the returned tuple;
+    <code>submission_indices</code> and
+    <code>failure_submission_indices</code> map each result back to the
+    command that produced it. Use those rather than assuming a result's
+    position is its submission index.
+  </p>
+</section>
+{% endblock %}

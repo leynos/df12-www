@@ -1057,6 +1057,15 @@ placed but no longer exported stops the build, so the reference cannot fall
 silently behind the package. Each reference page is a two-line template that
 sets `api_slug` and extends `pages/_docs_api_group.jinja`.
 
+The guides under `/cuprum/docs/guides/` are written for the site, each a
+template that sets `guide_slug` and extends `pages/_docs_guide.jinja`, with its
+title and summary in `docs_guides` in `data/docs.jinja`. Their code is not
+written for the site: every panel is one of the tested examples in Cuprum's
+users' guide or 0.2.0 migration guide, copied byte for byte, and run again
+against the documented release before the site's pin moves. Link a name to its
+reference entry with `api.ref('SafeCmd.lines')`; a name the generated data does
+not hold fails the build.
+
 Each long page carries a sticky route map, rendered by the `routemap` macro
 from the same `sections` list as its headings. From 80rem up it is a strip of
 links; below that, where the strip would scroll sideways, the same links sit in

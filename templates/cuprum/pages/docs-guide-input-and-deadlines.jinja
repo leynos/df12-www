@@ -1,0 +1,116 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'input-and-deadlines' %}
+{% block guide_body %}
+<section aria-labelledby="input">
+  <h2 id="input">Input, environment, and directory</h2>
+  <p>
+    {{ api.ref('StdinInput') }}<code>(text=...)</code> encodes text with the
+    context's encoding; <code>StdinInput(data=...)</code> passes bytes. Give
+    one, not both. {{ api.ref('ExecutionContext') }}<code>.env</code>
+    overlays the live parent environment rather than replacing it, so an
+    empty mapping still inherits everything; <code>cwd</code> sets the
+    child's working directory.
+  </p>
+{% call ui.code_panel('input_and_context.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ExecutionContext, ProgramCatalogue, StdinInput, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="input")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+command = python(
+    "-c", "import os,sys; print(os.getenv('CUPRUM_EXAMPLE'), sys.stdin.read())"
+)
+result = command.run_sync(
+    context=ExecutionContext(env={"CUPRUM_EXAMPLE": "ready"}),
+    stdin=StdinInput(text="hello"),
+    timeout=5,
+)
+assert result.stdout == "ready hello\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Code that needs a replacement environment rather than an overlay must
+    build that policy itself: an overlay can add and change variables but
+    never removes one.
+  </p>
+</section>
+
+<section aria-labelledby="deadline">
+  <h2 id="deadline">Set a deadline</h2>
+  <p>
+    Pass <code>timeout</code> to <code>run()</code> or
+    <code>run_sync()</code> and catch {{ api.ref('TimeoutExpired') }}, which
+    subclasses the built-in <code>TimeoutError</code>. On expiry Cuprum asks
+    the child to terminate, waits <code>cancel_grace</code> seconds, then
+    kills it. Output captured before the deadline stays on the exception, as
+    empty strings rather than <code>None</code> when capture is on.
+  </p>
+{% call ui.code_panel('slow_command.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import ExecutionContext, Program, ProgramCatalogue, TimeoutExpired, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="slow")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+slow = python("-c", "import time; time.sleep(30)")
+
+try:
+    slow.run_sync(timeout=0.5, context=ExecutionContext(cancel_grace=0.2))
+except TimeoutExpired as exc:
+    assert exc.timeout == 0.5
+    assert exc.output == "" and exc.stderr == ""
+else:
+    raise AssertionError("the command should have timed out")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Cancelling an async run starts the same teardown. Catch the timeout
+    separately from a non-zero exit: one means the deadline passed, the
+    other that the child finished and failed.
+  </p>
+</section>
+
+<section aria-labelledby="where">
+  <h2 id="where">Where a deadline comes from</h2>
+  <p>Cuprum uses the first of these that is set:</p>
+  <ol>
+    <li>The <code>timeout</code> argument to <code>run()</code> or <code>run_sync()</code>.</li>
+    <li>{{ api.ref('ExecutionContext') }}<code>.timeout</code>.</li>
+    <li>A {{ api.ref('ScopeConfig') }}<code>(timeout=...)</code> default from the enclosing <code>scoped()</code> block, which applies to every command run inside it.</li>
+  </ol>
+{% call ui.code_panel('scope_timeout.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, ScopeConfig, TimeoutExpired, scoped, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="timeouts")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+command = python("-c", "import time; print('started', flush=True); time.sleep(30)")
+
+with scoped(ScopeConfig(timeout=1.0)):
+    try:
+        command.run_sync()
+    except TimeoutExpired as exc:
+        assert exc.timeout == 1.0
+        # A slow start can expire before the child prints anything.
+        assert exc.output in {"", "started\n"}
+    else:
+        raise AssertionError("the scope timeout should have expired")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Timeouts must be finite and non-negative; <code>None</code> means no
+    limit. Zero or less is treated as a deadline already passed. A pipeline
+    enforces one deadline for the whole run and reports its expiry once per
+    stage. Every expiry also writes a structured <code>WARNING</code> to the
+    <code>cuprum.timeout</code> logger, whether or not a hook is observing.
+  </p>
+</section>
+{% endblock %}

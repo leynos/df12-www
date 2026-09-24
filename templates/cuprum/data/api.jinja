@@ -4343,6 +4343,55 @@
             }
           }
         ]
+      },
+      {
+        "name": "cuprum.stream_observation",
+        "kind": "module",
+        "module": "cuprum.stream_observation",
+        "path": "cuprum/stream_observation.py",
+        "line": 1,
+        "display": "from cuprum import stream_observation",
+        "doc": {
+          "summary": "Registration and fail-open emission for aggregate stream-operation events."
+        },
+        "members": [
+          {
+            "name": "StreamOperationHookRegistration",
+            "kind": "class",
+            "display": "class StreamOperationHookRegistration(hook: StreamOperationHook) -> None",
+            "doc": {
+              "summary": "Registration handle for a stream-operation observation hook."
+            }
+          },
+          {
+            "name": "current_stream_operation_hooks",
+            "kind": "function",
+            "display": "def current_stream_operation_hooks() -> tuple[StreamOperationHook, ...]",
+            "doc": {
+              "summary": "Return stream-operation hooks registered in the current context."
+            }
+          },
+          {
+            "name": "observe_stream_operation",
+            "kind": "function",
+            "display": "def observe_stream_operation(\n    hook: StreamOperationHook,\n) -> StreamOperationHookRegistration",
+            "doc": {
+              "summary": "Register a hook for aggregate stream-operation completion events.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "StreamOperationHookRegistration",
+                      "description": "A context-local registration handle that supports <code>detach()</code> and context-manager use."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       }
     ]
   },
@@ -4746,7 +4795,7 @@
   {
     "slug": "adapters",
     "title": "Adapters and sinks",
-    "lede": "Ready-made observe hooks for logging, metrics, and tracing, and the output sink that frames a run for GitHub Actions.",
+    "lede": "Ready-made observe hooks for logging, metrics, and tracing; metrics for stream operations, line events, echo, and the Rust pump; and the output sink that frames a run for GitHub Actions.",
     "entries": [
       {
         "name": "cuprum.adapters.logging_adapter",
@@ -5062,6 +5111,347 @@
                   ]
                 }
               ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cuprum.adapters.stream_metrics",
+        "kind": "module",
+        "module": "cuprum.adapters.stream_metrics",
+        "path": "cuprum/adapters/stream_metrics.py",
+        "line": 1,
+        "display": "from cuprum.adapters import stream_metrics",
+        "doc": {
+          "summary": "Bounded aggregate metrics for completed pure-Python stream operations."
+        },
+        "members": [
+          {
+            "name": "STREAM_OPERATION_BYTES_TOTAL",
+            "kind": "constant",
+            "display": "STREAM_OPERATION_BYTES_TOTAL = 'cuprum_stream_operation_bytes_total'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "STREAM_OPERATION_DURATION_SECONDS",
+            "kind": "constant",
+            "display": "STREAM_OPERATION_DURATION_SECONDS = 'cuprum_stream_operation_duration_seconds'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "STREAM_OPERATION_READ_OPERATIONS_TOTAL",
+            "kind": "constant",
+            "display": "STREAM_OPERATION_READ_OPERATIONS_TOTAL = 'cuprum_stream_operation_read_operations_total'",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "StreamOperationMetricsHook",
+            "kind": "class",
+            "display": "class StreamOperationMetricsHook(collector: MetricsCollector) -> None",
+            "doc": {
+              "summary": "Project aggregate stream-operation events into bounded metrics.",
+              "body": [
+                "The hook emits one byte counter, one reader-operation counter, and one duration histogram for every received event. Every metric uses exactly the closed <code>operation</code> and <code>outcome</code> labels from the event enums."
+              ]
+            }
+          },
+          {
+            "name": "stream_operation_metrics_hook",
+            "kind": "function",
+            "display": "def stream_operation_metrics_hook(\n    collector: MetricsCollector,\n) -> StreamOperationHook",
+            "doc": {
+              "summary": "Create a bounded metrics hook for stream-operation observation."
+            }
+          }
+        ]
+      },
+      {
+        "name": "cuprum.adapters.line_stream_metrics",
+        "kind": "module",
+        "module": "cuprum.adapters.line_stream_metrics",
+        "path": "cuprum/adapters/line_stream_metrics.py",
+        "line": 1,
+        "display": "from cuprum.adapters import line_stream_metrics",
+        "doc": {
+          "summary": "Bounded metrics projection for line-stream lifecycle events."
+        },
+        "members": [
+          {
+            "name": "LINE_STREAM_EVENTS_TOTAL",
+            "kind": "constant",
+            "display": "LINE_STREAM_EVENTS_TOTAL = 'cuprum_line_stream_events_total'",
+            "doc": {
+              "summary": "Counter of <code>SafeCmd.lines()</code> lifecycle events by closed categories."
+            }
+          },
+          {
+            "name": "LineStreamMetricsHook",
+            "kind": "class",
+            "display": "class LineStreamMetricsHook(collector: MetricsCollector) -> None",
+            "doc": {
+              "summary": "Count line-stream lifecycle events with bounded categorical labels.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "collector",
+                      "type": "",
+                      "description": "The metrics collector that receives one counter increment per event."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "line_stream_metrics_hook",
+            "kind": "function",
+            "display": "def line_stream_metrics_hook(\n    collector: MetricsCollector,\n) -> LineStreamHook",
+            "doc": {
+              "summary": "Return a lifecycle hook that projects events into <code>collector</code>.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "collector",
+                      "type": "",
+                      "description": "The metrics collector that receives line-stream event counters."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "LineStreamHook",
+                      "description": "A synchronous hook that records bounded lifecycle labels."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cuprum.adapters.echo_metrics",
+        "kind": "module",
+        "module": "cuprum.adapters.echo_metrics",
+        "path": "cuprum/adapters/echo_metrics.py",
+        "line": 1,
+        "display": "from cuprum.adapters import echo_metrics",
+        "doc": {
+          "summary": "Metrics adapter for stream-echo failure and truncation events.",
+          "body": [
+            "Counts how often a text-only echo sink rejected the subprocess output, per output stream, and how often a bounded echoed line was successfully truncated. Those facts are otherwise visible only through a <code>WARNING</code> log record or the echo observation hook, which dashboards cannot aggregate.",
+            "The hook consumes <a href=\"#EchoEvent\"><code>EchoEvent</code></a> values from <a href=\"#observe_echo\"><code>observe_echo</code></a>. It reuses the <code>MetricsCollector</code> protocol, so one collector can back the execution, pump, and echo hooks and no new telemetry dependency is introduced.",
+            "Example ------- ::",
+            "from cuprum import sh from cuprum.adapters.echo_metrics import EchoMetricsHook from cuprum.adapters.metrics_adapter import InMemoryMetrics from cuprum.echo_observation import observe_echo",
+            "metrics = InMemoryMetrics()",
+            "with sh.observe(MetricsHook(metrics)), observe_echo(EchoMetricsHook(metrics)): command.run_sync(output=RunOutputOptions(echo=True))",
+            "print(metrics.counters[\"cuprum_echo_encoding_failures_total\"])"
+          ]
+        },
+        "members": [
+          {
+            "name": "ECHO_ENCODING_FAILURES_TOTAL",
+            "kind": "constant",
+            "display": "ECHO_ENCODING_FAILURES_TOTAL = 'cuprum_echo_encoding_failures_total'",
+            "doc": {
+              "summary": "Echo writes rejected with <code>UnicodeEncodeError</code>, labelled by <code>stream</code>.",
+              "body": [
+                "The only other label is <code>error_category</code>, whose single value (<code>UNICODE_ENCODE</code>) names the closed category the counter counts. The label exists so a future failure category extends the metric rather than silently mixing into this series."
+              ]
+            }
+          },
+          {
+            "name": "ECHO_TRUNCATIONS_TOTAL",
+            "kind": "constant",
+            "display": "ECHO_TRUNCATIONS_TOTAL = 'cuprum_echo_truncations_total'",
+            "doc": {
+              "summary": "Successfully written bounded echo lines, labelled by <code>stream</code>."
+            }
+          },
+          {
+            "name": "EchoMetricsHook",
+            "kind": "class",
+            "display": "class EchoMetricsHook(collector: MetricsCollector) -> None",
+            "doc": {
+              "summary": "Echo observation hook that records bounded echo outcomes.",
+              "body": [
+                "The hook emits <code>cuprum_echo_encoding_failures_total</code>: incremented once per first <code>UnicodeEncodeError</code> on a drain's echo path, labelled <code>stream</code> with <code>stdout</code> or <code>stderr</code> and <code>error_category</code> with <code>unicode_encode</code>. It also emits <code>cuprum_echo_truncations_total</code> once per successfully written truncation, labelled only by <code>stream</code>.",
+                "A drain that has already disabled echo emits nothing further, so repeated chunks after the first failure do not compound the count."
+              ],
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "Example",
+                      "type": "",
+                      "description": ""
+                    },
+                    {
+                      "name": "-------",
+                      "type": "",
+                      "description": "metrics = InMemoryMetrics() with observe_echo(EchoMetricsHook(metrics)): command.run_sync(output=RunOutputOptions(echo=True)) assert metrics.counters[\"cuprum_echo_encoding_failures_total\"] == 1.0"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "echo_metrics_hook",
+            "kind": "function",
+            "display": "def echo_metrics_hook(collector: MetricsCollector) -> EchoHook",
+            "doc": {
+              "summary": "Create an echo observation hook for the given collector.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "EchoHook",
+                      "description": "A hook suitable for use with <a href=\"#observe_echo\"><code>observe_echo</code></a>."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "cuprum.adapters.pump_metrics",
+        "kind": "module",
+        "module": "cuprum.adapters.pump_metrics",
+        "path": "cuprum/adapters/pump_metrics.py",
+        "line": 1,
+        "display": "from cuprum.adapters import pump_metrics",
+        "doc": {
+          "summary": "Metrics adapter for Rust-pump routing events.",
+          "body": [
+            "Counts the pump lifecycle facts that are otherwise visible only as <code>DEBUG</code> log records: how often an inter-stage hop declined the Rust pump, broken down by the seam that refused; how often a cancelled hop's worker failed; and how long native cleanup took after cancellation.",
+            "The hook consumes <a href=\"#PumpEvent\"><code>PumpEvent</code></a> values from <a href=\"#observe_pump\"><code>observe_pump</code></a>, not <a href=\"#ExecEvent\"><code>ExecEvent</code></a> values from <code>sh.observe</code>. It reuses the <code>MetricsCollector</code> protocol, so one collector can back both hooks and no new telemetry dependency is introduced.",
+            "Example ------- ::",
+            "from cuprum.adapters.metrics_adapter import InMemoryMetrics, MetricsHook from cuprum.adapters.pump_metrics import PumpMetricsHook from cuprum.pump_observation import observe_pump",
+            "metrics = InMemoryMetrics()",
+            "with sh.observe(MetricsHook(metrics)), observe_pump(PumpMetricsHook(metrics)): pipeline.run_sync()",
+            "print(metrics.counters[\"cuprum_rust_pump_declined_total\"])"
+          ]
+        },
+        "members": [
+          {
+            "name": "RUST_PUMP_CLEANUP_DEFERRED_TOTAL",
+            "kind": "constant",
+            "display": "RUST_PUMP_CLEANUP_DEFERRED_TOTAL = 'cuprum_rust_pump_cleanup_deferred_total'",
+            "doc": {
+              "summary": "Deferred native-pump cleanups completed after the caller had returned."
+            }
+          },
+          {
+            "name": "RUST_PUMP_CLEANUP_DURATION_SECONDS",
+            "kind": "constant",
+            "display": "RUST_PUMP_CLEANUP_DURATION_SECONDS = 'cuprum_rust_pump_cleanup_duration_seconds'",
+            "doc": {
+              "summary": "Monotonic wait durations for completed native-pump cleanup."
+            }
+          },
+          {
+            "name": "RUST_PUMP_CLEANUP_GRACE_EXPIRED_TOTAL",
+            "kind": "constant",
+            "display": "RUST_PUMP_CLEANUP_GRACE_EXPIRED_TOTAL = 'cuprum_rust_pump_cleanup_grace_expired_total'",
+            "doc": {
+              "summary": "Caller-facing cleanup waits that exhausted their configured grace."
+            }
+          },
+          {
+            "name": "RUST_PUMP_CLEANUP_TOTAL",
+            "kind": "constant",
+            "display": "RUST_PUMP_CLEANUP_TOTAL = 'cuprum_rust_pump_cleanup_total'",
+            "doc": {
+              "summary": "Completed native-pump cleanups after a pipeline cancellation."
+            }
+          },
+          {
+            "name": "RUST_PUMP_DECLINED_TOTAL",
+            "kind": "constant",
+            "display": "RUST_PUMP_DECLINED_TOTAL = 'cuprum_rust_pump_declined_total'",
+            "doc": {
+              "summary": "Declined Rust-pump hand-offs, labelled by the <code>reason</code> that refused."
+            }
+          },
+          {
+            "name": "RUST_PUMP_FAILED_AFTER_CANCEL_TOTAL",
+            "kind": "constant",
+            "display": "RUST_PUMP_FAILED_AFTER_CANCEL_TOTAL = 'cuprum_rust_pump_failed_after_cancel_total'",
+            "doc": {
+              "summary": "Rust-pump worker failures consumed after their hop was cancelled."
+            }
+          },
+          {
+            "name": "RUST_PUMP_HANDOFF_TOTAL",
+            "kind": "constant",
+            "display": "RUST_PUMP_HANDOFF_TOTAL = 'cuprum_rust_pump_handoff_total'",
+            "doc": {
+              "summary": "Rust writer-resource hand-offs, labelled by their bounded outcome."
+            }
+          },
+          {
+            "name": "UNKNOWN_DECLINE_REASON",
+            "kind": "constant",
+            "display": "UNKNOWN_DECLINE_REASON = 'unknown'",
+            "doc": {
+              "summary": "The <code>reason</code> label a decline carrying no recognized reason degrades to.",
+              "body": [
+                "Public because it is operator-visible: it is the one value the <code>reason</code> label can take that is not a <a href=\"#RustPumpDeclineReason\"><code>RustPumpDeclineReason</code></a> member, so a dashboard filtering on that enum alone would silently miss these. Declared here rather than as an enum member because no seam reports it — it exists only so a malformed event cannot introduce an unbounded label."
+              ]
+            }
+          },
+          {
+            "name": "PumpMetricsHook",
+            "kind": "class",
+            "display": "class PumpMetricsHook(collector: MetricsCollector) -> None",
+            "doc": {
+              "summary": "Collect bounded metrics from Rust-pump routing events.",
+              "body": [
+                "The hook emits the following metrics:",
+                "- <code>cuprum_rust_pump_declined_total</code>: a counter labelled <code>reason</code> by the closed <a href=\"#RustPumpDeclineReason\"><code>RustPumpDeclineReason</code></a> vocabulary, plus <code>unknown</code> for an unrecognized hand-built event. - <code>cuprum_rust_pump_failed_after_cancel_total</code>: an unlabelled counter for worker failures observed after cancellation. - <code>cuprum_rust_pump_cleanup_total</code>: an unlabelled counter for completed native-pump cleanup. - <code>cuprum_rust_pump_cleanup_duration_seconds</code>: an unlabelled histogram of normal cleanup durations. - <code>cuprum_rust_pump_cleanup_grace_expired_total</code>: an unlabelled counter for cleanup waits that reach their configured grace limit. - <code>cuprum_rust_pump_cleanup_deferred_total</code>: an unlabelled counter for deferred cleanup completed by the worker's callback. - <code>cuprum_rust_pump_handoff_total</code>: a counter labelled <code>outcome</code> by the closed <a href=\"#RustPumpHandoffOutcome\"><code>RustPumpHandoffOutcome</code></a> vocabulary.",
+                "All labels are closed and bounded; descriptor values, exception details, and other event data are never labels. Unknown phases are ignored so a newer producer cannot make an existing observer fail. The collector must be thread-safe because pump events may be emitted from worker threads."
+              ],
+              "examples": "::\n\n    metrics = InMemoryMetrics()\n\n    with observe_pump(PumpMetricsHook(metrics)):\n        pipeline.run_sync()"
+            }
+          },
+          {
+            "name": "pump_metrics_hook",
+            "kind": "function",
+            "display": "def pump_metrics_hook(collector: MetricsCollector) -> PumpHook",
+            "doc": {
+              "summary": "Create a pump observation hook for the given collector.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "PumpHook",
+                      "description": "A hook suitable for use with <a href=\"#observe_pump\"><code>observe_pump</code></a>."
+                    }
+                  ]
+                }
+              ],
+              "examples": "::\n\n    with observe_pump(pump_metrics_hook(metrics)):\n        pipeline.run_sync()"
             }
           }
         ]

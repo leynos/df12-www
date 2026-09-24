@@ -5,7 +5,7 @@
   declarations and examples are plain text, highlighted here.
 #}
 {% import "_icons.jinja" as icons %}
-{% from "data/api.jinja" import api_source %}
+{% from "data/api.jinja" import api_groups, api_source %}
 
 {#- A parsed docstring: summary, paragraphs, field and prose sections, and
     any doctest examples. -#}
@@ -73,4 +73,15 @@
   </details>
   {% endif %}
 </article>
+{%- endmacro %}
+
+{#- A link from prose to a reference entry. `name` is an exported name or a
+    dotted member such as `SafeCmd.lines`; the page is found from the
+    generated data, so a renamed or removed entry fails the build. -#}
+{% macro ref(name, label=none) -%}
+{% set head = name.split('.')[0] %}
+{% set found = namespace(href=none) %}
+{% for group in api_groups %}{% for e in group.entries %}{% if e.name == head or e.name == name %}{% set found.href = '/cuprum/docs/api/' ~ group.slug ~ '/#' ~ name %}{% endif %}{% endfor %}{% endfor %}
+{% if found.href is none %}{{ raise_missing_reference(name) }}{% endif %}
+<a href="{{ found.href }}"><code>{{ label or name }}</code></a>
 {%- endmacro %}

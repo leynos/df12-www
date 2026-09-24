@@ -1,0 +1,186 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'migrate' %}
+{% block guide_body %}
+<section aria-labelledby="overview">
+  <h2 id="overview">What changes</h2>
+  <p>
+    Everything below is opt-in unless a section says otherwise: an
+    application using 0.1.0 runs unchanged. Each part can be adopted on its
+    own.
+  </p>
+</section>
+
+<section aria-labelledby="scopes">
+  <h2 id="scopes">Scopes from a catalogue</h2>
+  <p>
+    When a scope's allowlist should match a {{ api.ref('ProgramCatalogue') }},
+    pass the catalogue itself: {{ api.ref('scoped') }}<code>(catalogue=catalogue)</code>
+    takes the allowlist from its programs. Keep
+    <code>scoped(ScopeConfig(...))</code> when the scope also needs hooks or
+    other policy. <a href="/cuprum/docs/guides/policy-and-hooks/">Scopes, policy, and hooks</a>
+    shows both.
+  </p>
+</section>
+
+<section aria-labelledby="lines">
+  <h2 id="lines">Line-level output</h2>
+  <p>
+    {{ api.ref('SafeCmd.lines') }} and {{ api.ref('RunOutputOptions') }}<code>.on_line</code>
+    observe decoded lines as they arrive. They are additive: callers of
+    <code>run()</code> and pipelines need no change. See
+    <a href="/cuprum/docs/guides/output/">Control output</a>.
+  </p>
+</section>
+
+<section aria-labelledby="catalogue">
+  <h2 id="catalogue">Shorter single-project catalogues</h2>
+  <p>
+    {{ api.ref('ProjectSettings') }}<code>.documentation_locations</code> and
+    <code>noise_rules</code> now default to empty tuples, and
+    <code>ProgramCatalogue.from_project()</code> removes the
+    <code>ProgramCatalogue(projects=(settings,))</code> wrapper. Existing
+    construction still works.
+  </p>
+{% call ui.code_panel('catalogue.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+from cuprum import Program
+from cuprum.catalogue import ProgramCatalogue, ProjectSettings
+
+settings = ProjectSettings(name="rust-test-gates", programs=(Program("cargo"),))
+catalogue = ProgramCatalogue.from_project(settings)
+assert catalogue.lookup(Program("cargo")).project_name == "rust-test-gates"
+{% endhighlight %}
+{% endcall %}
+</section>
+
+<section aria-labelledby="measurements">
+  <h2 id="measurements">Execution measurements</h2>
+  <p>
+    {{ api.ref('CommandResult') }} now carries <code>started_at</code>, a
+    wall-clock timestamp, and <code>duration</code>, in monotonic seconds.
+    Both default to <code>0.0</code>, so positional construction with the
+    original six arguments still works. On Linux and macOS a direct command
+    also reports its own user and system CPU time and maximum RSS. Those
+    three fields are <code>None</code> on Windows, and for pipeline stages,
+    whose usage cannot be attributed safely; keep <code>None</code> as
+    unavailable when serializing them. On platforms without the per-child
+    wait interface, the CPU figures are approximate when commands run
+    concurrently.
+  </p>
+</section>
+
+<section aria-labelledby="stream-metrics">
+  <h2 id="stream-metrics">Stream-operation observation</h2>
+  <p>
+    A new opt-in channel reports each completed stream drain or pipeline
+    transfer. Nothing is installed until a hook is registered.
+  </p>
+{% call ui.code_panel('stream_metrics.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+from cuprum.adapters.metrics_adapter import InMemoryMetrics
+from cuprum.adapters.stream_metrics import stream_operation_metrics_hook
+from cuprum.stream_observation import observe_stream_operation
+
+metrics = InMemoryMetrics()
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="metrics")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hello')")
+with observe_stream_operation(stream_operation_metrics_hook(metrics)):
+    result = command.run_sync()
+assert result.ok and result.stdout == "hello\n"
+{% endhighlight %}
+{% endcall %}
+</section>
+
+<section aria-labelledby="fallbacks">
+  <h2 id="fallbacks">Echo-fallback diagnostics</h2>
+  <p>
+    <code>CommandResult.relay_fallbacks</code> records handled failures to
+    encode echoed text, by stream and closed category, without output or
+    arguments. The field is trailing and defaults to <code>()</code>, so
+    existing construction is unaffected.
+  </p>
+</section>
+
+<section aria-labelledby="heartbeat">
+  <h2 id="heartbeat">A heartbeat for quiet children</h2>
+  <p>
+    <code>RunOutputOptions.idle_after</code> defaults to <code>None</code>,
+    so the heartbeat is off until set. When set, the built-in notice goes to
+    the stderr sink and never into captured output.
+  </p>
+{% call ui.code_panel('heartbeat.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="idle")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('done')")
+result = command.run_sync(output=RunOutputOptions(idle_after=30.0))
+assert result.ok and result.stdout == "done\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    <code>on_idle(elapsed_total, elapsed_idle)</code> replaces the notice.
+    It runs on the command's own event loop and must not block, and neither
+    must the sink the built-in notice writes to. Wrap a slow sink so that
+    writes hand off without waiting, for example through a queue that
+    something off the loop drains:
+  </p>
+{% call ui.code_panel('queue_sink.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import queue
+
+
+class QueueSink:
+    """Feed a queue that something off the run's loop drains."""
+
+    def __init__(self, pending: queue.Queue[str]) -> None:
+        self._pending = pending
+
+    def write(self, text: str) -> None:
+        self._pending.put_nowait(text)
+
+    def flush(self) -> None:
+        pass
+
+
+pending: queue.Queue[str] = queue.Queue()
+sink = QueueSink(pending)
+sink.write("ready")
+sink.flush()
+assert pending.get_nowait() == "ready"
+{% endhighlight %}
+{% endcall %}
+</section>
+
+<section aria-labelledby="sink">
+  <h2 id="sink">An opt-in presentation sink</h2>
+  <p>
+    {{ api.ref('cuprum.sinks', 'GitHubActionsSink') }} frames a run's echoed
+    output as a collapsible group on GitHub Actions and turns a failure into
+    one error annotation. Nothing is framed unless a sink is passed.
+  </p>
+{% call ui.code_panel('actions_sink.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+from cuprum.sinks import GitHubActionsSink
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="actions")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hello')")
+result = command.run_sync(
+    output=RunOutputOptions(echo=True, sink=GitHubActionsSink()),
+)
+assert result.ok and result.stdout == "hello\n"
+{% endhighlight %}
+{% endcall %}
+</section>
+{% endblock %}

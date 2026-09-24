@@ -431,3 +431,57 @@
 .cu-api__member-head code {
   font-weight: 600;
 }
+
+/* ---------- Guides ---------------------------------------------------- */
+
+/* Prose keeps the reading measure; code panels and tables take the column. */
+.cu-guide > section {
+  padding-top: 2.5rem;
+  scroll-margin-top: calc(4.25rem + 1.5rem);
+}
+
+.cu-guide > section + section {
+  margin-top: 2.5rem;
+  border-top: 1px dashed var(--color-ink);
+}
+
+.cu-guide > section > * + * {
+  margin-top: 1rem;
+}
+
+.cu-guide h2 {
+  font-size: clamp(1.9rem, 3.5vw, 2.4rem);
+  line-height: 1;
+}
+
+.cu-guide p,
+.cu-guide ul,
+.cu-guide ol {
+  max-width: var(--cu-measure);
+}
+
+.cu-guide ul,
+.cu-guide ol {
+  padding-left: 1.25rem;
+}
+
+.cu-guide ul {
+  list-style: square;
+}
+
+.cu-guide ol {
+  list-style: decimal;
+}
+
+.cu-guide li + li {
+  margin-top: 0.5rem;
+}
+
+.cu-guide li::marker {
+  color: var(--color-copper);
+}
+
+.cu-guide .cu-code,
+.cu-guide .cu-matrix-wrap {
+  margin-block: 1.5rem;
+}

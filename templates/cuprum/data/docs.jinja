@@ -9,7 +9,19 @@
 #}
 {% from "data/api.jinja" import api_groups, api_source %}
 {% set docs_source = api_source %}
-{% set docs_guides = [] %}
+{#- The note under every guide example: when it was run, and against what. -#}
+{% set docs_tested = 'Run ' ~ cuprum_verified_on ~ ' against Cuprum ' ~ api_source.version ~ ' · Python 3.13 · Linux' %}
+{% set docs_guides = [
+  {'slug': 'run-a-command', 'title': 'Run a command', 'summary': 'Declare a program, build its argument vector, run it, and read the result, and meet the three ways a run can fail.', 'href': '/cuprum/docs/guides/run-a-command/'},
+  {'slug': 'output', 'title': 'Control output', 'summary': 'Capture, echo, per-line callbacks, lines streamed as they arrive, and a heartbeat for a quiet child.', 'href': '/cuprum/docs/guides/output/'},
+  {'slug': 'input-and-deadlines', 'title': 'Input, environment, and deadlines', 'summary': 'Feed standard input, overlay the environment, and set a deadline that tears the child down cleanly.', 'href': '/cuprum/docs/guides/input-and-deadlines/'},
+  {'slug': 'pipelines-and-concurrency', 'title': 'Pipelines and concurrency', 'summary': 'Join commands stage to stage, find the stage that failed, and run independent commands side by side.', 'href': '/cuprum/docs/guides/pipelines-and-concurrency/'},
+  {'slug': 'catalogues-and-builders', 'title': 'Catalogues and builders', 'summary': 'Name the programs an application may run, and wrap argument construction in small, validated builders.', 'href': '/cuprum/docs/guides/catalogues-and-builders/'},
+  {'slug': 'policy-and-hooks', 'title': 'Scopes, policy, and hooks', 'summary': 'Narrow what a block of code may run, overlay its environment, and run code around every command.', 'href': '/cuprum/docs/guides/policy-and-hooks/'},
+  {'slug': 'observe', 'title': 'Observe production runs', 'summary': 'Structured logs, metrics, and traces from every run, and output framed for GitHub Actions.', 'href': '/cuprum/docs/guides/observe/'},
+  {'slug': 'troubleshoot', 'title': 'Troubleshoot a run', 'summary': 'The first thing to check for each common outcome, from an unknown program to a missing speed-up.', 'href': '/cuprum/docs/guides/troubleshoot/'},
+  {'slug': 'migrate', 'title': 'Migrate to 0.2.0', 'summary': 'What 0.2.0 adds for an application already using Cuprum, and how to adopt each part.', 'href': '/cuprum/docs/guides/migrate/'},
+] %}
 {% set docs_api = [] %}
 {% for group in api_groups %}
 {% set _ = docs_api.append({'slug': group.slug, 'title': group.title, 'lede': group.lede,

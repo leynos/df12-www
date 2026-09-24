@@ -1651,6 +1651,16 @@ sites:
       - { key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals }
       - { key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: internals/rust-extension }
       - { key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs }
+      - { key: docs-guides, label: Guides, template: pages/docs-guides.jinja, output_slug: docs/guides }
+      - { key: docs-guide-run-a-command, label: "Run a command", template: pages/docs-guide-run-a-command.jinja, output_slug: docs/guides/run-a-command }
+      - { key: docs-guide-output, label: "Control output", template: pages/docs-guide-output.jinja, output_slug: docs/guides/output }
+      - { key: docs-guide-input-and-deadlines, label: "Input, environment, and deadlines", template: pages/docs-guide-input-and-deadlines.jinja, output_slug: docs/guides/input-and-deadlines }
+      - { key: docs-guide-pipelines-and-concurrency, label: "Pipelines and concurrency", template: pages/docs-guide-pipelines-and-concurrency.jinja, output_slug: docs/guides/pipelines-and-concurrency }
+      - { key: docs-guide-catalogues-and-builders, label: "Catalogues and builders", template: pages/docs-guide-catalogues-and-builders.jinja, output_slug: docs/guides/catalogues-and-builders }
+      - { key: docs-guide-policy-and-hooks, label: "Scopes, policy, and hooks", template: pages/docs-guide-policy-and-hooks.jinja, output_slug: docs/guides/policy-and-hooks }
+      - { key: docs-guide-observe, label: "Observe production runs", template: pages/docs-guide-observe.jinja, output_slug: docs/guides/observe }
+      - { key: docs-guide-troubleshoot, label: "Troubleshoot a run", template: pages/docs-guide-troubleshoot.jinja, output_slug: docs/guides/troubleshoot }
+      - { key: docs-guide-migrate, label: "Migrate to 0.2.0", template: pages/docs-guide-migrate.jinja, output_slug: docs/guides/migrate }
       - { key: docs-api, label: API reference, template: pages/docs-api.jinja, output_slug: docs/api }
       - { key: docs-api-commands, label: "Commands and results", template: pages/docs-api-commands.jinja, output_slug: docs/api/commands }
       - { key: docs-api-catalogues, label: "Programs and catalogues", template: pages/docs-api-catalogues.jinja, output_slug: docs/api/catalogues }

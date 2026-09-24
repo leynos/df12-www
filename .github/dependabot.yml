@@ -2,6 +2,13 @@ version: 2
 updates:
   - package-ecosystem: "bun"
     directory: "/"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
@@ -14,6 +21,13 @@ updates:
 
   - package-ecosystem: "uv"
     directory: "/"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"

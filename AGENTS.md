@@ -373,10 +373,13 @@ build scripts under `scripts/` against `tsconfig.scripts.json`, both in strict
 mode. The compile step strips types without checking them, so this gate is the
 only thing that catches a wrongly typed module before review.
 
-Ruff and ty are pinned rather than taken from `PATH`: Ruff by `uv.lock`, since
-it is a dev dependency run with `uv run ruff`, and ty by `TY_VERSION` in the
-`Makefile`, run with `uv tool run`. Upgrade either deliberately, in a commit
-that carries the fixes the new release asks for.
+Ruff and ty are pinned rather than taken from `PATH`: Ruff is a dev dependency
+fixed by `uv.lock`, and the gates run the locked `.venv/bin/ruff` that
+`make build` installs. `make check-fmt` and `make lint` do not provision or
+sync the environment themselves; they stop and point to `make build` when that
+Ruff is missing. ty is pinned by `TY_VERSION` in the `Makefile` and run with
+`uv tool run`. Upgrade either deliberately, in a commit that carries the fixes
+the new release asks for.
 
 `make lint` runs Ruff over the Python and Biome over everything else —
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked

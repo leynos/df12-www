@@ -17,7 +17,10 @@ UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
 # Ruff comes from the dev group, so uv.lock fixes its version; ty is pinned
 # here. A new release of either therefore cannot fail the gates on code
 # nobody has changed: moving to it is a deliberate bump and its fixes.
-RUFF = $(UV_ENV) uv run ruff
+# The gates run the Ruff that `make build` installed, straight from the
+# virtualenv, so checking never resolves, syncs, or rewrites the environment;
+# `uv run` would sync it first.
+RUFF = .venv/bin/ruff
 TY_VERSION ?= 0.0.82
 TY = $(UV_ENV) uv tool run ty==$(TY_VERSION)
 SKIP_PLAYWRIGHT ?= 0
@@ -35,7 +38,7 @@ endif
 
 .PHONY: help all clean build build-release lint fmt check-fmt check-site-data \
         docs-check markdownlint nixie site-data spelling stylelint test typecheck \
-        typecheck-js \
+        typecheck-js venv-ruff \
         $(TOOLS) \
         $(VENV_TOOLS) dev
 
@@ -110,6 +113,12 @@ $(VENV_TOOLS): ## Verify required CLI tools in venv
 	$(call ensure_tool_venv,$@)
 endif
 
+venv-ruff: ## Verify the locked Ruff is installed; `make build` installs it
+	@test -x $(RUFF) || { \
+	  printf "Error: '%s' is missing; run 'make build' to install the locked dev tools\n" "$(RUFF)" >&2; \
+	  exit 1; \
+	}
+
 fmt: build $(NODE_MODULES_STAMP) ## Format sources
 	$(RUFF) format
 	$(RUFF) check --select I --fix
@@ -121,13 +130,13 @@ fmt: build $(NODE_MODULES_STAMP) ## Format sources
 	$(MDTABLEFIX) --in-place $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 	$(MDLINT) --fix "**/*.md"
 
-check-fmt: build ## Verify formatting
+check-fmt: venv-ruff ## Verify formatting
 	$(RUFF) format --check
 	# Biome's formatting is checked by the lint target, which runs
 	# `biome check` — formatter, linter, and assists in one pass.
 	$(MDTABLEFIX) --check $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 
-lint: build $(NODE_MODULES_STAMP) ## Run linters
+lint: venv-ruff $(NODE_MODULES_STAMP) ## Run linters
 	$(RUFF) check
 	bun run lint:js
 

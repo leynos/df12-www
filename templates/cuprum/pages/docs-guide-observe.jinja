@@ -102,11 +102,77 @@ assert metrics.counters["cuprum_stream_operation_bytes_total"] > 0
 <section aria-labelledby="actions">
   <h2 id="actions">Present output in GitHub Actions</h2>
   <p>
-    {{ api.ref('cuprum.sinks', 'GitHubActionsSink') }} groups a run's echoed
-    output in a collapsible log section and turns a failure into an error
-    annotation. It activates only when <code>GITHUB_ACTIONS</code> is
-    <code>true</code>; pass <code>force=True</code> to reproduce the framing
-    elsewhere. It changes only what is echoed, never capture or the result.
+    On GitHub Actions, Cuprum can frame a run's echoed output in a
+    collapsible log group and turn a failed run into an
+    <code>::error::</code> annotation. Both are presentation only: capture,
+    exit codes, and the result are unchanged. The framing activates only when
+    the parent process runs on GitHub Actions (<code>GITHUB_ACTIONS</code> is
+    <code>true</code>); elsewhere a run behaves as if it were absent.
+  </p>
+  <h3>Group and annotate flags</h3>
+  <p>
+    <code>group</code> and <code>annotate_failure</code> on
+    {{ api.ref('RunOutputOptions') }} are the shorthand for the common case.
+    They build a <code>GitHubActionsSink</code> and store it as the options'
+    sink, so shared options can carry them safely:
+  </p>
+{% call ui.code_panel('ci_flags.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import dataclasses
+import io
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+from cuprum.sinks import GitHubActionsSink
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="ci-flags")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+
+shared = RunOutputOptions(echo=True, group=True, annotate_failure=True)
+assert isinstance(shared.sink, GitHubActionsSink)
+result = python("-c", "print('building')").run_sync(output=shared)
+assert result.ok and result.stdout == "building\n"
+
+# An explicit sink wins, so shared flagged options never displace it.
+explicit = GitHubActionsSink(io.StringIO(), force=True)
+assert dataclasses.replace(shared, sink=explicit).sink is explicit
+
+try:
+    RunOutputOptions(group="yes")
+except ValueError:
+    pass
+else:
+    raise AssertionError("a non-bool flag should be rejected")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    The flags are independent, and both default to <code>False</code>.
+    <code>group=True</code> frames the run in a <code>::group::</code> and
+    <code>::endgroup::</code> pair and protects echoed output with a
+    stop-commands lease, so child output cannot inject workflow commands; a
+    pipeline receives one group for the whole run.
+    <code>annotate_failure=True</code> writes one <code>::error::</code>
+    annotation when the run ends in a non-zero exit, a timeout, or an error;
+    on its own it frames no group and takes no lease.
+  </p>
+  <p>
+    Workflow commands go to the parent's stderr. An explicit
+    <code>sink=</code> takes precedence and makes both flags no-ops, which is
+    what makes them safe in shared options; pass it on a new
+    <code>RunOutputOptions</code> or through
+    <code>dataclasses.replace(shared, sink=...)</code>. The flags carry no
+    <code>force</code>, and anything but a <code>bool</code> raises
+    <code>ValueError</code>. Run grouped commands one after another when they
+    share the parent's stderr, or their frames can interleave.
+  </p>
+  <h3>Configure the sink directly</h3>
+  <p>
+    Use {{ api.ref('cuprum.sinks', 'GitHubActionsSink') }} for anything the
+    flags do not cover: a custom <code>title</code>, another
+    <code>destination</code>, <code>force=True</code> to reproduce the
+    framing locally, or <code>emit_group=False</code> and
+    <code>emit_annotation=False</code> to switch off either half of the
+    frame.
   </p>
 {% call ui.code_panel('actions_sink.py', 'Tested', foot=[docs_tested]) %}
 {% highlight 'python', 'cuprum-syntax' %}

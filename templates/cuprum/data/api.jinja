@@ -6,7 +6,7 @@
   after the documented release moves; `make check-cuprum-api-data` fails when
   this file no longer matches the source.
 
-  Source: leynos/cuprum 0.2.0-beta1 at 230c4b9b31c74e538bd75d21224ebb4f70dc7f9d
+  Source: leynos/cuprum 0.2.0-beta1 at d2c7651c78fc66cd06f8253b00a7b2e569616d34
 #}
 {% set api_groups = [
   {
@@ -116,7 +116,7 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 586,
+        "line": 712,
         "display": "class SafeCmd(\n    program: Program,\n    argv: tuple[str, ...],\n    project: ProjectSettings,\n    __weakref__: object = dc.field(init=False, repr=False, hash=False, compare=False),\n)",
         "doc": {
           "summary": "Typed representation of a curated command ready for execution."
@@ -371,7 +371,7 @@
         "kind": "type alias",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 62,
+        "line": 65,
         "display": "SafeCmdBuilder = cabc.Callable[..., SafeCmd]",
         "doc": {
           "summary": ""
@@ -382,7 +382,7 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 126,
+        "line": 129,
         "display": "class CommandResult(\n    program: Program,\n    argv: tuple[str, ...],\n    exit_code: int,\n    pid: int,\n    stdout: str | None,\n    stderr: str | None,\n    started_at: float = dc.field(default=0.0, kw_only=True),\n    duration: float = dc.field(default=0.0, kw_only=True),\n    max_rss_bytes: int | None = dc.field(default=None, kw_only=True),\n    user_cpu_seconds: float | None = dc.field(default=None, kw_only=True),\n    system_cpu_seconds: float | None = dc.field(default=None, kw_only=True),\n    relay_fallbacks: tuple[RelayFallback, ...] = (),\n)",
         "doc": {
           "summary": "Structured result returned by command execution.",
@@ -578,7 +578,7 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 278,
+        "line": 281,
         "display": "class ExecutionContext(\n    env: _EnvMapping = None,\n    cwd: _CwdType = None,\n    cancel_grace: float = _DEFAULT_CANCEL_GRACE,\n    native_pump_cleanup_grace: float = _DEFAULT_NATIVE_PUMP_CLEANUP_GRACE,\n    timeout: float | None = None,\n    stdout_sink: typ.IO[str] | None = None,\n    stderr_sink: typ.IO[str] | None = None,\n    encoding: str = _DEFAULT_ENCODING,\n    errors: str = _DEFAULT_ERROR_HANDLING,\n    tags: cabc.Mapping[str, object] | None = None,\n)",
         "doc": {
           "summary": "Execution parameters for SafeCmd runtime control.",
@@ -728,8 +728,8 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 413,
-        "display": "class RunOutputOptions(\n    capture: bool = True,\n    echo: bool = False,\n    echo_stdout: bool | None = None,\n    echo_stderr: bool | None = None,\n    max_echo_line_bytes: int | None = DEFAULT_ECHO_MAX_LINE_BYTES,\n    on_line: LineHook | None = None,\n    idle_after: float | None = None,\n    on_idle: cabc.Callable[[float, float], None] | None = None,\n    sink: sinks.OutputSink | None = None,\n)",
+        "line": 444,
+        "display": "class RunOutputOptions(\n    capture: bool = True,\n    echo: bool = False,\n    echo_stdout: bool | None = None,\n    echo_stderr: bool | None = None,\n    max_echo_line_bytes: int | None = DEFAULT_ECHO_MAX_LINE_BYTES,\n    on_line: LineHook | None = None,\n    idle_after: float | None = None,\n    on_idle: cabc.Callable[[float, float], None] | None = None,\n    sink: sinks.OutputSink | None = None,\n    group: bool = False,\n    annotate_failure: bool = False,\n    _synthesized_sink: sinks.OutputSink | None = dc.field(default=None, repr=False, compare=False, kw_only=True),\n)",
         "doc": {
           "summary": "Configure captured and mirrored command output.",
           "sections": [
@@ -780,11 +780,30 @@
                   "name": "sink",
                   "type": "sinks.OutputSink | None, default=None",
                   "description": "Optional presentation adapter (<code>sinks</code> protocol). When given, it may reframe the parent-facing output of this run (for example, a GitHub Actions group); the default <code>None</code> keeps the plain two-stream behaviour. An adapter is inactive for a run when it declines activation, in which case output is unchanged."
+                },
+                {
+                  "name": "group",
+                  "type": "bool, default=False",
+                  "description": "Convenience opt-in for a GitHub Actions collapsible log group around this run's echoed output. It is a shim over <code>sink</code>: setting it constructs <code>GitHubActionsSink(emit_group=True)</code> and stores it in <code>sink</code> when the caller supplied none, so the framing, the stop-commands lease that shields it from child output, and the workflow-command syntax all stay inside the adapter and the execution layer learns nothing new. A pipeline emits one group for the whole pipeline, not one per stage. Values other than <code>bool</code> raise <code>ValueError</code>."
+                },
+                {
+                  "name": "annotate_failure",
+                  "type": "bool, default=False",
+                  "description": "Convenience opt-in for a single <code>::error::</code> annotation when the run ends in a non-zero exit, a timeout, or an error. Synthesizes <code>GitHubActionsSink(emit_annotation=True)</code> the same way <code>group</code> does, and composes with it: either flag alone synthesizes the adapter with only its own half enabled. Values other than <code>bool</code> raise <code>ValueError</code>."
                 }
+              ]
+            },
+            {
+              "title": "Notes",
+              "paragraphs": [
+                "The two convenience flags reuse the same environment gate as any other sink: the adapter they construct carries no <code>force</code>, so they take effect only when the parent process runs on GitHub Actions (<code>GITHUB_ACTIONS == &quot;true&quot;</code>). Outside that environment they synthesize a sink that declines activation and the run keeps its plain destinations byte-for-byte — which is the intended behaviour, not a failure to apply them. Callers who want the framing locally, on a non-standard runner, or through a custom destination or title pass <code>sink=</code> explicitly, possibly with <code>force=True</code>.",
+                "An explicit <code>sink</code> always wins: when one is supplied the flags are recorded but ignored, and no adapter is synthesized. Put the sink on a new <code>RunOutputOptions</code> or use <code>dataclasses.replace</code> when adapting shared options; <code>run</code> methods do not override <code>output.sink</code> per call. Passing a sink obtained from another options object to a new <code>RunOutputOptions(sink=...)</code> also makes it explicit, even when the sink was originally synthesized by the convenience flags. Replacing either flag on flag-generated options rebuilds their adapter to match the new values, while an explicitly supplied sink remains untouched.",
+                "The default GitHub Actions sink does not serialize overlapping sessions. Do not run grouped commands concurrently when they write to the same parent stderr; run them sequentially so their workflow frames cannot interleave.",
+                "Workflow commands are written to the parent's stderr by default. Neither flag changes capture, exit codes, or the returned result."
               ]
             }
           ],
-          "examples": ">>> options = RunOutputOptions(capture=True, echo=True)\n>>> options.resolved_echo\n(True, True)\n>>> RunOutputOptions(capture=True, echo=True, echo_stdout=False).resolved_echo\n(False, True)\n>>> RunOutputOptions(capture=False, idle_after=30.0).capture\nFalse"
+          "examples": ">>> options = RunOutputOptions(capture=True, echo=True)\n>>> options.resolved_echo\n(True, True)\n>>> RunOutputOptions(capture=True, echo=True, echo_stdout=False).resolved_echo\n(False, True)\n>>> RunOutputOptions(capture=False, idle_after=30.0).capture\nFalse\n>>> RunOutputOptions(group=True).sink is not None\nTrue\n>>> RunOutputOptions().sink is None\nTrue"
         },
         "members": [
           {
@@ -860,6 +879,22 @@
             }
           },
           {
+            "name": "group",
+            "kind": "field",
+            "display": "group: bool",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "annotate_failure",
+            "kind": "field",
+            "display": "annotate_failure: bool",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
             "name": "resolved_echo",
             "kind": "property",
             "display": "resolved_echo: tuple[bool, bool]",
@@ -877,7 +912,7 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 529,
+        "line": 655,
         "display": "class IOOptions()",
         "doc": {
           "summary": "Deprecated alias for command output stream options."
@@ -891,7 +926,7 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 371,
+        "line": 374,
         "display": "class StdinInput(text: str | None = None, data: bytes | None = None)",
         "doc": {
           "summary": "Caller-provided data to write to a subprocess's stdin pipe.",
@@ -2135,7 +2170,7 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 789,
+        "line": 915,
         "display": "class Pipeline(parts: tuple[SafeCmd, ...])",
         "doc": {
           "summary": "A sequence of SafeCmd stages connected via stdout/stdin piping."
@@ -2321,7 +2356,7 @@
         "kind": "class",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 209,
+        "line": 212,
         "display": "class PipelineResult(\n    stages: tuple[CommandResult, ...],\n    failure_index: int | None = None,\n)",
         "doc": {
           "summary": "Structured result returned by pipeline execution.",
@@ -6203,22 +6238,24 @@
           {
             "name": "GitHubActionsSession",
             "kind": "class",
-            "display": "class GitHubActionsSession(\n    log: typ.IO[str],\n    label: str,\n    *,\n    annotation_label: str,\n) -> None",
+            "display": "class GitHubActionsSession(\n    log: typ.IO[str],\n    label: str,\n    *,\n    annotation_label: str | _Annotation,\n) -> None",
             "doc": {
               "summary": "One run's framed presentation session on GitHub Actions.",
               "body": [
-                "Framing is complete the moment the session exists: the group opening and the stop-commands lease are written before the sink returns it, so child output can never appear above the group opening. The session holds that lease for the run's entire lifetime and closes the group with an error annotation when the run's terminal outcome is a failure."
+                "Framing is complete the moment the session exists: the group opening and the stop-commands lease are written before the sink returns it, so child output can never appear above the group opening. The session holds that lease for the run's entire lifetime and closes the group with an error annotation when the run's terminal outcome is a failure.",
+                "Both halves of that frame are separately switchable. A session opened with <code>emit_group=False</code> writes no group command and takes no lease — it is a plain pass-through destination that may still annotate. A session opened with <code>emit_annotation=False</code> frames normally but never annotates."
               ]
             }
           },
           {
             "name": "GitHubActionsSink",
             "kind": "class",
-            "display": "class GitHubActionsSink(\n    destination: typ.IO[str] | None = None,\n    *,\n    title: str | None = None,\n    force: bool = False,\n) -> None",
+            "display": "class GitHubActionsSink(\n    destination: typ.IO[str] | None = None,\n    *,\n    title: str | None = None,\n    force: bool = False,\n    emit_group: bool = True,\n    emit_annotation: bool = True,\n) -> None",
             "doc": {
               "summary": "Opt-in presentation sink for GitHub Actions CI callers.",
               "body": [
-                "The sink holds only immutable configuration; every run gets a fresh <code>GitHubActionsSession</code> from <code>open_session</code>, so one sink instance can serve many sequential or concurrent runs."
+                "The sink holds only immutable configuration; every run gets a fresh <code>GitHubActionsSession</code> from <code>open_session</code>, so one sink instance can serve many sequential or concurrent runs.",
+                "<code>emit_group</code> and <code>emit_annotation</code> independently control whether the session writes the collapsible group frame and failure annotation."
               ],
               "sections": [
                 {
@@ -6238,6 +6275,26 @@
                       "name": "force",
                       "type": "",
                       "description": "Activate the sink even when the parent process does not run on GitHub Actions. Intended for local reproduction of CI framing and non-standard runners; when <code>False</code> (the default) the sink defers to the environment check."
+                    },
+                    {
+                      "name": "emit_group",
+                      "type": "",
+                      "description": "Whether a session writes the group commands and their stop-commands lease. <code>False</code> leaves the run's log destination unframed, which is what <code>RunOutputOptions(annotate_failure=True)</code> asks for: an annotation without collapsible logs."
+                    },
+                    {
+                      "name": "emit_annotation",
+                      "type": "",
+                      "description": "Whether a failed outcome emits its <code>::error::</code> annotation. <code>False</code> keeps the framing and drops the annotation, which is what <code>RunOutputOptions(group=True)</code> asks for."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "TypeError",
+                      "type": "",
+                      "description": "If <code>emit_group</code> or <code>emit_annotation</code> is not a <code>bool</code>. They gate workflow commands, so a merely truthy value would frame a run on the strength of something the caller never documented as a flag."
                     }
                   ]
                 }
@@ -6252,7 +6309,7 @@
               "summary": "The write side of one active adapter run.",
               "body": [
                 "Implementations keep their framing state here and remain safe for the sequential single-writer use the execution layer guarantees: child-output writes and control writes are issued from the run's own task context, not from unrelated tasks.",
-                "An adapter emits its opening framing as the session is constructed, so it is already written when <code>OutputSink.open_session</code> returns; the execution layer offers no framing hook and never reaches into an adapter's internals. <code>log</code> is therefore a pure accessor."
+                "An adapter emits its opening framing as the session is constructed, so it is already written when <code>OutputSink.open_session</code> returns; the execution layer offers no framing hook and never reaches into an adapter's internals. <code>log</code> is therefore a pure accessor. A session may expose an optional <code>redirects_echo</code> boolean attribute; when it is <code>False</code>, the shared lifecycle leaves echoed output on the caller's original destinations while the session still handles its terminal annotation. Sessions without this hint continue to route echoed output through <code>log</code>."
               ]
             }
           },
@@ -6391,7 +6448,7 @@
         "kind": "exception",
         "module": "cuprum.sh",
         "path": "cuprum/sh.py",
-        "line": 339,
+        "line": 342,
         "display": "class TimeoutExpired(\n    *,\n    cmd: cabc.Sequence[str] | object,\n    timeout: float,\n    output: str | bytes | None = None,\n    stderr: str | bytes | None = None,\n) -> None",
         "doc": {
           "summary": "Raised when command execution exceeds the configured timeout."
@@ -6427,5 +6484,5 @@
 ] %}
 {% set api_source = {
   "version": "0.2.0-beta1",
-  "commit": "230c4b9b31c74e538bd75d21224ebb4f70dc7f9d"
+  "commit": "d2c7651c78fc66cd06f8253b00a7b2e569616d34"
 } %}

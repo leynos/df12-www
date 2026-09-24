@@ -71,10 +71,11 @@
           pip and uv skip pre-releases unless one is named, so a bare
           <code>pip install cuprum</code> still installs {{ cuprum_previous }}.
           Pin <code>cuprum=={{ cuprum_pypi }}</code> until 0.2.0 ships; the API
-          may still shift before then. On CPython 3.13 for Linux, macOS, and
-          Windows x86_64, the install may pick a native wheel with the optional
-          <a href="/cuprum/internals/rust-extension/">Rust pump</a>; behaviour
-          is the same either way.
+          may still shift before then. On glibc-based Linux, macOS, and
+          Windows x86_64, the install picks a native wheel with the optional
+          <a href="/cuprum/internals/rust-extension/">Rust pump</a>, one wheel
+          for CPython 3.12 and every later version; behaviour is the same
+          either way.
         </p>
         {% endcall %}
       </div>

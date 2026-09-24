@@ -3,10 +3,10 @@
 {% set example_slug = 'ci-observability' %}
 {% set example_facts = [
   ('Level', 'Intermediate'),
-  ('Needs', 'Python ' ~ python_floor ~ ' or later; nothing else, as the interpreter stands in for a test runner'),
+  ('Needs', 'Python ' ~ python_floor ~ ' or later, which stands in for a test runner; the flags run also needs python3 on PATH'),
   ('Install', 'Cuprum ' ~ cuprum_pypi ~ ' from PyPI; see Getting started'),
-  ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor ~ '; both runs repeated eight times, identical apart from the random stop-commands token'),
-  ('Uses', 'sh.observe, ExecEvent, logging_hook, cuprum.sinks.GitHubActionsSink'),
+  ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor ~ '; every run repeated eight times, identical apart from the random stop-commands token; the flags run with GITHUB_ACTIONS=true and python3 on PATH'),
+  ('Uses', 'sh.observe, ExecEvent, logging_hook, cuprum.sinks.GitHubActionsSink, RunOutputOptions(group=..., annotate_failure=...)'),
 ] %}
 
 {% block problem %}
@@ -157,6 +157,68 @@ result: False 1
     output. The sink activates by itself when <code>GITHUB_ACTIONS</code> is
     <code>true</code>; <code>force=True</code> reproduces the framing
     elsewhere, as here.
+  </p>
+  <h3>On the runner: two flags, no sink</h3>
+  <p>
+    A job that only wants the group and the annotation can skip the sink.
+    <code>group=True</code> and <code>annotate_failure=True</code> on
+    {{ api.ref('RunOutputOptions') }} build a
+    <code>GitHubActionsSink</code> for the run, so one options object can be
+    shared by every step. The flags carry no <code>force</code>: they act
+    only when <code>GITHUB_ACTIONS</code> is <code>true</code>, and write to
+    the parent's stderr. This step calls <code>python3</code> from
+    <code>PATH</code>, so the group's default title is the command line
+    itself.
+  </p>
+</div>
+<div class="cu-pair mt-8">
+{% call ui.code_panel('ci_step_flags.py', 'On the runner', foot=[verified], flat=true) %}
+{% highlight 'python', 'cuprum-syntax' %}
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, scoped, sh
+
+PYTHON = Program("python3")
+CATALOGUE = ProgramCatalogue.from_programs(PYTHON, name="ci")
+python = sh.make(PYTHON, catalogue=CATALOGUE)
+
+# One options object for every step; inert off GitHub Actions.
+CI_OUTPUT = RunOutputOptions(echo=True, group=True, annotate_failure=True)
+
+FAIL = "import sys; print('1 failed, 41 passed'); sys.exit(1)"
+
+with scoped(catalogue=CATALOGUE):
+    result = python("-c", FAIL).run_sync(output=CI_OUTPUT)
+
+print("result:", result.ok, result.exit_code, repr(result.stdout))
+{% endhighlight %}
+{% endcall %}
+  <div>
+  {% call ui.output('Observed output', 'GITHUB_ACTIONS=true, stdout and stderr') %}
+::group::python3 -c import sys; print('1 failed, 41 passed'); sys.exit(1)
+::stop-commands::977dbae16495e769
+1 failed, 41 passed
+::977dbae16495e769::
+::endgroup::
+::error title=ci%3A python3::exit_nonzero
+result: False 1 '1 failed, 41 passed\n'
+  {% endcall %}
+  <div class="mt-6">
+  {% call ui.output('Observed output', 'GITHUB_ACTIONS unset') %}
+1 failed, 41 passed
+result: False 1 '1 failed, 41 passed\n'
+  {% endcall %}
+  </div>
+  </div>
+</div>
+<div class="cu-prose mt-10">
+  <p>
+    The group is titled with the whole command line, arguments included, so
+    it appears in the step's log. The annotation, which GitHub also shows on
+    the job summary, carries only the run's bounded label,
+    <code>ci: python3</code> (escaped as <code>ci%3A</code> in the workflow
+    command), and never an argument. Off the runner the flags do nothing: the
+    output is echoed as usual and the result is the same. An explicit
+    <code>sink=</code> always wins over the flags, so a step that needs its
+    own title passes a sink as the first two runs do.
   </p>
 </div>
 {% endblock %}

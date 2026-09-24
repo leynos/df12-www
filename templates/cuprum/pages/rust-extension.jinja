@@ -3,7 +3,7 @@
 {% import "_icons.jinja" as icons %}
 {% from "data/capabilities.jinja" import capabilities, state_labels %}
 {% block title %}Rust extension (technical preview) · Cuprum{% endblock %}
-{% block description %}Technical preview, optional backend: Cuprum's Rust extension accelerates the byte copy between pipeline stages. Python remains the behavioural reference, and no native wheel has been released yet.{% endblock %}
+{% block description %}Technical preview, optional backend: Cuprum's Rust extension accelerates the byte copy between pipeline stages. Python remains the behavioural reference; native wheels for CPython 3.12 and later ship with {{ cuprum_pypi }}.{% endblock %}
 {% block main_class %} class="cu-rust"{% endblock %}
 {% block content %}
 {% set src = repository_url ~ '/blob/' ~ cuprum_tag ~ '/' %}
@@ -41,7 +41,7 @@
 } %}
       {% call ui.page_head('Internals · Annex R · Technical preview', 'Rust extension',
         'Python remains the behavioural reference. Rust accelerates the byte copy between pipeline stages when the extension is available — nothing else.',
-        statuses=['preview'], meta='Optional backend · not required · native wheels for CPython 3.13 · describes Cuprum ' ~ cuprum_version,
+        statuses=['preview'], meta='Optional backend · not required · native wheels for CPython 3.12 and later · describes Cuprum ' ~ cuprum_version,
         art_image=valve_art, stamp='Technical preview') %}
         {{ ui.button('Read backend selection', '#selection', icon='arrow-down') }}
         {{ ui.button('ADR-001', src ~ 'docs/adr-001-rust-extension.md', variant='outline', icon='external') }}
@@ -69,10 +69,13 @@
         <p>
           ADR-001, which introduces the extension, is still marked
           <em>Proposed</em>. Cuprum {{ cuprum_version }} is the first release
-          with native wheels, for CPython 3.13 on Linux (x86_64, aarch64),
-          macOS (x86_64, arm64), and Windows (x86_64); every other interpreter
-          installs the pure-Python wheel. For another interpreter, build from a
-          checkout with Rust 1.85 or later and <code>maturin develop</code>.
+          with native wheels, for glibc-based Linux (x86_64, aarch64), macOS
+          (x86_64, arm64), and Windows (x86_64). Each targets the CPython 3.12
+          stable ABI, so one wheel per platform serves 3.12 and every later
+          version (ADR-016). Other platforms, and free-threaded builds, install
+          the pure-Python wheel; Windows arm64 is planned for a later beta. To
+          build for another platform, use a checkout with Rust 1.85 or later
+          and <code>maturin develop</code>.
         </p>
         {% endcall %}
       </div>

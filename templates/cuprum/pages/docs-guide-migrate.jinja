@@ -183,4 +183,36 @@ assert result.ok and result.stdout == "hello\n"
 {% endhighlight %}
 {% endcall %}
 </section>
+
+<section aria-labelledby="flags">
+  <h2 id="flags">Group and annotate flags</h2>
+  <p>
+    Two additive flags on {{ api.ref('RunOutputOptions') }},
+    <code>group</code> and <code>annotate_failure</code>, reach the same
+    framing without constructing a sink:
+  </p>
+{% call ui.code_panel('flags.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+from cuprum.sinks import GitHubActionsSink
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="migration-flags")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hello')")
+options = RunOutputOptions(echo=True, group=True, annotate_failure=True)
+assert isinstance(options.sink, GitHubActionsSink)
+result = command.run_sync(output=options)
+assert result.ok and result.stdout == "hello\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Both default to <code>False</code>, so existing applications need no
+    change and unflagged output is byte for byte what it was. The flags build
+    a <code>GitHubActionsSink</code>, so they share its gate: they act only
+    when <code>GITHUB_ACTIONS</code> is <code>true</code>, and an explicit
+    <code>sink=</code> makes them no-ops. Anything but a <code>bool</code>
+    raises <code>ValueError</code>.
+  </p>
+</section>
 {% endblock %}

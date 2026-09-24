@@ -536,6 +536,13 @@
   line-height: 1;
 }
 
+/* A sub-heading inside a guide section, a step below the section title. */
+.cu-guide h3 {
+  padding-top: 0.75rem;
+  font-size: 1.6rem;
+  line-height: 1.05;
+}
+
 .cu-guide p,
 .cu-guide ul,
 .cu-guide ol {

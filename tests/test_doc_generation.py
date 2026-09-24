@@ -493,9 +493,18 @@ def test_sidebar_shows_label_and_description(
     )
 
 
-def _cdp_element_with_text(
-    nodes: list[dict[str, typ.Any]], tag: str, text: str
-) -> dict[str, typ.Any]:
+class _CdpNode(typ.TypedDict):
+    """The fields of a css-view CDP snapshot node that these tests read."""
+
+    index: int
+    nodeType: int
+    tagName: typ.NotRequired[str]
+    textContent: typ.NotRequired[str | None]
+    parentIndex: typ.NotRequired[int | None]
+    computedStyles: typ.NotRequired[dict[str, str]]
+
+
+def _cdp_element_with_text(nodes: list[_CdpNode], tag: str, text: str) -> _CdpNode:
     """Return the *tag* element in a CDP snapshot whose text node reads *text*.
 
     CDP snapshots are a flat node list: an element's text sits on a child
@@ -570,7 +579,7 @@ def test_doc_prose_code_spans_have_expected_computed_style(
                 timeout=30,
             )
     payload = msgspec_json.decode(result.stdout)
-    nodes = typ.cast("list[dict[str, typ.Any]]", payload["payload"]["nodes"])
+    nodes = typ.cast("list[_CdpNode]", payload["payload"]["nodes"])
     inline_node = _cdp_element_with_text(nodes, "code", INLINE_CODE_LABEL)
     style = inline_node["computedStyles"]
 

@@ -56,13 +56,15 @@ def word_count(text: str) -> int:
 
       <section class="cu-section cu-section--tint" aria-labelledby="cabinet-title">
         <div class="cu-shell">
+          {% set pending = examples | rejectattr('published') | list %}
           <div class="cu-section-head">
             <p class="cu-kicker">The cabinet</p>
             <h2 id="cabinet-title" class="cu-section-head__title">Every job sheet</h2>
             <p class="cu-section-head__lede">
               A sheet is published once its code and expected output have been
-              run against the pinned commit. The dashed ones are planned and
-              not yet written; they have no page to open.
+              run against the pinned release.
+              {%- if pending %} The dashed ones are planned and not yet
+              written; they have no page to open.{% endif %}
             </p>
           </div>
           <h3 class="cu-examples__row-title">Published <span>{{ published_examples | length }}</span></h3>
@@ -74,7 +76,7 @@ def word_count(text: str) -> int:
             </li>
             {% endfor %}
           </ul>
-          {% set pending = examples | rejectattr('published') | list %}
+          {% if pending %}
           <h3 class="cu-examples__row-title">In preparation <span>{{ pending | length }}</span></h3>
           <ul class="cu-card-grid" role="list">
             {% for example in pending %}
@@ -84,6 +86,7 @@ def word_count(text: str) -> int:
             </li>
             {% endfor %}
           </ul>
+          {% endif %}
         </div>
       </section>
 {% endblock %}

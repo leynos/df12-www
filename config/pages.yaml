@@ -1647,6 +1647,9 @@ sites:
       - { key: examples, label: Worked examples, template: pages/examples.jinja, output_slug: examples }
       - { key: examples-first-command, label: Run an approved command, template: pages/examples-first-command.jinja, output_slug: examples/first-command }
       - { key: examples-pipeline-tee, label: Pipeline, tee, and stage failure, template: pages/examples-pipeline-tee.jinja, output_slug: examples/pipeline-tee }
+      - { key: examples-deployment-helper, label: A deployment helper with scoped policy, template: pages/examples-deployment-helper.jinja, output_slug: examples/deployment-helper }
+      - { key: examples-ci-observability, label: Observe CI commands, template: pages/examples-ci-observability.jinja, output_slug: examples/ci-observability }
+      - { key: examples-concurrent-jobs, label: Run jobs concurrently, template: pages/examples-concurrent-jobs.jinja, output_slug: examples/concurrent-jobs }
       - { key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals }
       - { key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: internals/rust-extension }
       - { key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs }

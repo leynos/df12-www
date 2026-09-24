@@ -1,0 +1,200 @@
+{% extends "pages/_example.jinja" %}
+{% import "_api.jinja" as api %}
+{% set example_slug = 'deployment-helper' %}
+{% set example_facts = [
+  ('Level', 'Intermediate'),
+  ('Needs', 'Python ' ~ python_floor ~ ' or later, and tar on PATH (any POSIX system)'),
+  ('Install', 'Cuprum ' ~ cuprum_pypi ~ ' from PyPI; see Getting started'),
+  ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor ~ '; both runs repeated eight times with identical output'),
+  ('Uses', 'ScopeConfig (allowlist, timeout, env_overlay, after_hooks), ExecutionContext(cwd=...), TimeoutExpired'),
+] %}
+
+{% block problem %}
+<p>
+  A deployment step is several commands that belong together: render a
+  configuration file for the target environment, pack a release, check what
+  went into it. Each runs in the same working directory, with the same
+  environment, under the same deadline, and the scratch directory has to go
+  away afterwards whether the step succeeded or not.
+</p>
+<p>
+  In Cuprum the shared policy is one {{ api.ref('ScopeConfig') }}: the
+  programs allowed, a default deadline, an environment overlay, and a hook
+  that records every command's outcome. The working directory is a per-run
+  {{ api.ref('ExecutionContext') }}, and cleanup is an ordinary
+  <code>with</code> block.
+</p>
+{% endblock %}
+
+{% block code %}
+{% call ui.code_panel('deploy.py', 'Complete', foot=[verified]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+import tempfile
+from pathlib import Path
+
+from cuprum import (
+    TAR,
+    ExecutionContext,
+    Program,
+    ProgramCatalogue,
+    ScopeConfig,
+    scoped,
+    sh,
+)
+
+PYTHON = Program(sys.executable)
+CATALOGUE = ProgramCatalogue.from_programs(PYTHON, TAR, name="deploy")
+
+python = sh.make(PYTHON, catalogue=CATALOGUE)
+tar = sh.make(TAR, catalogue=CATALOGUE)
+
+audit: list[str] = []
+
+
+def record(cmd, result):
+    tool = "python" if cmd.program == PYTHON else cmd.program
+    audit.append(f"{tool} {cmd.argv[0]} exited {result.exit_code}")
+
+
+RENDER = (
+    "import os, pathlib\n"
+    "pathlib.Path('app.conf').write_text(f\"env={os.environ['DEPLOY_ENV']}\\n\")"
+)
+
+policy = ScopeConfig(
+    allowlist=CATALOGUE.allowlist,
+    timeout=10.0,
+    env_overlay={"DEPLOY_ENV": "staging"},
+    after_hooks=(record,),
+)
+
+with tempfile.TemporaryDirectory(prefix="deploy-") as workdir:
+    staging = Path(workdir)
+    here = ExecutionContext(cwd=staging)
+    with scoped(policy):
+        python("-c", RENDER).run_sync(context=here)
+        packed = tar("-czf", "release.tgz", "app.conf").run_sync(context=here)
+        listed = tar("-tzf", "release.tgz").run_sync(context=here)
+    rendered = (staging / "app.conf").read_text()
+
+print(f"rendered {rendered.strip()!r}")
+print(f"packed ok={packed.ok}")
+print(f"archive holds {listed.stdout.split()}")
+print(f"cleaned up: {not staging.exists()}")
+for line in audit:
+    print(line)
+{% endhighlight %}
+{% endcall %}
+{% endblock %}
+
+{% block output %}
+<div class="cu-pair">
+  {% call ui.output('Expected output', 'terminal') %}
+rendered 'env=staging'
+packed ok=True
+archive holds ['app.conf']
+cleaned up: True
+python -c exited 0
+tar -czf exited 0
+tar -tzf exited 0
+  {% endcall %}
+  <div class="cu-prose">
+    <p>
+      The first line comes from the file the child wrote: the child saw
+      <code>DEPLOY_ENV=staging</code> from the scope's overlay without the
+      parent's environment changing. The archive holds the rendered file,
+      packed in the scratch directory because every command ran with that
+      <code>cwd</code>.
+    </p>
+    <p>
+      The directory is gone once the <code>with</code> block closes, and the
+      after hook saw each of the three commands in the order they finished.
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block failure %}
+<div class="cu-prose">
+  <p>
+    Now a migration step that hangs. The scope's one-second default applies to
+    every command inside it, so the step is torn down: asked to terminate,
+    given <code>cancel_grace</code> to do so, then killed.
+  </p>
+</div>
+<div class="cu-pair mt-8">
+{% call ui.code_panel('deploy_timeout.py', 'Failure path', foot=[verified], flat=true) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+import tempfile
+from pathlib import Path
+
+from cuprum import (
+    ExecutionContext,
+    Program,
+    ProgramCatalogue,
+    ScopeConfig,
+    TimeoutExpired,
+    scoped,
+    sh,
+)
+
+PYTHON = Program(sys.executable)
+CATALOGUE = ProgramCatalogue.from_programs(PYTHON, name="deploy")
+python = sh.make(PYTHON, catalogue=CATALOGUE)
+
+MIGRATE = "import time; print('migrating', flush=True); time.sleep(30)"
+
+policy = ScopeConfig(allowlist=CATALOGUE.allowlist, timeout=1.0)
+
+staging = None
+try:
+    with tempfile.TemporaryDirectory(prefix="deploy-") as workdir:
+        staging = Path(workdir)
+        with scoped(policy):
+            python("-c", MIGRATE).run_sync(
+                context=ExecutionContext(cwd=staging, cancel_grace=0.5)
+            )
+except TimeoutExpired as exc:
+    print(f"timed out after {exc.timeout}s")
+    print(f"partial output: {exc.output!r}")
+print(f"cleaned up: {staging is not None and not staging.exists()}")
+{% endhighlight %}
+{% endcall %}
+  {% call ui.output('Observed output', 'stdout') %}
+timed out after 1.0s
+partial output: 'migrating\n'
+cleaned up: True
+  {% endcall %}
+</div>
+<div class="cu-prose mt-10">
+  <p>
+    {{ api.ref('TimeoutExpired') }} carries what the child had printed
+    before its deadline, and the scratch directory was still removed: the
+    exception unwound through the <code>with</code> block like any other.
+    Every expiry also writes a <code>subprocess_timeout_expired</code>
+    warning to the <code>cuprum.timeout</code> logger on stderr, with the
+    process ID and the deadline.
+  </p>
+</div>
+{% endblock %}
+
+{% block policy %}
+<p>
+  The catalogue lists this interpreter and <code>tar</code>, and the scope's
+  allowlist is that catalogue's, so nothing else can run inside the block. The
+  overlay, the deadline, and the audit hook apply to every command in the
+  scope and disappear when it closes; none of them changes the process's own
+  environment.
+</p>
+{% call ui.callout('preview', 'Forthcoming: removing a variable') %}
+<p>
+  An overlay can add or change environment variables but not remove one, so a
+  step that must run without an inherited variable, a credential say, cannot
+  yet say so. Explicit environment replacement and unset are in progress in
+  <a href="{{ repository_url }}/pull/466">pull request #466</a>, and are not in
+  {{ cuprum_version }}.
+</p>
+{% endcall %}
+{% endblock %}

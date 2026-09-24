@@ -6,7 +6,7 @@
 {% block description %}Technical preview, optional backend: Cuprum's Rust extension accelerates the byte copy between pipeline stages. Python remains the behavioural reference, and no native wheel has been released yet.{% endblock %}
 {% block main_class %} class="cu-rust"{% endblock %}
 {% block content %}
-{% set src = repository_url ~ '/blob/main/' %}
+{% set src = repository_url ~ '/blob/' ~ cuprum_tag ~ '/' %}
 {% set sections = [
   {'id': 'optional', 'label': 'What is optional', 'title': 'Optional, and narrow',
    'lede': 'Cuprum is complete without Rust. The extension speeds up one operation, and says so when it declines.'},
@@ -37,11 +37,11 @@
     {'when': 'rust selected but not installed', 'then': 'Pipeline execution raises ImportError rather than silently falling back.'},
   ],
   'takeaway': 'Only the inter-stage copy has a native path. Capture, echo, line events, spawning, policy, and results are the same Python code on every backend.',
-  'source': 'Source: docs/users-guide.md#choosing-a-stream-backend and ADR-001 at main@' ~ cuprum_ref,
+  'source': 'Source: docs/users-guide.md#choosing-a-stream-backend and ADR-001 at ' ~ cuprum_tag,
 } %}
       {% call ui.page_head('Internals · Annex R · Technical preview', 'Rust extension',
         'Python remains the behavioural reference. Rust accelerates the byte copy between pipeline stages when the extension is available — nothing else.',
-        statuses=['preview'], meta='Optional backend · not required · no native wheel released · describes main@' ~ cuprum_ref,
+        statuses=['preview'], meta='Optional backend · not required · native wheels for CPython 3.13 · describes Cuprum ' ~ cuprum_version,
         art_image=valve_art, stamp='Technical preview') %}
         {{ ui.button('Read backend selection', '#selection', icon='arrow-down') }}
         {{ ui.button('ADR-001', src ~ 'docs/adr-001-rust-extension.md', variant='outline', icon='external') }}
@@ -65,13 +65,14 @@
             needs a Rust toolchain.
           </p>
         </div>
-        {% call ui.callout('preview', 'Technical preview · not released') %}
+        {% call ui.callout('preview', 'Technical preview') %}
         <p>
           ADR-001, which introduces the extension, is still marked
-          <em>Proposed</em>. The PyPI release ({{ cuprum_released }}) is a
-          pure-Python wheel, and native wheels built in CI from main have not
-          been published. To try the native path today, build from a checkout
-          with Rust 1.85 or later and <code>maturin develop</code>.
+          <em>Proposed</em>. Cuprum {{ cuprum_version }} is the first release
+          with native wheels, for CPython 3.13 on Linux (x86_64, aarch64),
+          macOS (x86_64, arm64), and Windows (x86_64); every other interpreter
+          installs the pure-Python wheel. For another interpreter, build from a
+          checkout with Rust 1.85 or later and <code>maturin develop</code>.
         </p>
         {% endcall %}
       </div>
@@ -81,7 +82,7 @@
       {% endcall %}
 
       {% call ui.section(sections, 'matrix', class='cu-section--tint') %}
-      {% call ui.matrix('matrix-caption', 'Capability matrix · technical preview · main@' ~ cuprum_ref,
+      {% call ui.matrix('matrix-caption', 'Capability matrix · technical preview · Cuprum ' ~ cuprum_version,
         ['Capability', 'Python path', 'Rust extension', 'Notes']) %}
       {% for row in capabilities %}
       <tr role="row">
@@ -93,7 +94,7 @@
       {% endfor %}
       {% endcall %}
       <ul class="cu-legend" aria-label="Legend">
-        {% for key in ['available', 'integrated', 'inert', 'proposed', 'investigating', 'unreleased', 'python-only'] %}
+        {% for key in ['available', 'integrated', 'inert', 'proposed', 'investigating', 'python-only'] %}
         <li><span class="cu-state cu-state--{{ key }}">{{ state_labels[key] }}</span></li>
         {% endfor %}
       </ul>
@@ -123,7 +124,7 @@ $ CUPRUM_STREAM_BACKEND=python python my_script.py
 $ CUPRUM_STREAM_BACKEND=rust python my_script.py
           {% endhighlight %}
           {% endcall %}
-          {% call ui.code_panel('check_backend.py', 'Probe', foot=['Verified ' ~ cuprum_verified_on ~ ' · main@' ~ cuprum_ref ~ ' · pure-Python install'], flat=true) %}
+          {% call ui.code_panel('check_backend.py', 'Probe', foot=['Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · pure-Python install'], flat=true) %}
           {% highlight 'python', 'cuprum-syntax' %}
 import cuprum
 

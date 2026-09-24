@@ -3,14 +3,14 @@
 {% import "_icons.jinja" as icons %}
 {% from "data/roadmap.jinja" import roadmap, roadmap_columns, roadmap_groups %}
 {% block title %}Roadmap · Cuprum{% endblock %}
-{% block description %}Cuprum's public works board: what is shipped on main, what is in progress, and what is only proposed, each with its evidence and exit criterion.{% endblock %}
+{% block description %}Cuprum's public works board: what is shipped, what is in progress, and what is only proposed, each with its evidence and exit criterion.{% endblock %}
 {% block main_class %} class="cu-roadmap"{% endblock %}
 {% block content %}
-{% set src = repository_url ~ '/blob/main/' %}
+{% set src = repository_url ~ '/blob/' ~ cuprum_tag ~ '/' %}
 {% set checked = 'Last checked ' ~ cuprum_verified_on %}
       {% call ui.page_head('Public works board · Roadmap', 'Roadmap',
         'What exists now, what is being built, and what is only proposed — each with the evidence behind it and the criterion that makes it done.',
-        meta=checked ~ ' against main@' ~ cuprum_ref ~ ' and open pull requests. No delivery dates are promised.') %}
+        meta=checked ~ ' against Cuprum ' ~ cuprum_version ~ ' and open pull requests. No delivery dates are promised.') %}
         {{ ui.button('Read the source roadmap', src ~ 'docs/roadmap.md', icon='external') }}
         {{ ui.button('Open pull requests', repository_url ~ '/pulls', variant='outline') }}
       {% endcall %}
@@ -48,7 +48,7 @@
           <p class="cu-prose mt-6">
             A phase number is not a status: the source roadmap has finished and
             unfinished steps side by side in several phases. Shipped cards say
-            whether the work has reached a PyPI release or is only on main.
+            which PyPI release first carried the work.
           </p>
         </div>
       </section>

@@ -1610,18 +1610,17 @@ sites:
       label: "← Back to df12 Productions"
       href: /
     template_vars:
-      # The development line every snippet on the sub-site is verified
-      # against. Main is ahead of the last PyPI release and its package
-      # metadata still reports the released version, so the site names the
-      # commit rather than inventing a version number. Bump the commit, its
-      # short form, and the dates together after re-running the snippets.
-      # Install commands use the full hash: pip warns on an abbreviated one.
-      cuprum_commit: "e82cf9f648fc7143bdb11a4b0a9cf0cde7f2f62c"
-      cuprum_ref: "e82cf9f6"
-      cuprum_ref_date: "2026-09-23"
-      cuprum_verified_on: "2026-09-23"
-      cuprum_released: "0.1.0"
-      cuprum_released_on: "2026-01-30"
+      # The release every snippet on the sub-site is verified against, as
+      # tagged (cuprum_version), as PyPI normalizes it (cuprum_pypi, which
+      # the install commands pin exactly, since pip skips a pre-release that
+      # is not named), and as the git tag that source links point at. Move
+      # them together, with the verification date, after re-running every
+      # snippet, and regenerate the API reference from the new tag.
+      cuprum_version: "0.2.0-beta1"
+      cuprum_pypi: "0.2.0b1"
+      cuprum_tag: "v0.2.0-beta1"
+      cuprum_previous: "0.1.0"
+      cuprum_verified_on: "2026-09-24"
       python_floor: "3.12"
       repository_url: "https://github.com/leynos/cuprum"
     nav_links:

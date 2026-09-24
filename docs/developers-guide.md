@@ -1097,12 +1097,15 @@ under code, tables, small type, figures, or a focus ring, and it never appears
 on a legal notice: `shared_content_page.jinja` empties the colophon seal block,
 and `tests/test_cuprum_build.py` checks that it stays empty.
 
-The code on the sub-site is real. Every snippet was run against the commit
-named by `cuprum_commit` in `config/pages.yaml`, and each code panel's footer
-says so. When that commit moves, rerun the snippets, update the expected
-output, and bump `cuprum_commit`, `cuprum_ref`, `cuprum_ref_date`, and
-`cuprum_verified_on` together; the install slips read the full commit, and a
-test fails if one is unpinned.
+The code on the sub-site is real. Every snippet was run against the release
+named by `cuprum_version` in `config/pages.yaml`, and each code panel's footer
+says so. `cuprum_pypi` is the same version as PyPI normalizes it, and the
+install commands pin it exactly, because pip and uv skip a pre-release that is
+not named; `cuprum_tag` is the git tag that source links point at. When the
+release moves, rerun every snippet and guide example, update the expected
+output, bump `cuprum_version`, `cuprum_pypi`, `cuprum_tag`, and
+`cuprum_verified_on` together, and regenerate the API reference from a checkout
+of the new tag; a test fails if an install command is unpinned.
 
 ## 6. Browser-side components
 

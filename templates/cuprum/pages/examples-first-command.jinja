@@ -3,8 +3,8 @@
 {% set example_facts = [
   ('Level', 'Beginner'),
   ('Needs', 'Python ' ~ python_floor ~ ' or later, and wc on PATH (any POSIX system)'),
-  ('Install', 'Cuprum from main@' ~ cuprum_ref ~ '; see Getting started'),
-  ('Tested', cuprum_verified_on ~ ' against main@' ~ cuprum_ref ~ ' on Linux, Python ' ~ python_floor),
+  ('Install', 'Cuprum ' ~ cuprum_pypi ~ ' from PyPI; see Getting started'),
+  ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor),
   ('Uses', 'ProgramCatalogue.from_programs, sh.make, StdinInput, scoped(catalogue=…)'),
 ] %}
 

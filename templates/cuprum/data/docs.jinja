@@ -10,7 +10,7 @@
 {% from "data/api.jinja" import api_groups, api_source %}
 {% set docs_source = api_source %}
 {#- The note under every guide example: when it was run, and against what. -#}
-{% set docs_tested = 'Run ' ~ cuprum_verified_on ~ ' against Cuprum ' ~ api_source.version ~ ' · Python 3.13 · Linux' %}
+{% set docs_tested = 'Run ' ~ cuprum_verified_on ~ ' against Cuprum ' ~ api_source.version ~ ' · Python ' ~ python_floor ~ ' · Linux' %}
 {% set docs_guides = [
   {'slug': 'run-a-command', 'title': 'Run a command', 'summary': 'Declare a program, build its argument vector, run it, and read the result, and meet the three ways a run can fail.', 'href': '/cuprum/docs/guides/run-a-command/'},
   {'slug': 'output', 'title': 'Control output', 'summary': 'Capture, echo, per-line callbacks, lines streamed as they arrive, and a heartbeat for a quiet child.', 'href': '/cuprum/docs/guides/output/'},

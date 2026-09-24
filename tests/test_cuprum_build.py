@@ -115,16 +115,19 @@ def test_code_regions_are_keyboard_reachable_and_labelled(built_site: Path) -> N
 
 
 @pytest.mark.timeout(300)
-def test_install_commands_pin_the_verified_commit(built_site: Path) -> None:
-    """Install commands pin the full commit, and nothing installs Setwork.
+def test_install_commands_pin_the_verified_release(built_site: Path) -> None:
+    """Install commands pin the documented release, and nothing installs Setwork.
 
-    The documented API is on main, ahead of the PyPI release, so an unpinned
-    `pip install cuprum` would install something the pages do not describe.
-    Setwork has no package at all; a placeholder install would be a promise.
+    The documented release is a pre-release, which pip and uv skip unless it
+    is named, so an unpinned `pip install cuprum` would install something the
+    pages do not describe. Setwork has no package at all; a placeholder
+    install would be a promise.
     """
     assert built_site.is_dir()
-    commit = str(_site_vars()["cuprum_commit"])
-    assert re.fullmatch(r"[0-9a-f]{40}", commit), "cuprum_commit must be a full SHA"
+    release = str(_site_vars()["cuprum_pypi"])
+    assert re.fullmatch(r"\d+\.\d+\.\d+((a|b|rc)\d+)?", release), (
+        "cuprum_pypi must be a normalized PEP 440 version"
+    )
     commands = [
         command.get_text()
         for page in _pages()
@@ -132,7 +135,7 @@ def test_install_commands_pin_the_verified_commit(built_site: Path) -> None:
     ]
     assert commands, "expected install slips on the published pages"
     for command in commands:
-        assert command.endswith(f'@{commit}"'), f"unpinned install: {command}"
+        assert command.endswith(f"cuprum=={release}"), f"unpinned install: {command}"
     for page in _pages():
         text = page.read_text(encoding="utf-8")
         assert "install setwork" not in text, f"{page} offers to install Setwork"

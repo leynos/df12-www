@@ -3,8 +3,8 @@
 {% set example_facts = [
   ('Level', 'Intermediate'),
   ('Needs', 'Python ' ~ python_floor ~ ' or later, and echo on PATH (any POSIX system)'),
-  ('Install', 'Cuprum from main@' ~ cuprum_ref ~ '; see Getting started'),
-  ('Tested', cuprum_verified_on ~ ' against main@' ~ cuprum_ref ~ ' on Linux, Python ' ~ python_floor ~ '; the failure run was repeated eight times with identical output'),
+  ('Install', 'Cuprum ' ~ cuprum_pypi ~ ' from PyPI; see Getting started'),
+  ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor ~ '; the failure run was repeated eight times with identical output'),
   ('Uses', 'Pipeline via |, RunOutputOptions(echo=True), PipelineResult.stages, failure_index'),
 ] %}
 {% set pipeline_figure = {
@@ -22,7 +22,7 @@
     {'when': 'Any stage writes to stderr', 'then': 'With echo=True every stage’s stderr is teed; only the final stage’s stdout is.'},
   ],
   'takeaway': 'Only the final stage’s stdout is captured and echoed. Intermediate stdout feeds the next stage and is reported as None.',
-  'source': 'Source: cuprum/_pipeline_internals.py and docs/users-guide.md#pipeline-execution at main@' ~ cuprum_ref,
+  'source': 'Source: cuprum/_pipeline_internals.py and docs/users-guide.md at ' ~ cuprum_tag,
 } %}
 
 {% block problem %}

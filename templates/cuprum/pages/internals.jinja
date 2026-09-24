@@ -6,7 +6,7 @@
 {% block description %}How Cuprum keeps process boundaries legible: catalogue and builders construct, policy authorizes, the runtime executes, and observers report. The lifecycle, pipelines, and invariants.{% endblock %}
 {% block main_class %} class="cu-internals"{% endblock %}
 {% block content %}
-{% set src = repository_url ~ '/blob/main/' %}
+{% set src = repository_url ~ '/blob/' ~ cuprum_tag ~ '/' %}
 {% set sections = [
   {'id': 'division', 'label': 'Division of labour', 'title': 'Four jobs, four owners',
    'lede': 'Catalogue and builders construct. Policy authorizes. The runtime executes. Observers report. No component does another’s job.'},
@@ -38,7 +38,7 @@
     {'when': 'Observers, throughout', 'then': 'Before and after hooks, sh.observe event hooks, telemetry adapters, and presentation sinks receive events from the runtime. They report; they do not route.'},
   ],
   'takeaway': 'Construction and authorization are separate: the catalogue decides what can be built, and the scope in force decides what may run here.',
-  'source': 'Source: docs/cuprum-design.md §§4–6 at main@' ~ cuprum_ref,
+  'source': 'Source: docs/cuprum-design.md §§4–6 at ' ~ cuprum_tag,
 } %}
 {% set lifecycle = {
   'id': 'fig-lifecycle', 'num': 'Fig. 02', 'horizontal': false,
@@ -57,7 +57,7 @@
     {'when': 'An observe hook raises', 'then': 'The run fails with the hook’s own exception type. A hook that must never affect a run catches its own errors.'},
   ],
   'takeaway': 'A command that was never authorized is never spawned, and a spawned command is always reaped, however the run ends.',
-  'source': 'Source: cuprum/sh.py, cuprum/_command_internals.py, and docs/users-guide.md#execution-runtime at main@' ~ cuprum_ref,
+  'source': 'Source: cuprum/sh.py, cuprum/_command_internals.py, and docs/users-guide.md at ' ~ cuprum_tag,
 } %}
 {% set pipeline = {
   'id': 'fig-pipeline', 'num': 'Fig. 03', 'horizontal': true,
@@ -74,11 +74,11 @@
     {'when': 'Deadline reached', 'then': 'One deadline covers the whole pipeline; each stage still gets its own timeout event and log record.'},
   ],
   'takeaway': 'Only the final stage’s stdout reaches the caller; every stage’s stderr does. Blame goes to the first stage to fail, not the last.',
-  'source': 'Source: cuprum/_pipeline_internals.py, cuprum/_pipeline_wait.py, and docs/users-guide.md#pipeline-execution at main@' ~ cuprum_ref,
+  'source': 'Source: cuprum/_pipeline_internals.py, cuprum/_pipeline_wait.py, and docs/users-guide.md at ' ~ cuprum_tag,
 } %}
       {% call ui.page_head('Engineering plans · Internals', 'Internals',
         'Catalogue and builders construct; policy authorizes; the runtime executes; observers report. This is how Cuprum keeps each of those boundaries legible.',
-        meta='Describes main@' ~ cuprum_ref ~ ' (' ~ cuprum_ref_date ~ '). Internal module names can change without notice; the public API is in the users’ guide.',
+        meta='Describes Cuprum ' ~ cuprum_version ~ '. Internal module names can change without notice; the public API is in the documentation.',
         art_image=drafting_art) %}
         {{ ui.button('Inspect the lifecycle', '#lifecycle', icon='arrow-down') }}
         {{ ui.button('Show me the failure path', '/cuprum/examples/pipeline-tee/#failure', variant='outline') }}

@@ -6,7 +6,7 @@
 {% block main_class %} class="cu-home"{% endblock %}
 {% block content %}
 {#- The four dispatch cards: what Cuprum does, one fitting each. Every
-    snippet line is real API on main. -#}
+    snippet line is real API in the documented release. -#}
 {% set dispatch_cards = [
   {'icon': 'shield', 'tone': 'orange', 'title': 'Approved programs only',
    'body': 'Commands are built from a curated catalogue of Program values. A program outside the catalogue raises UnknownProgramError before anything runs.',
@@ -39,11 +39,11 @@
   {'title': 'Rust extension', 'href': '/cuprum/internals/rust-extension/', 'number': 'Annex R',
    'body': 'An optional native pathway for inter-stage pipeline pumping. Python remains the reference behaviour.', 'status': 'preview'},
   {'title': 'Roadmap', 'href': '/cuprum/roadmap/', 'number': 'Board 1',
-   'body': 'What is shipped on main, what is in progress, and what is only proposed, each with its evidence.', 'status': none},
+   'body': 'What is shipped, what is in progress, and what is only proposed, each with its evidence.', 'status': none},
   {'title': 'Setwork', 'href': '/cuprum/setwork/', 'number': 'Annex S',
    'body': 'A proposed companion that generates typed adapters returning Cuprum commands. Design only; nothing to install.', 'status': 'proposed'},
 ] %}
-{% set install = 'pip install "cuprum @ git+' ~ repository_url ~ '@' ~ cuprum_commit ~ '"' %}
+{% set install = 'pip install cuprum==' ~ cuprum_pypi %}
 
       <section class="cu-hero cu-surface-ink" aria-labelledby="hero-title">
         <div class="cu-hero__art">
@@ -73,7 +73,7 @@
             </div>
             <p class="cu-hero__status">
               Python {{ python_floor }}+ · no runtime dependencies · ISC licence ·
-              documented against main@{{ cuprum_ref }}, ahead of the {{ cuprum_released }} release on PyPI
+              Cuprum {{ cuprum_version }}, a beta release on PyPI
             </p>
           </div>
         </div>
@@ -120,15 +120,16 @@
               Use <code>run_sync()</code> when the job is small and the kettle
               is already on.
             </p>
-            {{ ui.install_slip(install, 'Install from main') }}
+            {{ ui.install_slip(install, 'Install the beta') }}
             <p class="cu-manual__note">
-              The API documented here is on main and not yet on PyPI, where the
-              last release is {{ cuprum_released }}. The command pins the exact
-              commit these pages were checked against.
+              Cuprum {{ cuprum_version }} is a beta: the API documented here is
+              settling towards 0.2.0 and may still change. pip installs a
+              pre-release only when it is named, so the command pins the exact
+              version these pages were checked against.
             </p>
             <a class="cu-arrow-link" href="/cuprum/getting-started/">Run your first command {{ icons.icon('arrow-right') }}</a>
           </div>
-          {% call ui.code_panel('dispatch.py', 'Job #0042', foot=['Verified ' ~ cuprum_verified_on ~ ' · main@' ~ cuprum_ref ~ ' · Python ' ~ python_floor]) %}
+          {% call ui.code_panel('dispatch.py', 'Job #0042', foot=['Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · Python ' ~ python_floor]) %}
           {% highlight 'python', 'cuprum-syntax' %}
 import asyncio
 

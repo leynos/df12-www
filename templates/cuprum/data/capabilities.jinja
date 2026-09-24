@@ -1,6 +1,6 @@
 {#
   The Rust-extension capability matrix, checked against main at the commit
-  named in config/pages.yaml (`cuprum_ref`). Each state is a word first:
+  named in config/pages.yaml (`cuprum_version`). Each state is a word first:
   `available`, `integrated`, `inert` (implemented, not integrated),
   `proposed`, `investigating`, and `unreleased`. Revisit every row when the
   pinned commit moves; the sources are docs/users-guide.md ("Performance
@@ -35,6 +35,6 @@
    'python': 'available', 'rust': 'investigating',
    'notes': 'A synchronous native subprocess path and native pipeline orchestration are open decisions (roadmap step 8.3). Process management is Python today.'},
   {'name': 'Native wheels',
-   'python': 'available', 'rust': 'unreleased',
-   'notes': 'CI builds them for Linux (x86_64, aarch64), macOS (x86_64, arm64), and Windows (x86_64, arm64). PyPI has only the pure-Python ' ~ cuprum_released ~ ' wheel.'},
+   'python': 'available', 'rust': 'available',
+   'notes': 'Published with ' ~ cuprum_pypi ~ ' for CPython 3.13 on Linux (x86_64, aarch64), macOS (x86_64, arm64), and Windows (x86_64). Every other interpreter installs the pure-Python wheel.'},
 ] %}

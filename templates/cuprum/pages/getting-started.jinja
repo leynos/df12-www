@@ -6,7 +6,7 @@
 {% block main_class %} class="cu-getting-started"{% endblock %}
 {% block content %}
 {% set sections = [
-  {'id': 'install', 'label': 'Install', 'title': 'Install from main',
+  {'id': 'install', 'label': 'Install', 'title': 'Install the beta',
    'lede': 'Cuprum needs Python ' ~ python_floor ~ ' or later and nothing else at run time. The pure-Python wheel needs no Rust toolchain.'},
   {'id': 'first-command', 'label': 'First command', 'title': 'Run one approved command',
    'lede': 'A builder comes from the catalogue, a call makes an exact argv, and running it returns a CommandResult.'},
@@ -16,9 +16,9 @@
    'lede': 'A scope says which catalogued programs may run inside a block of code. Anything else is refused before it starts.'},
   {'id': 'next', 'label': 'Next', 'title': 'Where to go next'},
 ] %}
-{% set install_pip = 'pip install "cuprum @ git+' ~ repository_url ~ '@' ~ cuprum_commit ~ '"' %}
-{% set install_uv = 'uv add "cuprum @ git+' ~ repository_url ~ '@' ~ cuprum_commit ~ '"' %}
-{% set verified = 'Verified ' ~ cuprum_verified_on ~ ' · main@' ~ cuprum_ref ~ ' · Python ' ~ python_floor ~ ' · Linux' %}
+{% set install_pip = 'pip install cuprum==' ~ cuprum_pypi %}
+{% set install_uv = 'uv add cuprum==' ~ cuprum_pypi %}
+{% set verified = 'Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · Python ' ~ python_floor ~ ' · Linux' %}
 {% set lifecycle = {
   'id': 'fig-first-job', 'num': 'Fig. 01', 'horizontal': true,
   'title': 'What happens between a builder call and a result?',
@@ -34,7 +34,7 @@
     {'when': 'Program outside the current scope', 'then': 'run_sync() raises ForbiddenProgramError before anything is spawned.'},
   ],
   'takeaway': 'Construction and authorization are separate checks: the catalogue decides what can be built; the scope decides what may run here.',
-  'source': 'Source: cuprum/sh.py and cuprum/context/ at main@' ~ cuprum_ref,
+  'source': 'Source: cuprum/sh.py and cuprum/context/ at ' ~ cuprum_tag,
 } %}
 {% set stamp_art = {
   'name': 'job-stamp', 'widths': [640], 'width': 640, 'height': 640,
@@ -54,25 +54,27 @@
       <div class="cu-gs-install">
         <div class="cu-prose">
           <p>
-            Everything on these pages describes Cuprum's main branch. The last
-            release on PyPI is {{ cuprum_released }}, from {{ cuprum_released_on }},
-            and it predates most of what is shown here, including
-            <code>RunOutputOptions</code>, <code>ScopeConfig</code>, and
-            <code>ProgramCatalogue.from_programs()</code>. Install from the
-            pinned commit instead:
+            Everything on these pages describes Cuprum {{ cuprum_version }},
+            a beta release on PyPI. Most of what is shown here is new since
+            {{ cuprum_previous }}, including <code>RunOutputOptions</code>,
+            <code>ScopeConfig</code>, and
+            <code>ProgramCatalogue.from_programs()</code>. Install it by its
+            exact version:
           </p>
           <div class="cu-gs-slips">
             {{ ui.install_slip(install_pip, 'pip') }}
             {{ ui.install_slip(install_uv, 'uv') }}
           </div>
         </div>
-        {% call ui.callout('caveat', 'Unreleased development line') %}
+        {% call ui.callout('caveat', 'A beta release') %}
         <p>
-          Main's package metadata still reports version {{ cuprum_released }}, so
-          <code>importlib.metadata.version("cuprum")</code> will say
-          {{ cuprum_released }} after this install. Pin the commit, not the
-          version, until the next release ships. The API may still shift before
-          then.
+          pip and uv skip pre-releases unless one is named, so a bare
+          <code>pip install cuprum</code> still installs {{ cuprum_previous }}.
+          Pin <code>cuprum=={{ cuprum_pypi }}</code> until 0.2.0 ships; the API
+          may still shift before then. On CPython 3.13 for Linux, macOS, and
+          Windows x86_64, the install may pick a native wheel with the optional
+          <a href="/cuprum/internals/rust-extension/">Rust pump</a>; behaviour
+          is the same either way.
         </p>
         {% endcall %}
       </div>

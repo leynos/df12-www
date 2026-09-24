@@ -203,12 +203,13 @@ everything inside a dark panel. Its classes all carry a `cu-` prefix, and it
 uses its own `.cu-btn` and `.cu-tag` rather than daisyUI's `btn` and `badge`:
 daisyUI v5 emits components into the utilities layer, where they outrank the
 sub-site's components layer whatever the specificity. Its code is real — every
-snippet was run against the commit named by `cuprum_commit` in the site's
-`template_vars`, and the install commands pin that commit. The fictional
-Philadelphia Command Plumbing seal is decorative and never appears on a legal
-page. Its API reference, under `/cuprum/docs/api/`, is generated rather than
-written: `make cuprum-api-data` reads every name Cuprum exports from a Cuprum
-checkout (`CUPRUM_SOURCE`, default `../cuprum`) into
+snippet was run against the release named by `cuprum_version` in the site's
+`template_vars`, and the install commands pin it exactly (`cuprum==` plus
+`cuprum_pypi`), since pip and uv skip a pre-release that is not named. The
+fictional Philadelphia Command Plumbing seal is decorative and never appears on
+a legal page. Its API reference, under `/cuprum/docs/api/`, is generated rather
+than written: `make cuprum-api-data` reads every name Cuprum exports from a
+Cuprum checkout (`CUPRUM_SOURCE`, default `../cuprum`) into
 `templates/cuprum/data/api.jinja`, and `make check-cuprum-api-data` fails when
 that file has drifted. Never edit the generated file; when Cuprum exports a new
 name, place it in a group in `scripts/build_cuprum_api_data.py` or the build

@@ -88,7 +88,7 @@
       <p>
         The adapter below is handwritten to show the shape the compiler would
         generate. It is ordinary Python built on Cuprum, so the argv it prints
-        is real — it was run against main@{{ cuprum_ref }} on
+        is real — it was run against Cuprum {{ cuprum_pypi }} on
         {{ cuprum_verified_on }} — but there is no <code>setwork</code>
         package, and the API may change entirely.
       </p>
@@ -127,7 +127,7 @@ def echo(
         {% endhighlight %}
         {% endcall %}
         <div class="cu-stack">
-          {% call ui.code_panel('use_adapters.py', 'Illustrative', foot=['Run ' ~ cuprum_verified_on ~ ' against main@' ~ cuprum_ref], flat=true) %}
+          {% call ui.code_panel('use_adapters.py', 'Illustrative', foot=['Run ' ~ cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi], flat=true) %}
           {% highlight 'python', 'cuprum-syntax' %}
 import functools
 
@@ -271,7 +271,7 @@ ValueError: ambiguous first echo operand '-n'; the selected profile has no verif
         </div>
         <div class="flex flex-wrap gap-4">
           {{ ui.button('Cuprum issues', repository_url ~ '/issues', icon='external') }}
-          {{ ui.button('Cuprum builders today', repository_url ~ '/blob/main/docs/users-guide.md#core-builders-for-common-tools', variant='outline', icon='external') }}
+          {{ ui.button('Cuprum builders today', '/cuprum/docs/guides/catalogues-and-builders/#builders', variant='outline', icon='external') }}
         </div>
       </div>
       {% endcall %}

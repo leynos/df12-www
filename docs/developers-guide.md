@@ -1057,6 +1057,12 @@ placed but no longer exported stops the build, so the reference cannot fall
 silently behind the package. Each reference page is a two-line template that
 sets `api_slug` and extends `pages/_docs_api_group.jinja`.
 
+The generator also refuses a checkout whose `pyproject.toml` version is not the
+release `cuprum_pypi` in `config/pages.yaml` documents, normalizing both under
+PEP 440 first, so `0.2.0-beta1` in the checkout matches `0.2.0b1` in the
+config. A mismatch raises `ReleaseMismatchError` before anything is written;
+`--pages-config` points the check at a different configuration file.
+
 The guides under `/cuprum/docs/guides/` are written for the site, each a
 template that sets `guide_slug` and extends `pages/_docs_guide.jinja`, with its
 title and summary in `docs_guides` in `data/docs.jinja`. Their code is not
@@ -1073,7 +1079,20 @@ a `<details>` drop-down with a solid chevron. `routemap.ts` adds the
 scroll-spy: it marks the section being read with `aria-current="location"` in
 both lists, names it in the drop-down's summary, and closes the drop-down after
 a choice, on Escape, or on a click outside. Without the script both forms still
-work as plain fragment links.
+work as plain fragment links. `pickActiveIndex(tops, offset, atBottom)` and
+`collectTargets(doc, nav)` are its pure decision and query;
+`createRouteMapController(nav, deps)` takes a `RouteMapDeps` of `document`, a
+`viewport`, and an animation-frame `requestFrame`, with `init()` supplying the
+real ones.
+
+Code panels and install slips carry a Copy button, added by `copy-code.ts`
+rather than baked into the macros: `data-cu-copy` marks a panel,
+`[data-cu-copy-slot]` its titlebar slot, and `data-cu-copy="console"` strips
+the leading `$` prompts, and the space after each, before copying, so what
+lands on the clipboard can be pasted and run. `stripPrompts`, `copyLabel`, and
+`panelText` are its pure queries; `createCopyController(deps)` takes a
+`CopyDeps` of `document`, a `Clock` (`setTimeout`/`clearTimeout`), and a
+clipboard getter, with `init()` supplying the real ones.
 
 The fictional municipal marks live in `templates/cuprum/_marks.jinja`, in the
 three registers the design language names:
@@ -1111,6 +1130,83 @@ output, bump `cuprum_version`, `cuprum_pypi`, `cuprum_tag`, and
 `cuprum_verified_on` together, and regenerate the API reference from a checkout
 of the new tag; a test fails if an install command is unpinned.
 
+### 5.6. The main homepage's Libraries group
+
+The main site's homepage carries an optional Libraries group beneath its
+systems grid: a short list of libraries, styled more plainly than the product
+cards above them. It lives under `homepage.systems.libraries` in
+`config/pages.yaml`:
+
+```yaml
+homepage:
+  systems:
+    libraries:
+      heading: Libraries
+      kicker: Smaller parts, built to be built with.
+      links:
+        - label: Cuprum
+          description: Typed, async command execution for Python. Approved programs, exact argv, structured results.
+          href: "cuprum/"
+          meta_label: Learn more
+          external: false
+        - label: rstest-bdd
+          description: Behaviour-driven testing macros layered on rstest. Narrative clarity without the ceremony.
+          href: "https://github.com/leynos/rstest-bdd"
+          meta_label: View on GitHub
+          external: true
+```
+
+`_build_libraries_config` in `df12_pages/config/homepage.py` builds
+`LibrariesConfig` and `LibraryLinkConfig` (both in
+`df12_pages/config/models.py`) from that mapping, and
+`SystemsSectionConfig.libraries` holds the result — `None` when the mapping is
+absent, since the group is optional. Every link's `label`, `description`,
+`href`, and `meta_label` must be a non-empty string, and `external` must be a
+bool; the group itself needs a `heading`, a `kicker`, and at least one link.
+Any of these missing raises `SiteConfigError`. `external` defaults to `true`
+when a link omits it.
+
+The homepage template renders the group inside `#systems` as
+`section.libraries`, labelled by its heading, with each link drawn as
+`a.library-card`. A link with `external: true` opens in a new tab with
+`rel="noopener noreferrer"`; one with `external: false` renders as a plain
+same-site link. An absent group renders nothing.
+`tests/test_homepage_libraries.py` pins the builder's validation and the
+rendered markup.
+
+### 5.7. Cuprum's Python test suites
+
+Three suites hold the sub-site to its promises from the Python side.
+
+`tests/test_cuprum_snapshots.py` takes syrupy semantic snapshots of one
+representative of each component that carries the design language — the
+masthead, a route map, a code panel, an output block, the home page's receipt,
+a flow figure, the capability matrix, a docs plate, the docs navigation, one
+API entry, and a job sheet's facts table. The serialization keeps structure
+only: text content and the inside of `pre` and `svg` are dropped, and the
+attributes that remain pass through a redaction pass that masks commit SHAs,
+version numbers, ISO dates, asset paths, image sizes, and similar volatile
+material. Regenerate the snapshots after an intended markup change with
+`uv run pytest tests/test_cuprum_snapshots.py --snapshot-update`, then review
+the `.ambr` diff — an unexpected cascade of changes means a redaction is
+missing, not that the snapshot should be accepted wholesale.
+
+`tests/test_cuprum_browser.py`, marked `playwright`, checks the responsive
+contract at the breakpoints section 5.5 describes by reading computed styles
+and boxes back from `agent-browser` against the built `public/` tree: the route
+map trades its strip for a drop-down below 80rem, the documentation rail folds
+into a drop-down below 64rem, the capability matrix turns its rows into cards
+below 48rem, the content panels run full bleed below 480px, and the page does
+not scroll horizontally at 320px.
+
+`tests/test_cuprum_build.py`'s
+`test_every_configured_route_is_published_with_its_markers` is the route-set
+contract: every route `config/pages.yaml` declares for the Cuprum sub-site is
+read from the config, not the built tree, so a page the build silently drops
+fails by name, and each is checked for the markers its kind needs — a guide
+carries a code panel and a plate, an API group carries an entry article, and an
+example carries a facts list and a code panel.
+
 ## 6. Browser-side components
 
 Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files
@@ -1147,12 +1243,13 @@ the build.
 Types are the only thing a migrated module gains. Each `querySelector` result
 is typed as the element its handler reads and narrowed with an early return;
 the injected `deps` objects (`copy-buttons.ts`, `config-keys.ts`,
-`site-search.ts`) are named interfaces so the browser wiring and the test fakes
-are held to the same shape; the `data-*` vocabularies are typed where a module
-reads more than one. Where the checker cannot narrow — a `var` or a hoisted
-`function` declaration reading a root that an early return has already guarded
-— the lookup is cast at the point of the guard, with a comment saying so,
-rather than the module being restructured around the checker.
+`site-search.ts`, Cuprum's `copy-code.ts` and `routemap.ts`) are named
+interfaces so the browser wiring and the test fakes are held to the same shape;
+the `data-*` vocabularies are typed where a module reads more than one. Where
+the checker cannot narrow — a `var` or a hoisted `function` declaration reading
+a root that an early return has already guarded — the lookup is cast at the
+point of the guard, with a comment saying so, rather than the module being
+restructured around the checker.
 
 Where a module has no pure decision to extract, it is tested against a real DOM
 instead. `tests/js/helpers/mobile-nav-harness.mjs` builds a happy-dom window,
@@ -1285,6 +1382,18 @@ fails is treated as no index and the search box reports the index as
 unavailable; and `siteRootFromIndexPath` for the sub-site root recovered from
 the index path. As with the Episodic module, a dropped record is reported once
 per search root through `console.warn`.
+
+`tests/js/cuprum-copy-code.test.mjs` and `tests/js/cuprum-routemap.test.mjs`
+drive `createCopyController` and `createRouteMapController` through the same
+kind of fakes: a manually advanced clock, a clipboard whose write resolves,
+rejects, or is missing, and, for the route map, a viewport whose scroll and
+resize listeners a test fires by hand and an animation-frame queue it runs on
+demand, so a burst of events is shown to coalesce into one frame rather than
+inferred. Both suites also carry fast-check properties: `stripPrompts` against
+a line-wise reference that strips one leading `$` and its following space per
+line, and `pickActiveIndex` against an oracle that states the same rule the
+implementation does — the last section at the foot of the page, else the last
+one whose top has passed the offset.
 
 ### 6.1. Episodic search telemetry
 

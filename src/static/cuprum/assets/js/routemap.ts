@@ -16,7 +16,11 @@
  * sticky route map, with a little room to spare; at the foot of the page the
  * last section is current, so a short closing section can still be marked.
  *
- * `pickActiveIndex` is pure and exported for the Bun tests.
+ * `pickActiveIndex` is a pure decision and `collectTargets` a query over the
+ * route map's links. The controller takes its dependencies (document,
+ * viewport, animation-frame scheduler) as arguments so tests can drive it
+ * with fakes; `init` at the bottom supplies the real ones. All of them are
+ * exported for the Bun tests.
  */
 (() => {
   "use strict";
@@ -46,9 +50,28 @@
     links: HTMLAnchorElement[];
   }
 
-  /* Pair each distinct fragment in the route map with its section, in the
-     order the strip lists them. Links to a missing section are ignored. */
-  function collectTargets(nav: HTMLElement): Target[] {
+  /* The page geometry the scroll-spy reads, and the events that move it. The
+     browser wiring reads `window` and the root element; the tests a fake. */
+  interface Viewport {
+    scrollY(): number;
+    innerHeight(): number;
+    scrollHeight(): number;
+    listen(type: "scroll" | "resize", listener: () => void): void;
+  }
+
+  /* What `createRouteMapController` needs from its host. `requestFrame` runs
+     a callback before the next paint, as `window.requestAnimationFrame`
+     does. */
+  interface RouteMapDeps {
+    document: Document;
+    viewport: Viewport;
+    requestFrame(callback: () => void): void;
+  }
+
+  /* Pair each distinct fragment in the route map with its section in `doc`,
+     in the order the strip lists them. Links to a missing section are
+     ignored; later links to a section already found join its links. */
+  function collectTargets(doc: Document, nav: HTMLElement): Target[] {
     var byId = new Map<string, Target>();
     var links = nav.querySelectorAll<HTMLAnchorElement>("a[data-cu-routemap-link]");
     for (const link of links) {
@@ -58,7 +81,7 @@
         existing.links.push(link);
         continue;
       }
-      const el = id ? document.getElementById(id) : null;
+      const el = id ? doc.getElementById(id) : null;
       if (el) {
         byId.set(id, { id: id, el: el, links: [link] });
       }
@@ -66,12 +89,13 @@
     return Array.from(byId.values());
   }
 
-  /* Wire one route map, returning early when it names no section on the
-     page. */
-  function initRouteMap(nav: HTMLElement): void {
-    var targets = collectTargets(nav);
+  /* The component proper. Wires one route map and returns its targets and
+     its update and schedule steps, or null, wiring nothing, when it names
+     no section in `deps.document`. */
+  function createRouteMapController(nav: HTMLElement, deps: RouteMapDeps) {
+    var targets = collectTargets(deps.document, nav);
     if (!targets.length) {
-      return;
+      return null;
     }
     var menu = nav.querySelector<HTMLDetailsElement>("details");
     var summary = menu ? menu.querySelector<HTMLElement>("summary") : null;
@@ -109,8 +133,8 @@
        animation frame rather than directly from an event. */
     function update(): void {
       var offset = nav.getBoundingClientRect().bottom + SLACK;
-      var atBottom =
-        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      var viewport = deps.viewport;
+      var atBottom = viewport.innerHeight() + viewport.scrollY() >= viewport.scrollHeight() - 2;
       var tops = targets.map((target) => target.el.getBoundingClientRect().top);
       var index = pickActiveIndex(tops, offset, atBottom);
       setActive(index >= 0 ? targets[index] : null);
@@ -121,19 +145,27 @@
     function schedule(): void {
       if (!ticking) {
         ticking = true;
-        window.requestAnimationFrame(() => {
+        deps.requestFrame(() => {
           ticking = false;
           update();
         });
       }
     }
 
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
+    deps.viewport.listen("scroll", schedule);
+    deps.viewport.listen("resize", schedule);
     update();
 
+    var controller = {
+      targets: targets,
+      update: update,
+      schedule: schedule,
+      /* The section currently marked, or null. */
+      active: (): Target | null => active,
+    };
+
     if (!menu) {
-      return;
+      return controller;
     }
     var details = menu;
     details.addEventListener("click", (event) => {
@@ -149,17 +181,33 @@
         }
       }
     });
-    document.addEventListener("click", (event) => {
+    deps.document.addEventListener("click", (event) => {
       if (details.open && event.target instanceof Node && !details.contains(event.target)) {
         details.open = false;
       }
     });
+    return controller;
   }
 
-  /* Wire every route map on the page; most pages have one, some none. */
+  /* Wire every route map on the page; most pages have one, some none.
+     Supplies the real document, viewport, and animation frames. */
   function init(): void {
+    var deps: RouteMapDeps = {
+      document: document,
+      viewport: {
+        scrollY: () => window.scrollY,
+        innerHeight: () => window.innerHeight,
+        scrollHeight: () => document.documentElement.scrollHeight,
+        listen: (type, listener) => {
+          window.addEventListener(type, listener, { passive: true });
+        },
+      },
+      requestFrame: (callback) => {
+        window.requestAnimationFrame(() => callback());
+      },
+    };
     for (const nav of document.querySelectorAll<HTMLElement>("[data-cu-routemap]")) {
-      initRouteMap(nav);
+      createRouteMapController(nav, deps);
     }
   }
 
@@ -172,6 +220,11 @@
   }
 
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = { pickActiveIndex: pickActiveIndex };
+    module.exports = {
+      pickActiveIndex: pickActiveIndex,
+      collectTargets: collectTargets,
+      createRouteMapController: createRouteMapController,
+      SLACK: SLACK,
+    };
   }
 })();

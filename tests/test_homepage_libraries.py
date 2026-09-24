@@ -59,7 +59,9 @@ class TestBuildLibrariesConfig:
 
     def test_absent_group_is_none(self) -> None:
         """A systems section without libraries renders no group."""
-        assert _build_libraries_config(None) is None
+        assert _build_libraries_config(None) is None, (
+            "an absent libraries payload should yield no libraries config"
+        )
 
     def test_valid_group_is_parsed(self) -> None:
         """Links keep their order, and `external` defaults to true."""
@@ -89,6 +91,23 @@ class TestBuildLibrariesConfig:
         """A malformed link fails loudly rather than being dropped."""
         link = {k: v for k, v in VALID_LINKS[0].items() if k != missing}
         with pytest.raises(SiteConfigError, match="Library links require"):
+            _build_libraries_config({**VALID_LIBRARIES, "links": [link]})
+
+    @pytest.mark.parametrize("field", ["label", "description", "href", "meta_label"])
+    @pytest.mark.parametrize("value", ["", "   ", 42, None, ["Cuprum"]])
+    def test_link_text_must_be_a_non_empty_string(
+        self, field: str, value: object
+    ) -> None:
+        """Blank or non-string text fails rather than being coerced with str()."""
+        link = {**VALID_LINKS[0], field: value}
+        with pytest.raises(SiteConfigError, match=f"non-empty string for '{field}'"):
+            _build_libraries_config({**VALID_LIBRARIES, "links": [link]})
+
+    @pytest.mark.parametrize("value", ["no", "false", 0, 1, None])
+    def test_external_must_be_boolean(self, value: object) -> None:
+        """`external: "no"` would be truthy under bool(); it is rejected instead."""
+        link = {**VALID_LINKS[0], "external": value}
+        with pytest.raises(SiteConfigError, match="'external' must be true or false"):
             _build_libraries_config({**VALID_LIBRARIES, "links": [link]})
 
 

@@ -321,3 +321,73 @@ def test_every_guide_is_published_and_listed(built_site: Path) -> None:
         assert page.is_file(), f"{href} has no page"
         panels = _soup(page).select(".cu-code")
         assert panels, f"{href} carries no tested example"
+
+
+#: Markers every configured route must carry, and the extra markers pages
+#: under a route prefix must carry. A prefix matches the pages below it, not
+#: the index page at the prefix itself.
+_ROUTE_MARKERS = (
+    "main",
+    "h1",
+    'link[rel="stylesheet"][href="/cuprum/assets/styles/cuprum.css"]',
+)
+_PREFIX_MARKERS = {
+    "docs/guides/": (".cu-code", "figure.cu-plate"),
+    "docs/api/": ("article.cu-api__entry",),
+    "examples/": ("dl.cu-facts", ".cu-code"),
+}
+
+
+def _configured_routes() -> dict[str, Path]:
+    """Map every route the Cuprum config declares to its published page."""
+    config = load_site_config(REPO_ROOT / "config" / "pages.yaml")
+    site = config.sites["cuprum"]
+    output = REPO_ROOT / site.output_dir
+    routes: dict[str, Path] = {}
+    if site.homepage is not None:
+        routes[site.base_path] = REPO_ROOT / site.homepage.output
+    slugs = [page.output_slug for page in site.content_pages]
+    slugs += [
+        config.shared_content[ref].output_slug for ref in site.shared_content_refs
+    ]
+    for slug in slugs:
+        routes[f"{site.base_path}{slug}/"] = output / slug / "index.html"
+    return routes
+
+
+def _required_markers(route: str) -> list[str]:
+    """Return the selectors the page at ``route`` must match."""
+    markers = list(_ROUTE_MARKERS)
+    slug = route.removeprefix("/cuprum/")
+    for prefix, extra in _PREFIX_MARKERS.items():
+        if slug.startswith(prefix) and slug != prefix:
+            markers.extend(extra)
+    return markers
+
+
+@pytest.mark.timeout(300)
+def test_every_configured_route_is_published_with_its_markers(
+    built_site: Path,
+) -> None:
+    """Each route in the config has a page carrying the markers its kind needs.
+
+    The routes come from ``config/pages.yaml`` rather than from the built
+    tree, so a page the build silently drops fails here by name, and a new
+    guide, API group, or job sheet is held to its kind's markers as soon as
+    it is configured.
+    """
+    assert built_site.is_dir()
+    routes = _configured_routes()
+    assert "/cuprum/" in routes, "the Cuprum home page is not configured"
+    assert len(routes) >= MIN_PUBLISHED_PAGES, sorted(routes)
+    for kind in _PREFIX_MARKERS:
+        assert any(
+            route.startswith(f"/cuprum/{kind}") and route != f"/cuprum/{kind}"
+            for route in routes
+        ), f"no configured route under /cuprum/{kind}"
+    for route, page in routes.items():
+        assert page.is_file(), f"{route} is configured but {page} was not built"
+        soup = _soup(page)
+        for marker in _required_markers(route):
+            assert soup.select_one(marker) is not None, f"{route} lacks {marker!r}"
+        assert len(soup.select("h1")) == 1, f"{route}: expected one h1"

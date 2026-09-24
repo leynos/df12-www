@@ -162,8 +162,10 @@ output and are overwritten on the next build. The one stylesheet still under
 generated Pygments output; it compiles into the Stilyagi entry point rather
 than being linked on its own. Cuprum's `src/static/cuprum/assets/styles/` holds
 the same kind of `syntax.css`, and `src/static/cuprum/assets/images/` holds,
-beside its illustrations, the two engraved alpha masks (`*-mask.webp`) the seal
-and skyline are painted through.
+beside its illustrations, the engraved alpha masks (`*-mask.webp`) its marks
+are painted through: `seal-emblem-mask.webp`, `skyline-engraving-mask.webp`, and
+`town-hall-engraving-mask.webp`. The documentation's engraved plates use the
+same convention; their masks live under `src/static/cuprum/assets/images/docs/`.
 
 ### `templates/`
 

@@ -76,11 +76,13 @@
 
 {#- A link from prose to a reference entry. `name` is an exported name or a
     dotted member such as `SafeCmd.lines`; the page is found from the
-    generated data, so a renamed or removed entry fails the build. -#}
+    generated data, so a renamed or removed entry, or a member the entry does
+    not have, fails the build. A dotted module entry such as
+    `cuprum.sinks` matches by its whole name. -#}
 {% macro ref(name, label=none) -%}
-{% set head = name.split('.')[0] %}
+{% set head, _, member = name.partition('.') %}
 {% set found = namespace(href=none) %}
-{% for group in api_groups %}{% for e in group.entries %}{% if e.name == head or e.name == name %}{% set found.href = '/cuprum/docs/api/' ~ group.slug ~ '/#' ~ name %}{% endif %}{% endfor %}{% endfor %}
+{% for group in api_groups %}{% for e in group.entries %}{% if e.name == name or (e.name == head and member and member in (e.members | default([]) | map(attribute='name') | list)) %}{% set found.href = '/cuprum/docs/api/' ~ group.slug ~ '/#' ~ name %}{% endif %}{% endfor %}{% endfor %}
 {% if found.href is none %}{{ raise_missing_reference(name) }}{% endif %}
 <a href="{{ found.href }}"><code>{{ label or name }}</code></a>
 {%- endmacro %}

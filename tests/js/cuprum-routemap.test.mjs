@@ -7,15 +7,21 @@
  * same sections — places the sections by stubbing their layout, evaluates
  * the compiled script against the global happy-dom document, and checks the
  * mark, the summary, and how the drop-down closes.
+ *
+ * The controller suite drives `createRouteMapController` through injected
+ * fakes — a viewport whose geometry a test sets and whose scroll and resize
+ * events it fires by hand, and an animation-frame queue it runs on demand —
+ * so the coalescing of events into frames is counted rather than inferred.
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
+import fc from "fast-check";
 
 const require = createRequire(import.meta.url);
 const SCRIPT = join("public", "cuprum", "assets", "js", "routemap.js");
-const { pickActiveIndex } = require(`../../${SCRIPT}`);
+const { pickActiveIndex, collectTargets, createRouteMapController } = require(`../../${SCRIPT}`);
 
 /* One list of links, as `_routemap_links` renders it. */
 const LINKS = `
@@ -68,6 +74,79 @@ function marked() {
   );
 }
 
+/* A viewport whose geometry a test sets through `state` and whose scroll
+   and resize listeners it fires by hand. Defaults to the top of a document
+   far taller than the window. */
+function fakeViewport() {
+  const state = { scrollY: 0, innerHeight: 900, scrollHeight: 10000 };
+  const listeners = { scroll: [], resize: [] };
+  return {
+    state,
+    listeners,
+    scrollY: () => state.scrollY,
+    innerHeight: () => state.innerHeight,
+    scrollHeight: () => state.scrollHeight,
+    listen(type, listener) {
+      listeners[type].push(listener);
+    },
+    fire(type) {
+      for (const listener of listeners[type]) {
+        listener();
+      }
+    },
+  };
+}
+
+/* An animation-frame queue that runs only when a test says so, counting
+   every frame requested of it. */
+function fakeFrames() {
+  const queue = [];
+  const frames = {
+    requested: 0,
+    requestFrame(callback) {
+      frames.requested += 1;
+      queue.push(callback);
+    },
+    run() {
+      for (const callback of queue.splice(0)) {
+        callback();
+      }
+    },
+  };
+  return frames;
+}
+
+/* Mount the fixture as `mount` does, but build the controller over a fake
+   viewport and frame queue instead of evaluating the script. */
+function mountController(tops, markup = FIXTURE) {
+  document.body.innerHTML = markup;
+  const nav = document.querySelector("[data-cu-routemap]");
+  place(nav, 60, 100);
+  ["problem", "code", "output"].forEach((id, i) => {
+    const section = document.getElementById(id);
+    if (section) {
+      place(section, tops[i]);
+    }
+  });
+  const viewport = fakeViewport();
+  const frames = fakeFrames();
+  const controller = createRouteMapController(nav, {
+    document,
+    viewport,
+    requestFrame: frames.requestFrame,
+  });
+  return { controller, frames, nav, viewport };
+}
+
+/* The index `pickActiveIndex` should return, written as the rule states it:
+   the last section at the foot of the page, else the last one reached. */
+function activeIndexOracle(tops, offset, atBottom) {
+  if (atBottom && tops.length > 0) {
+    return tops.length - 1;
+  }
+  return tops.findLastIndex((top) => top <= offset);
+}
+
 describe("pickActiveIndex", () => {
   test("picks the last section whose top has passed the offset", () => {
     expect(pickActiveIndex([-500, 80, 900], 124, false)).toBe(1);
@@ -83,6 +162,116 @@ describe("pickActiveIndex", () => {
 
   test("reports nothing for a page without sections", () => {
     expect(pickActiveIndex([], 124, true)).toBe(-1);
+  });
+
+  test("agrees with the stated rule for any sorted layout", () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: -5000, max: 5000 }), { maxLength: 12 }),
+        fc.integer({ min: -5000, max: 5000 }),
+        fc.boolean(),
+        (unsorted, offset, atBottom) => {
+          const tops = unsorted.toSorted((a, b) => a - b);
+          expect(pickActiveIndex(tops, offset, atBottom)).toBe(
+            activeIndexOracle(tops, offset, atBottom),
+          );
+        },
+      ),
+    );
+  });
+});
+
+describe("collectTargets", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  test("drops missing sections and gathers repeated links under one target", () => {
+    document.body.innerHTML = `
+      <nav data-cu-routemap>
+        <a href="#problem" data-cu-routemap-link>one</a>
+        <a href="#gone" data-cu-routemap-link>missing</a>
+        <a href="#" data-cu-routemap-link>empty</a>
+        <a href="#caf%C3%A9" data-cu-routemap-link>encoded</a>
+        <a href="#problem" data-cu-routemap-link>again</a>
+        <a href="#gone" data-cu-routemap-link>missing again</a>
+      </nav>
+      <section id="problem"></section>
+      <section id="café"></section>`;
+    const targets = collectTargets(document, document.querySelector("nav"));
+    expect(targets.map((target) => target.id)).toEqual(["problem", "café"]);
+    expect(targets[0].links.map((link) => link.textContent)).toEqual(["one", "again"]);
+    expect(targets[0].el).toBe(document.getElementById("problem"));
+  });
+});
+
+describe("the route map controller", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  test("a map that names no section on the page marks and schedules nothing", () => {
+    const markup = FIXTURE.replace(/<section id="\w+"><\/section>/g, "");
+    const { controller, frames, viewport } = mountController([], markup);
+    expect(controller).toBeNull();
+    expect(marked()).toEqual([]);
+    expect(document.querySelector("[data-cu-routemap-current]").textContent).toBe(
+      "Jump to a section",
+    );
+    expect(viewport.listeners.scroll.length + viewport.listeners.resize.length).toBe(0);
+    expect(frames.requested).toBe(0);
+  });
+
+  test("a link to a missing section is never marked", () => {
+    const markup = FIXTURE.replace('<section id="code"></section>', "");
+    const { controller } = mountController([-600, -300, 900], markup);
+    expect(controller.targets.map((target) => target.id)).toEqual(["problem", "output"]);
+    expect(marked()).toEqual(["01Problem", "01Problem"]);
+    expect(document.querySelectorAll("a[href='#code'][aria-current]").length).toBe(0);
+  });
+
+  test("a burst of scroll and resize events reads layout once, in a frame", () => {
+    const { controller, frames, viewport } = mountController([400, 900, 1500]);
+    viewport.fire("scroll");
+    viewport.fire("scroll");
+    viewport.fire("resize");
+    viewport.fire("scroll");
+    viewport.fire("resize");
+    expect(frames.requested).toBe(1);
+
+    // The sections move, but nothing is read until the frame runs.
+    place(document.getElementById("problem"), -600);
+    place(document.getElementById("code"), 110);
+    expect(marked()).toEqual([]);
+    frames.run();
+    expect(marked()).toEqual(["02Code", "02Code"]);
+    expect(controller.active().id).toBe("code");
+
+    // Once the frame has run, the next event asks for a new one.
+    viewport.fire("scroll");
+    expect(frames.requested).toBe(2);
+  });
+
+  test("scrolling back above every section clears the mark and restores the summary", () => {
+    const { frames, viewport } = mountController([-600, 110, 900]);
+    expect(marked()).toEqual(["02Code", "02Code"]);
+    place(document.getElementById("problem"), 400);
+    place(document.getElementById("code"), 900);
+    viewport.fire("scroll");
+    frames.run();
+    expect(marked()).toEqual([]);
+    expect(document.querySelector("[data-cu-routemap-current]").textContent).toBe(
+      "Jump to a section",
+    );
+  });
+
+  test("the foot of the page, read from the viewport, marks the last section", () => {
+    const { frames, viewport } = mountController([-900, -300, 600]);
+    expect(marked()).toEqual(["02Code", "02Code"]);
+    viewport.state.scrollY = viewport.state.scrollHeight - viewport.state.innerHeight;
+    viewport.fire("scroll");
+    frames.run();
+    expect(marked()).toEqual(["03Output", "03Output"]);
   });
 });
 
@@ -137,5 +326,46 @@ describe("the route map in the document", () => {
     menu.open = true;
     document.getElementById("elsewhere").click();
     expect(menu.open).toBe(false);
+  });
+});
+
+describe("several route maps on one page", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  test("each map marks its own sections and names its own in its summary", () => {
+    /* One route map over two sections, its ids prefixed with `prefix`. */
+    const routemap = (prefix) => `
+      <nav data-cu-routemap id="${prefix}-map">
+        <ol><li><a href="#${prefix}-one" data-cu-routemap-link>${prefix} one</a></li>
+        <li><a href="#${prefix}-two" data-cu-routemap-link>${prefix} two</a></li></ol>
+        <details><summary><span data-cu-routemap-current>Jump</span></summary></details>
+      </nav>
+      <section id="${prefix}-one"></section>
+      <section id="${prefix}-two"></section>`;
+    document.body.innerHTML = `${routemap("a")}${routemap("b")}
+      <nav data-cu-routemap id="empty-map"><a href="#nowhere" data-cu-routemap-link>x</a></nav>`;
+    Object.defineProperty(document.documentElement, "scrollHeight", {
+      configurable: true,
+      value: 10000,
+    });
+    for (const nav of document.querySelectorAll("[data-cu-routemap]")) {
+      place(nav, 60, 100);
+    }
+    place(document.getElementById("a-one"), -600);
+    place(document.getElementById("a-two"), 900);
+    place(document.getElementById("b-one"), -600);
+    place(document.getElementById("b-two"), 110);
+    new Function("module", readFileSync(SCRIPT, "utf8"))(undefined);
+
+    /* The labels marked inside one map. */
+    const markedIn = (id) =>
+      Array.from(document.querySelectorAll(`#${id} [aria-current]`)).map((a) => a.textContent);
+    expect(markedIn("a-map")).toEqual(["a one"]);
+    expect(markedIn("b-map")).toEqual(["b two"]);
+    expect(markedIn("empty-map")).toEqual([]);
+    expect(document.querySelector("#a-map [data-cu-routemap-current]").textContent).toBe("a one");
+    expect(document.querySelector("#b-map [data-cu-routemap-current]").textContent).toBe("b two");
   });
 });

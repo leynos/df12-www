@@ -24,6 +24,9 @@ import tomllib
 import typing as typ
 from pathlib import Path
 
+from packaging.version import InvalidVersion, Version
+from ruamel.yaml import YAML
+
 if __package__:
     from .atomic_write import atomic_write
     from .cuprum_api_parser import SECTION_NAMES, ApiEntry, Docstring, Member, load_api
@@ -337,6 +340,10 @@ class GroupingError(Exception):
     """Raised when the exported names and :data:`GROUPS` disagree."""
 
 
+class ReleaseMismatchError(Exception):
+    """Raised when the checkout is not the release the site documents."""
+
+
 def inline_html(text: str, known: frozenset[str]) -> str:
     """Render reStructuredText inline markup in ``text`` as escaped HTML.
 
@@ -503,6 +510,66 @@ def source_identity(root: Path) -> dict[str, str]:
     return {"version": str(project["project"]["version"]), "commit": commit}
 
 
+def documented_release(pages_config: Path) -> str:
+    """Return the Cuprum release the site documents.
+
+    Parameters
+    ----------
+    pages_config : Path
+        The site configuration, ``config/pages.yaml``.
+
+    Returns
+    -------
+    str
+        ``cuprum_pypi`` from the Cuprum sub-site's ``template_vars``.
+
+    Raises
+    ------
+    ReleaseMismatchError
+        When the configuration names no Cuprum release.
+    """
+    config = YAML(typ="safe").load(pages_config.read_text(encoding="utf-8"))
+    try:
+        release = config["sites"]["cuprum"]["template_vars"]["cuprum_pypi"]
+    except (KeyError, TypeError) as error:
+        msg = f"{pages_config} names no sites.cuprum.template_vars.cuprum_pypi"
+        raise ReleaseMismatchError(msg) from error
+    return str(release)
+
+
+def check_release(identity: dict[str, str], release: str) -> None:
+    """Refuse a checkout whose version is not the documented release.
+
+    The checkout's ``pyproject.toml`` spells a pre-release as ``0.2.0-beta1``
+    and PyPI as ``0.2.0b1``, so both are normalized under PEP 440 before
+    they are compared.
+
+    Parameters
+    ----------
+    identity : dict[str, str]
+        The checkout's version and commit, from :func:`source_identity`.
+    release : str
+        The documented release, from :func:`documented_release`.
+
+    Raises
+    ------
+    ReleaseMismatchError
+        When either version is invalid or the two differ.
+    """
+    try:
+        checkout, documented = Version(identity["version"]), Version(release)
+    except InvalidVersion as error:
+        msg = f"cannot compare Cuprum versions: {error}"
+        raise ReleaseMismatchError(msg) from error
+    if checkout != documented:
+        msg = (
+            f"the Cuprum checkout is {identity['version']} at "
+            f"{identity['commit'][:8]}, but the site documents {release}; "
+            "check out the documented release or update cuprum_pypi"
+        )
+        raise ReleaseMismatchError(msg)
+
+
 def render(groups: list[dict[str, typ.Any]], identity: dict[str, str]) -> str:
     """Render the complete Jinja data template.
 
@@ -555,6 +622,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Generated Jinja data template.",
     )
     parser.add_argument(
+        "--pages-config",
+        type=Path,
+        default=Path("config/pages.yaml"),
+        help="Site configuration naming the documented Cuprum release.",
+    )
+    parser.add_argument(
         "--check",
         action="store_true",
         help="Fail when the committed data differs from the source.",
@@ -574,10 +647,17 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         ``0`` on success; ``1`` when ``--check`` finds drift.
+
+    Raises
+    ------
+    ReleaseMismatchError
+        When the checkout is not the release ``config/pages.yaml`` documents.
     """
     args = parse_args(argv)
+    identity = source_identity(args.cuprum_root)
+    check_release(identity, documented_release(args.pages_config))
     groups = group_entries(load_api(args.cuprum_root, "cuprum", EXTRA_MODULES))
-    rendered = render(groups, source_identity(args.cuprum_root))
+    rendered = render(groups, identity)
     if args.check:
         current = (
             args.output.read_text(encoding="utf-8") if args.output.exists() else ""

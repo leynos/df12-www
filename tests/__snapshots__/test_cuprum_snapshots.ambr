@@ -1,0 +1,649 @@
+# serializer version: 1
+# name: test_cuprum_component_structure[api-commands-safecmd]
+  '''
+  article.cu-api__entry aria-labelledby='SafeCmd-title' id='SafeCmd'
+    header.cu-api__head
+      span.cu-api__kind
+      h3.cu-api__name id='SafeCmd-title'
+        code
+      a.cu-api__source href='https://github.com/leynos/cuprum/blob/[sha]/cuprum/sh.py#L[line]'
+        span.sr-only
+        svg aria-hidden='true'
+    div.cu-api__decl
+      div.cuprum-syntax
+        pre
+    p.cu-api__summary
+    details.cu-api__members
+      summary
+      div.cu-api__member id='SafeCmd.program'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+      div.cu-api__member id='SafeCmd.argv'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+      div.cu-api__member id='SafeCmd.project'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+      div.cu-api__member id='SafeCmd.argv_with_program'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+        p.cu-api__summary
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                span.cu-api__field-type
+              dd
+                code
+      div.cu-api__member id='SafeCmd.run'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+        p.cu-api__summary
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                span.cu-api__field-type
+              dd
+                code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+      div.cu-api__member id='SafeCmd.lines'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+        p.cu-api__summary
+        p
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                span.cu-api__field-type
+              dd
+                code
+                code
+                code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+      div.cu-api__member id='SafeCmd.run_sync'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+        p.cu-api__summary
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                span.cu-api__field-type
+              dd
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[first-command-code-panel]
+  '''
+  div.cu-code data-cu-copy='text' data-cu-copy-label='word_count.py'
+    div.cu-code__bar
+      span
+      span.cu-code__bar-end data-cu-copy-slot=''
+        span.cu-code__label
+    div.code-scroll aria-label='word_count.py' role='region' tabindex='0'
+      div.cuprum-syntax
+        pre
+    div.cu-code__foot
+      span
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[first-command-facts]
+  '''
+  dl.cu-facts aria-label='Prerequisites and tested version'
+    div.cu-facts__row
+      dt
+      dd
+    div.cu-facts__row
+      dt
+      dd
+    div.cu-facts__row
+      dt
+      dd
+    div.cu-facts__row
+      dt
+      dd
+    div.cu-facts__row
+      dt
+      dd
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[first-command-output]
+  '''
+  div.cu-output
+    div.cu-output__bar
+      span
+      span
+    div.cu-output__body aria-label='Expected output' role='region' tabindex='0'
+      pre
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[first-command-routemap]
+  '''
+  nav.cu-routemap aria-label='On this page' data-cu-routemap=''
+    div.cu-routemap__inner.cu-shell
+      span.cu-routemap__label aria-hidden='true'
+      div.cu-routemap__scroll
+        ol.cu-routemap__list
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#problem'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#before'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#code'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#output'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#failure'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#policy'
+              span.cu-routemap__num aria-hidden='true'
+      details.cu-routemap__menu
+        summary.cu-routemap__summary
+          span.cu-routemap__current data-cu-routemap-current=''
+          svg.cu-routemap__chevron aria-hidden='true'
+        ol.cu-routemap__menu-list
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#problem'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#before'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#code'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#output'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#failure'
+              span.cu-routemap__num aria-hidden='true'
+          li
+            a.cu-routemap__link data-cu-routemap-link='' href='#policy'
+              span.cu-routemap__num aria-hidden='true'
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[getting-started-flow-figure]
+  '''
+  figure.cu-figure aria-labelledby='fig-first-job-title'
+    div.cu-figure__head
+      span.cu-figure__num
+      h3.cu-figure__title id='fig-first-job-title'
+    ol.cu-flow.cu-flow--horizontal
+      li.cu-flow__step
+        div.cu-flow__stage.cu-flow__stage--builder
+          span.cu-flow__kind
+          span.cu-flow__name
+          span.cu-flow__detail
+        div.cu-flow__edge
+          span
+            span.sr-only
+            span.sr-only
+      li.cu-flow__step
+        div.cu-flow__stage.cu-flow__stage--builder
+          span.cu-flow__kind
+          span.cu-flow__name
+          span.cu-flow__detail
+        div.cu-flow__edge
+          span
+            span.sr-only
+            span.sr-only
+      li.cu-flow__step
+        div.cu-flow__stage.cu-flow__stage--policy
+          span.cu-flow__kind
+          span.cu-flow__name
+          span.cu-flow__detail
+        div.cu-flow__edge
+          span
+            span.sr-only
+            span.sr-only
+      li.cu-flow__step
+        div.cu-flow__stage.cu-flow__stage--process
+          span.cu-flow__kind
+          span.cu-flow__name
+          span.cu-flow__detail
+        div.cu-flow__edge
+          span
+            span.sr-only
+            span.sr-only
+      li.cu-flow__step
+        div.cu-flow__stage.cu-flow__stage--result
+          span.cu-flow__kind
+          span.cu-flow__name
+          span.cu-flow__detail
+    ul.cu-branches aria-label='Other paths'
+      li.cu-branch
+        span.cu-branch__when
+        span.cu-branch__then
+      li.cu-branch
+        span.cu-branch__when
+        span.cu-branch__then
+    figcaption.cu-figure__caption
+      strong
+      span.cu-figure__source
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[guide-output-docs-nav]
+  '''
+  nav.cu-docs-nav aria-label='Documentation'
+    details.cu-docs-nav__menu
+      summary.cu-docs-nav__summary
+      div.cu-docs-nav__panel
+        a.cu-docs-nav__home href='/cuprum/docs/'
+        p.cu-docs-nav__heading
+          a href='/cuprum/docs/guides/'
+        ul.cu-docs-nav__list role='list'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/run-a-command/'
+          li
+            a.cu-docs-nav__link aria-current='page' href='/cuprum/docs/guides/output/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/input-and-deadlines/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/pipelines-and-concurrency/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/catalogues-and-builders/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/policy-and-hooks/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/observe/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/troubleshoot/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/guides/migrate/'
+        p.cu-docs-nav__heading
+          a href='/cuprum/docs/api/'
+        ul.cu-docs-nav__list role='list'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/commands/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/catalogues/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/pipelines/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/policy/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/observation/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/rust/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/adapters/'
+          li
+            a.cu-docs-nav__link href='/cuprum/docs/api/errors/'
+    div.cu-docs-nav__rail
+      a.cu-docs-nav__home href='/cuprum/docs/'
+      p.cu-docs-nav__heading
+        a href='/cuprum/docs/guides/'
+      ul.cu-docs-nav__list role='list'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/run-a-command/'
+        li
+          a.cu-docs-nav__link aria-current='page' href='/cuprum/docs/guides/output/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/input-and-deadlines/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/pipelines-and-concurrency/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/catalogues-and-builders/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/policy-and-hooks/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/observe/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/troubleshoot/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/guides/migrate/'
+      p.cu-docs-nav__heading
+        a href='/cuprum/docs/api/'
+      ul.cu-docs-nav__list role='list'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/commands/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/catalogues/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/pipelines/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/policy/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/observation/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/rust/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/adapters/'
+        li
+          a.cu-docs-nav__link href='/cuprum/docs/api/errors/'
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[guide-output-plate]
+  '''
+  figure.cu-plate.cu-plate--landscape
+    div.cu-plate__art aria-hidden='true' style='--cu-plate-mask: url([path]); aspect-ratio: [ratio]'
+    figcaption.cu-art__caption
+      span.cu-art__plate
+      span
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[home-masthead]
+  '''
+  header.cu-mast.cu-surface-ink
+    div.cu-mast__inner
+      a.cu-wordmark aria-label='Cuprum home' href='/cuprum/'
+        span.cu-wordmark__mark aria-hidden='true'
+        span.cu-wordmark__name aria-hidden='true'
+        span.cu-wordmark__imprint aria-hidden='true'
+      nav.cu-nav aria-label='Primary'
+        button.cu-nav__toggle popovertarget='cu-primary-nav' type='button'
+          svg aria-hidden='true'
+          span
+        ul.cu-nav__list id='cu-primary-nav' popover=''
+          li.cu-nav__up
+            a.cu-nav__link href='/'
+              span aria-hidden='true'
+          li
+            a.cu-nav__link aria-current='page' href='/cuprum/'
+          li
+            a.cu-nav__link href='/cuprum/docs/'
+          li
+            a.cu-nav__link href='/cuprum/examples/'
+          li
+            a.cu-nav__link href='/cuprum/internals/'
+          li
+            a.cu-nav__link href='/cuprum/roadmap/'
+          li
+            a.cu-nav__link href='/cuprum/setwork/'
+          li.cu-nav__menu-only
+            a.cu-nav__link href='/cuprum/getting-started/'
+          li.cu-nav__menu-only
+            a.cu-nav__link href='https://github.com/leynos/cuprum'
+      div.cu-mast__actions
+        a.cu-mast__github href='https://github.com/leynos/cuprum'
+          svg aria-hidden='true'
+          span
+        a.cu-btn.cu-btn--compact.cu-btn--primary href='/cuprum/getting-started/'
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[home-receipt]
+  '''
+  section.cu-receipt aria-labelledby='receipt-title'
+    div.cu-receipt__grid.cu-shell
+      div
+        svg.cu-receipt__icon aria-hidden='true'
+        p.cu-kicker.cu-receipt__kicker
+        h2.cu-section-head__title id='receipt-title'
+        p.mt-3
+          code
+      dl.cu-receipt__fields
+        div.cu-receipt__field
+          dt
+            code
+          dd
+        div.cu-receipt__field
+          dt
+            code
+          dd
+        div.cu-receipt__field
+          dt
+            code
+          dd
+        div.cu-receipt__field
+          dt
+            code
+          dd
+        div.cu-receipt__field
+          dt
+            code
+          dd
+        div.cu-receipt__field
+          dt
+            code
+          dd
+  
+  '''
+# ---
+# name: test_cuprum_component_structure[rust-extension-capability-matrix]
+  '''
+  div.cu-matrix-wrap aria-labelledby='matrix-caption' role='region' tabindex='0'
+    table.cu-matrix.table role='table'
+      caption id='matrix-caption'
+      thead role='rowgroup'
+        tr role='row'
+          th role='columnheader' scope='col'
+          th role='columnheader' scope='col'
+          th role='columnheader' scope='col'
+          th role='columnheader' scope='col'
+      tbody role='rowgroup'
+        tr role='row'
+          th role='rowheader' scope='row'
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--integrated
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+        tr role='row'
+          th role='rowheader' scope='row'
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--python-only
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+        tr role='row'
+          th role='rowheader' scope='row'
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--inert
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+        tr role='row'
+          th role='rowheader' scope='row'
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--proposed
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+        tr role='row'
+          th role='rowheader' scope='row'
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--python-only
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+        tr role='row'
+          th role='rowheader' scope='row'
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--investigating
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+        tr role='row'
+          th role='rowheader' scope='row'
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+            span.cu-state.cu-state--available
+          td role='cell'
+            span.cu-matrix__label aria-hidden='true'
+  
+  '''
+# ---

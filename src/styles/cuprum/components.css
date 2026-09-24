@@ -499,7 +499,9 @@
 .cu-btn--compact,
 .cu-btn--compact:hover,
 .cu-surface-ink .cu-btn--compact,
-.cu-surface-ink .cu-btn--compact:hover {
+.cu-surface-ink .cu-btn--compact:hover,
+.cu-surface-teal .cu-btn--compact,
+.cu-surface-teal .cu-btn--compact:hover {
   min-height: 2.75rem;
   padding: 0.5rem 0.9rem;
   font-size: 0.72rem;

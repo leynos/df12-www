@@ -226,22 +226,36 @@ def _build_library_links(
                     "and 'meta_label'."
                 )
                 raise SiteConfigError(msg)
-        if not (label and description and href and meta_label):
-            msg = (
-                "Library links require 'label', 'description', 'href', "
-                "and 'meta_label'."
-            )
-            raise SiteConfigError(msg)
         links.append(
             LibraryLinkConfig(
-                label=str(label),
-                description=str(description),
-                href=str(href),
-                meta_label=str(meta_label),
-                external=bool(rest.get("external", True)),
+                label=_library_link_text(label, "label"),
+                description=_library_link_text(description, "description"),
+                href=_library_link_text(href, "href"),
+                meta_label=_library_link_text(meta_label, "meta_label"),
+                external=_library_link_external(rest.get("external", True)),
             )
         )
     return links
+
+
+def _library_link_text(value: object, field: str) -> str:
+    """Return a library link's text field, rejecting anything but a non-empty string."""
+    match value:
+        case str() if value.strip():
+            return value
+        case _:
+            msg = f"Library links require a non-empty string for '{field}'."
+            raise SiteConfigError(msg)
+
+
+def _library_link_external(value: object) -> bool:
+    """Return a library link's `external` flag, rejecting non-Boolean values."""
+    match value:
+        case bool():
+            return value
+        case _:
+            msg = "Library link 'external' must be true or false."
+            raise SiteConfigError(msg)
 
 
 def _build_system_cards(

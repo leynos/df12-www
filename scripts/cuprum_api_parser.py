@@ -268,6 +268,14 @@ class _Resolver:
         msg = f"no source for module {module!r} under {self.root}"
         raise ApiSourceError(msg)
 
+    def has_source(self, module: str) -> bool:
+        """Return whether dotted ``module`` has a source file under the root."""
+        try:
+            self._path(module)
+        except ApiSourceError:
+            return False
+        return True
+
     def tree(self, module: str) -> ast.Module:
         """Return the parsed source of ``module``, parsing it once."""
         if module not in self._trees:
@@ -317,7 +325,11 @@ class _Resolver:
                     return self.find(target, alias.name, seen | {key})
                 except ApiSourceError:
                     # ``from . import sh`` names a submodule, not an attribute.
+                    # When there is no such submodule either, the original
+                    # error is the one that explains the failure.
                     submodule = f"{target}.{alias.name}"
+                    if not self.has_source(submodule):
+                        raise
                     return submodule, _module_stub(self.tree(submodule))
         msg = f"cannot find a definition of {name!r} in {module}"
         raise ApiSourceError(msg)

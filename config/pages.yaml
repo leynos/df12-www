@@ -1620,7 +1620,7 @@ sites:
       cuprum_pypi: "0.2.0b1"
       cuprum_tag: "v0.2.0-beta1"
       cuprum_previous: "0.1.0"
-      cuprum_verified_on: "2026-09-24"
+      cuprum_verified_on: "2026-09-25"
       python_floor: "3.12"
       repository_url: "https://github.com/leynos/cuprum"
     nav_links:

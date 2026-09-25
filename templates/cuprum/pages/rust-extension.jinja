@@ -127,14 +127,17 @@ $ CUPRUM_STREAM_BACKEND=python python my_script.py
 $ CUPRUM_STREAM_BACKEND=rust python my_script.py
           {% endhighlight %}
           {% endcall %}
-          {% call ui.code_panel('check_backend.py', 'Probe', foot=['Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · pure-Python install'], flat=true) %}
+          {% call ui.code_panel('check_backend.py', 'Probe', foot=['Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · native and pure-Python wheels'], flat=true) %}
           {% highlight 'python', 'cuprum-syntax' %}
 import cuprum
 
 print(cuprum.is_rust_available())
           {% endhighlight %}
           {% endcall %}
-          {% call ui.output('Expected output', 'pure-Python install') %}
+          {% call ui.output('Expected output', 'native wheel') %}
+True
+          {% endcall %}
+          {% call ui.output('Expected output', 'pure-Python wheel') %}
 False
           {% endcall %}
         </div>

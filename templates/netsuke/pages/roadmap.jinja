@@ -282,7 +282,7 @@
                     </div>
                     <p class="text-charcoal-mid mb-6 max-w-3xl">
                         The core build-system compiler is implemented and packaged for Linux, macOS, and Windows.
-                        The public beta releases so far cover the following; items marked <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta4</span> are new in this release.
+                        The public beta releases so far cover the following; items marked <span class="hm-chip hm-chip--inline hm-chip--success">beta4</span> are new in this release.
                     </p>
                     <div class="grid md:grid-cols-2 gap-4">
                         {%- for group in shipped %}
@@ -290,7 +290,7 @@
                             <h3 class="font-bold text-base-content text-sm mb-2">{{ group.title | safe }}</h3>
                             <ul class="space-y-1.5 text-sm text-charcoal-mid">
                                 {%- for item in group['items'] %}
-                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>{{ item.text | safe }}{% if item.new %} <span class="hm-chip ml-1"><span class="w-2 h-2 rounded-full bg-success mr-1.5"></span> beta4</span>{% endif %}</span></li>
+                                <li class="flex items-start"><span class="iconify shrink-0 text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>{{ item.text | safe }}{% if item.new %} <span class="hm-chip hm-chip--inline hm-chip--success">beta4</span>{% endif %}</span></li>
                                 {%- endfor %}
                             </ul>
                         </div>

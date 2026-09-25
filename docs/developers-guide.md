@@ -4,8 +4,8 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Episodic, Netsuke, and Stilyagi sub-sites are generated, the shared Jinja
-macros and the component classes they pair with, the convention used for
+Episodic, Netsuke, Stilyagi, and Cuprum sub-sites are generated, the shared
+Jinja macros and the component classes they pair with, the convention used for
 browser-side components, the cascade quirks introduced by the Netsuke
 sub-site's use of the Tailwind Play content delivery network (CDN), and how
 accessibility is checked. It does not restate deployment or OpenTofu guidance,
@@ -40,12 +40,13 @@ depends on the last:
 bun run build              # build:static, build:js, build:css, build:images, build:pages, build:search, build:static
 bun run build:static       # copy src/static/ verbatim, except .ts (scripts/copy-static.ts)
 bun run build:js           # compile the browser scripts to public/ (scripts/compile-browser-scripts.ts)
-bun run build:css          # compile the main, mxd, Episodic, Weaver, Stilyagi and Netsuke Tailwind entrypoints
+bun run build:css          # compile the main, mxd, Episodic, Weaver, Stilyagi, Netsuke and Cuprum Tailwind entrypoints
 bun run build:css:mxd      # just the mxd entrypoint, for iterating on one sub-site
 bun run build:css:episodic # just the Episodic entrypoint
 bun run build:css:weaver   # just the Weaver entrypoint
 bun run build:css:stilyagi # just the Stilyagi entrypoint
 bun run build:css:netsuke  # just the Netsuke entrypoint
+bun run build:css:cuprum   # just the Cuprum entrypoint
 bun run build:images       # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages        # uv run pages generate --all-sites
 bun run build:search       # build the Netsuke and Episodic search indices
@@ -283,6 +284,7 @@ carries its reasoning in the file:
 | `src/static/episodic/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/styles/netsuke/himotoshi.css`                       | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/stilyagi/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/cuprum/assets/styles/syntax.css`             | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/episodic/assets/search/episodic-search.json` | Episodic's MiniSearch builder owns the serialized index. Reformatting it would make the committed projection differ from its generator.                                                                                                     |
 | `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
 | `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules belong to stylelint, see section 2.5.                                                                                                                                                            |
@@ -326,12 +328,12 @@ grouped by component, which the rule would scatter.
 Where a rule genuinely should not apply, disable it at the line with a stated
 reason, `/* stylelint-disable-next-line <rule> -- why */`, rather than
 loosening it in the config. The generated Pygments blocks are the one standing
-exception: the Himotoshi and Stilyagi generators each fence their block with a
-`/* stylelint-disable */` and a matching `/* stylelint-enable */` marker, while
-the Episodic generator writes the whole file and so emits only a file-level
-`/* stylelint-disable */` in its header. Either way, a finding inside a
-generated range is a change to the generator rather than to the stylesheet.
-Section 4.4 has the detail.
+exception: the Himotoshi, Stilyagi, and Cuprum generators each fence their
+block with a `/* stylelint-disable */` and a matching `/* stylelint-enable */`
+marker, while the Episodic generator writes the whole file and so emits only a
+file-level `/* stylelint-disable */` in its header. Either way, a finding
+inside a generated range is a change to the generator rather than to the
+stylesheet. Section 4.4 has the detail.
 
 `make fmt` runs `stylelint --fix` as well as Biome. That is safe over the
 generated blocks because stylelint does not apply fixes inside a disabled
@@ -355,6 +357,7 @@ Every published file has a source elsewhere in the repository:
 | `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                                              |
 | `stilyagi/assets/styles/stilyagi.css` | Tailwind compiling `src/styles/`                                              |
 | `netsuke/assets/css/himotoshi.css`    | Tailwind compiling `src/styles/`                                              |
+| `cuprum/assets/styles/cuprum.css`     | Tailwind compiling `src/styles/`                                              |
 | `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                                          |
 | `*/assets/js/*.js`                    | `scripts/compile-browser-scripts.ts` compiling `src/static/**/assets/js/*.ts` |
 | `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`                                      |
@@ -379,13 +382,13 @@ local or in CI — discards it silently.
 ## 4. The Pygments CSS generators
 
 This is the source of truth for how build-time syntax highlighting is wired
-together on the Episodic, Netsuke, and Stilyagi sub-sites, referenced from the
-[Netsuke update execution plan](execplans/netsuke-update.md).
+together on the Episodic, Netsuke, Stilyagi, and Cuprum sub-sites, referenced
+from the [Netsuke update execution plan](execplans/netsuke-update.md).
 
 ### 4.1. Styles, lexers, and the highlight tag
 
-Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
-build time by the Jinja tag
+Code blocks on the Episodic, Netsuke, Stilyagi, and Cuprum sub-sites are
+highlighted at build time by the Jinja tag
 `{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
 `df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
 `pygments.highlight` with the named lexer, and wraps the result in a
@@ -394,7 +397,7 @@ using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
 syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
 must be wrapped in `{% raw %}` inside the tag.
 
-Three Pygments styles supply the colours:
+Four Pygments styles supply the colours:
 
 - `EpisodicStyle` in `df12_pages/episodic_highlighting.py`, for the Episodic
   sub-site.
@@ -405,11 +408,15 @@ Three Pygments styles supply the colours:
   lexers.
 - `StilyagiStyle` in `df12_pages/stilyagi_highlighting.py`, for the Stilyagi
   sub-site.
+- `CuprumStyle` in `df12_pages/cuprum_highlighting.py`, for the Cuprum
+  sub-site.
 
-`EpisodicStyle` is imported directly by the Episodic generator. The Netsuke
-custom lexers and the `HimotoshiStyle` and `StilyagiStyle` classes are
-registered with Pygments through the `pygments.lexers` and `pygments.styles`
-entry points in `pyproject.toml`, so `get_lexer_by_name("netsuke")` and
+`EpisodicStyle` and `CuprumStyle` are imported directly by their generators;
+nothing resolves them by name, because the highlight tag emits token classes
+and the colours arrive from the generated stylesheet. The Netsuke custom lexers
+and the `HimotoshiStyle` and `StilyagiStyle` classes are registered with
+Pygments through the `pygments.lexers` and `pygments.styles` entry points in
+`pyproject.toml`, so `get_lexer_by_name("netsuke")` and
 `get_style_by_name("stilyagi")` resolve anywhere in the pipeline without an
 explicit import.
 
@@ -419,12 +426,15 @@ explicit import.
 `token_rules(formatter, style, css_class, prefix, bold_weight)`, the single
 translation from a Pygments `Style` to CSS rules, shared by
 `scripts/generate_episodic_pygments_css.py`,
-`scripts/generate_himotoshi_pygments_css.py`, and
-`scripts/generate_stilyagi_pygments_css.py`. The generated `:root` variables
-and token rules are shared output. Site-specific chrome stays at each site's
-established boundary: Himotoshi's remains in its generator, while Stilyagi's
-layout rules for `.code-scroll`, `.stilyagi-syntax`, and `.stilyagi-syntax pre`
-are handwritten above the `BEGIN` marker in `syntax.css`.
+`scripts/generate_himotoshi_pygments_css.py`,
+`scripts/generate_stilyagi_pygments_css.py`, and
+`scripts/generate_cuprum_pygments_css.py`. The generated `:root` variables and
+token rules are shared output. Site-specific chrome stays at each site's
+established boundary: Himotoshi's remains in its generator, while the layout
+rules for Stilyagi's `.code-scroll`, `.stilyagi-syntax`, and
+`.stilyagi-syntax pre`, and for Cuprum's `.code-scroll`, `.cuprum-syntax`, and
+`.cuprum-syntax pre`, are handwritten above the `BEGIN` marker in each
+`syntax.css`.
 
 The module exports two functions. Everything else in it is private and may be
 reshaped freely.
@@ -440,9 +450,9 @@ shared helper resolves token classes without a private Pygments method: it
 walks each token's parent chain and uses the public `STANDARD_TYPES` mapping,
 preserving Pygments' class strings.
 
-The Stilyagi generator emits only the `:root` variables and token rules. Its
-layout rules stay outside the marked block so padding, scrolling, and chrome
-can be edited directly as CSS.
+The Stilyagi and Cuprum generators emit only the `:root` variables and token
+rules. Their layout rules stay outside the marked block so padding, scrolling,
+and chrome can be edited directly as CSS.
 
 `variable_name(token, prefix)` derives one custom-property name from a Pygments
 token type: `Literal.String.Escape` with the prefix `--netsuke-syntax-` gives
@@ -477,7 +487,7 @@ uninteresting rather than obviously wrong. This exact defect shipped on
 twenty-one Netsuke pages — comments, strings, numbers, and keyword constants
 all rendering at body colour — before it was found; see the addendum to the
 [Netsuke update execution plan](execplans/netsuke-update.md). `token_rules`
-exists specifically to close this gap for all three sub-sites, and
+exists specifically to close this gap for every sub-site, and
 `scripts/pygments_css.py`'s module docstring documents the same risk for
 Stilyagi.
 
@@ -499,19 +509,21 @@ long as the style declares parents before children.
   `generate_himotoshi_pygments_css.py` itself, alongside the generated token
   rules.
 - Rerun the relevant generator after any change to `EpisodicStyle`,
-  `HimotoshiStyle`, or `StilyagiStyle`.
+  `HimotoshiStyle`, `StilyagiStyle`, or `CuprumStyle`.
 - The generators write to the tracked source —
   `src/static/episodic/assets/styles/syntax.css`,
-  `src/styles/netsuke/himotoshi.css`, and
-  `src/static/stilyagi/assets/styles/syntax.css` — never to `public/`. Writing
-  to `public/` would lose the change on the next clean build.
+  `src/styles/netsuke/himotoshi.css`,
+  `src/static/stilyagi/assets/styles/syntax.css`, and
+  `src/static/cuprum/assets/styles/syntax.css` — never to `public/`. Writing to
+  `public/` would lose the change on the next clean build.
 - A test asserts the committed marked block matches what the generator would
   produce (`test_committed_stylesheet_matches_the_generator` in each test
   module below). A stale stylesheet fails the commit gates.
-- All three generated stylesheets are excluded from the Biome formatter, in the
+- All four generated stylesheets are excluded from the Biome formatter, in the
   `src/static/stilyagi/assets/styles/syntax.css`,
-  `src/styles/netsuke/himotoshi.css`, and
-  `src/static/episodic/assets/styles/syntax.css` override in `biome.jsonc`.
+  `src/styles/netsuke/himotoshi.css`,
+  `src/static/episodic/assets/styles/syntax.css`, and
+  `src/static/cuprum/assets/styles/syntax.css` override in `biome.jsonc`.
   `token_rules` emits one rule per line, which the formatter would expand; the
   next generator run would collapse it again, and the tools would undo each
   other on alternate runs — with the test above failing on whichever ran last.
@@ -519,14 +531,15 @@ long as the style declares parents before children.
   `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to tidy
   a diff.
 - Stylelint is handled by the generators themselves rather than by the config.
-  `generate_himotoshi_pygments_css.py` and `generate_stilyagi_pygments_css.py`
-  emit a `/* stylelint-disable */` marker after `BEGIN` and a
-  `/* stylelint-enable */` marker before `END`; the Episodic generator, which
-  writes the whole file, emits a `/* stylelint-disable */` in its header. The
-  rest of each file is still linted. `stylelint --fix` leaves a disabled range
-  alone, so `make fmt` and the generators do not fight; a lint finding inside
-  the markers means the generator's output has changed shape and the generator,
-  not the stylesheet, is what to change.
+  `generate_himotoshi_pygments_css.py`, `generate_stilyagi_pygments_css.py`, and
+  `generate_cuprum_pygments_css.py` emit a `/* stylelint-disable */` marker
+  after `BEGIN` and a `/* stylelint-enable */` marker before `END`; the
+  Episodic generator, which writes the whole file, emits a
+  `/* stylelint-disable */` in its header. The rest of each file is still
+  linted. `stylelint --fix` leaves a disabled range alone, so `make fmt` and
+  the generators do not fight; a lint finding inside the markers means the
+  generator's output has changed shape and the generator, not the stylesheet,
+  is what to change.
 
 ### 4.5. Regenerating and verifying
 
@@ -534,8 +547,9 @@ long as the style declares parents before children.
 uv run python scripts/generate_episodic_pygments_css.py
 uv run python scripts/generate_himotoshi_pygments_css.py
 uv run python scripts/generate_stilyagi_pygments_css.py
-uv run pytest tests/test_episodic_highlight.py tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py
-bunx biome check src/static/episodic/assets/styles src/styles/netsuke src/static/stilyagi/assets/styles
+uv run python scripts/generate_cuprum_pygments_css.py
+uv run pytest tests/test_episodic_highlight.py tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py tests/test_cuprum_highlight.py
+bunx biome check src/static/episodic/assets/styles src/styles/netsuke src/static/stilyagi/assets/styles src/static/cuprum/assets/styles
 ```
 
 Each script is idempotent: rerunning it without changing the corresponding
@@ -555,6 +569,7 @@ block outright, so a run restores it without needing the previous content.
 | Episodic | `EpisodicStyle`  | `bash`, `console`, `json`, `make`, `xml`           | `episodic-syntax` | `--episodic-syntax-` | `600`       | `src/static/episodic/assets/styles/syntax.css` |
 | Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/styles/netsuke/himotoshi.css`             |
 | Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
+| Cuprum   | `CuprumStyle`    | `python`, `console`                                | `cuprum-syntax`   | `--cuprum-syntax-`   | `600`       | `src/static/cuprum/assets/styles/syntax.css`   |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each
@@ -564,8 +579,8 @@ The lexer list reflects what the templates currently use, not the full set
 Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`, and
 `xml` are stock Pygments lexers used unmodified. The bold weight differs
 because the sub-sites' monospace faces read differently at the same weight:
-Episodic and Netsuke stop at semibold, while Stilyagi's lighter face goes to
-full bold.
+Episodic, Netsuke, and Cuprum stop at semibold — Cuprum ships IBM Plex Mono
+only up to 600 — while Stilyagi's lighter face goes to full bold.
 
 ### 4.7. The Weaver icon generator
 
@@ -980,26 +995,244 @@ the primary button. `example_header(key)` renders it:
 {{ exdata.example_header('hello-world') }}
 ```
 
+### 5.5. Cuprum's components and marks
+
+`templates/cuprum/components.jinja` holds the Cuprum sub-site's macros; import
+it as `ui`. Each macro pairs with a block in `src/styles/cuprum/`:
+
+| Macro                            | Draws                                                             | Classes                       |
+| -------------------------------- | ----------------------------------------------------------------- | ----------------------------- |
+| `page_head`                      | Docket, title, statuses, thesis, meta, actions, and art or seal   | `.cu-page-head`, `.cu-docket` |
+| `routemap` / `section`           | The sticky in-page route map and the numbered sections it targets | `.cu-routemap`, `.cu-section` |
+| `code_panel` / `output`          | A highlighted code panel and its expected-output receipt          | `.cu-code`, `.cu-output`      |
+| `flow`                           | A technical figure: stages, labelled edges, and failure branches  | `.cu-figure`, `.cu-flow`      |
+| `status`, `card`, `callout`      | Status lozenges, docket cards, and caveat or preview call-outs    | `.cu-status`, `.cu-card`, …   |
+| `install_slip`, `facts`, `pager` | An install command, a prerequisites list, previous and next links | `.cu-slip`, `.cu-facts`, …    |
+
+_Table 7a: the Cuprum macros and the component classes they pair with._
+
+Every class carries a `cu-` prefix, and the sub-site uses its own `.cu-btn` and
+`.cu-tag` rather than daisyUI's `btn` and `badge`. daisyUI v5 emits its
+components into the utilities layer, where they outrank anything in the
+components layer regardless of specificity, so a printed button built on `btn`
+would have to override its height, padding, type, and shadow at the call site.
+`tests/test_cuprum_build.py` fails if a published page uses a daisyUI component
+name.
+
+Data drives the repeated structure. A page's `sections` list feeds both the
+`routemap` and every `section` call, so the route map and the section numbers
+cannot drift; `templates/cuprum/data/` holds the worked-example cabinet, the
+Rust capability matrix, and the roadmap board.
+
+Below 480px Cuprum's content panels run full bleed, as Netsuke's code windows
+and Stilyagi's bands do: code panels, output receipts, figures, callouts, facts
+lists, install slips, and illustration frames shed the page gutter and their
+side rules, and the faux terminals drop to 0.7rem type. The rules live in
+`src/styles/cuprum/bleed.css`, which imports last so no `!important` is needed.
+Cards and board columns keep their frames, a panel nested in another stays
+inside it, and nothing changes at 480px and above.
+
+Comparison tables use the `matrix` and `matrix_cell` macros. Below 48rem, where
+a table would scroll sideways, each row becomes a card titled by its row
+header, with each cell labelled by its column; the macros state the table's
+ARIA roles, which the block display would otherwise cost it. The desktop table
+is unchanged.
+
+The documentation section lives under `/cuprum/docs/`. Every page in it extends
+`pages/_docs.jinja`, whose navigation renders from `data/docs.jinja` as a
+sticky rail from 64rem and a `<details>` drop-down below it. The API reference
+is generated from Cuprum's source: `scripts/cuprum_api_parser.py` resolves each
+name in `cuprum.__all__` to the statement that defines it, with `ast` alone,
+following re-exports through the package, and parses its signature and NumPy
+docstring. Public submodules the package does not re-export, such as
+`cuprum.sinks` and the adapters, are listed in the builder's `EXTRA_MODULES`
+and documented as module entries. `scripts/build_cuprum_api_data.py` then sorts
+the names into the reference pages in its `GROUPS`, renders the
+reStructuredText inline markup as escaped HTML, and writes
+`templates/cuprum/data/api.jinja`. Run
+`make cuprum-api-data CUPRUM_SOURCE=<checkout>` against a checkout of the
+documented release, and `make check-cuprum-api-data` to confirm the committed
+file still matches. A name exported but placed in no group, placed twice, or
+placed but no longer exported stops the build, so the reference cannot fall
+silently behind the package. Each reference page is a two-line template that
+sets `api_slug` and extends `pages/_docs_api_group.jinja`.
+
+The generator also refuses a checkout whose `pyproject.toml` version is not the
+release `cuprum_pypi` in `config/pages.yaml` documents, normalizing both under
+PEP 440 first, so `0.2.0-beta1` in the checkout matches `0.2.0b1` in the
+config. A mismatch raises `ReleaseMismatchError` before anything is written;
+`--pages-config` points the check at a different configuration file. The
+checkout must also be clean under `cuprum/` and `pyproject.toml`: the generator
+reads the working tree but records `HEAD` as the source commit, so uncommitted
+or untracked files there raise `SourceIdentityError` rather than being credited
+to a commit that does not contain them. Ignored files, such as a locally built
+extension, do not count. An unreadable or malformed `config/pages.yaml` raises
+`PagesConfigError`.
+
+The guides under `/cuprum/docs/guides/` are written for the site, each a
+template that sets `guide_slug` and extends `pages/_docs_guide.jinja`, with its
+title and summary in `docs_guides` in `data/docs.jinja`. Their code is not
+written for the site: every panel is one of the tested examples in Cuprum's
+users' guide or 0.2.0 migration guide, copied byte for byte, and run again
+against the documented release before the site's pin moves. Link a name to its
+reference entry with `api.ref('SafeCmd.lines')`; a name the generated data does
+not hold fails the build.
+
+Each long page carries a sticky route map, rendered by the `routemap` macro
+from the same `sections` list as its headings. From 80rem up it is a strip of
+links; below that, where the strip would scroll sideways, the same links sit in
+a `<details>` drop-down with a solid chevron. `routemap.ts` adds the
+scroll-spy: it marks the section being read with `aria-current="location"` in
+both lists, names it in the drop-down's summary, and closes the drop-down after
+a choice, on Escape, or on a click outside. Without the script both forms still
+work as plain fragment links. `pickActiveIndex(tops, offset, atBottom)` and
+`collectTargets(doc, nav)` are its pure decision and query;
+`createRouteMapController(nav, deps)` takes a `RouteMapDeps` of `document`, a
+`viewport`, and an animation-frame `requestFrame`, with `init()` supplying the
+real ones.
+
+Code panels and install slips carry a Copy button, added by `copy-code.ts`
+rather than baked into the macros: `data-cu-copy` marks a panel,
+`[data-cu-copy-slot]` its titlebar slot, and `data-cu-copy="console"` strips
+the leading `$` prompts, and the space after each, before copying, so what
+lands on the clipboard can be pasted and run. `stripPrompts`, `copyLabel`, and
+`panelText` are its pure queries; `createCopyController(deps)` takes a
+`CopyDeps` of `document`, a `Clock` (`setTimeout`/`clearTimeout`), and a
+clipboard getter, with `init()` supplying the real ones.
+
+The fictional municipal marks live in `templates/cuprum/_marks.jinja`, in the
+three registers the design language names:
+
+- **Engraving.** The Philadelphia Command Plumbing seal in the colophon and the
+  engraved skyline above it, and a plate of Germantown Town Hall beside the
+  stated invariants on the Internals page, shown only at desktop width. The
+  emblem, the skyline, and the town hall are alpha masks under
+  `src/static/cuprum/assets/images/`, painted in `currentcolor`, so they follow
+  the theme tokens; the seal's legend is live SVG text. The town hall was drawn
+  from a photograph of the real building, so it is a likeness, not an invention
+  like the seal. The documentation's plates of fittings and valves use the same
+  technique through the `ui.plate` macro: `docs_plates` in
+  `templates/cuprum/data/docs.jinja` names each mask, its size, and its
+  caption, and the macro passes the mask to CSS in a `--cu-plate-mask`
+  property, so adding a plate needs no new stylesheet rule.
+- **Watermark.** The seal at low contrast in the blank paper beside a page head
+  that has no illustration. It has a grid column of its own, so it never sits
+  under text, and it is dropped below the desktop breakpoint.
+- **Stamp.** `.cu-stamp`, a rotated label that repeats a status the page already
+  states in words, such as "Technical preview" or "Field copy".
+
+**Normative:** a mark is decorative and carries `aria-hidden`. It never sits
+under code, tables, small type, figures, or a focus ring, and it never appears
+on a legal notice: `shared_content_page.jinja` empties the colophon seal block,
+and `tests/test_cuprum_build.py` checks that it stays empty.
+
+The code on the sub-site is real. Every snippet was run against the release
+named by `cuprum_version` in `config/pages.yaml`, and each code panel's footer
+says so. `cuprum_pypi` is the same version as PyPI normalizes it, and the
+install commands pin it exactly, because pip and uv skip a pre-release that is
+not named; `cuprum_tag` is the git tag that source links point at. When the
+release moves, rerun every snippet and guide example, update the expected
+output, bump `cuprum_version`, `cuprum_pypi`, `cuprum_tag`, and
+`cuprum_verified_on` together, and regenerate the API reference from a checkout
+of the new tag; a test fails if an install command is unpinned.
+
+### 5.6. The main homepage's Libraries group
+
+The main site's homepage carries an optional Libraries group beneath its
+systems grid: a short list of libraries, styled more plainly than the product
+cards above them. It lives under `homepage.systems.libraries` in
+`config/pages.yaml`:
+
+```yaml
+homepage:
+  systems:
+    libraries:
+      heading: Libraries
+      kicker: Smaller parts, built to be built with.
+      links:
+        - label: Cuprum
+          description: Typed, async command execution for Python. Approved programs, exact argv, structured results.
+          href: "cuprum/"
+          meta_label: Learn more
+          external: false
+        - label: rstest-bdd
+          description: Behaviour-driven testing macros layered on rstest. Narrative clarity without the ceremony.
+          href: "https://github.com/leynos/rstest-bdd"
+          meta_label: View on GitHub
+          external: true
+```
+
+`_build_libraries_config` in `df12_pages/config/homepage.py` builds
+`LibrariesConfig` and `LibraryLinkConfig` (both in
+`df12_pages/config/models.py`) from that mapping, and
+`SystemsSectionConfig.libraries` holds the result — `None` when the mapping is
+absent, since the group is optional. Every link's `label`, `description`,
+`href`, and `meta_label` must be a non-empty string, and `external` must be a
+bool; the group itself needs a `heading`, a `kicker`, and at least one link.
+Any of these missing raises `SiteConfigError`. `external` defaults to `true`
+when a link omits it.
+
+The homepage template renders the group inside `#systems` as
+`section.libraries`, labelled by its heading, with each link drawn as
+`a.library-card`. A link with `external: true` opens in a new tab with
+`rel="noopener noreferrer"`; one with `external: false` renders as a plain
+same-site link. An absent group renders nothing.
+`tests/test_homepage_libraries.py` pins the builder's validation and the
+rendered markup.
+
+### 5.7. Cuprum's Python test suites
+
+Three suites hold the sub-site to its promises from the Python side.
+
+`tests/test_cuprum_snapshots.py` takes syrupy semantic snapshots of one
+representative of each component that carries the design language — the
+masthead, a route map, a code panel, an output block, the home page's receipt,
+a flow figure, the capability matrix, a docs plate, the docs navigation, one
+API entry, and a job sheet's facts table. The serialization keeps structure
+only: text content and the inside of `pre` and `svg` are dropped, and the
+attributes that remain pass through a redaction pass that masks commit SHAs,
+version numbers, ISO dates, asset paths, image sizes, and similar volatile
+material. Regenerate the snapshots after an intended markup change with
+`uv run pytest tests/test_cuprum_snapshots.py --snapshot-update`, then review
+the `.ambr` diff — an unexpected cascade of changes means a redaction is
+missing, not that the snapshot should be accepted wholesale.
+
+`tests/test_cuprum_browser.py`, marked `playwright`, checks the responsive
+contract at the breakpoints section 5.5 describes by reading computed styles
+and boxes back from `agent-browser` against the built `public/` tree: the route
+map trades its strip for a drop-down below 80rem, the documentation rail folds
+into a drop-down below 64rem, the capability matrix turns its rows into cards
+below 48rem, the content panels run full bleed below 480px, and the page does
+not scroll horizontally at 320px.
+
+`tests/test_cuprum_build.py`'s
+`test_every_configured_route_is_published_with_its_markers` is the route-set
+contract: every route `config/pages.yaml` declares for the Cuprum sub-site is
+read from the config, not the built tree, so a page the build silently drops
+fails by name, and each is checked for the markers its kind needs — a guide
+carries a code panel and a plate, an API group carries an entry article, and an
+example carries a facts list and a code panel.
+
 ## 6. Browser-side components
 
 Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files
 that follow one shared convention: a plain immediately invoked function
 expression (IIFE) module, guarded by the same `module.exports` hook described
-below. Loading and bootstrap otherwise differ by site. Fourteen of the sixteen
-scripts (Netsuke, Stilyagi, and Episodic) are loaded with `<script defer>` and
-guard their own initialization on `document.readyState` (running immediately if
-the document has already finished loading, or waiting for `DOMContentLoaded`
-otherwise). Weaver's two scripts, `telemetry.ts` and `mobile-nav.ts`, are the
-exception: they are loaded with a plain `<script>` at the end of `<body>` and
-run immediately and unconditionally, with no `readyState`/`DOMContentLoaded`
-gate. Where a component's behaviour has a pure decision worth testing in
-isolation — no DOM, no timers — that function is exported via `module.exports`
-at the end of the IIFE, guarded by `typeof module !== "undefined"` so the same
-file still runs unmodified as a plain browser script. `docs-scrollspy.ts`
-exports `pickActiveIndex` (which heading is currently being read);
-`config-keys.ts` exports `nextTabIndex` (which tab an arrow/Home/End keypress
-should move to). `mobile-nav.ts` has no such function — its logic is DOM
-interaction throughout — and exports nothing.
+below. Loading and bootstrap otherwise differ by site. Sixteen of the eighteen
+scripts (Netsuke, Stilyagi, Episodic, and Cuprum) are loaded with
+`<script defer>` and guard their own initialization on `document.readyState`
+(running immediately if the document has already finished loading, or waiting
+for `DOMContentLoaded` otherwise). Weaver's two scripts, `telemetry.ts` and
+`mobile-nav.ts`, are the exception: they are loaded with a plain `<script>` at
+the end of `<body>` and run immediately and unconditionally, with no
+`readyState`/`DOMContentLoaded` gate. Where a component's behaviour has a pure
+decision worth testing in isolation — no DOM, no timers — that function is
+exported via `module.exports` at the end of the IIFE, guarded by
+`typeof module !== "undefined"` so the same file still runs unmodified as a
+plain browser script. `docs-scrollspy.ts` exports `pickActiveIndex` (which
+heading is currently being read); `config-keys.ts` exports `nextTabIndex`
+(which tab an arrow/Home/End keypress should move to). `mobile-nav.ts` has no
+such function — its logic is DOM interaction throughout — and exports nothing.
 
 The `.ts` file is the source of truth. `bun run build:js`
 (`scripts/compile-browser-scripts.ts`) strips the types with swc and writes the
@@ -1016,12 +1249,13 @@ the build.
 Types are the only thing a migrated module gains. Each `querySelector` result
 is typed as the element its handler reads and narrowed with an early return;
 the injected `deps` objects (`copy-buttons.ts`, `config-keys.ts`,
-`site-search.ts`) are named interfaces so the browser wiring and the test fakes
-are held to the same shape; the `data-*` vocabularies are typed where a module
-reads more than one. Where the checker cannot narrow — a `var` or a hoisted
-`function` declaration reading a root that an early return has already guarded
-— the lookup is cast at the point of the guard, with a comment saying so,
-rather than the module being restructured around the checker.
+`site-search.ts`, Cuprum's `copy-code.ts` and `routemap.ts`) are named
+interfaces so the browser wiring and the test fakes are held to the same shape;
+the `data-*` vocabularies are typed where a module reads more than one. Where
+the checker cannot narrow — a `var` or a hoisted `function` declaration reading
+a root that an early return has already guarded — the lookup is cast at the
+point of the guard, with a comment saying so, rather than the module being
+restructured around the checker.
 
 Where a module has no pure decision to extract, it is tested against a real DOM
 instead. `tests/js/helpers/mobile-nav-harness.mjs` builds a happy-dom window,
@@ -1154,6 +1388,18 @@ fails is treated as no index and the search box reports the index as
 unavailable; and `siteRootFromIndexPath` for the sub-site root recovered from
 the index path. As with the Episodic module, a dropped record is reported once
 per search root through `console.warn`.
+
+`tests/js/cuprum-copy-code.test.mjs` and `tests/js/cuprum-routemap.test.mjs`
+drive `createCopyController` and `createRouteMapController` through the same
+kind of fakes: a manually advanced clock, a clipboard whose write resolves,
+rejects, or is missing, and, for the route map, a viewport whose scroll and
+resize listeners a test fires by hand and an animation-frame queue it runs on
+demand, so a burst of events is shown to coalesce into one frame rather than
+inferred. Both suites also carry fast-check properties: `stripPrompts` against
+a line-wise reference that strips one leading `$` and its following space per
+line, and `pickActiveIndex` against an oracle that states the same rule the
+implementation does — the last section at the foot of the page, else the last
+one whose top has passed the offset.
 
 ### 6.1. Episodic search telemetry
 

@@ -16,6 +16,7 @@ from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 
 from df12_pages.highlighting import HimotoshiStyle
+from scripts import generate_cuprum_pygments_css as cuprum_generator
 from scripts import generate_himotoshi_pygments_css as himotoshi_generator
 from scripts import generate_stilyagi_pygments_css as stilyagi_generator
 from scripts.generate_himotoshi_pygments_css import (
@@ -286,13 +287,14 @@ class TestHimotoshiPygmentsCss:
     [
         pytest.param(himotoshi_generator, id="himotoshi"),
         pytest.param(stilyagi_generator, id="stilyagi"),
+        pytest.param(cuprum_generator, id="cuprum"),
     ],
 )
 def test_generated_block_is_fenced_from_stylelint(generator: ModuleType) -> None:
     """The markers switch stylelint off for the block and back on after.
 
-    Both generators write a block into a larger handwritten stylesheet, so
-    both fence it the same way, and the contract is asserted once here rather
+    These generators write a block into a larger handwritten stylesheet, so
+    each fences it the same way, and the contract is asserted once here rather
     than restated in each sub-site's module. The Episodic generator owns its
     whole file and needs only the opening marker, so it is checked in
     ``test_episodic_highlight.py`` instead.

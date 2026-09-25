@@ -1,0 +1,175 @@
+/* Cuprum element defaults — imported in layer(base), beside the preflight.
+ *
+ * The colour tokens live in the entrypoint's theme blocks. What is declared
+ * here are the *roles* the components read — the ring, the accent type, the
+ * muted type, the rule — which the dark surfaces below re-point. Custom
+ * properties inherit, so setting a role on a panel re-colours everything
+ * inside it; that is the only reason these are not aliases in @theme, whose
+ * aliases resolve once on :root and would not follow a panel. */
+
+:root {
+  /* One ring for everything the keyboard can reach. It sits outside the
+     control, on the page, so it takes the page's ink: 14.43:1 on paper and
+     11.44:1 on paper-deep. Dark surfaces re-point it to yellow (9.57:1 on
+     ink, 5.86:1 on deep teal). It is deliberately not the hover cue: hover
+     shifts the control, focus draws a rule around it. */
+  --cu-focus: var(--color-ink);
+  --cu-focus-width: 3px;
+  --cu-focus-offset: 3px;
+
+  /* Type roles on the current ground. */
+  --cu-accent-text: var(--color-copper-text);
+  --cu-muted-text: var(--color-ink-muted);
+  --cu-link: var(--color-copper-text);
+  --cu-rule: var(--color-ink);
+
+  /* Geometry. */
+  --cu-measure: 44rem;
+  --cu-shell: 82.5rem;
+  --cu-gutter: clamp(1rem, 4vw, 3.5rem);
+  --cu-grid-pitch: 24px;
+  --cu-ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* The dark grounds. Ink is the night office and the chrome; teal is the
+   field manual. Each re-points the roles above for everything inside it. */
+.cu-surface-ink {
+  --cu-focus: var(--color-yellow);
+  --cu-accent-text: var(--color-orange);
+  --cu-muted-text: var(--color-night-muted);
+  --cu-link: var(--color-yellow);
+  --cu-rule: var(--color-rule-on-dark);
+
+  background-color: var(--color-ink);
+  color: var(--color-cream);
+}
+
+.cu-surface-teal {
+  --cu-focus: var(--color-yellow);
+  --cu-accent-text: var(--color-orange-lift);
+  --cu-muted-text: var(--color-night-muted);
+  --cu-link: var(--color-yellow);
+  --cu-rule: color-mix(in oklab, var(--color-cream) 55%, transparent);
+
+  background-color: var(--color-teal);
+  color: var(--color-cream);
+}
+
+:focus-visible {
+  outline: var(--cu-focus-width) solid var(--cu-focus);
+  outline-offset: var(--cu-focus-offset);
+}
+
+html {
+  scroll-behavior: smooth;
+
+  /* Anchor targets clear the sticky header and route map. */
+  scroll-padding-top: 8rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-rendering: optimizelegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings are real HTML text in the display face. They stay short by
+   policy; the sentence below a heading states the technical point. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Links are recognisable without hue: underlined at rest, a heavier rule on
+   hover. The preflight strips both. */
+a {
+  color: var(--cu-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* The preflight also strips list markers; prose lists want them back. */
+ul,
+ol {
+  padding-left: 1.4em;
+}
+
+ul {
+  list-style: square;
+}
+
+ol {
+  list-style: decimal;
+}
+
+li + li {
+  margin-top: 0.3em;
+}
+
+/* Inline code: mono on a paper-deep chip. Blocks get their own panel. */
+:not(pre) > code {
+  padding: 0.05em 0.35em;
+  background: color-mix(in oklab, var(--color-paper-deep) 70%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  overflow-wrap: anywhere;
+}
+
+.cu-surface-ink :not(pre) > code,
+.cu-surface-teal :not(pre) > code {
+  background: color-mix(in oklab, var(--color-cream) 12%, transparent);
+}
+
+strong {
+  font-weight: 700;
+}
+
+::selection {
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}

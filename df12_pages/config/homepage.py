@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing as typ
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from .helpers import _as_int, _normalize_classes, _optional_str
 from .models import (
@@ -12,6 +13,8 @@ from .models import (
     FooterLinkConfig,
     HeroConfig,
     HomepageConfig,
+    LibrariesConfig,
+    LibraryLinkConfig,
     NavLinkConfig,
     SiteConfigError,
     SystemCardConfig,
@@ -176,7 +179,107 @@ def _build_systems_config(
         heading=str(heading),
         kicker=str(kicker),
         cards=cards,
+        libraries=_build_libraries_config(rest.get("libraries")),
     )
+
+
+def _build_libraries_config(
+    payload: object,
+) -> LibrariesConfig | None:
+    """Build the optional libraries group listed beneath the systems grid."""
+    match payload:
+        case None:
+            return None
+        case {"heading": heading, "kicker": kicker, **rest}:
+            links = _build_library_links(rest.get("links"))
+        case _:
+            msg = "Systems libraries require 'heading', 'kicker', and links."
+            raise SiteConfigError(msg)
+    if not (heading and kicker and links):
+        msg = "Systems libraries require 'heading', 'kicker', and links."
+        raise SiteConfigError(msg)
+    return LibrariesConfig(heading=str(heading), kicker=str(kicker), links=links)
+
+
+def _build_library_links(
+    entries: object,
+) -> list[LibraryLinkConfig]:
+    """Build the library links for the libraries group."""
+    links: list[LibraryLinkConfig] = []
+    match entries:
+        case list() as items:
+            iterable = items
+        case _:
+            return links
+    for entry in iterable:
+        match entry:
+            case {
+                "label": label,
+                "description": description,
+                "href": href,
+                "meta_label": meta_label,
+                **rest,
+            }:
+                pass
+            case _:
+                msg = (
+                    "Library links require 'label', 'description', 'href', "
+                    "and 'meta_label'."
+                )
+                raise SiteConfigError(msg)
+        external = _library_link_external(rest.get("external", True))
+        links.append(
+            LibraryLinkConfig(
+                label=_library_link_text(label, "label"),
+                description=_library_link_text(description, "description"),
+                href=_library_link_href(href, external=external),
+                meta_label=_library_link_text(meta_label, "meta_label"),
+                external=external,
+            )
+        )
+    return links
+
+
+def _library_link_text(value: object, field: str) -> str:
+    """Return a library link's text field, rejecting anything but a non-empty string."""
+    match value:
+        case str() if value.strip():
+            return value
+        case _:
+            msg = f"Library links require a non-empty string for '{field}'."
+            raise SiteConfigError(msg)
+
+
+def _library_link_href(value: object, *, external: bool) -> str:
+    """Return a library link's href, checked against its `external` flag.
+
+    An external link must be an absolute http or https URL with a host, since
+    a bare ``github.com/...`` would resolve as a path on this site. A local
+    link must be a path with no scheme or host, so it cannot leave the site.
+    """
+    href = _library_link_text(value, "href")
+    parts = urlsplit(href)
+    if external:
+        if parts.scheme.lower() in {"http", "https"} and parts.hostname:
+            return href
+        msg = f"External library link {href!r} must be an absolute http(s) URL."
+        raise SiteConfigError(msg)
+    # Browsers read a backslash in an http(s) URL as a slash, so `/\\host`
+    # would reach another host even though urlsplit sees no netloc in it.
+    if not parts.scheme and not parts.netloc and "\\" not in href:
+        return href
+    msg = f"Local library link {href!r} must be a path on this site."
+    raise SiteConfigError(msg)
+
+
+def _library_link_external(value: object) -> bool:
+    """Return a library link's `external` flag, rejecting non-Boolean values."""
+    match value:
+        case bool():
+            return value
+        case _:
+            msg = "Library link 'external' must be true or false."
+            raise SiteConfigError(msg)
 
 
 def _build_system_cards(
@@ -406,6 +509,8 @@ __all__ = [
     "_build_footer_links",
     "_build_hero_config",
     "_build_homepage_config",
+    "_build_libraries_config",
+    "_build_library_links",
     "_build_nav_links",
     "_build_system_cards",
     "_build_systems_config",

@@ -1,0 +1,368 @@
+/* Cuprum chrome: the masthead, the primary navigation, and the colophon.
+ *
+ * The masthead is the dispatch office's lit sign: an ink bar with the
+ * wordmark, the six destinations, GitHub as a utility link, and Get started
+ * as the one persistent action. Below 1100px the destinations collapse into a
+ * native popover opened by a labelled Menu button — no script, and never a
+ * bare hamburger. */
+
+.cu-mast {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 2px solid var(--color-copper);
+}
+
+.cu-mast__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: var(--cu-shell);
+  min-height: 4.25rem;
+  margin: 0 auto;
+  padding: 0.5rem var(--cu-gutter);
+}
+
+/* The wordmark: the element symbol set in a stamped, slightly rotated box,
+   then the name in the display face. */
+.cu-wordmark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--color-cream);
+  text-decoration: none;
+}
+
+.cu-wordmark:hover {
+  color: var(--color-cream);
+}
+
+.cu-wordmark__mark {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  aspect-ratio: 1;
+  border: 2px solid var(--color-orange);
+  color: var(--color-orange);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  transform: rotate(-3deg);
+}
+
+.cu-wordmark__name {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cu-wordmark__imprint {
+  display: none;
+  color: var(--color-night-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xs);
+  letter-spacing: var(--tracking-stamp);
+  text-transform: uppercase;
+}
+
+@media (width >= 80rem) {
+  .cu-wordmark__imprint {
+    display: block;
+    max-width: 9rem;
+    line-height: 1.35;
+  }
+}
+
+/* ---------- Primary navigation ---------------------------------------- */
+
+.cu-nav {
+  flex: 1;
+  min-width: 0;
+}
+
+.cu-nav__toggle {
+  display: none;
+}
+
+/* The list is a popover element, and the UA styles a popover as a fixed,
+   bordered, inset box even while it is closed. At desktop widths it is an
+   ordinary row, so every one of those UA declarations is reset here. */
+.cu-nav__list {
+  position: static;
+  inset: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 1.35rem;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  list-style: none;
+}
+
+.cu-nav__list li + li {
+  margin-top: 0;
+}
+
+.cu-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  border-bottom: 3px solid transparent;
+  color: var(--color-cream);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cu-nav__link:hover {
+  border-bottom-color: var(--color-cream);
+  color: var(--color-cream);
+}
+
+.cu-nav__link[aria-current="page"] {
+  border-bottom-color: var(--color-orange);
+  color: var(--color-orange);
+}
+
+/* The way back to df12 sits first in the row, quieter than the rest. */
+.cu-nav__up .cu-nav__link {
+  color: var(--color-night-muted);
+}
+
+/* Copies of the masthead actions that only the collapsed menu shows. */
+.cu-nav__menu-only {
+  display: none;
+}
+
+.cu-mast__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cu-mast__github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  color: var(--color-cream);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.cu-mast__github:hover {
+  color: var(--color-cream);
+  text-decoration: underline;
+}
+
+.cu-mast__github svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+@media (width < 68.75rem) {
+  .cu-nav {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .cu-nav__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 0.9rem;
+    border: 2px solid var(--color-cream);
+    background: transparent;
+    color: var(--color-cream);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .cu-nav__toggle svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .cu-nav__list {
+    display: none;
+  }
+
+  /* The open panel drops from the masthead as a full-width work order. */
+  .cu-nav__list:popover-open {
+    position: fixed;
+    inset: 4.25rem 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: calc(100dvh - 4.25rem);
+    padding: 0.5rem var(--cu-gutter) 1.5rem;
+    overflow-y: auto;
+    border-bottom: 3px solid var(--color-copper);
+    background: var(--color-ink);
+    color: var(--color-cream);
+  }
+
+  .cu-nav__list:popover-open .cu-nav__link {
+    width: 100%;
+    border-bottom: 1px solid var(--color-rule-on-dark);
+    font-size: 0.875rem;
+  }
+
+  .cu-nav__list:popover-open .cu-nav__link[aria-current="page"] {
+    border-bottom-color: var(--color-orange);
+  }
+
+  .cu-nav__menu-only {
+    display: block;
+  }
+
+  .cu-mast__github {
+    display: none;
+  }
+}
+
+@media (width < 30rem) {
+  .cu-mast__inner {
+    gap: 0.75rem;
+  }
+
+  .cu-wordmark__name {
+    font-size: 1.6rem;
+  }
+
+  .cu-mast__actions .cu-btn {
+    display: none;
+  }
+}
+
+/* ---------- Colophon -------------------------------------------------- */
+
+.cu-colophon {
+  border-top: 3px solid var(--color-copper);
+  font-size: 0.95rem;
+}
+
+.cu-colophon__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 2.5rem;
+  max-width: var(--cu-shell);
+  margin: 0 auto;
+  padding: 3.5rem var(--cu-gutter) 2.5rem;
+}
+
+.cu-colophon__blurb {
+  max-width: 26rem;
+  color: var(--cu-muted-text);
+}
+
+.cu-colophon__heading {
+  margin-bottom: 0.9rem;
+  color: var(--color-orange);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+}
+
+.cu-colophon__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cu-colophon__list li + li {
+  margin-top: 0.45rem;
+}
+
+.cu-colophon__list a {
+  color: var(--color-cream);
+  text-decoration-color: var(--color-rule-on-dark);
+}
+
+.cu-colophon__list a:hover {
+  text-decoration-color: var(--color-cream);
+}
+
+.cu-colophon__strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  max-width: var(--cu-shell);
+  margin: 0 auto;
+  padding: 1.25rem var(--cu-gutter) 2rem;
+  border-top: 1px solid var(--color-rule-on-dark);
+  color: var(--cu-muted-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (width < 56rem) {
+  .cu-colophon__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cu-colophon__about {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (width < 30rem) {
+  .cu-colophon__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Skip link ------------------------------------------------- */
+
+.cu-skip {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.8rem 1rem;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+
+.cu-skip:focus {
+  transform: translateY(0);
+}
+
+/* The link lands over the ink masthead, where the default ink ring would
+   vanish; cream holds 16.46:1 there. */
+.cu-skip:focus-visible {
+  --cu-focus: var(--color-cream);
+}

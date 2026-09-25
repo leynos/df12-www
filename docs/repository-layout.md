@@ -18,6 +18,7 @@ df12-www/
 ├── features/
 ├── modules/
 ├── public/
+│   ├── cuprum/
 │   ├── mxd/
 │   ├── episodic/
 │   ├── netsuke/
@@ -29,6 +30,7 @@ df12-www/
 │   ├── static/
 │   └── styles/
 ├── templates/
+│   ├── cuprum/
 │   ├── mxd/
 │   ├── episodic/
 │   ├── netsuke/
@@ -88,9 +90,9 @@ Scaleway-specific variants, and deployment configuration).
 
 Generated output directory. The main df12 site pages live at the top level.
 Sub-site output lands under path-prefixed subdirectories (`mxd/`, `episodic/`,
-`netsuke/`, `weaver/`, `stilyagi/`), each containing the full static site
-including assets, doc pages, and shared content pages. This directory is the
-deployment root.
+`netsuke/`, `weaver/`, `stilyagi/`, `cuprum/`), each containing the full static
+site including assets, doc pages, and shared content pages. This directory is
+the deployment root.
 
 ### `reference/`
 
@@ -119,25 +121,33 @@ Build-time scripts outside the Python package:
 - `generate-image-variants.ts` — Produces responsive image variants with Sharp.
 - `build-netsuke-search-index.mjs` — Builds the MiniSearch full-text index for
   the Netsuke documentation sub-site.
+- `generate_*_pygments_css.py` — Regenerate the marked Pygments block in each
+  sub-site's syntax stylesheet from its Pygments `Style`; Cuprum's is
+  `generate_cuprum_pygments_css.py`.
+- `cuprum_api_parser.py` and `build_cuprum_api_data.py` — Read Cuprum's public
+  API from a Cuprum checkout, with `ast` alone, and write the generated
+  `templates/cuprum/data/api.jinja` the API reference renders; run through
+  `make cuprum-api-data` and checked by `make check-cuprum-api-data`.
 
 ### `src/`
 
 Frontend source files. `styles/` contains one Tailwind CSS entry point per
 compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css`,
-`weaver.css`, `stilyagi.css` and `netsuke.css` for those sub-sites — plus any
-plugins. Each is compiled to its own file under `public/`:
+`weaver.css`, `stilyagi.css`, `netsuke.css` and `cuprum.css` for those
+sub-sites — plus any plugins. Each is compiled to its own file under `public/`:
 `public/assets/site.css`, `public/mxd/assets/tailwind.css`,
 `public/episodic/assets/styles/tailwind.css`,
 `public/weaver/assets/styles/weaver.css`,
-`public/stilyagi/assets/styles/stilyagi.css`, and
-`public/netsuke/assets/css/himotoshi.css`.
+`public/stilyagi/assets/styles/stilyagi.css`,
+`public/netsuke/assets/css/himotoshi.css`, and
+`public/cuprum/assets/styles/cuprum.css`.
 
 An entry point that has grown past a single file keeps its partials in a
-directory beside it. `styles/episodic/`, `styles/weaver/`, `styles/stilyagi/`
-and `styles/netsuke/` are the examples: the entry point declares the theme and
-imports partials named for what they style, each into an explicit cascade
-layer. Netsuke's `styles/netsuke/himotoshi.css` carries the generated Pygments
-block that `scripts/generate_himotoshi_pygments_css.py` owns.
+directory beside it. `styles/episodic/`, `styles/weaver/`, `styles/stilyagi/`,
+`styles/netsuke/` and `styles/cuprum/` are the examples: the entry point
+declares the theme and imports partials named for what they style, each into an
+explicit cascade layer. Netsuke's `styles/netsuke/himotoshi.css` carries the
+generated Pygments block that `scripts/generate_himotoshi_pygments_css.py` owns.
 
 `static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
 and favicons — that are published at the same path. Its layout mirrors the
@@ -150,17 +160,24 @@ see beyond the DOM. Edit the files here. The copies under `public/` are build
 output and are overwritten on the next build. The one stylesheet still under
 `src/static/stilyagi/assets/styles/` is `syntax.css`, whose marked block is
 generated Pygments output; it compiles into the Stilyagi entry point rather
-than being linked on its own.
+than being linked on its own. Cuprum's `src/static/cuprum/assets/styles/` holds
+the same kind of `syntax.css`, and `src/static/cuprum/assets/images/` holds,
+beside its illustrations, the engraved alpha masks (`*-mask.webp`) its marks
+are painted through: `seal-emblem-mask.webp`, `skyline-engraving-mask.webp`, and
+`town-hall-engraving-mask.webp`. The documentation's engraved plates use the
+same convention; their masks live under `src/static/cuprum/assets/images/docs/`.
 
 ### `templates/`
 
 Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `episodic/`,
-`netsuke/`, `weaver/`, `stilyagi/`) holds the templates for that sub-site's
-design system. Episodic and Netsuke keep shared macros in `components.jinja`;
+`netsuke/`, `weaver/`, `stilyagi/`, `cuprum/`) holds the templates for that
+sub-site's design system. Episodic, Netsuke, and Cuprum keep shared macros in
+`components.jinja`; Cuprum adds `_icons.jinja`, `_marks.jinja` for its
+fictional municipal marks, and `data/` for the lists its pages loop over;
 Netsuke adds `chrome.jinja` for page furniture, `docs_nav.jinja` for the docs
 navigation, and `examples_data.jinja` for the examples catalogue. Netsuke,
-Weaver, and Stilyagi each centralize their chrome in a `_layout.jinja`: every
-Netsuke content page reaches it through `doc_page.jinja` and the homepage
+Weaver, Stilyagi, and Cuprum each centralize their chrome in a `_layout.jinja`:
+every Netsuke content page reaches it through `doc_page.jinja` and the homepage
 extends it directly; the one standalone document is
 `pages/icon-replacements.jinja`, which carries its own head and scripts. These
 are distinct from the main-site templates in `df12_pages/templates/`.

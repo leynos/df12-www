@@ -1,0 +1,197 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'observe' %}
+{% block guide_body %}
+<section aria-labelledby="channels">
+  <h2 id="channels">Choose a channel</h2>
+  <p>
+    Cuprum reports a run through several channels, and each answers a
+    different question. Pick by the question, and keep every callback
+    bounded:
+  </p>
+  <ul>
+    <li><strong>Lifecycle events.</strong> {{ api.ref('observe') }} delivers an {{ api.ref('ExecEvent') }} as a command plans, starts, writes, exits, or times out. Correlate by <code>exec_id</code>, not <code>pid</code>, which the operating system recycles.</li>
+    <li><strong>Lines.</strong> <code>on_line</code> or {{ api.ref('SafeCmd.lines') }}, in <a href="/cuprum/docs/guides/output/">Control output</a>, for progress as it happens.</li>
+    <li><strong>A heartbeat.</strong> <code>idle_after</code> says that no monitored output arrived; it says nothing about whether the child is stuck.</li>
+    <li><strong>Stream operations.</strong> One aggregate event per completed drain or pipeline transfer, for throughput.</li>
+    <li><strong>The Rust pump.</strong> Whether each pipeline hop used the native pump or fell back to Python; a decline is a routing decision, not a failure. See the <a href="/cuprum/internals/rust-extension/">Rust extension</a>.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="telemetry">
+  <h2 id="telemetry">Log, measure, and trace runs</h2>
+  <p>
+    The adapters turn lifecycle events into structured log records
+    ({{ api.ref('cuprum.adapters.logging_adapter', 'logging_adapter') }}),
+    metrics ({{ api.ref('cuprum.adapters.metrics_adapter', 'metrics_adapter') }}),
+    and trace spans ({{ api.ref('cuprum.adapters.tracing_adapter', 'tracing_adapter') }}).
+    Each is an observe hook. <code>InMemoryMetrics</code> and
+    <code>InMemoryTracer</code> are reference backends; production code
+    implements the <code>MetricsCollector</code> protocol, or the
+    <code>Tracer</code> and <code>Span</code> protocols, over its own
+    telemetry library.
+  </p>
+{% call ui.code_panel('telemetry.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import logging
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+from cuprum.adapters.logging_adapter import structured_logging_hook
+from cuprum.adapters.metrics_adapter import InMemoryMetrics, MetricsHook
+from cuprum.adapters.tracing_adapter import InMemoryTracer, TracingHook
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="telemetry")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+metrics = InMemoryMetrics()
+tracer = InMemoryTracer()
+logger = logging.getLogger("myapp.telemetry")
+
+with (
+    sh.observe(structured_logging_hook(logger=logger)),
+    sh.observe(MetricsHook(metrics)),
+    sh.observe(TracingHook(tracer)),
+):
+    python("-c", "print('traced')").run_sync()
+
+assert metrics.counters["cuprum_executions_total"] == 1
+assert [span.name for span in tracer.spans] and tracer.spans[0].ended
+{% endhighlight %}
+{% endcall %}
+  <p>
+    The structured logging adapter records <code>argv</code> verbatim, so a
+    secret passed as an argument reaches the log: pass secrets through the
+    environment or a file. Never turn untrusted arguments into metric
+    labels.
+  </p>
+</section>
+
+<section aria-labelledby="streams">
+  <h2 id="streams">Measure stream throughput</h2>
+  <p>
+    {{ api.ref('cuprum.stream_observation', 'observe_stream_operation') }}
+    registers a hook for the pure-Python stream paths. It receives one event
+    per completed drain or transfer, never one per read, with the bytes
+    moved, the number of reads, and the duration.
+    {{ api.ref('cuprum.adapters.stream_metrics', 'stream_operation_metrics_hook') }}
+    turns those into counters and a histogram whose only labels are the
+    closed <code>operation</code> and <code>outcome</code> values. Observer
+    failures are logged and suppressed, so observing never changes a run.
+  </p>
+{% call ui.code_panel('stream_metrics.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+from cuprum.adapters.metrics_adapter import InMemoryMetrics
+from cuprum.adapters.stream_metrics import stream_operation_metrics_hook
+from cuprum.stream_observation import observe_stream_operation
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="stream-metrics")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+metrics = InMemoryMetrics()
+with observe_stream_operation(stream_operation_metrics_hook(metrics)):
+    python("-c", "print('hello')").run_sync()
+assert metrics.counters["cuprum_stream_operation_bytes_total"] > 0
+{% endhighlight %}
+{% endcall %}
+</section>
+
+<section aria-labelledby="actions">
+  <h2 id="actions">Present output in GitHub Actions</h2>
+  <p>
+    On GitHub Actions, Cuprum can frame a run's echoed output in a
+    collapsible log group and turn a failed run into an
+    <code>::error::</code> annotation. Both are presentation only: capture,
+    exit codes, and the result are unchanged. The framing activates only when
+    the parent process runs on GitHub Actions (<code>GITHUB_ACTIONS</code> is
+    <code>true</code>); elsewhere a run behaves as if it were absent.
+  </p>
+  <h3>Group and annotate flags</h3>
+  <p>
+    <code>group</code> and <code>annotate_failure</code> on
+    {{ api.ref('RunOutputOptions') }} are the shorthand for the common case.
+    They build a <code>GitHubActionsSink</code> and store it as the options'
+    sink, so shared options can carry them safely:
+  </p>
+{% call ui.code_panel('ci_flags.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import dataclasses
+import io
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+from cuprum.sinks import GitHubActionsSink
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="ci-flags")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+
+shared = RunOutputOptions(echo=True, group=True, annotate_failure=True)
+assert isinstance(shared.sink, GitHubActionsSink)
+result = python("-c", "print('building')").run_sync(output=shared)
+assert result.ok and result.stdout == "building\n"
+
+# An explicit sink wins, so shared flagged options never displace it.
+explicit = GitHubActionsSink(io.StringIO(), force=True)
+assert dataclasses.replace(shared, sink=explicit).sink is explicit
+
+try:
+    RunOutputOptions(group="yes")
+except ValueError:
+    pass
+else:
+    raise AssertionError("a non-bool flag should be rejected")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    The flags are independent, and both default to <code>False</code>.
+    <code>group=True</code> frames the run in a <code>::group::</code> and
+    <code>::endgroup::</code> pair and protects echoed output with a
+    stop-commands lease, so child output cannot inject workflow commands; a
+    pipeline receives one group for the whole run.
+    <code>annotate_failure=True</code> writes one <code>::error::</code>
+    annotation when the run ends in a non-zero exit, a timeout, or an error;
+    on its own it frames no group and takes no lease.
+  </p>
+  <p>
+    Workflow commands go to the parent's stderr. An explicit
+    <code>sink=</code> takes precedence and makes both flags no-ops, which is
+    what makes them safe in shared options; pass it on a new
+    <code>RunOutputOptions</code> or through
+    <code>dataclasses.replace(shared, sink=...)</code>. The flags carry no
+    <code>force</code>, and anything but a <code>bool</code> raises
+    <code>ValueError</code>. Run grouped commands one after another when they
+    share the parent's stderr, or their frames can interleave.
+  </p>
+  <h3>Configure the sink directly</h3>
+  <p>
+    Use {{ api.ref('cuprum.sinks', 'GitHubActionsSink') }} for anything the
+    flags do not cover: a custom <code>title</code>, another
+    <code>destination</code>, <code>force=True</code> to reproduce the
+    framing locally, or <code>emit_group=False</code> and
+    <code>emit_annotation=False</code> to switch off either half of the
+    frame.
+  </p>
+{% call ui.code_panel('actions_sink.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import io
+import sys
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
+from cuprum.sinks import GitHubActionsSink
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="ci")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+workflow_log = io.StringIO()
+sink = GitHubActionsSink(workflow_log, title="Build", force=True)
+result = python("-c", "print('building')").run_sync(
+    output=RunOutputOptions(echo=True, sink=sink),
+)
+assert result.ok and result.stdout == "building\n"
+assert workflow_log.getvalue().startswith("::group::Build")
+{% endhighlight %}
+{% endcall %}
+</section>
+{% endblock %}

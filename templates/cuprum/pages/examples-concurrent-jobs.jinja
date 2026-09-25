@@ -1,0 +1,161 @@
+{% extends "pages/_example.jinja" %}
+{% import "_api.jinja" as api %}
+{% set example_slug = 'concurrent-jobs' %}
+{% set example_facts = [
+  ('Level', 'Intermediate'),
+  ('Needs', 'Python ' ~ python_floor ~ ' or later; nothing else, as the interpreter stands in for three checks'),
+  ('Install', 'Cuprum ' ~ cuprum_pypi ~ ' from PyPI; see Getting started'),
+  ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor ~ '; both runs repeated eight times with identical output'),
+  ('Uses', 'run_concurrent_sync, ConcurrentConfig (concurrency, fail_fast), ConcurrentResult'),
+] %}
+
+{% block problem %}
+<p>
+  Three independent checks — lint, type checking, and a documentation
+  build — have no reason to wait for each other. Run them side by side, but
+  not all at once on a small machine, and afterwards know which failed and
+  what each printed.
+</p>
+<p>
+  {{ api.ref('run_concurrent_sync') }} runs commands concurrently and
+  returns a {{ api.ref('ConcurrentResult') }};
+  {{ api.ref('ConcurrentConfig') }}<code>.concurrency</code> bounds how
+  many children run at once. In async code, {{ api.ref('run_concurrent') }}
+  is the same call awaited.
+</p>
+{% endblock %}
+
+{% block code %}
+{% call ui.code_panel('checks.py', 'Complete', foot=[verified]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import (
+    ConcurrentConfig,
+    Program,
+    ProgramCatalogue,
+    run_concurrent_sync,
+    scoped,
+    sh,
+)
+
+PYTHON = Program(sys.executable)
+CATALOGUE = ProgramCatalogue.from_programs(PYTHON, name="jobs")
+python = sh.make(PYTHON, catalogue=CATALOGUE)
+
+
+def job(name: str, seconds: float, code: int = 0):
+    script = (
+        f"import sys, time; time.sleep({seconds}); "
+        f"print('{name}'); sys.exit({code})"
+    )
+    return python("-c", script)
+
+
+jobs = [job("lint", 0.3), job("types", 0.1, code=2), job("docs", 0.2)]
+
+with scoped(catalogue=CATALOGUE):
+    result = run_concurrent_sync(*jobs, config=ConcurrentConfig(concurrency=2))
+
+print(f"ok={result.ok}")
+print(f"failures={result.failures}")
+for index, item in zip(result.submission_indices, result.results):
+    print(index, item.exit_code, item.stdout.strip())
+{% endhighlight %}
+{% endcall %}
+{% endblock %}
+
+{% block output %}
+<div class="cu-pair">
+  {% call ui.output('Expected output', 'stdout') %}
+ok=False
+failures=(1,)
+0 0 lint
+1 2 types
+2 0 docs
+  {% endcall %}
+  <div class="cu-prose">
+    <p>
+      Every check ran to completion, two at a time, and the results come back
+      in submission order whatever order they finished in: the type check
+      finished first but is listed second. <code>failures</code> holds the
+      position of each result that exited non-zero, so the run as a whole is
+      not <code>ok</code>.
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block failure %}
+<div class="cu-prose">
+  <p>
+    Collecting every result is the default. With <code>fail_fast=True</code>,
+    the first non-zero exit cancels everything still running. Here the type
+    check fails at once, and the two thirty-second checks are stopped.
+  </p>
+</div>
+<div class="cu-pair mt-8">
+{% call ui.code_panel('checks_fail_fast.py', 'Failure path', foot=[verified], flat=true) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import (
+    ConcurrentConfig,
+    Program,
+    ProgramCatalogue,
+    run_concurrent_sync,
+    scoped,
+    sh,
+)
+
+PYTHON = Program(sys.executable)
+CATALOGUE = ProgramCatalogue.from_programs(PYTHON, name="jobs")
+python = sh.make(PYTHON, catalogue=CATALOGUE)
+
+
+def job(name: str, seconds: float, code: int = 0):
+    script = (
+        f"import sys, time; time.sleep({seconds}); "
+        f"print('{name}'); sys.exit({code})"
+    )
+    return python("-c", script)
+
+
+jobs = [job("types", 0.1, code=2), job("lint", 30), job("docs", 30)]
+
+config = ConcurrentConfig(concurrency=3, fail_fast=True)
+with scoped(catalogue=CATALOGUE):
+    result = run_concurrent_sync(*jobs, config=config)
+
+print(f"ok={result.ok}")
+print(f"returned {len(result.results)} of {len(jobs)} results")
+print(f"submission_indices={result.submission_indices}")
+print(f"failure_submission_indices={result.failure_submission_indices}")
+{% endhighlight %}
+{% endcall %}
+  {% call ui.output('Observed output', 'stdout') %}
+ok=False
+returned 1 of 3 results
+submission_indices=(0,)
+failure_submission_indices=(0,)
+  {% endcall %}
+</div>
+<div class="cu-prose mt-10">
+  <p>
+    The run returned in a fraction of a second, with one result: the
+    cancelled commands have none. Because a result's position no longer
+    matches its command's, map back with <code>submission_indices</code> and
+    <code>failure_submission_indices</code> rather than trusting positions. A
+    command that had already finished before the cancellation still appears.
+  </p>
+</div>
+{% endblock %}
+
+{% block policy %}
+<p>
+  The catalogue lists only this interpreter, and <code>scoped(catalogue=...)</code>
+  makes it the allowlist for every command submitted inside the block. Each
+  command is checked before it is spawned, so a forbidden one fails with
+  {{ api.ref('ForbiddenProgramError') }} rather than running.
+</p>
+{% endblock %}

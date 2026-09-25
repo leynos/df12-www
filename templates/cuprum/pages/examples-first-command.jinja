@@ -1,0 +1,180 @@
+{% extends "pages/_example.jinja" %}
+{% set example_slug = 'first-command' %}
+{% set example_facts = [
+  ('Level', 'Beginner'),
+  ('Needs', 'Python ' ~ python_floor ~ ' or later, and wc on PATH (any POSIX system)'),
+  ('Install', 'Cuprum ' ~ cuprum_pypi ~ ' from PyPI; see Getting started'),
+  ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor),
+  ('Uses', 'ProgramCatalogue.from_programs, sh.make, StdinInput, scoped(catalogue=…)'),
+] %}
+
+{% block problem %}
+<p>
+  A script needs one external tool — here, <code>wc</code>, to count the words
+  in a piece of text. With <code>subprocess</code> that is a string or a list
+  assembled wherever it is needed, run with whatever is on the machine. With
+  Cuprum the program is declared once in a catalogue, the command is built
+  from typed arguments, and the script says exactly which programs it may run.
+</p>
+<p>
+  This job builds that catalogue, feeds the text on standard input rather
+  than as an argument, and turns the captured output into an integer.
+</p>
+{% endblock %}
+
+{% block code %}
+{% call ui.code_panel('word_count.py', 'Complete', foot=[verified]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+from cuprum import (
+    Program,
+    ProgramCatalogue,
+    StdinInput,
+    scoped,
+    sh,
+)
+
+WC = Program("wc")
+CATALOGUE = ProgramCatalogue.from_programs(WC, name="word-count")
+
+count_words = sh.make(WC, catalogue=CATALOGUE)
+
+
+def word_count(text: str) -> int:
+    cmd = count_words("-w")
+    with scoped(catalogue=CATALOGUE):
+        result = cmd.run_sync(stdin=StdinInput(text=text))
+    if not result.ok:
+        msg = f"wc failed with exit code {result.exit_code}: {result.stderr}"
+        raise RuntimeError(msg)
+    return int((result.stdout or "").strip())
+
+
+print(count_words("-w").argv_with_program)
+print(count_words("-w").project.name)
+print(word_count("Every command gets the right fitting."))
+{% endhighlight %}
+{% endcall %}
+<div class="cu-prose mt-10">
+  <h3>Reading it</h3>
+  <ul>
+    <li>
+      <code>ProgramCatalogue.from_programs(WC, name="word-count")</code> builds
+      a single-project catalogue whose allowlist is exactly <code>wc</code>.
+      Without <code>name=</code>, the project would be named after the
+      programs' base names.
+    </li>
+    <li>
+      <code>sh.make(WC, catalogue=CATALOGUE)</code> returns a builder. It has
+      already checked that <code>wc</code> is catalogued, so every command it
+      builds carries the project's metadata.
+    </li>
+    <li>
+      <code>StdinInput(text=...)</code> is encoded with the context's encoding
+      (UTF-8 by default) and written to the child's standard input, so the
+      text never appears in argv.
+    </li>
+    <li>
+      <code>strip()</code> is there because <code>wc</code> pads its count
+      differently on different systems. Capture keeps the child's bytes as
+      they were.
+    </li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block output %}
+<div class="cu-pair">
+  {% call ui.output('Expected output', 'stdout') %}
+('wc', '-w')
+word-count
+6
+  {% endcall %}
+  <div class="cu-prose">
+    <p>
+      The first line is the exact argv Cuprum will pass — program first, no
+      shell. The second is the project the command belongs to, which is what
+      downstream tooling reads to find noise rules and documentation links.
+      The third is the count.
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block failure %}
+<div class="cu-prose">
+  <p>
+    Cuprum refuses a program at two different moments, for two different
+    reasons. This script triggers both.
+  </p>
+</div>
+<div class="cu-pair mt-8">
+  {% call ui.code_panel('refusals.py', 'Failure path', foot=[verified], flat=true) %}
+  {% highlight 'python', 'cuprum-syntax' %}
+from cuprum import (
+    ECHO,
+    ForbiddenProgramError,
+    Program,
+    ProgramCatalogue,
+    UnknownProgramError,
+    scoped,
+    sh,
+)
+
+WC = Program("wc")
+CATALOGUE = ProgramCatalogue.from_programs(WC, name="word-count")
+
+# Not in the catalogue: refused when the builder is made.
+try:
+    sh.make(Program("curl"), catalogue=CATALOGUE)
+except UnknownProgramError as exc:
+    print(f"UnknownProgramError: {exc}")
+
+# In a catalogue, but outside the active scope: refused when it runs.
+with scoped(catalogue=CATALOGUE):
+    try:
+        sh.make(ECHO)("hello").run_sync()
+    except ForbiddenProgramError as exc:
+        print(f"ForbiddenProgramError: {exc}")
+  {% endhighlight %}
+  {% endcall %}
+  <div>
+    {% call ui.output('Expected output', 'stdout') %}
+UnknownProgramError: Program 'curl' is not in the catalogue allowlist
+ForbiddenProgramError: Program 'echo' is not allowed in the current context
+    {% endcall %}
+    {% call ui.output('Also expected', 'stderr, logger cuprum.context') %}
+Program echo denied by context allowlist restricted_state=True
+    {% endcall %}
+  </div>
+</div>
+<div class="cu-prose mt-10">
+  <p>
+    <code>UnknownProgramError</code> is a construction failure: the catalogue
+    you passed does not know the program, so no command exists to run.
+    <code>ForbiddenProgramError</code> is an authorization failure:
+    <code>ECHO</code> is in Cuprum's default catalogue, so the command was
+    built, but the scope around it allows only <code>wc</code>. Nothing is
+    spawned in either case.
+  </p>
+  <p>
+    A non-zero exit is not an exception. If <code>wc</code> itself failed,
+    <code>result.ok</code> would be false and the script above raises its own
+    <code>RuntimeError</code> with the exit code and stderr.
+  </p>
+</div>
+{% endblock %}
+
+{% block policy %}
+<p>
+  Two independent checks let this run. The builder was made from a catalogue
+  that lists <code>wc</code>, and the <code>scoped()</code> block takes its
+  allowlist from that same catalogue, so <code>wc</code> is the one program
+  the block may run.
+</p>
+<p>
+  The scope is what a reviewer reads. Remove the <code>with</code> block and
+  the command still runs, because an unscoped root context permits every
+  catalogued program; that default exists to ease adoption, and narrowing it
+  is how a script states its policy.
+</p>
+{% endblock %}

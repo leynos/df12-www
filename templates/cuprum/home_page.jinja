@@ -1,0 +1,248 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% block title %}{{ homepage.title }}{% endblock %}
+{% block description %}Cuprum runs external commands from Python without handing strings to a shell: a curated catalogue of approved programs, typed argv, scoped policy, pipelines, and structured results.{% endblock %}
+{% block main_class %} class="cu-home"{% endblock %}
+{% block content %}
+{#- The four dispatch cards: what Cuprum does, one fitting each. Every
+    snippet line is real API in the documented release. -#}
+{% set dispatch_cards = [
+  {'icon': 'shield', 'tone': 'orange', 'title': 'Approved programs only',
+   'body': 'Commands are built from a curated catalogue of Program values. A program outside the catalogue raises UnknownProgramError before anything runs.',
+   'code': 'sh.make(ECHO)'},
+  {'icon': 'braces', 'tone': 'cream', 'title': 'Arguments, not strings',
+   'body': 'Builders produce an exact argv tuple. No shell parses it, so a stray quote or semicolon is just a character.',
+   'code': 'echo("-n", "hello")'},
+  {'icon': 'flow', 'tone': 'patina', 'title': 'Async first, sync on request',
+   'body': 'Await a command or a pipeline, or call run_sync() in a small script. Both return the same structured result.',
+   'code': 'await cmd.run()'},
+  {'icon': 'wrench', 'tone': 'ink', 'title': 'No cowboy shutdowns',
+   'body': 'Cancellation and timeouts send SIGTERM, wait out a grace period (0.5 s by default), then send SIGKILL and reap the child.',
+   'code': 'SIGTERM → grace → SIGKILL'},
+] %}
+{#- The receipt: fields a CommandResult carries, by their real names. -#}
+{% set receipt = [
+  ('ok', 'Did it work?'),
+  ('exit_code', 'How did it end?'),
+  ('stdout', 'What did it say?'),
+  ('stderr', 'What did it mutter?'),
+  ('pid', 'Who was responsible?'),
+  ('duration', 'How long did it take?'),
+] %}
+{#- The drawers of the wider site. -#}
+{% set drawers = [
+  {'title': 'Worked examples', 'href': '/cuprum/examples/', 'number': 'Drawer A',
+   'body': 'Task-shaped job sheets with complete code, expected output, and the failure path.', 'status': 'verified'},
+  {'title': 'Internals', 'href': '/cuprum/internals/', 'number': 'Drawer B',
+   'body': 'How a command is constructed, authorized, run, observed, and torn down, with the invariants that hold throughout.', 'status': none},
+  {'title': 'Rust extension', 'href': '/cuprum/internals/rust-extension/', 'number': 'Annex R',
+   'body': 'An optional native pathway for inter-stage pipeline pumping. Python remains the reference behaviour.', 'status': 'preview'},
+  {'title': 'Roadmap', 'href': '/cuprum/roadmap/', 'number': 'Board 1',
+   'body': 'What is shipped, what is in progress, and what is only proposed, each with its evidence.', 'status': none},
+  {'title': 'Setwork', 'href': '/cuprum/setwork/', 'number': 'Annex S',
+   'body': 'A proposed companion that generates typed adapters returning Cuprum commands. Design only; nothing to install.', 'status': 'proposed'},
+] %}
+{% set install = 'pip install cuprum==' ~ cuprum_pypi %}
+
+      <section class="cu-hero cu-surface-ink" aria-labelledby="hero-title">
+        <div class="cu-hero__art">
+          <img
+            src="/cuprum/assets/images/dispatch-desk-1536.webp"
+            srcset="/cuprum/assets/images/dispatch-desk-960.webp 960w, /cuprum/assets/images/dispatch-desk-1536.webp 1536w"
+            sizes="100vw"
+            width="1536"
+            height="1024"
+            alt="Copper, a black cat in a copper collar, grips two curved pipes at a dispatch desk in a rain-soaked night office, with rotary telephones, filing cabinets, and a wall-sized route board of copper and teal pipes."
+            fetchpriority="high"
+          />
+        </div>
+        <div class="cu-hero__scrim" aria-hidden="true"></div>
+        <div class="cu-shell cu-hero__inner">
+          <div class="cu-hero__copy">
+            <p class="cu-kicker">{{ icons.icon('tee') }} Philadelphia Command Plumbing · Night shift</p>
+            <h1 id="hero-title" class="cu-hero__title">Stop calling <code>subprocess</code> like an emergency plumber.</h1>
+            <p class="cu-hero__deck">
+              Cuprum runs external commands from Python without handing strings
+              to a shell. Programs come from an approved catalogue, arguments
+              become an exact argv, and every run returns a structured result.
+            </p>
+            <div class="cu-hero__actions">
+              {{ ui.button('Get started', '/cuprum/getting-started/', icon='arrow-right') }}
+              {{ ui.button('Worked examples', '/cuprum/examples/', variant='outline') }}
+            </div>
+            <p class="cu-hero__status">
+              Python {{ python_floor }}+ · no runtime dependencies · ISC licence ·
+              Cuprum {{ cuprum_version }}, a beta release on PyPI
+            </p>
+          </div>
+        </div>
+        <p class="cu-hero__plate cu-shell">
+          <span class="cu-art__plate">Plate 01</span>
+          Copper takes the night shift at the dispatch desk: every line on the board is a job that knows where it is going.
+        </p>
+      </section>
+
+      <section class="cu-section cu-drafting" aria-labelledby="dispatch-title">
+        <div class="cu-shell">
+          <div class="cu-home-heading">
+            <p class="cu-kicker">Work order 00-CU</p>
+            <h2 id="dispatch-title" class="cu-section-head__title">Every command gets the right fitting.</h2>
+            <p class="cu-section-head__lede">
+              The shell accepts whatever string it is handed. Cuprum starts
+              from programs you have approved, builds the argument vector in
+              one place, and hands back a job sheet you can inspect.
+            </p>
+          </div>
+          <ol class="cu-dispatch">
+            {% for card in dispatch_cards %}
+            <li class="cu-dispatch__card cu-dispatch__card--{{ card.tone }}">
+              <span class="cu-dispatch__num" aria-hidden="true">{{ '%02d' % loop.index }}</span>
+              {{ icons.icon(card.icon, 'cu-dispatch__icon') }}
+              <h3 class="cu-dispatch__title">{{ card.title }}</h3>
+              <p>{{ card.body }}</p>
+              <code class="cu-dispatch__code">{{ card.code }}</code>
+            </li>
+            {% endfor %}
+          </ol>
+        </div>
+      </section>
+
+      <section class="cu-manual cu-surface-teal" aria-labelledby="manual-title">
+        <div class="cu-shell cu-manual__grid">
+          <div class="cu-manual__copy">
+            <p class="cu-kicker">Field manual · page 12</p>
+            <h2 id="manual-title" class="cu-section-head__title">From loose parts to a sound installation.</h2>
+            <p>
+              Make a builder from a catalogued program, call it with arguments,
+              and run the command. <code>RunOutputOptions(echo=True)</code>
+              tees the output to your terminal while Cuprum still captures it.
+              Use <code>run_sync()</code> when the job is small and the kettle
+              is already on.
+            </p>
+            {{ ui.install_slip(install, 'Install the beta') }}
+            <p class="cu-manual__note">
+              Cuprum {{ cuprum_version }} is a beta: the API documented here is
+              settling towards 0.2.0 and may still change. pip installs a
+              pre-release only when it is named, so the command pins the exact
+              version these pages were checked against.
+            </p>
+            <a class="cu-arrow-link" href="/cuprum/getting-started/">Run your first command {{ icons.icon('arrow-right') }}</a>
+          </div>
+          {% call ui.code_panel('dispatch.py', 'Job #0042', foot=['Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · Python ' ~ python_floor]) %}
+          {% highlight 'python', 'cuprum-syntax' %}
+import asyncio
+
+from cuprum import ECHO, RunOutputOptions, sh
+
+
+async def main() -> None:
+    # Pick a known fitting from the catalogue.
+    echo = sh.make(ECHO)
+    cmd = echo("-n", "hello, cuprum!")
+
+    result = await cmd.run(output=RunOutputOptions(echo=True))
+    if result.ok:
+        print()
+        print(f"exit {result.exit_code}, captured {result.stdout!r}")
+
+
+asyncio.run(main())
+          {% endhighlight %}
+          {% endcall %}
+        </div>
+      </section>
+
+      <section class="cu-receipt" aria-labelledby="receipt-title">
+        <div class="cu-shell cu-receipt__grid">
+          <div>
+            {{ icons.icon('receipt', 'cu-receipt__icon') }}
+            <p class="cu-kicker cu-receipt__kicker">Completed works</p>
+            <h2 id="receipt-title" class="cu-section-head__title">Receipts, not vibes.</h2>
+            <p class="mt-3">Every run returns a <code>CommandResult</code>. These are its fields.</p>
+          </div>
+          <dl class="cu-receipt__fields">
+            {% for field, question in receipt %}
+            <div class="cu-receipt__field">
+              <dt><code>{{ field }}</code></dt>
+              <dd>{{ question }}</dd>
+            </div>
+            {% endfor %}
+          </dl>
+        </div>
+      </section>
+
+      <section class="cu-section cu-drafting" aria-labelledby="drawers-title">
+        <div class="cu-shell">
+          <div class="cu-home-heading">
+            <p class="cu-kicker">The rest of the office</p>
+            <h2 id="drawers-title" class="cu-section-head__title">Open the drawers.</h2>
+            <p class="cu-section-head__lede">
+              The front window shows what Cuprum is for. The drawers hold the
+              detail: runnable examples, the engineering plans, the optional
+              native annex, and a public works board.
+            </p>
+          </div>
+          <div class="cu-card-grid">
+            {% for drawer in drawers %}
+            <article class="cu-card">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="cu-card__number">{{ drawer.number }}</span>
+                {% if drawer.status %}{{ ui.status(drawer.status) }}{% endif %}
+              </div>
+              <h3 class="cu-card__title"><a href="{{ drawer.href }}">{{ drawer.title }}</a></h3>
+              <p class="cu-card__body">{{ drawer.body }}</p>
+            </article>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="cu-renegade cu-surface-ink" aria-labelledby="renegade-title">
+        <figure class="cu-renegade__art">
+          <img
+            src="/cuprum/assets/images/poster-alley-1003.webp"
+            srcset="/cuprum/assets/images/poster-alley-640.webp 640w, /cuprum/assets/images/poster-alley-1003.webp 1003w"
+            sizes="(min-width: 64rem) 45vw, 100vw"
+            width="1003"
+            height="1568"
+            alt="In a rainy future city, a plumber in a patched orange work jacket pastes pipe-route diagrams onto an alley wall while surveillance drones sweep searchlights overhead and Copper keeps watch from a fire escape."
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption class="cu-renegade__tag">Exhibit A · suspiciously legible CI glue</figcaption>
+        </figure>
+        <div class="cu-renegade__copy">
+          <p class="cu-kicker">Wanted by the authorities</p>
+          <h2 id="renegade-title" class="cu-section-head__title">For making shell scripts comprehensible.</h2>
+          <p class="cu-renegade__lead">
+            Somewhere between Bash and a full orchestration platform there was
+            a perfectly reasonable Python program trying to get out. Cuprum is
+            for that program.
+          </p>
+          <ul class="cu-renegade__list">
+            <li>{{ icons.icon('package') }}<span><strong>Deployment helpers</strong> that say which step failed, with its exit code and stderr.</span></li>
+            <li>{{ icons.icon('flow') }}<span><strong>CI glue</strong> with names, types, and an opt-in GitHub Actions sink that folds each run into a log group.</span></li>
+            <li>{{ icons.icon('wrench') }}<span><strong>Maintenance scripts</strong> whose allowlist a reviewer can read in one place.</span></li>
+          </ul>
+          <blockquote class="cu-renegade__quote">
+            <p>“I keep a spare tee behind the filing cabinet. You’d be amazed.”</p>
+            <cite>Copper, senior pipeline dispatcher</cite>
+          </blockquote>
+        </div>
+      </section>
+
+      <section class="cu-final" aria-labelledby="final-title">
+        <div class="cu-shell cu-final__grid">
+          <div>
+            <p class="cu-kicker cu-final__kicker">No call-out charge</p>
+            <h2 id="final-title" class="cu-final__title">Send for Cuprum.</h2>
+            <p class="cu-final__lede">Typed command execution for Python. The pipes have suffered enough.</p>
+          </div>
+          <div class="cu-final__actions">
+            {{ ui.button('Get started', '/cuprum/getting-started/', variant='dark', icon='arrow-right') }}
+            {{ ui.button('View on GitHub', repository_url, variant='outline', icon='external') }}
+          </div>
+        </div>
+      </section>
+{% endblock %}

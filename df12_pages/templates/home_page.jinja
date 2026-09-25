@@ -141,6 +141,29 @@
           </a>
 {% endfor %}
         </div>
+{% if homepage.systems.libraries %}
+{% set libraries = homepage.systems.libraries %}
+        <section class="libraries" aria-labelledby="libraries-title">
+          <div class="libraries__head">
+            <h3 id="libraries-title" class="libraries__title">{{ libraries.heading }}</h3>
+            <p class="libraries__kicker">{{ libraries.kicker }}</p>
+          </div>
+          <ul class="libraries__list">
+{% for link in libraries.links %}
+            <li>
+              <a href="{{ link.href }}"{% if link.external %} target="_blank" rel="noopener noreferrer"{% endif %} class="group library-card pressable">
+                <span class="library-card__title">{{ link.label }}</span>
+                <span class="library-card__description">{{ link.description }}</span>
+                <span class="library-card__meta">
+                  {{ link.meta_label }}
+                  <iconify-icon icon="carbon:arrow-right" aria-hidden="true" class="link-arrow"></iconify-icon>
+                </span>
+              </a>
+            </li>
+{% endfor %}
+          </ul>
+        </section>
+{% endif %}
       </div>
     </section>
 

@@ -77,12 +77,91 @@ class SystemCardConfig:
 
 
 @dc.dataclass(slots=True)
+class LibraryLinkConfig:
+    """A compact link to a library, listed beneath the systems grid.
+
+    Attributes
+    ----------
+    label : str
+        The library's name, shown as the link's title.
+    description : str
+        A short blurb describing what the library does.
+    href : str
+        The link target: a relative path for a local sub-site, or an
+        absolute URL for an external project.
+    meta_label : str
+        The call-to-action text shown alongside the link, such as
+        "Learn more" or "View on GitHub".
+    external : bool
+        Whether the link points off-site. When ``True`` (the default), the
+        homepage renders the link with ``target="_blank"`` and a ``rel``
+        attribute that includes ``noopener``; when ``False``, it renders as
+        a plain same-site link.
+
+    `_build_libraries_config` in `df12_pages.config.homepage` validates
+    every field before constructing this dataclass: `label`, `description`,
+    `href`, and `meta_label` must each be a non-empty string, and `external`
+    must be a bool. It raises `SiteConfigError` otherwise.
+
+    Examples
+    --------
+    >>> link = LibraryLinkConfig(
+    ...     label="Cuprum",
+    ...     description="Typed, async command execution for Python.",
+    ...     href="cuprum/",
+    ...     meta_label="Learn more",
+    ...     external=False,
+    ... )
+    >>> link.external
+    False
+    >>> LibraryLinkConfig(
+    ...     label="rstest-bdd",
+    ...     description="Behaviour-driven testing macros layered on rstest.",
+    ...     href="https://github.com/leynos/rstest-bdd",
+    ...     meta_label="View on GitHub",
+    ... ).external
+    True
+    """
+
+    label: str
+    description: str
+    href: str
+    meta_label: str
+    external: bool = True
+
+
+@dc.dataclass(slots=True)
+class LibrariesConfig:
+    """The libraries group within the systems section.
+
+    Attributes
+    ----------
+    heading : str
+        The group's section heading, shown above its links.
+    kicker : str
+        A short standfirst displayed beneath the heading.
+    links : list[LibraryLinkConfig]
+        The group's links, non-empty and rendered in the given order.
+
+    `_build_libraries_config` in `df12_pages.config.homepage` validates the
+    payload before constructing this dataclass: `heading` and `kicker` must
+    be truthy, and `links` must be non-empty, or it raises
+    `SiteConfigError`.
+    """
+
+    heading: str
+    kicker: str
+    links: list[LibraryLinkConfig]
+
+
+@dc.dataclass(slots=True)
 class SystemsSectionConfig:
     """Systems grid configuration for the homepage."""
 
     heading: str
     kicker: str
     cards: list[SystemCardConfig]
+    libraries: LibrariesConfig | None = None
 
 
 @dc.dataclass(slots=True)
@@ -382,6 +461,8 @@ __all__ = [
     "FooterLinkConfig",
     "HeroConfig",
     "HomepageConfig",
+    "LibrariesConfig",
+    "LibraryLinkConfig",
     "NavLinkConfig",
     "PageConfig",
     "PrincipleConfig",

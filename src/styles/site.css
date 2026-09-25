@@ -507,6 +507,45 @@
     height: auto;
   }
 
+  /* Libraries: smaller parts listed beneath the systems grid. They are
+     compact links rather than product cards — a title, a sentence, and where
+     the link goes — so they read as a second tier of the same section. */
+  .libraries {
+    @apply mt-16 border-t border-base-300 pt-10;
+  }
+
+  .libraries__head {
+    @apply flex flex-wrap items-baseline gap-x-4 gap-y-1;
+  }
+
+  .libraries__title {
+    @apply font-mono text-2xl font-bold text-base-content;
+  }
+
+  .libraries__kicker {
+    @apply font-mono italic text-base-content/80;
+  }
+
+  .libraries__list {
+    @apply mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4;
+  }
+
+  .library-card {
+    @apply flex h-full flex-col gap-2 rounded-xl border border-base-300 bg-white px-6 py-5;
+  }
+
+  .library-card__title {
+    @apply font-mono text-lg font-bold text-base-content;
+  }
+
+  .library-card__description {
+    @apply text-sm text-base-content/80;
+  }
+
+  .library-card__meta {
+    @apply mt-auto inline-flex items-center gap-2 pt-2 font-mono text-sm text-primary;
+  }
+
   .product-card__link {
     @apply inline-flex items-center gap-2 text-sm text-base-content transition-colors duration-200;
   }

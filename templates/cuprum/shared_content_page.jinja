@@ -1,0 +1,33 @@
+{#
+  Shared legal copy (terms, privacy, code of conduct) rendered through the
+  Cuprum chrome. The body arrives as sanitised HTML from the Markdown in
+  config/shared/, so it carries no classes of its own and is styled by the
+  element selectors under .cu-legal. No municipal marks appear here: a legal
+  notice is not the place for a fictional crest.
+#}
+{% extends "_layout.jinja" %}
+{% block title %}{{ title }} · Cuprum{% endblock %}
+{% block description %}{{ summary or title ~ " for the Cuprum site." }}{% endblock %}
+{% block colophon_seal %}{% endblock %}
+{% block content %}
+      <header class="cu-page-head">
+        <div class="cu-shell cu-page-head__grid">
+          <div>
+            <div class="cu-page-head__labels">
+              <span class="cu-docket">{{ eyebrow or "Legal" }}</span>
+            </div>
+            <h1 class="cu-page-head__title">{{ title }}</h1>
+            {% if summary %}
+            <p class="cu-page-head__thesis">{{ summary }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </header>
+      <section class="cu-section">
+        <div class="cu-shell">
+          <article class="cu-legal">
+            {{ body_html | safe }}
+          </article>
+        </div>
+      </section>
+{% endblock %}

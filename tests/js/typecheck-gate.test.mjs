@@ -139,7 +139,9 @@ describe("the typecheck-js target", () => {
     const dirty = build();
     expect(dirty.status).not.toBe(0);
     expect(`${dirty.stdout ?? ""}${dirty.stderr ?? ""}`).toContain("error TS2322");
-  });
+    // Two uncached solution builds take about two seconds each, which leaves
+    // the default five-second test timeout no room on a busy machine.
+  }, 60000);
 
   test("leaves no fixture behind", () => {
     expect(existsSync(BROWSER_FIXTURE)).toBe(false);

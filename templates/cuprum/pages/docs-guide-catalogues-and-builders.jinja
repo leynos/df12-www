@@ -1,0 +1,110 @@
+{% extends "pages/_docs_guide.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_api.jinja" as api %}
+{% from "data/docs.jinja" import docs_tested %}
+{% set guide_slug = 'catalogues-and-builders' %}
+{% block guide_body %}
+<section aria-labelledby="catalogue">
+  <h2 id="catalogue">Define an application catalogue</h2>
+  <p>
+    A catalogue names the programs an application may build commands for.
+    Give them a project, a {{ api.ref('ProjectSettings') }}, and every
+    command carries the project's name, documentation locations, and noise
+    rules. {{ api.ref('ProgramCatalogue') }}<code>.from_project()</code>
+    builds a catalogue from one project; <code>ProgramCatalogue(projects=(...))</code>
+    holds several, each owning its programs. Cuprum stores noise rules for
+    log processing downstream; it does not filter output itself.
+  </p>
+{% call ui.code_panel('application_catalogue.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, ProjectSettings, sh
+from cuprum.catalogue import DuplicateProgramError
+
+PYTHON = Program(sys.executable)
+settings = ProjectSettings(
+    name="report-builder",
+    programs=(PYTHON,),
+    documentation_locations=("docs/reports.md",),
+    noise_rules=(r"^progress:",),
+)
+catalogue = ProgramCatalogue.from_project(settings)
+
+command = sh.make(PYTHON, catalogue=catalogue)("-c", "print('ok')")
+assert command.project.name == "report-builder"
+assert command.project.noise_rules == (r"^progress:",)
+assert catalogue.lookup(PYTHON).project.documentation_locations == ("docs/reports.md",)
+
+try:
+    ProgramCatalogue.from_programs(PYTHON, PYTHON)
+except DuplicateProgramError as exc:
+    assert exc.program == PYTHON
+else:
+    raise AssertionError("a program listed twice should be rejected")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    A catalogue that lists the same program twice raises
+    <code>DuplicateProgramError</code>, and two projects with one name raise
+    <code>DuplicateProjectError</code>; both are <code>ValueError</code>
+    subclasses from {{ api.ref('cuprum.catalogue') }}. An absolute path is
+    allowlisted exactly as written: <code>/usr/bin/git</code> does not also
+    permit <code>git</code> found on <code>PATH</code>.
+    <code>catalogue.visible_settings</code> maps each project name to its
+    settings for services that pass this metadata on.
+  </p>
+</section>
+
+<section aria-labelledby="builders">
+  <h2 id="builders">Wrap commands in project builders</h2>
+  <p>
+    Put argument construction in small functions that validate their input
+    and return a {{ api.ref('SafeCmd') }}. Callers then cannot build an
+    unvalidated command line. {{ api.ref('builders', 'cuprum.builders') }}
+    provides ready-made builders for Git, rsync, and tar, and the
+    <code>safe_path()</code> and <code>git_ref()</code> validators they use.
+    They use the default catalogue, so building their commands does not
+    need the tools installed; running them does.
+  </p>
+{% call ui.code_panel('project_builders.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+from pathlib import Path
+
+from cuprum import Program, ProgramCatalogue, SafeCmd, sh
+from cuprum.builders import git_rev_parse, safe_path
+
+PYTHON = Program(sys.executable)
+CATALOGUE = ProgramCatalogue.from_programs(PYTHON, name="line-counter")
+
+
+def count_lines(path: Path) -> SafeCmd:
+    """Build a command that counts the lines in one existing file."""
+    checked = safe_path(path.resolve())
+    script = "import sys; print(sum(1 for _ in open(sys.argv[1])))"
+    return sh.make(PYTHON, catalogue=CATALOGUE)("-c", script, str(checked))
+
+
+result = count_lines(Path("README.md")).run_sync()
+assert result.ok and int(result.stdout) > 0
+
+command = git_rev_parse("main")
+assert command.argv_with_program == ("git", "rev-parse", "main")
+try:
+    git_rev_parse("main..evil")
+except ValueError:
+    pass
+else:
+    raise AssertionError("an unsafe ref should be rejected")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    <code>safe_path()</code> rejects empty paths, NUL characters, and
+    <code>..</code> segments, and requires an absolute path unless
+    <code>allow_relative=True</code>. <code>git_ref()</code> rejects
+    whitespace, a leading <code>-</code>, <code>..</code>, <code>@{</code>,
+    and other constructs Git would read as options or revision syntax.
+  </p>
+</section>
+{% endblock %}

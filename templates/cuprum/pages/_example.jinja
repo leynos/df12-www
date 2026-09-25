@@ -1,0 +1,81 @@
+{#
+  The job-sheet layout every worked example extends.
+
+  A child sets `example_slug` and `example_facts`, then fills the six
+  section blocks. The head, the route map, the section numbering, and the
+  previous/next links all come from here and from data/examples.jinja, so a
+  new example cannot forget one of them or number them differently.
+#}
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% from "data/examples.jinja" import examples, published_examples %}
+{% set example = (examples | selectattr('slug', 'equalto', example_slug) | first) %}
+{% set slugs = published_examples | map(attribute='slug') | list %}
+{% set position = slugs.index(example_slug) %}
+{% set verified = 'Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · Python ' ~ python_floor ~ ' · Linux' %}
+{% set sections = [
+  {'id': 'problem', 'label': 'Problem', 'title': 'The job'},
+  {'id': 'before', 'label': 'Before you start', 'title': 'Before you start'},
+  {'id': 'code', 'label': 'Code', 'title': 'The code'},
+  {'id': 'output', 'label': 'Output', 'title': 'Expected output'},
+  {'id': 'failure', 'label': 'Failure path', 'title': 'When it fails'},
+  {'id': 'policy', 'label': 'Why it is allowed', 'title': 'Why the policy permits it'},
+] %}
+{% block title %}{{ example.title }} · Worked examples · Cuprum{% endblock %}
+{% block description %}{{ example.summary }}{% endblock %}
+{% block main_class %} class="cu-example"{% endblock %}
+{% block content %}
+      {% call ui.page_head('Job sheet ' ~ example.number ~ ' · Worked example', example.title, example.summary,
+        statuses=['verified'], meta=verified, stamp='Field copy') %}
+        {% for tag in example.tags %}<span class="cu-tag">{{ tag }}</span>{% endfor %}
+      {% endcall %}
+      {{ ui.routemap(sections, 'Job sheet') }}
+
+      <section id="problem" class="cu-section" aria-labelledby="problem-title">
+        <div class="cu-shell">
+          {{ ui.section_head(sections, 'problem') }}
+          <div class="cu-prose">{% block problem %}{% endblock %}</div>
+        </div>
+      </section>
+
+      <section id="before" class="cu-section cu-section--tint" aria-labelledby="before-title">
+        <div class="cu-shell cu-example__narrow">
+          {{ ui.section_head(sections, 'before') }}
+          {{ ui.facts(example_facts, 'Prerequisites and tested version') }}
+        </div>
+      </section>
+
+      <section id="code" class="cu-section" aria-labelledby="code-title">
+        <div class="cu-shell">
+          {{ ui.section_head(sections, 'code') }}
+          {% block code %}{% endblock %}
+        </div>
+      </section>
+
+      <section id="output" class="cu-section cu-section--tint" aria-labelledby="output-title">
+        <div class="cu-shell">
+          {{ ui.section_head(sections, 'output') }}
+          {% block output %}{% endblock %}
+        </div>
+      </section>
+
+      <section id="failure" class="cu-section" aria-labelledby="failure-title">
+        <div class="cu-shell">
+          {{ ui.section_head(sections, 'failure') }}
+          {% block failure %}{% endblock %}
+        </div>
+      </section>
+
+      <section id="policy" class="cu-section cu-section--tint" aria-labelledby="policy-title">
+        <div class="cu-shell">
+          {{ ui.section_head(sections, 'policy') }}
+          <div class="cu-prose">{% block policy %}{% endblock %}</div>
+          {% set prev = published_examples[position - 1] if position > 0 else none %}
+          {% set next = published_examples[position + 1] if position + 1 < published_examples | length else none %}
+          {{ ui.pager(
+            {'href': '/cuprum/examples/' ~ prev.slug ~ '/', 'title': prev.title} if prev else {'href': '/cuprum/examples/', 'title': 'All worked examples'},
+            {'href': '/cuprum/examples/' ~ next.slug ~ '/', 'title': next.title} if next else {'href': '/cuprum/examples/', 'title': 'All worked examples'}
+          ) }}
+        </div>
+      </section>
+{% endblock %}

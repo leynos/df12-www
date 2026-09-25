@@ -105,6 +105,20 @@ homepage:
         icon: stilyagi
         meta_label: Learn more
         external: false
+    libraries:
+      heading: Libraries
+      kicker: Smaller parts, built to be built with.
+      links:
+        - label: Cuprum
+          description: Typed, async command execution for Python. Approved programs, exact argv, structured results.
+          href: "cuprum/"
+          meta_label: Learn more
+          external: false
+        - label: rstest-bdd
+          description: Behaviour-driven testing macros layered on rstest. Narrative clarity without the ceremony.
+          href: "https://github.com/leynos/rstest-bdd"
+          meta_label: View on GitHub
+          external: true
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.
@@ -1581,4 +1595,83 @@ sites:
         label: Docs
         template: pages/docs.jinja
         output_slug: docs
+    pages: {}
+
+  cuprum:
+    output_dir: public/cuprum
+    templates_dir: templates/cuprum
+    stylesheet: /cuprum/assets/styles/cuprum.css
+    base_path: /cuprum/
+    theme:
+      site_name: Cuprum
+      hero_eyebrow: Cuprum Documentation
+      hero_tagline: Typed, async command execution for Python
+    parent_link:
+      label: "← Back to df12 Productions"
+      href: /
+    template_vars:
+      # The release every snippet on the sub-site is verified against, as
+      # tagged (cuprum_version), as PyPI normalizes it (cuprum_pypi, which
+      # the install commands pin exactly, since pip skips a pre-release that
+      # is not named), and as the git tag that source links point at. Move
+      # them together, with the verification date, after re-running every
+      # snippet, and regenerate the API reference from the new tag.
+      cuprum_version: "0.2.0-beta1"
+      cuprum_pypi: "0.2.0b1"
+      cuprum_tag: "v0.2.0-beta1"
+      cuprum_previous: "0.1.0"
+      cuprum_verified_on: "2026-09-25"
+      python_floor: "3.12"
+      repository_url: "https://github.com/leynos/cuprum"
+    nav_links:
+      - label: Home
+        href: /cuprum/
+      - label: Docs
+        href: /cuprum/docs/
+      - label: Examples
+        href: /cuprum/examples/
+      - label: Internals
+        href: /cuprum/internals/
+      - label: Roadmap
+        href: /cuprum/roadmap/
+      - label: Setwork
+        href: /cuprum/setwork/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    homepage:
+      title: "Cuprum — typed command execution for Python"
+    content_pages:
+      - { key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: getting-started }
+      - { key: examples, label: Worked examples, template: pages/examples.jinja, output_slug: examples }
+      - { key: examples-first-command, label: Run an approved command, template: pages/examples-first-command.jinja, output_slug: examples/first-command }
+      - { key: examples-pipeline-tee, label: Pipeline, tee, and stage failure, template: pages/examples-pipeline-tee.jinja, output_slug: examples/pipeline-tee }
+      - { key: examples-deployment-helper, label: A deployment helper with scoped policy, template: pages/examples-deployment-helper.jinja, output_slug: examples/deployment-helper }
+      - { key: examples-ci-observability, label: Observe CI commands, template: pages/examples-ci-observability.jinja, output_slug: examples/ci-observability }
+      - { key: examples-concurrent-jobs, label: Run jobs concurrently, template: pages/examples-concurrent-jobs.jinja, output_slug: examples/concurrent-jobs }
+      - { key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals }
+      - { key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: internals/rust-extension }
+      - { key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs }
+      - { key: docs-guides, label: Guides, template: pages/docs-guides.jinja, output_slug: docs/guides }
+      - { key: docs-guide-run-a-command, label: "Run a command", template: pages/docs-guide-run-a-command.jinja, output_slug: docs/guides/run-a-command }
+      - { key: docs-guide-output, label: "Control output", template: pages/docs-guide-output.jinja, output_slug: docs/guides/output }
+      - { key: docs-guide-input-and-deadlines, label: "Input, environment, and deadlines", template: pages/docs-guide-input-and-deadlines.jinja, output_slug: docs/guides/input-and-deadlines }
+      - { key: docs-guide-pipelines-and-concurrency, label: "Pipelines and concurrency", template: pages/docs-guide-pipelines-and-concurrency.jinja, output_slug: docs/guides/pipelines-and-concurrency }
+      - { key: docs-guide-catalogues-and-builders, label: "Catalogues and builders", template: pages/docs-guide-catalogues-and-builders.jinja, output_slug: docs/guides/catalogues-and-builders }
+      - { key: docs-guide-policy-and-hooks, label: "Scopes, policy, and hooks", template: pages/docs-guide-policy-and-hooks.jinja, output_slug: docs/guides/policy-and-hooks }
+      - { key: docs-guide-observe, label: "Observe production runs", template: pages/docs-guide-observe.jinja, output_slug: docs/guides/observe }
+      - { key: docs-guide-troubleshoot, label: "Troubleshoot a run", template: pages/docs-guide-troubleshoot.jinja, output_slug: docs/guides/troubleshoot }
+      - { key: docs-guide-migrate, label: "Migrate to 0.2.0", template: pages/docs-guide-migrate.jinja, output_slug: docs/guides/migrate }
+      - { key: docs-api, label: API reference, template: pages/docs-api.jinja, output_slug: docs/api }
+      - { key: docs-api-commands, label: "Commands and results", template: pages/docs-api-commands.jinja, output_slug: docs/api/commands }
+      - { key: docs-api-catalogues, label: "Programs and catalogues", template: pages/docs-api-catalogues.jinja, output_slug: docs/api/catalogues }
+      - { key: docs-api-pipelines, label: "Pipelines and concurrency", template: pages/docs-api-pipelines.jinja, output_slug: docs/api/pipelines }
+      - { key: docs-api-policy, label: "Scopes, policy, and hooks", template: pages/docs-api-policy.jinja, output_slug: docs/api/policy }
+      - { key: docs-api-observation, label: "Events and observation", template: pages/docs-api-observation.jinja, output_slug: docs/api/observation }
+      - { key: docs-api-rust, label: "Rust pump and backends", template: pages/docs-api-rust.jinja, output_slug: docs/api/rust }
+      - { key: docs-api-adapters, label: "Adapters and sinks", template: pages/docs-api-adapters.jinja, output_slug: docs/api/adapters }
+      - { key: docs-api-errors, label: "Errors", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors }
+      - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
+      - { key: setwork, label: Setwork, template: pages/setwork.jinja, output_slug: setwork }
     pages: {}

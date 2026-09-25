@@ -1,0 +1,278 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% block title %}Setwork (preview, not installable) · Cuprum{% endblock %}
+{% block description %}Setwork is a proposed companion to Cuprum: an offline compiler that turns command descriptions into typed Python functions returning Cuprum commands. Design draft only; nothing to install.{% endblock %}
+{% block main_class %} class="cu-setwork"{% endblock %}
+{% block content %}
+{% set sections = [
+  {'id': 'boundary', 'label': 'The boundary', 'title': 'Describe, generate, run',
+   'lede': 'Three owners, and generation is not execution. Setwork produces argv; Cuprum decides whether and how it runs.'},
+  {'id': 'illustrative', 'label': 'Illustrative API', 'title': 'What a generated adapter looks like',
+   'lede': 'A handwritten stand-in from the design documents, not generated output and not a package you can install.'},
+  {'id': 'grammar', 'label': 'Grammar', 'title': 'Not every command is flat',
+   'lede': 'Commands fall into grammar classes, and each class changes what a trustworthy serializer needs.'},
+  {'id': 'exclusions', 'label': 'Exclusions', 'title': 'What Setwork will not do'},
+  {'id': 'open', 'label': 'Open questions', 'title': 'Decisions still to make'},
+] %}
+{% set crate_art = {
+  'name': 'fittings-crate', 'widths': [768, 1536], 'width': 1536, 'height': 1024,
+  'alt': '', 'plate': 'Plate 08',
+  'caption': 'Copper inspects a fitting from a crate sorted by kind. Setwork is about naming the fittings; the tags are blank because the corpus is not written yet.',
+  'eager': true,
+} %}
+{% set boundary = {
+  'id': 'fig-setwork', 'num': 'Fig. 01', 'horizontal': true, 'status': 'proposed',
+  'title': 'Who describes a command, who generates it, and who runs it?',
+  'steps': [
+    {'kind': 'builder', 'kind_label': '1 · Source description', 'name': 'completion specs + overlays', 'detail': 'Versioned command metadata, imported statically, corrected by curated overlays for a named target profile.', 'edge': 'evidence-bearing IR'},
+    {'kind': 'builder', 'kind_label': '2 · Generated adapter', 'name': 'def echo(*text, n=False) -> SafeCmd', 'detail': 'An ordinary typed function that serializes values into an exact argv. It runs nothing.', 'edge': 'SafeCmd'},
+    {'kind': 'process', 'kind_label': '3 · Cuprum runtime', 'name': 'policy, run, pipelines, results', 'detail': 'Allowlists, scopes, execution, observation, cancellation, and results, exactly as for any SafeCmd.'},
+  ],
+  'branches': [
+    {'when': 'Build time', 'then': 'The compiler never executes imported completion code under its default policy, and a command with unresolved facts is not published.'},
+    {'when': 'Run time', 'then': 'The generated package imports no compiler, Node.js, or Fig code, and never inspects PATH.'},
+  ],
+  'takeaway': 'Setwork names the fittings. Cuprum runs the pipes.',
+  'source': 'Source: Setwork technical design, draft v0.1 (18 July 2026), Figure 1',
+} %}
+      {% call ui.page_head('Annex S · Preview · Not yet installable', 'Setwork',
+        'Setwork names the fittings; Cuprum runs the pipes. It is a proposed offline compiler that turns command descriptions into typed Python functions, each returning an exact Cuprum SafeCmd.',
+        statuses=['proposed', 'illustrative'],
+        meta='Design draft v0.1, last revised 18 July 2026 · no code, package, or public repository yet',
+        art_image=crate_art, stamp='Not yet installable') %}
+        {{ ui.button('See the boundary', '#boundary', icon='arrow-down') }}
+        {{ ui.button('Cuprum on GitHub', repository_url, variant='outline', icon='external') }}
+      {% endcall %}
+      {{ ui.routemap(sections, 'Annex S') }}
+
+      {% call ui.section(sections, 'boundary') %}
+      {{ ui.flow(boundary) }}
+      <div class="cu-columns mt-12">
+        <div class="cu-prose">
+          <h3>Why a compiler</h3>
+          <p>
+            Cuprum’s <code>tar</code> builder validates its values and
+            constructs a canonical tuple of tokens by hand. That works, but
+            every supported command needs new handwritten API, validation,
+            serialization, documentation, and tests. Meanwhile completion
+            projects such as Fig, Carapace, and OpenCLI already describe the
+            structure of many popular command lines.
+          </p>
+          <p>
+            Setwork proposes to close that gap: import what those sources can
+            prove, correct it with curated overlays, and generate typed
+            functions a checker can hold to account.
+          </p>
+        </div>
+        <div class="cu-prose">
+          <h3>Why not trust completion data as is</h3>
+          <p>
+            Completion asks what token might sensibly come next. Invocation
+            asks which typed values form a valid command, and exactly how they
+            become argv. A completion spec may suggest numbers without proving
+            the program accepts an integer, or which separator it wants, or
+            which version introduced the option.
+          </p>
+          <p>
+            So every field in Setwork’s intermediate representation carries
+            its evidence — authoritative, curated, imported, inferred, or
+            unresolved — and unresolved fields block publication.
+          </p>
+        </div>
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'illustrative', class='cu-section--tint') %}
+      {% call ui.callout('preview', 'Illustrative API') %}
+      <p>
+        The adapter below is handwritten to show the shape the compiler would
+        generate. It is ordinary Python built on Cuprum, so the argv it prints
+        is real — it was run against Cuprum {{ cuprum_pypi }} on
+        {{ cuprum_verified_on }} — but there is no <code>setwork</code>
+        package, and the API may change entirely.
+      </p>
+      {% endcall %}
+      <div class="cu-pair mt-8">
+        {% call ui.code_panel('generated_api_example.py (excerpt)', 'Illustrative') %}
+        {% highlight 'python', 'cuprum-syntax' %}
+def echo(
+    *text: TextOperand,
+    n: bool = False,
+    enable_escapes: bool = False,
+    disable_escapes: bool = False,
+) -> SafeCmd:
+    """Write operands with the selected GNU ``echo`` profile."""
+
+    if enable_escapes and disable_escapes:
+        raise ValueError("enable_escapes and disable_escapes conflict")
+
+    operands = tuple(_stringify(value, role="echo operand") for value in text)
+    if operands and _looks_like_echo_option(operands[0]):
+        msg = (
+            f"ambiguous first echo operand {operands[0]!r}; the selected profile "
+            "has no verified option terminator for this position"
+        )
+        raise ValueError(msg)
+
+    argv: list[str] = []
+    if n:
+        argv.append("-n")
+    if enable_escapes:
+        argv.append("-e")
+    if disable_escapes:
+        argv.append("-E")
+    argv.extend(operands)
+    return _BUILD_ECHO(*argv)
+        {% endhighlight %}
+        {% endcall %}
+        <div class="cu-stack">
+          {% call ui.code_panel('use_adapters.py', 'Illustrative', foot=['Run ' ~ cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi], flat=true) %}
+          {% highlight 'python', 'cuprum-syntax' %}
+import functools
+
+from generated_api_example import BlockSize, Conversion, dd, echo
+
+backup = dd(
+    input_path="disk.img",
+    output_path="backup.img",
+    block_size=BlockSize("4M"),
+    conversions=(Conversion.NOERROR, Conversion.SYNC),
+)
+print(backup.argv_with_program)
+
+quiet = functools.partial(echo, n=True)
+print(quiet("hello", "pipes").argv_with_program)
+
+try:
+    echo("-n")
+except ValueError as exc:
+    print(f"ValueError: {exc}")
+          {% endhighlight %}
+          {% endcall %}
+          {% call ui.output('Exact argv', 'stdout') %}
+('dd', 'if=disk.img', 'of=backup.img', 'bs=4M', 'conv=noerror,sync')
+('echo', '-n', 'hello', 'pipes')
+ValueError: ambiguous first echo operand '-n'; the selected profile has no verified option terminator for this position
+          {% endcall %}
+        </div>
+      </div>
+      <div class="cu-pair mt-10">
+        <div class="cu-prose">
+          <h3>Reading it</h3>
+          <p>
+            <code>dd</code> takes assignment operands, so its parameters become
+            <code>if=</code>, <code>of=</code>, <code>bs=</code>, and
+            <code>conv=</code> tokens rather than flags. <code>echo</code> is
+            wrapped with <code>functools.partial</code> and keeps a checkable
+            signature. And an operand the GNU profile could read as an option
+            is refused before anything runs, because this profile has no
+            verified way to terminate options.
+          </p>
+        </div>
+        {{ ui.facts([
+          ('Source lock', 'Each source repository, immutable revision, selected files, checksums, and adapter version'),
+          ('Licence', 'Licence evidence for every imported source, carried into the generated package'),
+          ('Overlays', 'The curated overlay set applied on top of imported facts'),
+          ('Evidence', 'Per field: authoritative, curated, imported, inferred, or unresolved'),
+          ('Reproducible', 'Two builds from the same lock produce byte-identical source and provenance'),
+        ], 'Provenance each generated package records') }}
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'grammar') %}
+      {% call ui.matrix('grammar-caption', 'Command grammar classes · from the Setwork terms of reference',
+        ['Grammar class', 'Examples', 'Consequence for Setwork']) %}
+      <tr role="row">
+        <th scope="row" role="rowheader">Flat option algebra</th>
+        {% call ui.matrix_cell('Examples') %}<code>echo</code>, many core utilities{% endcall %}
+        {% call ui.matrix_cell('Consequence for Setwork') %}A generated function can usually model the full command.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Assignment operands</th>
+        {% call ui.matrix_cell('Examples') %}<code>dd</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Setwork') %}Named values serialize as tokens such as <code>bs=4M</code>, not POSIX flags.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Command family</th>
+        {% call ui.matrix_cell('Examples') %}<code>git</code>, <code>docker</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Setwork') %}Runnable leaves map to functions in a module.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Mode-sensitive command</th>
+        {% call ui.matrix_cell('Examples') %}<code>tar</code>, <code>openssl</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Setwork') %}Incompatible modes become separate functions.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Embedded language</th>
+        {% call ui.matrix_cell('Examples') %}<code>find</code>, <code>sed</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Setwork') %}A command-specific syntax tree is required.{% endcall %}
+      </tr>
+      <tr role="row">
+        <th scope="row" role="rowheader">Delegated execution</th>
+        {% call ui.matrix_cell('Examples') %}<code>find -exec</code>, <code>sh -c</code>{% endcall %}
+        {% call ui.matrix_cell('Consequence for Setwork') %}Authorization must cover programs nested inside arguments. Excluded for now.{% endcall %}
+      </tr>
+      {% endcall %}
+      <p class="cu-prose mt-6">
+        Dialect is part of the contract. GNU, BSD, BusyBox, and vendor variants
+        are separate target profiles, never folded into a fictional universal
+        command, and Setwork does not guess one from the machine it runs on.
+      </p>
+      {% endcall %}
+
+      {% call ui.section(sections, 'exclusions', class='cu-section--tint') %}
+      <div class="cu-setwork__exclusions">
+        {% call ui.callout('caveat', 'Delegated execution is not included') %}
+        <p>
+          <code>find -exec</code>, <code>sh -c</code>, and command-valued
+          options make one program run another. Cuprum authorizes a
+          <code>SafeCmd</code> by its direct program, so allowing
+          <code>find</code> would quietly allow whatever it executes. These
+          features stay out of the publishable surface until Cuprum can
+          authorize the whole set of programs a command may start.
+        </p>
+        {% endcall %}
+        {% call ui.callout('caveat', 'Secrets stay out of argv') %}
+        <p>
+          A type annotation does not make a process argument confidential:
+          argv is visible to other processes and reaches logs and traces.
+          Password, token, and key parameters are excluded from the default
+          surface until a sensitivity and redaction policy exists.
+        </p>
+        {% endcall %}
+        {% call ui.callout('note', 'Not a shell, not a runtime') %}
+        <p>
+          No shell strings, globbing, redirection, or control flow. No runtime
+          discovery of commands from PATH. No execution, installation, or
+          process supervision: Setwork generates argv, and Cuprum owns
+          everything that happens after.
+        </p>
+        {% endcall %}
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'open') %}
+      <ol class="cu-invariants cu-setwork__questions">
+        <li><strong>Which target profile ships first?</strong> GNU/Linux, macOS/BSD, BusyBox, or a narrower pinned toolchain decides the semantics, fixtures, and package naming.</li>
+        <li><strong>Which commands form the first corpus?</strong> The proposal is <code>echo</code>, <code>dd</code>, selected <code>git</code> leaves, <code>tar</code> create and extract, and a non-delegating <code>find</code> subset.</li>
+        <li><strong>May derived Fig material be redistributed?</strong> The examined revision’s licence files disagree, so this needs a written interpretation first.</li>
+        <li><strong>How should Cuprum authorize delegated execution?</strong> A joint Setwork and Cuprum decision; it blocks <code>-exec</code>-style features, not a safe first subset.</li>
+        <li><strong>One package, per-profile extras, or generate-it-yourself?</strong> The choice sets release cadence, licence obligations, and compatibility promises.</li>
+        <li><strong>Can the name be held?</strong> <code>setwork</code> was unclaimed on PyPI when this page was checked on 2026-09-23, but nothing reserves it yet, and a trademark search comes before anything is published.</li>
+      </ol>
+      <div class="cu-setwork__follow mt-12">
+        <div class="cu-prose">
+          <p>
+            There is no Setwork repository to star and no package to install.
+            Setwork targets Cuprum’s runtime, so Cuprum’s repository is the
+            place to follow the seam it depends on and to ask about it.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+          {{ ui.button('Cuprum issues', repository_url ~ '/issues', icon='external') }}
+          {{ ui.button('Cuprum builders today', '/cuprum/docs/guides/catalogues-and-builders/#builders', variant='outline', icon='external') }}
+        </div>
+      </div>
+      {% endcall %}
+{% endblock %}

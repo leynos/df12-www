@@ -1,0 +1,589 @@
+/* The Cuprum front window: the site's one cinematic page.
+ *
+ * It alternates full-bleed night scenes with warm paper: the dispatch-office
+ * hero, a paper run of dispatch cards, the teal field manual with real code,
+ * a yellow receipt, the drawers of the wider site, the renegade plumber, and
+ * an orange closing action. Every rule is scoped under `.cu-home`. */
+
+/* ---------- Hero ------------------------------------------------------ */
+
+/* Accent type over the art uses the lifted orange: over the brightest pixel
+   the scrim can leave, plain orange measures 4.35:1 and the lifted cut
+   6.08:1. */
+.cu-home .cu-hero {
+  --cu-accent-text: var(--color-orange-lift);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: min(52rem, calc(100svh - 4.25rem));
+  overflow: hidden;
+}
+
+.cu-home .cu-hero__art {
+  position: absolute;
+  inset: 0;
+}
+
+.cu-home .cu-hero__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% center;
+}
+
+/* The scrim is what the headline's contrast is measured against: at the
+   copy column it is at least 88% ink, so cream type holds above 12:1 over
+   the brightest part of the art. */
+.cu-home .cu-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(15 20 18 / 94%) 0%, rgb(15 20 18 / 88%) 36%, rgb(15 20 18 / 20%) 72%),
+    linear-gradient(0deg, rgb(15 20 18 / 85%), transparent 45%);
+}
+
+.cu-home .cu-hero__inner {
+  position: relative;
+  width: 100%;
+  padding-block: 5rem 2rem;
+}
+
+.cu-home .cu-hero__copy {
+  max-width: 46rem;
+}
+
+.cu-home .cu-hero .cu-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cu-home .cu-hero .cu-kicker svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.cu-home .cu-hero__title {
+  margin-top: 1.25rem;
+  font-size: clamp(3.4rem, 8.5vw, 7.75rem);
+  line-height: 0.86;
+}
+
+.cu-home .cu-hero__title code {
+  padding: 0;
+  background: none;
+  color: var(--color-yellow);
+  font-family: inherit;
+  font-size: inherit;
+  overflow-wrap: normal;
+}
+
+.cu-home .cu-hero__deck {
+  max-width: 38rem;
+  margin-top: 1.5rem;
+  color: var(--color-cream);
+  font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+  line-height: 1.55;
+}
+
+.cu-home .cu-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.cu-home .cu-hero__status {
+  max-width: 40rem;
+  margin-top: 1.75rem;
+  color: var(--color-night-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+}
+
+.cu-home .cu-hero__plate {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  padding-block: 1rem 1.5rem;
+  border-top: 1px solid var(--color-rule-on-dark);
+  color: var(--color-night-muted);
+  font-size: 0.9rem;
+}
+
+@media (width < 48rem) {
+  .cu-home .cu-hero__art img {
+    object-position: 72% center;
+    opacity: 0.75;
+  }
+
+  .cu-home .cu-hero__scrim {
+    background: linear-gradient(
+      0deg,
+      rgb(15 20 18 / 97%) 10%,
+      rgb(15 20 18 / 84%) 70%,
+      rgb(15 20 18 / 70%)
+    );
+  }
+
+  .cu-home .cu-hero__actions .cu-btn {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Section headings on the front window ---------------------- */
+
+.cu-home .cu-home-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+@media (width >= 64rem) {
+  .cu-home .cu-home-heading {
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .cu-home .cu-home-heading .cu-section-head__title {
+    margin-top: 0;
+  }
+
+  .cu-home .cu-home-heading .cu-section-head__lede {
+    margin-top: 0.3rem;
+  }
+}
+
+/* ---------- Dispatch board -------------------------------------------- */
+
+.cu-home .cu-dispatch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  border: 3px solid var(--color-ink);
+  box-shadow: 10px 10px 0 var(--color-ink);
+  list-style: none;
+}
+
+.cu-home .cu-dispatch > li + li {
+  margin-top: 0;
+  border-top: 2px solid var(--color-ink);
+}
+
+.cu-home .cu-dispatch__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 2rem 1.75rem 1.5rem;
+}
+
+.cu-home .cu-dispatch__num {
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.cu-home .cu-dispatch__icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cu-home .cu-dispatch__title {
+  font-size: 2rem;
+}
+
+.cu-home .cu-dispatch__code {
+  margin-top: auto;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid currentcolor;
+  background: none;
+  font-size: 0.78rem;
+}
+
+.cu-home .cu-dispatch__card--orange {
+  background: var(--color-orange);
+  color: var(--color-ink);
+}
+
+.cu-home .cu-dispatch__card--cream {
+  background: var(--color-cream);
+}
+
+.cu-home .cu-dispatch__card--patina {
+  --cu-focus: var(--color-yellow);
+
+  background: var(--color-patina-text);
+  color: var(--color-cream);
+}
+
+.cu-home .cu-dispatch__card--ink {
+  --cu-focus: var(--color-yellow);
+
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+@media (width >= 48rem) {
+  .cu-home .cu-dispatch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cu-home .cu-dispatch > li + li {
+    border-top: 0;
+  }
+
+  .cu-home .cu-dispatch > li:nth-child(odd) {
+    border-right: 2px solid var(--color-ink);
+  }
+
+  .cu-home .cu-dispatch > li:nth-child(n + 3) {
+    border-top: 2px solid var(--color-ink);
+  }
+
+  .cu-home .cu-dispatch__card {
+    min-height: 20rem;
+  }
+}
+
+@media (width >= 80rem) {
+  .cu-home .cu-dispatch {
+    grid-template-columns: 4fr 3fr 3fr 4fr;
+  }
+
+  .cu-home .cu-dispatch > li:nth-child(n) {
+    border-top: 0;
+    border-right: 2px solid var(--color-ink);
+  }
+
+  .cu-home .cu-dispatch > li:last-child {
+    border-right: 0;
+  }
+}
+
+/* ---------- Field manual ---------------------------------------------- */
+
+.cu-home .cu-manual {
+  padding-block: clamp(4rem, 8vw, 7rem);
+}
+
+.cu-home .cu-manual__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (width >= 64rem) {
+  .cu-home .cu-manual__grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 5vw;
+  }
+}
+
+.cu-home .cu-manual__copy > * + * {
+  margin-top: 1.25rem;
+}
+
+.cu-home .cu-manual__copy .cu-section-head__title {
+  margin-top: 0.75rem;
+}
+
+.cu-home .cu-manual__copy .cu-slip {
+  margin-top: 2rem;
+}
+
+.cu-home .cu-manual__note {
+  color: var(--color-night-muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Receipt --------------------------------------------------- */
+
+.cu-home .cu-receipt {
+  --cu-accent-text: var(--color-ink);
+
+  padding-block: clamp(3.5rem, 6vw, 5rem);
+  border-block: 3px solid var(--color-ink);
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+.cu-home .cu-receipt__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+}
+
+@media (width >= 64rem) {
+  .cu-home .cu-receipt__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: stretch;
+  }
+}
+
+.cu-home .cu-receipt__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.cu-home .cu-receipt .cu-section-head__title {
+  margin-top: 0.5rem;
+}
+
+.cu-home .cu-receipt__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border: 2px solid var(--color-ink);
+}
+
+.cu-home .cu-receipt__field {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 7rem;
+  padding: 1rem;
+  border-right: 1px dashed var(--color-ink);
+  border-bottom: 1px dashed var(--color-ink);
+}
+
+.cu-home .cu-receipt__field:nth-child(2n) {
+  border-right: 0;
+}
+
+.cu-home .cu-receipt__field:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.cu-home .cu-receipt__field dt code {
+  padding: 0;
+  background: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.cu-home .cu-receipt__field dd {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+}
+
+@media (width >= 48rem) {
+  .cu-home .cu-receipt__fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cu-home .cu-receipt__field:nth-child(2n) {
+    border-right: 1px dashed var(--color-ink);
+  }
+
+  .cu-home .cu-receipt__field:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .cu-home .cu-receipt__field:nth-last-child(-n + 3) {
+    border-bottom: 0;
+  }
+}
+
+/* ---------- Drawers --------------------------------------------------- */
+
+/* Five drawers: three over two on tablets, all five abreast on a wide
+   desk, so none is left alone on a row. */
+@media (width >= 48rem) {
+  .cu-home .cu-card-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .cu-home .cu-card-grid > * {
+    grid-column: span 2;
+  }
+
+  .cu-home .cu-card-grid > :nth-child(4) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (width >= 80rem) {
+  .cu-home .cu-card-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .cu-home .cu-card-grid > *,
+  .cu-home .cu-card-grid > :nth-child(4) {
+    grid-column: auto;
+  }
+}
+
+/* ---------- Renegade scene -------------------------------------------- */
+
+.cu-home .cu-renegade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (width >= 64rem) {
+  .cu-home .cu-renegade {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    min-height: 48rem;
+  }
+}
+
+.cu-home .cu-renegade__art {
+  position: relative;
+  min-height: 28rem;
+  margin: 0;
+  overflow: hidden;
+}
+
+.cu-home .cu-renegade__art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.cu-home .cu-renegade__tag {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  max-width: calc(100% - 3rem);
+  padding: 0.7rem 0.9rem;
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper);
+  box-shadow: 5px 5px 0 var(--color-orange);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+.cu-home .cu-renegade__copy {
+  align-self: center;
+  max-width: 44rem;
+  padding: clamp(3rem, 6vw, 5rem) var(--cu-gutter);
+}
+
+.cu-home .cu-renegade__copy .cu-section-head__title {
+  margin-top: 0.75rem;
+}
+
+.cu-home .cu-renegade__lead {
+  margin-top: 1.5rem;
+  color: var(--color-night-muted);
+  font-size: 1.15rem;
+}
+
+.cu-home .cu-renegade__list {
+  display: grid;
+  gap: 0;
+  margin: 2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cu-home .cu-renegade__list li {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  margin: 0;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-rule-on-dark);
+}
+
+.cu-home .cu-renegade__list svg {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.15rem;
+  color: var(--color-orange);
+}
+
+.cu-home .cu-renegade__quote {
+  margin: 2.5rem 0 0;
+  padding: 1.5rem;
+  background: var(--color-paper);
+  box-shadow: 7px 7px 0 var(--color-orange);
+  color: var(--color-ink);
+  font-size: 1.2rem;
+  font-style: italic;
+  transform: rotate(1deg);
+}
+
+.cu-home .cu-renegade__quote cite {
+  display: block;
+  margin-top: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---------- Closing action -------------------------------------------- */
+
+/* Orange with a fine ink halftone, as in the prototype. Ink type holds
+   5.73:1 on bare orange; the dots only darken the ground, which raises
+   rather than lowers the contrast of ink type laid over it. */
+.cu-home .cu-final {
+  --cu-accent-text: var(--color-ink);
+
+  padding-block: clamp(4rem, 8vw, 6rem);
+  background-color: var(--color-orange);
+  background-image: radial-gradient(rgb(22 26 24 / 22%) 0.8px, transparent 0.8px);
+  background-size: 7px 7px;
+  color: var(--color-ink);
+}
+
+.cu-home .cu-final__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (width >= 64rem) {
+  .cu-home .cu-final__grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  }
+}
+
+.cu-home .cu-final__title {
+  margin-top: 0.75rem;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+}
+
+.cu-home .cu-final__lede {
+  max-width: 34rem;
+  margin-top: 1rem;
+  font-size: 1.15rem;
+}
+
+.cu-home .cu-final__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cu-home .cu-final .cu-btn--outline {
+  background: var(--color-cream);
+}

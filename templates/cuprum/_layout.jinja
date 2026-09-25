@@ -1,0 +1,133 @@
+{#
+  Shared chrome for the Cuprum sub-site.
+
+  A page overrides `title` and `description`, sets `main_class` when its
+  body needs a page-scoped class, and fills `content`. Every page's styles
+  compile into the one sheet linked below; the page partials scope their
+  rules under the <main> class. The masthead and colophon live here so every
+  page shares one source.
+#}
+{% import "_icons.jinja" as icons %}
+{% import "_marks.jinja" as marks %}
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}Cuprum{% endblock %}</title>
+    <meta name="description" content="{% block description %}Typed, async command execution for Python.{% endblock %}" />
+    <meta property="og:title" content="{{ self.title() }}" />
+    <meta property="og:description" content="{{ self.description() }}" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#161a18" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preload" href="/cuprum/assets/fonts/league-gothic-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/cuprum/assets/styles/cuprum.css" />
+  </head>
+  <body>
+    <a class="cu-skip" href="#main-content">Skip to content</a>
+    <header class="cu-mast cu-surface-ink">
+      <div class="cu-mast__inner">
+        <a class="cu-wordmark" href="/cuprum/" aria-label="Cuprum home">
+          <span class="cu-wordmark__mark" aria-hidden="true">Cu</span>
+          <span class="cu-wordmark__name" aria-hidden="true">Cuprum</span>
+          <span class="cu-wordmark__imprint" aria-hidden="true">A df12 production</span>
+        </a>
+        <nav class="cu-nav" aria-label="Primary">
+          {#- Below the desktop breakpoint the list becomes a native popover,
+              opened by a labelled button with no script. -#}
+          <button class="cu-nav__toggle" type="button" popovertarget="cu-primary-nav">
+            {{ icons.icon('menu') }}<span>Menu</span>
+          </button>
+          <ul id="cu-primary-nav" class="cu-nav__list" popover>
+            <li class="cu-nav__up">
+              <a class="cu-nav__link" href="/"><span aria-hidden="true">←&nbsp;</span>df12</a>
+            </li>
+            {% for link in nav_links %}
+            <li>
+              <a class="cu-nav__link" href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+            </li>
+            {% endfor %}
+            <li class="cu-nav__menu-only">
+              <a class="cu-nav__link" href="/cuprum/getting-started/">Get started</a>
+            </li>
+            <li class="cu-nav__menu-only">
+              <a class="cu-nav__link" href="{{ repository_url }}">GitHub</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="cu-mast__actions">
+          <a class="cu-mast__github" href="{{ repository_url }}">{{ icons.icon('github') }}<span>GitHub</span></a>
+          <a class="cu-btn cu-btn--primary cu-btn--compact" href="/cuprum/getting-started/">Get started</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content"{% block main_class %}{% endblock %}>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="cu-colophon cu-surface-ink">
+      {{ marks.skyline('cu-colophon__skyline') }}
+      <div class="cu-colophon__grid">
+        <div class="cu-colophon__about">
+          <a class="cu-wordmark" href="/cuprum/" aria-label="Cuprum home">
+            <span class="cu-wordmark__mark" aria-hidden="true">Cu</span>
+            <span class="cu-wordmark__name" aria-hidden="true">Cuprum</span>
+          </a>
+          <p class="cu-colophon__blurb mt-4">
+            Typed, async command execution for Python: a curated catalogue of
+            approved programs, scoped policy, pipelines, and structured
+            results. ISC licensed.
+          </p>
+          {#- The seal is an engraving, and an engraving has no place on a
+              legal notice; shared_content_page.jinja empties this block. -#}
+          {% block colophon_seal %}{{ marks.seal('colophon-seal', 'cu-colophon__seal') }}{% endblock %}
+        </div>
+        <div>
+          <h2 class="cu-colophon__heading">Read</h2>
+          <ul class="cu-colophon__list">
+            <li><a href="/cuprum/getting-started/">Getting started</a></li>
+            <li><a href="/cuprum/examples/">Worked examples</a></li>
+            <li><a href="/cuprum/internals/">Internals</a></li>
+            <li><a href="/cuprum/internals/rust-extension/">Rust extension</a></li>
+            <li><a href="/cuprum/roadmap/">Roadmap</a></li>
+            <li><a href="/cuprum/setwork/">Setwork</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="cu-colophon__heading">Source</h2>
+          <ul class="cu-colophon__list">
+            <li><a href="/cuprum/docs/">Documentation</a></li>
+            <li><a href="{{ repository_url }}">Repository</a></li>
+            <li><a href="{{ repository_url }}/blob/main/CHANGELOG.md">Changelog</a></li>
+            <li><a href="{{ repository_url }}/blob/main/LICENSE">Licence (ISC)</a></li>
+            <li><a href="{{ repository_url }}/issues">Issues</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="cu-colophon__heading">df12</h2>
+          <ul class="cu-colophon__list">
+            {% if parent_link %}
+            <li><a href="{{ parent_link.href }}">{{ parent_link.label }}</a></li>
+            {% endif %}
+            <li><a href="/netsuke/">Netsuke</a></li>
+            <li><a href="/weaver/">Weaver</a></li>
+            <li><a href="/cuprum/privacy-policy/">Privacy Policy</a></li>
+            <li><a href="/cuprum/terms-of-use/">Terms of Use</a></li>
+            <li><a href="/cuprum/code-of-conduct/">Code of Conduct</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="cu-colophon__strip">
+        <span>A df12 Production</span>
+        <span>Serious tools, playful worlds</span>
+        <span>39.9526° N · 75.1652° W</span>
+        <span>Philadelphia Command Plumbing is a fiction; the pipes are not</span>
+      </div>
+    </footer>
+    <script src="/cuprum/assets/js/copy-code.js" defer></script>
+    <script src="/cuprum/assets/js/routemap.js" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

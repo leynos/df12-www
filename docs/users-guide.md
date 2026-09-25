@@ -207,6 +207,36 @@ what it lists rather than for the page showing it: a documentation page's
 sidebar is "Documentation pages", a guide's is "Page sections", and a preview
 page's is "Preview pages". Section 5.1 describes what each one contains.
 
+## 6. Cuprum
+
+Cuprum's documentation begins at [/cuprum/](/cuprum/); its guided entry point is
+[Getting started](/cuprum/getting-started/). The
+[documentation landing page](/cuprum/docs/) links its
+[guides](/cuprum/docs/guides/) and [API reference](/cuprum/docs/api/); readers
+upgrading from 0.1.0 should start with the
+[migration guide](/cuprum/docs/guides/migrate/). Beyond the documentation, the
+sub-site carries [worked examples](/cuprum/examples/), an
+[internals](/cuprum/internals/) page with a
+[Rust extension preview](/cuprum/internals/rust-extension/), a
+[roadmap](/cuprum/roadmap/), and the [Setwork](/cuprum/setwork/) preview.
+
+The sub-site documents Cuprum 0.2.0-beta1, installed with
+`pip install cuprum==0.2.0b1`. Every code sample was run against that release
+before publication, and each panel's footer names it. Where the site's
+navigation would otherwise overflow a narrow window, it degrades to a
+drop-down: the documentation's own navigation becomes a `<details>` drop-down
+below 64rem wide, and a long page's in-page route map becomes a drop-down below
+80rem wide. Above those widths, both render as the fuller strip or rail
+described above for the equivalent Netsuke and Weaver surfaces.
+
+### 6.1. The main home page's Libraries group
+
+The df12 Productions home page carries a short Libraries list beneath its
+product grid. It currently lists two entries: Cuprum, linking to
+[/cuprum/](/cuprum/), and rstest-bdd, linking to
+[https://github.com/leynos/rstest-bdd](https://github.com/leynos/rstest-bdd)
+and opening in a new tab.
+
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the
 [df12 Pages App Design](df12-pages-app-design.md).

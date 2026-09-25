@@ -1,0 +1,32 @@
+{#
+  The worked-example cabinet. One list drives the index cards and every
+  detail page's previous/next links, so the two cannot disagree.
+
+  An entry with `published: false` is a proposed content slot from the site
+  map, shown on the index as pending and never linked. Publish one only when
+  its code and expected output have been run against the pinned release, and
+  add its content page to config/pages.yaml at the same time.
+#}
+{% set examples = [
+  {'slug': 'first-command', 'number': '001', 'published': true,
+   'title': 'Run an approved command',
+   'summary': 'Build a one-program catalogue for your own tool, feed it stdin, read the result, and meet both ways Cuprum refuses a program.',
+   'tags': ['Beginner', 'Catalogue', 'Policy']},
+  {'slug': 'pipeline-tee', 'number': '002', 'published': true,
+   'title': 'Pipeline, tee, and stage failure',
+   'summary': 'Compose two stages with |, tee the output to the terminal while capturing it, and read which stage failed when fail-fast stops the rest.',
+   'tags': ['Pipelines', 'Output']},
+  {'slug': 'deployment-helper', 'number': '003', 'published': true,
+   'title': 'A deployment helper with scoped policy',
+   'summary': 'Working directory, environment overlays, a timeout, and cleanup, all under one narrowed scope.',
+   'tags': ['Policy', 'Timeouts']},
+  {'slug': 'ci-observability', 'number': '004', 'published': true,
+   'title': 'Observe CI commands',
+   'summary': 'Hooks, structured events, and the opt-in GitHub Actions sink that folds each run into a log group.',
+   'tags': ['Observability', 'CI']},
+  {'slug': 'concurrent-jobs', 'number': '005', 'published': true,
+   'title': 'Run jobs concurrently',
+   'summary': 'Bounded concurrency with run_concurrent, fail-fast or collect-all, and inspecting every result.',
+   'tags': ['Concurrency']},
+] %}
+{% set published_examples = examples | selectattr('published') | list %}

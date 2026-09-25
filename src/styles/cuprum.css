@@ -1,0 +1,178 @@
+/* Cuprum sub-site stylesheet — the Tailwind 4 + daisyUI 5 entry.
+ *
+ * Compiled by the shared df12 build into
+ * public/cuprum/assets/styles/cuprum.css, alongside the main, mxd, Episodic,
+ * Weaver, Stilyagi, and Netsuke entrypoints.
+ *
+ * The site is a municipal dispatch desk for command plumbing: ink and night
+ * for the chrome, warm paper for the work orders, copper and orange for
+ * action, patina and deep teal for technical depth, and a sparing
+ * work-order yellow. The palette is declared once — as the daisyUI "cuprum"
+ * theme plus the tokens under @theme — and the partials consume those
+ * variables rather than restating a colour literal. The generated Pygments
+ * block stays in src/static/cuprum/assets/styles/syntax.css, which
+ * scripts/generate_cuprum_pygments_css.py owns.
+ *
+ * Every class the partials define carries a `cu-` prefix. daisyUI emits every
+ * component it knows, so an unprefixed `.card`, `.status`, or `.steps` in the
+ * markup would be restyled the moment this sheet is linked.
+ */
+
+@import "tailwindcss";
+
+/* @font-face rules belong to no layer: an unlayered at-rule that declares a
+ * font rather than styling an element cannot lose a cascade argument. */
+@import "./cuprum/fonts.css";
+
+/* The layering is load-bearing: compiled Tailwind puts utilities in
+ * @layer utilities, and per CSS Cascade Level 5 an unlayered declaration
+ * beats every layered one regardless of specificity. In the components
+ * layer a utility in the markup still wins, which is what anyone writing
+ * `class="mt-8"` expects. Element defaults go a layer lower, beside the
+ * preflight — they describe an element before any class touches it. */
+@import "./cuprum/site-base.css" layer(base);
+@import "./cuprum/chrome.css" layer(components);
+@import "./cuprum/components.css" layer(components);
+@import "./cuprum/diagrams.css" layer(components);
+@import "./cuprum/marks.css" layer(components);
+
+/* The Pygments stylesheet stays at its src/static path, where its generator
+ * and test point, but compiles in here rather than loading as a link. */
+@import "../static/cuprum/assets/styles/syntax.css" layer(components);
+
+/* Page partials import last, so where a page tunes a shared component its
+ * rule wins the source-order tie. Each is scoped under the page's <main>
+ * class, because every page's rules share this one sheet. */
+@import "./cuprum/home.css" layer(components);
+@import "./cuprum/pages.css" layer(components);
+@import "./cuprum/docs.css" layer(components);
+
+/* The phone-width full bleed imports after everything it overrides. */
+@import "./cuprum/bleed.css" layer(components);
+
+@source "../../templates/cuprum/**/*.jinja";
+@source "../static/cuprum/assets/js/*.ts";
+
+@plugin "daisyui" {
+  themes: cuprum --default;
+  logs: false;
+}
+
+/* The Cuprum palette as a daisyUI theme.
+ *
+ * The base ramp is the work-order paper, from cream-lit through the scuffed
+ * paper-deep of a filing drawer; base-content is the charcoal ink. Orange is
+ * primary because it is the colour of action — Get started, the stamp, the
+ * route the eye follows — and it carries ink type rather than cream, which
+ * would fall to 2.87:1 on it. Patina is secondary, the technical register.
+ *
+ * Every content pairing meets WCAG 2.2 AA for body text on its fill:
+ * primary 5.73:1, secondary 5.59:1, accent 9.57:1, neutral 16.46:1,
+ * info 6.51:1, success 6.51:1, warning 9.57:1, error 5.51:1.
+ */
+@plugin "daisyui/theme" {
+  name: "cuprum";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #f2e8d2; /* paper: the work-order ground */
+  --color-base-200: #e9dcc0; /* paper-shade: a recessed tray */
+  --color-base-300: #dfcfad; /* paper-deep: a filing drawer */
+  --color-base-content: #161a18; /* ink: charcoal night */
+  --color-primary: #f16a32; /* orange: action */
+  --color-primary-content: #161a18;
+  --color-secondary: #176f6b; /* patina: technical depth */
+  --color-secondary-content: #fff7e4;
+  --color-accent: #efb642; /* work-order yellow: a sparing flag */
+  --color-accent-content: #161a18;
+  --color-neutral: #161a18;
+  --color-neutral-content: #fff7e4;
+  --color-info: #156460; /* patina darkened to carry type on paper */
+  --color-info-content: #fff7e4;
+  --color-success: #156460;
+  --color-success-content: #fff7e4;
+  --color-warning: #efb642;
+  --color-warning-content: #161a18;
+  --color-error: #a74725; /* copper darkened to carry cream type */
+  --color-error-content: #fff7e4;
+
+  /* Printed forms, not plastic: square corners, 2px rules, and elevation
+     drawn as a hard offset block rather than a blur. */
+  --radius-selector: 0;
+  --radius-field: 0;
+  --radius-box: 0;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 2px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  /* Typography. League Gothic is the depot sign: short headlines only.
+     Source Sans 3 is the humanist face for paragraphs and controls. IBM Plex
+     Mono is for code, paths, docket numbers, and stamped labels — never for
+     long-form reading. Every family name is quoted and every generic keyword
+     is not, so the two are told apart at a glance. */
+  --font-display: "League Gothic", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-sans: "Source Sans 3", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", "Consolas", monospace;
+
+  /* The design-language names for the daisyUI slots above, so partials and
+     templates speak Cuprum while the values live in exactly one place. */
+  --color-paper: var(--color-base-100);
+  --color-paper-shade: var(--color-base-200);
+  --color-paper-deep: var(--color-base-300);
+  --color-ink: var(--color-base-content);
+  --color-orange: var(--color-primary);
+  --color-patina: var(--color-secondary);
+  --color-yellow: var(--color-accent);
+
+  /* Cream: the lit paper of a job sheet under the lamp, and the type on
+     every dark surface — 16.46:1 on ink, 10.08:1 on deep teal. */
+  --color-cream: #fff7e4;
+
+  /* Copper is a fill, rule, and pipe colour. As type it manages 3.71:1 on
+     paper, so copper type takes copper-text, which clears 4.5:1 on the
+     deepest paper (4.60:1 on paper-deep, 5.81:1 on paper). */
+  --color-copper: #c5532b;
+  --color-copper-text: #943e20;
+
+  /* Patina type on paper: 4.52:1 on paper-deep, 5.70:1 on paper. */
+  --color-patina-text: #156460;
+
+  /* Deep teal is the field-manual ground; the night panel is the darker
+     teal-black code sits on. */
+  --color-teal: #0d4544;
+  --color-code-ground: #101817;
+
+  /* Accent type on the dark grounds. Orange reads at 5.73:1 on ink but only
+     3.51:1 on deep teal, so teal panels take the lifted cut (4.89:1). */
+  --color-orange-lift: #f5976f;
+
+  /* Secondary type on the dark grounds: 9.78:1 on ink, 5.99:1 on teal. */
+  --color-night-muted: #b9c4bd;
+
+  /* Secondary type on paper: 6.90:1 on paper, 5.47:1 on paper-deep. */
+  --color-ink-muted: #45504a;
+
+  /* Structural rules. A divider is a non-text element and needs 3:1 against
+     its ground: rule-on-dark is 3.92:1 on ink. It is not for teal
+     panels, where it falls to 2.40:1; those rule in cream at reduced
+     alpha instead. */
+  --color-rule-on-dark: #6d7a73;
+
+  /* The drafting-paper grid: a 5% ink line, never a colour to paint in. */
+  --color-grid-line: color-mix(in oklab, var(--color-ink) 5%, transparent);
+
+  /* Stamped small-caps sizes below Tailwind's text-xs. */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-3xs: 0.625rem; /* 10px */
+  --tracking-stamp: 0.14em;
+
+  /* Elevation is a printed offset block, never a blur. */
+  --shadow-block: 6px 6px 0 var(--color-ink);
+  --shadow-block-sm: 4px 4px 0 var(--color-ink);
+  --shadow-copper: 10px 10px 0 var(--color-copper);
+}

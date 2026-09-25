@@ -1,0 +1,226 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% block title %}Getting started · Cuprum{% endblock %}
+{% block description %}Install Cuprum {{ cuprum_pypi }} from PyPI, run one approved command, and read its structured result. Every snippet on this page was run against that release.{% endblock %}
+{% block main_class %} class="cu-getting-started"{% endblock %}
+{% block content %}
+{% set sections = [
+  {'id': 'install', 'label': 'Install', 'title': 'Install the beta',
+   'lede': 'Cuprum needs Python ' ~ python_floor ~ ' or later and nothing else at run time. The pure-Python wheel needs no Rust toolchain.'},
+  {'id': 'first-command', 'label': 'First command', 'title': 'Run one approved command',
+   'lede': 'A builder comes from the catalogue, a call makes an exact argv, and running it returns a CommandResult.'},
+  {'id': 'async', 'label': 'Async', 'title': 'Await it, and watch it',
+   'lede': 'The same command awaits in async code. RunOutputOptions decides whether output is captured, echoed, or both.'},
+  {'id': 'policy', 'label': 'Policy', 'title': 'Narrow what may run',
+   'lede': 'A scope says which catalogued programs may run inside a block of code. Anything else is refused before it starts.'},
+  {'id': 'next', 'label': 'Next', 'title': 'Where to go next'},
+] %}
+{% set install_pip = 'pip install cuprum==' ~ cuprum_pypi %}
+{% set install_uv = 'uv add cuprum==' ~ cuprum_pypi %}
+{% set verified = 'Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · Python ' ~ python_floor ~ ' · Linux' %}
+{% set lifecycle = {
+  'id': 'fig-first-job', 'num': 'Fig. 01', 'horizontal': true,
+  'title': 'What happens between a builder call and a result?',
+  'steps': [
+    {'kind': 'builder', 'name': 'sh.make(ECHO)', 'detail': 'Looks ECHO up in the catalogue and returns a builder.', 'edge': 'builder'},
+    {'kind': 'builder', 'kind_label': 'Command', 'name': 'echo("-n", "hello, cuprum!")', 'detail': 'Builds a SafeCmd: program, argv, and project metadata.', 'edge': 'SafeCmd'},
+    {'kind': 'policy', 'name': 'Current scope', 'detail': 'run_sync() checks the program against the active allowlist.', 'edge': 'allowed'},
+    {'kind': 'process', 'name': 'echo -n "hello, cuprum!"', 'detail': 'Spawned directly with the argv tuple; no shell.', 'edge': 'status, bytes'},
+    {'kind': 'result', 'name': 'CommandResult', 'detail': 'ok, exit_code, stdout, stderr, pid, duration.'},
+  ],
+  'branches': [
+    {'when': 'Program not in the catalogue', 'then': 'sh.make raises UnknownProgramError. No command is built.'},
+    {'when': 'Program outside the current scope', 'then': 'run_sync() raises ForbiddenProgramError before anything is spawned.'},
+  ],
+  'takeaway': 'Construction and authorization are separate checks: the catalogue decides what can be built; the scope decides what may run here.',
+  'source': 'Source: cuprum/sh.py and cuprum/context/ at ' ~ cuprum_tag,
+} %}
+{% set stamp_art = {
+  'name': 'job-stamp', 'widths': [640], 'width': 640, 'height': 640,
+  'alt': '', 'plate': 'Plate 02',
+  'caption': 'Copper stamps a single job sheet. One command, one result.',
+  'sizes': '(min-width: 64rem) 30vw, 100vw',
+} %}
+      {% call ui.page_head('Work order 001 · Getting started', 'Getting started',
+        'Install Cuprum, run one approved command, and read the result it hands back.',
+        statuses=['verified'], meta=verified, art_image=stamp_art, stamp='Last verified ' ~ cuprum_verified_on) %}
+        {{ ui.button('Install', '#install', icon='arrow-down') }}
+        {{ ui.button('Worked examples', '/cuprum/examples/', variant='outline') }}
+      {% endcall %}
+      {{ ui.routemap(sections) }}
+
+      {% call ui.section(sections, 'install') %}
+      <div class="cu-gs-install">
+        <div class="cu-prose">
+          <p>
+            Everything on these pages describes Cuprum {{ cuprum_version }},
+            a beta release on PyPI. Most of what is shown here is new since
+            {{ cuprum_previous }}, including <code>RunOutputOptions</code>,
+            <code>ScopeConfig</code>, and
+            <code>ProgramCatalogue.from_programs()</code>. Install it by its
+            exact version:
+          </p>
+          <div class="cu-gs-slips">
+            {{ ui.install_slip(install_pip, 'pip') }}
+            {{ ui.install_slip(install_uv, 'uv') }}
+          </div>
+        </div>
+        {% call ui.callout('caveat', 'A beta release') %}
+        <p>
+          pip and uv skip pre-releases unless one is named, so a bare
+          <code>pip install cuprum</code> still installs {{ cuprum_previous }}.
+          Pin <code>cuprum=={{ cuprum_pypi }}</code> until 0.2.0 ships; the API
+          may still shift before then. On glibc-based Linux, macOS, and
+          Windows x86_64, the install picks a native wheel with the optional
+          <a href="/cuprum/internals/rust-extension/">Rust pump</a>, one wheel
+          for CPython 3.12 and every later version; behaviour is the same
+          either way.
+        </p>
+        {% endcall %}
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'first-command', class='cu-section--tint') %}
+      <div class="cu-pair">
+        {% call ui.code_panel('first_command.py', 'Synchronous', foot=[verified]) %}
+        {% highlight 'python', 'cuprum-syntax' %}
+from cuprum import ECHO, sh
+
+cmd = sh.make(ECHO)("-n", "hello, cuprum!")
+print(cmd.argv_with_program)
+
+result = cmd.run_sync()
+print(result.ok, result.exit_code, repr(result.stdout))
+        {% endhighlight %}
+        {% endcall %}
+        {% call ui.output('Expected output', 'stdout') %}
+('echo', '-n', 'hello, cuprum!')
+True 0 'hello, cuprum!'
+        {% endcall %}
+      </div>
+      <div class="cu-prose mt-10">
+        <p>
+          <code>ECHO</code> is one of the programs in Cuprum's default catalogue,
+          alongside <code>LS</code>, <code>GIT</code>, <code>RSYNC</code>,
+          <code>TAR</code>, and <code>DOC_TOOL</code>. Positional arguments are
+          stringified in order; keyword arguments become
+          <code>--flag=value</code>; <code>None</code> is rejected. With no
+          scope established, every catalogued program may run — the permissive
+          default eases adoption, and the <a href="#policy">policy section</a>
+          shows how to narrow it.
+        </p>
+      </div>
+      <div class="mt-10">
+        {{ ui.flow(lifecycle) }}
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'async') %}
+      <div class="cu-pair">
+        {% call ui.code_panel('dispatch.py', 'Async', foot=[verified]) %}
+        {% highlight 'python', 'cuprum-syntax' %}
+import asyncio
+
+from cuprum import ECHO, RunOutputOptions, sh
+
+
+async def main() -> None:
+    # Pick a known fitting from the catalogue.
+    echo = sh.make(ECHO)
+    cmd = echo("-n", "hello, cuprum!")
+
+    result = await cmd.run(output=RunOutputOptions(echo=True))
+    if result.ok:
+        print()
+        print(f"exit {result.exit_code}, captured {result.stdout!r}")
+
+
+asyncio.run(main())
+        {% endhighlight %}
+        {% endcall %}
+        <div>
+          {% call ui.output('Expected output', 'terminal') %}
+hello, cuprum!
+exit 0, captured 'hello, cuprum!'
+          {% endcall %}
+          <div class="cu-prose mt-6">
+            <p>
+              The first line is the echo: <code>echo=True</code> tees the child's
+              output to your terminal as it arrives. The second is the capture,
+              which still happens. <code>capture=True, echo=False</code> is the
+              default; <code>echo_stdout</code> and <code>echo_stderr</code>
+              choose per stream.
+            </p>
+            <p>
+              Cancelling the awaiting task sends <code>SIGTERM</code>, waits
+              half a second, then sends <code>SIGKILL</code> and reaps the child.
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'policy', class='cu-section--tint') %}
+      <div class="cu-pair">
+        {% call ui.code_panel('scoped.py', 'Scope', foot=[verified]) %}
+        {% highlight 'python', 'cuprum-syntax' %}
+from cuprum import ECHO, LS, ForbiddenProgramError, ScopeConfig, scoped, sh
+
+with scoped(ScopeConfig(allowlist=frozenset([ECHO]))):
+    print(sh.make(ECHO)("-n", "allowed").run_sync().stdout)
+    try:
+        sh.make(LS)().run_sync()
+    except ForbiddenProgramError as exc:
+        print(f"refused: {exc}")
+        {% endhighlight %}
+        {% endcall %}
+        <div>
+          {% call ui.output('Expected output', 'stdout') %}
+allowed
+refused: Program 'ls' is not allowed in the current context
+          {% endcall %}
+          {% call ui.output('Also expected', 'stderr, logger cuprum.context') %}
+Program ls denied by context allowlist restricted_state=True
+          {% endcall %}
+        </div>
+      </div>
+      <div class="cu-prose mt-10">
+        <p>
+          Scopes nest, and a nested scope can only narrow its parent: its
+          allowlist is intersected with the one it inherits. The scope lives in
+          a <code>ContextVar</code>, so it follows the current thread and async
+          task rather than the whole process, and it is restored when the block
+          exits, even on an exception.
+        </p>
+        <p>
+          A program that is not in the catalogue at all is refused earlier,
+          when the builder is made:
+        </p>
+      </div>
+      <div class="cu-pair mt-6">
+        {% call ui.code_panel('unknown.py', 'Catalogue', foot=[verified], flat=true) %}
+        {% highlight 'python', 'cuprum-syntax' %}
+from cuprum import Program, UnknownProgramError, sh
+
+try:
+    sh.make(Program("rm"))
+except UnknownProgramError as exc:
+    print(f"refused: {exc}")
+        {% endhighlight %}
+        {% endcall %}
+        {% call ui.output('Expected output', 'stdout') %}
+refused: Program 'rm' is not in the catalogue allowlist
+        {% endcall %}
+      </div>
+      {% endcall %}
+
+      {% call ui.section(sections, 'next') %}
+      <div class="cu-card-grid">
+        {{ ui.card('Run an approved command', 'Build a one-program catalogue for your own tool, feed it stdin, and see both refusal paths.', number='Example 001', href='/cuprum/examples/first-command/', tags=['Beginner', 'Catalogue']) }}
+        {{ ui.card('Pipeline, tee, and stage failure', 'Compose stages with |, tee the output, and read which stage failed when fail-fast stops the rest.', number='Example 002', href='/cuprum/examples/pipeline-tee/', tags=['Pipelines']) }}
+        {{ ui.card('Internals', 'The lifecycle of one command, the pipeline plumbing, and the invariants that hold throughout.', number='Drawer B', href='/cuprum/internals/') }}
+        {{ ui.card("The users' guide", 'The complete reference, on GitHub, including telemetry adapters, timeouts, and concurrency.', number='Reference', href=repository_url ~ '/blob/main/docs/users-guide.md') }}
+      </div>
+      {% endcall %}
+{% endblock %}

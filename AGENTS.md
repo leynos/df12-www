@@ -46,7 +46,7 @@ is authored directly as HTML.
 - **`config/pages.yaml`** is the single source of layout and copy data. It
   defines the main site's homepage, about page, and documentation bundles, and a
   `sites:` mapping that configures each sub-site (`mxd`, `episodic`, `netsuke`,
-  `weaver`, `stilyagi`). A sub-site entry declares its `output_dir`,
+  `weaver`, `stilyagi`, `cuprum`). A sub-site entry declares its `output_dir`,
   `templates_dir`, `stylesheet`, `base_path`, theme metadata, navigation links,
   shared-content pages, and content pages.
 - **`config/shared/*.md`** holds copy shared across sub-sites — the privacy
@@ -95,6 +95,7 @@ Every published file therefore has a source elsewhere in the repository:
 | `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                      |
 | `stilyagi/assets/styles/stilyagi.css` | Tailwind compiling `src/styles/`                      |
 | `netsuke/assets/css/himotoshi.css`    | Tailwind compiling `src/styles/`                      |
+| `cuprum/assets/styles/cuprum.css`     | Tailwind compiling `src/styles/`                      |
 | `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                  |
 | `*/assets/js/*.js`                    | swc compiling `src/static/**/assets/js/*.ts`          |
 | `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`              |
@@ -139,13 +140,14 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Six entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Seven entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode), `src/styles/mxd.css` for the mxd sub-site (the `mxd`
 theme), `src/styles/episodic.css` for Episodic (the `episodic` theme),
 `src/styles/weaver.css` for Weaver (the `weaver` theme),
-`src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme), and
-`src/styles/netsuke.css` for Netsuke (the `netsuke` theme).
+`src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme),
+`src/styles/netsuke.css` for Netsuke (the `netsuke` theme), and
+`src/styles/cuprum.css` for Cuprum (the `cuprum` theme).
 
 Weaver's entrypoint is the one to read first when adding a sub-site stylesheet,
 and Episodic's follows the same shape. It declares the theme, then imports
@@ -169,13 +171,15 @@ partial still beats a utility is the phone-width full-bleed block, whose
 `!important` declarations are load-bearing, as Weaver's are. See
 `docs/execplans/netsuke-daisy-migration.md` for what the migration turned up.
 
-Code blocks on the Episodic, Netsuke, and Stilyagi sub-sites are highlighted at
-build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja tag, which
-runs Pygments and emits token classes. The colours come from a Pygments `Style`
-(`EpisodicStyle`, `HimotoshiStyle`, `StilyagiStyle`) and the matching CSS is
-generated, not handwritten — rerun `scripts/generate_episodic_pygments_css.py`,
-`scripts/generate_himotoshi_pygments_css.py`, and
-`scripts/generate_stilyagi_pygments_css.py` after changing a style, and never
+Code blocks on the Episodic, Netsuke, Stilyagi, and Cuprum sub-sites are
+highlighted at build time by the `{% highlight '<lexer>'[, '<class>'] %}` Jinja
+tag, which runs Pygments and emits token classes. The colours come from a
+Pygments `Style` (`EpisodicStyle`, `HimotoshiStyle`, `StilyagiStyle`,
+`CuprumStyle`) and the matching CSS is generated, not handwritten — rerun
+`scripts/generate_episodic_pygments_css.py`,
+`scripts/generate_himotoshi_pygments_css.py`,
+`scripts/generate_stilyagi_pygments_css.py`, and
+`scripts/generate_cuprum_pygments_css.py` after changing a style, and never
 edit the marked block by hand.
 
 Weaver's icons are generated the same way. `config/weaver-icons.yaml` maps each
@@ -192,6 +196,25 @@ which each dark panel re-points from the paper-surface red to the ink-ground
 one (the re-pointing block lives in `src/styles/stilyagi/site-base.css`).
 Because custom properties inherit, setting `--color-accent-text` on a container
 is enough — prefer that over adding a colour at the call site.
+
+Cuprum works the same way with `--cu-accent-text`, `--cu-muted-text`, and
+`--cu-focus`, which `.cu-surface-ink` and `.cu-surface-teal` re-point for
+everything inside a dark panel. Its classes all carry a `cu-` prefix, and it
+uses its own `.cu-btn` and `.cu-tag` rather than daisyUI's `btn` and `badge`:
+daisyUI v5 emits components into the utilities layer, where they outrank the
+sub-site's components layer whatever the specificity. Its code is real — every
+snippet was run against the release named by `cuprum_version` in the site's
+`template_vars`, and the install commands pin it exactly (`cuprum==` plus
+`cuprum_pypi`), since pip and uv skip a pre-release that is not named. The
+fictional Philadelphia Command Plumbing seal is decorative and never appears on
+a legal page. Its API reference, under `/cuprum/docs/api/`, is generated rather
+than written: `make cuprum-api-data` reads every name Cuprum exports from a
+Cuprum checkout (`CUPRUM_SOURCE`, default `../cuprum`) into
+`templates/cuprum/data/api.jinja`, and `make check-cuprum-api-data` fails when
+that file has drifted. Never edit the generated file; when Cuprum exports a new
+name, place it in a group in `scripts/build_cuprum_api_data.py` or the build
+refuses to run. See section 5.5 of the
+[Developer's Guide](docs/developers-guide.md).
 
 ### Prefer semantic classes over literal colours
 

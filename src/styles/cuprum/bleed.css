@@ -1,0 +1,50 @@
+/* Full bleed and terminal type at phone width.
+ *
+ * Below 480px the page gutter and a panel's own frame together cost a code
+ * line a fifth of the screen, so the content panels run to both edges, as
+ * Netsuke's code windows and Stilyagi's bands do. Each sheds the gutter
+ * with a negative inline margin, drops its side rules and printed offset,
+ * and keeps its own padding, which holds its content off the glass. The
+ * top and bottom rules stay, so stacked panels still read as separate
+ * sheets.
+ *
+ * Only the panels bleed. Cards, board columns, and the matrix tables, whose
+ * rows are already drawn as cards at this width, keep their frames, and a
+ * panel nested in another panel stays inside its parent, since the parent
+ * has already reached the edge.
+ *
+ * No `!important` is needed, unlike Netsuke and Weaver: the Cuprum markup
+ * puts no utilities on these frames, and this partial imports last, so it
+ * wins on source order within the components layer. At 480px and above
+ * nothing here applies, and the desktop presentation is unchanged. */
+
+@media (width < 30rem) {
+  :is(.cu-code, .cu-output, .cu-figure, .cu-facts, .cu-art__frame, .cu-slip, .cu-callout):not(
+    :is(.cu-code, .cu-output, .cu-figure, .cu-callout, .cu-card) *
+  ) {
+    max-width: none;
+    margin-inline: calc(-1 * var(--cu-gutter));
+    border-inline-width: 0;
+    box-shadow: none;
+  }
+
+  /* A callout's left rule is its kind, drawn in colour beside the icon, so
+     it stays at the screen edge; only the right rule goes. */
+  .cu-callout:not(:is(.cu-code, .cu-output, .cu-figure, .cu-callout, .cu-card) *) {
+    border-left-width: 8px;
+  }
+
+  /* The faux terminals — code panels and install slips — drop to 0.7rem,
+     as Netsuke's code windows and terminals do, so more of a line fits
+     before it scrolls. The code gives up the extra inset it keeps inside a
+     framed panel and lines up with the panel's bar. Output receipts keep
+     their size: they wrap rather than scroll, and are there to be read. */
+  .cu-code .cuprum-syntax pre {
+    padding-inline: 0.9rem;
+    font-size: 0.7rem;
+  }
+
+  .cu-slip__body {
+    font-size: 0.7rem;
+  }
+}

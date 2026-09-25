@@ -277,9 +277,11 @@ $ netsuke clean --artefact build-output --force --no-input
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    RFC 0023 does not mention accessibility or localization, and makes no promise about how a cleanup preview renders in Netsuke's
-                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a>. What it does require bears directly on
-                    anyone deciding, from text alone, whether to delete something:
+                    Every human-readable message Netsuke emits is localized by default through its <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a>, and cleanup is no
+                    exception: previews, confirmations, and failure reports arrive in the operator's locale, while artefact names, paths, and
+                    reason codes stay exactly as written so they can be matched. RFC 0023 adds requirements that bear directly on anyone
+                    deciding, from text alone, whether to delete something, and they apply in Netsuke's
+                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a> as much as anywhere:
                 </p>
                 <ul class="space-y-2 text-sm text-charcoal-mid max-w-3xl mb-6">
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>The preview must state recursive scope &ldquo;plainly&rdquo;, and an interactive run asks for confirmation only after displaying it.</span></li>
@@ -287,7 +289,7 @@ $ netsuke clean --artefact build-output --force --no-input
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Command and recipe forms return the same structured results, so machine-readable output does not depend on which door was used.</span></li>
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#8-evaluation-and-diagnostics" class="hm-link">RFC 0025 &sect;8</a> tells maturity diagnostics, including <code>owned-cleanup</code> findings, to &ldquo;Reuse Fluent localization&rdquo;, the machinery behind Netsuke's existing <a href="/netsuke/docs/cli/#localization" class="hm-link">locale catalogues</a>.</span></li>
                 </ul>
-                <p class="text-xs text-charcoal-mid max-w-3xl">Task 24.3.2 documents ownership assertions, recursive scope, retained caches, preview limitations, and external-command boundaries. Whether cleanup messages themselves are localized is not stated.</p>
+                <p class="text-xs text-charcoal-mid max-w-3xl">Task 24.3.2 documents ownership assertions, recursive scope, retained caches, preview limitations, and external-command boundaries. RFC 0023 does not discuss accessibility beyond these requirements.</p>
             </section>
 
 {{ fc.footer('artefacts') }}

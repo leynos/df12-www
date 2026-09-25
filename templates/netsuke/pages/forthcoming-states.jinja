@@ -373,9 +373,11 @@ defaults:
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    RFC 0021 does not mention accessibility. It makes no promise about how state results appear in Netsuke's
-                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a>, and this page does not invent one.
-                    What the design does say bears on anyone reading probe output through a screen reader or a log:
+                    Every human-readable message Netsuke emits is localized by default through its <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a>: state results,
+                    unmet preconditions, and preparation failures arrive in the reader's locale, while state names, result values such as
+                    <code>not_ready</code>, and reason codes stay untranslated. RFC 0021 does not discuss how state results appear in Netsuke's
+                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a>, and this page does not invent a
+                    promise. What the design does say bears on anyone reading probe output through a screen reader or a log:
                 </p>
                 <ul class="space-y-2 text-sm text-charcoal-mid max-w-3xl mb-6">
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Probe arguments and output are redacted through the shared diagnostic policy, messages are bounded, and terminal control sequences are escaped. Raw probe output never becomes a metric label.</span></li>
@@ -383,7 +385,7 @@ defaults:
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Roadmap task 23.4.2 publishes state diagnostics and a probe author guide, and adds &ldquo;metadata and localization through existing surfaces&rdquo; &mdash; the <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a> Netsuke already ships.</span></li>
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#8-evaluation-and-diagnostics" class="hm-link">RFC 0025 &sect;8</a> tells maturity diagnostics, including <code>verified-states</code> findings, to &ldquo;Reuse Fluent localization&rdquo; and never to leak probe output.</span></li>
                 </ul>
-                <p class="text-xs text-charcoal-mid max-w-3xl">Probe authors write their own summary line; the RFC says nothing about localizing it.</p>
+                <p class="text-xs text-charcoal-mid max-w-3xl">An external probe&rsquo;s summary line is the probe author&rsquo;s own text, so Netsuke shows it as written, inside its own localized framing.</p>
             </section>
 
 {{ fc.footer('states') }}

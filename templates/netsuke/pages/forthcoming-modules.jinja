@@ -377,9 +377,10 @@ rust: df12.rust-quality 1.4.2
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility &amp; localization
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    The composition documents &mdash; RFCs 0002, 0003, and 0004 and the composition roadmap &mdash; are silent on accessibility
-                    and localization. They promise no translated composition diagnostics and no composition-specific output modes, and this
-                    preview does not invent any. What does follow from them:
+                    Every human-readable message Netsuke emits is localized by default through its <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a>, so include cycles,
+                    bundle resolution failures, lock mismatches, and provenance summaries arrive in the reader's locale like any other
+                    diagnostic; bundle names, versions, digests, and error codes stay untranslated so they can be matched. The composition
+                    documents add no composition-specific output modes, and this preview does not invent any. What else follows from them:
                 </p>
                 <ul class="space-y-3 text-sm text-charcoal-mid max-w-3xl mb-6">
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs shrink-0" data-icon="carbon:terminal" aria-hidden="true"></span> <span><strong>Bundle commands join the existing CLI vocabulary.</strong> The roadmap requires that vocabulary to be extended before any bundle command is built, so bundle commands inherit the global flags v{{ netsuke_version }} already has &mdash; <code>--json</code>, <code>--locale</code>, <code>--color</code>, <code>--emoji</code>, <code>--progress</code>, and <code>--accessibility</code> &mdash; rather than inventing their own. See the <a href="/netsuke/docs/cli/" class="hm-link">CLI reference</a>.</span></li>
@@ -387,8 +388,8 @@ rust: df12.rust-quality 1.4.2
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs shrink-0" data-icon="carbon:view-off" aria-hidden="true"></span> <span><strong>Redaction by default.</strong> Bundle parameter values are redacted in diagnostics and metadata unless declared <code>expose: non-secret</code>; credentials in Git URLs are rejected and redacted; absolute host and cache paths never appear in metadata.</span></li>
                 </ul>
                 <p class="text-sm text-charcoal-mid max-w-3xl">
-                    Whether composition diagnostics are translated through the same Fluent catalogues as today&rsquo;s messages is not stated.
-                    The <a href="/netsuke/guides/translating/" class="hm-link">translation guide</a> covers how today&rsquo;s messages are localized.
+                    The <a href="/netsuke/guides/translating/" class="hm-link">translation guide</a> covers how those messages are
+                    translated, and the glossary keeps terms such as <em>bundle</em> and <em>include</em> consistent across locales.
                 </p>
             </section>
 

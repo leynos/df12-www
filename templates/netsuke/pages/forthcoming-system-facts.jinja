@@ -370,7 +370,9 @@ targets:
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    The sketch is silent here, and this page will not invent a promise for it. What it would inherit is concrete.
+                    Every human-readable message Netsuke emits is localized by default, and host facts would be no exception: a diagnostic
+                    about an unsupported platform or a misused fact reads in the user&rsquo;s locale. The facts themselves are values a manifest
+                    compares against, not prose, so <code>host.os</code> and its siblings would never be translated. The rest is inherited:
                 </p>
                 <ul class="space-y-3 text-sm text-charcoal-mid max-w-3xl">
                     <li><strong>Localized diagnostics.</strong> Netsuke's diagnostics go through Fluent across 35 shipped locales, and RFC 0006 requires every new helper's messages to do the same, with a stable machine code of the form <code>netsuke::jinja::&lt;module&gt;::&lt;reason&gt;</code> that survives translation.</li>

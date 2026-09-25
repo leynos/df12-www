@@ -289,7 +289,9 @@ $ netsuke build --input workers=4
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    RFC 0022 does not mention accessibility or localization. It says nothing about how input diagnostics render in Netsuke's
+                    Every human-readable message Netsuke emits is localized by default through its <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a>, so a rejected value,
+                    a missing input, or a type mismatch is explained in the caller's locale; input names, type names, and choices stay exactly as
+                    declared, because they are what the caller types. RFC 0022 does not discuss how input diagnostics render in Netsuke's
                     <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a>. What it does say concerns what a
                     diagnostic contains and what it must withhold:
                 </p>
@@ -299,7 +301,7 @@ $ netsuke build --input workers=4
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Input documentation flows through the existing documentation and schema pipelines, &ldquo;without a parallel input-help renderer&rdquo;, and inspection names the effective profile, source, and contract without running a build.</span></li>
                     <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#8-evaluation-and-diagnostics" class="hm-link">RFC 0025 &sect;8</a> tells maturity diagnostics, including <code>typed-inputs</code> findings, to &ldquo;Reuse Fluent localization&rdquo; and not to leak input values. Netsuke's existing <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a> are that surface.</span></li>
                 </ul>
-                <p class="text-xs text-charcoal-mid max-w-3xl">The RFC does not say whether an input's <code>description</code> can be translated.</p>
+                <p class="text-xs text-charcoal-mid max-w-3xl">An input&rsquo;s <code>description</code> is the manifest author&rsquo;s own text, so Netsuke shows it as written.</p>
             </section>
 
 {{ fc.footer('typed-inputs') }}
